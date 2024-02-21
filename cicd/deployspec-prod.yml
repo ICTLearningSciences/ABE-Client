@@ -1,0 +1,25 @@
+version: 0.2
+
+env:
+  variables:
+    REACT_APP_GOOGLE_API_ENDPOINT: "https://api.abewriting.org/docs"
+    REACT_APP_GRAPHQL_ENDPOINT: "https://api.abewriting.org/graphql/graphql"
+    STAGE: 'prod'
+  parameter-store:
+    REACT_APP_GOOGLE_CLIENT_ID: "/ABE/google_client_id"
+    S3_DEPLOY_BUCKET_PROD: "/abewriting/prod/s3-websites/NAME"
+    CDN_ID_PROD: "/abewriting/prod/CLOUDFRONT_DISTRIBUTION_ID"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+    commands:
+      - n 18
+
+  build:
+    commands:
+      - npm run build
+      - echo Deploying to $S3_DEPLOY_BUCKET_PROD
+      - aws s3 sync ./public s3://$S3_DEPLOY_BUCKET_PROD
+      - aws cloudfront create-invalidation --distribution-id $CDN_ID_PROD --paths "/*"
