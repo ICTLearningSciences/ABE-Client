@@ -1,0 +1,19 @@
+
+.google-doc-item-row{
+
+}
+
+.google-doc-item-row:hover{
+    background-color: #f5f5f5;
+}
+
+.google-doc-item-name{
+    font-weight: bold;
+    word-break: break-word;
+}
+
+.google-doc-item-name:hover{
+    cursor: pointer;
+    color: #1a73e8;
+    text-decoration: underline;
+}

@@ -1,0 +1,379 @@
+import { useEffect, useState } from 'react';
+import { useAppSelector } from '../store/hooks';
+import { useWithChat } from '../store/slices/chat/use-with-chat';
+import axios, { CancelTokenSource } from 'axios';
+import {
+  Activity,
+  ActivityGQL,
+  ActivityStep,
+  ActivityStepTypes,
+  DocGoal,
+  GQLPrompt,
+  MultistepPromptRes,
+  OpenAiPromptStep,
+  PromptConfiguration,
+  PromptRoles,
+} from '../types';
+import {
+  ChatMessageTypes,
+  MessageDisplayType,
+  Sender,
+  UserInputType,
+} from '../store/slices/chat';
+import useWithStrongerHookActivity from './use-with-stronger-hook-activity';
+import { DisplayIcons } from '../helpers/display-icon-helper';
+import { useWithPromptActivity } from './use-with-prompt-activity';
+import { getLastUserMessage } from '../helpers';
+import { UseWithPrompts } from './use-with-prompts';
+import { asyncPromptExecute } from './use-with-synchronous-polling';
+
+export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
+
+export const emptyActivity: Activity = {
+  _id: '',
+  title: '',
+  introduction: '',
+  responsePendingMessage: '',
+  responseReadyMessage: '',
+  disabled: false,
+  steps: [],
+  description: '',
+  displayIcon: DisplayIcons.DEFAULT,
+  getStep: () => {
+    return {
+      text: '',
+      stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
+      handleResponse: () => {},
+    };
+  },
+  stepName: '',
+  resetActivity: () => {},
+  isReady: true,
+};
+
+interface PromptRetryData {
+  callback?: (response: MultistepPromptRes) => void;
+  prompts: OpenAiPromptStep[];
+  numRetries: number;
+}
+
+export function useWithActivityHandler(
+  useWithPrompts: UseWithPrompts,
+  editDocGoal: () => void,
+  resetActivityCounter: number,
+  selectedGoal?: DocGoal,
+  selectedActivity?: ActivityGQL
+) {
+  const {
+    state,
+    sendMessage,
+    sendMessages,
+    chatLogToString,
+    clearChatLog,
+    coachResponsePending,
+  } = useWithChat();
+  const [retryData, setRetryData] = useState<PromptRetryData>();
+  const googleDocId: string = useAppSelector(
+    (state) => state.state.googleDocId
+  );
+  const systemPrompt: string = useAppSelector(
+    (state) => state.chat.systemPrompt
+  );
+  const messages = state.chatLogs[googleDocId] || [];
+  const userId: string | undefined = useAppSelector(
+    (state) => state.login.user?._id
+  );
+  const [waitingForUserAnswer, setWaitingForUserAnswer] =
+    useState<boolean>(false);
+  const [abortController, setAbortController] = useState<{
+    controller: AbortController;
+    source: CancelTokenSource;
+  }>();
+  const { prompts, isLoading: promptsLoading } = useWithPrompts;
+  const useGpt4 = useAppSelector((state) => state.state.useGpt4);
+  const strongerHookActivity = useWithStrongerHookActivity(
+    selectedActivity || emptyActivity,
+    sendMessage,
+    setWaitingForUserAnswer,
+    promptsLoading,
+    prompts,
+    selectedGoal
+  );
+  const promptActivity = useWithPromptActivity(
+    selectedActivity || emptyActivity,
+    sendMessage,
+    setWaitingForUserAnswer
+  );
+
+  const activity =
+    selectedActivity?.title === 'Stronger Hook'
+      ? strongerHookActivity
+      : selectedActivity?.prompt
+      ? promptActivity
+      : undefined;
+
+  function resetActivity() {
+    // cancel any pending requests
+    if (abortController) {
+      try {
+        abortController.controller.abort();
+        abortController.source.cancel();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    coachResponsePending(false);
+    setWaitingForUserAnswer(false);
+    if (activity) {
+      activity.resetActivity();
+    }
+  }
+
+  function sendIntroMessages() {
+    const activityIntroduction = activity?.introduction;
+    const goalIntroduction = selectedGoal?.introduction;
+    const messagesToSend: ChatMessageTypes[] = [];
+    if (activityIntroduction) {
+      messagesToSend.push({
+        message: activityIntroduction,
+        sender: Sender.SYSTEM,
+        displayType: MessageDisplayType.TEXT,
+      });
+    }
+    if (goalIntroduction) {
+      messagesToSend.push({
+        message: goalIntroduction,
+        sender: Sender.SYSTEM,
+        displayType: MessageDisplayType.TEXT,
+      });
+    }
+    sendMessages(messagesToSend, true, googleDocId);
+  }
+
+  async function executePrompt(
+    _prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
+    callback?: (response: MultistepPromptRes) => void
+  ) {
+    if (!activity) return;
+    if (!userId) return;
+    if (!messages.length) return;
+    const lastUserMessage = getLastUserMessage(messages);
+    const chatLogString = chatLogToString(googleDocId);
+    const openAiPromptSteps: OpenAiPromptStep[] = [];
+    const prompt = _prompt(messages);
+    prompt.openAiPromptSteps.map((openAiPromptStep) => {
+      const prompts: PromptConfiguration[] = [];
+
+      if (openAiPromptStep.includeChatLogContext) {
+        prompts.push({
+          promptRole: PromptRoles.ASSISSANT,
+          promptText: `Here is the chat between the user and the system: ${chatLogString}`,
+          includeEssay: false,
+        });
+      }
+
+      openAiPromptStep.prompts.map((prompt) => {
+        prompts.push({
+          ...prompt,
+          promptText: `${prompt.promptText} ${
+            prompt.includeUserInput
+              ? `\n\nHere is the users input: ${lastUserMessage}`
+              : ''
+          }`,
+        });
+      });
+
+      openAiPromptSteps.push({
+        ...openAiPromptStep,
+        prompts,
+      });
+    });
+    coachResponsePending(true);
+
+    const abortController = new AbortController();
+    const source = axios.CancelToken.source();
+    setAbortController({
+      controller: abortController,
+      source,
+    });
+    asyncPromptExecute(
+      googleDocId,
+      openAiPromptSteps,
+      userId,
+      systemPrompt,
+      useGpt4,
+      source.token
+    )
+      .then((response) => {
+        handleOpenAiSuccess(activity, response, callback);
+      })
+      .catch((err) => {
+        if (abortController.signal.aborted) return;
+        setRetryData({
+          callback,
+          prompts: openAiPromptSteps,
+          numRetries: 0,
+        });
+      });
+  }
+
+  function handleOpenAiSuccess(
+    activity: Activity,
+    response: MultistepPromptRes,
+    callback?: (response: MultistepPromptRes) => void
+  ) {
+    coachResponsePending(false);
+    if (callback) {
+      callback(response);
+    } else {
+      sendMessage(
+        {
+          message: response.answer,
+          sender: Sender.SYSTEM,
+          displayType: MessageDisplayType.TEXT,
+          openAiInfo: {
+            openAiPrompt: response.openAiData[0].openAiPrompt,
+            openAiResponse: response.openAiData[0].openAiResponse,
+          },
+        },
+        false,
+        googleDocId
+      );
+    }
+  }
+
+  useEffect(() => {
+    if (resetActivityCounter === 0) return;
+    clearChatLog(googleDocId);
+    sendIntroMessages();
+    resetActivity();
+  }, [resetActivityCounter]);
+
+  // handle retry data
+  useEffect(() => {
+    if (!retryData) return;
+    if (!userId) return;
+    if (!activity) return;
+    if (retryData.numRetries > 2) {
+      coachResponsePending(false);
+      sendMessage(
+        {
+          message: 'Request failed, please try again later.',
+          sender: Sender.SYSTEM,
+          displayType: MessageDisplayType.TEXT,
+          mcqChoices: [MCQ_RETRY_FAILED_REQUEST],
+        },
+        false,
+        googleDocId
+      );
+      return;
+    }
+    coachResponsePending(true);
+    setTimeout(() => {
+      const { callback, prompts, numRetries } = retryData;
+      const abortController = new AbortController();
+      const source = axios.CancelToken.source();
+      setAbortController({
+        controller: abortController,
+        source,
+      });
+      asyncPromptExecute(
+        googleDocId,
+        retryData.prompts,
+        userId,
+        systemPrompt,
+        useGpt4,
+        source.token
+      )
+        .then((response) => {
+          handleOpenAiSuccess(activity, response, callback);
+        })
+        .catch((err) => {
+          if (abortController.signal.aborted) return;
+          setRetryData({
+            callback,
+            prompts: prompts,
+            numRetries: numRetries + 1,
+          });
+        });
+    }, 1000);
+  }, [retryData, userId]);
+
+  // Handles initial load
+  useEffect(() => {
+    if (!googleDocId) {
+      return;
+    }
+    clearChatLog(googleDocId);
+    resetActivity();
+    sendIntroMessages();
+  }, [selectedActivity, selectedGoal]);
+
+  // Handles new step
+  useEffect(() => {
+    if (!activity) return;
+    const currentStep = activity.getStep({
+      executePrompt,
+      openSelectActivityModal: editDocGoal,
+    });
+    sendMessage(
+      {
+        message: currentStep.text,
+        sender: Sender.SYSTEM,
+        displayType: MessageDisplayType.TEXT,
+        mcqChoices: currentStep.mcqChoices,
+        activityStep: currentStep,
+        selectedActivity: activity,
+        selectedGoal: selectedGoal,
+      },
+      false,
+      googleDocId
+    );
+    setWaitingForUserAnswer(true);
+  }, [activity?.stepName]);
+
+  useEffect(() => {
+    if (!messages.length) return;
+    const mostRecentMessage = messages[messages.length - 1];
+    const userMessage = mostRecentMessage.sender === Sender.USER;
+    if (userMessage && mostRecentMessage.message === MCQ_RETRY_FAILED_REQUEST) {
+      setRetryData((prevData) => {
+        if (prevData) {
+          return {
+            ...prevData,
+            numRetries: 0,
+          };
+        }
+      });
+    }
+  }, [messages]);
+
+  // Handles user response to activity step via messages
+  useEffect(() => {
+    if (!activity) return;
+    const currentStep = activity.getStep({
+      executePrompt,
+      openSelectActivityModal: editDocGoal,
+    });
+    if (!currentStep) return;
+    if (!messages.length) return;
+    if (!waitingForUserAnswer) return;
+    const mostRecentMessage = messages[messages.length - 1];
+    const userMessage = mostRecentMessage.sender === Sender.USER;
+    const userInputType: UserInputType =
+      currentStep.stepType === ActivityStepTypes.FREE_RESPONSE_QUESTION
+        ? UserInputType.FREE_INPUT
+        : UserInputType.MCQ;
+    if (userMessage) {
+      const userAnswer = mostRecentMessage;
+      if (currentStep.handleResponse) {
+        currentStep.handleResponse(userAnswer.message, userInputType);
+      }
+      setWaitingForUserAnswer(false);
+    }
+  }, [waitingForUserAnswer, messages, activity?.stepName]);
+
+  return {
+    activityReady: activity?.isReady || !selectedActivity,
+  };
+}

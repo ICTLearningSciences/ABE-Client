@@ -1,0 +1,247 @@
+import OpenAI from 'openai';
+export enum UserRole {
+    NONE = 'NONE',
+    ADMIN = 'ADMIN',
+    USER = 'USER',
+  }
+  
+export enum Sender {
+    USER = 'USER',
+    SYSTEM = 'SYSTEM',
+  }
+  
+  export enum MessageDisplayType {
+    TEXT = 'TEXT',
+    BULLET_POINT = 'BULLET_POINT',
+    PENDING_MESSAGE = 'PENDING_MESSAGE',
+  }
+export interface ChatMessage {
+    sender: Sender;
+    displayType: MessageDisplayType;
+    openAiInfo?: OpenAiReqRes;
+    mcqChoices?: string[];
+    selectActivities?: Activity[];
+    activityStep?: ActivityStep;
+    selectedActivity?: Activity;
+    selectedGoal?: DocGoal;
+  }
+
+export type ChatMessageTypes =
+  | TextMessage
+  | BulletPointMessage
+  | PendingMessage;
+
+export interface PendingMessage extends ChatMessage {
+  message: string;
+}
+
+export interface TextMessage extends ChatMessage {
+  message: string;
+}
+
+export interface BulletPointMessage extends ChatMessage {
+  message: string;
+  bulletPoints: string[];
+}
+
+export enum DisplayIcons {
+    LIGHT_BULB = 'LIGHT_BULB',
+    PENCIL = 'PENCIL',
+    PENCIL_OUTLINE = 'PENCIL_OUTLINE',
+    DEFAULT = 'DEFAULT',
+  }
+
+export interface Connection<T> {
+  edges: Edge<T>[];
+  pageInfo: PageInfo;
+}
+
+export interface Edge<T> {
+  cursor: string;
+  node: T;
+}
+
+export interface PageInfo {
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+  startCursor: string;
+  endCursor: string;
+}
+
+export interface User {
+  _id: string;
+  googleId: string;
+  name: string;
+  email: string;
+  userRole: UserRole;
+  lastLoginAt: Date;
+}
+
+export interface UserAccessToken {
+  user: User;
+  accessToken: string;
+  expirationDate: string;
+}
+
+export interface CreateGoogleDocResponse {
+  data: NewDocData;
+}
+
+export interface NewDocData {
+  docId: string;
+  docUrl: string;
+}
+
+export enum GoogleDocTextModifyActions {
+  HIGHLIGHT = 'HIGHLIGHT',
+  INSERT = 'INSERT',
+  REMOVE = 'REMOVE',
+}
+
+export interface DocData {
+  plainText: string;
+  lastChangedId: string;
+  title: string;
+  lastModifyingUser: string;
+  modifiedTime: string;
+}
+
+export interface GoogleDoc {
+  googleDocId: string;
+  title: string;
+  createdAt: string;
+  admin: boolean;
+}
+
+export interface DocRevision {
+  docId: string;
+  plainText: string;
+  lastChangedId: string;
+  chatLog: ChatMessageTypes[];
+  title: string;
+  lastModifyingUser: string;
+  modifiedTime: string;
+}
+
+export interface OpenAiReqRes {
+  openAiPrompt: OpenAI.Chat.Completions.ChatCompletionCreateParams;
+  openAiResponse: OpenAI.Chat.Completions.ChatCompletion.Choice[];
+  originalRequestPrompt?: OpenAiPromptStep;
+}
+
+export enum UserActions {
+  ASK_QUESTION = 'ASK_QUESTION',
+  MULTISTEP_PROMPTS = 'MULTISTEP_PROMPTS',
+  SINGLE_PROMPT = 'SINGLE_PROMPT',
+}
+
+export interface GQLPrompt {
+  _id: string;
+  clientId: string;
+  openAiPromptSteps: OpenAiPromptStep[];
+  title: string;
+  includeChatLog?: boolean;
+}
+
+export interface GQLResPrompts {
+  prompts: GQLPrompt[];
+}
+
+export enum PromptRoles {
+  SYSTEM = 'system',
+  USER = 'user',
+  ASSISSANT = 'assistant',
+  FUNCTION = 'function',
+}
+
+export interface PromptConfiguration {
+  promptText: string;
+  includeEssay: boolean;
+  promptRole?: PromptRoles;
+}
+
+export interface OpenAiPromptStep {
+  prompts: PromptConfiguration[];
+  outputDataType: PromptOutputTypes;
+}
+
+export interface MultistepPromptRes {
+  openAiData: OpenAiReqRes[];
+  answer: string;
+}
+
+export enum PromptOutputTypes {
+  TEXT = 'TEXT',
+  JSON = 'JSON',
+}
+
+export interface Config {
+  openaiSystemPrompt: string[];
+}
+
+export enum ActivityStepTypes {
+  FREE_RESPONSE_QUESTION = 'FREE_RESPONSE_QUESTION',
+  MULTIPLE_CHOICE_QUESTIONS = 'MULTIPLE_CHOICE_QUESTIONS',
+  MESSAGE = 'MESSAGE',
+  SHOULD_INCLUDE_ESSAY = 'SHOULD_INCLUDE_ESSAY',
+}
+
+export interface ActivityStep {
+  text: string;
+  stepType: ActivityStepTypes;
+  mcqChoices?: string[];
+  handleResponse?: (response: string) => void;
+  /**
+   * Should also handle sending a message to the user
+   * If this is not define, openAi text response will be displayed to user
+   */
+  handlePromptResponse?: (response: string) => void;
+  prompt?: GQLPrompt;
+}
+
+export interface Activity extends ActivityGQL {
+  steps: ActivityStep[];
+  prompt: GQLPrompt;
+  introStep: ActivityStep;
+}
+
+export interface ActivityGQL {
+  _id: string;
+  title: string;
+  introduction: string;
+  description: string;
+  displayIcon: DisplayIcons;
+  responsePendingMessage: string;
+  responseReadyMessage: string;
+}
+
+export interface DocGoal {
+  _id: string;
+  title: string;
+  description: string;
+  displayIcon: DisplayIcons;
+  activities?: ActivityGQL[];
+  introduction: string;
+}
+
+export interface UserActivityState {
+  userId: string;
+  activityId: string;
+  googleDocId: string;
+  metadata: string;
+}
+
+export enum JobStatus {
+  QUEUED = 'QUEUED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETE = 'COMPLETE',
+}
+
+export interface OpenAiJobStatus {
+  jobStatus: JobStatus;
+  openAiResponse: MultistepPromptRes;
+}
+
+export interface OpenAiJobStatusApiRes{
+  response: OpenAiJobStatus;
+}

@@ -1,0 +1,240 @@
+import { Box, Button, Modal, Theme } from '@mui/material';
+import { makeStyles } from 'tss-react/mui';
+import { GoogleDoc } from '../../types';
+import { RowDiv, RowDivSB } from '../../styled-components';
+import React, { useEffect } from 'react';
+import './create-google-doc-modal.css';
+import { useAppSelector } from '../../store/hooks';
+import { UserRole } from '../../store/slices/login';
+import CreateNewAdminGoogleDoc from '../admin-view/author-new-google-doc-modal';
+import LockIcon from '@mui/icons-material/Lock';
+import { PreviewGoogleDocModal } from './preview-google-doc-modal';
+import { useNavigate } from 'react-router-dom';
+const useStyles = makeStyles({ name: { ExampleGoogleDocModal } })(
+  (theme: Theme) => ({
+    inputField: {
+      width: '100%',
+      margin: 10,
+    },
+    modal: {},
+    paper: {
+      backgroundColor: theme.palette.background.paper,
+      border: '2px solid #000',
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(2, 4, 3),
+      maxWidth: '50%',
+    },
+  })
+);
+
+export default function ExampleGoogleDocModal(props: {
+  adminDocs?: GoogleDoc[];
+  onCreateDoc: (docId?: string, title?: string, isAdminDoc?: boolean) => void;
+  open: boolean;
+  close: () => void;
+}): JSX.Element {
+  const [selectedGoogleDoc, setSelectedGoogleDoc] = React.useState<string>('');
+  const viewingRole = useAppSelector((state) => state.state.viewingRole);
+  const viewingAsAdmin = viewingRole === UserRole.ADMIN;
+  const { open, close, adminDocs, onCreateDoc } = props;
+  const [openNewDocModal, setOpenNewDocModal] = React.useState(false);
+  const [previewDocId, setPreviewDocId] = React.useState<string>('');
+  const { classes } = useStyles();
+  const navigate = useNavigate();
+  const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 'fit-content',
+    minWidth: '30%',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+
+  useEffect(() => {
+    if (!open) {
+      setSelectedGoogleDoc('');
+    }
+  }, [open]);
+
+  return (
+    <div>
+      <Modal open={Boolean(open)} className={classes.modal}>
+        <Box sx={style}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              height: '100%',
+            }}
+          >
+            <h2 style={{ alignSelf: 'center', marginBottom: 5 }}>
+              Example Documents
+            </h2>
+            <span
+              style={{
+                alignSelf: 'center',
+                fontWeight: 'bold',
+                marginBottom: '10px',
+              }}
+            >
+              Select One
+            </span>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '80%',
+                overflow: 'auto',
+              }}
+            >
+              <div
+                style={{
+                  maxHeight: 'fit-content',
+                  overflow: 'auto',
+                }}
+              >
+                {adminDocs?.map((doc) => (
+                  <RowDivSB
+                    className="example-google-doc-item"
+                    style={{
+                      borderBottom: '1px solid black',
+                      backgroundColor:
+                        selectedGoogleDoc === doc.googleDocId
+                          ? 'lightgrey'
+                          : '',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      setSelectedGoogleDoc(doc.googleDocId);
+                    }}
+                  >
+                    <h4>{doc.title}</h4>
+                  </RowDivSB>
+                ))}
+              </div>
+            </div>
+            <RowDiv
+              style={{
+                alignSelf: 'center',
+                marginTop: '20px',
+              }}
+            >
+              <Button
+                size="large"
+                variant="outlined"
+                style={{
+                  marginRight: '20px',
+                }}
+                onClick={() => {
+                  setPreviewDocId(selectedGoogleDoc);
+                }}
+                disabled={!selectedGoogleDoc}
+              >
+                Preview
+              </Button>
+              <Button
+                onClick={() => {
+                  onCreateDoc(selectedGoogleDoc);
+                }}
+                style={{
+                  marginRight: '20px',
+                }}
+                disabled={!selectedGoogleDoc}
+                size="large"
+                variant="outlined"
+              >
+                COPY
+              </Button>
+              <Button size="large" variant="outlined" onClick={close}>
+                Close
+              </Button>
+            </RowDiv>
+
+            {viewingAsAdmin && (
+              <RowDiv
+                style={{
+                  alignSelf: 'center',
+                  marginTop: '20px',
+                  padding: '10px',
+                  border: '1px solid black',
+                }}
+              >
+                <LockIcon
+                  style={{
+                    marginRight: '10px',
+                  }}
+                />
+                <span
+                  style={{
+                    marginRight: '20px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Admin
+                </span>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  style={{
+                    marginRight: '20px',
+                  }}
+                  onClick={() => {
+                    setOpenNewDocModal(true);
+                  }}
+                >
+                  + New
+                </Button>
+                <Button
+                  onClick={() => {
+                    navigate(`/docs/${selectedGoogleDoc}`);
+                  }}
+                  style={{
+                    marginRight: '20px',
+                  }}
+                  disabled={!selectedGoogleDoc}
+                  size="large"
+                  variant="outlined"
+                >
+                  Edit
+                </Button>
+                {/* <Button
+                  onClick={() => {
+                    // TODO: delete
+                  }}
+                  style={{
+                    marginRight: '20px',
+                  }}
+                  disabled={!selectedGoogleDoc}
+                  size="large"
+                  variant="outlined"
+                >
+                  Delete
+                </Button> */}
+              </RowDiv>
+            )}
+          </div>
+        </Box>
+      </Modal>
+      <CreateNewAdminGoogleDoc
+        open={openNewDocModal}
+        close={() => {
+          setOpenNewDocModal(false);
+        }}
+        onCreateDoc={(title: string) => {
+          onCreateDoc('', title, true);
+        }}
+      />
+      <PreviewGoogleDocModal
+        googleDocId={previewDocId}
+        close={() => {
+          setPreviewDocId('');
+        }}
+      />
+    </div>
+  );
+}

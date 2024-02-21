@@ -1,0 +1,192 @@
+import { Box, Button, LinearProgress } from '@mui/material';
+import { DARK_BLUE_HEX, LIGHT_BLUE_HEX } from '../../../constants';
+import {
+  BulletPointMessage,
+  ChatMessageTypes,
+  MessageDisplayType,
+  Sender,
+} from '../../../store/slices/chat';
+import { useAppSelector } from '../../../store/hooks';
+import { UserRole } from '../../../store/slices/login';
+import { OpenAiReqRes } from '../../../types';
+import { useEffect, useState } from 'react';
+import './message.css';
+
+const baseMessageStyle: React.CSSProperties = {
+  borderRadius: '1rem',
+  padding: '1rem',
+  margin: 5,
+  maxWidth: '70%',
+  maxInlineSize: '70%',
+  whiteSpace: 'pre-wrap',
+  overflowWrap: 'break-word',
+};
+
+function PendingMessage(): JSX.Element {
+  return (
+    <Box
+      sx={{
+        width: '100%',
+      }}
+    >
+      <LinearProgress />
+    </Box>
+  );
+}
+
+function DisplayOpenAiInfoButton(props: {
+  chatMessage: ChatMessageTypes;
+  setOpenAiInfoToDisplay: (openAiInfo?: OpenAiReqRes) => void;
+}): JSX.Element {
+  const { chatMessage, setOpenAiInfoToDisplay } = props;
+  const userRole = useAppSelector((state) => state.login.userRole);
+  const showAdvancedOptions = useAppSelector(
+    (state) => state.state.viewingAdvancedOptions
+  );
+  const isAdmin = userRole === UserRole.ADMIN;
+  if (!chatMessage.openAiInfo || !isAdmin || !showAdvancedOptions) {
+    return <></>;
+  }
+  return (
+    <Button
+      onClick={() => {
+        setOpenAiInfoToDisplay(chatMessage.openAiInfo);
+      }}
+    >
+      OpenAI Info
+    </Button>
+  );
+}
+
+const FadingText: React.FC<{ strings: string[] }> = ({ strings }) => {
+  const [currentStringIndex, setCurrentStringIndex] = useState(0);
+  const [fadeState, setFadeState] = useState<'fading-out' | 'fading-in'>(
+    'fading-in'
+  );
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (currentStringIndex !== strings.length - 1) {
+        setFadeState('fading-out');
+      }
+    }, 3000); // Change the duration as needed
+
+    return () => clearTimeout(timeoutId);
+  }, [currentStringIndex]);
+
+  useEffect(() => {
+    if (
+      fadeState === 'fading-out' &&
+      currentStringIndex !== strings.length - 1
+    ) {
+      const timeoutId = setTimeout(() => {
+        setCurrentStringIndex((prevIndex) => (prevIndex + 1) % strings.length);
+        setFadeState('fading-in');
+      }, 1000); // Adjust the delay before fading in the next string
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [fadeState, strings.length]);
+
+  return (
+    <div
+      className={`fading-text ${
+        fadeState === 'fading-out' ? 'fade-out' : 'fade-in'
+      }`}
+    >
+      {strings[currentStringIndex]}
+    </div>
+  );
+};
+
+export default function Message(props: {
+  message: ChatMessageTypes;
+  setOpenAiInfoToDisplay: (openAiInfo?: OpenAiReqRes) => void;
+  messageIndex: number;
+}): JSX.Element {
+  const { message, setOpenAiInfoToDisplay, messageIndex } = props;
+  const pendingMessage =
+    message.displayType === MessageDisplayType.PENDING_MESSAGE;
+
+  const backgroundColor =
+    message.sender === Sender.USER ? LIGHT_BLUE_HEX : DARK_BLUE_HEX;
+  const alignSelf = message.sender === Sender.USER ? 'flex-end' : 'flex-start';
+  const textColor = message.sender === Sender.USER ? 'black' : 'white';
+
+  if (message.displayType === MessageDisplayType.TEXT) {
+    return (
+      <div
+        data-cy={`text-message-${messageIndex}`}
+        style={{
+          ...baseMessageStyle,
+          alignSelf: alignSelf,
+          backgroundColor: backgroundColor,
+          color: textColor,
+        }}
+      >
+        {message.message}
+        <DisplayOpenAiInfoButton
+          chatMessage={message}
+          setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
+        />
+      </div>
+    );
+  } else if (message.displayType === MessageDisplayType.PENDING_MESSAGE) {
+    return (
+      <div
+        data-cy={`pending-message-${messageIndex}`}
+        style={{
+          ...baseMessageStyle,
+          alignSelf: alignSelf,
+          backgroundColor: backgroundColor,
+          color: textColor,
+        }}
+      >
+        <FadingText
+          strings={['Reading...', 'Analyzing...', 'Getting opinionated...']}
+        />
+      </div>
+    );
+  } else if (message.displayType === MessageDisplayType.BULLET_POINT) {
+    const bpMsg = message as BulletPointMessage;
+    return (
+      <div
+        data-cy={`bullet-point-message-${messageIndex}`}
+        style={{
+          alignSelf: alignSelf,
+          backgroundColor: backgroundColor,
+          color: textColor,
+          borderRadius: '1rem',
+          padding: '1rem',
+          margin: 5,
+          width: pendingMessage ? '100px' : 'fit-content',
+          maxWidth: '70%',
+        }}
+      >
+        <ul>
+          {bpMsg.bulletPoints.map((bulletPoint: string) => {
+            return <li>{bulletPoint}</li>;
+          })}
+        </ul>
+        <DisplayOpenAiInfoButton
+          chatMessage={message}
+          setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
+        />
+      </div>
+    );
+  } else {
+    return (
+      <div
+        data-cy={`unknown-message-${messageIndex}`}
+        style={{
+          ...baseMessageStyle,
+          alignSelf: alignSelf,
+          backgroundColor: backgroundColor,
+          color: textColor,
+        }}
+      >
+        Unknown Message Type
+      </div>
+    );
+  }
+}
