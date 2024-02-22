@@ -1,0 +1,31 @@
+name: test and publish
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "18.13"
+      - name: Install
+        run:  npm ci 
+      - name: Run format test
+        run: npm run test:format
+      - name: Run license test
+        run: npm run test:license
+      - name: Run lint test
+        run: npm run test:lint
+      - name: Run types test
+        run: npm run test:types
+  test-e2e:
+    name: test e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the docker-compose stack
+        run: docker-compose up -d
+      - name: Check running containers
+        run: docker ps
+      - name: Cypress run tests
+        run: make test-e2e-exec
