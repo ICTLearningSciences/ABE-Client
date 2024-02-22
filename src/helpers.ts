@@ -124,6 +124,7 @@ export function parseOpenAIResContent(openAiRes: OpenAiReqRes): OpenAiReqRes {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function validateJsonResponse<T>(response: string, schema: any): T {
   try {
     const v = new Validator.Validator();
@@ -151,6 +152,7 @@ export function getLastUserMessage(chatLog: ChatLog) {
   return message;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type GenericObject = Record<string, any>;
 
 export function removeDuplicatesByField<T extends GenericObject>(

@@ -1,7 +1,7 @@
-import { Box, Button, LinearProgress } from '@mui/material';
+import React from 'react';
+import { Button } from '@mui/material';
 import { DARK_BLUE_HEX, LIGHT_BLUE_HEX } from '../../../constants';
 import {
-  BulletPointMessage,
   ChatMessageTypes,
   MessageDisplayType,
   Sender,
@@ -88,13 +88,11 @@ const FadingText: React.FC<{ strings: string[] }> = ({ strings }) => {
 };
 
 export default function Message(props: {
-  isNextAiResponse: boolean;
   message: ChatMessageTypes;
   setOpenAiInfoToDisplay: (openAiInfo?: OpenAiReqRes) => void;
   messageIndex: number;
 }): JSX.Element {
-  const { message, setOpenAiInfoToDisplay, messageIndex, isNextAiResponse } =
-    props;
+  const { message, setOpenAiInfoToDisplay, messageIndex } = props;
   const backgroundColor =
     message.sender === Sender.USER ? LIGHT_BLUE_HEX : DARK_BLUE_HEX;
   const alignSelf = message.sender === Sender.USER ? 'flex-end' : 'flex-start';

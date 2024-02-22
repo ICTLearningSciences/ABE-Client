@@ -1,3 +1,4 @@
+import React from 'react';
 import { Box, Button, Modal, Theme } from '@mui/material';
 import { OpenAiReqRes } from '../../../types';
 import { makeStyles } from 'tss-react/mui';
@@ -26,7 +27,7 @@ export default function OpenAiInfoModal(props: {
   const { classes } = useStyles();
 
   const style = {
-    position: 'absolute' as 'absolute',
+    position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',

@@ -1,4 +1,9 @@
-import axios from 'axios';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
 import React, { useEffect } from 'react';
 import { createNewGoogleDoc } from './api';
 import { useAppSelector } from '../store/hooks';
@@ -22,7 +27,6 @@ export interface UseWithGoogleDocs {
   docUrl: string;
   googleDocs: GoogleDoc[];
   copyGoogleDocs: GoogleDoc[];
-  revisionsList: RevisionsItem[];
   creationInProgress: boolean;
   handleCreateGoogleDoc: (
     docIdToCopyFrom?: string,
@@ -47,7 +51,6 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
   const userGoogleDocs = googleDocs?.filter((doc) => !doc.admin);
   const copyGoogleDocs = googleDocs?.filter((doc) => doc.admin);
   const navigate = useNavigate();
-  const [revisionsList, setRevisionsList] = React.useState<RevisionsItem[]>([]);
   const [creationInProgress, setCreationInProgress] =
     React.useState<boolean>(false);
   const [testNumber, setTestNumber] = React.useState<number>(0);
@@ -110,21 +113,6 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     updateCurrentDocId(docId);
   }
 
-  function getGoogleDocRevisions(docId: string) {
-    axios
-      .get<DocRevisionResponse>(
-        `${process.env.REACT_APP_GOOGLE_API_ENDPOINT}/doc_revisions/${docId}`
-      )
-      .then((res) => {
-        console.log(res);
-        setRevisionsList(res.data.revisions);
-      })
-      .catch((err) => {
-        console.error('Error getting google doc revisions');
-        console.error(err);
-      });
-  }
-
   return {
     docId: googleDocId,
     docUrl: googleDocId
@@ -132,7 +120,6 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
       : '',
     googleDocs: userGoogleDocs || [],
     copyGoogleDocs: copyGoogleDocs || [],
-    revisionsList,
     creationInProgress,
     handleCreateGoogleDoc,
     handleOpenGoogleDoc,

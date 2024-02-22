@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Box,
   Button,
@@ -65,7 +66,7 @@ export default function SystemPromptModal(props: {
   const isAdmin = userRole === UserRole.ADMIN;
 
   const style = {
-    position: 'absolute' as 'absolute',
+    position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
@@ -109,7 +110,7 @@ export default function SystemPromptModal(props: {
                         <Checkbox
                           checked={targetSystemPrompt === index}
                           indeterminate={false}
-                          onChange={(e) => {
+                          onChange={() => {
                             setTargetSystemPrompt(index);
                           }}
                         />

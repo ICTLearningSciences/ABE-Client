@@ -66,7 +66,7 @@ export function useWithChat(): UseWithChat {
   }
 
   function chatLogToString(docId: string) {
-    let chatLog = chatState.chatLogs[docId];
+    const chatLog = chatState.chatLogs[docId];
     let chatLogString = '';
     for (let i = 0; i < chatLog.length; i++) {
       chatLogString += `${chatLog[i].sender}: ${chatLog[i].message}\n`;

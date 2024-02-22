@@ -48,7 +48,13 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "format": "prettier --write \"src/**/*.{js,ts,tsx}\"",
-    "cy:open": "npx cypress open"
+    "cy:open": "npx cypress open",
+    "test:audit": "npm audit --production --audit-level=moderate",
+    "test:lint": "eslint src --ext ts --ext tsx --ext js --ext jsx --max-warnings 0",
+    "test:types": "tsc --noEmit",
+    "test:format": "prettier --check \"src/**/*.{js,ts,tsx}\"",
+    "license:fix": "license-check-and-add remove -f license-config.json && license-check-and-add add -f license-config.json",
+    "test:license": "license-check-and-add check -f license-config.json"
   },
   "eslintConfig": {
     "extends": [
@@ -72,6 +78,7 @@
     "@types/redux-logger": "^3.0.10",
     "@types/uuid": "^9.0.7",
     "cypress": "^13.6.2",
+    "license-check-and-add": "^4.0.2",
     "cypress-localstorage-commands": "^2.2.5"
   }
 }

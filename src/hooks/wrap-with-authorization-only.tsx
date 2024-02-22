@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../store/hooks';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const withAuthorizationOnly = (Component: any) => (props: any) => {
   const loginState = useAppSelector((state) => state.login);
   const navigate = useNavigate();

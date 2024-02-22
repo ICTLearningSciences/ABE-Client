@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useRef, useEffect } from 'react';
 import {
   Button,
@@ -112,13 +113,11 @@ function ChatMessagesContainer(props: {
   }, [messageElements]);
 
   useEffect(() => {
-    const mostRecentAiResponse = getMostRecentAiResponse(chatMessages);
     const _newMessageElements = chatMessages.map(
       (message: ChatMessageTypes, index: number) => {
         return (
           <>
             <Message
-              isNextAiResponse={message.id === mostRecentAiResponse?.id}
               key={index}
               message={message}
               setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
@@ -135,9 +134,10 @@ function ChatMessagesContainer(props: {
                   margin: '10px',
                 }}
               >
-                {message.mcqChoices.map((choice: string) => {
+                {message.mcqChoices.map((choice: string, i: number) => {
                   return (
                     <Button
+                      key={i}
                       variant="outlined"
                       style={{
                         marginBottom: '5px',
@@ -194,7 +194,7 @@ function ChatInput(props: {
   googleDocId: string;
   disableInput: boolean;
 }): JSX.Element {
-  const { sendMessage, googleDocId } = props;
+  const { sendMessage } = props;
   const [message, setMessage] = useState<string>('');
   function handleSendUserMessage(message: string) {
     sendMessage({

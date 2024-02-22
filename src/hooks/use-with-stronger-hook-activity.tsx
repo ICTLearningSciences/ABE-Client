@@ -1,3 +1,9 @@
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
 import { useEffect, useState } from 'react';
 import {
   Activity,
@@ -7,7 +13,6 @@ import {
   DocGoal,
   GQLPrompt,
   MultistepPromptRes,
-  PromptOutputTypes,
   PromptRoles,
 } from '../types';
 import {
@@ -353,17 +358,9 @@ export default function useWithStrongerHookActivity(
     resetActivity();
   }, [activityGql.title, goal?._id]);
 
-  const { curStepName, numPumps, selectedExperience, experiencesList } = state;
+  const { curStepName, experiencesList } = state;
   function setCurStepName(stepName: StepNames) {
     setState((prevState) => ({ ...prevState, curStepName: stepName }));
-  }
-
-  function setNumPumps(numPumps: number) {
-    setState((prevState) => ({ ...prevState, numPumps: numPumps }));
-  }
-
-  function setSelectedEntity(selectedEntity: string) {
-    setState((prevState) => ({ ...prevState, selectedEntity: selectedEntity }));
   }
 
   function setExperiencesList(experiences: Experience[]) {
@@ -382,34 +379,27 @@ export default function useWithStrongerHookActivity(
     }));
   }
 
-  function setRevisionIntention(revisionIntention: string) {
-    setState((prevState) => ({
-      ...prevState,
-      revisionIntention: revisionIntention,
-    }));
-  }
-
   function getStep(stepData: StepData): ActivityStep {
     switch (curStepName) {
       case StepNames.INTRO:
       case StepNames.INTRO_2:
         return introStep(stepData);
       case StepNames.SELECT_NARRATIVE_OR_EMOTION:
-        return selectNarrativeOrEmotion(stepData);
+        return selectNarrativeOrEmotion();
       case StepNames.NARRATIVE_WEAK_STEP_ONE:
-        return narrativeWeakStepOne(stepData);
+        return narrativeWeakStepOne();
       case StepNames.NARRATIVE_WEAK_STEP_TWO:
         return narrativeWeakStepTwo(stepData);
       case StepNames.NARRATIVE_WEAK_STEP_THREE:
-        return narrativeWeakStepThree(stepData);
+        return narrativeWeakStepThree();
       case StepNames.NARRATIVE_WEAK_STEP_FOUR:
         return narrativeWeakStepFour(stepData);
       case StepNames.NARRATIVE_WEAK_STEP_FIVE:
-        return narrativeWeakStepFive(stepData);
+        return narrativeWeakStepFive();
       case StepNames.NARRATIVE_WEAK_STEP_SIX:
         return narrativeWeakStepSix(stepData);
       case StepNames.NARRATIVE_WEAK_STEP_SEVEN:
-        return narrativeWeakStepSeven(stepData);
+        return narrativeWeakStepSeven();
       case StepNames.EMOTION_WEAK_STEP_ONE:
         return emotionWeakStepOne(stepData);
       case StepNames.EMOTION_WEAK_STEP_TWO:
@@ -425,9 +415,6 @@ export default function useWithStrongerHookActivity(
         return introStep(stepData);
     }
   }
-
-  const NUM_EXPERIENCES = 3;
-  const NUM_PUMP_EXPERIENCES = 3;
 
   function resetActivity(targetStep?: StepNames) {
     setState({
@@ -681,7 +668,7 @@ export default function useWithStrongerHookActivity(
     };
   }
 
-  function selectNarrativeOrEmotion(stepData: StepData): ActivityStep {
+  function selectNarrativeOrEmotion(): ActivityStep {
     const selections = [];
     const weakNarrative = state.narrativeScore < WEAK_THRESHOLD;
     const weakEmotion = state.emotionScore < WEAK_THRESHOLD;
@@ -740,7 +727,7 @@ export default function useWithStrongerHookActivity(
     };
   }
 
-  function narrativeWeakStepOne(stepData: StepData): ActivityStep {
+  function narrativeWeakStepOne(): ActivityStep {
     return {
       text: 'Would you like to brainstorm some stories or do you already have a story in mind?',
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
@@ -813,7 +800,7 @@ export default function useWithStrongerHookActivity(
   };
 
   // Come up with more examples or work with what already have?
-  const narrativeWeakStepThree = (stepData: StepData): ActivityStep => {
+  const narrativeWeakStepThree = (): ActivityStep => {
     return {
       text: "Would you like to brainstorm more examples or work with what you've got?",
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
@@ -839,7 +826,7 @@ export default function useWithStrongerHookActivity(
           return;
         }
         executePrompt(
-          (messages) => compareStoryToHookPrompt,
+          () => compareStoryToHookPrompt,
           (response: MultistepPromptRes) => {
             sendMessage(
               {
@@ -879,8 +866,7 @@ export default function useWithStrongerHookActivity(
 
   // declare proposed revision or brainstorm more
   // once proposed revision is declared, go to step 6
-  const narrativeWeakStepFive = (stepData: StepData): ActivityStep => {
-    const { executePrompt } = stepData;
+  const narrativeWeakStepFive = (): ActivityStep => {
     return {
       text: `What kind of revision are you thinking of doing now? If you're not sure, we can brainstorm some more.`,
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
@@ -953,8 +939,7 @@ export default function useWithStrongerHookActivity(
   };
 
   // prompt to restart narrative, emotion, or to re-analyze (restart activity)
-  const narrativeWeakStepSeven = (stepData: StepData): ActivityStep => {
-    const { executePrompt } = stepData;
+  const narrativeWeakStepSeven = (): ActivityStep => {
     return {
       text: `What would you like to do next?`,
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
@@ -992,7 +977,7 @@ export default function useWithStrongerHookActivity(
     return {
       text: 'Great. Consider who this piece is speaking to. Can you list the main audience or a few audiences? For each audience, what kind of emotions do you want them to feel?',
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
-      handleResponse: (response: string) => {
+      handleResponse: () => {
         if (!audienceAndEmotionsDetectionPrompt) {
           return;
         }
@@ -1082,7 +1067,7 @@ export default function useWithStrongerHookActivity(
   };
 
   const freeInputStep = (stepData: StepData): ActivityStep => {
-    const { executePrompt, openSelectActivityModal } = stepData;
+    const { executePrompt } = stepData;
     return {
       text: "Okay, feel free to ask me anything you'd like",
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
@@ -1111,7 +1096,7 @@ export default function useWithStrongerHookActivity(
   };
 
   const outroStep = (stepData: StepData): ActivityStep => {
-    const { executePrompt, openSelectActivityModal } = stepData;
+    const { openSelectActivityModal } = stepData;
     return {
       text: 'Okay, would you like to revise and then have me analyze it again? Or would you like to work on another activity?',
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
