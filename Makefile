@@ -49,4 +49,4 @@ license: LICENSE LICENSE_HEADER
 
 .PHONY: test-e2e-exec
 test-e2e-exec:
-	$(TEST_E2E_DOCKER_COMPOSE) exec -T cypress npx cypress run --env CYPRESS_SNAPSHOT_DIFF_DIR=$(TEST_E2E_DOCKER_FAILED_SNAPSHOT_DIFFS)
+	$(TEST_E2E_DOCKER_COMPOSE) exec -T cypress npx cypress run
