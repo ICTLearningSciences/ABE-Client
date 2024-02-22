@@ -12,3 +12,5 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.cypress
+    environment:
+      - "CYPRESS_BASE_URL=http://client/"
