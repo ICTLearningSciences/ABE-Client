@@ -5,3 +5,18 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import "cypress-localstorage-commands";
+
+// Define a beforeEach hook
+beforeEach(() => {
+    console.log("before each")
+    // Assuming your built HTML file is served at 'index.html'
+    const pageUrl = '/index.html';
+  
+    // Fetch the HTML content and modify it to include a <base> tag
+    cy.request(pageUrl)
+      .its('body')
+      .then((html) => {
+        const modifiedHtml = html.replace('<head>', '<head><base href="/">');
+        cy.document({ log: false }).invoke('write', modifiedHtml);
+      });
+  });
