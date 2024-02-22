@@ -3,5 +3,5 @@ services:
   cypress:
     container_name: cypress
     build:
-      context: cypress
+      context: ./
       dockerfile: Dockerfile.cypress
