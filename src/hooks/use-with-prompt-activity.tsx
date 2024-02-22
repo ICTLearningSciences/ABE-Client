@@ -16,6 +16,7 @@ import {
 } from '../types';
 import { StepData } from './use-with-stronger-hook-activity';
 import { useAppSelector } from '../store/hooks';
+import { v4 as uuidv4 } from 'uuid';
 
 const MCQ_READY = 'Ready';
 const MCQ_ANALYZE = 'Analyze';
@@ -91,6 +92,7 @@ export function useWithPromptActivity(
           (response) => {
             sendMessage(
               {
+                id: uuidv4(),
                 message: response.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
@@ -124,6 +126,7 @@ export function useWithPromptActivity(
               setWaitingForUserAnswer(true);
               sendMessage(
                 {
+                  id: uuidv4(),
                   message: response.answer,
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
@@ -138,6 +141,7 @@ export function useWithPromptActivity(
               );
               sendMessage(
                 {
+                  id: uuidv4(),
                   message:
                     'Feel free to ask me anything else about your essay, or I can anaylze it again for you.',
                   sender: Sender.SYSTEM,
@@ -155,6 +159,7 @@ export function useWithPromptActivity(
             setWaitingForUserAnswer(true);
             sendMessage(
               {
+                id: uuidv4(),
                 message: response.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
@@ -169,6 +174,7 @@ export function useWithPromptActivity(
             );
             sendMessage(
               {
+                id: uuidv4(),
                 message:
                   'Feel free to ask me anything else about your essay, or I can anaylze it again for you.',
                 sender: Sender.SYSTEM,

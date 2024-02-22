@@ -19,6 +19,7 @@ import { addContextToPromptSteps, validateJsonResponse } from '../helpers';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { useAppSelector } from '../store/hooks';
 import { freeInputPrompt } from './use-with-prompt-activity';
+import { v4 as uuidv4 } from 'uuid';
 
 export const WEAK_THRESHOLD = 4;
 export const MCQ_READY_FOR_REVIEW = 'Ready';
@@ -479,6 +480,7 @@ export default function useWithStrongerHookActivity(
       setWaitingForUserAnswer(true);
       sendMessage(
         {
+          id: uuidv4(),
           message: `I didn't find any people or places in your responses. Please try again.`,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
@@ -490,6 +492,7 @@ export default function useWithStrongerHookActivity(
     } else {
       sendMessage(
         {
+          id: uuidv4(),
           message: result.response,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
@@ -537,6 +540,7 @@ export default function useWithStrongerHookActivity(
         );
       sendMessage(
         {
+          id: uuidv4(),
           message: cannedResponse,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
@@ -603,6 +607,7 @@ export default function useWithStrongerHookActivity(
       setWaitingForUserAnswer(true);
       sendMessage(
         {
+          id: uuidv4(),
           message: `Okay. Are there any other audiences or stakeholders who are important to this? How should they feel?`,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
@@ -638,6 +643,7 @@ export default function useWithStrongerHookActivity(
         (response: MultistepPromptRes) => {
           sendMessage(
             {
+              id: uuidv4(),
               message: response.answer,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
@@ -767,6 +773,7 @@ export default function useWithStrongerHookActivity(
               setWaitingForUserAnswer(true);
               sendMessage(
                 {
+                  id: uuidv4(),
                   message: res.answer,
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
@@ -782,6 +789,7 @@ export default function useWithStrongerHookActivity(
               );
               sendMessage(
                 {
+                  id: uuidv4(),
                   message: `If these helped at all, please brainstorm some people or places you connect with the topic. Otherwise, I can help brainstorm a few more ideas.`,
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
@@ -835,6 +843,7 @@ export default function useWithStrongerHookActivity(
           (response: MultistepPromptRes) => {
             sendMessage(
               {
+                id: uuidv4(),
                 message: response.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
@@ -921,6 +930,7 @@ export default function useWithStrongerHookActivity(
           (response: MultistepPromptRes) => {
             sendMessage(
               {
+                id: uuidv4(),
                 message: response.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
@@ -1010,6 +1020,7 @@ export default function useWithStrongerHookActivity(
           (res: MultistepPromptRes) => {
             sendMessage(
               {
+                id: uuidv4(),
                 message: res.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
@@ -1050,6 +1061,7 @@ export default function useWithStrongerHookActivity(
           (response: MultistepPromptRes) => {
             sendMessage(
               {
+                id: uuidv4(),
                 message: response.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
@@ -1079,6 +1091,7 @@ export default function useWithStrongerHookActivity(
           setWaitingForUserAnswer(true);
           sendMessage(
             {
+              id: uuidv4(),
               message: response.answer,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,

@@ -14,7 +14,6 @@ export enum Sender {
 
 export enum MessageDisplayType {
   TEXT = 'TEXT',
-  BULLET_POINT = 'BULLET_POINT',
   PENDING_MESSAGE = 'PENDING_MESSAGE',
 }
 
@@ -25,6 +24,7 @@ export enum UserInputType {
 }
 
 export interface ChatMessage {
+  id: string;
   sender: Sender;
   displayType: MessageDisplayType;
   openAiInfo?: OpenAiReqRes;

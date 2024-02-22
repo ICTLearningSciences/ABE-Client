@@ -36,6 +36,7 @@ import './chat.css';
 import Message from './message';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { UseWithPrompts } from '../../../hooks/use-with-prompts';
+import { v4 as uuidv4 } from 'uuid';
 
 function ChatMessagesContainer(props: {
   coachResponsePending: boolean;
@@ -50,6 +51,7 @@ function ChatMessagesContainer(props: {
     sendMessage,
   } = props;
   const messageContainerRef = useRef<HTMLDivElement>(null);
+  const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
   const { state } = useWithChat();
   const messages = state.chatLogs[googleDocId] || [];
   const chatMessages: ChatMessageTypes[] = [
@@ -57,6 +59,7 @@ function ChatMessagesContainer(props: {
     ...(coachResponsePending
       ? [
           {
+            id: 'pending-message',
             message: '...',
             sender: Sender.SYSTEM,
             displayType: MessageDisplayType.PENDING_MESSAGE,
@@ -64,36 +67,58 @@ function ChatMessagesContainer(props: {
         ]
       : []),
   ];
+  const mostRecentChatId =
+    chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].id : '';
+
+  function scrollToElementById(id: string) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function scrollToMostRecentAiResponse() {
+    const mostRecentAiResponse = getMostRecentAiResponse(chatMessages);
+    if (mostRecentAiResponse) {
+      scrollToElementById(mostRecentAiResponse.id);
+    }
+  }
+
+  function getMostRecentAiResponse(
+    messages: ChatMessageTypes[]
+  ): ChatMessageTypes | undefined {
+    // first, find the most recent user message, then find the most recent system message after that
+    if (!messages || messages.length <= 1) return undefined;
+    let mostRecentUserMessageIndex = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].sender === Sender.USER) {
+        mostRecentUserMessageIndex = i;
+        break;
+      }
+    }
+    if (mostRecentUserMessageIndex === -1) return undefined;
+    for (let i = mostRecentUserMessageIndex; i < messages.length; i++) {
+      if (messages[i].sender === Sender.SYSTEM) {
+        return messages[i];
+      }
+    }
+    return undefined;
+  }
 
   useEffect(() => {
     if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTop =
-        messageContainerRef.current.scrollHeight;
+      scrollToMostRecentAiResponse();
     }
-  }, [chatMessages]);
+  }, [messageElements]);
 
-  return (
-    <div
-      ref={messageContainerRef}
-      data-cy="messages-container"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        width: '100%',
-        maxWidth: '100%',
-        justifyContent: 'flex-start',
-        margin: '1rem',
-        borderRadius: '1rem',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-        border: '1px solid black',
-      }}
-    >
-      {chatMessages.map((message: ChatMessageTypes, index: number) => {
+  useEffect(() => {
+    const mostRecentAiResponse = getMostRecentAiResponse(chatMessages);
+    const _newMessageElements = chatMessages.map(
+      (message: ChatMessageTypes, index: number) => {
         return (
           <>
             <Message
+              isNextAiResponse={message.id === mostRecentAiResponse?.id}
               key={index}
               message={message}
               setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
@@ -120,6 +145,7 @@ function ChatMessagesContainer(props: {
                       data-cy={`mcq-choice-${choice.replaceAll(' ', '-')}`}
                       onClick={() => {
                         sendMessage({
+                          id: uuidv4(),
                           message: choice,
                           sender: Sender.USER,
                           displayType: MessageDisplayType.TEXT,
@@ -135,7 +161,30 @@ function ChatMessagesContainer(props: {
             )}
           </>
         );
-      })}
+      }
+    );
+    setMessageElements(_newMessageElements);
+  }, [chatMessages.length, mostRecentChatId]);
+
+  return (
+    <div
+      ref={messageContainerRef}
+      data-cy="messages-container"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        width: '100%',
+        maxWidth: '100%',
+        justifyContent: 'flex-start',
+        margin: '1rem',
+        borderRadius: '1rem',
+        overflowX: 'hidden',
+        overflowY: 'auto',
+        border: '1px solid black',
+      }}
+    >
+      {messageElements}
     </div>
   );
 }
@@ -149,6 +198,7 @@ function ChatInput(props: {
   const [message, setMessage] = useState<string>('');
   function handleSendUserMessage(message: string) {
     sendMessage({
+      id: uuidv4(),
       message: message,
       sender: Sender.USER,
       displayType: MessageDisplayType.TEXT,

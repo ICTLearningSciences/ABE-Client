@@ -10,6 +10,7 @@ import {
 } from '../types';
 import { MessageDisplayType, Sender } from '../store/slices/chat';
 import { asyncPromptExecute } from './use-with-synchronous-polling';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function useWithFreeInput(selectedGoal?: DocGoal) {
   const { state, sendMessage, chatLogToString, coachResponsePending } =
@@ -91,6 +92,7 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
         .then((response) => {
           sendMessage(
             {
+              id: uuidv4(),
               message: response.answer,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,

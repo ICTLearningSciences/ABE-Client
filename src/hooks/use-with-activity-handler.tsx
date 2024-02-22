@@ -26,6 +26,7 @@ import { useWithPromptActivity } from './use-with-prompt-activity';
 import { getLastUserMessage } from '../helpers';
 import { UseWithPrompts } from './use-with-prompts';
 import { asyncPromptExecute } from './use-with-synchronous-polling';
+import { v4 as uuidv4 } from 'uuid';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -135,6 +136,7 @@ export function useWithActivityHandler(
     const messagesToSend: ChatMessageTypes[] = [];
     if (activityIntroduction) {
       messagesToSend.push({
+        id: uuidv4(),
         message: activityIntroduction,
         sender: Sender.SYSTEM,
         displayType: MessageDisplayType.TEXT,
@@ -142,6 +144,7 @@ export function useWithActivityHandler(
     }
     if (goalIntroduction) {
       messagesToSend.push({
+        id: uuidv4(),
         message: goalIntroduction,
         sender: Sender.SYSTEM,
         displayType: MessageDisplayType.TEXT,
@@ -228,6 +231,7 @@ export function useWithActivityHandler(
     } else {
       sendMessage(
         {
+          id: uuidv4(),
           message: response.answer,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
@@ -258,6 +262,7 @@ export function useWithActivityHandler(
       coachResponsePending(false);
       sendMessage(
         {
+          id: uuidv4(),
           message: 'Request failed, please try again later.',
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
@@ -318,6 +323,7 @@ export function useWithActivityHandler(
     });
     sendMessage(
       {
+        id: uuidv4(),
         message: currentStep.text,
         sender: Sender.SYSTEM,
         displayType: MessageDisplayType.TEXT,

@@ -12,7 +12,6 @@ export enum Sender {
   
   export enum MessageDisplayType {
     TEXT = 'TEXT',
-    BULLET_POINT = 'BULLET_POINT',
     PENDING_MESSAGE = 'PENDING_MESSAGE',
   }
 export interface ChatMessage {

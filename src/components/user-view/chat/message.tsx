@@ -22,18 +22,6 @@ const baseMessageStyle: React.CSSProperties = {
   overflowWrap: 'break-word',
 };
 
-function PendingMessage(): JSX.Element {
-  return (
-    <Box
-      sx={{
-        width: '100%',
-      }}
-    >
-      <LinearProgress />
-    </Box>
-  );
-}
-
 function DisplayOpenAiInfoButton(props: {
   chatMessage: ChatMessageTypes;
   setOpenAiInfoToDisplay: (openAiInfo?: OpenAiReqRes) => void;
@@ -100,93 +88,39 @@ const FadingText: React.FC<{ strings: string[] }> = ({ strings }) => {
 };
 
 export default function Message(props: {
+  isNextAiResponse: boolean;
   message: ChatMessageTypes;
   setOpenAiInfoToDisplay: (openAiInfo?: OpenAiReqRes) => void;
   messageIndex: number;
 }): JSX.Element {
-  const { message, setOpenAiInfoToDisplay, messageIndex } = props;
-  const pendingMessage =
-    message.displayType === MessageDisplayType.PENDING_MESSAGE;
-
+  const { message, setOpenAiInfoToDisplay, messageIndex, isNextAiResponse } =
+    props;
   const backgroundColor =
     message.sender === Sender.USER ? LIGHT_BLUE_HEX : DARK_BLUE_HEX;
   const alignSelf = message.sender === Sender.USER ? 'flex-end' : 'flex-start';
   const textColor = message.sender === Sender.USER ? 'black' : 'white';
 
-  if (message.displayType === MessageDisplayType.TEXT) {
-    return (
-      <div
-        data-cy={`text-message-${messageIndex}`}
-        style={{
-          ...baseMessageStyle,
-          alignSelf: alignSelf,
-          backgroundColor: backgroundColor,
-          color: textColor,
-        }}
-      >
-        {message.message}
-        <DisplayOpenAiInfoButton
-          chatMessage={message}
-          setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
-        />
-      </div>
-    );
-  } else if (message.displayType === MessageDisplayType.PENDING_MESSAGE) {
-    return (
-      <div
-        data-cy={`pending-message-${messageIndex}`}
-        style={{
-          ...baseMessageStyle,
-          alignSelf: alignSelf,
-          backgroundColor: backgroundColor,
-          color: textColor,
-        }}
-      >
+  return (
+    <div
+      id={message.id}
+      data-cy={`message-${messageIndex}`}
+      style={{
+        ...baseMessageStyle,
+        alignSelf: alignSelf,
+        backgroundColor: backgroundColor,
+        color: textColor,
+      }}
+    >
+      {message.displayType === MessageDisplayType.TEXT && message.message}
+      {message.displayType === MessageDisplayType.PENDING_MESSAGE && (
         <FadingText
           strings={['Reading...', 'Analyzing...', 'Getting opinionated...']}
         />
-      </div>
-    );
-  } else if (message.displayType === MessageDisplayType.BULLET_POINT) {
-    const bpMsg = message as BulletPointMessage;
-    return (
-      <div
-        data-cy={`bullet-point-message-${messageIndex}`}
-        style={{
-          alignSelf: alignSelf,
-          backgroundColor: backgroundColor,
-          color: textColor,
-          borderRadius: '1rem',
-          padding: '1rem',
-          margin: 5,
-          width: pendingMessage ? '100px' : 'fit-content',
-          maxWidth: '70%',
-        }}
-      >
-        <ul>
-          {bpMsg.bulletPoints.map((bulletPoint: string) => {
-            return <li>{bulletPoint}</li>;
-          })}
-        </ul>
-        <DisplayOpenAiInfoButton
-          chatMessage={message}
-          setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
-        />
-      </div>
-    );
-  } else {
-    return (
-      <div
-        data-cy={`unknown-message-${messageIndex}`}
-        style={{
-          ...baseMessageStyle,
-          alignSelf: alignSelf,
-          backgroundColor: backgroundColor,
-          color: textColor,
-        }}
-      >
-        Unknown Message Type
-      </div>
-    );
-  }
+      )}
+      <DisplayOpenAiInfoButton
+        chatMessage={message}
+        setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
+      />
+    </div>
+  );
 }
