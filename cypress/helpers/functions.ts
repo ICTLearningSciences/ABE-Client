@@ -307,10 +307,9 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
   }
 
   export function toPromptActivity(cy: CypressGlobal){
+    const key = cy.getLocalStorage(ACCESS_TOKEN_KEY).should("exist").should("equal", "fake-access-token")
+    const cookie = cy.getCookie("refreshTokenDev")
     cy.visit("/docs/1W8nTQk1bmzs88L-nxjIhCIqqAVVdzJRvzqRVV4v4lqg");
-    cy.get("[data-cy=header").should('exist')
-    cy.get("[data-cy=login-title").should('exist')
-    // cy.get("[data-cy=chat-box]").should("exist")
     cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
     cy.get("[data-cy=activity-display-65a8592b26523c7ce5acac9e]").click();
     cy.get("[data-cy=activity-select-start-button]").click();
