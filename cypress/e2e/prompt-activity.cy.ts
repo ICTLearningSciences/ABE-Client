@@ -129,6 +129,8 @@ describe('Prompt Activities', () => {
       cyMockDefault(cy, {userRole: UserRole.ADMIN});
       cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2)})
       cy.visit("/")
+      cy.get("[data-cy=login-title").should('exist')
+
       cy.get("[data-cy=role-switch]").click();
       cy.get("[data-cy=doc-list-item-Aliens]").click();
       cy.get("[data-cy=preview-button-N-3-Compare-Story-to-Hook]").click();
