@@ -12,7 +12,7 @@ import { JobStatus, UserRole } from "../helpers/types";
 
 
 describe('Prompt Activities', () => {
-    it('can visit prompt activity', async () => {
+    it('can visit prompt activity', () => {
       cyMockDefault(cy);
       cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)})
       toPromptActivity(cy)

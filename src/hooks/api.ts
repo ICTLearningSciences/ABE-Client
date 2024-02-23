@@ -34,8 +34,9 @@ import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
 import { addQueryParam } from '../helpers';
 import { isBulletPointMessage } from '../store/slices/chat/helpers';
 
-const API_ENDPOINT = process.env.REACT_APP_GOOGLE_API_ENDPOINT || '';
-const GRAPHQL_ENDPOINT = process.env.REACT_APP_GRAPHQL_ENDPOINT || '';
+const API_ENDPOINT = process.env.REACT_APP_GOOGLE_API_ENDPOINT || '/docs';
+const GRAPHQL_ENDPOINT =
+  process.env.REACT_APP_GRAPHQL_ENDPOINT || '/graphql/graphql';
 
 const REQUEST_TIMEOUT_GRAPHQL_DEFAULT = 30000;
 
