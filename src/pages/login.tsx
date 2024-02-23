@@ -49,7 +49,7 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
             src={AbeTitle}
             alt="ABE"
           />
-          <span style={{ fontSize: '22px' }}>
+          <span data-cy="login-title" style={{ fontSize: '22px' }}>
             AI for Brainstorming and Editing
           </span>
         </ColumnDiv>
