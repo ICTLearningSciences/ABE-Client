@@ -1,3 +1,5 @@
+TEST_E2E_DOCKER_COMPOSE=docker-compose
+
 .PHONY: develop
 develop:
 	npm run start
@@ -43,3 +45,12 @@ format: LICENSE LICENSE_HEADER
 .PHONY: license
 license: LICENSE LICENSE_HEADER
 	npm run license:fix 
+
+
+.PHONY: test-e2e-exec
+test-e2e-exec:
+	$(TEST_E2E_DOCKER_COMPOSE) exec -T cypress npx cypress run
+
+.PHONY: test-e2e-build
+test-e2e-build:
+	$(TEST_E2E_DOCKER_COMPOSE) build

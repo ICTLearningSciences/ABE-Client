@@ -20,6 +20,8 @@ import { updateUserActivityStatesResponse } from "../fixtures/update-user-activi
 import { ACCESS_TOKEN_KEY, localStorageStore } from "./local-storage";
 import { UserRole } from "./types";
 
+export type CypressGlobal = Cypress.cy & CyEventEmitter;
+
 
   interface StaticResponse {
     /**
@@ -74,7 +76,7 @@ import { UserRole } from "./types";
     };
   }
   
-  export function cySetup(cy) {
+  export function cySetup(cy: CypressGlobal) {
     cy.viewport(1280, 720);
     cy.clearLocalStorage();
   }
@@ -86,7 +88,7 @@ import { UserRole } from "./types";
 //     });
 //   }
   
-  export function cyInterceptGraphQL(cy, mocks: MockGraphQLQuery[]): void {
+  export function cyInterceptGraphQL(cy: CypressGlobal, mocks: MockGraphQLQuery[]): void {
     const queryCalls: any = {};
     for (const mock of mocks) {
       queryCalls[mock.query] = 0;
@@ -136,13 +138,13 @@ import { UserRole } from "./types";
     };
   }
   
-  export function cyMockLogin(cy): void {
+  export function cyMockLogin(cy: CypressGlobal): void {
     cy.setLocalStorage(ACCESS_TOKEN_KEY, "fake-access-token")
     cy.setCookie("refreshTokenDev", "fake-refresh-token", {secure: true});
   }
   
   export function cyMockDefault(
-    cy,
+    cy: CypressGlobal,
     args: {
       gqlQueries?: MockGraphQLQuery[];
       userRole?: UserRole;
@@ -166,7 +168,7 @@ import { UserRole } from "./types";
   }
   
   export function cyMockOpenAiCall(
-    cy,
+    cy: CypressGlobal,
     params: {
       statusCode?: number,
       response?: any;
@@ -213,7 +215,7 @@ import { UserRole } from "./types";
     "Narrativity_Outro",
     "Complete_Emotions"
   }
-  export function toStrongerHookActivity(cy, step?: StepNames){
+  export function toStrongerHookActivity(cy: CypressGlobal, step?: StepNames){
     cy.visit("/docs/1W8nTQk1bmzs88L-nxjIhCIqqAVVdzJRvzqRVV4v4lqg");
     cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
     cy.get("[data-cy=activity-display-658230f699045156193339ac]").click();
@@ -297,14 +299,16 @@ import { UserRole } from "./types";
     }
   }
 
-  export function toPromptEditing(cy){
+  export function toPromptEditing(cy: CypressGlobal){
     cy.visit("/docs/1W8nTQk1bmzs88L-nxjIhCIqqAVVdzJRvzqRVV4v4lqg");
     cy.get("[data-cy=doc-goal-cancel-button]").click();
     cy.get("[data-cy=role-switch]").click();
     cy.get("[data-cy=prompt-item-Build-Thesis-Support]").click();
   }
 
-  export function toPromptActivity(cy){
+  export function toPromptActivity(cy: CypressGlobal){
+    const key = cy.getLocalStorage(ACCESS_TOKEN_KEY).should("exist").should("equal", "fake-access-token")
+    const cookie = cy.getCookie("refreshTokenDev").should("exist").should("have.property", "value", "fake-refresh-token")
     cy.visit("/docs/1W8nTQk1bmzs88L-nxjIhCIqqAVVdzJRvzqRVV4v4lqg");
     cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
     cy.get("[data-cy=activity-display-65a8592b26523c7ce5acac9e]").click();
