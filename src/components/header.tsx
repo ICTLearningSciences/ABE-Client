@@ -32,6 +32,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
 
   return (
     <header
+      data-cy="header"
       style={{
         width: '100%',
         height: '6%',
