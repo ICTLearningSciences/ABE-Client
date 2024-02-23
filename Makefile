@@ -50,3 +50,7 @@ license: LICENSE LICENSE_HEADER
 .PHONY: test-e2e-exec
 test-e2e-exec:
 	$(TEST_E2E_DOCKER_COMPOSE) exec -T cypress npx cypress run
+
+.PHONY: test-e2e-build
+test-e2e-build:
+	$(TEST_E2E_DOCKER_COMPOSE) build
