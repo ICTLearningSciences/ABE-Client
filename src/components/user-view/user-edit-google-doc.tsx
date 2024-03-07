@@ -20,6 +20,7 @@ import { useWithPrompts as _useWithPrompts } from '../../hooks/use-with-prompts'
 import { DisplayIcons } from '../../helpers/display-icon-helper';
 import { v4 as uuidv4 } from 'uuid';
 import { removeDuplicatesByField } from '../../helpers';
+import { useWithWindowSize } from '../../hooks/use-with-window-size';
 
 export default function EditGoogleDoc(props: {
   googleDocId: string;
@@ -36,6 +37,7 @@ export default function EditGoogleDoc(props: {
   const useWithPrompts = _useWithPrompts();
   const { prompts } = useWithPrompts;
   const navigate = useNavigate();
+  const { width: windowWidth } = useWithWindowSize();
   const { updateViewingUserRole } = useWithState();
   const [docGoalModalOpen, setDocGoalModalOpen] = useState(false);
   const googleDocUrl = `https://docs.google.com/document/d/${googleDocId}/edit`;
@@ -121,6 +123,10 @@ export default function EditGoogleDoc(props: {
     );
   }
 
+  const smallWindowWidth = windowWidth < 1200;
+  const googleDocWidth = smallWindowWidth ? '60%' : '55%';
+  const chatButtonologyWidth = smallWindowWidth ? '40%' : '45%';
+
   return (
     <div style={{ height: '100%', display: 'flex', flexGrow: 1 }}>
       <div
@@ -128,9 +134,9 @@ export default function EditGoogleDoc(props: {
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
-          width: '100%',
           justifyContent: 'space-around',
           alignItems: 'center',
+          width: googleDocWidth,
         }}
       >
         <iframe width={'98%'} height={'98%'} src={googleDocUrl} />
@@ -144,43 +150,45 @@ export default function EditGoogleDoc(props: {
         </Button>
       </div>
 
-      {viewingAdmin ? (
-        <Buttonology
-          googleDocId={googleDocId}
-          activities={allActivities}
-          goToActivity={goToActivityPreview}
-          useWithPrompts={useWithPrompts}
-        />
-      ) : (
-        <div
-          style={{
-            width: '100%',
-          }}
-        >
-          <Chat
-            selectedActivity={goalActivityState?.selectedActivity}
-            selectedGoal={goalActivityState?.selectedGoal}
-            editDocGoal={editDocGoal}
-            setSelectedActivity={setActivity}
+      <div
+        style={{
+          width: chatButtonologyWidth,
+        }}
+      >
+        {viewingAdmin ? (
+          <Buttonology
+            googleDocId={googleDocId}
+            activities={allActivities}
+            goToActivity={goToActivityPreview}
             useWithPrompts={useWithPrompts}
           />
-          <DocGoalModal
-            docGoals={docGoals}
-            setSelectedGoal={setGoal}
-            setSelectedActivity={setActivity}
-            selectedActivity={goalActivityState?.selectedActivity}
-            selectedGoal={goalActivityState?.selectedGoal}
-            open={
-              docGoalModalOpen &&
-              Boolean(docGoals?.length) &&
-              !previewingActivity
-            }
-            close={() => {
-              setDocGoalModalOpen(false);
-            }}
-          />
-        </div>
-      )}
+        ) : (
+          <>
+            <Chat
+              selectedActivity={goalActivityState?.selectedActivity}
+              selectedGoal={goalActivityState?.selectedGoal}
+              editDocGoal={editDocGoal}
+              setSelectedActivity={setActivity}
+              useWithPrompts={useWithPrompts}
+            />
+            <DocGoalModal
+              docGoals={docGoals}
+              setSelectedGoal={setGoal}
+              setSelectedActivity={setActivity}
+              selectedActivity={goalActivityState?.selectedActivity}
+              selectedGoal={goalActivityState?.selectedGoal}
+              open={
+                docGoalModalOpen &&
+                Boolean(docGoals?.length) &&
+                !previewingActivity
+              }
+              close={() => {
+                setDocGoalModalOpen(false);
+              }}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }
