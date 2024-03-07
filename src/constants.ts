@@ -13,3 +13,11 @@ export const LIGHT_BLUE_HEX = '#a6e3ff';
 export const LOADING_NAME = 'Loading';
 
 export const MOBILE_CUTOFF_SIZE = 1300;
+
+export enum GptModels {
+  GPT_3_5 = 'gpt-3.5-turbo-16k',
+  GPT_4 = 'gpt-4',
+  NONE = '',
+}
+
+export const DEFAULT_GPT_MODEL = GptModels.GPT_3_5;

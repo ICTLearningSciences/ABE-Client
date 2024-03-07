@@ -40,6 +40,7 @@ import {
 } from '../../helpers';
 import { ErrorDialog } from '../dialog';
 import { asyncPromptExecute } from '../../hooks/use-with-synchronous-polling';
+import { DEFAULT_GPT_MODEL, GptModels } from '../../constants';
 
 const emptyOpenAiPromptStep: OpenAiPromptStep = {
   prompts: [
@@ -49,6 +50,7 @@ const emptyOpenAiPromptStep: OpenAiPromptStep = {
       promptRole: PromptRoles.USER,
     },
   ],
+  targetGptModel: DEFAULT_GPT_MODEL,
   outputDataType: PromptOutputTypes.TEXT,
 };
 
@@ -84,7 +86,9 @@ export function MultiPromptTesting(props: {
   const orphanPrompts = prompts?.filter((prompt) => {
     return !isPromptInActivity(prompt, activities);
   });
-  const useGpt4 = useAppSelector((state) => state.state.useGpt4);
+  const overrideGptModel = useAppSelector(
+    (state) => state.state.overideGptModel
+  );
   const [previousRuns, setPreviousRuns] = useState<MultistepPromptRes[]>([]);
   const [viewPrevRunResults, setViewPrevRunResults] = useState<boolean>(false);
   const [runToView, setRunToView] = useState<MultistepPromptRes>();
@@ -376,6 +380,35 @@ export function MultiPromptTesting(props: {
                   <MenuItem value={PromptOutputTypes.JSON}>JSON</MenuItem>
                 </Select>
               </FormControl>
+              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                <InputLabel id="select-gpt-model">GPT Model</InputLabel>
+                <Select
+                  labelId="select-gpt-model"
+                  id="gpt-model-select"
+                  value={openAiPromptStep.targetGptModel}
+                  onChange={(e) => {
+                    editOrAddPrompt({
+                      ...promptTemplate,
+                      openAiPromptSteps: promptTemplate.openAiPromptSteps.map(
+                        (openAiPromptStep, openAiPromptStepIndex) => {
+                          if (openAiPromptStepIndex === index) {
+                            return {
+                              ...openAiPromptStep,
+                              targetGptModel: e.target.value as GptModels,
+                            };
+                          } else {
+                            return openAiPromptStep;
+                          }
+                        }
+                      ),
+                    });
+                  }}
+                  label="Output Data Type"
+                >
+                  <MenuItem value={GptModels.GPT_3_5}>GPT 3.5</MenuItem>
+                  <MenuItem value={GptModels.GPT_4}>GPT 4</MenuItem>
+                </Select>
+              </FormControl>
             </ColumnDiv>
             <Button
               disabled={inProgress}
@@ -434,7 +467,7 @@ export function MultiPromptTesting(props: {
                     promptTemplate.openAiPromptSteps,
                     userId,
                     systemPrompt,
-                    useGpt4
+                    overrideGptModel
                   );
                   setPreviousRuns((prevRuns) => {
                     return [...prevRuns, res];

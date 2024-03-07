@@ -3,9 +3,11 @@ import { useState, useRef, useEffect } from 'react';
 import {
   Button,
   CircularProgress,
-  FormControlLabel,
+  FormControl,
   IconButton,
-  Switch,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
 } from '@mui/material';
 import { useWithChat } from '../../../store/slices/chat/use-with-chat';
@@ -38,6 +40,7 @@ import Message from './message';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { UseWithPrompts } from '../../../hooks/use-with-prompts';
 import { v4 as uuidv4 } from 'uuid';
+import { GptModels } from '../../../constants';
 
 function ChatMessagesContainer(props: {
   coachResponsePending: boolean;
@@ -278,7 +281,7 @@ export default function Chat(props: {
     deleteSystemPrompt,
     isSaving,
   } = useWithSystemPromptsConfig();
-  const { toggleGpt4, state } = useWithState();
+  const { overrideOpenAiModel, state } = useWithState();
   const { userActivityStates, googleDocId } = state;
   const coachResponsePending = useAppSelector(
     (state) => state.chat.coachResponsePending
@@ -418,23 +421,28 @@ export default function Chat(props: {
             />
             {userIsAdmin && state.viewingAdvancedOptions && (
               <RowDiv>
-                <FormControlLabel
-                  labelPlacement="top"
-                  style={{
-                    margin: 0,
-                    marginRight: 10,
-                  }}
-                  control={
-                    <Switch
-                      size="medium"
-                      checked={state.useGpt4}
-                      onChange={(value) => {
-                        toggleGpt4(value.target.checked);
-                      }}
-                    />
-                  }
-                  label="GPT-4"
-                />
+                <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                  <InputLabel size="small" id="override-gpt-model">
+                    Override Model
+                  </InputLabel>
+                  <Select
+                    labelId="override-gpt-model"
+                    id="gpt-model-override"
+                    value={
+                      state.overideGptModel === GptModels.NONE
+                        ? ''
+                        : state.overideGptModel
+                    }
+                    onChange={(e) => {
+                      overrideOpenAiModel(e.target.value as GptModels);
+                    }}
+                    label="Output Data Type"
+                  >
+                    <MenuItem value={GptModels.NONE}>None</MenuItem>
+                    <MenuItem value={GptModels.GPT_3_5}>GPT 3.5</MenuItem>
+                    <MenuItem value={GptModels.GPT_4}>GPT 4</MenuItem>
+                  </Select>
+                </FormControl>
                 <RowDiv
                   style={{
                     justifyContent: 'center',

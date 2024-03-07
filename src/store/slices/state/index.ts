@@ -7,11 +7,12 @@ The full terms of this copyright and license should always be found in the root 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { UserActivityState } from '../../../types';
 import { UserRole } from '../login';
+import { GptModels } from '../../../constants';
 
 export interface State {
   googleDocId: string;
   userActivityStates: UserActivityState[];
-  useGpt4: boolean;
+  overideGptModel: GptModels;
   viewingRole: UserRole;
   viewingAdvancedOptions: boolean;
 }
@@ -19,7 +20,7 @@ export interface State {
 const initialState: State = {
   googleDocId: '',
   userActivityStates: [],
-  useGpt4: false,
+  overideGptModel: GptModels.NONE,
   viewingRole: UserRole.USER,
   viewingAdvancedOptions: false,
 };
@@ -38,8 +39,8 @@ export const stateSlice = createSlice({
     ) => {
       state.userActivityStates = action.payload;
     },
-    toggleOpenAiModel: (state: State, action: PayloadAction<boolean>) => {
-      state.useGpt4 = action.payload;
+    overrideOpenAiModel: (state: State, action: PayloadAction<GptModels>) => {
+      state.overideGptModel = action.payload;
     },
     updateViewingUserRole: (state: State, action: PayloadAction<UserRole>) => {
       state.viewingRole = action.payload;
@@ -56,7 +57,7 @@ export const stateSlice = createSlice({
 export const {
   updateDocId,
   updateUserActivityStates,
-  toggleOpenAiModel,
+  overrideOpenAiModel,
   updateViewingUserRole,
   updateViewingAdvancedOptions,
 } = stateSlice.actions;

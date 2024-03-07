@@ -4,6 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { GptModels } from './constants';
 import { DisplayIcons } from './helpers/display-icon-helper';
 import { StepData } from './hooks/use-with-stronger-hook-activity';
 import { ChatMessageTypes, UserInputType } from './store/slices/chat';
@@ -121,6 +122,7 @@ export interface PromptConfiguration {
 
 export interface OpenAiPromptStep {
   prompts: PromptConfiguration[];
+  targetGptModel: GptModels;
   outputDataType: PromptOutputTypes;
   includeChatLogContext?: boolean;
 }

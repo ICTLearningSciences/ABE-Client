@@ -17,6 +17,7 @@ import {
 import { MessageDisplayType, Sender } from '../store/slices/chat';
 import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { v4 as uuidv4 } from 'uuid';
+import { DEFAULT_GPT_MODEL, GptModels } from '../constants';
 
 export default function useWithFreeInput(selectedGoal?: DocGoal) {
   const { state, sendMessage, chatLogToString, coachResponsePending } =
@@ -28,7 +29,9 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
   );
-  const useGpt4: boolean = useAppSelector((state) => state.state.useGpt4);
+  const overrideGptModel: GptModels = useAppSelector(
+    (state) => state.state.overideGptModel
+  );
   const systemPrompt: string = useAppSelector(
     (state) => state.chat.systemPrompt
   );
@@ -76,6 +79,7 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
               promptRole: PromptRoles.ASSISSANT,
             },
           ],
+          targetGptModel: DEFAULT_GPT_MODEL,
           outputDataType: PromptOutputTypes.TEXT,
         },
       ];
@@ -92,7 +96,7 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
         prompts,
         userId,
         systemPrompt,
-        useGpt4,
+        overrideGptModel,
         source.token
       )
         .then((response) => {

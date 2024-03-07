@@ -9,7 +9,7 @@ import {
   State,
   updateDocId,
   updateUserActivityStates,
-  toggleOpenAiModel,
+  overrideOpenAiModel as _overrideOpenAiModel,
   updateViewingUserRole,
   updateViewingAdvancedOptions,
 } from '.';
@@ -19,6 +19,7 @@ import {
 } from '../../../hooks/api';
 import { UserActivityState } from '../../../types';
 import { UserRole } from '../login';
+import { GptModels } from '../../../constants';
 
 interface UseWithState {
   state: State;
@@ -30,7 +31,7 @@ interface UseWithState {
     activityId: string,
     metadata: string
   ) => Promise<void>;
-  toggleGpt4: (use: boolean) => void;
+  overrideOpenAiModel: (model: GptModels) => void;
   updateViewingUserRole: (role: UserRole) => void;
   updateViewingAdvancedOptions: (advancedOptions: boolean) => void;
 }
@@ -40,8 +41,8 @@ export function useWithState(): UseWithState {
   const dispatch = useAppDispatch();
   const state: State = useAppSelector((state) => state.state);
 
-  function toggleGpt4(use: boolean) {
-    dispatch(toggleOpenAiModel(use));
+  function overrideOpenAiModel(model: GptModels) {
+    dispatch(_overrideOpenAiModel(model));
   }
 
   function updateCurrentDocId(id: string) {
@@ -95,7 +96,7 @@ export function useWithState(): UseWithState {
     updateCurrentDocId,
     loadUserActivityStates,
     updateUserActivityState,
-    toggleGpt4,
+    overrideOpenAiModel,
     updateViewingUserRole: _updateViewingUserRole,
     updateViewingAdvancedOptions: _updateViewingAdvancedOptions,
   };

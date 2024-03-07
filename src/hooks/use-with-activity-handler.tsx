@@ -32,6 +32,7 @@ import { getLastUserMessage } from '../helpers';
 import { UseWithPrompts } from './use-with-prompts';
 import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { v4 as uuidv4 } from 'uuid';
+import { GptModels } from '../constants';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -100,7 +101,10 @@ export function useWithActivityHandler(
     source: CancelTokenSource;
   }>();
   const { prompts, isLoading: promptsLoading } = useWithPrompts;
-  const useGpt4 = useAppSelector((state) => state.state.useGpt4);
+  const overrideGptModel: GptModels = useAppSelector(
+    (state) => state.state.overideGptModel
+  );
+
   const strongerHookActivity = useWithStrongerHookActivity(
     selectedActivity || emptyActivity,
     sendMessage,
@@ -213,7 +217,7 @@ export function useWithActivityHandler(
       openAiPromptSteps,
       userId,
       systemPrompt,
-      useGpt4,
+      overrideGptModel,
       source.token
     )
       .then((response) => {
@@ -296,7 +300,7 @@ export function useWithActivityHandler(
         retryData.prompts,
         userId,
         systemPrompt,
-        useGpt4,
+        overrideGptModel,
         source.token
       )
         .then((response) => {

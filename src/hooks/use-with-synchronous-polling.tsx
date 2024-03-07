@@ -12,13 +12,14 @@ import {
   OpenAiPromptStep,
 } from '../types';
 import { asyncOpenAiJobStatus, asyncOpenAiRequest } from './api';
+import { GptModels } from '../constants';
 
 export async function asyncPromptExecute(
   googleDocId: string,
   openAiPromptSteps: OpenAiPromptStep[],
   userId: string,
   systemPrompt: string,
-  useGpt4: boolean,
+  overrideGptModel: GptModels,
   cancelToken?: CancelToken
 ): Promise<MultistepPromptRes> {
   const openAiJobId = await asyncOpenAiRequest(
@@ -26,7 +27,7 @@ export async function asyncPromptExecute(
     openAiPromptSteps,
     userId,
     systemPrompt,
-    useGpt4,
+    overrideGptModel,
     cancelToken
   );
   const pollFunction = () => {

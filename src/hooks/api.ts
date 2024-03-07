@@ -33,6 +33,7 @@ import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
 import { addQueryParam } from '../helpers';
 import { isBulletPointMessage } from '../store/slices/chat/helpers';
+import { GptModels } from '../constants';
 
 const API_ENDPOINT = process.env.REACT_APP_GOOGLE_API_ENDPOINT || '/docs';
 const GRAPHQL_ENDPOINT =
@@ -286,7 +287,8 @@ export async function fetchPrompts(): Promise<GQLResPrompts> {
                       includeUserInput
                       promptRole
                     }
-                    outputDataType
+                  targetGptModel
+                  outputDataType
                     includeChatLogContext
                   }
                 }
@@ -322,6 +324,7 @@ export async function storePrompts(
                 promptRole
               }
               outputDataType
+              targetGptModel
               includeChatLogContext
             }
           }
@@ -507,6 +510,7 @@ export async function fetchDocGoals(): Promise<DocGoal[]> {
                         promptRole
                       }
                       outputDataType
+                      targetGptModel
                       includeChatLogContext
                     }
                   }
@@ -623,7 +627,7 @@ export async function asyncOpenAiRequest(
   openAiPromptSteps: OpenAiPromptStep[],
   userId: string,
   systemPrompt: string,
-  useGpt4: boolean,
+  overrideOpenAiModel: GptModels,
   cancelToken?: CancelToken
 ): Promise<OpenAiJobId> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
@@ -633,7 +637,7 @@ export async function asyncOpenAiRequest(
     `${API_ENDPOINT}/async_open_ai_doc_question/?docId=${docsId}&userAction=${
       UserActions.MULTISTEP_PROMPTS
     }&userId=${userId}&systemPrompt=${systemPrompt}${
-      useGpt4 ? '&openAiModel=gpt-4' : ''
+      overrideOpenAiModel ? `&openAiModel=${overrideOpenAiModel}` : ''
     }`,
     {
       accessToken: accessToken,
