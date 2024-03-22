@@ -18,7 +18,7 @@ import {
   UserInputType,
 } from '../../../store/slices/chat';
 import { ChatHeader, RowDiv, SmallGreyText } from '../../../styled-components';
-import useWithSelectGoalActivity from '../../../hooks/use-with-store-doc-versions';
+import { useWithStoreDocVersions } from '../../../hooks/use-with-store-doc-versions';
 import { useAppSelector } from '../../../store/hooks';
 import {
   ActivityGQL,
@@ -290,7 +290,7 @@ export default function Chat(props: {
   const userIsAdmin = userRole === UserRole.ADMIN;
   const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
   useWithFreeInput(selectedGoal);
-  useWithSelectGoalActivity();
+  useWithStoreDocVersions(selectedActivity?._id || '');
   const { activityReady } = useWithActivityHandler(
     useWithPrompts,
     editDocGoal,

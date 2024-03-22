@@ -78,6 +78,8 @@ export interface DocRevision {
   plainText: string;
   lastChangedId: string;
   chatLog: ChatMessageTypes[];
+  activity: string;
+  intent: string;
   title: string;
   lastModifyingUser: string;
   modifiedTime: string;

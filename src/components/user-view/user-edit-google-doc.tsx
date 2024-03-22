@@ -139,7 +139,12 @@ export default function EditGoogleDoc(props: {
           width: googleDocWidth,
         }}
       >
-        <iframe width={'98%'} height={'98%'} src={googleDocUrl} />
+        <iframe
+          width={'98%'}
+          height={'98%'}
+          src={googleDocUrl}
+          data-cy="google-doc-iframe"
+        />
         <Button
           variant="text"
           onClick={() => {

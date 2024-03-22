@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { entityFoundResponse } from "../fixtures/stronger-hook-activity/entity-found-response";
 import { analyzeHookResponse } from "../fixtures/stronger-hook-activity/analyze-hook-response";
-import { StepNames, cyMockDefault, cyMockOpenAiCall, mockGQL, toStrongerHookActivity } from "../helpers/functions";
+import { StepNames, cyMockDefault, cyMockOpenAiCall, mockGQL, testGoogleDocId, toStrongerHookActivity } from "../helpers/functions";
 import { helpBrainstormResponse } from "../fixtures/stronger-hook-activity/help-brainstorm-response";
 import { audienceEmotionsResponse } from "../fixtures/stronger-hook-activity/audience-emotion-response";
 import { openAiTextResponse } from "../fixtures/stronger-hook-activity/basic-text-response";
@@ -303,21 +303,21 @@ describe('Stronger Hook Activity', () => {
 
       it("can visit goal without activity via url params", ()=>{
         cyMockDefault(cy);
-        cy.visit("/docs/1W8nTQk1bmzs88L-nxjIhCIqqAVVdzJRvzqRVV4v4lqg?goalId=65823a8799045156193339b2");
+        cy.visit(`/docs/${testGoogleDocId}?goalId=65823a8799045156193339b2`);
         cy.get("[data-cy=chat-box]").should("contain.text", "Free Input")
         cy.get("[data-cy=doc-goal-modal]").should("not.exist")
       })
 
       it("can visit activity without goal via url params", ()=>{
         cyMockDefault(cy);
-        cy.visit("/docs/1W8nTQk1bmzs88L-nxjIhCIqqAVVdzJRvzqRVV4v4lqg?activityId=658230f699045156193339ac");
+        cy.visit(`/docs/${testGoogleDocId}?activityId=658230f699045156193339ac`);
         cy.get("[data-cy=chat-header]").should("have.text", "Stronger Hook")
         cy.get("[data-cy=chat-box]").should("contain.text", "This activity is to work on the hook that gets")
       })
 
       it("can visit goal and activity via url params", ()=>{
         cyMockDefault(cy);
-        cy.visit("/docs/1W8nTQk1bmzs88L-nxjIhCIqqAVVdzJRvzqRVV4v4lqg?goalId=6580e5640ac7bcb42fc8d27f&activityId=658230f699045156193339ac");
+        cy.visit(`/docs/${testGoogleDocId}?goalId=6580e5640ac7bcb42fc8d27f&activityId=658230f699045156193339ac`);
         cy.get("[data-cy=chat-box]").should("contain.text", "Hook")
         cy.get("[data-cy=doc-goal-modal]").should("not.exist")
         cy.get("[data-cy=chat-box]").should("contain.text", "This activity is to work on the hook that gets")
