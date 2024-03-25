@@ -4,10 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { testGoogleDocId } from "../helpers/functions";
+
 export const fetchGoogleDocsResponse = {
     "fetchGoogleDocs": [
         {
-            "googleDocId": "1W8nTQk1bmzs88L-nxjIhCIqqAVVdzJRvzqRVV4v4lqg",
+            "googleDocId": testGoogleDocId,
             "title": "Aliens",
             "createdAt": null,
             "admin": false

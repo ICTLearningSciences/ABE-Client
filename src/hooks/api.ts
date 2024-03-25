@@ -227,6 +227,8 @@ export async function submitDocRevision(
               displayType
               bulletPoints
             }
+            activity
+            intent
             title
             lastModifyingUser
             modifiedTime

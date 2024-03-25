@@ -18,7 +18,9 @@ import { openAiTextResponse } from "../fixtures/stronger-hook-activity/basic-tex
 import { entityFoundResponse } from "../fixtures/stronger-hook-activity/entity-found-response";
 import { updateUserActivityStatesResponse } from "../fixtures/update-user-activity-states";
 import { ACCESS_TOKEN_KEY, localStorageStore } from "./local-storage";
-import { UserRole } from "./types";
+import { DocData, UserRole } from "./types";
+
+export const testGoogleDocId = "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"
 
 export type CypressGlobal = Cypress.cy & CyEventEmitter;
 
@@ -153,6 +155,7 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
     const gqlQueries = args?.gqlQueries || [];
     cySetup(cy);
     cyMockLogin(cy);
+    cyMockGetDocData(cy);
     cyInterceptGraphQL(cy, [
       ...gqlQueries,
       //Defaults
@@ -163,10 +166,42 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
       mockGQL("FetchConfig", fetchConfigResponse),
       mockGQL("FetchDocGoals", fetchDocGoalsResponse),
       mockGQL("FetchSystemPrompts", fetchConfigResponse),
-      mockGQL("UpdateUserActivityState", updateUserActivityStatesResponse)
+      mockGQL("UpdateUserActivityState", updateUserActivityStatesResponse),
+      mockGQL("SubmitGoogleDocVersion", {})
     ]);
   }
   
+  export function cyMockGetDocData(
+    cy: CypressGlobal,
+    params: Partial<DocData> = {}
+  ){
+    const defaultDocData: DocData = {
+      plainText: "This is a test doc",
+      lastChangedId: "123",
+      title: "Test Doc",
+      lastModifyingUser: "",
+      modifiedTime: ""
+    }
+  
+    const docData = {
+      ...defaultDocData,
+      ...params
+    }
+
+    cy.intercept("**/get_doc_data/**", (req) => {
+      req.reply(
+        staticResponse({
+          statusCode: 200,
+          body: docData,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          delayMs: 0
+        })
+      );
+    })
+  }
+
   export function cyMockOpenAiCall(
     cy: CypressGlobal,
     params: {
@@ -216,7 +251,7 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
     "Complete_Emotions"
   }
   export function toStrongerHookActivity(cy: CypressGlobal, step?: StepNames){
-    cy.visit("/docs/1W8nTQk1bmzs88L-nxjIhCIqqAVVdzJRvzqRVV4v4lqg");
+    cy.visit(`/docs/${testGoogleDocId}`);
     cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
     cy.get("[data-cy=activity-display-658230f699045156193339ac]").click();
     cy.get("[data-cy=activity-select-start-button]").click();
@@ -300,7 +335,7 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
   }
 
   export function toPromptEditing(cy: CypressGlobal){
-    cy.visit("/docs/1W8nTQk1bmzs88L-nxjIhCIqqAVVdzJRvzqRVV4v4lqg");
+    cy.visit(`/docs/${testGoogleDocId}`);
     cy.get("[data-cy=doc-goal-cancel-button]").click();
     cy.get("[data-cy=role-switch]").click();
     cy.get("[data-cy=prompt-item-Build-Thesis-Support]").click();
@@ -309,7 +344,7 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
   export function toPromptActivity(cy: CypressGlobal){
     const key = cy.getLocalStorage(ACCESS_TOKEN_KEY).should("exist").should("equal", "fake-access-token")
     const cookie = cy.getCookie("refreshTokenDev").should("exist").should("have.property", "value", "fake-refresh-token")
-    cy.visit("/docs/1W8nTQk1bmzs88L-nxjIhCIqqAVVdzJRvzqRVV4v4lqg");
+    cy.visit(`/docs/${testGoogleDocId}`);
     cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
     cy.get("[data-cy=activity-display-65a8592b26523c7ce5acac9e]").click();
     cy.get("[data-cy=activity-select-start-button]").click();

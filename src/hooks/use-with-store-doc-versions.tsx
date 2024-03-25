@@ -11,7 +11,7 @@ import { useAppSelector } from '../store/hooks';
 import useInterval from './use-interval';
 import { DocRevision } from '../types';
 
-export default function useWithStoreDocVersions() {
+export function useWithStoreDocVersions(selectedActivityId: string) {
   const { state } = useWithChat();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
@@ -19,23 +19,33 @@ export default function useWithStoreDocVersions() {
   const messages = state.chatLogs[googleDocId] || [];
   const [lastUpdatedId, setLastUpdatedId] = useState<string>('');
   const [lastUpdatedTitle, setLastUpdatedTitle] = useState<string>('');
+  const [lastNumMessages, setLastNumMessages] = useState<number>(
+    messages.length
+  );
 
   useInterval(
     async () => {
       try {
+        if (!messages.length) {
+          return;
+        }
         const docData = await getDocData(googleDocId);
         if (
           docData.lastChangedId === lastUpdatedId &&
-          docData.title === lastUpdatedTitle
+          docData.title === lastUpdatedTitle &&
+          messages.length === lastNumMessages
         )
           return;
         setLastUpdatedId(docData.lastChangedId);
         setLastUpdatedTitle(docData.title);
+        setLastNumMessages(messages.length);
         const newDocData: DocRevision = {
           docId: googleDocId,
           plainText: docData.plainText,
           lastChangedId: docData.lastChangedId,
           chatLog: messages,
+          activity: selectedActivityId,
+          intent: '',
           title: docData.title,
           lastModifyingUser: docData.lastModifyingUser,
           modifiedTime: docData.modifiedTime,
@@ -45,8 +55,6 @@ export default function useWithStoreDocVersions() {
         console.log(e);
       }
     },
-    googleDocId ? (process.env.NODE_ENV === 'development' ? 60000 : 5000) : null
+    googleDocId ? (process.env.NODE_ENV === 'development' ? 5000 : 5000) : null
   );
-
-  return {};
 }
