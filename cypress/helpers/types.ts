@@ -20,7 +20,9 @@ export enum Sender {
   export enum MessageDisplayType {
     TEXT = 'TEXT',
     PENDING_MESSAGE = 'PENDING_MESSAGE',
+    MESSAGE_STREAMING = 'MESSAGE_STREAMING'
   }
+  
 export interface ChatMessage {
     sender: Sender;
     displayType: MessageDisplayType;

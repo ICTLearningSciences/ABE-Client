@@ -25,6 +25,7 @@ import { useWithState } from '../store/slices/state/use-with-state';
 import { useAppSelector } from '../store/hooks';
 import { freeInputPrompt } from './use-with-prompt-activity';
 import { v4 as uuidv4 } from 'uuid';
+import { useWithChat } from '../store/slices/chat/use-with-chat';
 
 export const WEAK_THRESHOLD = 4;
 export const MCQ_READY_FOR_REVIEW = 'Ready';
@@ -191,18 +192,17 @@ export const emotionCannedResponses: Record<number, string[]> = {
 export interface StepData {
   executePrompt: (
     prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
-    callback: (response: MultistepPromptRes) => void
+    streamText: boolean,
+    callback: (
+      response: MultistepPromptRes,
+      newMessage: ChatMessageTypes
+    ) => void
   ) => void;
   openSelectActivityModal: () => void;
 }
 
 export default function useWithStrongerHookActivity(
   activityGql: ActivityGQL,
-  sendMessage: (
-    msg: ChatMessageTypes,
-    clearChat: boolean,
-    docId: string
-  ) => void,
   setWaitingForUserAnswer: (waiting: boolean) => void,
   promptsLoading: boolean,
   prompts: GQLPrompt[],
@@ -211,6 +211,7 @@ export default function useWithStrongerHookActivity(
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
   const userId = useAppSelector((state) => state.login.user?._id);
   const { updateUserActivityState } = useWithState();
+  const { updateMessage, sendMessage } = useWithChat();
 
   interface StrongerHookActivityPrompts {
     analyzeHookPrompt: GQLPrompt;
@@ -438,7 +439,8 @@ export default function useWithStrongerHookActivity(
 
   function handleEntityDetectionResponse(
     response: MultistepPromptRes,
-    stepData: StepData
+    stepData: StepData,
+    message: ChatMessageTypes
   ) {
     const result = validateJsonResponse<EntityDetectionPromptResponse>(
       response.answer,
@@ -465,27 +467,23 @@ export default function useWithStrongerHookActivity(
     setExperiencesList(sortedExperiencesList);
     if (sortedExperiencesList.length === 0) {
       setWaitingForUserAnswer(true);
-      sendMessage(
+      updateMessage(
         {
-          id: uuidv4(),
+          ...message,
           message: `I didn't find any people or places in your responses. Please try again.`,
-          sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
           activityStep: narrativeWeakStepTwo(stepData),
         },
-        false,
         googleDocId
       );
     } else {
-      sendMessage(
+      updateMessage(
         {
-          id: uuidv4(),
+          ...message,
           message: result.response,
-          sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
           activityStep: narrativeWeakStepTwo(stepData),
         },
-        false,
         googleDocId
       );
       setCurStepName(StepNames.NARRATIVE_WEAK_STEP_THREE);
@@ -495,6 +493,7 @@ export default function useWithStrongerHookActivity(
   function handleAnalyzePromptResponse(
     response: MultistepPromptRes,
     stepData: StepData,
+    message: ChatMessageTypes,
     nextStage?: StepNames
   ) {
     try {
@@ -525,20 +524,17 @@ export default function useWithStrongerHookActivity(
           activityGql._id,
           cannedResponse
         );
-      sendMessage(
+      updateMessage(
         {
-          id: uuidv4(),
+          ...message,
           message: cannedResponse,
-          sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
           activityStep: introStep(stepData),
-
           openAiInfo: {
             openAiPrompt: response.openAiData[0].openAiPrompt,
             openAiResponse: response.openAiData[0].openAiResponse,
           },
         },
-        false,
         googleDocId
       );
 
@@ -565,7 +561,8 @@ export default function useWithStrongerHookActivity(
 
   function handleAudienceAndEmotionsPromptResponse(
     res: MultistepPromptRes,
-    stepData: StepData
+    stepData: StepData,
+    message: ChatMessageTypes
   ) {
     if (!audienceAnalysisPrompt) {
       return;
@@ -592,20 +589,17 @@ export default function useWithStrongerHookActivity(
     setAudienceEmotionsList(tempAudienceEmotionsList);
     if (tempAudienceEmotionsList.length === 1) {
       setWaitingForUserAnswer(true);
-      sendMessage(
+      updateMessage(
         {
-          id: uuidv4(),
+          ...message,
           message: `Okay. Are there any other audiences or stakeholders who are important to this? How should they feel?`,
-          sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
           activityStep: emotionWeakStepOne(stepData),
-
           openAiInfo: {
             openAiPrompt: res.openAiData[0].openAiPrompt,
             openAiResponse: res.openAiData[0].openAiResponse,
           },
         },
-        false,
         googleDocId
       );
     } else {
@@ -627,12 +621,12 @@ export default function useWithStrongerHookActivity(
       );
       executePrompt(
         () => updatedAudienceAnalysisPrompt,
+        true,
         (response: MultistepPromptRes) => {
-          sendMessage(
+          updateMessage(
             {
-              id: uuidv4(),
+              ...message,
               message: response.answer,
-              sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
               activityStep: emotionWeakStepOne(stepData),
 
@@ -641,7 +635,6 @@ export default function useWithStrongerHookActivity(
                 openAiResponse: response.openAiData[0].openAiResponse,
               },
             },
-            false,
             googleDocId
           );
           setCurStepName(StepNames.EMOTION_WEAK_STEP_TWO);
@@ -662,7 +655,9 @@ export default function useWithStrongerHookActivity(
         }
         executePrompt(
           () => analyzeHookPrompt,
-          (response) => handleAnalyzePromptResponse(response, stepData)
+          false,
+          (response, newMessage) =>
+            handleAnalyzePromptResponse(response, stepData, newMessage)
         );
       },
     };
@@ -756,13 +751,13 @@ export default function useWithStrongerHookActivity(
         if (response === HELP_ME_BRAINSTORM) {
           executePrompt(
             () => helpBrainstormPrompt,
-            (res: MultistepPromptRes) => {
+            true,
+            (res: MultistepPromptRes, message: ChatMessageTypes) => {
               setWaitingForUserAnswer(true);
-              sendMessage(
+              updateMessage(
                 {
-                  id: uuidv4(),
+                  ...message,
                   message: res.answer,
-                  sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
                   activityStep: narrativeWeakStepTwo(stepData),
 
@@ -771,7 +766,6 @@ export default function useWithStrongerHookActivity(
                     openAiResponse: res.openAiData[0].openAiResponse,
                   },
                 },
-                false,
                 googleDocId
               );
               sendMessage(
@@ -791,8 +785,9 @@ export default function useWithStrongerHookActivity(
         } else {
           executePrompt(
             () => entityDetectionPrompt,
-            (res: MultistepPromptRes) =>
-              handleEntityDetectionResponse(res, stepData)
+            false,
+            (res: MultistepPromptRes, newMessage: ChatMessageTypes) =>
+              handleEntityDetectionResponse(res, stepData, newMessage)
           );
         }
       },
@@ -827,21 +822,19 @@ export default function useWithStrongerHookActivity(
         }
         executePrompt(
           () => compareStoryToHookPrompt,
-          (response: MultistepPromptRes) => {
-            sendMessage(
+          true,
+          (response: MultistepPromptRes, message: ChatMessageTypes) => {
+            updateMessage(
               {
-                id: uuidv4(),
+                ...message,
                 message: response.answer,
-                sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: narrativeWeakStepFour(stepData),
-
                 openAiInfo: {
                   openAiPrompt: response.openAiData[0].openAiPrompt,
                   openAiResponse: response.openAiData[0].openAiResponse,
                 },
               },
-              false,
               googleDocId
             );
             userId &&
@@ -913,12 +906,12 @@ export default function useWithStrongerHookActivity(
         );
         executePrompt(
           () => updatedPrompt,
-          (response: MultistepPromptRes) => {
-            sendMessage(
+          true,
+          (response: MultistepPromptRes, message: ChatMessageTypes) => {
+            updateMessage(
               {
-                id: uuidv4(),
+                ...message,
                 message: response.answer,
-                sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: narrativeWeakStepSix(stepData),
 
@@ -927,7 +920,6 @@ export default function useWithStrongerHookActivity(
                   openAiResponse: response.openAiData[0].openAiResponse,
                 },
               },
-              false,
               googleDocId
             );
 
@@ -984,8 +976,9 @@ export default function useWithStrongerHookActivity(
         const { executePrompt } = stepData;
         executePrompt(
           () => audienceAndEmotionsDetectionPrompt,
-          (res: MultistepPromptRes) =>
-            handleAudienceAndEmotionsPromptResponse(res, stepData)
+          false,
+          (res: MultistepPromptRes, message: ChatMessageTypes) =>
+            handleAudienceAndEmotionsPromptResponse(res, stepData, message)
         );
       },
     };
@@ -1002,12 +995,12 @@ export default function useWithStrongerHookActivity(
         }
         executePrompt(
           () => eCommentOnProposedRevisionPrompt,
-          (res: MultistepPromptRes) => {
-            sendMessage(
+          true,
+          (res: MultistepPromptRes, message: ChatMessageTypes) => {
+            updateMessage(
               {
-                id: uuidv4(),
+                ...message,
                 message: res.answer,
-                sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: emotionWeakStepTwo(stepData),
                 openAiInfo: {
@@ -1015,7 +1008,6 @@ export default function useWithStrongerHookActivity(
                   openAiResponse: res.openAiData[0].openAiResponse,
                 },
               },
-              false,
               googleDocId
             );
             setState((prevState) => {
@@ -1043,12 +1035,12 @@ export default function useWithStrongerHookActivity(
         }
         executePrompt(
           () => eAnalyzeDocRevisionPrompt,
-          (response: MultistepPromptRes) => {
-            sendMessage(
+          true,
+          (response: MultistepPromptRes, message: ChatMessageTypes) => {
+            updateMessage(
               {
-                id: uuidv4(),
+                ...message,
                 message: response.answer,
-                sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: emotionWeakStepThree(stepData),
                 openAiInfo: {
@@ -1056,7 +1048,6 @@ export default function useWithStrongerHookActivity(
                   openAiResponse: response.openAiData[0].openAiResponse,
                 },
               },
-              false,
               googleDocId
             );
             setCurStepName(StepNames.OUTRO);
@@ -1072,25 +1063,27 @@ export default function useWithStrongerHookActivity(
       text: "Okay, feel free to ask me anything you'd like",
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       handleResponse: () => {
-        executePrompt(freeInputPrompt, (response: MultistepPromptRes) => {
-          setWaitingForUserAnswer(true);
-          sendMessage(
-            {
-              id: uuidv4(),
-              message: response.answer,
-              sender: Sender.SYSTEM,
-              displayType: MessageDisplayType.TEXT,
-              activityStep: freeInputStep(stepData),
+        executePrompt(
+          freeInputPrompt,
+          true,
+          (response: MultistepPromptRes, message: ChatMessageTypes) => {
+            setWaitingForUserAnswer(true);
+            updateMessage(
+              {
+                ...message,
+                message: response.answer,
+                displayType: MessageDisplayType.TEXT,
+                activityStep: freeInputStep(stepData),
 
-              openAiInfo: {
-                openAiPrompt: response.openAiData[0].openAiPrompt,
-                openAiResponse: response.openAiData[0].openAiResponse,
+                openAiInfo: {
+                  openAiPrompt: response.openAiData[0].openAiPrompt,
+                  openAiResponse: response.openAiData[0].openAiResponse,
+                },
               },
-            },
-            false,
-            googleDocId
-          );
-        });
+              googleDocId
+            );
+          }
+        );
       },
     };
   };

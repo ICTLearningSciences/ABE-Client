@@ -14,14 +14,23 @@ import {
   PromptOutputTypes,
   PromptRoles,
 } from '../types';
-import { MessageDisplayType, Sender } from '../store/slices/chat';
+import {
+  ChatMessageTypes,
+  MessageDisplayType,
+  Sender,
+} from '../store/slices/chat';
 import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_GPT_MODEL, GptModels } from '../constants';
 
 export default function useWithFreeInput(selectedGoal?: DocGoal) {
-  const { state, sendMessage, chatLogToString, coachResponsePending } =
-    useWithChat();
+  const {
+    state,
+    sendMessage,
+    chatLogToString,
+    coachResponsePending,
+    updateMessage,
+  } = useWithChat();
   const [abortController, setAbortController] = useState<{
     controller: AbortController;
     source: CancelTokenSource;
@@ -91,27 +100,43 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
         controller: abortController,
         source,
       });
+      const newMessage: ChatMessageTypes = {
+        id: uuidv4(),
+        message: '',
+        sender: Sender.SYSTEM,
+        displayType: MessageDisplayType.PENDING_MESSAGE,
+      };
+      sendMessage(newMessage, false, googleDocId);
       asyncPromptExecute(
         googleDocId,
         prompts,
         userId,
         systemPrompt,
         overrideGptModel,
+        true,
+        (answer) => {
+          updateMessage(
+            {
+              ...newMessage,
+              message: answer,
+              displayType: MessageDisplayType.MESSAGE_STREAMING,
+            },
+            googleDocId
+          );
+        },
         source.token
       )
         .then((response) => {
-          sendMessage(
+          updateMessage(
             {
-              id: uuidv4(),
+              ...newMessage,
               message: response.answer,
-              sender: Sender.SYSTEM,
-              displayType: MessageDisplayType.TEXT,
               openAiInfo: {
                 openAiPrompt: response.openAiData[0].openAiPrompt,
                 openAiResponse: response.openAiData[0].openAiResponse,
               },
+              displayType: MessageDisplayType.TEXT,
             },
-            false,
             googleDocId
           );
         })

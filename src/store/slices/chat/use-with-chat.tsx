@@ -13,6 +13,7 @@ import {
   clearChat,
   ChatMessageTypes,
   updateSystemPrompt,
+  updateMessage as _updateMessage,
 } from '.';
 
 interface UseWithChat {
@@ -31,6 +32,7 @@ interface UseWithChat {
   clearChatLog: (docId: string) => void;
   chatLogToString: (docId: string) => string;
   setSystemPrompt: (prompt: string) => void;
+  updateMessage: (msg: ChatMessageTypes, docId: string) => void;
 }
 
 export function useWithChat(): UseWithChat {
@@ -65,6 +67,11 @@ export function useWithChat(): UseWithChat {
     dispatch(updateSystemPrompt(prompt));
   }
 
+  function updateMessage(msg: ChatMessageTypes, docId: string) {
+    console.log(`updating message: ${msg.message}`);
+    dispatch(_updateMessage({ message: msg, docId }));
+  }
+
   function chatLogToString(docId: string) {
     const chatLog = chatState.chatLogs[docId];
     let chatLogString = '';
@@ -82,5 +89,6 @@ export function useWithChat(): UseWithChat {
     clearChatLog,
     chatLogToString,
     setSystemPrompt,
+    updateMessage,
   };
 }

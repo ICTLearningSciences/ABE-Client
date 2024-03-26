@@ -63,9 +63,13 @@ export const emptyActivity: Activity = {
 };
 
 interface PromptRetryData {
-  callback?: (response: MultistepPromptRes) => void;
+  callback?: (
+    response: MultistepPromptRes,
+    newMessage: ChatMessageTypes
+  ) => void;
   prompts: OpenAiPromptStep[];
   numRetries: number;
+  streamText: boolean;
 }
 
 export function useWithActivityHandler(
@@ -82,6 +86,7 @@ export function useWithActivityHandler(
     chatLogToString,
     clearChatLog,
     coachResponsePending,
+    updateMessage,
   } = useWithChat();
   const [retryData, setRetryData] = useState<PromptRetryData>();
   const googleDocId: string = useAppSelector(
@@ -107,7 +112,6 @@ export function useWithActivityHandler(
 
   const strongerHookActivity = useWithStrongerHookActivity(
     selectedActivity || emptyActivity,
-    sendMessage,
     setWaitingForUserAnswer,
     promptsLoading,
     prompts,
@@ -115,7 +119,6 @@ export function useWithActivityHandler(
   );
   const promptActivity = useWithPromptActivity(
     selectedActivity || emptyActivity,
-    sendMessage,
     setWaitingForUserAnswer
   );
 
@@ -168,7 +171,11 @@ export function useWithActivityHandler(
 
   async function executePrompt(
     _prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
-    callback?: (response: MultistepPromptRes) => void
+    streamText: boolean,
+    callback?: (
+      response: MultistepPromptRes,
+      newMessage: ChatMessageTypes
+    ) => void
   ) {
     if (!activity) return;
     if (!userId) return;
@@ -212,16 +219,38 @@ export function useWithActivityHandler(
       controller: abortController,
       source,
     });
+
+    const newMessage = {
+      id: uuidv4(),
+      message: '',
+      sender: Sender.SYSTEM,
+      displayType: MessageDisplayType.PENDING_MESSAGE,
+    };
+    sendMessage(newMessage, false, googleDocId);
+
     asyncPromptExecute(
       googleDocId,
       openAiPromptSteps,
       userId,
       systemPrompt,
       overrideGptModel,
+      streamText,
+      !streamText
+        ? undefined
+        : (answer) => {
+            updateMessage(
+              {
+                ...newMessage,
+                message: answer,
+                displayType: MessageDisplayType.MESSAGE_STREAMING,
+              },
+              googleDocId
+            );
+          },
       source.token
     )
       .then((response) => {
-        handleOpenAiSuccess(activity, response, callback);
+        handleOpenAiSuccess(activity, response, newMessage, callback);
       })
       .catch(() => {
         if (abortController.signal.aborted) return;
@@ -229,6 +258,7 @@ export function useWithActivityHandler(
           callback,
           prompts: openAiPromptSteps,
           numRetries: 0,
+          streamText,
         });
       });
   }
@@ -236,24 +266,26 @@ export function useWithActivityHandler(
   function handleOpenAiSuccess(
     activity: Activity,
     response: MultistepPromptRes,
-    callback?: (response: MultistepPromptRes) => void
+    newMessage: ChatMessageTypes,
+    callback?: (
+      response: MultistepPromptRes,
+      newMessage: ChatMessageTypes
+    ) => void
   ) {
     coachResponsePending(false);
     if (callback) {
-      callback(response);
-    } else {
-      sendMessage(
+      callback(response, newMessage);
+    } else if (newMessage) {
+      updateMessage(
         {
-          id: uuidv4(),
+          ...newMessage,
           message: response.answer,
-          sender: Sender.SYSTEM,
-          displayType: MessageDisplayType.TEXT,
           openAiInfo: {
             openAiPrompt: response.openAiData[0].openAiPrompt,
             openAiResponse: response.openAiData[0].openAiResponse,
           },
+          displayType: MessageDisplayType.TEXT,
         },
-        false,
         googleDocId
       );
     }
@@ -288,23 +320,44 @@ export function useWithActivityHandler(
     }
     coachResponsePending(true);
     setTimeout(() => {
-      const { callback, prompts, numRetries } = retryData;
+      const { callback, prompts, numRetries, streamText } = retryData;
       const abortController = new AbortController();
       const source = axios.CancelToken.source();
       setAbortController({
         controller: abortController,
         source,
       });
+      const newMessage: ChatMessageTypes = {
+        id: uuidv4(),
+        message: '',
+        sender: Sender.SYSTEM,
+        displayType: MessageDisplayType.PENDING_MESSAGE,
+      };
+      sendMessage(newMessage, false, googleDocId);
+
       asyncPromptExecute(
         googleDocId,
         retryData.prompts,
         userId,
         systemPrompt,
         overrideGptModel,
+        streamText,
+        !streamText
+          ? undefined
+          : (answer) => {
+              updateMessage(
+                {
+                  ...newMessage,
+                  message: answer,
+                  displayType: MessageDisplayType.MESSAGE_STREAMING,
+                },
+                googleDocId
+              );
+            },
         source.token
       )
         .then((response) => {
-          handleOpenAiSuccess(activity, response, callback);
+          handleOpenAiSuccess(activity, response, newMessage, callback);
         })
         .catch(() => {
           if (abortController.signal.aborted) return;
@@ -312,6 +365,7 @@ export function useWithActivityHandler(
             callback,
             prompts: prompts,
             numRetries: numRetries + 1,
+            streamText,
           });
         });
     }, 1000);

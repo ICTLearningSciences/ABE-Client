@@ -54,23 +54,13 @@ function ChatMessagesContainer(props: {
     setOpenAiInfoToDisplay,
     sendMessage,
   } = props;
+  const chatUpdatedCounter = useAppSelector(
+    (state) => state.chat.chatUpdatedCounter
+  );
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
   const { state } = useWithChat();
-  const messages = state.chatLogs[googleDocId] || [];
-  const chatMessages: ChatMessageTypes[] = [
-    ...messages,
-    ...(coachResponsePending
-      ? [
-          {
-            id: 'pending-message',
-            message: '...',
-            sender: Sender.SYSTEM,
-            displayType: MessageDisplayType.PENDING_MESSAGE,
-          },
-        ]
-      : []),
-  ];
+  const chatMessages = state.chatLogs[googleDocId] || [];
   const mostRecentChatId =
     chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].id : '';
 
@@ -113,7 +103,7 @@ function ChatMessagesContainer(props: {
     if (messageContainerRef.current) {
       scrollToMostRecentAiResponse();
     }
-  }, [messageElements]);
+  }, [messageElements.length, mostRecentChatId]);
 
   useEffect(() => {
     const _newMessageElements = chatMessages.map(
@@ -167,7 +157,7 @@ function ChatMessagesContainer(props: {
       }
     );
     setMessageElements(_newMessageElements);
-  }, [chatMessages.length, mostRecentChatId]);
+  }, [chatUpdatedCounter]);
 
   return (
     <div
@@ -246,6 +236,7 @@ function ChatInput(props: {
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
+            e.preventDefault();
             handleSendUserMessage(message);
           }
         }}

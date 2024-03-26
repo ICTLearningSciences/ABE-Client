@@ -217,4 +217,5 @@ export enum JobStatus {
 export interface OpenAiJobStatus {
   jobStatus: JobStatus;
   openAiResponse: MultistepPromptRes;
+  answer: string;
 }
