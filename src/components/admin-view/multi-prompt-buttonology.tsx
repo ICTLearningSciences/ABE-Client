@@ -467,7 +467,8 @@ export function MultiPromptTesting(props: {
                     promptTemplate.openAiPromptSteps,
                     userId,
                     systemPrompt,
-                    overrideGptModel
+                    overrideGptModel,
+                    false
                   );
                   setPreviousRuns((prevRuns) => {
                     return [...prevRuns, res];

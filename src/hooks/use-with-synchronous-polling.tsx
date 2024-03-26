@@ -20,6 +20,8 @@ export async function asyncPromptExecute(
   userId: string,
   systemPrompt: string,
   overrideGptModel: GptModels,
+  streamText: boolean,
+  updateMessage?: (msg: string) => void,
   cancelToken?: CancelToken
 ): Promise<MultistepPromptRes> {
   const openAiJobId = await asyncOpenAiRequest(
@@ -30,8 +32,12 @@ export async function asyncPromptExecute(
     overrideGptModel,
     cancelToken
   );
-  const pollFunction = () => {
-    return asyncOpenAiJobStatus(openAiJobId, cancelToken);
+  const pollFunction = async () => {
+    const res = await asyncOpenAiJobStatus(openAiJobId, cancelToken);
+    if (res.jobStatus !== JobStatus.COMPLETE && res.answer && streamText) {
+      updateMessage && updateMessage(res.answer);
+    }
+    return res;
   };
   const res = await pollUntilTrue<OpenAiJobStatus>(
     pollFunction,

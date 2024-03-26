@@ -11,6 +11,7 @@ import { UserRole } from '../../../store/slices/login';
 import { OpenAiReqRes } from '../../../types';
 import { useEffect, useState } from 'react';
 import './message.css';
+import useInterval from '../../../hooks/use-interval';
 
 const baseMessageStyle: React.CSSProperties = {
   borderRadius: '1rem',
@@ -93,10 +94,18 @@ export default function Message(props: {
   messageIndex: number;
 }): JSX.Element {
   const { message, setOpenAiInfoToDisplay, messageIndex } = props;
+  const [flash, setFlash] = useState(true);
   const backgroundColor =
     message.sender === Sender.USER ? LIGHT_BLUE_HEX : DARK_BLUE_HEX;
   const alignSelf = message.sender === Sender.USER ? 'flex-end' : 'flex-start';
   const textColor = message.sender === Sender.USER ? 'black' : 'white';
+
+  useInterval(
+    () => {
+      setFlash((prev) => !prev);
+    },
+    message.displayType === MessageDisplayType.MESSAGE_STREAMING ? 1000 : null
+  );
 
   return (
     <div
@@ -114,6 +123,9 @@ export default function Message(props: {
         <FadingText
           strings={['Reading...', 'Analyzing...', 'Getting opinionated...']}
         />
+      )}
+      {message.displayType === MessageDisplayType.MESSAGE_STREAMING && (
+        <span className="streaming-text">{message.message}</span>
       )}
       <DisplayOpenAiInfoButton
         chatMessage={message}

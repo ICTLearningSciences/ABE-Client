@@ -23,6 +23,7 @@ import { StepData } from './use-with-stronger-hook-activity';
 import { useAppSelector } from '../store/hooks';
 import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_GPT_MODEL } from '../constants';
+import { useWithChat } from '../store/slices/chat/use-with-chat';
 
 const MCQ_READY = 'Ready';
 const MCQ_ANALYZE = 'Analyze';
@@ -55,11 +56,6 @@ export const freeInputPrompt = (chatLog: ChatMessageTypes[]): GQLPrompt => {
 
 export function useWithPromptActivity(
   activityGql: ActivityGQL,
-  sendMessage: (
-    msg: ChatMessageTypes,
-    clearChat: boolean,
-    docId: string
-  ) => void,
   setWaitingForUserAnswer: (waiting: boolean) => void
 ): Activity {
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
@@ -68,7 +64,7 @@ export function useWithPromptActivity(
     INTRO_2 = 'INTRO_2',
     FREE_INPUT = 'FREE_INPUT',
   }
-
+  const { sendMessage, updateMessage } = useWithChat();
   const [curStepName, setCurStepName] = useState<StepNames>(StepNames.INTRO);
 
   useEffect(() => {
@@ -96,12 +92,12 @@ export function useWithPromptActivity(
       handleResponse: () => {
         executePrompt(
           () => activityGql.prompt!,
-          (response) => {
-            sendMessage(
+          true,
+          (response, message) => {
+            updateMessage(
               {
-                id: uuidv4(),
+                ...message,
                 message: response.answer,
-                sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: introStep(stepData),
                 openAiInfo: {
@@ -109,7 +105,6 @@ export function useWithPromptActivity(
                   openAiResponse: response.openAiData[0].openAiResponse,
                 },
               },
-              false,
               googleDocId
             );
             setCurStepName(StepNames.FREE_INPUT);
@@ -129,13 +124,13 @@ export function useWithPromptActivity(
         if (response === MCQ_ANALYZE) {
           executePrompt(
             () => activity.prompt!,
-            (response) => {
+            true,
+            (response, message) => {
               setWaitingForUserAnswer(true);
-              sendMessage(
+              updateMessage(
                 {
-                  id: uuidv4(),
+                  ...message,
                   message: response.answer,
-                  sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
                   activityStep: freeInputStep(stepData),
                   openAiInfo: {
@@ -143,7 +138,6 @@ export function useWithPromptActivity(
                     openAiResponse: response.openAiData[0].openAiResponse,
                   },
                 },
-                false,
                 googleDocId
               );
               sendMessage(
@@ -162,13 +156,12 @@ export function useWithPromptActivity(
             }
           );
         } else {
-          executePrompt(freeInputPrompt, (response) => {
+          executePrompt(freeInputPrompt, true, (response, message) => {
             setWaitingForUserAnswer(true);
-            sendMessage(
+            updateMessage(
               {
-                id: uuidv4(),
+                ...message,
                 message: response.answer,
-                sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: freeInputStep(stepData),
                 openAiInfo: {
@@ -176,7 +169,6 @@ export function useWithPromptActivity(
                   openAiResponse: response.openAiData[0].openAiResponse,
                 },
               },
-              false,
               googleDocId
             );
             sendMessage(

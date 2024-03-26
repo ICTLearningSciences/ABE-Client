@@ -10,3 +10,21 @@
   .fade-in {
     opacity: 1;
   }
+
+  .streaming-text::after{
+      content: " ";
+      width: 2px;
+      height: 10px;
+      background-color: #464646;
+      margin-left: 5px;
+      animation: flickerOpacity 1s infinite;
+  }
+
+  @keyframes flickerOpacity {
+    0%, 50% {
+      opacity: 1;
+    }
+    51%, 100% {
+      opacity: 0;
+    }
+  }

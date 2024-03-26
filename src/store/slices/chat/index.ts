@@ -15,6 +15,7 @@ export enum Sender {
 export enum MessageDisplayType {
   TEXT = 'TEXT',
   PENDING_MESSAGE = 'PENDING_MESSAGE',
+  MESSAGE_STREAMING = 'MESSAGE_STREAMING',
 }
 
 export enum UserInputType {
@@ -61,12 +62,14 @@ export interface ChatState {
   chatLogs: Record<GoogleDocId, ChatLog>;
   coachResponsePending: boolean;
   systemPrompt: string;
+  chatUpdatedCounter: number;
 }
 
 const initialState: ChatState = {
   chatLogs: {},
   coachResponsePending: false,
   systemPrompt: '',
+  chatUpdatedCounter: 0,
 };
 
 /** Reducer */
@@ -77,6 +80,30 @@ export const chatSlice = createSlice({
   reducers: {
     updateSystemPrompt: (state: ChatState, action: PayloadAction<string>) => {
       state.systemPrompt = action.payload;
+    },
+    updateMessage: (
+      state: ChatState,
+      action: PayloadAction<{
+        message: ChatMessageTypes;
+        docId: string;
+      }>
+    ) => {
+      const { message, docId } = action.payload;
+      if (!message) return;
+      const messages = state.chatLogs[docId] || [];
+      const messageIndex = messages.findIndex((m) => m.id === message.id);
+      if (messageIndex === -1) {
+        return;
+      }
+      state.chatLogs = {
+        ...state.chatLogs,
+        [docId]: [
+          ...messages.slice(0, messageIndex),
+          message,
+          ...messages.slice(messageIndex + 1),
+        ],
+      };
+      state.chatUpdatedCounter += 1;
     },
     addMessage: (
       state: ChatState,
@@ -112,6 +139,7 @@ export const chatSlice = createSlice({
         ...state.chatLogs,
         [docId]: [...(state.chatLogs[docId] || []), message],
       };
+      state.chatUpdatedCounter += 1;
     },
     addMessages: (
       state: ChatState,
@@ -132,6 +160,7 @@ export const chatSlice = createSlice({
         ...state.chatLogs,
         [docId]: [...(state.chatLogs[docId] || []), ...messages],
       };
+      state.chatUpdatedCounter += 1;
     },
     clearChat: (state: ChatState, action: PayloadAction<string>) => {
       const docId = action.payload;
@@ -139,12 +168,14 @@ export const chatSlice = createSlice({
         ...state.chatLogs,
         [docId]: [],
       };
+      state.chatUpdatedCounter += 1;
     },
     setCoachResponsePending: (
       state: ChatState,
       action: PayloadAction<boolean>
     ) => {
       state.coachResponsePending = action.payload;
+      state.chatUpdatedCounter += 1;
     },
   },
 });
@@ -155,6 +186,7 @@ export const {
   setCoachResponsePending,
   clearChat,
   updateSystemPrompt,
+  updateMessage,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
