@@ -28,6 +28,7 @@ import {
   OpenAiPromptStep,
   UserActivityState,
   OpenAiJobStatus,
+  GQLDocumentTimeline,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -667,6 +668,27 @@ export async function asyncOpenAiJobStatus(
     {
       accessToken: accessToken,
       dataPath: ['response'],
+      axiosConfig: {
+        cancelToken: cancelToken,
+      },
+    }
+  );
+  return res;
+}
+
+export async function requestDocTimeline(
+  userId: string,
+  docId: string,
+  cancelToken?: CancelToken
+): Promise<GQLDocumentTimeline> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  if (!accessToken) throw new Error('No access token');
+  const res = await execHttp<GQLDocumentTimeline>(
+    'POST',
+    `${API_ENDPOINT}/get_document_timeline/?docId=${docId}&userId=${userId}`,
+    {
+      accessToken: accessToken,
+      dataPath: [],
       axiosConfig: {
         cancelToken: cancelToken,
       },
