@@ -66,7 +66,7 @@ export function formatISODateToReadable(isoDate: string): string {
     const hours = inputDate.getHours() % 12 || 12;
     const minutes = inputDate.getMinutes().toString().padStart(2, '0');
     const period = inputDate.getHours() < 12 ? 'AM' : 'PM';
-    return `${hours}:${minutes} ${period}`;
+    return `${hours}:${minutes} ${period} (Today)`;
   } else {
     // If the date is not today, show the full date
     const options: Intl.DateTimeFormatOptions = {

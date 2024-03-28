@@ -23,6 +23,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import { Delete } from '@mui/icons-material';
 import './select-create-docs.css';
 import { useNavigate } from 'react-router-dom';
+import RestoreIcon from '@mui/icons-material/Restore';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: GoogleDoc[];
@@ -42,6 +43,10 @@ export default function SelectCreateDocs(props: {
   } = props;
   const [createDocOpen, setCreateDocOpen] = React.useState(false);
   const navigate = useNavigate();
+
+  function onHistoryClicked(docId: string) {
+    navigate(`/docs/history/${docId}`);
+  }
 
   function googleDocsDisplay() {
     return (
@@ -100,7 +105,8 @@ export default function SelectCreateDocs(props: {
                 <TableCell style={{ width: '66%', padding: 0 }}></TableCell>
                 <TableCell style={{ padding: 0 }}></TableCell>
                 <TableCell style={{ padding: 0 }}></TableCell>{' '}
-                {/* Empty cell for delete button */}
+                <TableCell style={{ padding: 0 }}></TableCell>{' '}
+                {/* Empty cells for delete/history buttons */}
               </TableRow>
             </TableHead>
 
@@ -132,6 +138,15 @@ export default function SelectCreateDocs(props: {
                   </TableCell>
                   <TableCell>
                     {formatISODateToReadable(doc.createdAt)}
+                  </TableCell>
+                  <TableCell>
+                    <IconButton
+                      onClick={() => {
+                        onHistoryClicked(doc.googleDocId);
+                      }}
+                    >
+                      <RestoreIcon />
+                    </IconButton>
                   </TableCell>
                   <TableCell>
                     <IconButton>
