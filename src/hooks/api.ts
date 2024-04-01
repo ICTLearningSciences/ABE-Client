@@ -28,6 +28,8 @@ import {
   OpenAiPromptStep,
   UserActivityState,
   OpenAiJobStatus,
+  GQLDocumentTimeline,
+  DocumentTimelineJobStatus,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -664,6 +666,70 @@ export async function asyncOpenAiJobStatus(
   const res = await execHttp<OpenAiJobStatus>(
     'POST',
     `${API_ENDPOINT}/async_open_ai_doc_question_status/?jobId=${jobId}`,
+    {
+      accessToken: accessToken,
+      dataPath: ['response'],
+      axiosConfig: {
+        cancelToken: cancelToken,
+      },
+    }
+  );
+  return res;
+}
+
+export async function requestDocTimeline(
+  userId: string,
+  docId: string,
+  cancelToken?: CancelToken
+): Promise<GQLDocumentTimeline> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  if (!accessToken) throw new Error('No access token');
+  const res = await execHttp<GQLDocumentTimeline>(
+    'POST',
+    `${API_ENDPOINT}/get_document_timeline/?docId=${docId}&userId=${userId}`,
+    {
+      accessToken: accessToken,
+      dataPath: [],
+      axiosConfig: {
+        cancelToken: cancelToken,
+      },
+    }
+  );
+  return res;
+}
+
+export type DocumentTimelineJobId = string;
+
+export async function asyncRequestDocTimeline(
+  userId: string,
+  docId: string,
+  cancelToken?: CancelToken
+): Promise<DocumentTimelineJobId> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  if (!accessToken) throw new Error('No access token');
+  const res = await execHttp<DocumentTimelineJobId>(
+    'POST',
+    `${API_ENDPOINT}/async_get_document_timeline/?docId=${docId}&userId=${userId}`,
+    {
+      accessToken: accessToken,
+      dataPath: ['response', 'jobId'],
+      axiosConfig: {
+        cancelToken: cancelToken,
+      },
+    }
+  );
+  return res;
+}
+
+export async function asyncRequestDocTimelineStatus(
+  jobId: string,
+  cancelToken?: CancelToken
+): Promise<DocumentTimelineJobStatus> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  if (!accessToken) throw new Error('No access token');
+  const res = await execHttp<DocumentTimelineJobStatus>(
+    'POST',
+    `${API_ENDPOINT}/async_document_timeline_status/?jobId=${jobId}`,
     {
       accessToken: accessToken,
       dataPath: ['response'],

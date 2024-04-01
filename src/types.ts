@@ -218,3 +218,51 @@ export interface OpenAiJobStatus {
   jobStatus: JobStatus;
   openAiResponse: MultistepPromptRes;
 }
+
+export interface DocumentTimelineJobStatus {
+  jobStatus: JobStatus;
+  documentTimeline: GQLDocumentTimeline;
+}
+
+export enum TimelinePointType {
+  START = 'START',
+  MOST_RECENT = 'MOST_RECENT',
+  NEW_ACTIVITY = 'NEW_ACTIVITY',
+  TIME_DIFFERENCE = 'TIME_DIFFERENCE',
+  NONE = '',
+}
+
+export interface GQLTimelinePoint {
+  type: TimelinePointType;
+  versionTime: string;
+  version: IGDocVersion;
+  intent: string;
+  changeSummary: string;
+  reverseOutline: string;
+  relatedFeedback: string;
+}
+
+export interface ChatItem {
+  sender: string;
+  message: string;
+}
+
+export interface IGDocVersion {
+  docId: string;
+  plainText: string;
+  lastChangedId: string;
+  chatLog: ChatItem[];
+  activity: string;
+  intent: string;
+  title: string;
+  lastModifyingUser: string;
+  modifiedTime: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GQLDocumentTimeline {
+  docId: string;
+  user: string;
+  timelinePoints: GQLTimelinePoint[];
+}
