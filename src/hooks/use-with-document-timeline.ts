@@ -5,14 +5,20 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { useReducer } from 'react';
-import { GQLTimelinePoint } from '../types';
-import { requestDocTimeline } from './api';
+import {
+  DocumentTimelineJobStatus,
+  GQLTimelinePoint,
+  JobStatus,
+} from '../types';
+import { asyncRequestDocTimeline, asyncRequestDocTimelineStatus } from './api';
 import {
   TimelineActionType,
   TimelineReducer,
   TimelineState,
 } from './document-timeline-reducer';
 import { LoadingStatusType } from './generic-loading-reducer';
+import { CancelToken } from 'axios';
+import { pollUntilTrue } from './use-with-synchronous-polling';
 
 const initialState: TimelineState = {
   status: LoadingStatusType.NONE,
@@ -22,24 +28,36 @@ const initialState: TimelineState = {
 
 export function useWithDocumentTimeline() {
   const [state, dispatch] = useReducer(TimelineReducer, initialState);
-  function fetchDocumentTimeline(userId: string, docId: string) {
+
+  async function asyncFetchDocTimeline(
+    userId: string,
+    docId: string,
+    cancelToken?: CancelToken
+  ): Promise<void> {
     if (state.status === LoadingStatusType.LOADING) {
       return;
     }
     dispatch({ type: TimelineActionType.LOADING_STARTED });
-    requestDocTimeline(userId, docId)
-      .then((timeline) => {
-        dispatch({
-          type: TimelineActionType.LOADING_SUCCEEDED,
-          dataPayload: timeline,
-        });
-      })
-      .catch((error) => {
-        dispatch({
-          type: TimelineActionType.LOADING_FAILED,
-          errorPayload: { error: error, message: error },
-        });
-      });
+    const docTimelineJobId = await asyncRequestDocTimeline(
+      userId,
+      docId,
+      cancelToken
+    );
+    const pollFunction = () => {
+      return asyncRequestDocTimelineStatus(docTimelineJobId, cancelToken);
+    };
+    const res = await pollUntilTrue<DocumentTimelineJobStatus>(
+      pollFunction,
+      (res: DocumentTimelineJobStatus) => {
+        return res.jobStatus === JobStatus.COMPLETE;
+      },
+      1000,
+      60000
+    );
+    dispatch({
+      type: TimelineActionType.LOADING_SUCCEEDED,
+      dataPayload: res.documentTimeline,
+    });
   }
 
   function selectTimelinePoint(timepoint: GQLTimelinePoint) {
@@ -55,7 +73,7 @@ export function useWithDocumentTimeline() {
     loadInProgress: state.status === LoadingStatusType.LOADING,
     errorMessage:
       state.status === LoadingStatusType.ERROR ? state.error : undefined,
-    fetchDocumentTimeline,
+    fetchDocumentTimeline: asyncFetchDocTimeline,
     selectTimelinePoint,
   };
 }

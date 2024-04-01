@@ -219,6 +219,11 @@ export interface OpenAiJobStatus {
   openAiResponse: MultistepPromptRes;
 }
 
+export interface DocumentTimelineJobStatus {
+  jobStatus: JobStatus;
+  documentTimeline: GQLDocumentTimeline;
+}
+
 export enum TimelinePointType {
   START = 'START',
   MOST_RECENT = 'MOST_RECENT',
