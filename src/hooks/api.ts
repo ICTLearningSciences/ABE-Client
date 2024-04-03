@@ -30,6 +30,7 @@ import {
   OpenAiJobStatus,
   GQLDocumentTimeline,
   DocumentTimelineJobStatus,
+  StoreGoogleDoc,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -261,6 +262,15 @@ export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
           fetchGoogleDocs(userId: $userId) {
             googleDocId
             title
+            documentIntention {
+              description
+              createdAt
+            }
+            currentDayIntention{
+              description
+              createdAt
+            }
+            assignmentDescription
             createdAt
             admin
           }
@@ -341,6 +351,39 @@ export async function storePrompts(
     // login responds with set-cookie, w/o withCredentials it doesnt get stored
     {
       dataPath: 'storePrompts',
+    }
+  );
+  return { prompts: data };
+}
+
+export async function updateGoogleDocStorage(
+  googleDoc: StoreGoogleDoc
+): Promise<GQLResPrompts> {
+  const data = await execGql<GQLPrompt[]>(
+    {
+      query: `
+        mutation StoreGoogleDoc($googleDoc: GoogleDocInputType!) {
+          storeGoogleDoc(googleDoc: $googleDoc) {
+              googleDocId
+              admin
+              title
+              assignmentDescription
+              documentIntention {
+                  description
+              }
+              currentDayIntention{
+                  description
+              }
+              createdAt
+          }
+        }
+    `,
+      variables: {
+        googleDoc: googleDoc,
+      },
+    },
+    {
+      dataPath: 'storeGoogleDoc',
     }
   );
   return { prompts: data };
@@ -622,6 +665,63 @@ export async function fetchUserActivityStates(
     }
   );
   return res;
+}
+
+export async function fetchLatestDocVersion(
+  docId: string
+): Promise<DocRevision | undefined> {
+  const res = await execGql<Connection<DocRevision>>(
+    {
+      query: `
+      query DocVersions($limit: Int, $filter: String, $sortBy: String, $sortAscending: Boolean) {
+        docVersions(limit: $limit, filter: $filter, sortBy: $sortBy, sortAscending: $sortAscending) {
+              edges {
+                node{
+                    docId
+                    plainText
+                    lastChangedId
+                    sessionId
+                    sessionIntention {
+                      description
+                      createdAt
+                    }
+                    dayIntention {
+                      description
+                      createdAt
+                    }
+                    chatLog {
+                      sender
+                      message
+                    }
+                    activity
+                    intent
+                    title
+                    lastModifyingUser
+                    modifiedTime
+                    createdAt
+                }
+            }
+            }
+        }
+      `,
+      variables: {
+        limit: 1,
+        sortBy: 'createdAt',
+        sortAscending: false,
+        filter: JSON.stringify({
+          docId,
+        }),
+      },
+    },
+    {
+      dataPath: 'docVersions',
+    }
+  );
+  if (!res.edges.length) {
+    return undefined;
+  }
+  const latestRevision = res.edges[0].node;
+  return latestRevision;
 }
 
 export type OpenAiJobId = string;

@@ -33,6 +33,7 @@ import { UseWithPrompts } from './use-with-prompts';
 import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { v4 as uuidv4 } from 'uuid';
 import { GptModels } from '../constants';
+import { useWithState } from '../store/slices/state/use-with-state';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -83,6 +84,7 @@ export function useWithActivityHandler(
     clearChatLog,
     coachResponsePending,
   } = useWithChat();
+  const { newSession, updateSessionIntention } = useWithState();
   const [retryData, setRetryData] = useState<PromptRetryData>();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
@@ -136,6 +138,7 @@ export function useWithActivityHandler(
         console.log(e);
       }
     }
+    newSession();
     coachResponsePending(false);
     setWaitingForUserAnswer(false);
     if (activity) {
@@ -385,6 +388,9 @@ export function useWithActivityHandler(
         : UserInputType.MCQ;
     if (userMessage) {
       const userAnswer = mostRecentMessage;
+      if (currentStep.userInputIsIntention) {
+        updateSessionIntention(mostRecentMessage.message);
+      }
       if (currentStep.handleResponse) {
         currentStep.handleResponse(userAnswer.message, userInputType);
       }

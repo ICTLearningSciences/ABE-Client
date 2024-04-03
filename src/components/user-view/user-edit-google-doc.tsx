@@ -8,7 +8,7 @@ import React from 'react';
 import { Button, CircularProgress } from '@mui/material';
 import Chat from './chat/chat';
 import { useWithDocGoals } from '../../hooks/use-with-doc-goals';
-import DocGoalModal from './doc-goal-modal';
+import DocGoalModal from './doc-introduction/doc-goal-modal';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';

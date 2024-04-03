@@ -69,14 +69,25 @@ export interface DocData {
 export interface GoogleDoc {
   googleDocId: string;
   title: string;
+  documentIntention?: Intention;
+  currentDayIntention?: Intention;
+  assignmentDescription?: string;
   createdAt: string;
   admin: boolean;
+}
+
+export interface Intention {
+  description: string;
+  createdAt?: string;
 }
 
 export interface DocRevision {
   docId: string;
   plainText: string;
   lastChangedId: string;
+  sessionId: string;
+  sessionIntention?: Intention;
+  dayIntention?: Intention;
   chatLog: ChatMessageTypes[];
   activity: string;
   intent: string;
@@ -95,6 +106,15 @@ export enum UserActions {
   ASK_QUESTION = 'ASK_QUESTION',
   MULTISTEP_PROMPTS = 'MULTISTEP_PROMPTS',
   SINGLE_PROMPT = 'SINGLE_PROMPT',
+}
+
+export interface StoreGoogleDoc {
+  googleDocId: string;
+  user: string;
+  admin?: boolean;
+  documentIntention?: Intention;
+  assignmentDescription?: string;
+  title?: string;
 }
 
 export interface GQLPrompt {
@@ -153,6 +173,7 @@ export enum ActivityStepTypes {
 export interface ActivityStep {
   text: string;
   stepType: ActivityStepTypes;
+  userInputIsIntention?: boolean;
   mcqChoices?: string[];
   handleResponse?: (response: string, userInputType: UserInputType) => void;
 }

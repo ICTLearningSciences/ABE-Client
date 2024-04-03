@@ -9,12 +9,19 @@ import { useWithChat } from '../store/slices/chat/use-with-chat';
 import { getDocData, submitDocRevision } from './api';
 import { useAppSelector } from '../store/hooks';
 import useInterval from './use-interval';
-import { DocRevision } from '../types';
+import { DocRevision, Intention } from '../types';
 
 export function useWithStoreDocVersions(selectedActivityId: string) {
   const { state } = useWithChat();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
+  );
+  const sessionId: string = useAppSelector((state) => state.state.sessionId);
+  const sessionIntention: Intention | undefined = useAppSelector(
+    (state) => state.state.sessionIntention
+  );
+  const dayIntention: Intention | undefined = useAppSelector(
+    (state) => state.state.dayIntention
   );
   const messages = state.chatLogs[googleDocId] || [];
   const [lastUpdatedId, setLastUpdatedId] = useState<string>('');
@@ -26,7 +33,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
   useInterval(
     async () => {
       try {
-        if (!messages.length) {
+        if (!messages.length || !sessionId) {
           return;
         }
         const docData = await getDocData(googleDocId);
@@ -43,6 +50,9 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
           docId: googleDocId,
           plainText: docData.plainText,
           lastChangedId: docData.lastChangedId,
+          sessionIntention,
+          dayIntention,
+          sessionId: sessionId,
           chatLog: messages,
           activity: selectedActivityId,
           intent: '',

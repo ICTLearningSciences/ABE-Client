@@ -210,7 +210,7 @@ export default function useWithStrongerHookActivity(
 ): Activity {
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
   const userId = useAppSelector((state) => state.login.user?._id);
-  const { updateUserActivityState } = useWithState();
+  const { updateUserActivityState, updateSessionIntention } = useWithState();
 
   interface StrongerHookActivityPrompts {
     analyzeHookPrompt: GQLPrompt;
@@ -875,6 +875,7 @@ export default function useWithStrongerHookActivity(
         if (res === HELP_ME_BRAINSTORM) {
           setCurStepName(StepNames.NARRATIVE_WEAK_STEP_TWO);
         } else {
+          updateSessionIntention(res);
           setState((prevState) => {
             return {
               ...prevState,
@@ -997,6 +998,7 @@ export default function useWithStrongerHookActivity(
       text: 'What kind of revision are you thinking of doing now?',
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       handleResponse: (response: string) => {
+        updateSessionIntention(response);
         if (!eCommentOnProposedRevisionPrompt) {
           return;
         }
