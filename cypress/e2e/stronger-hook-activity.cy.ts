@@ -40,7 +40,7 @@ describe('Stronger Hook Activity', () => {
       cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
       
       cy.get("[data-cy=activity-display-658230f699045156193339ac]").click();
-      cy.get("[data-cy=activity-select-start-button]").click();
+      cy.get("[data-cy=doc-goal-modal-next-button]").click();
       cy.get("[data-cy=messages-container]").should("not.contain.text", "Your hook lacks any narrativity.")
     })
 
@@ -290,7 +290,7 @@ describe('Stronger Hook Activity', () => {
         cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
         
         cy.get("[data-cy=activity-display-658230f699045156193339ac]").click();
-        cy.get("[data-cy=activity-select-start-button]").click();
+        cy.get("[data-cy=doc-goal-modal-next-button]").click();
         cy.wait(4000)
         cy.get("[data-cy=messages-container]").should("not.contain.text", "Feel free to ask me any questions about your essay.")
         cy.get("[data-cy=messages-container]").should("contain.text", "This activity is to work on the hook")

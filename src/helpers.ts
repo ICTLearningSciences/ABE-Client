@@ -232,3 +232,14 @@ export function getPromptsByIds(
   });
   return promptsById;
 }
+
+export function hasHoursPassed(
+  lastDateISOtime: string,
+  nextDateISOtime: string,
+  hours: number
+): boolean {
+  return (
+    new Date(nextDateISOtime).getTime() - new Date(lastDateISOtime).getTime() >
+    hours * 60 * 60 * 1000
+  );
+}

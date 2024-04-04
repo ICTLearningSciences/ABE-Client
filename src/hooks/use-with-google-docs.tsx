@@ -6,11 +6,15 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React, { useEffect } from 'react';
 import { createNewGoogleDoc } from './api';
-import { useAppSelector } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { useWithState } from '../store/slices/state/use-with-state';
-import { GoogleDoc, NewDocData } from '../types';
-import { useWithGoogleDocsData } from './use-with-google-docs-data';
+import { GoogleDoc, NewDocData, StoreGoogleDoc } from '../types';
 import { useNavigate } from 'react-router-dom';
+import {
+  GoogleDocsLoadStatus,
+  loadUserGoogleDocs,
+  updateGoogleDoc as _updateGoogleDoc,
+} from '../store/slices/state';
 
 export interface DocRevisionResponse {
   revisions: RevisionsItem[];
@@ -36,9 +40,8 @@ export interface UseWithGoogleDocs {
   handleOpenGoogleDoc: (docId: string) => void;
   handleSelectGoogleDocs: (docId: string) => void;
   docsLoading: boolean;
-  handleRefreshGoogleDocs: () => void;
-  testNumber: number;
-  setTestNumber: (newNumber: number) => void;
+  updateGoogleDoc: (googleDoc: StoreGoogleDoc) => Promise<GoogleDoc>;
+  loadUsersGoogleDocs: () => void;
 }
 
 export function UseWithGoogleDocs(): UseWithGoogleDocs {
@@ -46,21 +49,22 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
   const userEmail = useAppSelector((state) => state.login.user?.email);
   const userId = useAppSelector((state) => state.login.user?._id) || '';
-  const { googleDocs, reloadData, isSaving, isLoading } =
-    useWithGoogleDocsData(userId);
+  const googleDocs = useAppSelector((state) => state.state.userGoogleDocs);
+  const googleDocsLoadStatus = useAppSelector(
+    (state) => state.state.userGoogleDocsLoadStatus
+  );
+  const dispatch = useAppDispatch();
+  const isLoading = googleDocsLoadStatus === GoogleDocsLoadStatus.LOADING;
   const userGoogleDocs = googleDocs?.filter((doc) => !doc.admin);
   const copyGoogleDocs = googleDocs?.filter((doc) => doc.admin);
   const navigate = useNavigate();
   const [creationInProgress, setCreationInProgress] =
     React.useState<boolean>(false);
-  const [testNumber, setTestNumber] = React.useState<number>(0);
 
   function handleNewGoogleDoc(newGoogleDoc: NewDocData) {
     updateCurrentDocId(newGoogleDoc.docId);
     navigate(`/docs/${newGoogleDoc.docId}`);
-    // TODO: add to list of google docs, which will need to also pull from the backend
   }
-
   useEffect(() => {
     const queryParameters = new URLSearchParams(window.location.search);
     const targetDocId = queryParameters.get('docId');
@@ -69,14 +73,8 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     }
   }, []);
 
-  useEffect(() => {
-    if (!googleDocId) {
-      handleRefreshGoogleDocs();
-    }
-  }, [googleDocId]);
-
-  function handleRefreshGoogleDocs() {
-    reloadData();
+  function loadUsersGoogleDocs() {
+    dispatch(loadUserGoogleDocs({ userId }));
   }
 
   async function handleCreateGoogleDoc(
@@ -94,7 +92,7 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     )
       .then((newDocData) => {
         handleNewGoogleDoc(newDocData);
-        reloadData();
+        loadUsersGoogleDocs(); //reload the user's google docs since have new onces
       })
       .catch((err) => {
         console.error('Error creating google doc');
@@ -113,6 +111,13 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     updateCurrentDocId(docId);
   }
 
+  async function updateGoogleDoc(
+    googleDoc: StoreGoogleDoc
+  ): Promise<GoogleDoc> {
+    const res = await dispatch(_updateGoogleDoc({ googleDoc }));
+    return res.payload as GoogleDoc;
+  }
+
   return {
     docId: googleDocId,
     docUrl: googleDocId
@@ -124,9 +129,8 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     handleCreateGoogleDoc,
     handleOpenGoogleDoc,
     handleSelectGoogleDocs,
-    docsLoading: isSaving || isLoading,
-    handleRefreshGoogleDocs,
-    testNumber,
-    setTestNumber,
+    docsLoading: isLoading,
+    updateGoogleDoc,
+    loadUsersGoogleDocs,
   };
 }

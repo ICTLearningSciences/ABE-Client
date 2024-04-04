@@ -69,14 +69,27 @@ export interface DocData {
 export interface GoogleDoc {
   googleDocId: string;
   title: string;
+  user: string;
+  documentIntention?: Intention;
+  currentDayIntention?: Intention;
+  assignmentDescription?: string;
   createdAt: string;
   admin: boolean;
 }
 
-export interface DocRevision {
+export interface Intention {
+  description: string;
+  createdAt?: string;
+}
+
+export interface DocVersion {
   docId: string;
   plainText: string;
   lastChangedId: string;
+  sessionId: string;
+  sessionIntention?: Intention;
+  documentIntention?: Intention;
+  dayIntention?: Intention;
   chatLog: ChatMessageTypes[];
   activity: string;
   intent: string;
@@ -95,6 +108,16 @@ export enum UserActions {
   ASK_QUESTION = 'ASK_QUESTION',
   MULTISTEP_PROMPTS = 'MULTISTEP_PROMPTS',
   SINGLE_PROMPT = 'SINGLE_PROMPT',
+}
+
+export interface StoreGoogleDoc {
+  googleDocId: string;
+  user: string;
+  admin?: boolean;
+  currentDayIntention?: Intention;
+  documentIntention?: Intention;
+  assignmentDescription?: string;
+  title?: string;
 }
 
 export interface GQLPrompt {
@@ -153,6 +176,7 @@ export enum ActivityStepTypes {
 export interface ActivityStep {
   text: string;
   stepType: ActivityStepTypes;
+  userInputIsIntention?: boolean;
   mcqChoices?: string[];
   handleResponse?: (response: string, userInputType: UserInputType) => void;
 }
@@ -214,6 +238,10 @@ export enum JobStatus {
   COMPLETE = 'COMPLETE',
 }
 
+export interface OpenAiJobStatusApiRes {
+  response: OpenAiJobStatus;
+}
+
 export interface OpenAiJobStatus {
   jobStatus: JobStatus;
   openAiResponse: MultistepPromptRes;
@@ -251,6 +279,10 @@ export interface IGDocVersion {
   docId: string;
   plainText: string;
   lastChangedId: string;
+  sessionId: string;
+  sessionIntention?: Intention;
+  documentIntention?: Intention;
+  dayIntention?: Intention;
   chatLog: ChatItem[];
   activity: string;
   intent: string;

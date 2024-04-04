@@ -5,22 +5,15 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { useEffect } from 'react';
-import { useAppSelector } from './store/hooks';
-import { useWithState } from './store/slices/state/use-with-state';
+import { useAppDispatch, useAppSelector } from './store/hooks';
+import { loadUserGoogleDocs } from './store/slices/state';
 
-export async function useLoader() {
+export async function useReduxHydration() {
   const userId = useAppSelector((state) => state.login.user?._id);
-
-  const useState = useWithState();
-
-  function initializeUserData(userId: string) {
-    useState.loadUserActivityStates(userId);
-  }
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!userId) return;
-    initializeUserData(userId);
+    dispatch(loadUserGoogleDocs({ userId }));
   }, [userId]);
-
-  return { useState };
 }

@@ -12,12 +12,14 @@ import {
   overrideOpenAiModel as _overrideOpenAiModel,
   updateViewingUserRole,
   updateViewingAdvancedOptions,
+  newSession as _newSession,
+  setSessionIntention,
 } from '.';
 import {
   fetchUserActivityStates,
   updateUserActivityState as _updateUserActivityState,
 } from '../../../hooks/api';
-import { UserActivityState } from '../../../types';
+import { Intention, UserActivityState } from '../../../types';
 import { UserRole } from '../login';
 import { GptModels } from '../../../constants';
 
@@ -34,6 +36,8 @@ interface UseWithState {
   overrideOpenAiModel: (model: GptModels) => void;
   updateViewingUserRole: (role: UserRole) => void;
   updateViewingAdvancedOptions: (advancedOptions: boolean) => void;
+  newSession: () => void;
+  updateSessionIntention: (intention?: Intention) => void;
 }
 
 // Gives you a way to interface with the redux store (which has the user information)
@@ -91,6 +95,13 @@ export function useWithState(): UseWithState {
     dispatch(updateViewingAdvancedOptions(advancedOptions));
   }
 
+  function newSession() {
+    dispatch(_newSession());
+  }
+
+  function updateSessionIntention(intention?: Intention) {
+    dispatch(setSessionIntention(intention));
+  }
   return {
     state,
     updateCurrentDocId,
@@ -99,5 +110,7 @@ export function useWithState(): UseWithState {
     overrideOpenAiModel,
     updateViewingUserRole: _updateViewingUserRole,
     updateViewingAdvancedOptions: _updateViewingAdvancedOptions,
+    newSession,
+    updateSessionIntention,
   };
 }

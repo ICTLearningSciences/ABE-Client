@@ -13,7 +13,7 @@ import axios, {
 import {
   CreateGoogleDocResponse,
   DocData,
-  DocRevision,
+  DocVersion,
   GoogleDoc,
   GoogleDocTextModifyActions,
   MultistepPromptRes,
@@ -30,6 +30,7 @@ import {
   OpenAiJobStatus,
   GQLDocumentTimeline,
   DocumentTimelineJobStatus,
+  StoreGoogleDoc,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -213,9 +214,7 @@ export async function getDocData(docId: string): Promise<DocData> {
   return res.data;
 }
 
-export async function submitDocRevision(
-  docRevision: DocRevision
-): Promise<void> {
+export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
   await axios.post(GRAPHQL_ENDPOINT, {
     query: `
         mutation SubmitGoogleDocVersion($googleDocData: GDocVersionInputType!) {
@@ -239,8 +238,23 @@ export async function submitDocRevision(
       `,
     variables: {
       googleDocData: {
-        ...docRevision,
-        chatLog: docRevision.chatLog.map((chatItem) => ({
+        ...docVersion,
+        dayIntention: docVersion.dayIntention
+          ? {
+              description: docVersion.dayIntention.description,
+            }
+          : undefined,
+        sessionIntention: docVersion.sessionIntention
+          ? {
+              description: docVersion.sessionIntention.description,
+            }
+          : undefined,
+        documentIntention: docVersion.documentIntention
+          ? {
+              description: docVersion.documentIntention.description,
+            }
+          : undefined,
+        chatLog: docVersion.chatLog.map((chatItem) => ({
           message: chatItem.message,
           sender: chatItem.sender,
           displayType: chatItem.displayType,
@@ -260,7 +274,17 @@ export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
         query FetchGoogleDocs($userId: ID!) {
           fetchGoogleDocs(userId: $userId) {
             googleDocId
+            user
             title
+            documentIntention {
+              description
+              createdAt
+            }
+            currentDayIntention{
+              description
+              createdAt
+            }
+            assignmentDescription
             createdAt
             admin
           }
@@ -344,6 +368,54 @@ export async function storePrompts(
     }
   );
   return { prompts: data };
+}
+
+export async function updateGoogleDocStorage(
+  googleDoc: StoreGoogleDoc
+): Promise<GoogleDoc> {
+  // remove createdAt from storeData
+  const storeData: StoreGoogleDoc = {
+    ...googleDoc,
+    documentIntention: googleDoc.documentIntention
+      ? {
+          description: googleDoc.documentIntention.description,
+        }
+      : undefined,
+    currentDayIntention: googleDoc.currentDayIntention
+      ? {
+          description: googleDoc.currentDayIntention.description,
+        }
+      : undefined,
+  };
+  const data = await execGql<GoogleDoc>(
+    {
+      query: `
+        mutation StoreGoogleDoc($googleDoc: GoogleDocInputType!) {
+          storeGoogleDoc(googleDoc: $googleDoc) {
+              googleDocId
+              user
+              admin
+              title
+              assignmentDescription
+              documentIntention {
+                  description
+              }
+              currentDayIntention{
+                  description
+              }
+              createdAt
+          }
+        }
+    `,
+      variables: {
+        googleDoc: storeData,
+      },
+    },
+    {
+      dataPath: 'storeGoogleDoc',
+    }
+  );
+  return data;
 }
 
 export async function loginGoogle(

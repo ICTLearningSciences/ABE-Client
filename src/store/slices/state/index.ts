@@ -4,13 +4,31 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { UserActivityState } from '../../../types';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {
+  GoogleDoc,
+  Intention,
+  StoreGoogleDoc,
+  UserActivityState,
+} from '../../../types';
 import { UserRole } from '../login';
 import { GptModels } from '../../../constants';
+import { v4 as uuidv4 } from 'uuid';
+import { fetchGoogleDocs, updateGoogleDocStorage } from '../../../hooks/api';
+
+export enum GoogleDocsLoadStatus {
+  NONE,
+  LOADING,
+  SUCCEEDED,
+  FAILED,
+}
 
 export interface State {
   googleDocId: string;
+  userGoogleDocs: GoogleDoc[];
+  userGoogleDocsLoadStatus: GoogleDocsLoadStatus;
+  sessionId: string;
+  sessionIntention?: Intention;
   userActivityStates: UserActivityState[];
   overideGptModel: GptModels;
   viewingRole: UserRole;
@@ -19,11 +37,28 @@ export interface State {
 
 const initialState: State = {
   googleDocId: '',
+  userGoogleDocsLoadStatus: GoogleDocsLoadStatus.NONE,
+  userGoogleDocs: [],
+  sessionId: uuidv4(),
   userActivityStates: [],
   overideGptModel: GptModels.NONE,
   viewingRole: UserRole.USER,
   viewingAdvancedOptions: false,
 };
+
+export const loadUserGoogleDocs = createAsyncThunk(
+  'state/loadUserGoogleDocs',
+  async (args: { userId: string }) => {
+    return await fetchGoogleDocs(args.userId);
+  }
+);
+
+export const updateGoogleDoc = createAsyncThunk(
+  'state/updateGoogleDoc',
+  async (args: { googleDoc: StoreGoogleDoc }) => {
+    return await updateGoogleDocStorage(args.googleDoc);
+  }
+);
 
 /** Reducer */
 export const stateSlice = createSlice({
@@ -32,6 +67,16 @@ export const stateSlice = createSlice({
   reducers: {
     updateDocId: (state: State, action: PayloadAction<string>) => {
       state.googleDocId = action.payload;
+    },
+    newSession: (state: State) => {
+      state.sessionId = uuidv4();
+      state.sessionIntention = undefined;
+    },
+    setSessionIntention: (
+      state: State,
+      action: PayloadAction<Intention | undefined>
+    ) => {
+      state.sessionIntention = action.payload;
     },
     updateUserActivityStates: (
       state: State,
@@ -52,6 +97,29 @@ export const stateSlice = createSlice({
       state.viewingAdvancedOptions = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(loadUserGoogleDocs.fulfilled, (state, action) => {
+      state.userGoogleDocsLoadStatus = GoogleDocsLoadStatus.SUCCEEDED;
+      state.userGoogleDocs = action.payload;
+    }),
+      builder.addCase(loadUserGoogleDocs.rejected, (state) => {
+        state.userGoogleDocsLoadStatus = GoogleDocsLoadStatus.FAILED;
+        state.userGoogleDocs = [];
+      }),
+      builder.addCase(loadUserGoogleDocs.pending, (state) => {
+        state.userGoogleDocsLoadStatus = GoogleDocsLoadStatus.LOADING;
+        state.userGoogleDocs = [];
+      });
+
+    builder.addCase(updateGoogleDoc.fulfilled, (state, action) => {
+      state.userGoogleDocs = state.userGoogleDocs.map((doc) => {
+        if (doc.googleDocId === action.payload.googleDocId) {
+          return action.payload;
+        }
+        return doc;
+      });
+    });
+  },
 });
 
 export const {
@@ -60,6 +128,8 @@ export const {
   overrideOpenAiModel,
   updateViewingUserRole,
   updateViewingAdvancedOptions,
+  newSession,
+  setSessionIntention,
 } = stateSlice.actions;
 
 export default stateSlice.reducer;

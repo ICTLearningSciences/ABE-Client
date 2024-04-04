@@ -13,7 +13,6 @@ export function useWithGoogleDocsData(userId: string) {
     useWithData<GoogleDoc[]>(fetch);
 
   function fetch() {
-    console.log(`fetching google docs: ${userId}`);
     return fetchGoogleDocs(userId);
   }
 

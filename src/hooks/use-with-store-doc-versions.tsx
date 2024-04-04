@@ -6,43 +6,68 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { useState } from 'react';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
-import { getDocData, submitDocRevision } from './api';
+import { getDocData, submitDocVersion } from './api';
 import { useAppSelector } from '../store/hooks';
 import useInterval from './use-interval';
-import { DocRevision } from '../types';
+import { DocVersion, Intention } from '../types';
+import { hasHoursPassed } from '../helpers';
 
 export function useWithStoreDocVersions(selectedActivityId: string) {
   const { state } = useWithChat();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
   );
+  const sessionId: string = useAppSelector((state) => state.state.sessionId);
+  const sessionIntention: Intention | undefined = useAppSelector(
+    (state) => state.state.sessionIntention
+  );
+  const curGoogleDoc = useAppSelector((state) =>
+    state.state.userGoogleDocs.find((doc) => doc.googleDocId === googleDocId)
+  );
+  const useDayIntention = curGoogleDoc?.currentDayIntention?.createdAt
+    ? !hasHoursPassed(
+        curGoogleDoc.currentDayIntention.createdAt,
+        new Date().toISOString(),
+        8
+      )
+    : false;
   const messages = state.chatLogs[googleDocId] || [];
   const [lastUpdatedId, setLastUpdatedId] = useState<string>('');
   const [lastUpdatedTitle, setLastUpdatedTitle] = useState<string>('');
   const [lastNumMessages, setLastNumMessages] = useState<number>(
     messages.length
   );
+  const [lastSavedSessionId, setLastSavedSessionId] =
+    useState<string>(sessionId);
 
   useInterval(
     async () => {
       try {
-        if (!messages.length) {
+        if (!messages.length || !sessionId) {
           return;
         }
         const docData = await getDocData(googleDocId);
         if (
           docData.lastChangedId === lastUpdatedId &&
           docData.title === lastUpdatedTitle &&
-          messages.length === lastNumMessages
+          messages.length === lastNumMessages &&
+          sessionId === lastSavedSessionId
         )
           return;
+        setLastSavedSessionId(sessionId);
         setLastUpdatedId(docData.lastChangedId);
         setLastUpdatedTitle(docData.title);
         setLastNumMessages(messages.length);
-        const newDocData: DocRevision = {
+        const newDocData: DocVersion = {
           docId: googleDocId,
           plainText: docData.plainText,
           lastChangedId: docData.lastChangedId,
+          sessionIntention,
+          dayIntention: useDayIntention
+            ? curGoogleDoc?.currentDayIntention
+            : undefined,
+          documentIntention: curGoogleDoc?.documentIntention,
+          sessionId: sessionId,
           chatLog: messages,
           activity: selectedActivityId,
           intent: '',
@@ -50,7 +75,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
           lastModifyingUser: docData.lastModifyingUser,
           modifiedTime: docData.modifiedTime,
         };
-        await submitDocRevision(newDocData);
+        await submitDocVersion(newDocData);
       } catch (e) {
         console.log(e);
       }
