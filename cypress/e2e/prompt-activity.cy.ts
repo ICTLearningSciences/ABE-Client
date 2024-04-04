@@ -32,7 +32,7 @@ describe('Prompt Activities', () => {
       cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
       
       cy.get("[data-cy=activity-display-65a8592b26523c7ce5acacsa]").click();
-      cy.get("[data-cy=activity-select-start-button]").click();
+      cy.get("[data-cy=doc-goal-modal-next-button]").click();
       cy.get("[data-cy=messages-container]").should("contain.text", "Feel free to edit your paper. Let me know when you're ready for me to analyze it.")
       cy.get("[data-cy=messages-container]").should("not.contain.text", "he ethical considerations surrounding the ")
 
@@ -50,7 +50,7 @@ describe('Prompt Activities', () => {
       cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
       
       cy.get("[data-cy=activity-display-658230f699045156193339ac]").click();
-      cy.get("[data-cy=activity-select-start-button]").click();
+      cy.get("[data-cy=doc-goal-modal-next-button]").click();
 
       cy.get("[data-cy=messages-container]").should("not.contain.text", "Feel free to ask me any questions about your essay.")
       cy.get("[data-cy=messages-container]").should("contain.text", "This activity is to work on the hook that gets the readers interest at the start of the paper.")
@@ -60,7 +60,7 @@ describe('Prompt Activities', () => {
       cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
       
       cy.get("[data-cy=activity-display-65a8592b26523c7ce5acacsa]").click();
-      cy.get("[data-cy=activity-select-start-button]").click();
+      cy.get("[data-cy=doc-goal-modal-next-button]").click();
       cy.get("[data-cy=messages-container]").should("contain.text", "Feel free to edit your paper. Let me know when you're ready for me to analyze it.")
       cy.get("[data-cy=messages-container]").should("not.contain.text", "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.")
     })
@@ -89,7 +89,7 @@ describe('Prompt Activities', () => {
       cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
       
       cy.get("[data-cy=activity-display-65a8592b26523c7ce5acacsa]").click();
-      cy.get("[data-cy=activity-select-start-button]").click();
+      cy.get("[data-cy=doc-goal-modal-next-button]").click();
 
       cy.get("[data-cy=messages-container]").should("contain.text", "Feel free to edit your paper. Let me know when you're ready for me to analyze it.")
       cy.get("[data-cy=messages-container]").should("not.contain.text", "The ethical considerations surrounding the design and use ")
@@ -107,7 +107,7 @@ describe('Prompt Activities', () => {
       cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
       
       cy.get("[data-cy=activity-display-65a8592b26523c7ce5acacsa]").click();
-      cy.get("[data-cy=activity-select-start-button]").click();
+      cy.get("[data-cy=doc-goal-modal-next-button]").click();
 
       cy.get("[data-cy=messages-container]").should("not.contain.text", "retrying")
     })

@@ -15,7 +15,7 @@ export const gDocWithNoIntentions: GoogleDoc = {
     "documentIntention": undefined,
     currentDayIntention: undefined,
     assignmentDescription: undefined,
-    "createdAt": "2021-06-01T00:00:00.000Z",
+    "createdAt": new Date().toISOString(),
     "admin": false
 }
 
@@ -25,24 +25,24 @@ export const gDocWithoutDocumentIntention: GoogleDoc = {
     "title": "Aliens",
     "documentIntention": undefined,
     currentDayIntention: {
-        description: "This is a document about aliens",
-        createdAt: "2021-06-01T00:00:00.000Z",
+        description: "Aliens day intention",
+        createdAt: new Date().toISOString(),
     },
-    assignmentDescription: "hello",
-    "createdAt": "2021-06-01T00:00:00.000Z",
+    assignmentDescription: "Aliens assignment description",
+    "createdAt": new Date().toISOString(),
     "admin": false
 }
 
-export const gDocWithoutCurrentDayIntention: GoogleDoc = {
+export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: GoogleDoc = {
     "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
     "documentIntention": {
-        description: "This is a document about aliens",
+        description: "Aliens document intention",
         createdAt: "2021-06-01T00:00:00.000Z",
     },
     currentDayIntention: undefined,
-    assignmentDescription: "hello",
+    assignmentDescription: "Aliens assignment description",
     "createdAt": "2021-06-01T00:00:00.000Z",
     "admin": false
 }
@@ -52,15 +52,15 @@ export const gDocWithoutAssignmentDescription: GoogleDoc = {
     "user": testUser._id,
     "title": "Aliens",
     "documentIntention": {
-        description: "This is a document about aliens",
-        createdAt: "2021-06-01T00:00:00.000Z",
+        description: "Aliens document intention",
+        createdAt: new Date().toISOString(),
     },
     currentDayIntention: {
-        description: "This is a document about aliens",
-        createdAt: "2021-06-01T00:00:00.000Z",
+        description: "Aliens day intention",
+        createdAt: new Date().toISOString(),
     },
     assignmentDescription: undefined,
-    "createdAt": "2021-06-01T00:00:00.000Z",
+    "createdAt": new Date().toISOString(),
     "admin": false
 }
 
@@ -69,15 +69,32 @@ export const gDocWithAllIntentions: GoogleDoc = {
     "user": testUser._id,
     "title": "Aliens",
     "documentIntention": {
-        description: "This is a document about aliens",
-        createdAt: "2021-06-01T00:00:00.000Z",
+        description: "Aliens document intention",
+        createdAt: new Date().toISOString(),
     },
     currentDayIntention: {
-        description: "This is a document about aliens",
+        description: "Aliens day intention",
+        createdAt: new Date().toISOString(),
+    },
+    assignmentDescription: "Aliens assignment description",
+    "createdAt": new Date().toISOString(),
+    "admin": false
+}
+
+export const gDocWithExpiredDayIntention: GoogleDoc = {
+    "googleDocId": testGoogleDocId,
+    "user": testUser._id,
+    "title": "Aliens",
+    "documentIntention": {
+        description: "Aliens document intention",
+        createdAt: new Date().toISOString(),
+    },
+    currentDayIntention: {
+        description: "Aliens day intention",
         createdAt: "2021-06-01T00:00:00.000Z",
     },
-    assignmentDescription: "hello",
-    "createdAt": "2021-06-01T00:00:00.000Z",
+    assignmentDescription: "Aliens assignment description",
+    "createdAt": new Date().toISOString(),
     "admin": false
 }
 

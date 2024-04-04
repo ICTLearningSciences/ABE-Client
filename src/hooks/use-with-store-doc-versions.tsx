@@ -37,6 +37,8 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
   const [lastNumMessages, setLastNumMessages] = useState<number>(
     messages.length
   );
+  const [lastSavedSessionId, setLastSavedSessionId] =
+    useState<string>(sessionId);
 
   useInterval(
     async () => {
@@ -48,9 +50,11 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         if (
           docData.lastChangedId === lastUpdatedId &&
           docData.title === lastUpdatedTitle &&
-          messages.length === lastNumMessages
+          messages.length === lastNumMessages &&
+          sessionId === lastSavedSessionId
         )
           return;
+        setLastSavedSessionId(sessionId);
         setLastUpdatedId(docData.lastChangedId);
         setLastUpdatedTitle(docData.title);
         setLastNumMessages(messages.length);

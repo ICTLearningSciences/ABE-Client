@@ -14,15 +14,17 @@ export const fetchGoogleDocsResponse: {fetchGoogleDocs: GoogleDoc[]} = {
             "user": testUser._id,
             "title": "Aliens",
             "documentIntention": {
-                description: "This is a document about aliens",
-                createdAt: "2021-06-01T00:00:00.000Z",
+                description: "Aliens document intention",
+                createdAt: new Date().toISOString(),
             },
             currentDayIntention: {
-                description: "This is a document about aliens",
-                createdAt: "2021-06-01T00:00:00.000Z",
+                description: "Aliens day intention",
+                createdAt: new Date().toISOString(),
+
             },
             assignmentDescription: "",
-            "createdAt": "2021-06-01T00:00:00.000Z",
+            createdAt: new Date().toISOString(),
+
             "admin": false,
             googleDocId: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"
         },
@@ -31,15 +33,18 @@ export const fetchGoogleDocsResponse: {fetchGoogleDocs: GoogleDoc[]} = {
             "user": testUser._id,
             "title": "Intention",
             "documentIntention": {
-                description: "This is a document about aliens",
-                createdAt: "2021-06-01T00:00:00.000Z",
+                description: "Aliens document intention",
+                createdAt: new Date().toISOString(),
+
             },
             currentDayIntention: {
-                description: "This is a document about aliens",
-                createdAt: "2021-06-01T00:00:00.000Z",
+                description: "Aliens day intention",
+                createdAt: new Date().toISOString(),
+
             },
             assignmentDescription: "",
-            "createdAt": "2021-06-01T00:00:00.000Z",
+            createdAt: new Date().toISOString(),
+
             "admin": false
         },
     ]

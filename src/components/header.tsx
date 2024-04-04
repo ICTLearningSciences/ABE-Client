@@ -54,6 +54,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
       >
         {loggedIn && (
           <IconButton
+            data-cy="home-button"
             onClick={() => {
               navigate('/');
             }}

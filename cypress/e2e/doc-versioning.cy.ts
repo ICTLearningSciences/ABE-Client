@@ -80,7 +80,7 @@ describe("User Doc Versioning", () => {
         cy.get("[data-cy=edit-goal-button]").click();
         cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
         cy.get("[data-cy=activity-display-658230f699045156193339ac]").click();
-        cy.get("[data-cy=activity-select-start-button]").click();
+        cy.get("[data-cy=doc-goal-modal-next-button]").click();
         cy.wait("@SubmitGoogleDocVersion", {timeout: 8000}).then((xhr)=>{
             const data = xhr.request.body.variables;
             expect(data.googleDocData.docId).to.be.eql(testGoogleDocId);

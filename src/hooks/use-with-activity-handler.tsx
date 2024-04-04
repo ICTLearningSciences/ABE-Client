@@ -269,6 +269,12 @@ export function useWithActivityHandler(
     resetActivity();
   }, [resetActivityCounter]);
 
+  useEffect(() => {
+    if (activity?._id && selectedGoal?._id) {
+      // newSession();
+    }
+  }, [activity?._id, selectedGoal?._id]);
+
   // handle retry data
   useEffect(() => {
     if (!retryData) return;

@@ -96,7 +96,6 @@ export function useWithState(): UseWithState {
   }
 
   function newSession() {
-    console.log('new session id');
     dispatch(_newSession());
   }
 

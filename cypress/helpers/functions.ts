@@ -286,6 +286,11 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
       );
     });
   }
+  export function sendChatMessage(cy: CypressGlobal, message: string){
+    cy.get("[data-cy=chat-input]").type(message, {delay: 0})
+    cy.get("[data-cy=send-input-button]").click();
+  }
+
 
   export enum StepNames{
     "Improve_Narrativity",
@@ -299,7 +304,7 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
     cy.visit(`/docs/${testGoogleDocId}`);
     cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
     cy.get("[data-cy=activity-display-658230f699045156193339ac]").click();
-    cy.get("[data-cy=activity-select-start-button]").click();
+    cy.get("[data-cy=doc-goal-modal-next-button]").click();
 
     if(step === StepNames.Improve_Narrativity || step === StepNames.Narrativity_Brainstorm || step === StepNames.Narrativity_Story_In_Mind || step === StepNames.Narrativity_Outro){
       cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2)})
@@ -392,5 +397,5 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
     cy.visit(`/docs/${testGoogleDocId}`);
     cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
     cy.get("[data-cy=activity-display-65a8592b26523c7ce5acac9e]").click();
-    cy.get("[data-cy=activity-select-start-button]").click();
+    cy.get("[data-cy=doc-goal-modal-next-button]").click();
   }

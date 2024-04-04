@@ -85,6 +85,14 @@ export default function DocGoalModal(props: {
   const [dayIntention, setDayIntention] = useState<string>('');
   const { updateGoogleDoc } = UseWithGoogleDocs();
 
+  useEffect(() => {
+    if (googleDoc?.googleDocId) {
+      setDocumentIntention(googleDoc.documentIntention?.description || '');
+      setAssignmentDescription(googleDoc.assignmentDescription || '');
+      setDayIntention(googleDoc.currentDayIntention?.description || '');
+    }
+  }, [googleDoc?.googleDocId]);
+
   function getRequiredStages(googleDoc: GoogleDoc): SelectingStage[] {
     const stages: SelectingStage[] = [];
     if (!googleDoc.documentIntention) {
@@ -130,8 +138,6 @@ export default function DocGoalModal(props: {
     stages.push(SelectingStage.ACTIVITY);
     return stages;
   }
-
-  console.log(googleDoc)
 
   // Manages first stage load
   useEffect(() => {
@@ -317,8 +323,6 @@ export default function DocGoalModal(props: {
     nextStage();
   }
 
-  console.log(stages, curStageIndex, currentStage)
-
   return (
     <div>
       <Modal open={Boolean(open)}>
@@ -390,6 +394,7 @@ export default function DocGoalModal(props: {
                 }}
               >
                 <Button
+                  data-cy="doc-goal-modal-back-button"
                   variant="text"
                   style={{
                     borderRadius: '20px',
@@ -407,7 +412,7 @@ export default function DocGoalModal(props: {
                 </Button>
                 <Button
                   variant="contained"
-                  data-cy="activity-select-start-button"
+                  data-cy="doc-goal-modal-next-button"
                   style={{
                     borderRadius: '20px',
                   }}
