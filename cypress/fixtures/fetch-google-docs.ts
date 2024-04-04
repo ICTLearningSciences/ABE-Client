@@ -8,7 +8,7 @@ import { testGoogleDocId } from "../helpers/functions";
 import { GoogleDoc } from "../helpers/types";
 import { testUser } from "./user-data";
 
-export const fetchGoogleDocsResponse = {
+export const fetchGoogleDocsResponse: {fetchGoogleDocs: GoogleDoc[]} = {
     "fetchGoogleDocs": [
         {
             "user": testUser._id,
@@ -24,10 +24,10 @@ export const fetchGoogleDocsResponse = {
             assignmentDescription: "",
             "createdAt": "2021-06-01T00:00:00.000Z",
             "admin": false,
-            googleDocId: testGoogleDocId
+            googleDocId: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"
         },
         {
-            "googleDocId": testGoogleDocId,
+            "googleDocId": "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
             "user": testUser._id,
             "title": "Intention",
             "documentIntention": {
