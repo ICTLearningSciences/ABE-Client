@@ -8,12 +8,12 @@ import React, { useEffect } from 'react';
 import { createNewGoogleDoc } from './api';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { useWithState } from '../store/slices/state/use-with-state';
-import { GoogleDoc, NewDocData } from '../types';
-import { useWithGoogleDocsData } from './use-with-google-docs-data';
+import { GoogleDoc, NewDocData, StoreGoogleDoc } from '../types';
 import { useNavigate } from 'react-router-dom';
 import {
   GoogleDocsLoadStatus,
   loadUserGoogleDocs,
+  updateGoogleDoc as _updateGoogleDoc,
 } from '../store/slices/state';
 
 export interface DocRevisionResponse {
@@ -40,6 +40,8 @@ export interface UseWithGoogleDocs {
   handleOpenGoogleDoc: (docId: string) => void;
   handleSelectGoogleDocs: (docId: string) => void;
   docsLoading: boolean;
+  updateGoogleDoc: (googleDoc: StoreGoogleDoc) => Promise<GoogleDoc>;
+  loadUsersGoogleDocs: () => void;
 }
 
 export function UseWithGoogleDocs(): UseWithGoogleDocs {
@@ -47,8 +49,6 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
   const userEmail = useAppSelector((state) => state.login.user?.email);
   const userId = useAppSelector((state) => state.login.user?._id) || '';
-  // const { googleDocs, reloadData, isSaving, isLoading } =
-  //   useWithGoogleDocsData(userId);
   const googleDocs = useAppSelector((state) => state.state.userGoogleDocs);
   const googleDocsLoadStatus = useAppSelector(
     (state) => state.state.userGoogleDocsLoadStatus
@@ -65,7 +65,6 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     updateCurrentDocId(newGoogleDoc.docId);
     navigate(`/docs/${newGoogleDoc.docId}`);
   }
-
   useEffect(() => {
     const queryParameters = new URLSearchParams(window.location.search);
     const targetDocId = queryParameters.get('docId');
@@ -112,6 +111,13 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     updateCurrentDocId(docId);
   }
 
+  async function updateGoogleDoc(
+    googleDoc: StoreGoogleDoc
+  ): Promise<GoogleDoc> {
+    const res = await dispatch(_updateGoogleDoc({ googleDoc }));
+    return res.payload as GoogleDoc;
+  }
+
   return {
     docId: googleDocId,
     docUrl: googleDocId
@@ -124,5 +130,7 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     handleOpenGoogleDoc,
     handleSelectGoogleDocs,
     docsLoading: isLoading,
+    updateGoogleDoc,
+    loadUsersGoogleDocs,
   };
 }

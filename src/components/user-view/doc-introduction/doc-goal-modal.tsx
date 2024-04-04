@@ -12,13 +12,7 @@ import {
   IconButton,
   Modal,
 } from '@mui/material';
-import {
-  ActivityGQL,
-  DocGoal,
-  DocRevision,
-  GoogleDoc,
-  Intention,
-} from '../../../types';
+import { ActivityGQL, DocGoal, GoogleDoc, Intention } from '../../../types';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import './doc-goal-modal.css';
 import { useState } from 'react';
@@ -26,14 +20,11 @@ import ChangeIcon from '@mui/icons-material/Construction';
 import { ActivitiesDisplay } from './activities-display';
 import { GoalsDisplay } from './goals-display';
 import { useAppSelector } from '../../../store/hooks';
-import { fetchLatestDocVersion } from '../../../hooks/api';
-import { useWithState } from '../../../store/slices/state/use-with-state';
 import { hasHoursPassed } from '../../../helpers';
-import { google } from 'googleapis';
-import { GoogleDocsLoadStatus } from '../../../store/slices/state';
 import { InputDocumentIntention } from './input-document-intention';
 import { InputDocumentAssignment } from './input-document-assignment';
 import { InputDayIntention } from './input-day-inention';
+import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 
 const style = {
   position: 'absolute',
@@ -41,7 +32,7 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: '80%',
-  height: '80%',
+  height: 'fit-content',
   p: 4,
   display: 'flex',
   flexDirection: 'column',
@@ -79,24 +70,34 @@ export default function DocGoalModal(props: {
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
   const googleDocs = useAppSelector((state) => state.state.userGoogleDocs);
   const googleDoc = googleDocs.find((doc) => doc.googleDocId === googleDocId);
-  const [_stage, _setStage] = useState<SelectingStage>(SelectingStage.LOADING);
+  const [curStageIndex, setCurStageIndex] = useState(0);
+  const [stages, setStages] = useState<SelectingStage[]>([]);
+  const currentStage = stages[curStageIndex];
   const [_selectedActivity, _setSelectedActivity] = useState<ActivityGQL>();
   const [_selectedGoal, _setSelectedGoal] = useState<DocGoal>();
-  const { updateDayIntention } = useWithState();
   const [firstLoadComplete, setFirstLoadComplete] = useState(false);
+  const [documentIntention, setDocumentIntention] = useState<string>(
+    googleDoc?.documentIntention?.description || ''
+  );
+  const [assignmentDescription, setAssignmentDescription] = useState<string>(
+    googleDoc?.assignmentDescription || ''
+  );
+  const [dayIntention, setDayIntention] = useState<string>('');
+  const { updateGoogleDoc } = UseWithGoogleDocs();
 
-  function getNextStage(googleDoc: GoogleDoc): SelectingStage {
+  function getRequiredStages(googleDoc: GoogleDoc): SelectingStage[] {
+    const stages: SelectingStage[] = [];
     if (!googleDoc.documentIntention) {
-      return SelectingStage.DOCUMENT_INTENTION;
+      stages.push(SelectingStage.DOCUMENT_INTENTION);
     }
     if (
       !googleDoc.assignmentDescription &&
       googleDoc.assignmentDescription !== ''
     ) {
-      return SelectingStage.ASSIGNMENT_DESCRIPTION;
+      stages.push(SelectingStage.ASSIGNMENT_DESCRIPTION);
     }
 
-    const eightHoursSinceDocIntention = googleDoc.documentIntention.createdAt
+    const eightHoursSinceDocIntention = googleDoc.documentIntention?.createdAt
       ? hasHoursPassed(
           googleDoc.documentIntention.createdAt,
           new Date().toISOString(),
@@ -111,22 +112,23 @@ export default function DocGoalModal(props: {
         )
       : false;
 
-    if (googleDoc.currentDayIntention && eightHoursSinceDayIntention) {
-      return SelectingStage.DAY_INTENTION;
+    if (
+      googleDoc.currentDayIntention?.description &&
+      eightHoursSinceDayIntention
+    ) {
+      stages.push(SelectingStage.DAY_INTENTION);
     }
 
-    if (!googleDoc.currentDayIntention && eightHoursSinceDocIntention) {
-      return SelectingStage.DAY_INTENTION;
+    if (
+      !googleDoc.currentDayIntention?.description &&
+      eightHoursSinceDocIntention
+    ) {
+      stages.push(SelectingStage.DAY_INTENTION);
     }
 
-    if (!_selectedGoal) {
-      return SelectingStage.GOAL;
-    }
-    if (!_selectedActivity) {
-      return SelectingStage.ACTIVITY;
-    }
-    completeModal(_selectedGoal);
-    return SelectingStage.GOAL;
+    stages.push(SelectingStage.GOAL);
+    stages.push(SelectingStage.ACTIVITY);
+    return stages;
   }
 
   // Manages first stage load
@@ -134,15 +136,15 @@ export default function DocGoalModal(props: {
     if (!googleDoc?.googleDocId || firstLoadComplete) {
       return;
     }
-    updateDayIntention(googleDoc.currentDayIntention);
-    _setStage(getNextStage(googleDoc));
+    const requiredStages = getRequiredStages(googleDoc);
+    setCurStageIndex(0);
+    setStages(requiredStages);
     setFirstLoadComplete(true);
   }, [googleDoc?.googleDocId, firstLoadComplete]);
 
   function closeModal() {
     _setSelectedGoal(undefined);
     _setSelectedActivity(undefined);
-    _setStage(SelectingStage.GOAL);
     close();
   }
 
@@ -153,45 +155,83 @@ export default function DocGoalModal(props: {
   function completeModal(goal: DocGoal) {
     beginGoal(goal);
     beginActivity(_selectedActivity);
+    googleDoc && setStages(getRequiredStages(googleDoc));
+    setCurStageIndex(0);
     closeModal();
   }
 
-  function resetSelections() {
+  function goBackToGoalStage() {
     _setSelectedGoal(undefined);
     _setSelectedActivity(undefined);
-    _setStage(SelectingStage.GOAL);
+    setCurStageIndex(
+      stages.findIndex((stage) => stage === SelectingStage.GOAL)
+    );
+  }
+
+  function nextStage() {
+    setCurStageIndex((prevValue) => {
+      if (prevValue + 1 === stages.length) {
+        closeModal();
+        return 0;
+      }
+      return prevValue + 1;
+    });
+  }
+
+  function prevStage() {
+    setCurStageIndex((prevValue) => {
+      if (prevValue === 0) {
+        return 0;
+      }
+      return prevValue - 1;
+    });
   }
 
   if (!docGoals) return <></>;
 
-  function getDisplay(docGoals: DocGoal[]) {
-    if (_stage === SelectingStage.LOADING) {
+  function getDisplayByStage(stage: SelectingStage) {
+    if (stage === SelectingStage.LOADING) {
       return <CircularProgress />;
     }
 
-    if (_stage === SelectingStage.DOCUMENT_INTENTION) {
-      return <InputDocumentIntention />;
+    if (stage === SelectingStage.DOCUMENT_INTENTION) {
+      return (
+        <InputDocumentIntention
+          documentIntention={documentIntention}
+          setDocumentIntention={setDocumentIntention}
+        />
+      );
     }
 
-    if (_stage === SelectingStage.ASSIGNMENT_DESCRIPTION) {
-      return <InputDocumentAssignment />;
+    if (stage === SelectingStage.ASSIGNMENT_DESCRIPTION) {
+      return (
+        <InputDocumentAssignment
+          documentAssignment={assignmentDescription}
+          setDocumentAssignment={setAssignmentDescription}
+        />
+      );
     }
 
-    if (_stage === SelectingStage.DAY_INTENTION) {
-      return <InputDayIntention />;
+    if (stage === SelectingStage.DAY_INTENTION) {
+      return (
+        <InputDayIntention
+          dayIntention={dayIntention}
+          setDayIntention={setDayIntention}
+        />
+      );
     }
 
-    if (_stage === SelectingStage.GOAL) {
+    if (stage === SelectingStage.GOAL) {
       return (
         <GoalsDisplay
-          docGoals={[...docGoals].reverse()}
+          docGoals={[...(docGoals || [])].reverse()}
           setSelectedGoal={(goal) => {
             _setSelectedGoal(goal);
             if (!goalHasActivities(goal)) {
               completeModal(goal);
               return;
             } else {
-              _setStage(SelectingStage.ACTIVITY);
+              nextStage();
             }
           }}
           selectedGoal={_selectedGoal}
@@ -209,6 +249,70 @@ export default function DocGoalModal(props: {
         )
       );
     }
+  }
+
+  function updateGoogleDocIntentions(curGoogleDoc: GoogleDoc) {
+    const newDocumentIntention: Intention | undefined =
+      documentIntention &&
+      documentIntention !== curGoogleDoc.documentIntention?.description
+        ? { description: documentIntention }
+        : undefined;
+    const newAssignmentDescription: string | undefined =
+      assignmentDescription !== curGoogleDoc.assignmentDescription
+        ? assignmentDescription
+        : undefined;
+    const newDayIntention: Intention | undefined =
+      dayIntention &&
+      dayIntention !== curGoogleDoc.currentDayIntention?.description
+        ? { description: dayIntention }
+        : undefined;
+
+    updateGoogleDoc({
+      googleDocId: curGoogleDoc.googleDocId,
+      user: curGoogleDoc.user,
+      ...(newDocumentIntention
+        ? { documentIntention: newDocumentIntention }
+        : {}),
+      ...(newAssignmentDescription || newAssignmentDescription === ''
+        ? { assignmentDescription: newAssignmentDescription }
+        : {}),
+      ...(newDayIntention ? { currentDayIntention: newDayIntention } : {}),
+    });
+  }
+
+  function handleNextClick(currentStage: SelectingStage) {
+    if (!googleDoc) {
+      return;
+    }
+    const nextStageIsGoal =
+      curStageIndex + 1 !== stages.length &&
+      stages[curStageIndex + 1] === SelectingStage.GOAL;
+
+    if (
+      nextStageIsGoal &&
+      [
+        SelectingStage.DOCUMENT_INTENTION,
+        SelectingStage.ASSIGNMENT_DESCRIPTION,
+        SelectingStage.DAY_INTENTION,
+      ].includes(currentStage)
+    ) {
+      updateGoogleDocIntentions(googleDoc);
+    }
+
+    if (currentStage === SelectingStage.GOAL) {
+      // goal stage next button disabled
+    }
+
+    if (currentStage === SelectingStage.ACTIVITY) {
+      if (!_selectedGoal) {
+        // Should always be a selected goal, since activity stage requires it.
+        return;
+      }
+      completeModal(_selectedGoal);
+      return;
+    }
+
+    nextStage();
   }
 
   return (
@@ -230,11 +334,11 @@ export default function DocGoalModal(props: {
                     fontWeight: 'bold',
                     cursor: 'pointer',
                   }}
-                  onClick={resetSelections}
+                  onClick={goBackToGoalStage}
                 >
                   {_selectedGoal.title}
                 </span>
-                <IconButton onClick={resetSelections}>
+                <IconButton onClick={goBackToGoalStage}>
                   <ChangeIcon />
                 </IconButton>
               </>
@@ -248,7 +352,11 @@ export default function DocGoalModal(props: {
               justifyContent: 'space-around',
             }}
           >
-            {getDisplay(docGoals)}
+            {curStageIndex < stages.length ? (
+              getDisplayByStage(stages[curStageIndex])
+            ) : (
+              <span>current stage index out of bounds</span>
+            )}
 
             <RowDiv
               style={{
@@ -272,7 +380,11 @@ export default function DocGoalModal(props: {
               >
                 Cancel
               </Button>
-              <div>
+              <RowDiv
+                style={{
+                  margin: '20px',
+                }}
+              >
                 <Button
                   variant="text"
                   style={{
@@ -282,9 +394,10 @@ export default function DocGoalModal(props: {
                   onClick={() => {
                     _setSelectedGoal(undefined);
                     _setSelectedActivity(undefined);
-                    _setStage(SelectingStage.GOAL);
+                    // _setStage(SelectingStage.GOAL);
+                    prevStage();
                   }}
-                  disabled={_stage === SelectingStage.GOAL}
+                  disabled={curStageIndex === 0}
                 >
                   Back
                 </Button>
@@ -294,18 +407,17 @@ export default function DocGoalModal(props: {
                   style={{
                     borderRadius: '20px',
                   }}
-                  disabled={_stage === SelectingStage.GOAL}
+                  disabled={currentStage === SelectingStage.GOAL}
                   onClick={() => {
-                    if (!_selectedGoal) return;
-                    completeModal(_selectedGoal);
+                    handleNextClick(currentStage);
                   }}
                 >
-                  {_stage === SelectingStage.ACTIVITY ||
-                  _stage === SelectingStage.GOAL
+                  {currentStage === SelectingStage.ACTIVITY ||
+                  currentStage === SelectingStage.GOAL
                     ? 'Start'
                     : 'Next'}
                 </Button>
-              </div>
+              </RowDiv>
             </RowDiv>
           </ColumnDiv>
         </Box>

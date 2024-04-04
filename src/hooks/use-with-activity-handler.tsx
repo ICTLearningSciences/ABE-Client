@@ -389,7 +389,9 @@ export function useWithActivityHandler(
     if (userMessage) {
       const userAnswer = mostRecentMessage;
       if (currentStep.userInputIsIntention) {
-        updateSessionIntention(mostRecentMessage.message);
+        updateSessionIntention({
+          description: mostRecentMessage.message,
+        });
       }
       if (currentStep.handleResponse) {
         currentStep.handleResponse(userAnswer.message, userInputType);

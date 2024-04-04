@@ -69,6 +69,7 @@ export interface DocData {
 export interface GoogleDoc {
   googleDocId: string;
   title: string;
+  user: string;
   documentIntention?: Intention;
   currentDayIntention?: Intention;
   assignmentDescription?: string;
@@ -81,12 +82,13 @@ export interface Intention {
   createdAt?: string;
 }
 
-export interface DocRevision {
+export interface DocVersion {
   docId: string;
   plainText: string;
   lastChangedId: string;
   sessionId: string;
   sessionIntention?: Intention;
+  documentIntention?: Intention;
   dayIntention?: Intention;
   chatLog: ChatMessageTypes[];
   activity: string;
@@ -112,6 +114,7 @@ export interface StoreGoogleDoc {
   googleDocId: string;
   user: string;
   admin?: boolean;
+  currentDayIntention?: Intention;
   documentIntention?: Intention;
   assignmentDescription?: string;
   title?: string;

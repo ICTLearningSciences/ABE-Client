@@ -13,7 +13,7 @@ import axios, {
 import {
   CreateGoogleDocResponse,
   DocData,
-  DocRevision,
+  DocVersion,
   GoogleDoc,
   GoogleDocTextModifyActions,
   MultistepPromptRes,
@@ -214,9 +214,7 @@ export async function getDocData(docId: string): Promise<DocData> {
   return res.data;
 }
 
-export async function submitDocRevision(
-  docRevision: DocRevision
-): Promise<void> {
+export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
   await axios.post(GRAPHQL_ENDPOINT, {
     query: `
         mutation SubmitGoogleDocVersion($googleDocData: GDocVersionInputType!) {
@@ -240,8 +238,18 @@ export async function submitDocRevision(
       `,
     variables: {
       googleDocData: {
-        ...docRevision,
-        chatLog: docRevision.chatLog.map((chatItem) => ({
+        ...docVersion,
+        dayIntention: docVersion.dayIntention
+          ? {
+              description: docVersion.dayIntention.description,
+            }
+          : undefined,
+        sessionIntention: docVersion.sessionIntention
+          ? {
+              description: docVersion.sessionIntention.description,
+            }
+          : undefined,
+        chatLog: docVersion.chatLog.map((chatItem) => ({
           message: chatItem.message,
           sender: chatItem.sender,
           displayType: chatItem.displayType,
@@ -261,6 +269,7 @@ export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
         query FetchGoogleDocs($userId: ID!) {
           fetchGoogleDocs(userId: $userId) {
             googleDocId
+            user
             title
             documentIntention {
               description
@@ -358,13 +367,28 @@ export async function storePrompts(
 
 export async function updateGoogleDocStorage(
   googleDoc: StoreGoogleDoc
-): Promise<GQLResPrompts> {
-  const data = await execGql<GQLPrompt[]>(
+): Promise<GoogleDoc> {
+  // remove createdAt from storeData
+  const storeData: StoreGoogleDoc = {
+    ...googleDoc,
+    documentIntention: googleDoc.documentIntention
+      ? {
+          description: googleDoc.documentIntention.description,
+        }
+      : undefined,
+    currentDayIntention: googleDoc.currentDayIntention
+      ? {
+          description: googleDoc.currentDayIntention.description,
+        }
+      : undefined,
+  };
+  const data = await execGql<GoogleDoc>(
     {
       query: `
         mutation StoreGoogleDoc($googleDoc: GoogleDocInputType!) {
           storeGoogleDoc(googleDoc: $googleDoc) {
               googleDocId
+              user
               admin
               title
               assignmentDescription
@@ -379,14 +403,14 @@ export async function updateGoogleDocStorage(
         }
     `,
       variables: {
-        googleDoc: googleDoc,
+        googleDoc: storeData,
       },
     },
     {
       dataPath: 'storeGoogleDoc',
     }
   );
-  return { prompts: data };
+  return data;
 }
 
 export async function loginGoogle(
@@ -669,8 +693,8 @@ export async function fetchUserActivityStates(
 
 export async function fetchLatestDocVersion(
   docId: string
-): Promise<DocRevision | undefined> {
-  const res = await execGql<Connection<DocRevision>>(
+): Promise<DocVersion | undefined> {
+  const res = await execGql<Connection<DocVersion>>(
     {
       query: `
       query DocVersions($limit: Int, $filter: String, $sortBy: String, $sortAscending: Boolean) {
@@ -682,6 +706,10 @@ export async function fetchLatestDocVersion(
                     lastChangedId
                     sessionId
                     sessionIntention {
+                      description
+                      createdAt
+                    }
+                    documentIntention{
                       description
                       createdAt
                     }

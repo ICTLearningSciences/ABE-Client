@@ -875,7 +875,9 @@ export default function useWithStrongerHookActivity(
         if (res === HELP_ME_BRAINSTORM) {
           setCurStepName(StepNames.NARRATIVE_WEAK_STEP_TWO);
         } else {
-          updateSessionIntention(res);
+          updateSessionIntention({
+            description: res,
+          });
           setState((prevState) => {
             return {
               ...prevState,
@@ -998,7 +1000,9 @@ export default function useWithStrongerHookActivity(
       text: 'What kind of revision are you thinking of doing now?',
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       handleResponse: (response: string) => {
-        updateSessionIntention(response);
+        updateSessionIntention({
+          description: response,
+        });
         if (!eCommentOnProposedRevisionPrompt) {
           return;
         }

@@ -5,11 +5,16 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { GoogleDoc, Intention, UserActivityState } from '../../../types';
+import {
+  GoogleDoc,
+  Intention,
+  StoreGoogleDoc,
+  UserActivityState,
+} from '../../../types';
 import { UserRole } from '../login';
 import { GptModels } from '../../../constants';
 import { v4 as uuidv4 } from 'uuid';
-import { fetchGoogleDocs } from '../../../hooks/api';
+import { fetchGoogleDocs, updateGoogleDocStorage } from '../../../hooks/api';
 
 export enum GoogleDocsLoadStatus {
   NONE,
@@ -24,7 +29,6 @@ export interface State {
   userGoogleDocsLoadStatus: GoogleDocsLoadStatus;
   sessionId: string;
   sessionIntention?: Intention;
-  dayIntention?: Intention;
   userActivityStates: UserActivityState[];
   overideGptModel: GptModels;
   viewingRole: UserRole;
@@ -44,13 +48,15 @@ const initialState: State = {
 
 export const loadUserGoogleDocs = createAsyncThunk(
   'state/loadUserGoogleDocs',
-  async (
-    args: {
-      userId: string;
-    },
-    thunkAPI
-  ) => {
+  async (args: { userId: string }) => {
     return await fetchGoogleDocs(args.userId);
+  }
+);
+
+export const updateGoogleDoc = createAsyncThunk(
+  'state/updateGoogleDoc',
+  async (args: { googleDoc: StoreGoogleDoc }) => {
+    return await updateGoogleDocStorage(args.googleDoc);
   }
 );
 
@@ -71,12 +77,6 @@ export const stateSlice = createSlice({
       action: PayloadAction<Intention | undefined>
     ) => {
       state.sessionIntention = action.payload;
-    },
-    setDayIntention: (
-      state: State,
-      action: PayloadAction<Intention | undefined>
-    ) => {
-      state.dayIntention = action.payload;
     },
     updateUserActivityStates: (
       state: State,
@@ -110,6 +110,15 @@ export const stateSlice = createSlice({
         state.userGoogleDocsLoadStatus = GoogleDocsLoadStatus.LOADING;
         state.userGoogleDocs = [];
       });
+
+    builder.addCase(updateGoogleDoc.fulfilled, (state, action) => {
+      state.userGoogleDocs = state.userGoogleDocs.map((doc) => {
+        if (doc.googleDocId === action.payload.googleDocId) {
+          return action.payload;
+        }
+        return doc;
+      });
+    });
   },
 });
 
@@ -121,7 +130,6 @@ export const {
   updateViewingAdvancedOptions,
   newSession,
   setSessionIntention,
-  setDayIntention,
 } = stateSlice.actions;
 
 export default stateSlice.reducer;

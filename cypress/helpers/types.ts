@@ -119,7 +119,7 @@ export interface GoogleDoc {
   admin: boolean;
 }
 
-export interface DocRevision {
+export interface DocVersion {
   docId: string;
   plainText: string;
   lastChangedId: string;

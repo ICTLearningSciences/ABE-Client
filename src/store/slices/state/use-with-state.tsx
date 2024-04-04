@@ -14,7 +14,6 @@ import {
   updateViewingAdvancedOptions,
   newSession as _newSession,
   setSessionIntention,
-  setDayIntention,
 } from '.';
 import {
   fetchUserActivityStates,
@@ -39,7 +38,6 @@ interface UseWithState {
   updateViewingAdvancedOptions: (advancedOptions: boolean) => void;
   newSession: () => void;
   updateSessionIntention: (intention?: Intention) => void;
-  updateDayIntention: (intention?: Intention) => void;
 }
 
 // Gives you a way to interface with the redux store (which has the user information)
@@ -105,11 +103,6 @@ export function useWithState(): UseWithState {
   function updateSessionIntention(intention?: Intention) {
     dispatch(setSessionIntention(intention));
   }
-
-  function updateDayIntention(intention?: Intention) {
-    dispatch(setDayIntention(intention));
-  }
-
   return {
     state,
     updateCurrentDocId,
@@ -120,6 +113,5 @@ export function useWithState(): UseWithState {
     updateViewingAdvancedOptions: _updateViewingAdvancedOptions,
     newSession,
     updateSessionIntention,
-    updateDayIntention,
   };
 }
