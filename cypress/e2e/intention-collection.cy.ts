@@ -264,7 +264,7 @@ describe("collectin user intentions", ()=>{
         it("resetting activity clears session intention", ()=>{
             cyMockDefault(cy);
             toStrongerHookActivity(cy, StepNames.Narrativity_Story_In_Mind);
-            didDocVersionDataGetSaved(cy, undefined);
+            didDocVersionDataGetSaved(cy, undefined, "Aliens document intention", "Aliens day intention");
             sendChatMessage(cy, "I want to revise my introduction");
             cy.get("[data-cy=messages-container]").should("contain.text", "What kind of revision are you thinking of doing now?")
             sendChatMessage(cy, "This is my session intention.");
