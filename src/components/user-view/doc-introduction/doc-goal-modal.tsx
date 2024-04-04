@@ -131,6 +131,8 @@ export default function DocGoalModal(props: {
     return stages;
   }
 
+  console.log(googleDoc)
+
   // Manages first stage load
   useEffect(() => {
     if (!googleDoc?.googleDocId || firstLoadComplete) {
@@ -314,6 +316,8 @@ export default function DocGoalModal(props: {
 
     nextStage();
   }
+
+  console.log(stages, curStageIndex, currentStage)
 
   return (
     <div>

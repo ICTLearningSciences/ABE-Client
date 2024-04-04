@@ -238,6 +238,10 @@ export enum JobStatus {
   COMPLETE = 'COMPLETE',
 }
 
+export interface OpenAiJobStatusApiRes {
+  response: OpenAiJobStatus;
+}
+
 export interface OpenAiJobStatus {
   jobStatus: JobStatus;
   openAiResponse: MultistepPromptRes;
@@ -275,6 +279,10 @@ export interface IGDocVersion {
   docId: string;
   plainText: string;
   lastChangedId: string;
+  sessionId: string;
+  sessionIntention?: Intention;
+  documentIntention?: Intention;
+  dayIntention?: Intention;
   chatLog: ChatItem[];
   activity: string;
   intent: string;

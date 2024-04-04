@@ -4,7 +4,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+
 import { GQLDocumentTimeline, TimelinePointType } from "../../helpers/types";
+
 
 export const eightHoursBetweenSessions: GQLDocumentTimeline = {
         "docId": "1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw",
@@ -58,7 +60,11 @@ export const eightHoursBetweenSessions: GQLDocumentTimeline = {
                     "activity": "658230f699045156193339ac",
                     "intent": "",
                     "title": "Same activity, 8 hour",
-                    "lastModifyingUser": "ashiel408@gmail.com"
+                    "lastModifyingUser": "ashiel408@gmail.com",
+                    "sessionId": "123",
+                    "modifiedTime" : "2024-03-27T04:53:41.735Z",
+                    "createdAt" : "2024-03-27T04:53:41.735Z",
+                    "updatedAt": "2024-03-27T04:53:41.735Z"
                 },
                 "intent": "",
                 "changeSummary": "",
@@ -97,7 +103,11 @@ export const eightHoursBetweenSessions: GQLDocumentTimeline = {
                     "activity": "658230f699045156193339ac",
                     "intent": "",
                     "title": "Same activity, 8 hour",
-                    "lastModifyingUser": "ashiel408@gmail.com"
+                    "lastModifyingUser": "ashiel408@gmail.com",
+                    "sessionId": "123",
+                    "modifiedTime" : "2024-03-27T04:53:41.735Z",
+                    "createdAt" : "2024-03-27T04:53:41.735Z",
+                    "updatedAt": "2024-03-27T04:53:41.735Z"
                 },
                 "intent": "",
                 "changeSummary": "In the current version, there are minor changes made to the document compared to the previous version. The only change made is the addition of the statement \"I'm making more changes\" at the end of the document. No other areas of the document were substantially changed.",

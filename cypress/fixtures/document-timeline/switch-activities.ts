@@ -4,7 +4,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+
 import { GQLDocumentTimeline, TimelinePointType } from "../../helpers/types";
+
 
 export const switchActivities: GQLDocumentTimeline = {
         "docId": "1L0TD7UkW2x0d0U9elMY-2KRXxdZmnus3_2nnR1a49FM",
@@ -35,6 +37,10 @@ export const switchActivities: GQLDocumentTimeline = {
                             "message": "Feel free to ask me anything else about your essay, or I can analyze it again for you."
                         }
                     ],
+                    "sessionId": "123",
+                    "modifiedTime" : "2024-03-27T04:53:41.735Z",
+                    "createdAt" : "2024-03-27T04:53:41.735Z",
+                    "updatedAt": "2024-03-27T04:53:41.735Z",
                     "activity": "65a8838126523c7ce5acacac",
                     "intent": "",
                     "title": "Copy of CDC Vaccines",
@@ -77,7 +83,11 @@ export const switchActivities: GQLDocumentTimeline = {
                     "activity": "658230f699045156193339ac",
                     "intent": "",
                     "title": "Swap activities",
-                    "lastModifyingUser": "ashiel408@gmail.com"
+                    "lastModifyingUser": "ashiel408@gmail.com",
+                    "sessionId": "123",
+                    "modifiedTime" : "2024-03-27T04:53:41.735Z",
+                    "createdAt" : "2024-03-27T04:53:41.735Z",
+                    "updatedAt": "2024-03-27T04:53:41.735Z"
                 },
                 "intent": "",
                 "changeSummary": "No changes from previous version",

@@ -11,6 +11,7 @@ export function InputDocumentIntention(props: {
         What kind of paper are you trying to write?
       </h1>
       <TextField
+        data-cy="input-document-intention"
         fullWidth
         rows={4}
         multiline

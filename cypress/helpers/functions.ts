@@ -12,13 +12,14 @@ import { fetchDocGoalsResponse } from "../fixtures/fetch-doc-goals";
 import { fetchGoogleDocsResponse } from "../fixtures/fetch-google-docs";
 import { fetchPromptTemplates } from "../fixtures/fetch-prompt-templates";
 import { fetchUserActivityStatesResponse } from "../fixtures/fetch-user-activity-states";
+import { gDocWithAllIntentions, storeGoogleDocResponse } from "../fixtures/intentions/google-docs-intentions";
 import { refreshAccessTokenResponse } from "../fixtures/refresh-access-token";
 import { analyzeHookResponse } from "../fixtures/stronger-hook-activity/analyze-hook-response";
 import { audienceEmotionsResponse } from "../fixtures/stronger-hook-activity/audience-emotion-response";
 import { openAiTextResponse } from "../fixtures/stronger-hook-activity/basic-text-response";
 import { entityFoundResponse } from "../fixtures/stronger-hook-activity/entity-found-response";
 import { updateUserActivityStatesResponse } from "../fixtures/update-user-activity-states";
-import { ACCESS_TOKEN_KEY, localStorageStore } from "./local-storage";
+import { ACCESS_TOKEN_KEY } from "./local-storage";
 import { DocData, GQLDocumentTimeline, JobStatus, UserRole } from "./types";
 
 export const testGoogleDocId = "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"
@@ -84,13 +85,7 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
     cy.clearLocalStorage();
   }
   
-  
-//   export function mockGQLConfig(config: Partial<Config>): MockGraphQLQuery {
-//     return mockGQL("FetchConfig", {
-//       config: { ...CONFIG_DEFAULT, ...(config || {}) },
-//     });
-//   }
-  
+
   export function cyInterceptGraphQL(cy: CypressGlobal, mocks: MockGraphQLQuery[]): void {
     const queryCalls: any = {};
     for (const mock of mocks) {
@@ -171,6 +166,7 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
       mockGQL("FetchDocGoals", fetchDocGoalsResponse),
       mockGQL("FetchSystemPrompts", fetchConfigResponse),
       mockGQL("UpdateUserActivityState", updateUserActivityStatesResponse),
+      mockGQL("StoreGoogleDoc", storeGoogleDocResponse(gDocWithAllIntentions)),
       mockGQL("SubmitGoogleDocVersion", {})
     ]);
   }

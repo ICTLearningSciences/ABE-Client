@@ -12,6 +12,7 @@ export function InputDocumentAssignment(props: {
         well.
       </h1>
       <TextField
+        data-cy="input-document-assignment"
         fullWidth
         rows={4}
         multiline

@@ -11,6 +11,7 @@ export function InputDayIntention(props: {
         What are you hoping to get done today?
       </h1>
       <TextField
+        data-cy="input-day-intention"
         fullWidth
         rows={4}
         multiline

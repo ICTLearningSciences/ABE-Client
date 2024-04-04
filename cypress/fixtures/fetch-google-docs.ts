@@ -5,14 +5,42 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { testGoogleDocId } from "../helpers/functions";
+import { GoogleDoc } from "../helpers/types";
+import { testUser } from "./user-data";
 
 export const fetchGoogleDocsResponse = {
     "fetchGoogleDocs": [
         {
-            "googleDocId": testGoogleDocId,
+            "user": testUser._id,
             "title": "Aliens",
-            "createdAt": null,
+            "documentIntention": {
+                description: "This is a document about aliens",
+                createdAt: "2021-06-01T00:00:00.000Z",
+            },
+            currentDayIntention: {
+                description: "This is a document about aliens",
+                createdAt: "2021-06-01T00:00:00.000Z",
+            },
+            assignmentDescription: "",
+            "createdAt": "2021-06-01T00:00:00.000Z",
+            "admin": false,
+            googleDocId: testGoogleDocId
+        },
+        {
+            "googleDocId": testGoogleDocId,
+            "user": testUser._id,
+            "title": "Intention",
+            "documentIntention": {
+                description: "This is a document about aliens",
+                createdAt: "2021-06-01T00:00:00.000Z",
+            },
+            currentDayIntention: {
+                description: "This is a document about aliens",
+                createdAt: "2021-06-01T00:00:00.000Z",
+            },
+            assignmentDescription: "",
+            "createdAt": "2021-06-01T00:00:00.000Z",
             "admin": false
-        }
+        },
     ]
 }

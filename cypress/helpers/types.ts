@@ -4,33 +4,51 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import OpenAI from 'openai';
-import { GptModels } from '../../src/constants';
-export enum UserRole {
-    NONE = 'NONE',
-    ADMIN = 'ADMIN',
-    USER = 'USER',
-  }
-  
+export enum GptModels {
+  GPT_3_5 = 'gpt-3.5-turbo-16k',
+  GPT_4 = 'gpt-4',
+  NONE = '',
+}
+export enum DisplayIcons {
+  LIGHT_BULB = 'LIGHT_BULB',
+  PENCIL = 'PENCIL',
+  PENCIL_OUTLINE = 'PENCIL_OUTLINE',
+  DEFAULT = 'DEFAULT',
+}
+export interface StepData {
+  executePrompt: (
+    prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
+    callback: (response: MultistepPromptRes) => void
+  ) => void;
+  openSelectActivityModal: () => void;
+}
+export enum UserInputType {
+  FREE_INPUT = 'FREE_INPUT',
+  MCQ = 'MCQ',
+  NONE = 'NONE',
+}
 export enum Sender {
-    USER = 'USER',
-    SYSTEM = 'SYSTEM',
-  }
-  
-  export enum MessageDisplayType {
-    TEXT = 'TEXT',
-    PENDING_MESSAGE = 'PENDING_MESSAGE',
-  }
+  USER = 'USER',
+  SYSTEM = 'SYSTEM',
+}
+
+export enum MessageDisplayType {
+  TEXT = 'TEXT',
+  PENDING_MESSAGE = 'PENDING_MESSAGE',
+}
+
 export interface ChatMessage {
-    sender: Sender;
-    displayType: MessageDisplayType;
-    openAiInfo?: OpenAiReqRes;
-    mcqChoices?: string[];
-    selectActivities?: Activity[];
-    activityStep?: ActivityStep;
-    selectedActivity?: Activity;
-    selectedGoal?: DocGoal;
-  }
+  id: string;
+  sender: Sender;
+  displayType: MessageDisplayType;
+  openAiInfo?: OpenAiReqRes;
+  mcqChoices?: string[];
+  selectActivities?: Activity[];
+  activityStep?: ActivityStep;
+  selectedActivity?: Activity;
+  selectedGoal?: DocGoal;
+  userInputType?: UserInputType;
+}
 
 export type ChatMessageTypes =
   | TextMessage
@@ -49,13 +67,12 @@ export interface BulletPointMessage extends ChatMessage {
   message: string;
   bulletPoints: string[];
 }
-
-export enum DisplayIcons {
-    LIGHT_BULB = 'LIGHT_BULB',
-    PENCIL = 'PENCIL',
-    PENCIL_OUTLINE = 'PENCIL_OUTLINE',
-    DEFAULT = 'DEFAULT',
-  }
+export enum UserRole {
+  NONE = 'NONE',
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+}
+import OpenAI from 'openai';
 
 export interface Connection<T> {
   edges: Edge<T>[];
@@ -115,15 +132,30 @@ export interface DocData {
 export interface GoogleDoc {
   googleDocId: string;
   title: string;
+  user: string;
+  documentIntention?: Intention;
+  currentDayIntention?: Intention;
+  assignmentDescription?: string;
   createdAt: string;
   admin: boolean;
+}
+
+export interface Intention {
+  description: string;
+  createdAt?: string;
 }
 
 export interface DocVersion {
   docId: string;
   plainText: string;
   lastChangedId: string;
+  sessionId: string;
+  sessionIntention?: Intention;
+  documentIntention?: Intention;
+  dayIntention?: Intention;
   chatLog: ChatMessageTypes[];
+  activity: string;
+  intent: string;
   title: string;
   lastModifyingUser: string;
   modifiedTime: string;
@@ -141,12 +173,21 @@ export enum UserActions {
   SINGLE_PROMPT = 'SINGLE_PROMPT',
 }
 
+export interface StoreGoogleDoc {
+  googleDocId: string;
+  user: string;
+  admin?: boolean;
+  currentDayIntention?: Intention;
+  documentIntention?: Intention;
+  assignmentDescription?: string;
+  title?: string;
+}
+
 export interface GQLPrompt {
   _id: string;
   clientId: string;
   openAiPromptSteps: OpenAiPromptStep[];
   title: string;
-  includeChatLog?: boolean;
 }
 
 export interface GQLResPrompts {
@@ -164,12 +205,14 @@ export interface PromptConfiguration {
   promptText: string;
   includeEssay: boolean;
   promptRole?: PromptRoles;
+  includeUserInput?: boolean;
 }
 
 export interface OpenAiPromptStep {
   prompts: PromptConfiguration[];
   targetGptModel: GptModels;
   outputDataType: PromptOutputTypes;
+  includeChatLogContext?: boolean;
 }
 
 export interface MultistepPromptRes {
@@ -196,20 +239,30 @@ export enum ActivityStepTypes {
 export interface ActivityStep {
   text: string;
   stepType: ActivityStepTypes;
+  userInputIsIntention?: boolean;
   mcqChoices?: string[];
-  handleResponse?: (response: string) => void;
-  /**
-   * Should also handle sending a message to the user
-   * If this is not define, openAi text response will be displayed to user
-   */
-  handlePromptResponse?: (response: string) => void;
-  prompt?: GQLPrompt;
+  handleResponse?: (response: string, userInputType: UserInputType) => void;
 }
 
 export interface Activity extends ActivityGQL {
   steps: ActivityStep[];
+  // introStep: ActivityStep;
+  getStep: (stepData: StepData) => ActivityStep;
+  stepName: string;
+  resetActivity: () => void;
+  isReady: boolean;
+}
+
+export interface ActivityPromptGQL {
+  _id: string;
+  promptId: string;
+  order: number;
+}
+
+export interface ActivityPrompt {
+  _id: string;
+  order: number;
   prompt: GQLPrompt;
-  introStep: ActivityStep;
 }
 
 export interface ActivityGQL {
@@ -220,6 +273,9 @@ export interface ActivityGQL {
   displayIcon: DisplayIcons;
   responsePendingMessage: string;
   responseReadyMessage: string;
+  disabled: boolean;
+  prompt?: GQLPrompt;
+  prompts?: ActivityPromptGQL[];
 }
 
 export interface DocGoal {
@@ -228,6 +284,7 @@ export interface DocGoal {
   description: string;
   displayIcon: DisplayIcons;
   activities?: ActivityGQL[];
+  activityOrder: string[];
   introduction: string;
 }
 
@@ -244,13 +301,18 @@ export enum JobStatus {
   COMPLETE = 'COMPLETE',
 }
 
+export interface OpenAiJobStatusApiRes{
+  response: OpenAiJobStatus;
+}
+
 export interface OpenAiJobStatus {
   jobStatus: JobStatus;
   openAiResponse: MultistepPromptRes;
 }
 
-export interface OpenAiJobStatusApiRes{
-  response: OpenAiJobStatus;
+export interface DocumentTimelineJobStatus {
+  jobStatus: JobStatus;
+  documentTimeline: GQLDocumentTimeline;
 }
 
 export enum TimelinePointType {
@@ -258,10 +320,10 @@ export enum TimelinePointType {
   MOST_RECENT = 'MOST_RECENT',
   NEW_ACTIVITY = 'NEW_ACTIVITY',
   TIME_DIFFERENCE = 'TIME_DIFFERENCE',
-  NONE = ''
+  NONE = '',
 }
 
-export interface GQLTimelinePoint{
+export interface GQLTimelinePoint {
   type: TimelinePointType;
   versionTime: string;
   version: IGDocVersion;
@@ -280,14 +342,21 @@ export interface IGDocVersion {
   docId: string;
   plainText: string;
   lastChangedId: string;
+  sessionId: string;
+  sessionIntention?: Intention;
+  documentIntention?: Intention;
+  dayIntention?: Intention;
   chatLog: ChatItem[];
   activity: string;
   intent: string;
   title: string;
   lastModifyingUser: string;
+  modifiedTime: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface GQLDocumentTimeline{
+export interface GQLDocumentTimeline {
   docId: string;
   user: string;
   timelinePoints: GQLTimelinePoint[];

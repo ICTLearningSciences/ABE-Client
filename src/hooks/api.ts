@@ -249,6 +249,11 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
               description: docVersion.sessionIntention.description,
             }
           : undefined,
+        documentIntention: docVersion.documentIntention
+          ? {
+              description: docVersion.documentIntention.description,
+            }
+          : undefined,
         chatLog: docVersion.chatLog.map((chatItem) => ({
           message: chatItem.message,
           sender: chatItem.sender,
@@ -689,67 +694,6 @@ export async function fetchUserActivityStates(
     }
   );
   return res;
-}
-
-export async function fetchLatestDocVersion(
-  docId: string
-): Promise<DocVersion | undefined> {
-  const res = await execGql<Connection<DocVersion>>(
-    {
-      query: `
-      query DocVersions($limit: Int, $filter: String, $sortBy: String, $sortAscending: Boolean) {
-        docVersions(limit: $limit, filter: $filter, sortBy: $sortBy, sortAscending: $sortAscending) {
-              edges {
-                node{
-                    docId
-                    plainText
-                    lastChangedId
-                    sessionId
-                    sessionIntention {
-                      description
-                      createdAt
-                    }
-                    documentIntention{
-                      description
-                      createdAt
-                    }
-                    dayIntention {
-                      description
-                      createdAt
-                    }
-                    chatLog {
-                      sender
-                      message
-                    }
-                    activity
-                    intent
-                    title
-                    lastModifyingUser
-                    modifiedTime
-                    createdAt
-                }
-            }
-            }
-        }
-      `,
-      variables: {
-        limit: 1,
-        sortBy: 'createdAt',
-        sortAscending: false,
-        filter: JSON.stringify({
-          docId,
-        }),
-      },
-    },
-    {
-      dataPath: 'docVersions',
-    }
-  );
-  if (!res.edges.length) {
-    return undefined;
-  }
-  const latestRevision = res.edges[0].node;
-  return latestRevision;
 }
 
 export type OpenAiJobId = string;
