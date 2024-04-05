@@ -15,6 +15,7 @@ import {
   loadUserGoogleDocs,
   updateGoogleDoc as _updateGoogleDoc,
 } from '../store/slices/state';
+import { URL_PARAM_NEW_DOC } from '../constants';
 
 export interface DocRevisionResponse {
   revisions: RevisionsItem[];
@@ -63,7 +64,7 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
 
   function handleNewGoogleDoc(newGoogleDoc: NewDocData) {
     updateCurrentDocId(newGoogleDoc.docId);
-    navigate(`/docs/${newGoogleDoc.docId}`);
+    navigate(`/docs/${newGoogleDoc.docId}?${URL_PARAM_NEW_DOC}=true`);
   }
   useEffect(() => {
     const queryParameters = new URLSearchParams(window.location.search);

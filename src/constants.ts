@@ -6,7 +6,10 @@ The full terms of this copyright and license should always be found in the root 
 */
 export const LS_GOOGLE_DOC_IDS_KEY = 'LS_GOOGLE_DOC_IDS_KEY';
 
+export const URL_PARAM_NEW_DOC = 'newDoc';
+
 export const BLUE_HEX = '#1B6A9C';
+export const BLUE_RGB = '27,106,156';
 export const DARK_BLUE_HEX = '#42A5F5';
 export const LIGHT_BLUE_HEX = '#a6e3ff';
 

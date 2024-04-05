@@ -213,6 +213,7 @@ export interface ActivityGQL {
   disabled: boolean;
   prompt?: GQLPrompt;
   prompts?: ActivityPromptGQL[];
+  newDocRecommend?: boolean;
 }
 
 export interface DocGoal {
@@ -223,6 +224,7 @@ export interface DocGoal {
   activities?: ActivityGQL[];
   activityOrder: string[];
   introduction: string;
+  newDocRecommend?: boolean;
 }
 
 export interface UserActivityState {

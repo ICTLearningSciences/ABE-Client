@@ -243,3 +243,12 @@ export function hasHoursPassed(
     hours * 60 * 60 * 1000
   );
 }
+
+export function hasMinutesPassed(
+  timeToCheck: string,
+  minutes: number
+): boolean {
+  return (
+    new Date().getTime() - new Date(timeToCheck).getTime() > minutes * 60 * 1000
+  );
+}

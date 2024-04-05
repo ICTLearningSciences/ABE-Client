@@ -10,11 +10,14 @@ function ActivityDisplay(props: {
   activity: ActivityGQL;
   setSelectedActivity: (activity: ActivityGQL) => void;
   isSelected?: boolean;
+  isNewGoogleDoc?: boolean;
 }): JSX.Element {
-  const { activity, setSelectedActivity, isSelected } = props;
+  const { activity, setSelectedActivity, isSelected, isNewGoogleDoc } = props;
   return (
     <div
-      className="goal-display"
+      className={`goal-display ${
+        isNewGoogleDoc && activity.newDocRecommend ? 'goal-display-flash' : ''
+      }`}
       data-cy={`activity-display-${activity._id}`}
       style={{
         border: isSelected ? '2px solid black' : '2px solid grey',
@@ -78,9 +81,15 @@ export function ActivitiesDisplay(props: {
   activityOrder: string[];
   setSelectedActivity: (activity: ActivityGQL) => void;
   selectedActivity?: ActivityGQL;
+  isNewGoogleDoc?: boolean;
 }): JSX.Element {
-  const { activities, setSelectedActivity, selectedActivity, activityOrder } =
-    props;
+  const {
+    activities,
+    setSelectedActivity,
+    selectedActivity,
+    activityOrder,
+    isNewGoogleDoc,
+  } = props;
   const activitiesCopy: ActivityGQL[] = [...activities];
   const activitiesInOrder = activitiesCopy.sort((a, b) => {
     return activityOrder.indexOf(a._id) - activityOrder.indexOf(b._id);
@@ -129,6 +138,7 @@ export function ActivitiesDisplay(props: {
                     activity={activity}
                     setSelectedActivity={setSelectedActivity}
                     isSelected={selectedActivity?._id === activity._id}
+                    isNewGoogleDoc={isNewGoogleDoc}
                   />
                 );
               })}

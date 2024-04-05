@@ -7,9 +7,10 @@ import './doc-goal-modal.css';
 export function GoalsDisplay(props: {
   docGoals: DocGoal[];
   setSelectedGoal: (goal: DocGoal) => void;
+  isNewGoogleDoc?: boolean;
   selectedGoal?: DocGoal;
 }): JSX.Element {
-  const { docGoals, setSelectedGoal, selectedGoal } = props;
+  const { docGoals, setSelectedGoal, selectedGoal, isNewGoogleDoc } = props;
   return (
     <>
       <h1
@@ -34,6 +35,7 @@ export function GoalsDisplay(props: {
               docGoal={docGoal}
               setSelectedGoal={setSelectedGoal}
               isSelected={selectedGoal?._id === docGoal._id}
+              isNewGoogleDoc={isNewGoogleDoc}
             />
           );
         })}
@@ -46,11 +48,14 @@ function GoalDisplay(props: {
   docGoal: DocGoal;
   setSelectedGoal: (goal: DocGoal) => void;
   isSelected?: boolean;
+  isNewGoogleDoc?: boolean;
 }): JSX.Element {
-  const { docGoal, setSelectedGoal, isSelected } = props;
+  const { docGoal, setSelectedGoal, isSelected, isNewGoogleDoc } = props;
   return (
     <div
-      className="goal-display"
+      className={`goal-display ${
+        isNewGoogleDoc && docGoal.newDocRecommend ? 'goal-display-flash' : ''
+      }`}
       data-cy={`goal-display-${docGoal._id}`}
       style={{
         border: isSelected ? '2px solid black' : '2px solid grey',

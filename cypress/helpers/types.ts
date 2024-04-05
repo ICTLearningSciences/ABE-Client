@@ -272,6 +272,7 @@ export interface ActivityGQL {
   description: string;
   displayIcon: DisplayIcons;
   responsePendingMessage: string;
+  newDocRecommend?: boolean;
   responseReadyMessage: string;
   disabled: boolean;
   prompt?: GQLPrompt;
@@ -286,6 +287,7 @@ export interface DocGoal {
   activities?: ActivityGQL[];
   activityOrder: string[];
   introduction: string;
+  newDocRecommend?: boolean;
 }
 
 export interface UserActivityState {

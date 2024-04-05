@@ -562,6 +562,7 @@ export async function fetchDocGoals(): Promise<DocGoal[]> {
                 displayIcon
                 introduction
                 activityOrder
+                newDocRecommend
                 activities{
                   _id
                   title
@@ -571,6 +572,7 @@ export async function fetchDocGoals(): Promise<DocGoal[]> {
                   disabled
                   responsePendingMessage
                   responseReadyMessage
+                  newDocRecommend
                   prompts{
                     _id
                     promptId
