@@ -123,6 +123,7 @@ export interface StoreGoogleDoc {
 export interface GQLPrompt {
   _id: string;
   clientId: string;
+  userInputIsIntention?: boolean;
   openAiPromptSteps: OpenAiPromptStep[];
   title: string;
 }
@@ -176,7 +177,6 @@ export enum ActivityStepTypes {
 export interface ActivityStep {
   text: string;
   stepType: ActivityStepTypes;
-  userInputIsIntention?: boolean;
   mcqChoices?: string[];
   handleResponse?: (response: string, userInputType: UserInputType) => void;
 }

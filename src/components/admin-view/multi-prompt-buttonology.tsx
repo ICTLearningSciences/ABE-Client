@@ -226,6 +226,27 @@ export function MultiPromptTesting(props: {
           });
         }}
       />
+      <FormControlLabel
+        label="User input is intention?"
+        style={{
+          height: 'fit-content',
+          textAlign: 'center',
+          alignSelf: 'center',
+        }}
+        control={
+          <Checkbox
+            checked={Boolean(promptTemplate.userInputIsIntention)}
+            indeterminate={false}
+            disabled={inProgress}
+            onChange={(e) => {
+              editOrAddPrompt({
+                ...promptTemplate,
+                userInputIsIntention: e.target.checked,
+              });
+            }}
+          />
+        }
+      />
       <div
         style={{
           height: '100%',

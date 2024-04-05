@@ -180,6 +180,9 @@ export function useWithActivityHandler(
     const chatLogString = chatLogToString(googleDocId);
     const openAiPromptSteps: OpenAiPromptStep[] = [];
     const prompt = _prompt(messages);
+    if (prompt.userInputIsIntention && lastUserMessage) {
+      updateSessionIntention({ description: lastUserMessage });
+    }
     prompt.openAiPromptSteps.map((openAiPromptStep) => {
       const prompts: PromptConfiguration[] = [];
 
@@ -394,11 +397,6 @@ export function useWithActivityHandler(
         : UserInputType.MCQ;
     if (userMessage) {
       const userAnswer = mostRecentMessage;
-      if (currentStep.userInputIsIntention) {
-        updateSessionIntention({
-          description: mostRecentMessage.message,
-        });
-      }
       if (currentStep.handleResponse) {
         currentStep.handleResponse(userAnswer.message, userInputType);
       }

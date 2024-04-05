@@ -188,6 +188,7 @@ export interface GQLPrompt {
   clientId: string;
   openAiPromptSteps: OpenAiPromptStep[];
   title: string;
+  userInputIsIntention?: boolean;
 }
 
 export interface GQLResPrompts {
@@ -239,7 +240,6 @@ export enum ActivityStepTypes {
 export interface ActivityStep {
   text: string;
   stepType: ActivityStepTypes;
-  userInputIsIntention?: boolean;
   mcqChoices?: string[];
   handleResponse?: (response: string, userInputType: UserInputType) => void;
 }
