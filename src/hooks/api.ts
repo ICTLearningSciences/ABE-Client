@@ -308,6 +308,7 @@ export async function fetchPrompts(): Promise<GQLResPrompts> {
                   _id
                   title
                   clientId
+                  userInputIsIntention
                   openAiPromptSteps {
                     prompts{
                       promptText
@@ -344,6 +345,7 @@ export async function storePrompts(
             _id
             title
             clientId
+            userInputIsIntention
             openAiPromptSteps {
               prompts{
                 promptText
@@ -578,6 +580,7 @@ export async function fetchDocGoals(): Promise<DocGoal[]> {
                     _id
                     title
                     clientId
+                    userInputIsIntention
                     openAiPromptSteps {
                       prompts{
                         promptText
