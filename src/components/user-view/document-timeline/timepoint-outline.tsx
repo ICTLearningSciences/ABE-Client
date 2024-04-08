@@ -56,9 +56,26 @@ export default function TimepointOutline(props: {
 
   function AIOutlineDisplay(props: { reverseOutline: string }): JSX.Element {
     const { reverseOutline } = props;
+    const outline = JSON.parse(reverseOutline);
+    console.log(outline);
+
     return (
-      <span>
-        <h3>AI Outline:</h3>
+      <Paper className={`paper-style ai-outline-container`}>
+        <Typography className="text-2">AI Outline</Typography>
+        <div>
+          <Typography className="text-2">Thesis Statement</Typography>
+          <Typography className="text-3">
+            {outline['Thesis Statement']}
+          </Typography>
+        </div>
+
+        <div>
+          <Typography className="text-2">Supporting Claims</Typography>
+          <Typography className="text-3">
+            {outline['Supporting Claims']}
+          </Typography>
+        </div>
+
         <pre
           style={{
             whiteSpace: 'pre-wrap',
@@ -67,7 +84,7 @@ export default function TimepointOutline(props: {
         >
           {reverseOutline}
         </pre>
-      </span>
+      </Paper>
     );
   }
 
