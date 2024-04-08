@@ -32,8 +32,11 @@ import ViewPreviousRunModal from './view-previous-run-modal';
 import { useAppSelector } from '../../store/hooks';
 import { UseWithPrompts } from '../../hooks/use-with-prompts';
 import { v4 as uuidv4 } from 'uuid';
-import { ActivityPrompts, SavedPromptsView } from './saved-prompts-view';
-import { SavedActivityPromptsView } from './saved-activity-prompts-view';
+import {
+  ActivityPrompts,
+  SavedPromptsView,
+} from './prompt-editing/saved-prompts-view';
+import { SavedActivityPromptsView } from './prompt-editing/saved-activity-prompts-view';
 import {
   extractErrorMessageFromError,
   isPromptInActivity,

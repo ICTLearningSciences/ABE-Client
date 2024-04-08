@@ -6,9 +6,9 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { CircularProgress } from '@mui/material';
-import { ActivityGQL, ActivityPrompt, GQLPrompt } from '../../types';
+import { ActivityGQL, ActivityPrompt, GQLPrompt } from '../../../types';
 import './saved-prompts-view.css';
-import SavePromptListItem from './saved-prompt-list-item';
+import SavePromptListItem from '../saved-prompt-list-item';
 
 export interface ActivityPrompts {
   activity: ActivityGQL;
