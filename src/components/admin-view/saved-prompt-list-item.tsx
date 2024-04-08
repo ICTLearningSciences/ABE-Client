@@ -13,12 +13,13 @@ import { ActivityGQL, GQLPrompt } from '../../types';
 export default function SavePromptListItem(props: {
   prompt: GQLPrompt;
   promptsLoading: boolean;
-  onImport: (prompt: GQLPrompt) => void;
+  startEditPrompt: (prompt: GQLPrompt) => void;
   goToActivity: (activityId: ActivityGQL) => void;
   getActivity: (prompt: GQLPrompt) => ActivityGQL | undefined;
   canDelete: boolean;
 }): JSX.Element {
-  const { onImport, goToActivity, getActivity, prompt, canDelete } = props;
+  const { startEditPrompt, goToActivity, getActivity, prompt, canDelete } =
+    props;
   return (
     <RowDiv style={{ width: '100%' }}>
       <div
@@ -27,7 +28,7 @@ export default function SavePromptListItem(props: {
       >
         <CardHeader
           onClick={() => {
-            onImport(prompt);
+            startEditPrompt(prompt);
           }}
           title={prompt.title}
           style={{ cursor: 'pointer' }}

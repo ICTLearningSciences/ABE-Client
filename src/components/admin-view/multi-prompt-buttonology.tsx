@@ -4,32 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import {
-  Button,
-  Checkbox,
-  CircularProgress,
-  FormControl,
-  FormControlLabel,
-  Input,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from '@mui/material';
-import { ColumnDiv, RowDivSB } from '../../styled-components';
+import { Button } from '@mui/material';
+import { ColumnDiv } from '../../styled-components';
 import React, { useState } from 'react';
 import {
   ActivityGQL,
   ActivityPrompt,
   GQLPrompt,
-  MultistepPromptRes,
   OpenAiPromptStep,
   PromptOutputTypes,
   PromptRoles,
 } from '../../types';
-import ViewPreviousRunsModal from './view-previous-runs-modal';
-import ViewPreviousRunModal from './view-previous-run-modal';
-import { useAppSelector } from '../../store/hooks';
 import { UseWithPrompts } from '../../hooks/use-with-prompts';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -37,15 +22,11 @@ import {
   SavedPromptsView,
 } from './prompt-editing/saved-prompts-view';
 import { SavedActivityPromptsView } from './prompt-editing/saved-activity-prompts-view';
-import {
-  extractErrorMessageFromError,
-  isPromptInActivity,
-} from '../../helpers';
-import { ErrorDialog } from '../dialog';
-import { asyncPromptExecute } from '../../hooks/use-with-synchronous-polling';
-import { DEFAULT_GPT_MODEL, GptModels } from '../../constants';
+import { isPromptInActivity } from '../../helpers';
+import { DEFAULT_GPT_MODEL } from '../../constants';
+import { EditPrompt } from './prompt-editing/edit-prompt';
 
-const emptyOpenAiPromptStep: OpenAiPromptStep = {
+export const emptyOpenAiPromptStep: OpenAiPromptStep = {
   prompts: [
     {
       promptText: '',
@@ -63,15 +44,9 @@ export function MultiPromptTesting(props: {
   goToActivity: (activityId: ActivityGQL) => void;
   useWithPrompts: UseWithPrompts;
 }): JSX.Element {
-  const { googleDocId, activities, goToActivity, useWithPrompts } = props;
-  const userId: string | undefined = useAppSelector(
-    (state) => state.login.user?._id
-  );
-  const systemPrompt: string = useAppSelector(
-    (state) => state.chat.systemPrompt
-  );
+  const { activities, goToActivity, useWithPrompts } = props;
   const [targetPromptId, setTargetPromptId] = useState<string>();
-  const { prompts, handleSavePrompts, editOrAddPrompt, isEdited, isLoading } =
+  const { prompts, handleSavePrompt, editOrAddPrompt, isLoading } =
     useWithPrompts;
   const activitiesWithPrompts = activities.filter(
     (activity) => (activity.prompts?.length || 0) > 0
@@ -89,15 +64,6 @@ export function MultiPromptTesting(props: {
   const orphanPrompts = prompts?.filter((prompt) => {
     return !isPromptInActivity(prompt, activities);
   });
-  const overrideGptModel = useAppSelector(
-    (state) => state.state.overideGptModel
-  );
-  const [previousRuns, setPreviousRuns] = useState<MultistepPromptRes[]>([]);
-  const [viewPrevRunResults, setViewPrevRunResults] = useState<boolean>(false);
-  const [runToView, setRunToView] = useState<MultistepPromptRes>();
-  const [inProgress, setInProgress] = useState<boolean>(false);
-  const [focusedPromptIndex, setFocusedPromptIndex] = useState<number>(0);
-  const [error, setError] = useState<string>('');
 
   function getPromptsForActivities(
     activitiesWithPrompts: ActivityGQL[],
@@ -149,7 +115,7 @@ export function MultiPromptTesting(props: {
     };
   }
 
-  function handleImportStoredPrompt(prompt: GQLPrompt) {
+  function handleStartEditPrompt(prompt: GQLPrompt) {
     setTargetPromptId(prompt.clientId || prompt._id);
   }
 
@@ -171,8 +137,8 @@ export function MultiPromptTesting(props: {
           <SavedActivityPromptsView
             activitiesWithPrompts={activityPrompts}
             promptsLoading={isLoading}
-            onImport={(prompt: GQLPrompt) => {
-              handleImportStoredPrompt(prompt);
+            startEditPrompt={(prompt: GQLPrompt) => {
+              handleStartEditPrompt(prompt);
             }}
             goToActivity={goToActivity}
             activities={activities}
@@ -182,8 +148,8 @@ export function MultiPromptTesting(props: {
           <SavedPromptsView
             savedPrompts={orphanPrompts}
             promptsLoading={isLoading}
-            onImport={(prompt: GQLPrompt) => {
-              handleImportStoredPrompt(prompt);
+            startEditPrompt={(prompt: GQLPrompt) => {
+              handleStartEditPrompt(prompt);
             }}
             goToActivity={goToActivity}
             activities={activities}
@@ -208,358 +174,16 @@ export function MultiPromptTesting(props: {
     );
   }
 
-  // Editing selected prompt template
   return (
-    <ColumnDiv style={{ width: '95%', maxHeight: '95%' }}>
-      <TextField
-        id="standard-basic"
-        label="Template Title"
-        variant="standard"
-        value={promptTemplate.title}
-        style={{
-          width: 'fit-content',
-          alignSelf: 'center',
-          margin: 10,
-          marginTop: 15,
-        }}
-        onChange={(e) => {
-          editOrAddPrompt({
-            ...promptTemplate,
-            title: e.target.value,
-          });
-        }}
-      />
-      <FormControlLabel
-        label="User input is intention?"
-        style={{
-          height: 'fit-content',
-          textAlign: 'center',
-          alignSelf: 'center',
-        }}
-        control={
-          <Checkbox
-            checked={Boolean(promptTemplate.userInputIsIntention)}
-            indeterminate={false}
-            disabled={inProgress}
-            onChange={(e) => {
-              editOrAddPrompt({
-                ...promptTemplate,
-                userInputIsIntention: e.target.checked,
-              });
-            }}
-          />
-        }
-      />
-      <div
-        style={{
-          height: '100%',
-          overflow: 'auto',
-          borderBottom: '1px solid black',
-          padding: '10px',
-        }}
-      >
-        {promptTemplate.openAiPromptSteps.map((openAiPromptStep, index) => (
-          <ColumnDiv
-            key={index}
-            style={{
-              minHeight: 'fit-content',
-              border: '1px solid grey',
-              padding: '10px',
-              margin: '10px',
-            }}
-          >
-            <Input
-              fullWidth
-              multiline
-              onFocus={() => {
-                setFocusedPromptIndex(index);
-              }}
-              key={index}
-              rows={focusedPromptIndex !== index ? 3 : undefined}
-              minRows={focusedPromptIndex === index ? 10 : 3}
-              disabled={inProgress}
-              value={openAiPromptStep.prompts[0].promptText}
-              placeholder={`Prompt ${index + 1}`}
-              onChange={(e) => {
-                editOrAddPrompt({
-                  ...promptTemplate,
-                  openAiPromptSteps: promptTemplate.openAiPromptSteps.map(
-                    (openAiPromptStep, openAiPromptStepIndex) => {
-                      if (openAiPromptStepIndex === index) {
-                        return {
-                          ...openAiPromptStep,
-                          prompts: [
-                            {
-                              ...openAiPromptStep.prompts[0],
-                              promptText: e.target.value,
-                            },
-                          ],
-                        };
-                      } else {
-                        return openAiPromptStep;
-                      }
-                    }
-                  ),
-                });
-              }}
-            />
-            <ColumnDiv>
-              <FormControlLabel
-                label="Include Essay?"
-                style={{ height: 'fit-content', textAlign: 'center' }}
-                control={
-                  <Checkbox
-                    checked={openAiPromptStep.prompts[0].includeEssay}
-                    indeterminate={false}
-                    disabled={inProgress}
-                    onChange={(e) => {
-                      editOrAddPrompt({
-                        ...promptTemplate,
-                        openAiPromptSteps: promptTemplate.openAiPromptSteps.map(
-                          (openAiPromptStep, openAiPromptStepIndex) => {
-                            if (openAiPromptStepIndex === index) {
-                              return {
-                                ...openAiPromptStep,
-                                prompts: [
-                                  {
-                                    ...openAiPromptStep.prompts[0],
-                                    includeEssay: e.target.checked,
-                                  },
-                                ],
-                              };
-                            } else {
-                              return openAiPromptStep;
-                            }
-                          }
-                        ),
-                      });
-                    }}
-                  />
-                }
-              />
-              <FormControlLabel
-                label="Include user input?"
-                style={{ height: 'fit-content', textAlign: 'center' }}
-                control={
-                  <Checkbox
-                    checked={Boolean(
-                      openAiPromptStep.prompts[0].includeUserInput
-                    )}
-                    indeterminate={false}
-                    disabled={inProgress}
-                    onChange={(e) => {
-                      editOrAddPrompt({
-                        ...promptTemplate,
-                        openAiPromptSteps: promptTemplate.openAiPromptSteps.map(
-                          (openAiPromptStep, openAiPromptStepIndex) => {
-                            if (openAiPromptStepIndex === index) {
-                              return {
-                                ...openAiPromptStep,
-                                prompts: [
-                                  {
-                                    ...openAiPromptStep.prompts[0],
-                                    includeUserInput: e.target.checked,
-                                  },
-                                ],
-                              };
-                            } else {
-                              return openAiPromptStep;
-                            }
-                          }
-                        ),
-                      });
-                    }}
-                  />
-                }
-              />
-              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id="demo-simple-select-standard-label">
-                  Output Data Type
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-standard-label"
-                  id="demo-simple-select-standard"
-                  value={openAiPromptStep.outputDataType}
-                  onChange={(e) => {
-                    editOrAddPrompt({
-                      ...promptTemplate,
-                      openAiPromptSteps: promptTemplate.openAiPromptSteps.map(
-                        (openAiPromptStep, openAiPromptStepIndex) => {
-                          if (openAiPromptStepIndex === index) {
-                            return {
-                              ...openAiPromptStep,
-                              outputDataType: e.target
-                                .value as PromptOutputTypes,
-                            };
-                          } else {
-                            return openAiPromptStep;
-                          }
-                        }
-                      ),
-                    });
-                  }}
-                  label="Output Data Type"
-                >
-                  <MenuItem value={PromptOutputTypes.TEXT}>TEXT</MenuItem>
-                  <MenuItem value={PromptOutputTypes.JSON}>JSON</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id="select-gpt-model">GPT Model</InputLabel>
-                <Select
-                  labelId="select-gpt-model"
-                  id="gpt-model-select"
-                  value={openAiPromptStep.targetGptModel}
-                  onChange={(e) => {
-                    editOrAddPrompt({
-                      ...promptTemplate,
-                      openAiPromptSteps: promptTemplate.openAiPromptSteps.map(
-                        (openAiPromptStep, openAiPromptStepIndex) => {
-                          if (openAiPromptStepIndex === index) {
-                            return {
-                              ...openAiPromptStep,
-                              targetGptModel: e.target.value as GptModels,
-                            };
-                          } else {
-                            return openAiPromptStep;
-                          }
-                        }
-                      ),
-                    });
-                  }}
-                  label="Output Data Type"
-                >
-                  <MenuItem value={GptModels.GPT_3_5}>GPT 3.5</MenuItem>
-                  <MenuItem value={GptModels.GPT_4}>GPT 4</MenuItem>
-                </Select>
-              </FormControl>
-            </ColumnDiv>
-            <Button
-              disabled={inProgress}
-              onClick={() => {
-                editOrAddPrompt({
-                  ...promptTemplate,
-                  openAiPromptSteps: promptTemplate.openAiPromptSteps.filter(
-                    (step, stepIndex) => {
-                      return stepIndex !== index;
-                    }
-                  ),
-                });
-              }}
-              style={{ height: 'fit-content' }}
-            >
-              Delete
-            </Button>
-          </ColumnDiv>
-        ))}
-      </div>
-      {inProgress ? (
-        <CircularProgress style={{ alignSelf: 'center' }} />
-      ) : (
-        <>
-          <RowDivSB style={{ justifyContent: 'space-around' }}>
-            <Button
-              onClick={() => {
-                editOrAddPrompt({
-                  ...promptTemplate,
-                  openAiPromptSteps: promptTemplate.openAiPromptSteps.concat(
-                    emptyOpenAiPromptStep
-                  ),
-                });
-              }}
-            >
-              Add Prompt
-            </Button>
-            <Button
-              disabled={!isEdited}
-              onClick={() => {
-                handleSavePrompts();
-              }}
-            >
-              Save
-            </Button>
-            <Button
-              data-cy="run-prompt-button"
-              onClick={async () => {
-                if (!userId) {
-                  return;
-                }
-                setInProgress(true);
-                try {
-                  const res = await asyncPromptExecute(
-                    googleDocId,
-                    promptTemplate.openAiPromptSteps,
-                    userId,
-                    systemPrompt,
-                    overrideGptModel
-                  );
-                  setPreviousRuns((prevRuns) => {
-                    return [...prevRuns, res];
-                  });
-                  setRunToView(res);
-                } catch (err) {
-                  const error = extractErrorMessageFromError(err);
-                  setError(error);
-                } finally {
-                  setInProgress(false);
-                }
-              }}
-              size={'large'}
-            >
-              Run
-            </Button>
-          </RowDivSB>
-          <RowDivSB style={{ justifyContent: 'space-around' }}>
-            <Button
-              disabled={prompts?.length === 0}
-              onClick={() => {
-                setTargetPromptId('');
-              }}
-            >
-              View Prompt Templates
-            </Button>
-            <Button
-              disabled={!getActivity(promptTemplate)}
-              onClick={() => {
-                const activity = getActivity(promptTemplate);
-                if (activity) {
-                  goToActivity(activity);
-                }
-              }}
-              size={'large'}
-            >
-              Preview
-            </Button>
-            <Button
-              disabled={previousRuns.length === 0}
-              onClick={() => {
-                setViewPrevRunResults((prev) => !prev);
-              }}
-            >
-              View Run Results
-            </Button>
-          </RowDivSB>
-        </>
-      )}
-      <br />
-      <ViewPreviousRunsModal
-        open={viewPrevRunResults}
-        close={() => {
-          setViewPrevRunResults(false);
-        }}
-        previousRuns={previousRuns}
-        setRunToView={(run?: MultistepPromptRes) => {
-          setRunToView(run);
-        }}
-      />
-      <ViewPreviousRunModal
-        previousRun={runToView}
-        open={Boolean(runToView)}
-        close={() => {
-          setRunToView(undefined);
-        }}
-      />
-      <ErrorDialog error={error} clearError={() => setError('')} />
-    </ColumnDiv>
+    <EditPrompt
+      promptTemplate={promptTemplate}
+      getActivityForPrompt={getActivity}
+      goToActivity={goToActivity}
+      onReturnToTemplates={() => {
+        setTargetPromptId('');
+      }}
+      promptsLoading={isLoading}
+      handleSavePrompt={handleSavePrompt}
+    />
   );
 }

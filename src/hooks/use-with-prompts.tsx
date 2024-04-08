@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { GQLPrompt, GQLResPrompts } from '../types';
-import { storePrompts } from './api';
+import { storePrompt, storePrompts } from './api';
 import { useWithPromptsData } from './use-with-prompts-data';
 
 export interface UseWithPrompts {
@@ -16,6 +16,7 @@ export interface UseWithPrompts {
   reloadData: () => void;
   editOrAddPrompt: (prompt: GQLPrompt) => void;
   handleSavePrompts: () => void;
+  handleSavePrompt: (prompt: GQLPrompt) => void;
 }
 
 export function useWithPrompts(): UseWithPrompts {
@@ -63,6 +64,11 @@ export function useWithPrompts(): UseWithPrompts {
     saveAndReturnData({ action: storePrompts }, promptsData);
   }
 
+  async function handleSavePrompt(prompt: GQLPrompt) {
+    await storePrompt(prompt);
+    reloadData();
+  }
+
   return {
     prompts: promptsData?.prompts || [],
     isLoading,
@@ -71,5 +77,6 @@ export function useWithPrompts(): UseWithPrompts {
     reloadData,
     editOrAddPrompt,
     handleSavePrompts,
+    handleSavePrompt,
   };
 }

@@ -18,12 +18,17 @@ export interface ActivityPrompts {
 export function SavedPromptsView(props: {
   savedPrompts: GQLPrompt[];
   promptsLoading: boolean;
-  onImport: (prompt: GQLPrompt) => void;
+  startEditPrompt: (prompt: GQLPrompt) => void;
   activities: ActivityGQL[];
   goToActivity: (activityId: ActivityGQL) => void;
 }) {
-  const { savedPrompts, onImport, promptsLoading, activities, goToActivity } =
-    props;
+  const {
+    savedPrompts,
+    startEditPrompt,
+    promptsLoading,
+    activities,
+    goToActivity,
+  } = props;
   if (promptsLoading) {
     return <CircularProgress />;
   }
@@ -39,7 +44,7 @@ export function SavedPromptsView(props: {
       {savedPrompts.map((prompt, index) => (
         <SavePromptListItem
           key={index}
-          onImport={onImport}
+          startEditPrompt={startEditPrompt}
           goToActivity={goToActivity}
           getActivity={getActivity}
           prompt={prompt}

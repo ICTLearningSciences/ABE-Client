@@ -372,6 +372,44 @@ export async function storePrompts(
   return { prompts: data };
 }
 
+export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  if (!accessToken) throw new Error('No access token');
+  const savedPrompt = await execGql<GQLPrompt>(
+    {
+      query: `
+      mutation StorePrompt($prompt: PromptInputType!) {
+        storePrompt(prompt: $prompt) {
+            _id
+            title
+            clientId
+            userInputIsIntention
+            openAiPromptSteps {
+              prompts{
+                promptText
+                includeEssay
+                includeUserInput
+                promptRole
+              }
+              outputDataType
+              targetGptModel
+              includeChatLogContext
+            }
+          }
+     }
+    `,
+      variables: {
+        prompt: prompt,
+      },
+    },
+    // login responds with set-cookie, w/o withCredentials it doesnt get stored
+    {
+      dataPath: 'storePrompt',
+    }
+  );
+  return savedPrompt;
+}
+
 export async function updateGoogleDocStorage(
   googleDoc: StoreGoogleDoc
 ): Promise<GoogleDoc> {

@@ -30,14 +30,14 @@ export interface ActivityPrompts {
 
 function SavedActivityPromptDisplay(props: {
   activityPrompts: ActivityPrompts;
-  onImport: (prompt: GQLPrompt) => void;
+  startEditPrompt: (prompt: GQLPrompt) => void;
   promptsLoading: boolean;
   goToActivity: (activityId: ActivityGQL) => void;
   getActivity: (prompt: GQLPrompt) => ActivityGQL | undefined;
 }) {
   const {
     activityPrompts,
-    onImport,
+    startEditPrompt,
     promptsLoading,
     goToActivity,
     getActivity,
@@ -73,7 +73,7 @@ function SavedActivityPromptDisplay(props: {
           {activityPrompts.savedPrompts.map((activityPrompt, i) => (
             <SavePromptListItem
               key={i}
-              onImport={onImport}
+              startEditPrompt={startEditPrompt}
               goToActivity={goToActivity}
               getActivity={getActivity}
               prompt={activityPrompt.prompt}
@@ -90,14 +90,14 @@ function SavedActivityPromptDisplay(props: {
 export function SavedActivityPromptsView(props: {
   activitiesWithPrompts: ActivityPrompts[];
   promptsLoading: boolean;
-  onImport: (prompt: GQLPrompt) => void;
+  startEditPrompt: (prompt: GQLPrompt) => void;
   activities: ActivityGQL[];
   goToActivity: (activityId: ActivityGQL) => void;
   getActivity: (prompt: GQLPrompt) => ActivityGQL | undefined;
 }) {
   const {
     activitiesWithPrompts,
-    onImport,
+    startEditPrompt,
     promptsLoading,
     goToActivity,
     getActivity,
@@ -113,7 +113,7 @@ export function SavedActivityPromptsView(props: {
           <SavedActivityPromptDisplay
             key={index}
             activityPrompts={activityPrompts}
-            onImport={onImport}
+            startEditPrompt={startEditPrompt}
             promptsLoading={promptsLoading}
             goToActivity={goToActivity}
             getActivity={getActivity}
