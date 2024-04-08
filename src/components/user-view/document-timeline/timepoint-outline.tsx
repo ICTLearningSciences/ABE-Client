@@ -1,6 +1,7 @@
 import React from 'react';
 import { formatISODateToReadable } from '../../../helpers';
 import { GQLTimelinePoint, TimelinePointType } from '../../../types';
+import { Box, Paper, Typography } from '@mui/material';
 
 export default function TimepointOutline(props: {
   timelinePoint: GQLTimelinePoint;
@@ -10,25 +11,46 @@ export default function TimepointOutline(props: {
   function RevisionTimeHeader(props: { revisionTime: string }): JSX.Element {
     const { revisionTime } = props;
     return (
-      <span>
-        <h3> Rev: {formatISODateToReadable(revisionTime)}</h3>
-      </span>
+      <Box>
+        <Typography className={`text-2`}>Last Revision</Typography>
+        <Typography className={`text-3`}>
+          {formatISODateToReadable(revisionTime)}
+        </Typography>
+      </Box>
     );
   }
 
   function IntentionDisplay(props: { intention: string }): JSX.Element {
     const { intention } = props;
     return (
-      <span>
-        <h3>Intention:</h3>
-        <span
-          style={{
-            color: intention ? 'black' : 'gray',
-          }}
-        >
-          {intention || 'No intention provided'}
-        </span>
-      </span>
+      <Box>
+        <Typography className={`text-2`}>Intention</Typography>
+        {intention ? (
+          <Typography className={`text-3`}>{intention}</Typography>
+        ) : (
+          <Typography className={`text-3-disable`}>
+            {'No intention provided'}
+          </Typography>
+        )}
+      </Box>
+    );
+  }
+
+  function SummaryDisplay(props: {
+    timelinePoint: GQLTimelinePoint;
+  }): JSX.Element {
+    const { timelinePoint } = props;
+    return (
+      <Box>
+        {timelinePoint.type !== TimelinePointType.START ? (
+          <span>
+            <Typography className="text-2"> Summary </Typography>
+            <Typography className="text-3">
+              {timelinePoint.changeSummary}
+            </Typography>
+          </span>
+        ) : undefined}
+      </Box>
     );
   }
 
@@ -50,28 +72,11 @@ export default function TimepointOutline(props: {
   }
 
   return (
-    <div
-      style={{
-        // height:"90%",
-        width: '90%',
-        overflow: 'auto',
-        overflowWrap: 'break-word',
-        margin: '10px',
-        padding: '10px',
-        marginBottom: 0,
-        border: '1px solid black',
-        boxShadow: '0px 0px 3px 0px rgba(0,0,0,0.75)',
-      }}
-    >
+    <Paper className="content-revision-container">
       <RevisionTimeHeader revisionTime={timelinePoint.versionTime} />
       <IntentionDisplay intention={timelinePoint.intent} />
-      {timelinePoint.type !== TimelinePointType.START ? (
-        <span>
-          <h3>Summary:</h3> {timelinePoint.changeSummary}
-        </span>
-      ) : undefined}
-      {/* <span><h3>Related Feedback:</h3> {timelinePoint.relatedFeedback}</span> */}
+      <SummaryDisplay timelinePoint={timelinePoint} />
       <AIOutlineDisplay reverseOutline={timelinePoint.reverseOutline} />
-    </div>
+    </Paper>
   );
 }
