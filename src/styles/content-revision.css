@@ -30,6 +30,12 @@ The full terms of this copyright and license should always be found in the root 
   overflow-y: auto;
 }
 
+.right-content-container {
+  height: calc(100vh - 150px);
+  width: 100%;
+  overflow-y: auto;
+}
+
 .summary-input {
   width: 100%;
   margin-bottom: 10px !important;

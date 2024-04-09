@@ -99,8 +99,9 @@ export default function TimepointOutline(props: {
     outline: string[];
     type: string;
     open: boolean;
+    claimNumber?: number | undefined;
   }): JSX.Element {
-    const { title, outline, type, open } = props;
+    const { title, outline, type, open, claimNumber } = props;
     const [expanded, setExpanded] = useState<boolean>(open);
 
     const toggleExpand = () => {
@@ -115,7 +116,7 @@ export default function TimepointOutline(props: {
               className="text-3-bold"
               style={{ marginTop: 10, maxWidth: '90%' }}
             >
-              {title}
+              {!claimNumber ? title : `${claimNumber}. ${title}`}
             </Typography>
           ) : (
             <Typography className="text-3">{title}</Typography>
@@ -161,12 +162,12 @@ export default function TimepointOutline(props: {
         <AIOutlineExpand
           title="Supporting Claims"
           outline={outline['Supporting Claims']}
-          type="no-bold"
+          type="bold"
           open={true}
         />
 
         <div>
-          <Typography className="text-2" style={{ margin: '10px 0px' }}>
+          <Typography className="text-2" style={{ margin: '10px 5px 0px 0px' }}>
             Evidence Given for each Claim
           </Typography>
           {outline['Evidence Given for Each Claim'].map(
@@ -184,6 +185,7 @@ export default function TimepointOutline(props: {
                   type="bold"
                   title={evidenceTitle}
                   outline={evidenceArray}
+                  claimNumber={i + 1}
                 />
               );
             }
@@ -205,15 +207,17 @@ export default function TimepointOutline(props: {
   return (
     <Box className="content-revision-container">
       <RevisionTimeHeader revisionTime={timelinePoint.versionTime} />
-      <Divider className="divider" />
+      <Box className="right-content-container">
+        <Divider className="divider" />
 
-      <IntentionDisplay />
-      <Divider className="divider" />
+        <IntentionDisplay />
+        <Divider className="divider" />
 
-      <SummaryDisplay timelinePoint={timelinePoint} />
-      <Divider className="divider" />
+        <SummaryDisplay timelinePoint={timelinePoint} />
+        <Divider className="divider" />
 
-      <AIOutlineDisplay reverseOutline={timelinePoint.reverseOutline} />
+        <AIOutlineDisplay reverseOutline={timelinePoint.reverseOutline} />
+      </Box>
     </Box>
   );
 }
