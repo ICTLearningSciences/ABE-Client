@@ -21,7 +21,7 @@ The full terms of this copyright and license should always be found in the root 
 .paper-style,
 .content-revision-container {
   height: calc(100vh - 150px);
-
+  width: 100%;
   padding: 20px 20px;
   margin: 10px 10px;
   border-radius: 15px;
@@ -32,8 +32,8 @@ The full terms of this copyright and license should always be found in the root 
 
 .summary-input {
   width: 100%;
-  margin-bottom: 20px !important;
-  padding: 5px !important;
+  margin-bottom: 10px !important;
+  padding: 5px 10px !important;
   border: 1px solid #e0e0e0a0 !important;
   border-radius: 5px;
 }
@@ -91,5 +91,39 @@ The full terms of this copyright and license should always be found in the root 
   margin: 0px !important;
 }
 .divider {
-  margin: 10px 0px !important;
+  margin: 5px 0px !important;
+}
+.list-container {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+.bulletpoint-icon {
+  font-size: 10px !important;
+  color: var(--content-revision-text-color-3);
+}
+.claims-title {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+.supporting-claims-container {
+  height: auto;
+  width: auto;
+  padding: 10px 5px;
+  border-radius: 15px;
+  box-shadow: var(--content-shadow);
+}
+
+.collapsable-claims {
+  transition: max-height 0.5s ease;
+  overflow: hidden;
+  max-height: 500px; /* Adjust to your desired max-height */
+}
+
+.collapsable-claims.collapsed {
+  transition: max-height 0.5s ease;
+  display: none;
 }

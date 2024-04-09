@@ -14,6 +14,9 @@ import {
   Typography,
 } from '@mui/material';
 
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+
 interface EvidenceObject {
   [key: string]: string[];
 }
@@ -25,9 +28,16 @@ export default function TimepointOutline(props: {
   const [summaryText, setSummaryText] = useState<string>(
     timelinePoint.changeSummary
   );
+  const [intentionText, setIntentionText] = useState<string>(
+    timelinePoint.intent
+  );
 
   const onSummaryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSummaryText(event.target.value);
+  };
+
+  const onIntentionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIntentionText(event.target.value);
   };
 
   function RevisionTimeHeader(props: { revisionTime: string }): JSX.Element {
@@ -42,23 +52,20 @@ export default function TimepointOutline(props: {
     );
   }
 
-  function IntentionDisplay(props: { intention: string }): JSX.Element {
-    const { intention } = props;
+  function IntentionDisplay(): JSX.Element {
     return (
       <Box>
         <Typography className={`text-2`}>Intention</Typography>
-        {intention ? (
-          <TextField
-            id="standard-basic"
-            value={intention}
-            label="Standard"
-            variant="standard"
-          />
-        ) : (
-          <Typography className={`text-3-disable`}>
-            {'No intention provided'}
-          </Typography>
-        )}
+        <Input
+          defaultValue={!intentionText ? 'No Intention text ' : intentionText}
+          value={intentionText}
+          className="summary-input"
+          minRows={1}
+          maxRows={10}
+          multiline={true}
+          onChange={onIntentionChange}
+          disableUnderline
+        />
       </Box>
     );
   }
@@ -75,7 +82,7 @@ export default function TimepointOutline(props: {
             <Input
               value={summaryText}
               className="summary-input"
-              minRows={3}
+              minRows={1}
               maxRows={10}
               multiline={true}
               onChange={onSummaryChange}
@@ -87,48 +94,53 @@ export default function TimepointOutline(props: {
     );
   }
 
-  function AIOutlineAccordion(props: {
+  function AIOutlineExpand(props: {
     title: string;
     outline: string[];
     type: string;
     open: boolean;
-    claim?: string;
   }): JSX.Element {
-    const { title, outline, type, claim, open } = props;
+    const { title, outline, type, open } = props;
+    const [expanded, setExpanded] = useState<boolean>(open);
 
-    const bold = (
-      <Box>
-        <Typography className="text-3">
-          <b>{claim}</b>
-        </Typography>
-        <Typography className="text-3">{title}</Typography>
-      </Box>
-    );
+    const toggleExpand = () => {
+      setExpanded(!expanded);
+    };
+
     return (
-      <Box className="content-revision-accordion">
-        <Accordion defaultExpanded={open}>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1-content"
-            id="panel1-header"
-          >
-            {type === 'bold' ? (
-              bold
-            ) : (
-              <Typography className="text-3-bold">{title}</Typography>
-            )}
-          </AccordionSummary>
-          <AccordionDetails>
-            {outline.map((claim: string, i: number) => {
-              return (
+      <div>
+        <div className="claims-title" onClick={toggleExpand}>
+          {type === 'bold' ? (
+            <Typography
+              className="text-3-bold"
+              style={{ marginTop: 10, maxWidth: '90%' }}
+            >
+              {title}
+            </Typography>
+          ) : (
+            <Typography className="text-3">{title}</Typography>
+          )}
+
+          {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        </div>
+
+        <div
+          className={`collapsable-claims supporting-claims-container ${
+            expanded ? 'expanded' : 'collapsed'
+          }`}
+        >
+          {outline.map((claim: string, i: number) => {
+            return (
+              <Box key={i} className="list-container">
+                <FiberManualRecordIcon className="bulletpoint-icon" />
                 <Typography key={i} className="text-3-list">
-                  - {claim}
+                  {claim}
                 </Typography>
-              );
-            })}
-          </AccordionDetails>
-        </Accordion>
-      </Box>
+              </Box>
+            );
+          })}
+        </div>
+      </div>
     );
   }
   function AIOutlineDisplay(props: { reverseOutline: string }): JSX.Element {
@@ -137,22 +149,23 @@ export default function TimepointOutline(props: {
 
     return (
       <Box className="ai-outline-container">
+        <Typography className="text-2">AI Outline</Typography>
+
         <div>
-          <Typography className="text-2" style={{ marginTop: 10 }}>
-            Thesis Statement
-          </Typography>
+          <Typography className="text-2">Statement</Typography>
           <Typography className="text-3">
             {outline['Thesis Statement']}
           </Typography>
         </div>
 
+        <AIOutlineExpand
+          title="Supporting Claims"
+          outline={outline['Supporting Claims']}
+          type="no-bold"
+          open={true}
+        />
+
         <div>
-          <AIOutlineAccordion
-            title="Supporting Claims"
-            outline={outline['Supporting Claims']}
-            type="no-bold"
-            open={true}
-          />
           <Typography className="text-2" style={{ margin: '10px 0px' }}>
             Evidence Given for each Claim
           </Typography>
@@ -165,14 +178,12 @@ export default function TimepointOutline(props: {
               const evidenceTitle = evidence[claimKey] as unknown as string;
 
               return (
-                <AIOutlineAccordion
-                  open={false}
+                <AIOutlineExpand
+                  open={true}
                   key={i}
                   type="bold"
-                  claim={claimKey}
-                  // use the first key as the title
                   title={evidenceTitle}
-                  outline={evidenceArray} // Fix: Convert the expression to 'unknown'
+                  outline={evidenceArray}
                 />
               );
             }
@@ -194,11 +205,12 @@ export default function TimepointOutline(props: {
   return (
     <Box className="content-revision-container">
       <RevisionTimeHeader revisionTime={timelinePoint.versionTime} />
-      <IntentionDisplay intention={timelinePoint.intent} />
+      <Divider className="divider" />
+
+      <IntentionDisplay />
+      <Divider className="divider" />
+
       <SummaryDisplay timelinePoint={timelinePoint} />
-      <Typography className="text-2" style={{ marginBottom: 10 }}>
-        AI Outline
-      </Typography>
       <Divider className="divider" />
 
       <AIOutlineDisplay reverseOutline={timelinePoint.reverseOutline} />
