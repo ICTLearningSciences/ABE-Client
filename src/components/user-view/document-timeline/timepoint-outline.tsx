@@ -150,10 +150,14 @@ export default function TimepointOutline(props: {
 
     return (
       <Box className="ai-outline-container">
-        <Typography className="text-2">AI Outline</Typography>
-
         <div>
-          <Typography className="text-2">Statement</Typography>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography className="text-2">Statement</Typography>
+
+            <Typography className={`text-2-bubble ai-outline-bubble`}>
+              AI Outline
+            </Typography>
+          </div>
           <Typography className="text-3">
             {outline['Thesis Statement']}
           </Typography>

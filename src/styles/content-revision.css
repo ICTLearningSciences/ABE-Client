@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 /* variables */
 :root {
-  --content-shadow: 0px 5px 10px 0px rgba(90, 82, 128, 0.2);
+  --content-shadow: 0px 2px 15px 0px rgba(90, 82, 128, 0.2);
   --content-bg: #fff;
   --content-revision-text-color-2: #4b4b4b;
   --content-revision-text-color-3: #5c5c5c;
@@ -20,19 +20,22 @@ The full terms of this copyright and license should always be found in the root 
 }
 .paper-style,
 .content-revision-container {
-  height: calc(100vh - 150px);
+  height: calc(100vh - 190px);
   width: 100%;
   padding: 20px 20px;
   margin: 10px 10px;
   border-radius: 15px;
   box-shadow: var(--content-shadow);
   background-color: var(--content-bg);
-  overflow-y: auto;
+  /* overflow-y: auto; */
+  margin-bottom: 10px;
 }
 
-.right-content-container {
-  height: calc(100vh - 150px);
+.right-content-container,
+.left-content-container {
+  height: calc(100vh - 200px);
   width: 100%;
+  margin-bottom: 10px;
   overflow-y: auto;
 }
 
@@ -42,11 +45,18 @@ The full terms of this copyright and license should always be found in the root 
   padding: 5px 10px !important;
   border: 1px solid #e0e0e0a0 !important;
   border-radius: 5px;
+  font-size: 0.8rem !important;
 }
 
 .MuiOutlinedInput-notchedOutline {
   border: 1px solid #e0e0e0a0 !important;
   border-radius: 5px;
+}
+.ai-outline-bubble {
+  color: var(--content-bg);
+  border-radius: 10px;
+  padding: 0px 10px;
+  background-color: var(--content-revision-text-color-2);
 }
 
 /* .ai-outline-container {
@@ -54,26 +64,32 @@ The full terms of this copyright and license should always be found in the root 
   overflow-y: auto;
 } */
 .text-2 {
-  font-size: 1.1rem !important;
+  font-size: 0.9rem !important;
   font-weight: 600 !important;
   color: var(--content-revision-text-color-2) !important;
 }
 
 .text-2-bold {
-  font-size: 1.1rem !important;
+  font-size: 0.9rem !important;
   font-weight: 600 !important;
   color: var(--content-revision-text-color-2) !important;
 }
 
+.text-2-bubble {
+  color: var(--content-bg) !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+}
+
 .text-3 {
-  font-size: 1rem !important;
+  font-size: 0.8rem !important;
   font-weight: 500 !important;
   margin-left: 10px !important;
   color: var(--content-revision-text-color-3);
 }
 
 .text-3-bold {
-  font-size: 1rem !important;
+  font-size: 0.8rem !important;
   font-weight: 600 !important;
   margin-left: 10px !important;
   color: var(--content-revision-text-color-3);
@@ -81,13 +97,13 @@ The full terms of this copyright and license should always be found in the root 
 }
 
 .text-3-no-indent {
-  font-size: 1rem !important;
+  font-size: 0.8rem !important;
   font-weight: 500 !important;
   color: var(--content-revision-text-color-3);
 }
 
 .text-3-disable {
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: 500;
   margin-left: 10px;
   margin-bottom: 10px !important;
@@ -95,7 +111,7 @@ The full terms of this copyright and license should always be found in the root 
 }
 
 .text-3-list {
-  font-size: 1rem !important;
+  font-size: 0.8rem !important;
   font-weight: 500 !important;
   margin-left: 10px !important;
   color: var(--content-revision-text-color-3);
@@ -117,7 +133,7 @@ The full terms of this copyright and license should always be found in the root 
   margin-left: 10px;
 }
 .bulletpoint-icon {
-  font-size: 10px !important;
+  font-size: 0.5rem !important;
   color: var(--content-revision-text-color-3);
 }
 .claims-title {
@@ -128,9 +144,10 @@ The full terms of this copyright and license should always be found in the root 
   cursor: pointer;
 }
 .supporting-claims-container {
+  margin: auto;
   height: auto;
-  width: auto;
-  padding: 10px 5px;
+  width: 97%;
+  padding: 5px 5px;
   border-radius: 15px;
   box-shadow: var(--content-shadow);
 }
