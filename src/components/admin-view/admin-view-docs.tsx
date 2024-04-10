@@ -22,6 +22,7 @@ export default function ViewUserGoogleDocs(
     copyGoogleDocs,
     creationInProgress,
     handleCreateGoogleDoc,
+    handleDeleteGoogleDoc,
   } = useWithGoogleDocs;
 
   return (
@@ -33,6 +34,7 @@ export default function ViewUserGoogleDocs(
       }}
     >
       <SelectCreateDocs
+        handleDeleteGoogleDoc={handleDeleteGoogleDoc}
         googleDocs={googleDocs}
         copyGoogleDocs={copyGoogleDocs}
         creationInProgress={creationInProgress}
