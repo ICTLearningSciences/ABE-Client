@@ -1,21 +1,37 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { formatISODateToReadable } from '../../../helpers';
 import { GQLTimelinePoint, TimelinePointType } from '../../../types';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Divider,
-  Input,
-  Paper,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+
+const useDynamicHeight = (initialValue: string) => {
+  const [value, setValue] = useState(initialValue);
+  const [height, setHeight] = useState('auto');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue(event.target.value);
+  };
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      const { scrollHeight, clientHeight } = textareaRef.current;
+      const newHeight = `${scrollHeight}px`;
+      // If the content is removed and scrollHeight decreases, resize the textarea to a smaller height
+      if (newHeight < height) {
+        setHeight(newHeight);
+      } else if (scrollHeight !== clientHeight) {
+        // If the content is added and scrollHeight increases, resize the textarea to a larger height
+        setHeight(newHeight);
+      }
+    }
+  }, [value]);
+
+  return { value, height, textareaRef, handleChange };
+};
 
 interface EvidenceObject {
   [key: string]: string[];
@@ -25,44 +41,42 @@ export default function TimepointOutline(props: {
   timelinePoint: GQLTimelinePoint;
 }): JSX.Element {
   const { timelinePoint } = props;
+  const [thesis, setThesis] = useState<boolean>(false);
+  const [supportingClaims, setSupportingClaims] = useState<boolean>(false);
+  const [claimEvidence, setClaimEvidence] = useState<boolean>(false);
+
+  // if reverseOutline is not empty, parse the reverseOutline
+
+  useEffect(() => {
+    if (timelinePoint.reverseOutline === 'No outline available') return;
+
+    const reverseOutlineParsed = JSON.parse(timelinePoint.reverseOutline);
+    console.log(reverseOutlineParsed);
+
+    if (reverseOutlineParsed['Thesis Statement'] !== '') {
+      setThesis(true);
+    }
+    if (reverseOutlineParsed['Supporting Claims'].length > 0) {
+      setSupportingClaims(true);
+    }
+    if (reverseOutlineParsed['Evidence Given for Each Claim'].length > 0) {
+      setClaimEvidence(true);
+    }
+  }, [timelinePoint]);
 
   function RevisionTimeHeader(props: { revisionTime: string }): JSX.Element {
     const { revisionTime } = props;
     return (
-      <Box className="revision-time-header">
-        <Typography className={`text-2`}>Revision: </Typography>
-        <Typography className={`text-3`}>
+      <Box className="revision-time-header" data-cy="revision-time-header">
+        <Typography className={`text-2`} data-cy="revision-title">
+          Revision:
+        </Typography>
+        <Typography className={`text-3`} data-cy="revision-date">
           {formatISODateToReadable(revisionTime)}
         </Typography>
       </Box>
     );
   }
-
-  const useDynamicHeight = (initialValue: string) => {
-    const [value, setValue] = useState(initialValue);
-    const [height, setHeight] = useState('auto');
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setValue(event.target.value);
-    };
-
-    useEffect(() => {
-      if (textareaRef.current) {
-        const { scrollHeight, clientHeight } = textareaRef.current;
-        const newHeight = `${scrollHeight}px`;
-        // If the content is removed and scrollHeight decreases, resize the textarea to a smaller height
-        if (newHeight < height) {
-          setHeight(newHeight);
-        } else if (scrollHeight !== clientHeight) {
-          // If the content is added and scrollHeight increases, resize the textarea to a larger height
-          setHeight(newHeight);
-        }
-      }
-    }, [value]);
-
-    return { value, height, textareaRef, handleChange };
-  };
 
   function IntentionDisplay(props: {
     timelinePoint: GQLTimelinePoint;
@@ -73,9 +87,11 @@ export default function TimepointOutline(props: {
     );
 
     return (
-      <Box className="input-container">
+      <Box className="input-container" data-cy="intention-container">
         <span className="input-wrapper">
-          <Typography className={`text-2`}>Intention</Typography>
+          <Typography className={`text-2`} data-cy="intention-title">
+            Intention
+          </Typography>
           <textarea
             ref={textareaRef}
             value={!value ? 'No Intention text ' : value}
@@ -83,6 +99,7 @@ export default function TimepointOutline(props: {
             className="summary-input"
             placeholder="Enter your text here..."
             style={{ height: height }}
+            data-cy="intention-textarea"
           />
         </span>
       </Box>
@@ -99,10 +116,12 @@ export default function TimepointOutline(props: {
     );
 
     return (
-      <Box className="input-container">
+      <Box className="input-container" data-cy="summary-container">
         {timelinePoint.type !== TimelinePointType.START ? (
           <span className="input-wrapper">
-            <Typography className="text-2"> Summary </Typography>
+            <Typography className="text-2" data-cy="summary-title">
+              Summary
+            </Typography>
             <textarea
               ref={textareaRef}
               value={value}
@@ -110,6 +129,7 @@ export default function TimepointOutline(props: {
               className="summary-input"
               placeholder="Enter your text here..."
               style={{ height: height }}
+              data-cy="summary-textarea"
             />
           </span>
         ) : undefined}
@@ -120,11 +140,12 @@ export default function TimepointOutline(props: {
   function AIOutlineExpand(props: {
     title: string;
     outline: string[];
-    type: string;
+    fontType: string;
     open: boolean;
+    dataCy: string;
     claimNumber?: number | undefined;
   }): JSX.Element {
-    const { title, outline, type, open, claimNumber } = props;
+    const { title, outline, fontType, open, claimNumber, dataCy } = props;
     const [expanded, setExpanded] = useState<boolean>(open);
 
     const toggleExpand = () => {
@@ -132,17 +153,20 @@ export default function TimepointOutline(props: {
     };
 
     return (
-      <div>
+      <Box data-cy={`${dataCy}-container`}>
         <div className="claims-title" onClick={toggleExpand}>
-          {type === 'bold' ? (
+          {fontType === 'bold' ? (
             <Typography
               className="text-3-bold"
               style={{ marginTop: 10, maxWidth: '90%' }}
+              data-cy={`${dataCy}-title`}
             >
               {!claimNumber ? title : `${claimNumber}. ${title}`}
             </Typography>
           ) : (
-            <Typography className="text-3">{title}</Typography>
+            <Typography className="text-3" data-cy={`${dataCy}-title`}>
+              {title}
+            </Typography>
           )}
 
           {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -152,6 +176,7 @@ export default function TimepointOutline(props: {
           className={`collapsable-claims supporting-claims-container ${
             expanded ? 'expanded' : 'collapsed'
           }`}
+          data-cy={`${dataCy}-accordion`}
         >
           {outline.map((claim: string, i: number) => {
             return (
@@ -164,7 +189,7 @@ export default function TimepointOutline(props: {
             );
           })}
         </div>
-      </div>
+      </Box>
     );
   }
   function AIOutlineDisplay(props: { reverseOutline: string }): JSX.Element {
@@ -172,69 +197,93 @@ export default function TimepointOutline(props: {
     const outline = JSON.parse(reverseOutline);
 
     return (
-      <Box className="ai-outline-container">
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography className="text-2">Statement</Typography>
+      <Box className="ai-outline-container" data-cy="ai-outline-container">
+        {/* This code snippet is conditionally rendering a section for the Thesis Statement based on the
+        value of the `thesis` state. If `thesis` is true, it will display a `div` element containing the
+        following elements: */}
+        {thesis ? (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography
+                className="text-2"
+                data-cy="ai-outline-statement-title"
+              >
+                Statement
+              </Typography>
 
-            <Typography className={`text-2-bubble ai-outline-bubble`}>
-              AI Outline
+              <Typography className={`text-2-bubble ai-outline-bubble`}>
+                AI Outline
+              </Typography>
+            </div>
+            <Typography
+              className="text-3"
+              data-cy="ai-outline-statement-content"
+            >
+              {outline['Thesis Statement']}
             </Typography>
           </div>
-          <Typography className="text-3">
-            {outline['Thesis Statement']}
-          </Typography>
-        </div>
+        ) : null}
 
-        <AIOutlineExpand
-          title="Supporting Claims"
-          outline={outline['Supporting Claims']}
-          type="bold"
-          open={true}
-        />
+        {/* This code snippet is conditionally rendering the `AIOutlineExpand`
+        component based on the value of the `supportingClaims` state. */}
+        {supportingClaims ? (
+          <AIOutlineExpand
+            title="Supporting Claims"
+            outline={outline['Supporting Claims']}
+            fontType="bold"
+            open={true}
+            dataCy="supporting-claims"
+          />
+        ) : null}
 
-        <div>
-          <Typography className="text-2" style={{ margin: '10px 5px 0px 0px' }}>
-            Evidence Given for each Claim
-          </Typography>
-          {outline['Evidence Given for Each Claim'].map(
-            (evidence: EvidenceObject, i: number) => {
-              const keys = Object.keys(evidence);
-              const claimKey = keys[0];
-              const evidenceKey = keys[1];
-              const evidenceArray = evidence[evidenceKey];
-              const evidenceTitle = evidence[claimKey] as unknown as string;
+        {/* This code snippet is conditionally rendering a section titled "Evidence Given for each Claim"
+       based on the value of the `claimEvidence` state. */}
+        {claimEvidence ? (
+          <div>
+            <Typography
+              className="text-2"
+              style={{ margin: '10px 5px 0px 0px' }}
+              data-cy="claim-evidence-title"
+            >
+              Evidence Given for Each Claim
+            </Typography>
+            {outline['Evidence Given for Each Claim'].map(
+              (evidence: EvidenceObject, i: number) => {
+                const keys = Object.keys(evidence);
+                const claimKey = keys[0];
+                const evidenceKey = keys[1];
+                const evidenceArray = evidence[evidenceKey];
+                const evidenceTitle = evidence[claimKey] as unknown as string;
 
-              return (
-                <AIOutlineExpand
-                  open={true}
-                  key={i}
-                  type="bold"
-                  title={evidenceTitle}
-                  outline={evidenceArray}
-                  claimNumber={i + 1}
-                />
-              );
-            }
-          )}
-        </div>
-
-        <pre
-          style={{
-            whiteSpace: 'pre-wrap',
-            wordWrap: 'break-word',
-          }}
-        >
-          {/* {reverseOutline} */}
-        </pre>
+                return (
+                  <AIOutlineExpand
+                    open={true}
+                    key={i}
+                    fontType="bold"
+                    title={evidenceTitle}
+                    outline={evidenceArray}
+                    claimNumber={i + 1}
+                    dataCy={`claim-evidence-${i + 1}`}
+                  />
+                );
+              }
+            )}
+          </div>
+        ) : null}
       </Box>
     );
   }
 
   return (
-    <Box className="content-revision-container">
+    <Box
+      className="content-revision-container"
+      data-cy="content-revision-container"
+    >
       <RevisionTimeHeader revisionTime={timelinePoint.versionTime} />
-      <Box className="right-content-container">
+      <Box
+        className="right-content-container"
+        data-cy="right-content-container"
+      >
         <Divider className="divider" />
         <div style={{ marginRight: 10 }}>
           <IntentionDisplay timelinePoint={timelinePoint} />
@@ -244,9 +293,18 @@ export default function TimepointOutline(props: {
           <SummaryDisplay timelinePoint={timelinePoint} />
         </div>
         <Divider className="divider" />
-        <div style={{ marginRight: 10 }}>
-          <AIOutlineDisplay reverseOutline={timelinePoint.reverseOutline} />
-        </div>
+        {
+          // if thesis, supporting claims, and claim evidence display
+          thesis && supportingClaims && claimEvidence ? (
+            <div style={{ marginRight: 10 }}>
+              <AIOutlineDisplay reverseOutline={timelinePoint.reverseOutline} />
+            </div>
+          ) : (
+            <Typography className="text-2" data-cy="no-ai-outline">
+              No AI outline available
+            </Typography>
+          )
+        }
       </Box>
     </Box>
   );
