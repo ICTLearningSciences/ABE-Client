@@ -17,7 +17,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import DocView from './components/doc-view';
 import { useWithLogin } from './store/slices/login/use-with-login';
 import DocumentTimelinePage from './components/user-view/document-timeline';
-import { useReduxHydration } from './root-loader';
+import { useReduxHydration } from './use-redux-hydration';
 
 function MainApp() {
   const useLogin = useWithLogin();

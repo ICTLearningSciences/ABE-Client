@@ -11,7 +11,9 @@ import {
   DialogContent,
   DialogContentText,
   Button,
+  CircularProgress,
 } from '@mui/material';
+import { RowDiv } from '../styled-components';
 
 export function ErrorDialog(props: {
   error?: string;
@@ -42,6 +44,61 @@ export function ErrorDialog(props: {
         >
           Close
         </Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface Option {
+  display: string;
+  onClick: () => void;
+}
+
+export function TwoOptionDialog(props: {
+  title: string;
+  open: boolean;
+  actionInProgress: boolean;
+  option1: Option;
+  option2: Option;
+}): JSX.Element {
+  const { title, option1, option2, open, actionInProgress } = props;
+  return (
+    <Dialog
+      data-cy="two-option-dialog"
+      maxWidth="sm"
+      fullWidth={true}
+      open={open}
+    >
+      <DialogTitle style={{ textAlign: 'center' }}>{title}</DialogTitle>
+      <DialogContent
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {actionInProgress && <CircularProgress />}
+        <RowDiv>
+          <Button
+            disabled={actionInProgress}
+            data-cy="option-1"
+            onClick={() => {
+              option1.onClick();
+            }}
+          >
+            {option1.display}
+          </Button>
+          <Button
+            disabled={actionInProgress}
+            data-cy="option-2"
+            onClick={() => {
+              option2.onClick();
+            }}
+          >
+            {option2.display}
+          </Button>
+        </RowDiv>
       </DialogContent>
     </Dialog>
   );
