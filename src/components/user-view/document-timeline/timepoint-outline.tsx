@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { formatISODateToReadable } from '../../../helpers';
 import { GQLTimelinePoint, TimelinePointType } from '../../../types';
@@ -25,20 +25,6 @@ export default function TimepointOutline(props: {
   timelinePoint: GQLTimelinePoint;
 }): JSX.Element {
   const { timelinePoint } = props;
-  const [summaryText, setSummaryText] = useState<string>(
-    timelinePoint.changeSummary
-  );
-  const [intentionText, setIntentionText] = useState<string>(
-    timelinePoint.intent
-  );
-
-  const onSummaryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSummaryText(event.target.value);
-  };
-
-  const onIntentionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIntentionText(event.target.value);
-  };
 
   function RevisionTimeHeader(props: { revisionTime: string }): JSX.Element {
     const { revisionTime } = props;
@@ -52,20 +38,46 @@ export default function TimepointOutline(props: {
     );
   }
 
-  function IntentionDisplay(): JSX.Element {
+  const useDynamicHeight = (initialValue: string) => {
+    const [value, setValue] = useState(initialValue);
+    const [height, setHeight] = useState('auto');
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setValue(event.target.value);
+    };
+
+    useEffect(() => {
+      if (textareaRef.current) {
+        setHeight('auto');
+        setHeight(`${textareaRef.current.scrollHeight}px`);
+      }
+    }, [value]);
+
+    return { value, height, textareaRef, handleChange };
+  };
+
+  function IntentionDisplay(props: {
+    timelinePoint: GQLTimelinePoint;
+  }): JSX.Element {
+    const { timelinePoint } = props;
+    const { value, height, textareaRef, handleChange } = useDynamicHeight(
+      timelinePoint.intent
+    );
+
     return (
-      <Box>
-        <Typography className={`text-2`}>Intention</Typography>
-        <Input
-          defaultValue={!intentionText ? 'No Intention text ' : intentionText}
-          value={intentionText}
-          className="summary-input"
-          minRows={1}
-          maxRows={10}
-          multiline={true}
-          onChange={onIntentionChange}
-          disableUnderline
-        />
+      <Box className="input-container">
+        <span className="input-wrapper">
+          <Typography className={`text-2`}>Intention</Typography>
+          <textarea
+            ref={textareaRef}
+            value={!value ? 'No Intention text ' : value}
+            onChange={handleChange}
+            className="summary-input"
+            placeholder="Enter your text here..."
+            style={{ height: height }}
+          />
+        </span>
       </Box>
     );
   }
@@ -74,19 +86,23 @@ export default function TimepointOutline(props: {
     timelinePoint: GQLTimelinePoint;
   }): JSX.Element {
     const { timelinePoint } = props;
+
+    const { value, height, textareaRef, handleChange } = useDynamicHeight(
+      timelinePoint.changeSummary
+    );
+
     return (
-      <Box>
+      <Box className="input-container">
         {timelinePoint.type !== TimelinePointType.START ? (
-          <span>
+          <span className="input-wrapper">
             <Typography className="text-2"> Summary </Typography>
-            <Input
-              value={summaryText}
+            <textarea
+              ref={textareaRef}
+              value={value}
+              onChange={handleChange}
               className="summary-input"
-              minRows={1}
-              maxRows={10}
-              multiline={true}
-              onChange={onSummaryChange}
-              disableUnderline
+              placeholder="Enter your text here..."
+              style={{ height: height }}
             />
           </span>
         ) : undefined}
@@ -213,13 +229,10 @@ export default function TimepointOutline(props: {
       <RevisionTimeHeader revisionTime={timelinePoint.versionTime} />
       <Box className="right-content-container">
         <Divider className="divider" />
-
-        <IntentionDisplay />
+        <IntentionDisplay timelinePoint={timelinePoint} />
         <Divider className="divider" />
-
         <SummaryDisplay timelinePoint={timelinePoint} />
         <Divider className="divider" />
-
         <AIOutlineDisplay reverseOutline={timelinePoint.reverseOutline} />
       </Box>
     </Box>
