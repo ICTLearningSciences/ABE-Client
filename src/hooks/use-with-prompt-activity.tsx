@@ -93,7 +93,7 @@ export function useWithPromptActivity(
       text: "Feel free to edit your paper. Let me know when you're ready for me to analyze it.",
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: [MCQ_READY],
-      handleResponse: () => {
+      handleResponse: async () => {
         executePrompt(
           () => activityGql.prompt!,
           (response) => {
@@ -125,7 +125,7 @@ export function useWithPromptActivity(
       text: 'Feel free to ask me anything else about your essay, or I can analyze it again for you.',
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       mcqChoices: [MCQ_ANALYZE],
-      handleResponse: (response: string) => {
+      handleResponse: async (response: string) => {
         if (response === MCQ_ANALYZE) {
           executePrompt(
             () => activity.prompt!,

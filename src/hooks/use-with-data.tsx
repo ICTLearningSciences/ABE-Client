@@ -59,6 +59,7 @@ export function useWithData<T>(fetch: () => Promise<T>): UseData<T> {
       .then((data) => {
         dispatch({ type: LoadingActionType.LOADING_SUCCEEDED });
         setData(data);
+        setEditedData(data);
       })
       .catch((err) => {
         console.error(err);

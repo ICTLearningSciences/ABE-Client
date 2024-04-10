@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   TextField,
   FormControlLabel,
@@ -62,6 +62,11 @@ export function EditPrompt(props: {
   const [promptTemplateCopy, setPromptTemplateCopy] = useState<GQLPrompt>(
     JSON.parse(JSON.stringify(promptTemplate))
   );
+
+  useEffect(() => {
+    setPromptTemplateCopy(JSON.parse(JSON.stringify(promptTemplate)));
+  }, [promptTemplate]);
+
   const isEdited = !equals(promptTemplate, promptTemplateCopy);
 
   return (

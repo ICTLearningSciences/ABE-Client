@@ -31,7 +31,6 @@ export interface ChatMessage {
   mcqChoices?: string[];
   selectActivities?: Activity[];
   activityStep?: ActivityStep;
-  selectedActivity?: Activity;
   selectedGoal?: DocGoal;
   userInputType?: UserInputType;
 }

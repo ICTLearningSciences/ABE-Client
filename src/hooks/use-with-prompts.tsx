@@ -68,7 +68,6 @@ export function useWithPrompts(): UseWithPrompts {
     await storePrompt(prompt);
     reloadData();
   }
-
   return {
     prompts: promptsData?.prompts || [],
     isLoading,

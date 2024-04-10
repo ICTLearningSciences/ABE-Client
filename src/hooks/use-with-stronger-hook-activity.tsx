@@ -25,6 +25,7 @@ import { useWithState } from '../store/slices/state/use-with-state';
 import { useAppSelector } from '../store/hooks';
 import { freeInputPrompt } from './use-with-prompt-activity';
 import { v4 as uuidv4 } from 'uuid';
+import { Schema } from 'jsonschema';
 
 export const WEAK_THRESHOLD = 4;
 export const MCQ_READY_FOR_REVIEW = 'Ready';
@@ -120,7 +121,7 @@ const analyzePromptResponseSchema = {
   required: ['content', 'emotion', 'narrativity', 'overall'],
 };
 
-const entityDetectionPromptResponseSchema = {
+const entityDetectionPromptResponseSchema: Schema = {
   type: 'object',
   properties: {
     experiences: {
@@ -191,8 +192,8 @@ export const emotionCannedResponses: Record<number, string[]> = {
 export interface StepData {
   executePrompt: (
     prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
-    callback: (response: MultistepPromptRes) => void
-  ) => void;
+    callback?: (response: MultistepPromptRes) => void
+  ) => Promise<void>;
   openSelectActivityModal: () => void;
 }
 
@@ -325,6 +326,7 @@ export default function useWithStrongerHookActivity(
     FREE_INPUT_STEP = 'freeInputStep',
     SELECT_NARRATIVE_OR_EMOTION = 'selectNarrativeOrEmotion',
   }
+
   interface StrongerHookActivityState {
     curStepName: StepNames;
     emotionScore: number;
@@ -656,7 +658,7 @@ export default function useWithStrongerHookActivity(
       text: "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: [MCQ_READY_FOR_REVIEW],
-      handleResponse: () => {
+      handleResponse: async () => {
         if (!analyzeHookPrompt) {
           return;
         }
@@ -715,7 +717,7 @@ export default function useWithStrongerHookActivity(
       text: 'What would you like to work on?',
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: selections,
-      handleResponse: (response: string) => {
+      handleResponse: async (response: string) => {
         if (response === MCQ_IMPROVE_NARRATIVITY) {
           setCurStepName(StepNames.NARRATIVE_WEAK_STEP_ONE);
         } else if (response === MCQ_IMPROVE_EMOTION) {
@@ -732,7 +734,7 @@ export default function useWithStrongerHookActivity(
       text: 'Would you like to brainstorm some stories or do you already have a story in mind?',
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: [BRAINSTORM_STORIES, STORY_IN_MIND],
-      handleResponse: (response: string) => {
+      handleResponse: async (response: string) => {
         if (response === BRAINSTORM_STORIES) {
           setCurStepName(StepNames.NARRATIVE_WEAK_STEP_TWO);
         } else if (response === STORY_IN_MIND) {
@@ -749,7 +751,7 @@ export default function useWithStrongerHookActivity(
       text: `Let's brainstorm then. What are a few examples of people or places you connect to this? How and why did your stories with them shape your attitudes?`,
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       mcqChoices: [HELP_ME_BRAINSTORM],
-      handleResponse(response: string) {
+      handleResponse: async (response: string) => {
         if (!helpBrainstormPrompt || !entityDetectionPrompt) {
           return;
         }
@@ -805,7 +807,7 @@ export default function useWithStrongerHookActivity(
       text: "Would you like to brainstorm more examples or work with what you've got?",
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: [MCQ_BRAINSTORM_MORE, MCQ_WORK_WITH_WHAT_YOU_HAVE],
-      handleResponse: (response: string) => {
+      handleResponse: async (response: string) => {
         if (response === MCQ_BRAINSTORM_MORE) {
           setCurStepName(StepNames.NARRATIVE_WEAK_STEP_TWO);
         } else {
@@ -821,7 +823,7 @@ export default function useWithStrongerHookActivity(
     return {
       text: `Great, can you share your story with me?`,
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
-      handleResponse(userInput: string) {
+      handleResponse: async (userInput: string) => {
         if (!compareStoryToHookPrompt) {
           return;
         }
@@ -871,7 +873,7 @@ export default function useWithStrongerHookActivity(
       text: `What kind of revision are you thinking of doing now? If you're not sure, we can brainstorm some more.`,
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       mcqChoices: [HELP_ME_BRAINSTORM],
-      handleResponse: (res: string) => {
+      handleResponse: async (res: string) => {
         if (res === HELP_ME_BRAINSTORM) {
           setCurStepName(StepNames.NARRATIVE_WEAK_STEP_TWO);
         } else {
@@ -898,7 +900,7 @@ export default function useWithStrongerHookActivity(
       text: `Please revise your paper and let me know when it's ready for me to review.`,
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: [MCQ_READY_FOR_REVIEW],
-      handleResponse: () => {
+      handleResponse: async () => {
         // Add revision and story to hook prompt
         if (!relateStoryAndRevisionToHookPrompt) {
           return;
@@ -951,7 +953,7 @@ export default function useWithStrongerHookActivity(
         MCQ_IMPROVE_EMOTION,
         MCQ_SOMETHING_ELSE,
       ],
-      handleResponse: (response: string) => {
+      handleResponse: async (response: string) => {
         if (response === MCQ_IMPROVE_NARRATIVITY) {
           setState((prevState) => {
             return {
@@ -980,7 +982,7 @@ export default function useWithStrongerHookActivity(
     return {
       text: 'Great. Consider who this piece is speaking to. Can you list the main audience or a few audiences? For each audience, what kind of emotions do you want them to feel?',
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
-      handleResponse: () => {
+      handleResponse: async () => {
         if (!audienceAndEmotionsDetectionPrompt) {
           return;
         }
@@ -999,7 +1001,7 @@ export default function useWithStrongerHookActivity(
     return {
       text: 'What kind of revision are you thinking of doing now?',
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
-      handleResponse: (response: string) => {
+      handleResponse: async (response: string) => {
         updateSessionIntention({
           description: response,
         });
@@ -1043,7 +1045,7 @@ export default function useWithStrongerHookActivity(
       text: "Let me know when you're done revising so I can look at it again.",
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: [MCQ_READY_FOR_REVIEW],
-      handleResponse: () => {
+      handleResponse: async () => {
         if (!eAnalyzeDocRevisionPrompt) {
           return;
         }
@@ -1077,7 +1079,7 @@ export default function useWithStrongerHookActivity(
     return {
       text: "Okay, feel free to ask me anything you'd like",
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
-      handleResponse: () => {
+      handleResponse: async () => {
         executePrompt(freeInputPrompt, (response: MultistepPromptRes) => {
           setWaitingForUserAnswer(true);
           sendMessage(
@@ -1107,7 +1109,7 @@ export default function useWithStrongerHookActivity(
       text: 'Okay, would you like to revise and then have me analyze it again? Or would you like to work on another activity?',
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: [MCQ_ANALYZE_AGAIN, MCQ_ANOTHER_ACTIVITY, MCQ_OPEN_DIALOGUE],
-      handleResponse: (response: string) => {
+      handleResponse: async (response: string) => {
         if (response === MCQ_ANALYZE_AGAIN) {
           resetActivity();
         } else if (response === MCQ_ANOTHER_ACTIVITY) {

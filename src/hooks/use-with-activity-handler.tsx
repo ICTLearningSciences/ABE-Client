@@ -34,6 +34,7 @@ import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { v4 as uuidv4 } from 'uuid';
 import { GptModels } from '../constants';
 import { useWithState } from '../store/slices/state/use-with-state';
+import { useWithStrongerConclusionActivity } from './stronger-conclusion-activity/use-with-stronger-conclusion-activity';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -115,6 +116,14 @@ export function useWithActivityHandler(
     prompts,
     selectedGoal
   );
+  const strongerConclusionActivity = useWithStrongerConclusionActivity(
+    selectedActivity || emptyActivity,
+    sendMessage,
+    setWaitingForUserAnswer,
+    promptsLoading,
+    prompts,
+    selectedGoal
+  );
   const promptActivity = useWithPromptActivity(
     selectedActivity || emptyActivity,
     sendMessage,
@@ -124,6 +133,8 @@ export function useWithActivityHandler(
   const activity =
     selectedActivity?.title === 'Stronger Hook'
       ? strongerHookActivity
+      : selectedActivity?.title === 'Stronger Conclusion'
+      ? strongerConclusionActivity
       : selectedActivity?.prompt
       ? promptActivity
       : undefined;
@@ -194,7 +205,7 @@ export function useWithActivityHandler(
         });
       }
 
-      openAiPromptStep.prompts.map((prompt) => {
+      openAiPromptStep.prompts.forEach((prompt) => {
         prompts.push({
           ...prompt,
           promptText: `${prompt.promptText} ${
@@ -218,7 +229,7 @@ export function useWithActivityHandler(
       controller: abortController,
       source,
     });
-    asyncPromptExecute(
+    await asyncPromptExecute(
       googleDocId,
       openAiPromptSteps,
       userId,
@@ -246,6 +257,7 @@ export function useWithActivityHandler(
   ) {
     coachResponsePending(false);
     if (callback) {
+      console.log('going to callback');
       callback(response);
     } else {
       sendMessage(
@@ -354,7 +366,6 @@ export function useWithActivityHandler(
         displayType: MessageDisplayType.TEXT,
         mcqChoices: currentStep.mcqChoices,
         activityStep: currentStep,
-        selectedActivity: activity,
         selectedGoal: selectedGoal,
       },
       false,
