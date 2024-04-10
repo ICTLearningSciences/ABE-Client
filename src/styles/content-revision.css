@@ -23,7 +23,7 @@ The full terms of this copyright and license should always be found in the root 
 .content-revision-container {
   height: calc(100vh - 190px);
   width: 100%;
-  padding: 20px 10px 20px 20px;
+  padding: 20px 0px 20px 20px;
   margin: 5px 5px;
   border-radius: 15px;
   box-shadow: var(--content-shadow);
@@ -41,7 +41,6 @@ The full terms of this copyright and license should always be found in the root 
 }
 .input-container {
   width: 100%;
-  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -49,7 +48,6 @@ The full terms of this copyright and license should always be found in the root 
   margin-bottom: 10px;
 }
 .input-wrapper {
-  height: auto;
   width: 100%;
   margin: auto;
   display: flex;
@@ -57,7 +55,6 @@ The full terms of this copyright and license should always be found in the root 
   justify-content: center;
 }
 .summary-input {
-  height: auto;
   width: 95%;
   margin: auto;
   margin-bottom: px !important;
@@ -70,6 +67,7 @@ The full terms of this copyright and license should always be found in the root 
 textarea {
   font-family: inherit;
   color: var(--content-revision-text-color-2);
+  resize: none;
 }
 
 .summary-input:focus-visible {

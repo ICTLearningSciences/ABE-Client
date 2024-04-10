@@ -49,8 +49,15 @@ export default function TimepointOutline(props: {
 
     useEffect(() => {
       if (textareaRef.current) {
-        setHeight('auto');
-        setHeight(`${textareaRef.current.scrollHeight}px`);
+        const { scrollHeight, clientHeight } = textareaRef.current;
+        const newHeight = `${scrollHeight}px`;
+        // If the content is removed and scrollHeight decreases, resize the textarea to a smaller height
+        if (newHeight < height) {
+          setHeight(newHeight);
+        } else if (scrollHeight !== clientHeight) {
+          // If the content is added and scrollHeight increases, resize the textarea to a larger height
+          setHeight(newHeight);
+        }
       }
     }, [value]);
 
@@ -229,11 +236,17 @@ export default function TimepointOutline(props: {
       <RevisionTimeHeader revisionTime={timelinePoint.versionTime} />
       <Box className="right-content-container">
         <Divider className="divider" />
-        <IntentionDisplay timelinePoint={timelinePoint} />
+        <div style={{ marginRight: 10 }}>
+          <IntentionDisplay timelinePoint={timelinePoint} />
+        </div>
         <Divider className="divider" />
-        <SummaryDisplay timelinePoint={timelinePoint} />
+        <div style={{ marginRight: 10 }}>
+          <SummaryDisplay timelinePoint={timelinePoint} />
+        </div>
         <Divider className="divider" />
-        <AIOutlineDisplay reverseOutline={timelinePoint.reverseOutline} />
+        <div style={{ marginRight: 10 }}>
+          <AIOutlineDisplay reverseOutline={timelinePoint.reverseOutline} />
+        </div>
       </Box>
     </Box>
   );
