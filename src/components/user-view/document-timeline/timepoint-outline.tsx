@@ -51,7 +51,6 @@ export default function TimepointOutline(props: {
     if (timelinePoint.reverseOutline === 'No outline available') return;
 
     const reverseOutlineParsed = JSON.parse(timelinePoint.reverseOutline);
-    console.log(reverseOutlineParsed);
 
     if (reverseOutlineParsed['Thesis Statement'] !== '') {
       setThesis(true);
@@ -194,7 +193,10 @@ export default function TimepointOutline(props: {
   }
   function AIOutlineDisplay(props: { reverseOutline: string }): JSX.Element {
     const { reverseOutline } = props;
+    console.log('reverseOutline:', reverseOutline);
     const outline = JSON.parse(reverseOutline);
+    console.log('outline:', outline);
+    console.log('Evidence:', outline['Evidence Given for Each Claim']);
 
     return (
       <Box className="ai-outline-container" data-cy="ai-outline-container">

@@ -145,7 +145,6 @@ describe('document timeline', () => {
                 cy.get('[data-cy=supporting-claims-accordion]')
                   .children()
                   .should('have.length', 3);
-                //   first claim should be 'Decreased crop yields'
                 cy.get('[data-cy=supporting-claims-accordion]')
                   .children()
                   .eq(0)
@@ -185,7 +184,6 @@ describe('document timeline', () => {
                 cy.get('[data-cy=claim-evidence-1-accordion]')
                   .children()
                   .should('have.length', 2);
-                //   first claim should be 'Decreased crop yields'
                 cy.get('[data-cy=claim-evidence-1-accordion]')
                   .children()
                   .eq(0)
@@ -221,5 +219,27 @@ describe('document timeline', () => {
         .should('exist')
         .contains('No AI outline available');
     });
+  });
+});
+
+describe('Not Available Timeline AI Outline', () => {
+  beforeEach(() => {
+    cyMockDefault(cy);
+  });
+
+  /* This test case is checking for the display of a statement if it exists in the document timeline
+   feature. Here's a breakdown of what the test is doing: */
+  it.only('display statement if exists', () => {
+    cy.visit('/docs/history/1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw');
+    // summary section should exist
+    cy.get('[data-cy=content-revision-container]')
+      .should('exist')
+      .within(() => {
+        cy.get('[data-cy=ai-outline-container]').should('not.exist');
+      });
+
+    cy.get('[data-cy=no-ai-outline]')
+      .should('exist')
+      .contains('No AI outline available');
   });
 });
