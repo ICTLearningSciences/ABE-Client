@@ -19,6 +19,7 @@ import { useWithLogin } from './store/slices/login/use-with-login';
 import DocumentTimelinePage from './components/user-view/document-timeline';
 import { useReduxHydration } from './root-loader';
 import './styles/content-revision.css';
+import './styles/timeline.css';
 
 function MainApp() {
   const useLogin = useWithLogin();

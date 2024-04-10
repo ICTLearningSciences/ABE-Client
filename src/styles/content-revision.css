@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-/* variables */
+
 :root {
   --content-shadow: 0px 2px 15px 0px rgba(90, 82, 128, 0.2);
   --content-shadow-inner: 0px 2px 15px 0px rgba(114, 107, 147, 0.2);
@@ -23,7 +23,7 @@ The full terms of this copyright and license should always be found in the root 
 .content-revision-container {
   height: calc(100vh - 190px);
   width: 100%;
-  padding: 20px 0px 20px 20px;
+  padding: 20px 0px 40px 15px;
   margin: 10px 10px;
   border-radius: 15px;
   box-shadow: var(--content-shadow);
@@ -85,10 +85,9 @@ textarea {
   background-color: var(--content-revision-text-color-2);
 }
 
-/* .ai-outline-container {
-  height: calc(100vh - 450px);
-  overflow-y: auto;
-} */
+.ai-outline-container {
+  margin-bottom: 10px;
+}
 .text-2 {
   font-size: 0.9rem !important;
   font-weight: 600 !important;
