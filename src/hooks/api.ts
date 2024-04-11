@@ -23,7 +23,6 @@ import {
   GQLPrompt,
   GQLResPrompts,
   Config,
-  DocGoal,
   Connection,
   OpenAiPromptStep,
   UserActivityState,
@@ -31,12 +30,15 @@ import {
   GQLDocumentTimeline,
   DocumentTimelineJobStatus,
   StoreGoogleDoc,
+  ActivityGQL,
+  DocGoalGQL,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
 import { addQueryParam } from '../helpers';
 import { isBulletPointMessage } from '../store/slices/chat/helpers';
 import { GptModels } from '../constants';
+import { activityQueryData } from './api-helpers';
 
 const API_ENDPOINT = process.env.REACT_APP_GOOGLE_API_ENDPOINT || '/docs';
 const GRAPHQL_ENDPOINT =
@@ -618,8 +620,31 @@ export async function refreshAccessToken(): Promise<UserAccessToken> {
   );
 }
 
-export async function fetchDocGoals(): Promise<DocGoal[]> {
-  const res = await execGql<Connection<DocGoal>>(
+export async function addOrUpdateActivity(
+  activity: ActivityGQL
+): Promise<ActivityGQL> {
+  const res = await execGql<ActivityGQL>(
+    {
+      query: `
+      mutation AddOrUpdateActivity($activity: ActivityInputType!) {
+        addOrUpdateActivity(activity: $activity) {
+          ${activityQueryData}
+            }
+       }
+      `,
+      variables: {
+        activity,
+      },
+    },
+    {
+      dataPath: 'addOrUpdateActivity',
+    }
+  );
+  return res;
+}
+
+export async function fetchDocGoals(): Promise<DocGoalGQL[]> {
+  const res = await execGql<Connection<DocGoalGQL>>(
     {
       query: `
         query FetchDocGoals{
@@ -633,40 +658,7 @@ export async function fetchDocGoals(): Promise<DocGoal[]> {
                 introduction
                 activityOrder
                 newDocRecommend
-                activities{
-                  _id
-                  title
-                  description
-                  displayIcon
-                  introduction
-                  disabled
-                  responsePendingMessage
-                  responseReadyMessage
-                  newDocRecommend
-                  prompts{
-                    _id
-                    promptId
-                    order
-                  }
-                  prompt{
-                    _id
-                    title
-                    clientId
-                    userInputIsIntention
-                    openAiPromptSteps {
-                      prompts{
-                        promptText
-                        includeEssay
-                        includeUserInput
-                        promptRole
-                      }
-                      outputDataType
-                      targetGptModel
-                      customSystemRole
-                      includeChatLogContext
-                    }
-                  }
-                }
+                activities
               }
             }
           }
@@ -675,6 +667,31 @@ export async function fetchDocGoals(): Promise<DocGoal[]> {
     },
     {
       dataPath: 'fetchDocGoals',
+    }
+  );
+  return res.edges.map((edge) => edge.node);
+}
+
+export async function fetchActivities(): Promise<ActivityGQL[]> {
+  const res = await execGql<Connection<ActivityGQL>>(
+    {
+      query: `
+      query FetchActivities($limit: Int){
+        fetchActivities(limit: $limit) {
+        edges {
+            node{
+              ${activityQueryData}
+            }
+            }
+        }
+    }
+      `,
+      variables: {
+        limit: 9999,
+      },
+    },
+    {
+      dataPath: 'fetchActivities',
     }
   );
   return res.edges.map((edge) => edge.node);

@@ -4,9 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { useWithDocGoalsActivities } from '../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { DocGoal, ActivityGQL } from '../types';
-import { fetchDocGoals } from './api';
-import { useWithData } from './use-with-data';
 import { useState } from 'react';
 
 export interface CurrentGoalAndActivity {
@@ -14,19 +13,14 @@ export interface CurrentGoalAndActivity {
   selectedActivity?: ActivityGQL;
 }
 
-export function useWithDocGoals() {
-  const {
-    data,
-    editedData,
-    isEdited,
-    isLoading,
-    isSaving,
-    editData,
-    saveAndReturnData,
-    reloadData,
-  } = useWithData<DocGoal[]>(fetch);
+export function useWithCurrentGoalActivity() {
+  const { docGoals, addOrUpdateActivity, isLoading } =
+    useWithDocGoalsActivities();
+
   const [goalActivityState, setGoalActivityState] =
     useState<CurrentGoalAndActivity>();
+
+  console.log(docGoals);
 
   function setGoal(goal?: DocGoal) {
     setGoalActivityState(() => {
@@ -55,23 +49,18 @@ export function useWithDocGoals() {
     });
   }
 
-  function fetch() {
-    return fetchDocGoals();
+  async function saveActivity(activity: ActivityGQL) {
+    await addOrUpdateActivity(activity);
   }
 
   return {
-    data,
-    editedData,
-    isLoading,
-    isSaving,
-    editData,
-    reloadData,
-    saveAndReturnData,
-    isEdited,
+    docGoals,
     goalActivityState,
     setGoalActivityState,
     setGoal,
     setActivity,
     setGoalAndActivity,
+    saveActivity,
+    isLoading,
   };
 }
