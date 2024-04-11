@@ -6,6 +6,11 @@ import { Box, Divider, Typography } from '@mui/material';
 
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import moment from 'moment';
+import {
+  formatTimeDifference,
+  formatTimeDifferenceToReadable,
+} from '../../../helpers/functions';
 
 const getIntentionText = (timelinePoint: GQLTimelinePoint): string => {
   if (timelinePoint.version?.sessionIntention?.description) {
@@ -76,13 +81,16 @@ export default function TimepointOutline(props: {
 
   function RevisionTimeHeader(props: { revisionTime: string }): JSX.Element {
     const { revisionTime } = props;
+
+    const formatTime = formatTimeDifferenceToReadable(revisionTime);
+
     return (
       <Box className="revision-time-header" data-cy="revision-time-header">
         <Typography className={`text-2`} data-cy="revision-title">
           Revision:
         </Typography>
         <Typography className={`text-3`} data-cy="revision-date">
-          {formatISODateToReadable(revisionTime)}
+          {formatISODateToReadable(revisionTime)} ({formatTime})
         </Typography>
       </Box>
     );
@@ -284,6 +292,8 @@ export default function TimepointOutline(props: {
       </Box>
     );
   }
+
+  console.log('timelinePoint', timelinePoint);
 
   return (
     <Box
