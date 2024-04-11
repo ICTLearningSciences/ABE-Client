@@ -325,6 +325,9 @@ export function EditPrompt(props: {
                 >
                   <MenuItem value={GptModels.GPT_3_5}>GPT 3.5</MenuItem>
                   <MenuItem value={GptModels.GPT_4}>GPT 4</MenuItem>
+                  <MenuItem value={GptModels.GPT_4_TURBO_PREVIEW}>
+                    GPT 4 Turbo Preview (128k token context)
+                  </MenuItem>
                 </Select>
               </FormControl>
             </ColumnDiv>
