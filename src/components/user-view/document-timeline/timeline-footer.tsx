@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
+import { Box, Paper, Typography } from '@mui/material';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+
 import { GQLTimelinePoint } from '../../../types';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { formatISODateToReadable } from '../../../helpers';
-import { Box, Paper, Typography } from '@mui/material';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 
+/* The `TimeLineCard` component is a functional component that takes in a prop `timelinePoint` of type
+`GQLTimelinePoint`. Inside the component, it retrieves the `getActivitById` function from the
+`useWithDocGoalsActivities` hook. It then uses this function to get the activity associated with the
+timeline point's version. */
 const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
   const { timelinePoint } = props;
   const { getActivitById } = useWithDocGoalsActivities();
@@ -36,10 +41,18 @@ export default function TimelineFooter(props: {
   const { timelinePoints, currentTimelinePoint } = props;
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
+  /**
+   * The handleMouseEnter function sets the hover index based on the provided index parameter.
+   * @param {number} index - The `index` parameter in the `handleMouseEnter` function is a number that
+   * represents the index of an item or element.
+   */
   const handleMouseEnter = (index: number) => {
     setHoverIndex(index);
   };
 
+  /**
+   * The `handleMouseLeave` function sets the `hoverIndex` state to `null` when called.
+   */
   const handleMouseLeave = () => {
     setHoverIndex(null);
   };
@@ -66,6 +79,8 @@ export default function TimelineFooter(props: {
               onMouseEnter={() => handleMouseEnter(i)}
               onMouseLeave={handleMouseLeave}
             >
+              {/* This part of the code is a conditional rendering within the `map` function of the
+              `timelinePoints` array. */}
               {hoverIndex !== i ? (
                 <Typography className="text-2">
                   {formatISODateToReadable(timelinePoint.versionTime || '')}

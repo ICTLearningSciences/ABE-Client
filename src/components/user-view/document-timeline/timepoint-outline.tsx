@@ -1,29 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { Box, Divider, Typography } from '@mui/material';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+
 import { formatISODateToReadable } from '../../../helpers';
 import { GQLTimelinePoint, TimelinePointType } from '../../../types';
-import { Box, Divider, Typography } from '@mui/material';
-
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import moment from 'moment';
 import {
-  formatTimeDifference,
   formatTimeDifferenceToReadable,
+  getIntentionText,
 } from '../../../helpers/functions';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 
-const getIntentionText = (timelinePoint: GQLTimelinePoint): string => {
-  if (timelinePoint.version?.sessionIntention?.description) {
-    return timelinePoint.version?.sessionIntention?.description || '';
-  } else if (timelinePoint.version?.dayIntention?.description) {
-    return timelinePoint.version?.dayIntention?.description || '';
-  } else if (timelinePoint.version?.documentIntention?.description) {
-    return timelinePoint.version?.documentIntention?.description || '';
-  }
-  return 'No Intention text';
-};
-
+/**
+ * The `useDynamicHeight` custom hook in TypeScript React dynamically adjusts the height of a textarea
+ * based on its content.
+ * @param {string} initialValue - The `initialValue` parameter in the `useDynamicHeight` function is
+ * the initial value that will be set for the textarea input. This value will be used to initialize the
+ * state of the textarea content.
+ * @returns The `useDynamicHeight` custom hook is returning an object with the following properties:
+ * - `value`: The current value of the textarea.
+ * - `height`: The height of the textarea element, which is dynamically adjusted based on the content.
+ * - `textareaRef`: A reference to the textarea element.
+ * - `handleChange`: A function to handle the change event on the textarea element.
+ */
 const useDynamicHeight = (initialValue: string) => {
   const [value, setValue] = useState(initialValue);
   const [height, setHeight] = useState('auto');
@@ -62,8 +62,10 @@ export default function TimepointOutline(props: {
   const [supportingClaims, setSupportingClaims] = useState<boolean>(false);
   const [claimEvidence, setClaimEvidence] = useState<boolean>(false);
 
-  // if reverseOutline is not empty, parse the reverseOutline
-
+  /* The above code is a `useEffect` hook in a TypeScript React component. It checks if the
+ `timelinePoint.reverseOutline` is not equal to 'No outline available'. If it is not, it parses the
+ `reverseOutline` JSON data and checks if there is a 'Thesis Statement', 'Supporting Claims', and
+ 'Evidence Given for Each Claim' in the parsed data. */
   useEffect(() => {
     if (timelinePoint.reverseOutline === 'No outline available') return;
 
@@ -80,96 +82,11 @@ export default function TimepointOutline(props: {
     }
   }, [timelinePoint]);
 
-  function RevisionTimeHeader(props: { revisionTime: string }): JSX.Element {
-    const { revisionTime } = props;
-
-    const formatTime = formatTimeDifferenceToReadable(revisionTime);
-
-    return (
-      <Box className="revision-time-header" data-cy="revision-time-header">
-        <Typography className={`text-2`} data-cy="revision-title">
-          Revision:
-        </Typography>
-        <Typography className={`text-3`} data-cy="revision-date">
-          {formatISODateToReadable(revisionTime)} ({formatTime})
-        </Typography>
-      </Box>
-    );
-  }
-
-  function IntentionDisplay(props: {
-    timelinePoint: GQLTimelinePoint;
-  }): JSX.Element {
-    const { timelinePoint } = props;
-    const { getActivitById } = useWithDocGoalsActivities();
-    const activityId = timelinePoint.version.activity;
-    const activity = getActivitById(activityId);
-
-    const { value, height, textareaRef, handleChange } = useDynamicHeight(
-      getIntentionText(timelinePoint)
-    );
-
-    return (
-      <Box className="input-container" data-cy="intention-container">
-        <span className="input-wrapper">
-          <div className="summary-title-container">
-            <Typography className="text-2" data-cy="summary-title">
-              Intention
-            </Typography>
-            <Typography className="text-3">({activity.title})</Typography>
-          </div>
-          <textarea
-            ref={textareaRef}
-            value={!value ? 'No Intention text ' : value}
-            onChange={handleChange}
-            className="summary-input"
-            placeholder="Enter your text here..."
-            style={{ height: height }}
-            data-cy="intention-textarea"
-          />
-        </span>
-      </Box>
-    );
-  }
-
-  function SummaryDisplay(props: {
-    timelinePoint: GQLTimelinePoint;
-  }): JSX.Element {
-    const { timelinePoint } = props;
-    const { getActivitById } = useWithDocGoalsActivities();
-    const activityId = timelinePoint.version.activity;
-    const activity = getActivitById(activityId);
-
-    const { value, height, textareaRef, handleChange } = useDynamicHeight(
-      timelinePoint.changeSummary
-    );
-
-    return (
-      <Box className="input-container" data-cy="summary-container">
-        {timelinePoint.type !== TimelinePointType.START ? (
-          <span className="input-wrapper">
-            <div className="summary-title-container">
-              <Typography className="text-2" data-cy="summary-title">
-                Summary
-              </Typography>
-              <Typography className="text-3">({activity.title})</Typography>
-            </div>
-
-            <textarea
-              ref={textareaRef}
-              value={value}
-              onChange={handleChange}
-              className="summary-input"
-              placeholder="Enter your text here..."
-              style={{ height: height }}
-              data-cy="summary-textarea"
-            />
-          </span>
-        ) : undefined}
-      </Box>
-    );
-  }
-
+  /* The above code defines a functional component named AIOutlineExpand in TypeScript for a React
+  application. This component takes in props including title, outline, fontType, open, dataCy, and
+  optional claimNumber. It renders a collapsible section with a title and a list of items. Clicking
+  on the title toggles the visibility of the list. The component uses Material-UI components like
+  Typography, Box, ExpandLessIcon, and ExpandMoreIcon to achieve this functionality. */
   function AIOutlineExpand(props: {
     title: string;
     outline: string[];
@@ -225,6 +142,121 @@ export default function TimepointOutline(props: {
       </Box>
     );
   }
+
+  /**
+   * The `RevisionTimeHeader` function displays the revision time in a readable format within a React
+   * component.
+   * @param props - The `RevisionTimeHeader` component takes a single prop `revisionTime`, which is a
+   * string representing the time of the revision. This prop is used to display information about the
+   * revision time in a formatted way within the component.
+   * @returns The `RevisionTimeHeader` component is being returned, which consists of a Box containing
+   * two Typography components. The first Typography component displays "Revision:" and the second
+   * Typography component displays the formatted revision date and time difference.
+   */
+  function RevisionTimeHeader(props: { revisionTime: string }): JSX.Element {
+    const { revisionTime } = props;
+
+    const formatTime = formatTimeDifferenceToReadable(revisionTime);
+
+    return (
+      <Box className="revision-time-header" data-cy="revision-time-header">
+        <Typography className={`text-2`} data-cy="revision-title">
+          Revision:
+        </Typography>
+        <Typography className={`text-3`} data-cy="revision-date">
+          {formatISODateToReadable(revisionTime)} ({formatTime})
+        </Typography>
+      </Box>
+    );
+  }
+
+  /* The above code is a TypeScript React component called `IntentionDisplay`. It takes in a prop
+  `timelinePoint` which is of type `GQLTimelinePoint`. Inside the component, it retrieves an
+  activity based on the `activityId` from the `timelinePoint` using a custom hook
+  `useWithDocGoalsActivities`. It then uses another custom hook `useDynamicHeight` to manage the
+  height of a textarea based on the content. */
+  function IntentionDisplay(props: {
+    timelinePoint: GQLTimelinePoint;
+  }): JSX.Element {
+    const { timelinePoint } = props;
+    const { getActivitById } = useWithDocGoalsActivities();
+    const activityId = timelinePoint.version.activity;
+    const activity = getActivitById(activityId);
+
+    const { value, height, textareaRef, handleChange } = useDynamicHeight(
+      getIntentionText(timelinePoint)
+    );
+
+    return (
+      <Box className="input-container" data-cy="intention-container">
+        <span className="input-wrapper">
+          <div className="summary-title-container">
+            <Typography className="text-2" data-cy="intention-title">
+              Intention
+            </Typography>
+            <Typography className="text-3">({activity.title})</Typography>
+          </div>
+          <textarea
+            ref={textareaRef}
+            value={!value ? 'No Intention text ' : value}
+            onChange={handleChange}
+            className="summary-input"
+            placeholder="Enter your text here..."
+            style={{ height: height }}
+            data-cy="intention-textarea"
+          />
+        </span>
+      </Box>
+    );
+  }
+
+  /* The above code is a TypeScript React component called `SummaryDisplay` that displays a summary input
+field based on the provided `timelinePoint` prop. It uses hooks like `useWithDocGoalsActivities` and
+`useDynamicHeight` to manage state and behavior of the input field. It also retrieves the
+corresponding activity based on the `activityId` from the `timelinePoint`. The summary input field
+is conditionally rendered based on the type of `timelinePoint`, and it allows users to enter text
+and dynamically adjust the height of the input field. */
+  function SummaryDisplay(props: {
+    timelinePoint: GQLTimelinePoint;
+  }): JSX.Element {
+    const { timelinePoint } = props;
+    const { getActivitById } = useWithDocGoalsActivities();
+    const activityId = timelinePoint.version.activity;
+    const activity = getActivitById(activityId);
+
+    const { value, height, textareaRef, handleChange } = useDynamicHeight(
+      timelinePoint.changeSummary
+    );
+
+    return (
+      <Box className="input-container" data-cy="summary-container">
+        {timelinePoint.type !== TimelinePointType.START ? (
+          <span className="input-wrapper">
+            <div className="summary-title-container">
+              <Typography className="text-2" data-cy="summary-title">
+                Summary
+              </Typography>
+              <Typography className="text-3">({activity.title})</Typography>
+            </div>
+
+            <textarea
+              ref={textareaRef}
+              value={value}
+              onChange={handleChange}
+              className="summary-input"
+              placeholder="Enter your text here..."
+              style={{ height: height }}
+              data-cy="summary-textarea"
+            />
+          </span>
+        ) : undefined}
+      </Box>
+    );
+  }
+
+  /* The above code is a TypeScript React component named `AIOutlineDisplay` that takes in a prop
+  `reverseOutline` and renders different sections based on the values of certain states (`thesis`,
+  `supportingClaims`, `claimEvidence`). Here's a breakdown of what the code is doing: */
   function AIOutlineDisplay(props: { reverseOutline: string }): JSX.Element {
     const { reverseOutline } = props;
     const outline = JSON.parse(reverseOutline);
@@ -326,6 +358,11 @@ export default function TimepointOutline(props: {
           <SummaryDisplay timelinePoint={timelinePoint} />
         </div>
         <Divider className="divider" />
+        {/* The above code is conditionally rendering an AIOutlineDisplay component based on the
+        presence of values in the variables thesis, supportingClaims, and claimEvidence. If all
+        three variables have values, the AIOutlineDisplay component is rendered with a specific
+        style. If any of the variables is missing a value, a Typography component displaying "No AI
+        outline available" is rendered instead. */}
         {
           // if thesis, supporting claims, and claim evidence display
           thesis && supportingClaims && claimEvidence ? (
