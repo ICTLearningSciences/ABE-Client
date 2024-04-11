@@ -199,7 +199,7 @@ export function useWithActivityHandler(
 
       if (openAiPromptStep.includeChatLogContext) {
         prompts.push({
-          promptRole: PromptRoles.ASSISSANT,
+          promptRole: PromptRoles.SYSTEM,
           promptText: `Here is the chat between the user and the system: ${chatLogString}`,
           includeEssay: false,
         });

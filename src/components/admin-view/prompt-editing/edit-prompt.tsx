@@ -165,6 +165,35 @@ export function EditPrompt(props: {
             />
             <ColumnDiv>
               <FormControlLabel
+                label="Include Chat Log as context?"
+                style={{ height: 'fit-content', textAlign: 'center' }}
+                control={
+                  <Checkbox
+                    checked={openAiPromptStep.includeChatLogContext}
+                    indeterminate={false}
+                    disabled={inProgress}
+                    onChange={(e) => {
+                      setPromptTemplateCopy({
+                        ...promptTemplateCopy,
+                        openAiPromptSteps:
+                          promptTemplateCopy.openAiPromptSteps.map(
+                            (openAiPromptStep, openAiPromptStepIndex) => {
+                              if (openAiPromptStepIndex === index) {
+                                return {
+                                  ...openAiPromptStep,
+                                  includeChatLogContext: e.target.checked,
+                                };
+                              } else {
+                                return openAiPromptStep;
+                              }
+                            }
+                          ),
+                      });
+                    }}
+                  />
+                }
+              />
+              <FormControlLabel
                 label="Include Essay?"
                 style={{ height: 'fit-content', textAlign: 'center' }}
                 control={
