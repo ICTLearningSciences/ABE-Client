@@ -149,6 +149,7 @@ export interface PromptConfiguration {
 export interface OpenAiPromptStep {
   prompts: PromptConfiguration[];
   targetGptModel: GptModels;
+  customSystemRole?: string;
   outputDataType: PromptOutputTypes;
   includeChatLogContext?: boolean;
 }

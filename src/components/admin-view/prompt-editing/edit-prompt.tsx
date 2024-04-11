@@ -231,6 +231,36 @@ export function EditPrompt(props: {
               />
               <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel id="demo-simple-select-standard-label">
+                  Custom System Role
+                </InputLabel>
+                <Input
+                  value={openAiPromptStep.customSystemRole}
+                  multiline
+                  maxRows={4}
+                  onChange={(e) => {
+                    setPromptTemplateCopy({
+                      ...promptTemplateCopy,
+                      openAiPromptSteps:
+                        promptTemplateCopy.openAiPromptSteps.map(
+                          (openAiPromptStep, openAiPromptStepIndex) => {
+                            if (openAiPromptStepIndex === index) {
+                              return {
+                                ...openAiPromptStep,
+                                customSystemRole: e.target.value,
+                              };
+                            } else {
+                              return openAiPromptStep;
+                            }
+                          }
+                        ),
+                    });
+                  }}
+                  // label="Custom System Role"
+                />
+              </FormControl>
+
+              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                <InputLabel id="demo-simple-select-standard-label">
                   Output Data Type
                 </InputLabel>
                 <Select
