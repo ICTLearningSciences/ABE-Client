@@ -317,6 +317,7 @@ export async function fetchPrompts(): Promise<GQLResPrompts> {
                       promptRole
                     }
                   targetGptModel
+                  customSystemRole
                   outputDataType
                     includeChatLogContext
                   }
@@ -384,6 +385,7 @@ export async function storePrompts(
               }
               outputDataType
               targetGptModel
+              customSystemRole
               includeChatLogContext
             }
           }
@@ -422,6 +424,7 @@ export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
               }
               outputDataType
               targetGptModel
+              customSystemRole
               includeChatLogContext
             }
           }
@@ -659,6 +662,7 @@ export async function fetchDocGoals(): Promise<DocGoal[]> {
                       }
                       outputDataType
                       targetGptModel
+                      customSystemRole
                       includeChatLogContext
                     }
                   }
