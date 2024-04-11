@@ -231,6 +231,36 @@ export function EditPrompt(props: {
               />
               <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel id="demo-simple-select-standard-label">
+                  Custom System Role
+                </InputLabel>
+                <Input
+                  value={openAiPromptStep.customSystemRole}
+                  multiline
+                  maxRows={4}
+                  onChange={(e) => {
+                    setPromptTemplateCopy({
+                      ...promptTemplateCopy,
+                      openAiPromptSteps:
+                        promptTemplateCopy.openAiPromptSteps.map(
+                          (openAiPromptStep, openAiPromptStepIndex) => {
+                            if (openAiPromptStepIndex === index) {
+                              return {
+                                ...openAiPromptStep,
+                                customSystemRole: e.target.value,
+                              };
+                            } else {
+                              return openAiPromptStep;
+                            }
+                          }
+                        ),
+                    });
+                  }}
+                  // label="Custom System Role"
+                />
+              </FormControl>
+
+              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                <InputLabel id="demo-simple-select-standard-label">
                   Output Data Type
                 </InputLabel>
                 <Select
@@ -290,6 +320,9 @@ export function EditPrompt(props: {
                 >
                   <MenuItem value={GptModels.GPT_3_5}>GPT 3.5</MenuItem>
                   <MenuItem value={GptModels.GPT_4}>GPT 4</MenuItem>
+                  <MenuItem value={GptModels.GPT_4_TURBO_PREVIEW}>
+                    GPT 4 Turbo Preview (128k token context)
+                  </MenuItem>
                 </Select>
               </FormControl>
             </ColumnDiv>

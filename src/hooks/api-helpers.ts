@@ -4,22 +4,42 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GoogleDoc } from '../types';
-import { fetchGoogleDocs } from './api';
-import { useWithData } from './use-with-data';
 
-export function useWithGoogleDocsData(userId: string) {
-  const { editedData, isLoading, isSaving, reloadData } =
-    useWithData<GoogleDoc[]>(fetch);
-
-  function fetch() {
-    return fetchGoogleDocs(userId);
-  }
-
-  return {
-    googleDocs: editedData,
-    isLoading,
-    isSaving,
-    reloadData,
-  };
+export const activityQueryData = `
+_id
+title
+steps{
+    messages
+    stepName
+    stepType
+    mcqChoices
+    prompts
 }
+description
+responsePendingMessage
+responseReadyMessage
+newDocRecommend
+introduction
+disabled
+displayIcon
+prompt{
+  _id
+  openAiPromptSteps{
+    prompts{
+      promptText
+      includeEssay
+      includeUserInput
+      promptRole
+    }
+    outputDataType
+    includeChatLogContext
+  }
+  title
+  userInputIsIntention
+}
+prompts{
+  _id
+  promptId
+  order
+}
+`;

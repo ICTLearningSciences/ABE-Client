@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 
 import { asyncStartRequestRes } from '../fixtures/async-start-request';
 import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
+import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
 import { fetchConfigResponse } from '../fixtures/fetch-config';
 import { fetchDocGoalsResponse } from '../fixtures/fetch-doc-goals';
 import { fetchGoogleDocsResponse } from '../fixtures/fetch-google-docs';
@@ -23,13 +24,7 @@ import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-tex
 import { entityFoundResponse } from '../fixtures/stronger-hook-activity/entity-found-response';
 import { updateUserActivityStatesResponse } from '../fixtures/update-user-activity-states';
 import { ACCESS_TOKEN_KEY } from './local-storage';
-import {
-  DocData,
-  GQLDocumentTimeline,
-  GQLTimelinePoint,
-  JobStatus,
-  UserRole,
-} from './types';
+import { DocData, GQLDocumentTimeline, JobStatus, UserRole } from './types';
 
 export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';
 
@@ -163,6 +158,7 @@ export function cyMockDefault(
   cySetup(cy);
   cyMockLogin(cy);
   cyMockGetDocData(cy);
+
   if (!args.reverseOutline) {
     cyMockGetDocTimeline(cy, {
       response: eightHoursBetweenSessions,
@@ -180,7 +176,6 @@ export function cyMockDefault(
       },
     });
   }
-
   cyInterceptGraphQL(cy, [
     ...gqlQueries,
     //Defaults
@@ -196,6 +191,7 @@ export function cyMockDefault(
     mockGQL('FetchSystemPrompts', fetchConfigResponse),
     mockGQL('UpdateUserActivityState', updateUserActivityStatesResponse),
     mockGQL('StoreGoogleDoc', storeGoogleDocResponse(gDocWithAllIntentions)),
+    mockGQL('FetchActivities', fetchActivitiesResponse),
     mockGQL('SubmitGoogleDocVersion', {}),
   ]);
 }
@@ -208,7 +204,6 @@ export function cyMockGetDocTimeline(
     delay?: number;
   } = {}
 ) {
-  console.log('mocking get doc timeline:', params.response);
   cy.intercept('**/async_get_document_timeline/**', (req) => {
     req.alias = 'openAiStartCall';
     req.reply(

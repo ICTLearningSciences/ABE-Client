@@ -14,6 +14,7 @@ import {
   GoogleDocsLoadStatus,
   loadUserGoogleDocs,
   updateGoogleDoc as _updateGoogleDoc,
+  deleteUserGoogleDoc,
 } from '../store/slices/state';
 import { URL_PARAM_NEW_DOC } from '../constants';
 
@@ -43,6 +44,7 @@ export interface UseWithGoogleDocs {
   docsLoading: boolean;
   updateGoogleDoc: (googleDoc: StoreGoogleDoc) => Promise<GoogleDoc>;
   loadUsersGoogleDocs: () => void;
+  handleDeleteGoogleDoc: (docId: string) => Promise<void>;
 }
 
 export function UseWithGoogleDocs(): UseWithGoogleDocs {
@@ -119,6 +121,10 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     return res.payload as GoogleDoc;
   }
 
+  async function handleDeleteGoogleDoc(docId: string) {
+    await dispatch(deleteUserGoogleDoc({ googleDocId: docId, userId }));
+  }
+
   return {
     docId: googleDocId,
     docUrl: googleDocId
@@ -133,5 +139,6 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     docsLoading: isLoading,
     updateGoogleDoc,
     loadUsersGoogleDocs,
+    handleDeleteGoogleDoc,
   };
 }

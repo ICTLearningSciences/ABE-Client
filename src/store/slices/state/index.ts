@@ -14,7 +14,11 @@ import {
 import { UserRole } from '../login';
 import { GptModels } from '../../../constants';
 import { v4 as uuidv4 } from 'uuid';
-import { fetchGoogleDocs, updateGoogleDocStorage } from '../../../hooks/api';
+import {
+  deleteGoogleDoc,
+  fetchGoogleDocs,
+  updateGoogleDocStorage,
+} from '../../../hooks/api';
 
 export enum GoogleDocsLoadStatus {
   NONE,
@@ -50,6 +54,18 @@ export const loadUserGoogleDocs = createAsyncThunk(
   'state/loadUserGoogleDocs',
   async (args: { userId: string }) => {
     return await fetchGoogleDocs(args.userId);
+  }
+);
+
+export interface DeleteUserGoogleDocArgs {
+  googleDocId: string;
+  userId: string;
+}
+
+export const deleteUserGoogleDoc = createAsyncThunk(
+  'state/deleteUserGoogleDoc',
+  async (args: DeleteUserGoogleDocArgs) => {
+    return await deleteGoogleDoc(args.googleDocId, args.userId);
   }
 );
 
@@ -118,6 +134,12 @@ export const stateSlice = createSlice({
         }
         return doc;
       });
+    });
+
+    builder.addCase(deleteUserGoogleDoc.fulfilled, (state, action) => {
+      state.userGoogleDocs = state.userGoogleDocs.filter(
+        (doc) => doc.googleDocId !== action.payload.googleDocId
+      );
     });
   },
 });

@@ -7,13 +7,17 @@ The full terms of this copyright and license should always be found in the root 
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { loadUserGoogleDocs } from './store/slices/state';
+import { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
 
 export async function useReduxHydration() {
   const userId = useAppSelector((state) => state.login.user?._id);
   const dispatch = useAppDispatch();
+  const { loadActivities, loadDocGoals } = useWithDocGoalsActivities();
 
   useEffect(() => {
     if (!userId) return;
     dispatch(loadUserGoogleDocs({ userId }));
+    loadActivities();
+    loadDocGoals();
   }, [userId]);
 }

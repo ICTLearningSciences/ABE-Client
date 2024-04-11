@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 export enum GptModels {
   GPT_3_5 = 'gpt-3.5-turbo-16k',
   GPT_4 = 'gpt-4',
+  GPT_4_TURBO_PREVIEW = 'gpt-4-turbo-preview',
   NONE = '',
 }
 export enum DisplayIcons {
@@ -279,15 +280,19 @@ export interface ActivityGQL {
   prompts?: ActivityPromptGQL[];
 }
 
-export interface DocGoal {
+export interface DocGoalGQL {
   _id: string;
   title: string;
   description: string;
   displayIcon: DisplayIcons;
-  activities?: ActivityGQL[];
+  activities?: string[];
   activityOrder: string[];
   introduction: string;
   newDocRecommend?: boolean;
+}
+
+export interface DocGoal extends Omit<DocGoalGQL, 'activities'> {
+  activities: ActivityGQL[];
 }
 
 export interface UserActivityState {
