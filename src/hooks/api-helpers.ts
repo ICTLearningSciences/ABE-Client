@@ -4,20 +4,42 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from './store/hooks';
-import { loadUserGoogleDocs } from './store/slices/state';
-import { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
 
-export async function useReduxHydration() {
-  const userId = useAppSelector((state) => state.login.user?._id);
-  const dispatch = useAppDispatch();
-  const { loadActivities, loadDocGoals } = useWithDocGoalsActivities();
-
-  useEffect(() => {
-    if (!userId) return;
-    dispatch(loadUserGoogleDocs({ userId }));
-    loadActivities();
-    loadDocGoals();
-  }, [userId]);
+export const activityQueryData = `
+_id
+title
+steps{
+    messages
+    stepName
+    stepType
+    mcqChoices
+    prompts
 }
+description
+responsePendingMessage
+responseReadyMessage
+newDocRecommend
+introduction
+disabled
+displayIcon
+prompt{
+  _id
+  openAiPromptSteps{
+    prompts{
+      promptText
+      includeEssay
+      includeUserInput
+      promptRole
+    }
+    outputDataType
+    includeChatLogContext
+  }
+  title
+  userInputIsIntention
+}
+prompts{
+  _id
+  promptId
+  order
+}
+`;

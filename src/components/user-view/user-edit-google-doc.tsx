@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { Button, CircularProgress } from '@mui/material';
 import Chat from './chat/chat';
-import { useWithDocGoals } from '../../hooks/use-with-doc-goals';
+import { useWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-activity';
 import DocGoalModal from './doc-introduction/doc-goal-modal';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -27,13 +27,14 @@ export default function EditGoogleDoc(props: {
 }): JSX.Element {
   const { googleDocId } = props;
   const {
-    data: docGoals,
+    docGoals,
     setGoal,
     setActivity,
     setGoalAndActivity,
     goalActivityState,
     isLoading: goalsLoading,
-  } = useWithDocGoals();
+  } = useWithCurrentGoalActivity();
+  console.log(goalActivityState);
   const useWithPrompts = _useWithPrompts();
   const { prompts } = useWithPrompts;
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ export default function EditGoogleDoc(props: {
   const goalFromParams = queryParams.get('goalId');
   const allActivities = getAllActivites(docGoals || []);
   const [previewingActivity, setPreviewingActivity] = useState<boolean>();
+  const [checkedUrlParams, setCheckedUrlParams] = useState<boolean>(false);
 
   function editDocGoal() {
     setDocGoalModalOpen(true);
@@ -83,6 +85,7 @@ export default function EditGoogleDoc(props: {
         return {
           _id: uuidv4(),
           prompt,
+          steps: [],
           title: prompt.title,
           description: '',
           introduction: '',
@@ -97,13 +100,19 @@ export default function EditGoogleDoc(props: {
   }
 
   useEffect(() => {
-    if (goalsLoading || !docGoals) {
+    console.log('use effect 1');
+    if (goalsLoading || !docGoals || checkedUrlParams) {
       return;
     }
+    console.log('use effect 2');
+
     if (!goalFromParams && !activityFromParams) {
+      console.log('setting doc goal modal open 1');
       setDocGoalModalOpen(true);
+      setCheckedUrlParams(true);
       return;
     }
+    console.log('use effect 3');
     const goal = docGoals.find((goal) => goal._id === goalFromParams);
     const activity = allActivities?.find(
       (activity) => activity?._id === activityFromParams
@@ -111,9 +120,10 @@ export default function EditGoogleDoc(props: {
     setGoalAndActivity(goal, activity);
     const goalHasActivities = goal?.activities?.length;
     if (!activity && goalHasActivities) {
+      console.log('setting doc goal modal open 2');
       setDocGoalModalOpen(true);
     }
-  }, [goalFromParams, goalsLoading, docGoals, activityFromParams]);
+  }, [goalFromParams, goalsLoading, activityFromParams, checkedUrlParams]);
 
   if (goalsLoading) {
     return (

@@ -10,6 +10,7 @@ import loginReducer from './slices/login';
 import chatReducer from './slices/chat';
 import stateReducer from './slices/state';
 import configReducer from './slices/config';
+import docGoalsActivitiesReducer from './slices/doc-goals-activities';
 import * as Sentry from '@sentry/react';
 
 const sentryEnhancer = Sentry.createReduxEnhancer({
@@ -28,6 +29,7 @@ export const store = configureStore({
     chat: chatReducer,
     state: stateReducer,
     config: configReducer,
+    docGoalsActivities: docGoalsActivitiesReducer,
   },
   enhancers: (defaultEhancers) => defaultEhancers.concat(sentryEnhancer),
 });
