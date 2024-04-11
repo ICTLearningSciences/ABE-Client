@@ -83,6 +83,7 @@ export default function EditGoogleDoc(props: {
         return {
           _id: uuidv4(),
           prompt,
+          steps: [],
           title: prompt.title,
           description: '',
           introduction: '',

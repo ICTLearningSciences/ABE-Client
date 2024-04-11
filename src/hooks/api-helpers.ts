@@ -1,0 +1,39 @@
+
+export const activityQueryData = `
+_id
+title
+steps{
+    messages
+    stepName
+    stepType
+    mcqChoices
+    prompts
+}
+description
+responsePendingMessage
+responseReadyMessage
+newDocRecommend
+introduction
+disabled
+displayIcon
+prompt{
+  _id
+  openAiPromptSteps{
+    prompts{
+      promptText
+      includeEssay
+      includeUserInput
+      promptRole
+    }
+    outputDataType
+    includeChatLogContext
+  }
+  title
+  userInputIsIntention
+}
+prompts{
+  _id
+  promptId
+  order
+}
+`

@@ -182,6 +182,14 @@ export interface ActivityStep {
   handleResponse?: (response: string, userInputType: UserInputType) => void;
 }
 
+export interface Step{
+  messages: string[];
+  stepName: string;
+  stepType: ActivityStepTypes;
+  mcqChoices: string[];
+  prompts: string[];
+}
+
 export interface Activity extends ActivityGQL {
   steps: ActivityStep[];
   // introStep: ActivityStep;
@@ -208,6 +216,7 @@ export interface ActivityGQL {
   title: string;
   introduction: string;
   description: string;
+  steps: ActivityStep[];
   displayIcon: DisplayIcons;
   responsePendingMessage: string;
   responseReadyMessage: string;
