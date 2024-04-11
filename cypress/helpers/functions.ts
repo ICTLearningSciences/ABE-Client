@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 
 import { asyncStartRequestRes } from "../fixtures/async-start-request";
 import { eightHoursBetweenSessions } from "../fixtures/document-timeline/eight-hours-difference";
+import { fetchActivitiesResponse } from "../fixtures/fetch-activities";
 import { fetchConfigResponse } from "../fixtures/fetch-config";
 import { fetchDocGoalsResponse } from "../fixtures/fetch-doc-goals";
 import { fetchGoogleDocsResponse } from "../fixtures/fetch-google-docs";
@@ -167,6 +168,7 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
       mockGQL("FetchSystemPrompts", fetchConfigResponse),
       mockGQL("UpdateUserActivityState", updateUserActivityStatesResponse),
       mockGQL("StoreGoogleDoc", storeGoogleDocResponse(gDocWithAllIntentions)),
+      mockGQL("FetchActivities", fetchActivitiesResponse),
       mockGQL("SubmitGoogleDocVersion", {})
     ]);
   }

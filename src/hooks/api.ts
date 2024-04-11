@@ -23,7 +23,6 @@ import {
   GQLPrompt,
   GQLResPrompts,
   Config,
-  DocGoal,
   Connection,
   OpenAiPromptStep,
   UserActivityState,
@@ -32,6 +31,7 @@ import {
   DocumentTimelineJobStatus,
   StoreGoogleDoc,
   ActivityGQL,
+  DocGoalGQL,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -620,7 +620,9 @@ export async function refreshAccessToken(): Promise<UserAccessToken> {
   );
 }
 
-export async function addOrUpdateActivity(activity:ActivityGQL): Promise<ActivityGQL> {
+export async function addOrUpdateActivity(
+  activity: ActivityGQL
+): Promise<ActivityGQL> {
   const res = await execGql<ActivityGQL>(
     {
       query: `
@@ -630,19 +632,19 @@ export async function addOrUpdateActivity(activity:ActivityGQL): Promise<Activit
             }
        }
       `,
-      variables:{
-        activity
-      }
+      variables: {
+        activity,
+      },
     },
     {
       dataPath: 'addOrUpdateActivity',
     }
   );
-  return res
+  return res;
 }
 
-export async function fetchDocGoals(): Promise<DocGoal[]> {
-  const res = await execGql<Connection<DocGoal>>(
+export async function fetchDocGoals(): Promise<DocGoalGQL[]> {
+  const res = await execGql<Connection<DocGoalGQL>>(
     {
       query: `
         query FetchDocGoals{
@@ -656,9 +658,7 @@ export async function fetchDocGoals(): Promise<DocGoal[]> {
                 introduction
                 activityOrder
                 newDocRecommend
-                activities{
-                  ${activityQueryData}
-                }
+                activities
               }
             }
           }
@@ -667,6 +667,31 @@ export async function fetchDocGoals(): Promise<DocGoal[]> {
     },
     {
       dataPath: 'fetchDocGoals',
+    }
+  );
+  return res.edges.map((edge) => edge.node);
+}
+
+export async function fetchActivities(): Promise<ActivityGQL[]> {
+  const res = await execGql<Connection<ActivityGQL>>(
+    {
+      query: `
+      query FetchActivities($limit: Int){
+        fetchActivities(limit: $limit) {
+        edges {
+            node{
+              ${activityQueryData}
+            }
+            }
+        }
+    }
+      `,
+      variables: {
+        limit: 9999,
+      },
+    },
+    {
+      dataPath: 'fetchActivities',
     }
   );
   return res.edges.map((edge) => edge.node);

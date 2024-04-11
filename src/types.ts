@@ -182,7 +182,7 @@ export interface ActivityStep {
   handleResponse?: (response: string, userInputType: UserInputType) => void;
 }
 
-export interface Step{
+export interface Step {
   messages: string[];
   stepName: string;
   stepType: ActivityStepTypes;
@@ -226,15 +226,19 @@ export interface ActivityGQL {
   newDocRecommend?: boolean;
 }
 
-export interface DocGoal {
+export interface DocGoalGQL {
   _id: string;
   title: string;
   description: string;
   displayIcon: DisplayIcons;
-  activities?: ActivityGQL[];
+  activities?: string[];
   activityOrder: string[];
   introduction: string;
   newDocRecommend?: boolean;
+}
+
+export interface DocGoal extends Omit<DocGoalGQL, 'activities'> {
+  activities: ActivityGQL[];
 }
 
 export interface UserActivityState {

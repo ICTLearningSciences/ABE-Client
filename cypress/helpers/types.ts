@@ -280,15 +280,19 @@ export interface ActivityGQL {
   prompts?: ActivityPromptGQL[];
 }
 
-export interface DocGoal {
+export interface DocGoalGQL {
   _id: string;
   title: string;
   description: string;
   displayIcon: DisplayIcons;
-  activities?: ActivityGQL[];
+  activities?: string[];
   activityOrder: string[];
   introduction: string;
   newDocRecommend?: boolean;
+}
+
+export interface DocGoal extends Omit<DocGoalGQL, 'activities'> {
+  activities: ActivityGQL[];
 }
 
 export interface UserActivityState {
