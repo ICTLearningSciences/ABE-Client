@@ -36,6 +36,9 @@ export async function asyncPromptExecute(
   const res = await pollUntilTrue<OpenAiJobStatus>(
     pollFunction,
     (res: OpenAiJobStatus) => {
+      if (res.jobStatus === JobStatus.FAILED) {
+        throw new Error('OpenAI job failed');
+      }
       return res.jobStatus === JobStatus.COMPLETE;
     },
     1000,

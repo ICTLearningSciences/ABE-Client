@@ -19,6 +19,7 @@ export const MOBILE_CUTOFF_SIZE = 1300;
 
 export enum GptModels {
   GPT_3_5 = 'gpt-3.5-turbo-16k',
+  GPT_4_TURBO_PREVIEW = 'gpt-4-turbo-preview',
   GPT_4 = 'gpt-4',
   NONE = '',
 }

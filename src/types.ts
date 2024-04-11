@@ -239,6 +239,7 @@ export enum JobStatus {
   QUEUED = 'QUEUED',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETE = 'COMPLETE',
+  FAILED = 'FAILED',
 }
 
 export interface OpenAiJobStatusApiRes {
