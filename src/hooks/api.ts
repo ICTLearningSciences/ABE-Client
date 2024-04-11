@@ -317,6 +317,7 @@ export async function fetchPrompts(): Promise<GQLResPrompts> {
                       promptRole
                     }
                   targetGptModel
+                  customSystemRole
                   outputDataType
                     includeChatLogContext
                   }
@@ -330,6 +331,35 @@ export async function fetchPrompts(): Promise<GQLResPrompts> {
     }
   );
   return { prompts: data };
+}
+
+export async function deleteGoogleDoc(
+  docId: string,
+  userId: string
+): Promise<GoogleDoc> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  if (!accessToken) throw new Error('No access token');
+  const data = await execGql<GoogleDoc>(
+    {
+      query: `
+      mutation DeleteGoogleDoc($googleDocId: String!, $userId: String!) {
+        deleteGoogleDoc(googleDocId: $googleDocId, userId: $userId) {
+            googleDocId
+            user
+                }
+            }
+    `,
+      variables: {
+        googleDocId: docId,
+        userId: userId,
+      },
+    },
+    {
+      dataPath: 'deleteGoogleDoc',
+      accessToken,
+    }
+  );
+  return data;
 }
 
 export async function storePrompts(
@@ -355,6 +385,7 @@ export async function storePrompts(
               }
               outputDataType
               targetGptModel
+              customSystemRole
               includeChatLogContext
             }
           }
@@ -393,6 +424,7 @@ export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
               }
               outputDataType
               targetGptModel
+              customSystemRole
               includeChatLogContext
             }
           }
@@ -630,6 +662,7 @@ export async function fetchDocGoals(): Promise<DocGoal[]> {
                       }
                       outputDataType
                       targetGptModel
+                      customSystemRole
                       includeChatLogContext
                     }
                   }

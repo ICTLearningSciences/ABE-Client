@@ -24,6 +24,7 @@ import { Delete } from '@mui/icons-material';
 import './select-create-docs.css';
 import { useNavigate } from 'react-router-dom';
 import RestoreIcon from '@mui/icons-material/Restore';
+import { TwoOptionDialog } from '../dialog';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: GoogleDoc[];
@@ -34,14 +35,18 @@ export default function SelectCreateDocs(props: {
     title?: string,
     isAdminDoc?: boolean
   ) => void;
+  handleDeleteGoogleDoc: (docId: string) => Promise<void>;
 }): JSX.Element {
   const {
     googleDocs,
     copyGoogleDocs,
     creationInProgress,
     handleCreateGoogleDoc,
+    handleDeleteGoogleDoc,
   } = props;
   const [createDocOpen, setCreateDocOpen] = React.useState(false);
+  const [deleteInProgress, setDeleteInProgress] = React.useState(false);
+  const [docToDelete, setDocToDelete] = React.useState<GoogleDoc>();
   const navigate = useNavigate();
 
   function onHistoryClicked(docId: string) {
@@ -149,7 +154,12 @@ export default function SelectCreateDocs(props: {
                     </IconButton>
                   </TableCell>
                   <TableCell>
-                    <IconButton>
+                    <IconButton
+                      data-cy={`delete-doc-${doc.title.replaceAll(' ', '-')}`}
+                      onClick={() => {
+                        setDocToDelete(doc);
+                      }}
+                    >
                       <Delete />
                     </IconButton>
                   </TableCell>
@@ -158,6 +168,31 @@ export default function SelectCreateDocs(props: {
             </TableBody>
           </Table>
         </TableContainer>
+        <TwoOptionDialog
+          title={`Are you sure you want to delete the document "${
+            docToDelete?.title || 'My Document'
+          }"?`}
+          actionInProgress={deleteInProgress}
+          open={Boolean(docToDelete)}
+          option1={{
+            display: 'Delete',
+            onClick: () => {
+              setDeleteInProgress(true);
+              handleDeleteGoogleDoc(docToDelete?.googleDocId || '').finally(
+                () => {
+                  setDeleteInProgress(false);
+                  setDocToDelete(undefined);
+                }
+              );
+            },
+          }}
+          option2={{
+            display: 'Cancel',
+            onClick: () => {
+              setDocToDelete(undefined);
+            },
+          }}
+        />
       </div>
     );
   }
