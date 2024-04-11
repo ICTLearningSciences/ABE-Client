@@ -8,6 +8,7 @@ import { ActivityGQL, DocGoal } from '../../../types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
 export interface UseWithDocGoalsActivities {
+  getActivitById: (id: string) => ActivityGQL;
   loadDocGoals: () => Promise<void>;
   loadActivities: () => Promise<void>;
   addOrUpdateActivity: (activity: ActivityGQL) => Promise<void>;
@@ -26,6 +27,10 @@ export function useWithDocGoalsActivities() {
   const activities = useAppSelector(
     (state) => state.docGoalsActivities.activities
   );
+
+  const getActivitById = (id: string): ActivityGQL => {
+    return activities.find((a) => a._id === id) || ({} as ActivityGQL);
+  };
   const docGoalsGql = useAppSelector(
     (state) => state.docGoalsActivities.docGoals
   );
@@ -55,6 +60,7 @@ export function useWithDocGoalsActivities() {
   }
 
   return {
+    getActivitById,
     loadDocGoals,
     loadActivities,
     addOrUpdateActivity,

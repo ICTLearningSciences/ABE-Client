@@ -74,14 +74,28 @@ textarea {
   outline: 1px solid var(--content-revision-text-color-3-disable) !important;
 }
 
+.summary-title-container {
+  width: 50%;
+  display: flex;
+  align-items: center;
+}
+
 .MuiOutlinedInput-notchedOutline {
   border: 1px solid #e0e0e0a0 !important;
   border-radius: 5px;
 }
 .ai-outline-bubble {
   color: var(--content-bg);
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 0px 10px;
+  background-color: var(--content-revision-text-color-2);
+}
+
+.activity-type-bubble {
+  color: var(--content-bg);
+  border-radius: 5px;
+  padding: 0px 5px;
+  margin-left: 10px !important;
   background-color: var(--content-revision-text-color-2);
 }
 

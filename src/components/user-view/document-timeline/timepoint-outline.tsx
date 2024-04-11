@@ -11,6 +11,7 @@ import {
   formatTimeDifference,
   formatTimeDifferenceToReadable,
 } from '../../../helpers/functions';
+import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 
 const getIntentionText = (timelinePoint: GQLTimelinePoint): string => {
   if (timelinePoint.version?.sessionIntention?.description) {
@@ -100,6 +101,9 @@ export default function TimepointOutline(props: {
     timelinePoint: GQLTimelinePoint;
   }): JSX.Element {
     const { timelinePoint } = props;
+    const { getActivitById } = useWithDocGoalsActivities();
+    const activityId = timelinePoint.version.activity;
+    const activity = getActivitById(activityId);
 
     const { value, height, textareaRef, handleChange } = useDynamicHeight(
       getIntentionText(timelinePoint)
@@ -108,9 +112,12 @@ export default function TimepointOutline(props: {
     return (
       <Box className="input-container" data-cy="intention-container">
         <span className="input-wrapper">
-          <Typography className={`text-2`} data-cy="intention-title">
-            Intention
-          </Typography>
+          <div className="summary-title-container">
+            <Typography className="text-2" data-cy="summary-title">
+              Intention
+            </Typography>
+            <Typography className="text-3">({activity.title})</Typography>
+          </div>
           <textarea
             ref={textareaRef}
             value={!value ? 'No Intention text ' : value}
@@ -129,6 +136,9 @@ export default function TimepointOutline(props: {
     timelinePoint: GQLTimelinePoint;
   }): JSX.Element {
     const { timelinePoint } = props;
+    const { getActivitById } = useWithDocGoalsActivities();
+    const activityId = timelinePoint.version.activity;
+    const activity = getActivitById(activityId);
 
     const { value, height, textareaRef, handleChange } = useDynamicHeight(
       timelinePoint.changeSummary
@@ -138,9 +148,13 @@ export default function TimepointOutline(props: {
       <Box className="input-container" data-cy="summary-container">
         {timelinePoint.type !== TimelinePointType.START ? (
           <span className="input-wrapper">
-            <Typography className="text-2" data-cy="summary-title">
-              Summary
-            </Typography>
+            <div className="summary-title-container">
+              <Typography className="text-2" data-cy="summary-title">
+                Summary
+              </Typography>
+              <Typography className="text-3">({activity.title})</Typography>
+            </div>
+
             <textarea
               ref={textareaRef}
               value={value}
@@ -292,8 +306,6 @@ export default function TimepointOutline(props: {
       </Box>
     );
   }
-
-  console.log('timelinePoint', timelinePoint);
 
   return (
     <Box

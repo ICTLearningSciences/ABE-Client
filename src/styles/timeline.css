@@ -34,6 +34,8 @@ The full terms of this copyright and license should always be found in the root 
   padding: 0 10px;
 }
 .timeline-footer-item {
+  max-width: 300px;
+  min-width: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,10 +43,27 @@ The full terms of this copyright and license should always be found in the root 
   cursor: pointer;
 }
 
+.timeline-footer-item-hover {
+  max-width: 300px;
+  min-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 110px;
+  cursor: pointer;
+}
+
 .timeline-footer-item-card {
   padding: 5px 15px !important;
   background-color: var(--timeline-bg);
   box-shadow: var(--content-shadow) !important;
+  margin-bottom: 5px;
+  border-radius: 15px !important;
+}
+
+.timeline-footer-item-card-hover {
+  padding: 5px 15px !important;
+  background-color: var(--timeline-bg);
   margin-bottom: 5px;
   border-radius: 15px !important;
 }
