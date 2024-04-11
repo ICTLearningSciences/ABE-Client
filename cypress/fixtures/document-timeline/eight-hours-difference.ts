@@ -19,6 +19,11 @@ export const eightHoursBetweenSessions: GQLDocumentTimeline = {
         plainText: 'Hello, world! What’s going on ?\n',
         lastChangedId:
           'ALBJ4LvGtDw60PlOb4l1tFcX4PLEKKguGqtBIRo_qqoSB4_bFjOkQDcvy7-FcRRMaoFZ6y2Q_3m77cwrMmm3WjA',
+        sessionIntention: {
+          description:
+            'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
+          createdAt: '2024-03-27T05:00:02.587Z',
+        },
         chatLog: [
           {
             sender: 'SYSTEM',
@@ -84,6 +89,10 @@ export const eightHoursBetweenSessions: GQLDocumentTimeline = {
         plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
         lastChangedId:
           'ALBJ4LvpUjPG6iVXa8vibKE0FafnztNmt9B3Qmmn8h0Z5SfAgNZSjfH1Dk33Ygrte_B_WuN1EIxZ4uBJoekEju8',
+        sessionIntention: {
+          description: 'This activity is to work on the hook of the essay.',
+          createdAt: '2024-03-27T05:00:02.587Z',
+        },
         chatLog: [
           {
             sender: 'SYSTEM',

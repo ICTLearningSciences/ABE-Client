@@ -10,7 +10,6 @@ export default function TimelineFooter(props: {
   onSelectTimepoint: (timepoint: GQLTimelinePoint) => void;
   currentTimelinePoint?: GQLTimelinePoint;
 }): JSX.Element {
-  console.log('TimelineFooter', props);
   const { timelinePoints, currentTimelinePoint } = props;
   return (
     <RowDiv className="timeline-footer-wrapper">

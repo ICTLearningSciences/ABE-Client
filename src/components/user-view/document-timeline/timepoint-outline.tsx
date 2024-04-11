@@ -7,6 +7,17 @@ import { Box, Divider, Typography } from '@mui/material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
+const getIntentionText = (timelinePoint: GQLTimelinePoint): string => {
+  if (timelinePoint.version?.sessionIntention?.description) {
+    return timelinePoint.version?.sessionIntention?.description || '';
+  } else if (timelinePoint.version?.dayIntention?.description) {
+    return timelinePoint.version?.dayIntention?.description || '';
+  } else if (timelinePoint.version?.documentIntention?.description) {
+    return timelinePoint.version?.documentIntention?.description || '';
+  }
+  return 'No Intention text';
+};
+
 const useDynamicHeight = (initialValue: string) => {
   const [value, setValue] = useState(initialValue);
   const [height, setHeight] = useState('auto');
@@ -81,8 +92,9 @@ export default function TimepointOutline(props: {
     timelinePoint: GQLTimelinePoint;
   }): JSX.Element {
     const { timelinePoint } = props;
+
     const { value, height, textareaRef, handleChange } = useDynamicHeight(
-      timelinePoint.intent
+      getIntentionText(timelinePoint)
     );
 
     return (
