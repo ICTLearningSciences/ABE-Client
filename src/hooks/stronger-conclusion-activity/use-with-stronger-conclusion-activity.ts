@@ -39,9 +39,11 @@ interface StrongerConclusionActivityPrompts {
   brainstormingOnSoWhatPrompt: GQLPrompt;
   soWhatQuestionPrompt: GQLPrompt;
   collectProposedRevisionPrompt: GQLPrompt;
+  impactDiscussionPrompt: GQLPrompt;
 }
 
 const HELP_ME_BRAINSTORM = 'Help me brainstorm';
+const MCQ_READY_TO_REVISE = 'Ready to revise';
 
 export function useWithStrongerConclusionActivity(
   activityGql: ActivityGQL,
@@ -68,6 +70,7 @@ export function useWithStrongerConclusionActivity(
     soWhatQuestionPrompt,
     brainstormingOnSoWhatPrompt,
     collectProposedRevisionPrompt,
+    impactDiscussionPrompt,
   } = activityPrompts || {};
 
   const ANALYZE_CONCLUSION_PROMPT_ID = '66144b64c2027d0f8e5828dd';
@@ -78,6 +81,7 @@ export function useWithStrongerConclusionActivity(
   const I_3_SO_WHAT_QUESTION_PROMPT_ID = '66144b89c2027d0f8e5829e3';
   const I_4_BRAINSTORMING_ON_SO_WHAT_PROMPT_ID = '66144b97c2027d0f8e582a28';
   const I_5_COLLECT_PROPOSED_REVISION_PROMPT_ID = '66144b9fc2027d0f8e582a6f';
+  const IMPACT_DISCUSSION_PROMPT_ID = '66185c96b765bc832e5b78aa';
 
   enum StepNames {
     INTRO = 'intro',
@@ -89,6 +93,7 @@ export function useWithStrongerConclusionActivity(
     SO_WHAT_QUESTION = 'So What Question',
     BRAINSTORMING_ON_SO_WHAT = 'Brainstorming on So What',
     COLLECT_PROPOSED_REVISION = 'Collect Proposed Revision',
+    IMPACT_DISCUSSION = 'Impact Discussion',
     OUTRO = 'Outro',
   }
 
@@ -98,6 +103,9 @@ export function useWithStrongerConclusionActivity(
     }
     const analyzeConclusionPrompt = prompts.find(
       (prompt) => prompt._id === ANALYZE_CONCLUSION_PROMPT_ID
+    );
+    const impactDiscussionPrompt = prompts.find(
+      (prompt) => prompt._id === IMPACT_DISCUSSION_PROMPT_ID
     );
     // const audienceImplicationEmotionDetectionPrompt = prompts.find(
     //   (prompt) => prompt._id === N_AUDIENCE_IMPLICATIONS_EMOTIONS_PROMPT_ID
@@ -124,7 +132,8 @@ export function useWithStrongerConclusionActivity(
       !collectAuthorOriginalIntentionPrompt ||
       !soWhatQuestionPrompt ||
       !brainstormingOnSoWhatPrompt ||
-      !collectProposedRevisionPrompt
+      !collectProposedRevisionPrompt ||
+      !impactDiscussionPrompt
     ) {
       throw new Error('Missing prompts');
     }
@@ -136,6 +145,7 @@ export function useWithStrongerConclusionActivity(
       soWhatQuestionPrompt,
       brainstormingOnSoWhatPrompt,
       collectProposedRevisionPrompt,
+      impactDiscussionPrompt,
     });
   }, [prompts, promptsLoading]);
 
@@ -179,6 +189,8 @@ export function useWithStrongerConclusionActivity(
         return i2CollectAuthorOriginalIntentionStep(stepData);
       case StepNames.SO_WHAT_QUESTION:
         return i3SoWhatQuestionStep(stepData);
+      case StepNames.IMPACT_DISCUSSION:
+        return impactDiscussionStep(stepData);
       case StepNames.COLLECT_PROPOSED_REVISION:
         return i5CollectProposedRevisionStep(stepData);
       default:
@@ -266,7 +278,7 @@ export function useWithStrongerConclusionActivity(
   ): ActivityStep {
     const { executePrompt } = stepData;
     return {
-      text: 'What was your original intention for writing this paper?',
+      text: 'To make sure I understand it right, can you tell me your main intention for the paper so I can compare with my understanding?',
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       handleResponse: async (response) => {
         if (!collectAuthorOriginalIntentionPrompt || !soWhatQuestionPrompt) {
@@ -372,63 +384,51 @@ export function useWithStrongerConclusionActivity(
               );
             }
           );
-          goToStep(StepNames.COLLECT_PROPOSED_REVISION);
+          goToStep(StepNames.IMPACT_DISCUSSION);
         }
       },
     };
   }
 
-  // function i4BrainstormingOnSoWhatStep(stepData: StepData): ActivityStep {
-  //   const { executePrompt } = stepData;
-  //   return {
-  //     text: 'Would you like brainstorm more on what you could write about?',
-  //     stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
-  //     mcqChoices: [PLAN_REVISION, HELP_ME_BRAINSTORM],
-  //     handleResponse: async (response) => {
-  //       if (response === PLAN_REVISION) {
-  //         goToStep(StepNames.COLLECT_PROPOSED_REVISION);
-  //       } else {
-  //         if (!brainstormingOnSoWhatPrompt) {
-  //           return;
-  //         }
-  //         await executePrompt(
-  //           () => brainstormingOnSoWhatPrompt,
-  //           (res) => {
-  //             sendMessage(
-  //               {
-  //                 id: uuidv4(),
-  //                 message: res.answer,
-  //                 sender: Sender.SYSTEM,
-  //                 displayType: MessageDisplayType.TEXT,
-  //                 activityStep: i4BrainstormingOnSoWhatStep(stepData),
-  //                 openAiInfo: {
-  //                   openAiPrompt: res.openAiData[0].openAiPrompt,
-  //                   openAiResponse: res.openAiData[0].openAiResponse,
-  //                 },
-  //               },
-  //               false,
-  //               googleDocId
-  //             );
-  //           }
-  //         );
-  //         setWaitingForUserAnswer(true);
-  //         sendMessage(
-  //           {
-  //             id: uuidv4(),
-  //             message:
-  //               'Would you like to plan your revision or continue brainstorming?',
-  //             sender: Sender.SYSTEM,
-  //             mcqChoices: [HELP_ME_BRAINSTORM, PLAN_REVISION],
-  //             displayType: MessageDisplayType.TEXT,
-  //             activityStep: i4BrainstormingOnSoWhatStep(stepData),
-  //           },
-  //           false,
-  //           googleDocId
-  //         );
-  //       }
-  //     },
-  //   };
-  // }
+  function impactDiscussionStep(stepData: StepData): ActivityStep {
+    const { executePrompt } = stepData;
+    return {
+      text: "Let's have an open ended discussion about the impact your essay could have. If you are ready to revise, click [READY TO REVISE].",
+      stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
+      mcqChoices: [MCQ_READY_TO_REVISE],
+      handleResponse: async (res) => {
+        if (!impactDiscussionPrompt) {
+          return;
+        }
+        if (res === MCQ_READY_TO_REVISE) {
+          goToStep(StepNames.COLLECT_PROPOSED_REVISION);
+        } else {
+          await executePrompt(
+            () => impactDiscussionPrompt,
+            (res) => {
+              sendMessage(
+                {
+                  id: uuidv4(),
+                  message: res.answer,
+                  sender: Sender.SYSTEM,
+                  mcqChoices: [MCQ_READY_TO_REVISE],
+                  displayType: MessageDisplayType.TEXT,
+                  activityStep: impactDiscussionStep(stepData),
+                  openAiInfo: {
+                    openAiPrompt: res.openAiData[0].openAiPrompt,
+                    openAiResponse: res.openAiData[0].openAiResponse,
+                  },
+                },
+                false,
+                googleDocId
+              );
+            }
+          );
+          setWaitingForUserAnswer(true);
+        }
+      },
+    };
+  }
 
   function i5CollectProposedRevisionStep(stepData: StepData): ActivityStep {
     const { executePrompt } = stepData;
