@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { GQLTimelinePoint } from '../../../types';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
@@ -86,7 +87,18 @@ export default function TimelineFooter(props: {
                   {formatISODateToReadable(timelinePoint.versionTime || '')}
                 </Typography>
               ) : (
-                <TimeLineCard timelinePoint={timelinePoint} />
+                <AnimatePresence>
+                  {hoverIndex === i && (
+                    <motion.div
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 100 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }} // Adjust transition duration and easing
+                    >
+                      <TimeLineCard timelinePoint={timelinePoints[i]} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               )}
             </Paper>
 

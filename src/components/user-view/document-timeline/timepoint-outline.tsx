@@ -3,6 +3,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { Box, Divider, Typography } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { formatISODateToReadable } from '../../../helpers';
 import { GQLTimelinePoint, TimelinePointType } from '../../../types';
@@ -11,6 +12,7 @@ import {
   getIntentionText,
 } from '../../../helpers/functions';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
+import ActivityTranscript from './ActivityTranscript';
 
 /**
  * The `useDynamicHeight` custom hook in TypeScript React dynamically adjusts the height of a textarea
@@ -103,43 +105,52 @@ export default function TimepointOutline(props: {
     };
 
     return (
-      <Box data-cy={`${dataCy}-container`}>
-        <div className="claims-title" onClick={toggleExpand}>
-          {fontType === 'bold' ? (
-            <Typography
-              className="text-3-bold"
-              style={{ marginTop: 10, maxWidth: '90%' }}
-              data-cy={`${dataCy}-title`}
-            >
-              {!claimNumber ? title : `${claimNumber}. ${title}`}
-            </Typography>
-          ) : (
-            <Typography className="text-3" data-cy={`${dataCy}-title`}>
-              {title}
-            </Typography>
-          )}
-
-          {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </div>
-
-        <div
-          className={`collapsable-claims supporting-claims-container ${
-            expanded ? 'expanded' : 'collapsed'
-          }`}
-          data-cy={`${dataCy}-accordion`}
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 100 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
         >
-          {outline.map((claim: string, i: number) => {
-            return (
-              <Box key={i} className="list-container">
-                <FiberManualRecordIcon className="bulletpoint-icon" />
-                <Typography key={i} className="text-3-list">
-                  {claim}
+          <Box data-cy={`${dataCy}-container`}>
+            <div className="claims-title" onClick={toggleExpand}>
+              {fontType === 'bold' ? (
+                <Typography
+                  className="text-3-bold"
+                  style={{ marginTop: 10, maxWidth: '90%' }}
+                  data-cy={`${dataCy}-title`}
+                >
+                  {!claimNumber ? title : `${claimNumber}. ${title}`}
                 </Typography>
-              </Box>
-            );
-          })}
-        </div>
-      </Box>
+              ) : (
+                <Typography className="text-3" data-cy={`${dataCy}-title`}>
+                  {title}
+                </Typography>
+              )}
+
+              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </div>
+
+            <div
+              className={`collapsable-claims supporting-claims-container ${
+                expanded ? 'expanded' : 'collapsed'
+              }`}
+              data-cy={`${dataCy}-accordion`}
+            >
+              {outline.map((claim: string, i: number) => {
+                return (
+                  <Box key={i} className="list-container">
+                    <FiberManualRecordIcon className="bulletpoint-icon" />
+                    <Typography key={i} className="text-3-list">
+                      {claim}
+                    </Typography>
+                  </Box>
+                );
+              })}
+            </div>
+          </Box>
+        </motion.div>
+      </AnimatePresence>
     );
   }
 
@@ -220,9 +231,6 @@ and dynamically adjust the height of the input field. */
     timelinePoint: GQLTimelinePoint;
   }): JSX.Element {
     const { timelinePoint } = props;
-    const { getActivitById } = useWithDocGoalsActivities();
-    const activityId = timelinePoint.version.activity;
-    const activity = getActivitById(activityId);
 
     const { value, height, textareaRef, handleChange } = useDynamicHeight(
       timelinePoint.changeSummary
@@ -236,7 +244,10 @@ and dynamically adjust the height of the input field. */
               <Typography className="text-2" data-cy="summary-title">
                 Summary
               </Typography>
-              <Typography className="text-3">({activity.title})</Typography>
+              <ActivityTranscript
+                chatLog={timelinePoint.version.chatLog}
+                activityId={timelinePoint.version.activity}
+              />
             </div>
 
             <textarea
@@ -322,8 +333,8 @@ and dynamically adjust the height of the input field. */
 
                 return (
                   <AIOutlineExpand
-                    open={true}
                     key={i}
+                    open={true}
                     fontType="bold"
                     title={evidenceTitle}
                     outline={evidenceArray}
