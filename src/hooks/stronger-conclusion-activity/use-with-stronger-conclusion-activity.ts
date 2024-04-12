@@ -16,9 +16,10 @@ import {
   ActivityGQL,
   DocGoal,
   Activity,
-  ActivityStep,
+  ActiveActivityStep,
   ActivityStepTypes,
   PromptRoles,
+  StepMessage,
 } from '../../types';
 import {
   StepData,
@@ -58,10 +59,15 @@ export function useWithStrongerConclusionActivity(
   goal?: DocGoal
 ): Activity {
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
-
+  const allActivityMessages: StepMessage[] = (activityGql.steps || [])?.reduce(
+    (acc, step) => {
+      return [...acc, ...step.messages];
+    },
+    [] as StepMessage[]
+  );
   const [activityPrompts, setActivityPrompts] =
     useState<StrongerConclusionActivityPrompts>();
-
+  // collectAuthorOriginalIntentionPrompt || !soWhatQuestionPrompt
   const {
     analyzeConclusionPrompt,
     // audienceImplicationEmotionDetectionPrompt,
@@ -180,7 +186,7 @@ export function useWithStrongerConclusionActivity(
     });
   }
 
-  function getStep(stepData: StepData): ActivityStep {
+  function getStep(stepData: StepData): ActiveActivityStep {
     switch (state.curStepName) {
       case StepNames.INTRO:
       case StepNames.INTRO_2:
@@ -198,10 +204,16 @@ export function useWithStrongerConclusionActivity(
     }
   }
 
-  function introStep(stepData: StepData): ActivityStep {
+  function introStep(stepData: StepData): ActiveActivityStep {
+    const INTRO_MESSAGE_ID = '65b8559017dcb51adc3af967';
+    const introMessage = allActivityMessages.find(
+      (msg) => msg._id === INTRO_MESSAGE_ID
+    );
     const { executePrompt } = stepData;
     return {
-      text: "Feel free to edit your papers conlusion, and tell me when it's ready for me to review.",
+      text:
+        introMessage?.text ||
+        "Feel free to edit your papers conlusion, and tell me when it's ready for me to review.",
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: [MCQ_READY_FOR_REVIEW],
       handleResponse: async () => {
@@ -275,13 +287,19 @@ export function useWithStrongerConclusionActivity(
 
   function i2CollectAuthorOriginalIntentionStep(
     stepData: StepData
-  ): ActivityStep {
+  ): ActiveActivityStep {
+    const COLLECT_MESSAGE_ID = '65b8559017dbb51ddc3af967';
+    const collectMessage = allActivityMessages.find(
+      (msg) => msg._id === COLLECT_MESSAGE_ID
+    );
     const { executePrompt } = stepData;
     return {
-      text: 'To make sure I understand it right, can you tell me your main intention for the paper so I can compare with my understanding?',
+      text:
+        collectMessage?.text ||
+        'To make sure I understand it right, can you tell me your main intention for the paper so I can compare with my understanding?',
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       handleResponse: async (response) => {
-        if (!collectAuthorOriginalIntentionPrompt || !soWhatQuestionPrompt) {
+        if (!collectAuthorOriginalIntentionPrompt) {
           return;
         }
         const collectIntentionPromptWithData: GQLPrompt =
@@ -318,10 +336,20 @@ export function useWithStrongerConclusionActivity(
     };
   }
 
-  function i3SoWhatQuestionStep(stepData: StepData): ActivityStep {
+  function i3SoWhatQuestionStep(stepData: StepData): ActiveActivityStep {
+    const SO_WHAT_MESSAGE_ONE_ID = '65b8859017dbb51ddc3af967';
+    const SO_WHAT_MESSAGE_TWO_ID = '65b8859017dbb51ddc3af467';
+    const soWhatMessageOne = allActivityMessages.find(
+      (msg) => msg._id === SO_WHAT_MESSAGE_ONE_ID
+    );
+    const soWhatMessageTwo = allActivityMessages.find(
+      (msg) => msg._id === SO_WHAT_MESSAGE_TWO_ID
+    );
     const { executePrompt } = stepData;
     return {
-      text: 'Why do you think people should care about what you are writing about? If you need help, click HELP ME BRAINSTORM.',
+      text:
+        soWhatMessageOne?.text ||
+        'Why do you think people should care about what you are writing about? If you need help, click HELP ME BRAINSTORM.',
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       mcqChoices: [HELP_ME_BRAINSTORM],
       handleResponse: async (response) => {
@@ -354,6 +382,7 @@ export function useWithStrongerConclusionActivity(
             {
               id: uuidv4(),
               message:
+                soWhatMessageTwo?.text ||
                 "Hope that helped. Why do you think people should care about what you're writing about?",
               sender: Sender.SYSTEM,
               mcqChoices: [HELP_ME_BRAINSTORM],
@@ -390,10 +419,16 @@ export function useWithStrongerConclusionActivity(
     };
   }
 
-  function impactDiscussionStep(stepData: StepData): ActivityStep {
+  function impactDiscussionStep(stepData: StepData): ActiveActivityStep {
+    const IMPACT_MESSAGE_ID = '65b8859017dbb51ddc3af997';
+    const impactMessage = allActivityMessages.find(
+      (msg) => msg._id === IMPACT_MESSAGE_ID
+    );
     const { executePrompt } = stepData;
     return {
-      text: "Let's have an open ended discussion about the impact your essay could have. If you are ready to revise, click [READY TO REVISE].",
+      text:
+        impactMessage?.text ||
+        "Let's have an open ended discussion about the impact your essay could have. If you are ready to revise, click [READY TO REVISE].",
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       mcqChoices: [MCQ_READY_TO_REVISE],
       handleResponse: async (res) => {
@@ -430,10 +465,18 @@ export function useWithStrongerConclusionActivity(
     };
   }
 
-  function i5CollectProposedRevisionStep(stepData: StepData): ActivityStep {
+  function i5CollectProposedRevisionStep(
+    stepData: StepData
+  ): ActiveActivityStep {
+    const REVISION_MESSAGE_ID = '65b8859017dbb51ddc3af957';
+    const revisionMessage = allActivityMessages.find(
+      (msg) => msg._id === REVISION_MESSAGE_ID
+    );
     const { executePrompt } = stepData;
     return {
-      text: 'What revision would you like to make to your essays conclusion?',
+      text:
+        revisionMessage?.text ||
+        'What revision would you like to make to your essays conclusion?',
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       handleResponse: async () => {
         if (!collectProposedRevisionPrompt) {

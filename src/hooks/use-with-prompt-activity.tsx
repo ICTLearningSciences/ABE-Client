@@ -14,7 +14,7 @@ import {
 import {
   Activity,
   ActivityGQL,
-  ActivityStep,
+  ActiveActivityStep,
   ActivityStepTypes,
   GQLPrompt,
   PromptOutputTypes,
@@ -87,7 +87,7 @@ export function useWithPromptActivity(
     }
   }
 
-  function introStep(stepData: StepData): ActivityStep {
+  function introStep(stepData: StepData): ActiveActivityStep {
     const { executePrompt } = stepData;
     return {
       text: "Feel free to edit your paper. Let me know when you're ready for me to analyze it.",
@@ -119,7 +119,7 @@ export function useWithPromptActivity(
     };
   }
 
-  function freeInputStep(stepData: StepData): ActivityStep {
+  function freeInputStep(stepData: StepData): ActiveActivityStep {
     const { executePrompt } = stepData;
     return {
       text: 'Feel free to ask me anything else about your essay, or I can analyze it again for you.',
@@ -198,7 +198,7 @@ export function useWithPromptActivity(
     };
   }
 
-  function getStep(stepData: StepData): ActivityStep {
+  function getStep(stepData: StepData): ActiveActivityStep {
     switch (curStepName) {
       case StepNames.INTRO:
       case StepNames.INTRO_2:
