@@ -58,9 +58,10 @@ export function MultiPromptTesting(props: {
   const promptTemplate = targetPromptId
     ? (prompts || []).find(
         (prompt) =>
-          prompt._id === targetPromptId || prompt.clientId === targetPromptId
+          prompt.clientId === targetPromptId || prompt._id === targetPromptId
       )
     : undefined;
+  console.log(promptTemplate);
   const orphanPrompts = prompts?.filter((prompt) => {
     return !isPromptInActivity(prompt, activities);
   });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   TextField,
   FormControlLabel,
@@ -62,6 +62,11 @@ export function EditPrompt(props: {
   const [promptTemplateCopy, setPromptTemplateCopy] = useState<GQLPrompt>(
     JSON.parse(JSON.stringify(promptTemplate))
   );
+
+  useEffect(() => {
+    setPromptTemplateCopy(JSON.parse(JSON.stringify(promptTemplate)));
+  }, [promptTemplate]);
+
   const isEdited = !equals(promptTemplate, promptTemplateCopy);
 
   return (
@@ -159,6 +164,35 @@ export function EditPrompt(props: {
               }}
             />
             <ColumnDiv>
+              <FormControlLabel
+                label="Include Chat Log as context?"
+                style={{ height: 'fit-content', textAlign: 'center' }}
+                control={
+                  <Checkbox
+                    checked={openAiPromptStep.includeChatLogContext}
+                    indeterminate={false}
+                    disabled={inProgress}
+                    onChange={(e) => {
+                      setPromptTemplateCopy({
+                        ...promptTemplateCopy,
+                        openAiPromptSteps:
+                          promptTemplateCopy.openAiPromptSteps.map(
+                            (openAiPromptStep, openAiPromptStepIndex) => {
+                              if (openAiPromptStepIndex === index) {
+                                return {
+                                  ...openAiPromptStep,
+                                  includeChatLogContext: e.target.checked,
+                                };
+                              } else {
+                                return openAiPromptStep;
+                              }
+                            }
+                          ),
+                      });
+                    }}
+                  />
+                }
+              />
               <FormControlLabel
                 label="Include Essay?"
                 style={{ height: 'fit-content', textAlign: 'center' }}

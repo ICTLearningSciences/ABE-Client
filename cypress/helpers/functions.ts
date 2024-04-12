@@ -390,7 +390,7 @@ export type CypressGlobal = Cypress.cy & CyEventEmitter;
     cy.visit(`/docs/${testGoogleDocId}`);
     cy.get("[data-cy=doc-goal-cancel-button]").click();
     cy.get("[data-cy=role-switch]").click();
-    cy.get("[data-cy=prompt-item-Build-Thesis-Support]").click();
+    cy.get("[data-cy=prompt-item-Review-Sources]").click();
   }
 
   export function toPromptActivity(cy: CypressGlobal){

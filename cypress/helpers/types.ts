@@ -38,6 +38,26 @@ export enum MessageDisplayType {
   PENDING_MESSAGE = 'PENDING_MESSAGE',
 }
 
+export interface ActiveActivityStep {
+  text: string;
+  stepType: ActivityStepTypes;
+  mcqChoices?: string[];
+  handleResponse?: (response: string, userInputType: UserInputType) => void;
+}
+
+export interface StepMessage{
+  _id: string,
+  text: string,
+}
+
+export interface ActivityStepGQL {
+  messages: StepMessage[];
+  stepName: string;
+  stepType?: ActivityStepTypes;
+  mcqChoices?: string[];
+  prompts?: string[];
+}
+
 export interface ChatMessage {
   id: string;
   sender: Sender;
@@ -45,8 +65,7 @@ export interface ChatMessage {
   openAiInfo?: OpenAiReqRes;
   mcqChoices?: string[];
   selectActivities?: Activity[];
-  activityStep?: ActivityStep;
-  selectedActivity?: Activity;
+  activityStep?: ActiveActivityStep;
   selectedGoal?: DocGoal;
   userInputType?: UserInputType;
 }
@@ -246,9 +265,9 @@ export interface ActivityStep {
 }
 
 export interface Activity extends ActivityGQL {
-  steps: ActivityStep[];
+  steps: ActivityStepGQL[];
   // introStep: ActivityStep;
-  getStep: (stepData: StepData) => ActivityStep;
+  getStep: (stepData: StepData) => ActiveActivityStep;
   stepName: string;
   resetActivity: () => void;
   isReady: boolean;

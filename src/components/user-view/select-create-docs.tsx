@@ -109,8 +109,8 @@ export default function SelectCreateDocs(props: {
               <TableRow>
                 <TableCell style={{ width: '66%', padding: 0 }}></TableCell>
                 <TableCell style={{ padding: 0 }}></TableCell>
-                <TableCell style={{ padding: 0 }}></TableCell>{' '}
-                <TableCell style={{ padding: 0 }}></TableCell>{' '}
+                <TableCell style={{ padding: 0 }}></TableCell>
+                <TableCell style={{ padding: 0 }}></TableCell>
                 {/* Empty cells for delete/history buttons */}
               </TableRow>
             </TableHead>
