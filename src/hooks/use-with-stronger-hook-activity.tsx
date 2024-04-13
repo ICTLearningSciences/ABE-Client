@@ -192,7 +192,8 @@ export const emotionCannedResponses: Record<number, string[]> = {
 export interface StepData {
   executePrompt: (
     prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
-    callback?: (response: MultistepPromptRes) => void
+    callback?: (response: MultistepPromptRes) => void,
+    customSystemPrompt?: string
   ) => Promise<void>;
   openSelectActivityModal: () => void;
 }
