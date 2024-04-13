@@ -3,10 +3,12 @@ import { Box, Paper, Typography } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { GQLTimelinePoint } from '../../../types';
+import { GQLTimelinePoint, TimelinePointType } from '../../../types';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { formatISODateToReadable } from '../../../helpers';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
+import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
+import { useParams } from 'react-router-dom';
 
 /* The `TimeLineCard` component is a functional component that takes in a prop `timelinePoint` of type
 `GQLTimelinePoint`. Inside the component, it retrieves the `getActivitById` function from the
@@ -15,17 +17,26 @@ timeline point's version. */
 const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
   const { timelinePoint } = props;
   const { getActivitById } = useWithDocGoalsActivities();
+  const { getCurrentGoogleDoc } = UseWithGoogleDocs();
+  const { docId } = useParams<Record<string, string>>();
 
   const activity = getActivitById(timelinePoint.version.activity || '');
+  const googleDoc = getCurrentGoogleDoc(docId);
 
   return (
     <Box
       style={{ padding: '1rem' }}
       className="timeline-footer-item-card-hover"
     >
-      <Typography className="text-2">{activity.title}</Typography>
+      <Typography className="text-2">
+        {timelinePoint.type === TimelinePointType.NEW_ACTIVITY
+          ? `${googleDoc?.title}`
+          : activity.title}
+      </Typography>
       <Typography className="text-3-no-indent">
-        {activity.description}
+        {timelinePoint.type === TimelinePointType.NEW_ACTIVITY
+          ? `${googleDoc?.assignmentDescription}`
+          : activity.description}
       </Typography>
       <Typography className="text-3-no-indent" style={{ textAlign: 'right' }}>
         {formatISODateToReadable(timelinePoint.versionTime || '')}

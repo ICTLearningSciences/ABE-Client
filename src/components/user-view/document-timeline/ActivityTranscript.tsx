@@ -36,7 +36,6 @@ const ChatMessage = (props: ChatMessageProps) => {
 
 function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
   const { chatLog, activityId } = props;
-  console.log(chatLog);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
   );

@@ -9,6 +9,7 @@ import {
   DocumentTimelineJobStatus,
   GQLTimelinePoint,
   JobStatus,
+  TimelinePointType,
 } from '../types';
 import { asyncRequestDocTimeline, asyncRequestDocTimelineStatus } from './api';
 import {
@@ -54,10 +55,41 @@ export function useWithDocumentTimeline() {
       1000,
       60000
     );
+    const timeline = res.documentTimeline;
+    const startPointDate = subtractOneSecondFromDate(
+      timeline.timelinePoints[0].versionTime
+    );
+
+    timeline.timelinePoints = [
+      { ...startPoint, versionTime: startPointDate },
+      ...timeline.timelinePoints,
+    ];
+
     dispatch({
       type: TimelineActionType.LOADING_SUCCEEDED,
-      dataPayload: res.documentTimeline,
+      dataPayload: timeline,
     });
+  }
+
+  /**
+   * The function `subtractOneSecondFromDate` takes a date string, converts it to a Date object,
+   * subtracts one second from it, and returns the updated date in ISO 8601 format.
+   * @param {string} dateString - The `dateString` parameter in the `subtractOneSecondFromDate`
+   * function should be a string representing a date and time in a format that can be parsed by the
+   * `Date` constructor in JavaScript. This can include formats like "YYYY-MM-DDTHH:MM:SS" or "YYYY-MM
+   * @returns The function `subtractOneSecondFromDate` takes a date string as input, parses it into a
+   * Date object, subtracts one second from the date, and then formats the result back into the ISO
+   * 8601 format. The function returns the updated date in ISO 8601 format.
+   */
+  function subtractOneSecondFromDate(dateString: string) {
+    // Parse the input date string into a Date object
+    const date = new Date(dateString);
+
+    // Subtract one second from the date
+    date.setSeconds(date.getSeconds() - 1);
+
+    // Format the result back into the desired format (ISO 8601)
+    return date.toISOString();
   }
 
   function selectTimelinePoint(timepoint: GQLTimelinePoint) {
@@ -66,6 +98,36 @@ export function useWithDocumentTimeline() {
       selectTimepointPayload: timepoint,
     });
   }
+
+  /* The `const startPoint` object is defining a starting point for a timeline activity. It contains
+  various properties related to the activity being described. Here's a breakdown of what each
+  property represents: */
+  const startPoint = {
+    type: TimelinePointType.NEW_ACTIVITY,
+    versionTime: '',
+    version: {
+      sessionIntention: {
+        description: '',
+        createdAt: '',
+      },
+      docId: '',
+      plainText: '',
+      lastChangedId: '',
+      sessionId: '',
+      chatLog: [],
+      activity: '',
+      intent: '',
+      title: '',
+      lastModifyingUser: '',
+      modifiedTime: '',
+      createdAt: '',
+      updatedAt: '',
+    },
+    intent: '',
+    changeSummary: '',
+    reverseOutline: 'No outline available',
+    relatedFeedback: '',
+  };
 
   return {
     documentTimeline: state.data,

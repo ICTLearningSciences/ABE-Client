@@ -11,7 +11,6 @@ import {
   formatTimeDifferenceToReadable,
   getIntentionText,
 } from '../../../helpers/functions';
-import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import ActivityTranscript from './ActivityTranscript';
 
 /**
@@ -63,6 +62,7 @@ export default function TimepointOutline(props: {
   const [thesis, setThesis] = useState<boolean>(false);
   const [supportingClaims, setSupportingClaims] = useState<boolean>(false);
   const [claimEvidence, setClaimEvidence] = useState<boolean>(false);
+  const [aiOutline, setAIOutline] = useState<boolean>(false);
 
   /* The above code is a `useEffect` hook in a TypeScript React component. It checks if the
  `timelinePoint.reverseOutline` is not equal to 'No outline available'. If it is not, it parses the
@@ -72,6 +72,7 @@ export default function TimepointOutline(props: {
     if (timelinePoint.reverseOutline === 'No outline available') return;
 
     const reverseOutlineParsed = JSON.parse(timelinePoint.reverseOutline);
+    setAIOutline(true);
 
     if (reverseOutlineParsed['Thesis Statement'] !== '') {
       setThesis(true);
@@ -190,9 +191,6 @@ export default function TimepointOutline(props: {
     timelinePoint: GQLTimelinePoint;
   }): JSX.Element {
     const { timelinePoint } = props;
-    const { getActivitById } = useWithDocGoalsActivities();
-    const activityId = timelinePoint.version.activity;
-    const activity = getActivitById(activityId);
 
     const { value, height, textareaRef, handleChange } = useDynamicHeight(
       getIntentionText(timelinePoint)
@@ -205,7 +203,10 @@ export default function TimepointOutline(props: {
             <Typography className="text-2" data-cy="intention-title">
               Intention
             </Typography>
-            <Typography className="text-3">({activity.title})</Typography>
+            <ActivityTranscript
+              chatLog={timelinePoint.version.chatLog}
+              activityId={timelinePoint.version.activity}
+            />
           </div>
           <textarea
             ref={textareaRef}
@@ -270,6 +271,13 @@ and dynamically adjust the height of the input field. */
   `supportingClaims`, `claimEvidence`). Here's a breakdown of what the code is doing: */
   function AIOutlineDisplay(props: { reverseOutline: string }): JSX.Element {
     const { reverseOutline } = props;
+    if (reverseOutline === 'No outline available')
+      return (
+        <Typography className="text-2" data-cy="no-ai-outline">
+          No AI outline available
+        </Typography>
+      );
+
     const outline = JSON.parse(reverseOutline);
 
     return (
@@ -376,7 +384,7 @@ and dynamically adjust the height of the input field. */
         outline available" is rendered instead. */}
         {
           // if thesis, supporting claims, and claim evidence display
-          thesis && supportingClaims && claimEvidence ? (
+          thesis && supportingClaims && claimEvidence && aiOutline ? (
             <div style={{ marginRight: 10 }}>
               <AIOutlineDisplay reverseOutline={timelinePoint.reverseOutline} />
             </div>

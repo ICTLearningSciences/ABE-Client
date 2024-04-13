@@ -8,14 +8,14 @@ The full terms of this copyright and license should always be found in the root 
 import { GQLDocumentTimeline, TimelinePointType } from '../../helpers/types';
 
 export const eightHoursBetweenSessions: GQLDocumentTimeline = {
-  docId: '1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw',
+  docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
   user: '653972706e601e65dbc3acea',
   timelinePoints: [
     {
       type: TimelinePointType.START,
       versionTime: '2024-03-27T05:00:02.587Z',
       version: {
-        docId: '1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw',
+        docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ?\n',
         lastChangedId:
           'ALBJ4LvGtDw60PlOb4l1tFcX4PLEKKguGqtBIRo_qqoSB4_bFjOkQDcvy7-FcRRMaoFZ6y2Q_3m77cwrMmm3WjA',
@@ -85,7 +85,7 @@ export const eightHoursBetweenSessions: GQLDocumentTimeline = {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
       version: {
-        docId: '1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw',
+        docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
         lastChangedId:
           'ALBJ4LvpUjPG6iVXa8vibKE0FafnztNmt9B3Qmmn8h0Z5SfAgNZSjfH1Dk33Ygrte_B_WuN1EIxZ4uBJoekEju8',

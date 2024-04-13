@@ -18,7 +18,7 @@ describe('document timeline', () => {
    This is a basic test to ensure that the content is being rendered correctly in the specified
    location on the page. */
     it('display content on right side if avaliable', () => {
-      cy.visit('/docs/history/1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw');
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // revision time header should exist
       cy.get('[data-cy=content-revision-container]').should('exist');
     });
@@ -30,7 +30,7 @@ describe('document timeline', () => {
   date contains 'Mar 27, 2024'. This test ensures that the revision information is being rendered
   correctly in the specified location on the page. */
     it('display revision', () => {
-      cy.visit('/docs/history/1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw');
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // revision time header should exist
       cy.get('[data-cy=content-revision-container]')
         .should('exist')
@@ -51,7 +51,7 @@ describe('document timeline', () => {
     /* This test case is checking the display of intention and ensuring that it is editable. Here's a
     breakdown of what the test is doing: */
     it('display intention and should be editable', () => {
-      cy.visit('/docs/history/1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw');
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // intention section should exist
       cy.get('[data-cy=content-revision-container]')
         .should('exist')
@@ -76,7 +76,7 @@ describe('document timeline', () => {
     /* This test case is checking the display of the summary section and ensuring that it is editable.
    Here's a breakdown of what the test is doing: */
     it('display summary and should be editable', () => {
-      cy.visit('/docs/history/1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw');
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // summary section should exist
       cy.get('[data-cy=content-revision-container]')
         .should('exist')
@@ -103,7 +103,7 @@ describe('document timeline', () => {
     /* This test case is checking the display of a statement in the document timeline feature. Here's a
    breakdown of what the test is doing: */
     it('display statement', () => {
-      cy.visit('/docs/history/1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw');
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // summary section should exist
       cy.get('[data-cy=content-revision-container]')
         .should('exist')
@@ -127,7 +127,7 @@ describe('document timeline', () => {
     /* This test case is checking the display of supporting claims in the document timeline feature.
    Here's a breakdown of what the test is doing: */
     it('display Supporting Claims', () => {
-      cy.visit('/docs/history/1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw');
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // summary section should exist
       cy.get('[data-cy=content-revision-container]')
         .should('exist')
@@ -160,7 +160,7 @@ describe('document timeline', () => {
     /* This test case is checking the display of evidence given for each claim in the document timeline
    feature. Here's a breakdown of what the test is doing: */
     it.only('display Evidence Given for Each Claim', () => {
-      cy.visit('/docs/history/1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw');
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // summary section should exist
       cy.get('[data-cy=content-revision-container]')
         .should('exist')
@@ -207,7 +207,7 @@ describe('document timeline', () => {
     /* This test case is checking for the display of a statement if it exists in the document timeline
    feature. Here's a breakdown of what the test is doing: */
     it('display statement if exists', () => {
-      cy.visit('/docs/history/1_toEJ46fGZxG1XhxGaQrX69xio2C5Rw8Q_nPNTmJvCw');
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // summary section should exist
       cy.get('[data-cy=content-revision-container]')
         .should('exist')

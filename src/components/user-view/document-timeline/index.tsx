@@ -32,6 +32,8 @@ function DocumentTimelinePage(): JSX.Element {
     return <CircularProgress />;
   }
 
+  const timelinePoints = documentTimeline.timelinePoints;
+
   if (errorMessage) {
     return (
       <div
@@ -103,7 +105,7 @@ function DocumentTimelinePage(): JSX.Element {
       <div className="footer-timeline">
         <TimelineFooter
           currentTimelinePoint={curTimelinePoint}
-          timelinePoints={documentTimeline.timelinePoints}
+          timelinePoints={timelinePoints}
           onSelectTimepoint={selectTimelinePoint}
         />
       </div>

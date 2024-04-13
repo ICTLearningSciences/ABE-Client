@@ -45,14 +45,17 @@ export interface UseWithGoogleDocs {
   updateGoogleDoc: (googleDoc: StoreGoogleDoc) => Promise<GoogleDoc>;
   loadUsersGoogleDocs: () => void;
   handleDeleteGoogleDoc: (docId: string) => Promise<void>;
+  getCurrentGoogleDoc: (docId: string | undefined) => GoogleDoc | undefined;
 }
 
 export function UseWithGoogleDocs(): UseWithGoogleDocs {
   const { updateCurrentDocId } = useWithState();
+
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
   const userEmail = useAppSelector((state) => state.login.user?.email);
   const userId = useAppSelector((state) => state.login.user?._id) || '';
   const googleDocs = useAppSelector((state) => state.state.userGoogleDocs);
+
   const googleDocsLoadStatus = useAppSelector(
     (state) => state.state.userGoogleDocsLoadStatus
   );
@@ -79,6 +82,14 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
   function loadUsersGoogleDocs() {
     dispatch(loadUserGoogleDocs({ userId }));
   }
+
+  const getCurrentGoogleDoc = (
+    docId: string | undefined
+  ): GoogleDoc | undefined => {
+    if (!docId) return undefined;
+
+    return userGoogleDocs?.find((doc) => doc.googleDocId === docId);
+  };
 
   async function handleCreateGoogleDoc(
     docIdToCopyFrom?: string,
@@ -140,5 +151,6 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     updateGoogleDoc,
     loadUsersGoogleDocs,
     handleDeleteGoogleDoc,
+    getCurrentGoogleDoc,
   };
 }

@@ -39,17 +39,7 @@ The full terms of this copyright and license should always be found in the root 
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 35px;
-  cursor: pointer;
-}
-
-.timeline-footer-item-hover {
-  max-width: 300px;
-  min-width: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 110px;
+  margin: 0px 10px 35px 10px;
   cursor: pointer;
 }
 
@@ -66,4 +56,25 @@ The full terms of this copyright and license should always be found in the root 
   background-color: var(--timeline-bg);
   margin-bottom: 5px;
   border-radius: 15px !important;
+}
+
+.timeline-footer-item-hover {
+  max-width: 300px;
+  min-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0px 10px 110px 10px;
+
+  cursor: pointer;
+}
+
+.timeline-footer-item-hover-no-content {
+  max-width: 00px;
+  min-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 50px;
+  cursor: pointer;
 }

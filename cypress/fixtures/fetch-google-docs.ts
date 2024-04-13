@@ -4,48 +4,45 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { testGoogleDocId } from "../helpers/functions";
-import { GoogleDoc } from "../helpers/types";
-import { testUser } from "./user-data";
+import { testGoogleDocId } from '../helpers/functions';
+import { GoogleDoc } from '../helpers/types';
+import { testUser } from './user-data';
 
-export const fetchGoogleDocsResponse: {fetchGoogleDocs: GoogleDoc[]} = {
-    "fetchGoogleDocs": [
-        {
-            "user": testUser._id,
-            "title": "Aliens",
-            "documentIntention": {
-                description: "Aliens document intention",
-                createdAt: new Date().toISOString(),
-            },
-            currentDayIntention: {
-                description: "Aliens day intention",
-                createdAt: new Date().toISOString(),
+export const fetchGoogleDocsResponse: { fetchGoogleDocs: GoogleDoc[] } = {
+  fetchGoogleDocs: [
+    {
+      user: testUser._id,
+      title: 'Aliens',
+      documentIntention: {
+        description: 'Aliens document intention',
+        createdAt: new Date().toISOString(),
+      },
+      currentDayIntention: {
+        description: 'Aliens day intention',
+        createdAt: new Date().toISOString(),
+      },
+      assignmentDescription: 'Aliens assignment description',
+      createdAt: new Date().toISOString(),
 
-            },
-            assignmentDescription: "",
-            createdAt: new Date().toISOString(),
+      admin: false,
+      googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+    },
+    {
+      googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Z',
+      user: testUser._id,
+      title: 'Intention',
+      documentIntention: {
+        description: 'Aliens document intention',
+        createdAt: new Date().toISOString(),
+      },
+      currentDayIntention: {
+        description: 'Aliens day intention',
+        createdAt: new Date().toISOString(),
+      },
+      assignmentDescription: '',
+      createdAt: new Date().toISOString(),
 
-            "admin": false,
-            googleDocId: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"
-        },
-        {
-            "googleDocId": "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
-            "user": testUser._id,
-            "title": "Intention",
-            "documentIntention": {
-                description: "Aliens document intention",
-                createdAt: new Date().toISOString(),
-
-            },
-            currentDayIntention: {
-                description: "Aliens day intention",
-                createdAt: new Date().toISOString(),
-
-            },
-            assignmentDescription: "",
-            createdAt: new Date().toISOString(),
-
-            "admin": false
-        },
-    ]
-}
+      admin: false,
+    },
+  ],
+};
