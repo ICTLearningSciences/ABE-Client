@@ -35,6 +35,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { GptModels } from '../constants';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { useWithStrongerConclusionActivity } from './stronger-conclusion-activity/use-with-stronger-conclusion-activity';
+import { useWithLimitsToArgumentActivity } from './limits-to-argument-activity/use-with-limits-to-argument-activity';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -67,6 +68,7 @@ export const emptyActivity: Activity = {
 interface PromptRetryData {
   callback?: (response: MultistepPromptRes) => void;
   prompts: OpenAiPromptStep[];
+  customSystemPrompt?: string;
   numRetries: number;
 }
 
@@ -124,6 +126,14 @@ export function useWithActivityHandler(
     prompts,
     selectedGoal
   );
+  const limitsToArgumentActivity = useWithLimitsToArgumentActivity(
+    selectedActivity || emptyActivity,
+    sendMessage,
+    setWaitingForUserAnswer,
+    promptsLoading,
+    prompts,
+    selectedGoal
+  );
   const promptActivity = useWithPromptActivity(
     selectedActivity || emptyActivity,
     sendMessage,
@@ -135,6 +145,8 @@ export function useWithActivityHandler(
       ? strongerHookActivity
       : selectedActivity?.title === 'Stronger Conclusion'
       ? strongerConclusionActivity
+      : selectedActivity?.title === 'Limits To Your Argument'
+      ? limitsToArgumentActivity
       : selectedActivity?.prompt
       ? promptActivity
       : undefined;
@@ -182,7 +194,8 @@ export function useWithActivityHandler(
 
   async function executePrompt(
     _prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
-    callback?: (response: MultistepPromptRes) => void
+    callback?: (response: MultistepPromptRes) => void,
+    customSystemPrompt?: string
   ) {
     if (!activity) return;
     if (!userId) return;
@@ -233,7 +246,7 @@ export function useWithActivityHandler(
       googleDocId,
       openAiPromptSteps,
       userId,
-      systemPrompt,
+      customSystemPrompt || systemPrompt,
       overrideGptModel,
       source.token
     )
@@ -246,6 +259,7 @@ export function useWithActivityHandler(
           callback,
           prompts: openAiPromptSteps,
           numRetries: 0,
+          customSystemPrompt,
         });
       });
   }
@@ -336,6 +350,7 @@ export function useWithActivityHandler(
             callback,
             prompts: prompts,
             numRetries: numRetries + 1,
+            customSystemPrompt: retryData.customSystemPrompt,
           });
         });
     }, 1000);
