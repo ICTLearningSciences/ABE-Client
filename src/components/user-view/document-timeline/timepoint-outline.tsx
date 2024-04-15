@@ -111,52 +111,50 @@ export default function TimepointOutline(props: {
     };
 
     return (
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 100 }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-        >
-          <Box data-cy={`${dataCy}-container`}>
-            <div className="claims-title" onClick={toggleExpand}>
-              {fontType === 'bold' ? (
-                <Typography
-                  className="text-3-bold"
-                  style={{ marginTop: 10, maxWidth: '90%' }}
-                  data-cy={`${dataCy}-title`}
-                >
-                  {!claimNumber ? title : `${claimNumber}. ${title}`}
-                </Typography>
-              ) : (
-                <Typography className="text-3" data-cy={`${dataCy}-title`}>
-                  {title}
-                </Typography>
-              )}
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 100 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+      >
+        <Box data-cy={`${dataCy}-container`}>
+          <div className="claims-title" onClick={toggleExpand}>
+            {fontType === 'bold' ? (
+              <Typography
+                className="text-3-bold"
+                style={{ marginTop: 10, maxWidth: '90%' }}
+                data-cy={`${dataCy}-title`}
+              >
+                {!claimNumber ? title : `${claimNumber}. ${title}`}
+              </Typography>
+            ) : (
+              <Typography className="text-3" data-cy={`${dataCy}-title`}>
+                {title}
+              </Typography>
+            )}
 
-              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </div>
+            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </div>
 
-            <div
-              className={`collapsable-claims supporting-claims-container ${
-                expanded ? 'expanded' : 'collapsed'
-              }`}
-              data-cy={`${dataCy}-accordion`}
-            >
-              {outline.map((claim: string, i: number) => {
-                return (
-                  <Box key={i} className="list-container">
-                    <FiberManualRecordIcon className="bulletpoint-icon" />
-                    <Typography key={i} className="text-3-list">
-                      {claim}
-                    </Typography>
-                  </Box>
-                );
-              })}
-            </div>
-          </Box>
-        </motion.div>
-      </AnimatePresence>
+          <div
+            className={`collapsable-claims supporting-claims-container ${
+              expanded ? 'expanded' : 'collapsed'
+            }`}
+            data-cy={`${dataCy}-accordion`}
+          >
+            {outline.map((claim: string, i: number) => {
+              return (
+                <Box key={i} className="list-container">
+                  <FiberManualRecordIcon className="bulletpoint-icon" />
+                  <Typography key={i} className="text-3-list">
+                    {claim}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </div>
+        </Box>
+      </motion.div>
     );
   }
 
