@@ -4,7 +4,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { IGDocVersion, MockDefaultType } from '../../src/types';
 import { asyncStartRequestRes } from '../fixtures/async-start-request';
 import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
 import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
@@ -24,7 +23,14 @@ import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-tex
 import { entityFoundResponse } from '../fixtures/stronger-hook-activity/entity-found-response';
 import { updateUserActivityStatesResponse } from '../fixtures/update-user-activity-states';
 import { ACCESS_TOKEN_KEY } from './local-storage';
-import { DocData, GQLDocumentTimeline, JobStatus, UserRole } from './types';
+import {
+  DocData,
+  GQLDocumentTimeline,
+  IGDocVersion,
+  JobStatus,
+  UserRole,
+  MockDefaultType,
+} from './types';
 
 export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';
 
