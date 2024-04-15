@@ -5,13 +5,15 @@ import { Box, Divider, Typography } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import ActivityTranscript from './ActivityTranscript';
 import { formatISODateToReadable } from '../../../helpers';
 import { GQLTimelinePoint, TimelinePointType } from '../../../types';
 import {
   formatTimeDifferenceToReadable,
   getIntentionText,
 } from '../../../helpers/functions';
-import ActivityTranscript from './ActivityTranscript';
+
+import '../../../styles/content-revision.css';
 
 /**
  * The `useDynamicHeight` custom hook in TypeScript React dynamically adjusts the height of a textarea
@@ -57,8 +59,9 @@ interface EvidenceObject {
 
 export default function TimepointOutline(props: {
   timelinePoint: GQLTimelinePoint;
+  hasOverflowX: boolean;
 }): JSX.Element {
-  const { timelinePoint } = props;
+  const { timelinePoint, hasOverflowX } = props;
   const [thesis, setThesis] = useState<boolean>(false);
   const [supportingClaims, setSupportingClaims] = useState<boolean>(false);
   const [claimEvidence, setClaimEvidence] = useState<boolean>(false);
@@ -360,7 +363,11 @@ and dynamically adjust the height of the input field. */
 
   return (
     <Box
-      className="content-revision-container"
+      className={
+        !hasOverflowX
+          ? 'content-revision-container-scroll'
+          : 'content-revision-container'
+      }
       data-cy="content-revision-container"
     >
       <RevisionTimeHeader revisionTime={timelinePoint.versionTime} />

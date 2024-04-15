@@ -284,6 +284,7 @@ export enum TimelinePointType {
 export enum MockDefaultType {
   VERSION = 'VERSION',
   REVERSE_OUTLINE = 'REVERSE_OUTLINE',
+  CUSTOM_FILE_DATA = 'CUSTOM_FILE_DATA',
   ALL = 'ALL',
 }
 export interface GQLTimelinePoint {

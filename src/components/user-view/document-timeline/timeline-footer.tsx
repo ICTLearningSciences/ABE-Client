@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useParams } from 'react-router-dom';
 
 import { GQLTimelinePoint, TimelinePointType } from '../../../types';
-import { ColumnDiv, RowDiv } from '../../../styled-components';
+import { ColumnDiv } from '../../../styled-components';
 import { formatISODateToReadable } from '../../../helpers';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
-import { useParams } from 'react-router-dom';
+
+import '../../../styles/timeline.css';
 
 /* The `TimeLineCard` component is a functional component that takes in a prop `timelinePoint` of type
 `GQLTimelinePoint`. Inside the component, it retrieves the `getActivitById` function from the
@@ -24,20 +26,13 @@ const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
   const googleDoc = getCurrentGoogleDoc(docId);
 
   return (
-    <Box
-      style={{ padding: '1rem' }}
-      className="timeline-footer-item-card-hover"
-    >
+    <Box className="timeline-footer-item-card-hover">
       <Typography className="text-2">
         {timelinePoint.type === TimelinePointType.NEW_ACTIVITY
           ? `${googleDoc?.title}`
           : activity.title}
       </Typography>
-      <Typography className="text-3-no-indent">
-        {timelinePoint.type === TimelinePointType.NEW_ACTIVITY
-          ? `${googleDoc?.assignmentDescription}`
-          : activity.description}
-      </Typography>
+
       <Typography className="text-3-no-indent" style={{ textAlign: 'right' }}>
         {formatISODateToReadable(timelinePoint.versionTime || '')}
       </Typography>
@@ -70,7 +65,7 @@ export default function TimelineFooter(props: {
   };
 
   return (
-    <RowDiv className="timeline-footer-wrapper">
+    <Box className="timeline-footer-wrapper" data-cy="timeline-footer-wrapper">
       {timelinePoints.map((timelinePoint, i) => {
         const isSelected =
           currentTimelinePoint?.versionTime === timelinePoint.versionTime;
@@ -98,18 +93,7 @@ export default function TimelineFooter(props: {
                   {formatISODateToReadable(timelinePoint.versionTime || '')}
                 </Typography>
               ) : (
-                <AnimatePresence>
-                  {hoverIndex === i && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 50 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 100 }}
-                      transition={{ duration: 0.3, ease: 'easeInOut' }} // Adjust transition duration and easing
-                    >
-                      <TimeLineCard timelinePoint={timelinePoints[i]} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <TimeLineCard timelinePoint={timelinePoints[i]} />
               )}
             </Paper>
 
@@ -129,6 +113,6 @@ export default function TimelineFooter(props: {
           </ColumnDiv>
         );
       })}
-    </RowDiv>
+    </Box>
   );
 }

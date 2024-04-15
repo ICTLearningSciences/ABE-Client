@@ -21,7 +21,19 @@ The full terms of this copyright and license should always be found in the root 
 }
 .paper-style,
 .content-revision-container {
-  height: calc(100vh - 190px);
+  height: calc(100vh - 230px);
+  width: 100%;
+  padding: 20px 0px 40px 15px;
+  margin: 10px 10px;
+  border-radius: 15px;
+  box-shadow: var(--content-shadow);
+  background-color: var(--content-bg);
+  /* overflow-y: auto; */
+  margin-bottom: 10px;
+}
+
+.content-revision-container-scroll {
+  height: calc(100vh - 200px);
   width: 100%;
   padding: 20px 0px 40px 15px;
   margin: 10px 10px;
@@ -33,7 +45,18 @@ The full terms of this copyright and license should always be found in the root 
 }
 
 .content-revision-container-left {
-  height: calc(100vh - 190px);
+  height: calc(100vh - 230px);
+  width: 100%;
+  padding: 20px 0px 40px 20px;
+  margin: 10px 10px;
+  border-radius: 15px;
+  box-shadow: var(--content-shadow);
+  background-color: var(--content-bg);
+  margin-bottom: 10px;
+}
+
+.content-revision-container-left-scroll {
+  height: calc(100vh - 200px);
   width: 100%;
   padding: 20px 0px 40px 20px;
   margin: 10px 10px;
@@ -45,7 +68,7 @@ The full terms of this copyright and license should always be found in the root 
 
 .right-content-container,
 .left-content-container {
-  height: calc(100vh - 200px);
+  height: calc(100vh - 230px);
   width: 100%;
   margin: 0px 10px 10px 0px;
   overflow-y: auto;

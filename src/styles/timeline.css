@@ -14,25 +14,60 @@ The full terms of this copyright and license should always be found in the root 
 }
 
 .footer-timeline {
+  max-width: 100vw;
   position: absolute;
-  bottom: 10px;
+  bottom: 0px;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 20px;
-  background-color: var(--timeline-bg);
-  box-shadow: var(--content-shadow-inner);
-  border-radius: 15px;
+  height: 80px;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
+
+.footer-timeline-scroll {
+  max-width: 100vw;
+  position: absolute;
+  bottom: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .timeline-footer-wrapper {
+  position: absolute;
+  bottom: 0px;
   display: flex;
   align-items: center;
   justify-content: space-around;
   width: 100%;
-  height: 100%;
-  padding: 0 10px;
+  height: 15px;
+  padding: 0 0px;
+  background-color: var(--timeline-bg);
+  box-shadow: var(--content-shadow-inner);
 }
+
+.timeline-footer-item-card {
+  padding: 5px 10px !important;
+  background-color: var(--timeline-bg);
+  box-shadow: var(--content-shadow) !important;
+  margin-bottom: 5px;
+  border-radius: 15px !important;
+  z-index: 100;
+}
+
+.timeline-footer-item-card-hover {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--timeline-bg);
+  border-radius: 15px !important;
+}
+
 .timeline-footer-item {
   max-width: 300px;
   min-width: 300px;
@@ -43,29 +78,13 @@ The full terms of this copyright and license should always be found in the root 
   cursor: pointer;
 }
 
-.timeline-footer-item-card {
-  padding: 5px 15px !important;
-  background-color: var(--timeline-bg);
-  box-shadow: var(--content-shadow) !important;
-  margin-bottom: 5px;
-  border-radius: 15px !important;
-}
-
-.timeline-footer-item-card-hover {
-  padding: 5px 15px !important;
-  background-color: var(--timeline-bg);
-  margin-bottom: 5px;
-  border-radius: 15px !important;
-}
-
 .timeline-footer-item-hover {
   max-width: 300px;
   min-width: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0px 10px 110px 10px;
-
+  margin: 0px 10px 55px 10px;
   cursor: pointer;
 }
 

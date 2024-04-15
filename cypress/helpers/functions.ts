@@ -155,6 +155,7 @@ export function cyMockDefault(
     mockType?: MockDefaultType;
     version?: IGDocVersion;
     reverseOutline?: string;
+    customFileData?: GQLDocumentTimeline;
   } = {}
 ) {
   const gqlQueries = args?.gqlQueries || [];
@@ -191,6 +192,11 @@ export function cyMockDefault(
         },
       });
       break;
+    case MockDefaultType.CUSTOM_FILE_DATA:
+      cyMockGetDocTimeline(cy, {
+        response: args.customFileData,
+      });
+      break;
     default:
       cyMockGetDocTimeline(cy, {
         response: eightHoursBetweenSessions,
@@ -225,7 +231,6 @@ export function cyMockGetDocTimeline(
     delay?: number;
   } = {}
 ) {
-  console.log('params', params.response);
   cy.intercept('**/async_get_document_timeline/**', (req) => {
     req.alias = 'openAiStartCall';
     req.reply(
