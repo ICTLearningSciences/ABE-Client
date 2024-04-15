@@ -32,12 +32,26 @@ The full terms of this copyright and license should always be found in the root 
   margin-bottom: 10px;
 }
 
+.content-revision-container-left {
+  height: calc(100vh - 190px);
+  width: 100%;
+  padding: 20px 0px 40px 20px;
+  margin: 10px 10px;
+  border-radius: 15px;
+  box-shadow: var(--content-shadow);
+  background-color: var(--content-bg);
+  margin-bottom: 10px;
+}
+
 .right-content-container,
 .left-content-container {
   height: calc(100vh - 200px);
   width: 100%;
   margin: 0px 10px 10px 0px;
   overflow-y: auto;
+}
+.left-content-container {
+  margin-right: 10px !important;
 }
 .input-container {
   width: 100%;

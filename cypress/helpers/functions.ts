@@ -4,6 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { cast } from 'cypress/types/bluebird';
+import { IGDocVersion, MockDefaultType } from '../../src/types';
 import { asyncStartRequestRes } from '../fixtures/async-start-request';
 import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
 import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
@@ -150,6 +152,8 @@ export function cyMockDefault(
   args: {
     gqlQueries?: MockGraphQLQuery[];
     userRole?: UserRole;
+    mockType?: MockDefaultType;
+    version?: IGDocVersion;
     reverseOutline?: string;
   } = {}
 ) {
@@ -160,23 +164,39 @@ export function cyMockDefault(
   cyMockGetDocTimeline(cy, {
     response: eightHoursBetweenSessions,
   });
-  if (!args.reverseOutline) {
-    cyMockGetDocTimeline(cy, {
-      response: eightHoursBetweenSessions,
-    });
-  } else {
-    cyMockGetDocTimeline(cy, {
-      response: {
-        ...eightHoursBetweenSessions,
-        timelinePoints: eightHoursBetweenSessions.timelinePoints.map(
-          (point) => ({
-            ...point,
-            reverseOutline: args.reverseOutline || '',
-          })
-        ),
-      },
-    });
+  switch (args.mockType) {
+    case MockDefaultType.VERSION:
+      cyMockGetDocTimeline(cy, {
+        response: {
+          ...eightHoursBetweenSessions,
+          timelinePoints: eightHoursBetweenSessions.timelinePoints.map(
+            (point) => ({
+              ...point,
+              version: args.version || ({} as IGDocVersion),
+            })
+          ),
+        },
+      });
+      break;
+    case MockDefaultType.REVERSE_OUTLINE:
+      cyMockGetDocTimeline(cy, {
+        response: {
+          ...eightHoursBetweenSessions,
+          timelinePoints: eightHoursBetweenSessions.timelinePoints.map(
+            (point) => ({
+              ...point,
+              reverseOutline: args.reverseOutline || '',
+            })
+          ),
+        },
+      });
+      break;
+    default:
+      cyMockGetDocTimeline(cy, {
+        response: eightHoursBetweenSessions,
+      });
   }
+
   cyInterceptGraphQL(cy, [
     ...gqlQueries,
     //Defaults
@@ -205,6 +225,7 @@ export function cyMockGetDocTimeline(
     delay?: number;
   } = {}
 ) {
+  console.log('params', params.response);
   cy.intercept('**/async_get_document_timeline/**', (req) => {
     req.alias = 'openAiStartCall';
     req.reply(

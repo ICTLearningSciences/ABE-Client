@@ -281,6 +281,11 @@ export enum TimelinePointType {
   NONE = '',
 }
 
+export enum MockDefaultType {
+  VERSION = 'VERSION',
+  REVERSE_OUTLINE = 'REVERSE_OUTLINE',
+  ALL = 'ALL',
+}
 export interface GQLTimelinePoint {
   type: TimelinePointType;
   versionTime: string;

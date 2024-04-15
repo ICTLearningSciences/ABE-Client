@@ -7,11 +7,15 @@ export default function TimepointDocumentText(props: {
 }): JSX.Element {
   const { timelinePoint } = props;
   return (
-    <Box className="content-revision-container">
-      <Typography className="text-2">{timelinePoint.version.title}</Typography>
-      <Typography className="text-3-no-indent">
-        {timelinePoint.version.plainText}
+    <Box className="content-revision-container-left">
+      <Typography className="revision-time-header text-2">
+        {timelinePoint.version.title}
       </Typography>
+      <Box className="left-content-container">
+        <Typography className="text-3-no-indent" style={{ marginRight: 10 }}>
+          {timelinePoint.version.plainText}
+        </Typography>
+      </Box>
     </Box>
   );
 }
