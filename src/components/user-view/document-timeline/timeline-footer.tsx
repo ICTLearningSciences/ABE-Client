@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { RefObject, useEffect, useState } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -43,9 +43,16 @@ const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
 export default function TimelineFooter(props: {
   timelinePoints: GQLTimelinePoint[];
   onSelectTimepoint: (timepoint: GQLTimelinePoint) => void;
+  footerTimelineRef: RefObject<HTMLElement>;
+  setHasOverflowX: (hasOverflow: boolean) => void;
   currentTimelinePoint?: GQLTimelinePoint;
 }): JSX.Element {
-  const { timelinePoints, currentTimelinePoint } = props;
+  const {
+    timelinePoints,
+    currentTimelinePoint,
+    footerTimelineRef,
+    setHasOverflowX,
+  } = props;
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   /**
@@ -64,8 +71,25 @@ export default function TimelineFooter(props: {
     setHoverIndex(null);
   };
 
+  /* The `useEffect` hook in the provided code snippet is responsible for checking if the
+ `footerTimelineRef` element has been rendered in the DOM. If the `footerTimelineRef` element
+ exists, it calculates whether the content inside the element overflows horizontally. */
+  useEffect(() => {
+    if (footerTimelineRef.current === null) return;
+    const footerTimelineElement = footerTimelineRef?.current;
+    if (footerTimelineElement) {
+      setHasOverflowX(
+        footerTimelineElement.scrollWidth > footerTimelineElement.clientWidth
+      );
+    }
+  }, [footerTimelineRef]);
+
   return (
-    <Box className="timeline-footer-wrapper" data-cy="timeline-footer-wrapper">
+    <Box
+      className="timeline-footer-wrapper"
+      data-cy="timeline-footer-wrapper"
+      ref={footerTimelineRef}
+    >
       {timelinePoints.map((timelinePoint, i) => {
         const isSelected =
           currentTimelinePoint?.versionTime === timelinePoint.versionTime;

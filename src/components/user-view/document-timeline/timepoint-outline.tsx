@@ -14,6 +14,7 @@ import {
 } from '../../../helpers/functions';
 
 import '../../../styles/content-revision.css';
+import '../../../styles/activity-transcript.css';
 
 /**
  * The `useDynamicHeight` custom hook in TypeScript React dynamically adjusts the height of a textarea
@@ -62,6 +63,7 @@ export default function TimepointOutline(props: {
   hasOverflowX: boolean;
 }): JSX.Element {
   const { timelinePoint, hasOverflowX } = props;
+
   const [thesis, setThesis] = useState<boolean>(false);
   const [supportingClaims, setSupportingClaims] = useState<boolean>(false);
   const [claimEvidence, setClaimEvidence] = useState<boolean>(false);
@@ -364,7 +366,7 @@ and dynamically adjust the height of the input field. */
   return (
     <Box
       className={
-        !hasOverflowX
+        hasOverflowX
           ? 'content-revision-container-scroll'
           : 'content-revision-container'
       }
@@ -372,7 +374,11 @@ and dynamically adjust the height of the input field. */
     >
       <RevisionTimeHeader revisionTime={timelinePoint.versionTime} />
       <Box
-        className="right-content-container"
+        className={
+          hasOverflowX
+            ? 'right-content-container-scroll'
+            : 'right-content-container'
+        }
         data-cy="right-content-container"
       >
         <Divider className="divider" />

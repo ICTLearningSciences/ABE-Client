@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { RefObject, useEffect, useRef, useState } from 'react';
 import { useWithDocumentTimeline } from '../../../hooks/use-with-document-timeline';
 import { useAppSelector } from '../../../store/hooks';
 import { Button, CircularProgress } from '@mui/material';
@@ -10,9 +10,11 @@ import TimelineFooter from './timeline-footer';
 import withAuthorizationOnly from '../../../hooks/wrap-with-authorization-only';
 
 function DocumentTimelinePage(): JSX.Element {
+  const footerTimelineRef = useRef<HTMLElement | null>(null);
   const userId = useAppSelector((state) => state.login.user?._id);
   const { docId } = useParams<Record<string, string>>();
-  const footerTimelineRef = useRef<HTMLDivElement>(null);
+  const [hasOverflowX, setHasOverflowX] = useState<boolean>(false);
+
   const {
     fetchDocumentTimeline,
     loadInProgress,
@@ -23,22 +25,11 @@ function DocumentTimelinePage(): JSX.Element {
   } = useWithDocumentTimeline();
   const navigate = useNavigate();
 
-  const [hasOverflowX, setHasOverflowX] = useState<boolean>(false);
-
   useEffect(() => {
     if (userId && docId && !loadInProgress && !documentTimeline) {
       fetchDocumentTimeline(userId, docId);
     }
   }, [userId, docId]);
-
-  useEffect(() => {
-    const footerTimelineElement = footerTimelineRef?.current;
-    if (footerTimelineElement) {
-      const hasOverflow =
-        footerTimelineElement.scrollWidth > footerTimelineElement.clientWidth;
-      setHasOverflowX(hasOverflow);
-    }
-  }, []);
 
   if (!documentTimeline || !curTimelinePoint || loadInProgress) {
     return <CircularProgress />;
@@ -122,13 +113,14 @@ function DocumentTimelinePage(): JSX.Element {
       </RowDiv>
       <div
         className={hasOverflowX ? 'footer-timeline-scroll' : 'footer-timeline'}
-        ref={footerTimelineRef}
         data-cy="footer-timeline"
       >
         <TimelineFooter
           currentTimelinePoint={curTimelinePoint}
           timelinePoints={timelinePoints}
           onSelectTimepoint={selectTimelinePoint}
+          footerTimelineRef={footerTimelineRef as RefObject<HTMLElement>}
+          setHasOverflowX={setHasOverflowX}
         />
       </div>
     </ColumnDiv>

@@ -65,7 +65,7 @@ export const eightHoursBetweenSessions: GQLDocumentTimeline = {
             message: 'What would you like to work on?',
           },
         ],
-        activity: '658230f699045156193339ac',
+        activity: '65a8592b26523c7ce5acac9e',
         intent: '',
         title: 'Same activity, 8 hour',
         lastModifyingUser: 'ashiel408@gmail.com',

@@ -55,7 +55,7 @@ function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
   return (
     <div className="text-3">
       <Typography className="text-3-clickable" onClick={handleClick}>
-        {activity.title}
+        ({activity.title})
       </Typography>
       <Popover
         open={open}

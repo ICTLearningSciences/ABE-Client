@@ -12,7 +12,7 @@ export default function TimepointDocumentText(props: {
   return (
     <Box
       className={
-        !hasOverflowX
+        hasOverflowX
           ? 'content-revision-container-left-scroll'
           : 'content-revision-container-left'
       }
@@ -20,7 +20,14 @@ export default function TimepointDocumentText(props: {
       <Typography className="revision-time-header text-2">
         {timelinePoint.version.title}
       </Typography>
-      <Box className="left-content-container" data-cy="left-content-container">
+      <Box
+        data-cy="left-content-container"
+        className={
+          hasOverflowX
+            ? 'left-content-container-scroll'
+            : 'left-content-container'
+        }
+      >
         <Typography className="text-3-no-indent" style={{ marginRight: 10 }}>
           {timelinePoint.version.plainText}
         </Typography>
