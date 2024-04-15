@@ -1,7 +1,6 @@
 import React, { RefObject, useEffect, useState } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 
 import { GQLTimelinePoint, TimelinePointType } from '../../../types';
