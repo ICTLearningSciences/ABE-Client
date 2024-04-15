@@ -18,6 +18,9 @@ import DocView from './components/doc-view';
 import { useWithLogin } from './store/slices/login/use-with-login';
 import DocumentTimelinePage from './components/user-view/document-timeline';
 import { useReduxHydration } from './use-redux-hydration';
+import './styles/content-revision.css';
+import './styles/timeline.css';
+import './styles/activity-transcript.css';
 
 function MainApp() {
   const useLogin = useWithLogin();

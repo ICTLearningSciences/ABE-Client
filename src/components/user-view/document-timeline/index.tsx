@@ -32,6 +32,8 @@ function DocumentTimelinePage(): JSX.Element {
     return <CircularProgress />;
   }
 
+  const timelinePoints = documentTimeline.timelinePoints;
+
   if (errorMessage) {
     return (
       <div
@@ -69,7 +71,7 @@ function DocumentTimelinePage(): JSX.Element {
   }
 
   return (
-    <ColumnDiv style={{ height: '100%', width: '100%' }}>
+    <ColumnDiv style={{ position: 'relative', height: '100%', width: '100%' }}>
       <RowDiv
         style={{
           height: '93%',
@@ -100,15 +102,10 @@ function DocumentTimelinePage(): JSX.Element {
           <TimepointOutline timelinePoint={curTimelinePoint} />
         </div>
       </RowDiv>
-      <div
-        style={{
-          height: '7%',
-          // backgroundColor:"grey"
-        }}
-      >
+      <div className="footer-timeline">
         <TimelineFooter
           currentTimelinePoint={curTimelinePoint}
-          timelinePoints={documentTimeline.timelinePoints}
+          timelinePoints={timelinePoints}
           onSelectTimepoint={selectTimelinePoint}
         />
       </div>

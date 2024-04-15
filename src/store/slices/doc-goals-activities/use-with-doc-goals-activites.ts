@@ -8,6 +8,7 @@ import { ActivityGQL, DocGoal } from '../../../types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
 export interface UseWithDocGoalsActivities {
+  getActivitById: (id: string) => ActivityGQL;
   loadDocGoals: () => Promise<void>;
   loadActivities: () => Promise<void>;
   addOrUpdateActivity: (activity: ActivityGQL) => Promise<void>;
@@ -26,6 +27,19 @@ export function useWithDocGoalsActivities() {
   const activities = useAppSelector(
     (state) => state.docGoalsActivities.activities
   );
+
+  /**
+   * The function `getActivityById` retrieves an activity object by its ID from an array of activities.
+   * @param {string} id - The `id` parameter is a string representing the unique identifier of an
+   * activity.
+   * @returns The function `getActivitById` is returning an object of type `ActivityGQL` that matches
+   * the provided `id` from the `activities` array. If no matching object is found, it returns an empty
+   * object of type `ActivityGQL`.
+   */
+  const getActivitById = (id: string): ActivityGQL => {
+    return activities.find((a) => a._id === id) || ({} as ActivityGQL);
+  };
+
   const docGoalsGql = useAppSelector(
     (state) => state.docGoalsActivities.docGoals
   );
@@ -55,6 +69,7 @@ export function useWithDocGoalsActivities() {
   }
 
   return {
+    getActivitById,
     loadDocGoals,
     loadActivities,
     addOrUpdateActivity,

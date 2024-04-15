@@ -1,0 +1,68 @@
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+.chat-container {
+  position: relative;
+  display: flex !important;
+  flex-direction: column;
+  border-radius: 15px !important;
+  overflow-y: auto;
+}
+
+.message {
+  max-width: 70%;
+  margin: 5px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.user-message {
+  align-self: flex-end !important;
+  background-color: #1b6a9c; /* Light green */
+  color: #fff !important;
+}
+
+.system-message {
+  align-self: flex-start !important;
+  background-color: #f0f0f0; /* Light gray */
+}
+
+.close-activity-transcript-icon {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+.sender-tag-system {
+  position: absolute;
+  bottom: -25px;
+  right: 0px;
+  border-radius: 10px;
+  font-size: 10px !important;
+  color: var(--content-revision-text-color-3);
+}
+
+.sender-tag-user {
+  position: absolute;
+  bottom: -25px;
+  right: 0px;
+  border-radius: 5px;
+  color: var(--content-revision-text-color-3);
+  font-size: 10px !important;
+  /* change to font to lowercase */
+}
+
+.MuiPopover-paper {
+  display: flex !important;
+  flex-direction: column !important;
+  max-width: 50% !important;
+  min-width: 50% !important;
+  max-height: 60% !important;
+  padding: 10px;
+  border-radius: 15px !important;
+}

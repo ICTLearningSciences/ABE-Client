@@ -1,34 +1,17 @@
 import React from 'react';
 import { GQLTimelinePoint } from '../../../types';
+import { Box, Typography } from '@mui/material';
 
 export default function TimepointDocumentText(props: {
   timelinePoint: GQLTimelinePoint;
 }): JSX.Element {
   const { timelinePoint } = props;
   return (
-    <div
-      style={{
-        // height:"90%",
-        width: '90%',
-        overflow: 'auto',
-        overflowWrap: 'break-word',
-        margin: '10px',
-        padding: '10px',
-        marginBottom: 0,
-        border: '1px solid black',
-        boxShadow: '0px 0px 3px 0px rgba(0,0,0,0.75)',
-      }}
-    >
-      <h3 style={{ textAlign: 'center' }}>{timelinePoint.version.title}</h3>
-      <pre
-        style={{
-          fontFamily: 'Arial',
-          whiteSpace: 'pre-wrap',
-          wordWrap: 'break-word',
-        }}
-      >
+    <Box className="content-revision-container">
+      <Typography className="text-2">{timelinePoint.version.title}</Typography>
+      <Typography className="text-3-no-indent">
         {timelinePoint.version.plainText}
-      </pre>
-    </div>
+      </Typography>
+    </Box>
   );
 }
