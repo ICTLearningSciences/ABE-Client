@@ -175,25 +175,29 @@ export enum ActivityStepTypes {
   SHOULD_INCLUDE_ESSAY = 'SHOULD_INCLUDE_ESSAY',
 }
 
-export interface ActivityStep {
+export interface ActiveActivityStep {
   text: string;
   stepType: ActivityStepTypes;
   mcqChoices?: string[];
   handleResponse?: (response: string, userInputType: UserInputType) => void;
 }
 
-export interface Step {
-  messages: string[];
+export interface StepMessage {
+  _id: string;
+  text: string;
+}
+
+export interface ActivityStepGQL {
+  messages: StepMessage[];
   stepName: string;
-  stepType: ActivityStepTypes;
-  mcqChoices: string[];
-  prompts: string[];
+  stepType?: ActivityStepTypes;
+  mcqChoices?: string[];
+  prompts?: string[];
 }
 
 export interface Activity extends ActivityGQL {
-  steps: ActivityStep[];
-  // introStep: ActivityStep;
-  getStep: (stepData: StepData) => ActivityStep;
+  steps: ActivityStepGQL[];
+  getStep: (stepData: StepData) => ActiveActivityStep;
   stepName: string;
   resetActivity: () => void;
   isReady: boolean;
@@ -216,7 +220,7 @@ export interface ActivityGQL {
   title: string;
   introduction: string;
   description: string;
-  steps: ActivityStep[];
+  steps?: ActivityStepGQL[];
   displayIcon: DisplayIcons;
   responsePendingMessage: string;
   responseReadyMessage: string;

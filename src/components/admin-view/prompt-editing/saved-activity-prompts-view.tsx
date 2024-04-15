@@ -6,6 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import {
+  Button,
   Card,
   CardActions,
   CardHeader,
@@ -22,6 +23,7 @@ import { RowDivSB } from '../../../styled-components';
 import SavePromptListItem from '../saved-prompt-list-item';
 import { useState } from 'react';
 import './saved-activity-prompts-view.css';
+import EditActivityMessages from './edit-activity-messages';
 
 export interface ActivityPrompts {
   activity: ActivityGQL;
@@ -34,6 +36,7 @@ function SavedActivityPromptDisplay(props: {
   promptsLoading: boolean;
   goToActivity: (activityId: ActivityGQL) => void;
   getActivity: (prompt: GQLPrompt) => ActivityGQL | undefined;
+  setActivityToEdit: (activity: ActivityGQL) => void;
 }) {
   const {
     activityPrompts,
@@ -41,6 +44,7 @@ function SavedActivityPromptDisplay(props: {
     promptsLoading,
     goToActivity,
     getActivity,
+    setActivityToEdit,
   } = props;
   const [expand, setExpand] = useState(false);
   return (
@@ -70,16 +74,30 @@ function SavedActivityPromptDisplay(props: {
           </CardActions>
         </RowDivSB>
         <Collapse in={expand}>
+          <Button
+            style={{
+              marginLeft: 10,
+            }}
+            variant="contained"
+            disabled={activityPrompts.activity.steps?.length === 0}
+            onClick={() => {
+              setActivityToEdit(activityPrompts.activity);
+            }}
+          >
+            Edit Messages
+          </Button>
           {activityPrompts.savedPrompts.map((activityPrompt, i) => (
-            <SavePromptListItem
-              key={i}
-              startEditPrompt={startEditPrompt}
-              goToActivity={goToActivity}
-              getActivity={getActivity}
-              prompt={activityPrompt.prompt}
-              promptsLoading={promptsLoading}
-              canDelete={false}
-            />
+            <>
+              <SavePromptListItem
+                key={i}
+                startEditPrompt={startEditPrompt}
+                goToActivity={goToActivity}
+                getActivity={getActivity}
+                prompt={activityPrompt.prompt}
+                promptsLoading={promptsLoading}
+                canDelete={false}
+              />
+            </>
           ))}
         </Collapse>
       </Card>
@@ -102,6 +120,7 @@ export function SavedActivityPromptsView(props: {
     goToActivity,
     getActivity,
   } = props;
+  const [activityToEdit, setActivityToEdit] = useState<ActivityGQL>();
   if (promptsLoading) {
     return <CircularProgress />;
   }
@@ -117,9 +136,18 @@ export function SavedActivityPromptsView(props: {
             promptsLoading={promptsLoading}
             goToActivity={goToActivity}
             getActivity={getActivity}
+            setActivityToEdit={setActivityToEdit}
           />
         );
       })}
+      {activityToEdit && (
+        <EditActivityMessages
+          activityToEdit={activityToEdit}
+          close={() => {
+            setActivityToEdit(undefined);
+          }}
+        />
+      )}
     </>
   );
 }

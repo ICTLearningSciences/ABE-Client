@@ -159,7 +159,7 @@ describe('document timeline', () => {
 
     /* This test case is checking the display of evidence given for each claim in the document timeline
    feature. Here's a breakdown of what the test is doing: */
-    it.only('display Evidence Given for Each Claim', () => {
+    it('display Evidence Given for Each Claim', () => {
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // summary section should exist
       cy.get('[data-cy=content-revision-container]')

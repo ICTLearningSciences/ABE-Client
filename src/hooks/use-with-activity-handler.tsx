@@ -34,6 +34,8 @@ import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { v4 as uuidv4 } from 'uuid';
 import { GptModels } from '../constants';
 import { useWithState } from '../store/slices/state/use-with-state';
+import { useWithStrongerConclusionActivity } from './stronger-conclusion-activity/use-with-stronger-conclusion-activity';
+import { useWithLimitsToArgumentActivity } from './limits-to-argument-activity/use-with-limits-to-argument-activity';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -66,6 +68,7 @@ export const emptyActivity: Activity = {
 interface PromptRetryData {
   callback?: (response: MultistepPromptRes) => void;
   prompts: OpenAiPromptStep[];
+  customSystemPrompt?: string;
   numRetries: number;
 }
 
@@ -115,6 +118,22 @@ export function useWithActivityHandler(
     prompts,
     selectedGoal
   );
+  const strongerConclusionActivity = useWithStrongerConclusionActivity(
+    selectedActivity || emptyActivity,
+    sendMessage,
+    setWaitingForUserAnswer,
+    promptsLoading,
+    prompts,
+    selectedGoal
+  );
+  const limitsToArgumentActivity = useWithLimitsToArgumentActivity(
+    selectedActivity || emptyActivity,
+    sendMessage,
+    setWaitingForUserAnswer,
+    promptsLoading,
+    prompts,
+    selectedGoal
+  );
   const promptActivity = useWithPromptActivity(
     selectedActivity || emptyActivity,
     sendMessage,
@@ -124,6 +143,10 @@ export function useWithActivityHandler(
   const activity =
     selectedActivity?.title === 'Stronger Hook'
       ? strongerHookActivity
+      : selectedActivity?.title === 'Stronger Conclusion'
+      ? strongerConclusionActivity
+      : selectedActivity?.title === 'Limits To Your Argument'
+      ? limitsToArgumentActivity
       : selectedActivity?.prompt
       ? promptActivity
       : undefined;
@@ -171,7 +194,8 @@ export function useWithActivityHandler(
 
   async function executePrompt(
     _prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
-    callback?: (response: MultistepPromptRes) => void
+    callback?: (response: MultistepPromptRes) => void,
+    customSystemPrompt?: string
   ) {
     if (!activity) return;
     if (!userId) return;
@@ -188,13 +212,13 @@ export function useWithActivityHandler(
 
       if (openAiPromptStep.includeChatLogContext) {
         prompts.push({
-          promptRole: PromptRoles.ASSISSANT,
+          promptRole: PromptRoles.SYSTEM,
           promptText: `Here is the chat between the user and the system: ${chatLogString}`,
           includeEssay: false,
         });
       }
 
-      openAiPromptStep.prompts.map((prompt) => {
+      openAiPromptStep.prompts.forEach((prompt) => {
         prompts.push({
           ...prompt,
           promptText: `${prompt.promptText} ${
@@ -218,11 +242,11 @@ export function useWithActivityHandler(
       controller: abortController,
       source,
     });
-    asyncPromptExecute(
+    await asyncPromptExecute(
       googleDocId,
       openAiPromptSteps,
       userId,
-      systemPrompt,
+      customSystemPrompt || systemPrompt,
       overrideGptModel,
       source.token
     )
@@ -235,6 +259,7 @@ export function useWithActivityHandler(
           callback,
           prompts: openAiPromptSteps,
           numRetries: 0,
+          customSystemPrompt,
         });
       });
   }
@@ -246,6 +271,7 @@ export function useWithActivityHandler(
   ) {
     coachResponsePending(false);
     if (callback) {
+      console.log('going to callback');
       callback(response);
     } else {
       sendMessage(
@@ -324,6 +350,7 @@ export function useWithActivityHandler(
             callback,
             prompts: prompts,
             numRetries: numRetries + 1,
+            customSystemPrompt: retryData.customSystemPrompt,
           });
         });
     }, 1000);
@@ -354,7 +381,6 @@ export function useWithActivityHandler(
         displayType: MessageDisplayType.TEXT,
         mcqChoices: currentStep.mcqChoices,
         activityStep: currentStep,
-        selectedActivity: activity,
         selectedGoal: selectedGoal,
       },
       false,

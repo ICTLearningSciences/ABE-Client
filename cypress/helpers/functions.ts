@@ -4,7 +4,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-
 import { asyncStartRequestRes } from '../fixtures/async-start-request';
 import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
 import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
@@ -158,7 +157,9 @@ export function cyMockDefault(
   cySetup(cy);
   cyMockLogin(cy);
   cyMockGetDocData(cy);
-
+  cyMockGetDocTimeline(cy, {
+    response: eightHoursBetweenSessions,
+  });
   if (!args.reverseOutline) {
     cyMockGetDocTimeline(cy, {
       response: eightHoursBetweenSessions,
@@ -478,7 +479,7 @@ export function toPromptEditing(cy: CypressGlobal) {
   cy.visit(`/docs/${testGoogleDocId}`);
   cy.get('[data-cy=doc-goal-cancel-button]').click();
   cy.get('[data-cy=role-switch]').click();
-  cy.get('[data-cy=prompt-item-Build-Thesis-Support]').click();
+  cy.get('[data-cy=prompt-item-Review-Sources]').click();
 }
 
 export function toPromptActivity(cy: CypressGlobal) {

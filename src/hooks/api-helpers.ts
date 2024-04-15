@@ -9,7 +9,10 @@ export const activityQueryData = `
 _id
 title
 steps{
-    messages
+    messages{
+      _id
+      text
+    }
     stepName
     stepType
     mcqChoices
