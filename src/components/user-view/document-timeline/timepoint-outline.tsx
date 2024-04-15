@@ -3,15 +3,18 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { Box, Divider, Typography } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
+import ActivityTranscript from './ActivityTranscript';
 import { formatISODateToReadable } from '../../../helpers';
 import { GQLTimelinePoint, TimelinePointType } from '../../../types';
 import {
   formatTimeDifferenceToReadable,
   getIntentionText,
 } from '../../../helpers/functions';
-import ActivityTranscript from './ActivityTranscript';
+
+import '../../../styles/content-revision.css';
+import '../../../styles/activity-transcript.css';
 
 /**
  * The `useDynamicHeight` custom hook in TypeScript React dynamically adjusts the height of a textarea
@@ -57,8 +60,10 @@ interface EvidenceObject {
 
 export default function TimepointOutline(props: {
   timelinePoint: GQLTimelinePoint;
+  hasOverflowX: boolean;
 }): JSX.Element {
-  const { timelinePoint } = props;
+  const { timelinePoint, hasOverflowX } = props;
+
   const [thesis, setThesis] = useState<boolean>(false);
   const [supportingClaims, setSupportingClaims] = useState<boolean>(false);
   const [claimEvidence, setClaimEvidence] = useState<boolean>(false);
@@ -106,52 +111,50 @@ export default function TimepointOutline(props: {
     };
 
     return (
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 100 }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-        >
-          <Box data-cy={`${dataCy}-container`}>
-            <div className="claims-title" onClick={toggleExpand}>
-              {fontType === 'bold' ? (
-                <Typography
-                  className="text-3-bold"
-                  style={{ marginTop: 10, maxWidth: '90%' }}
-                  data-cy={`${dataCy}-title`}
-                >
-                  {!claimNumber ? title : `${claimNumber}. ${title}`}
-                </Typography>
-              ) : (
-                <Typography className="text-3" data-cy={`${dataCy}-title`}>
-                  {title}
-                </Typography>
-              )}
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 100 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+      >
+        <Box data-cy={`${dataCy}-container`}>
+          <div className="claims-title" onClick={toggleExpand}>
+            {fontType === 'bold' ? (
+              <Typography
+                className="text-3-bold"
+                style={{ marginTop: 10, maxWidth: '90%' }}
+                data-cy={`${dataCy}-title`}
+              >
+                {!claimNumber ? title : `${claimNumber}. ${title}`}
+              </Typography>
+            ) : (
+              <Typography className="text-3" data-cy={`${dataCy}-title`}>
+                {title}
+              </Typography>
+            )}
 
-              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </div>
+            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </div>
 
-            <div
-              className={`collapsable-claims supporting-claims-container ${
-                expanded ? 'expanded' : 'collapsed'
-              }`}
-              data-cy={`${dataCy}-accordion`}
-            >
-              {outline.map((claim: string, i: number) => {
-                return (
-                  <Box key={i} className="list-container">
-                    <FiberManualRecordIcon className="bulletpoint-icon" />
-                    <Typography key={i} className="text-3-list">
-                      {claim}
-                    </Typography>
-                  </Box>
-                );
-              })}
-            </div>
-          </Box>
-        </motion.div>
-      </AnimatePresence>
+          <div
+            className={`collapsable-claims supporting-claims-container ${
+              expanded ? 'expanded' : 'collapsed'
+            }`}
+            data-cy={`${dataCy}-accordion`}
+          >
+            {outline.map((claim: string, i: number) => {
+              return (
+                <Box key={i} className="list-container">
+                  <FiberManualRecordIcon className="bulletpoint-icon" />
+                  <Typography key={i} className="text-3-list">
+                    {claim}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </div>
+        </Box>
+      </motion.div>
     );
   }
 
@@ -360,12 +363,20 @@ and dynamically adjust the height of the input field. */
 
   return (
     <Box
-      className="content-revision-container"
+      className={
+        hasOverflowX
+          ? 'content-revision-container-scroll'
+          : 'content-revision-container'
+      }
       data-cy="content-revision-container"
     >
       <RevisionTimeHeader revisionTime={timelinePoint.versionTime} />
       <Box
-        className="right-content-container"
+        className={
+          hasOverflowX
+            ? 'right-content-container-scroll'
+            : 'right-content-container'
+        }
         data-cy="right-content-container"
       >
         <Divider className="divider" />

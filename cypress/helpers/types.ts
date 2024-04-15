@@ -45,9 +45,9 @@ export interface ActiveActivityStep {
   handleResponse?: (response: string, userInputType: UserInputType) => void;
 }
 
-export interface StepMessage{
-  _id: string,
-  text: string,
+export interface StepMessage {
+  _id: string;
+  text: string;
 }
 
 export interface ActivityStepGQL {
@@ -327,7 +327,7 @@ export enum JobStatus {
   COMPLETE = 'COMPLETE',
 }
 
-export interface OpenAiJobStatusApiRes{
+export interface OpenAiJobStatusApiRes {
   response: OpenAiJobStatus;
 }
 
@@ -386,4 +386,39 @@ export interface GQLDocumentTimeline {
   docId: string;
   user: string;
   timelinePoints: GQLTimelinePoint[];
+}
+
+export enum MockDefaultType {
+  VERSION = 'VERSION',
+  REVERSE_OUTLINE = 'REVERSE_OUTLINE',
+  CUSTOM_FILE_DATA = 'CUSTOM_FILE_DATA',
+  ALL = 'ALL',
+}
+
+export interface IGDocVersion {
+  docId: string;
+  plainText: string;
+  lastChangedId: string;
+  sessionId: string;
+  sessionIntention?: Intention;
+  documentIntention?: Intention;
+  dayIntention?: Intention;
+  chatLog: ChatItem[];
+  activity: string;
+  intent: string;
+  title: string;
+  lastModifyingUser: string;
+  modifiedTime: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Intention {
+  description: string;
+  createdAt?: string;
+}
+
+export interface ChatItem {
+  sender: string;
+  message: string;
 }

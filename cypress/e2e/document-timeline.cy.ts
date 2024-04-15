@@ -4,7 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+
+import { tenTimelinePoints } from '../fixtures/document-timeline/ten-timeline-points';
 import { cyMockDefault } from '../helpers/functions';
+import { MockDefaultType } from '../helpers/types';
 
 describe('document timeline', () => {
   beforeEach(() => {
@@ -197,16 +200,48 @@ describe('document timeline', () => {
     });
   });
 
-  describe('Not Available Timeline AI Outline', () => {
+  describe('UI Content Revision', () => {
     beforeEach(() => {
       cyMockDefault(cy, {
-        reverseOutline: 'No outline available',
+        mockType: MockDefaultType.CUSTOM_FILE_DATA,
+        customFileData: tenTimelinePoints,
       });
     });
 
     /* This test case is checking for the display of a statement if it exists in the document timeline
    feature. Here's a breakdown of what the test is doing: */
-    it('display statement if exists', () => {
+    it('Shows scroll bar if needed in left side (Document)', () => {
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+      // left-content-container should have scroll bar
+      cy.get('[data-cy=left-content-container]').should(
+        'have.css',
+        'overflow-y',
+        'auto'
+      );
+    });
+
+    it('Shows scroll bar if needed (Footer Timeline)', () => {
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+      // left-content-container should have scroll bar
+      cy.get('[data-cy=footer-timeline]').should(
+        'have.css',
+        'overflow-x',
+        'auto'
+      );
+    });
+  });
+
+  describe('Not Available Timeline AI Outline', () => {
+    beforeEach(() => {
+      cyMockDefault(cy, {
+        reverseOutline: 'No outline available',
+        mockType: MockDefaultType.REVERSE_OUTLINE,
+      });
+    });
+
+    /* This test case is checking for the display of a statement if it exists in the document timeline
+   feature. Here's a breakdown of what the test is doing: */
+    it('Do not display statement if it does not exists', () => {
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // summary section should exist
       cy.get('[data-cy=content-revision-container]')

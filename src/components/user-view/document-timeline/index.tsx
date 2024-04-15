@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { RefObject, useEffect, useRef, useState } from 'react';
 import { useWithDocumentTimeline } from '../../../hooks/use-with-document-timeline';
 import { useAppSelector } from '../../../store/hooks';
 import { Button, CircularProgress } from '@mui/material';
@@ -10,8 +10,11 @@ import TimelineFooter from './timeline-footer';
 import withAuthorizationOnly from '../../../hooks/wrap-with-authorization-only';
 
 function DocumentTimelinePage(): JSX.Element {
+  const footerTimelineRef = useRef<HTMLElement | null>(null);
   const userId = useAppSelector((state) => state.login.user?._id);
   const { docId } = useParams<Record<string, string>>();
+  const [hasOverflowX, setHasOverflowX] = useState<boolean>(false);
+
   const {
     fetchDocumentTimeline,
     loadInProgress,
@@ -88,7 +91,10 @@ function DocumentTimelinePage(): JSX.Element {
             justifyContent: 'center',
           }}
         >
-          <TimepointDocumentText timelinePoint={curTimelinePoint} />
+          <TimepointDocumentText
+            timelinePoint={curTimelinePoint}
+            hasOverflowX={hasOverflowX}
+          />
         </div>
         <div
           style={{
@@ -99,14 +105,22 @@ function DocumentTimelinePage(): JSX.Element {
             justifyContent: 'center',
           }}
         >
-          <TimepointOutline timelinePoint={curTimelinePoint} />
+          <TimepointOutline
+            timelinePoint={curTimelinePoint}
+            hasOverflowX={hasOverflowX}
+          />
         </div>
       </RowDiv>
-      <div className="footer-timeline">
+      <div
+        className={hasOverflowX ? 'footer-timeline-scroll' : 'footer-timeline'}
+        data-cy="footer-timeline"
+      >
         <TimelineFooter
           currentTimelinePoint={curTimelinePoint}
           timelinePoints={timelinePoints}
           onSelectTimepoint={selectTimelinePoint}
+          footerTimelineRef={footerTimelineRef as RefObject<HTMLElement>}
+          setHasOverflowX={setHasOverflowX}
         />
       </div>
     </ColumnDiv>

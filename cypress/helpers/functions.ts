@@ -23,7 +23,14 @@ import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-tex
 import { entityFoundResponse } from '../fixtures/stronger-hook-activity/entity-found-response';
 import { updateUserActivityStatesResponse } from '../fixtures/update-user-activity-states';
 import { ACCESS_TOKEN_KEY } from './local-storage';
-import { DocData, GQLDocumentTimeline, JobStatus, UserRole } from './types';
+import {
+  DocData,
+  GQLDocumentTimeline,
+  IGDocVersion,
+  JobStatus,
+  UserRole,
+  MockDefaultType,
+} from './types';
 
 export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';
 
@@ -150,7 +157,10 @@ export function cyMockDefault(
   args: {
     gqlQueries?: MockGraphQLQuery[];
     userRole?: UserRole;
+    mockType?: MockDefaultType;
+    version?: IGDocVersion;
     reverseOutline?: string;
+    customFileData?: GQLDocumentTimeline;
   } = {}
 ) {
   const gqlQueries = args?.gqlQueries || [];
@@ -160,23 +170,44 @@ export function cyMockDefault(
   cyMockGetDocTimeline(cy, {
     response: eightHoursBetweenSessions,
   });
-  if (!args.reverseOutline) {
-    cyMockGetDocTimeline(cy, {
-      response: eightHoursBetweenSessions,
-    });
-  } else {
-    cyMockGetDocTimeline(cy, {
-      response: {
-        ...eightHoursBetweenSessions,
-        timelinePoints: eightHoursBetweenSessions.timelinePoints.map(
-          (point) => ({
-            ...point,
-            reverseOutline: args.reverseOutline || '',
-          })
-        ),
-      },
-    });
+  switch (args.mockType) {
+    case MockDefaultType.VERSION:
+      cyMockGetDocTimeline(cy, {
+        response: {
+          ...eightHoursBetweenSessions,
+          timelinePoints: eightHoursBetweenSessions.timelinePoints.map(
+            (point) => ({
+              ...point,
+              version: args.version || ({} as IGDocVersion),
+            })
+          ),
+        },
+      });
+      break;
+    case MockDefaultType.REVERSE_OUTLINE:
+      cyMockGetDocTimeline(cy, {
+        response: {
+          ...eightHoursBetweenSessions,
+          timelinePoints: eightHoursBetweenSessions.timelinePoints.map(
+            (point) => ({
+              ...point,
+              reverseOutline: args.reverseOutline || '',
+            })
+          ),
+        },
+      });
+      break;
+    case MockDefaultType.CUSTOM_FILE_DATA:
+      cyMockGetDocTimeline(cy, {
+        response: args.customFileData,
+      });
+      break;
+    default:
+      cyMockGetDocTimeline(cy, {
+        response: eightHoursBetweenSessions,
+      });
   }
+
   cyInterceptGraphQL(cy, [
     ...gqlQueries,
     //Defaults
