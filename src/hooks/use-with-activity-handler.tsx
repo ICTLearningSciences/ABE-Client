@@ -36,6 +36,7 @@ import { GptModels } from '../constants';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { useWithStrongerConclusionActivity } from './stronger-conclusion-activity/use-with-stronger-conclusion-activity';
 import { useWithLimitsToArgumentActivity } from './limits-to-argument-activity/use-with-limits-to-argument-activity';
+import { useWithThesisSupportActivity } from './increasing-thesis-support-activity/use-with-thesis-support-activity';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -126,6 +127,14 @@ export function useWithActivityHandler(
     prompts,
     selectedGoal
   );
+  const thesisSupportActivity = useWithThesisSupportActivity(
+    selectedActivity || emptyActivity,
+    sendMessage,
+    setWaitingForUserAnswer,
+    promptsLoading,
+    prompts,
+    selectedGoal
+  );
   const limitsToArgumentActivity = useWithLimitsToArgumentActivity(
     selectedActivity || emptyActivity,
     sendMessage,
@@ -147,6 +156,8 @@ export function useWithActivityHandler(
       ? strongerConclusionActivity
       : selectedActivity?.title === 'Limits To Your Argument'
       ? limitsToArgumentActivity
+      : selectedActivity?.title === 'Increasing Thesis Support'
+      ? thesisSupportActivity
       : selectedActivity?.prompt
       ? promptActivity
       : undefined;
@@ -167,6 +178,10 @@ export function useWithActivityHandler(
     if (activity) {
       activity.resetActivity();
     }
+  }
+
+  function sendMessageHelper(message: ChatMessageTypes) {
+    sendMessage(message, false, googleDocId);
   }
 
   function sendIntroMessages() {
@@ -372,6 +387,9 @@ export function useWithActivityHandler(
     const currentStep = activity.getStep({
       executePrompt,
       openSelectActivityModal: editDocGoal,
+      sendMessage: sendMessageHelper,
+      setWaitingForUserAnswer,
+      updateSessionIntention,
     });
     sendMessage(
       {
@@ -411,6 +429,9 @@ export function useWithActivityHandler(
     const currentStep = activity.getStep({
       executePrompt,
       openSelectActivityModal: editDocGoal,
+      sendMessage: sendMessageHelper,
+      setWaitingForUserAnswer,
+      updateSessionIntention,
     });
     if (!currentStep) return;
     if (!messages.length) return;
