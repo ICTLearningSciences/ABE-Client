@@ -1,6 +1,6 @@
 import { Schema } from 'jsonschema';
 
-const analyzeIntendedClaimResponseExample = {
+export const analyzeIntendedClaimResponseExample = {
   intendedAction: 'ADDING',
   intentionFeedback: 'The student intends to add a claim to their essay.',
 };

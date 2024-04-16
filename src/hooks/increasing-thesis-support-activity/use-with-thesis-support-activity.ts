@@ -31,9 +31,7 @@ import {
   ReverseOutlineResponse,
   reverseOutlineResponseSchema,
 } from './prompt-helpers/reverse-outline-prompt';
-import {
-  cCollectIntentionStep,
-} from './routes/change-claims/collect-change-intention';
+import { cCollectIntentionStep } from './routes/change-claims/collect-change-intention';
 import {
   caCollectArgumentForNewClaim,
   addClaimToPaperAnalyzeStep,
@@ -43,12 +41,8 @@ import {
   sCollectWhyNotSayOrDidSayThings,
   sSelectIntendedImprovement,
 } from './routes/supporting-claims/improve-support-on-claim';
-import {
-  cRevisingClaim,
-} from './routes/change-claims/revising-claim';
-import {
-  crRemoveClaimFromPaper,
-} from './routes/change-claims/removing-claim';
+import { cRevisingClaim } from './routes/change-claims/revising-claim';
+import { crRemoveClaimFromPaper } from './routes/change-claims/removing-claim';
 
 interface IncreasingSupportActivityPrompts {
   reverseOutlinePrompt: GQLPrompt; // 654e926e7aaab424574a7de6
@@ -351,14 +345,19 @@ export function useWithThesisSupportActivity(
     }
   }
 
-  function introStep(stepData: StepData, allActivityMessages: StepMessage[]): ActiveActivityStep {
-    const introMessageId = "15b8559017dcb51adc3bf967"
+  function introStep(
+    stepData: StepData,
+    allActivityMessages: StepMessage[]
+  ): ActiveActivityStep {
+    const introMessageId = '15b8559017dcb51adc3bf967';
     const message = allActivityMessages.find(
       (msg) => msg._id === introMessageId
     );
     const { executePrompt } = stepData;
     return {
-      text: message?.text || 'Let me know when your paper is ready for me to review.',
+      text:
+        message?.text ||
+        'Let me know when your paper is ready for me to review.',
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: [MCQ_READY_FOR_REVIEW],
       handleResponse: async () => {
@@ -406,8 +405,10 @@ export function useWithThesisSupportActivity(
     };
   }
 
-  function chooseChangeOrSupportClaimsStep(allActivityMessages: StepMessage[]): ActiveActivityStep {
-    const changeMessageId = "25b8559017dcb51adc3bf967"
+  function chooseChangeOrSupportClaimsStep(
+    allActivityMessages: StepMessage[]
+  ): ActiveActivityStep {
+    const changeMessageId = '25b8559017dcb51adc3bf967';
     const message = allActivityMessages.find(
       (msg) => msg._id === changeMessageId
     );

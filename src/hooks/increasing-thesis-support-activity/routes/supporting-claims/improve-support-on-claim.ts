@@ -27,18 +27,18 @@ export function sCollectImproveClaimSupportIntention(
   stepData: StepData,
   state: ThesisSupportActivityState,
   setState: (value: React.SetStateAction<ThesisSupportActivityState>) => void,
-  analyzeIntentionVsOutline: GQLPrompt, allActivityMessages: StepMessage[]
+  analyzeIntentionVsOutline: GQLPrompt,
+  allActivityMessages: StepMessage[]
 ): ActiveActivityStep {
-  const {
-    executePrompt,
-    updateSessionIntention,
-  } = stepData;
-  const collectImproveClaimMessageId = "35b8559017dcb51adc3bf967"
+  const { executePrompt, updateSessionIntention } = stepData;
+  const collectImproveClaimMessageId = '35b8559017dcb51adc3bf967';
   const message = allActivityMessages.find(
     (msg) => msg._id === collectImproveClaimMessageId
   );
   return {
-    text: message?.text || 'What claim would you like to improve? You may select a suggest one or input your own.',
+    text:
+      message?.text ||
+      'What claim would you like to improve? You may select a suggest one or input your own.',
     stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
     mcqChoices: state.potentialClaimsToImprove
       .map((claim) => claim.claim)
@@ -114,7 +114,8 @@ export function sSelectIntendedImprovement(
   state: ThesisSupportActivityState,
   setState: (value: React.SetStateAction<ThesisSupportActivityState>) => void,
   suggestClaimSupportChanges: GQLPrompt,
-  analyzeRevisionIntention: GQLPrompt, allActivityMessages: StepMessage[]
+  analyzeRevisionIntention: GQLPrompt,
+  allActivityMessages: StepMessage[]
 ): ActiveActivityStep {
   const {
     executePrompt,
@@ -122,12 +123,14 @@ export function sSelectIntendedImprovement(
     updateSessionIntention,
     setWaitingForUserAnswer,
   } = stepData;
-  const whatImprovementMessageId = "45b8559017dcb51adc3bf967"
+  const whatImprovementMessageId = '45b8559017dcb51adc3bf967';
   const message = allActivityMessages.find(
     (msg) => msg._id === whatImprovementMessageId
   );
   return {
-    text: message?.text || 'What improvement would you like to make? You may select one below, input your own, or we can brainstorm some more changes',
+    text:
+      message?.text ||
+      'What improvement would you like to make? You may select one below, input your own, or we can brainstorm some more changes',
     stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
     mcqChoices: [MCQ_BRAINSTORM, ...state.suggestedImprovements],
     handleResponse: async (response) => {

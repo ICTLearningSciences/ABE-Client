@@ -1,6 +1,6 @@
 import { Schema } from 'jsonschema';
 
-const suggestImprovementResponseExample = {
+export const suggestImprovementResponseExample = {
   suggestedImprovements: [
     'Provide specific examples of how Albert King has influenced other artists and how his impact can be seen in their music.',
     "Include research or quotes from credible sources to support your claims about Albert King's popularity and influence.",

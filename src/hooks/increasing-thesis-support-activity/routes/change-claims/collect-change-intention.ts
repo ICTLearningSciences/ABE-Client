@@ -30,7 +30,8 @@ export function cCollectIntentionStep(
   state: ThesisSupportActivityState,
   setState: (value: React.SetStateAction<ThesisSupportActivityState>) => void,
   brainstormPrompt: GQLPrompt,
-  analyzeIntendedClaimUsagePrompt: GQLPrompt, allActivityMessages: StepMessage[]
+  analyzeIntendedClaimUsagePrompt: GQLPrompt,
+  allActivityMessages: StepMessage[]
 ): ActiveActivityStep {
   const {
     executePrompt,
@@ -38,16 +39,18 @@ export function cCollectIntentionStep(
     setWaitingForUserAnswer,
     updateSessionIntention,
   } = stepData;
-  const collectChangeIntentionMessageId = "75b8559017dcb51adc3bf967"
+  const collectChangeIntentionMessageId = '75b8559017dcb51adc3bf967';
   const collectChangeIntentionMessage = allActivityMessages.find(
     (msg) => msg._id === collectChangeIntentionMessageId
   );
-  const hopeThatHelpedMessageId = "85b8559017dcb51adc3bf967"
+  const hopeThatHelpedMessageId = '85b8559017dcb51adc3bf967';
   const hopeThatHelpedMessage = allActivityMessages.find(
     (msg) => msg._id === hopeThatHelpedMessageId
   );
   return {
-    text: collectChangeIntentionMessage?.text || 'What claim would you like to add, remove, or revise? You may click [BRAINSTORM] for help.',
+    text:
+      collectChangeIntentionMessage?.text ||
+      'What claim would you like to add, remove, or revise? You may click [BRAINSTORM] for help.',
     stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
     mcqChoices: [MCQ_BRAINSTORM],
     handleResponse: async (response) => {
@@ -79,7 +82,8 @@ export function cCollectIntentionStep(
         sendMessage({
           id: uuidv4(),
           message:
-          hopeThatHelpedMessage?.text || 'Hope that helped. What claim would you like to add, remove, or revise?',
+            hopeThatHelpedMessage?.text ||
+            'Hope that helped. What claim would you like to add, remove, or revise?',
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
           activityStep: cCollectIntentionStep(

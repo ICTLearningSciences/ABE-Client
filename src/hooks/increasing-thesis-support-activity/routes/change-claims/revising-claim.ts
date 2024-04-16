@@ -15,10 +15,11 @@ export function cRevisingClaim(
   stepData: StepData,
   state: ThesisSupportActivityState,
   setState: (value: React.SetStateAction<ThesisSupportActivityState>) => void,
-  analyzeIntentionVsOutline: GQLPrompt, allActivityMessages: StepMessage[]
+  analyzeIntentionVsOutline: GQLPrompt,
+  allActivityMessages: StepMessage[]
 ): ActiveActivityStep {
   const { executePrompt, updateSessionIntention } = stepData;
-  const revisionMessageId = "55b8559017dcb51adc3bf967"
+  const revisionMessageId = '55b8559017dcb51adc3bf967';
   const message = allActivityMessages.find(
     (msg) => msg._id === revisionMessageId
   );

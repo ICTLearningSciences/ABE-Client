@@ -1,6 +1,4 @@
-import {
-  addContextToPromptSteps,
-} from '../../../../helpers';
+import { addContextToPromptSteps } from '../../../../helpers';
 import { Sender, MessageDisplayType } from '../../../../store/slices/chat';
 import {
   ActiveActivityStep,
@@ -24,15 +22,18 @@ export function crRemoveClaimFromPaper(
   state: ThesisSupportActivityState,
   setState: (value: React.SetStateAction<ThesisSupportActivityState>) => void,
   brainstormClaimRemoval: GQLPrompt,
-  analyzeClaimRemoval: GQLPrompt, allActivityMessages: StepMessage[]
+  analyzeClaimRemoval: GQLPrompt,
+  allActivityMessages: StepMessage[]
 ): ActiveActivityStep {
   const { executePrompt, sendMessage, setWaitingForUserAnswer } = stepData;
-  const removeMessageId = "65b8559017dcb51adc3bf967"
+  const removeMessageId = '65b8559017dcb51adc3bf967';
   const message = allActivityMessages.find(
     (msg) => msg._id === removeMessageId
   );
   return {
-    text: message?.text || "Remove the claim for your paper and let me know when you'd like me to review your work. If you'd like tips on how to remove it from the paper, click [BRAINSTORM]",
+    text:
+      message?.text ||
+      "Remove the claim for your paper and let me know when you'd like me to review your work. If you'd like tips on how to remove it from the paper, click [BRAINSTORM]",
     stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
     mcqChoices: [MCQ_BRAINSTORM, MCQ_READY_FOR_REVIEW],
     handleResponse: async (response) => {

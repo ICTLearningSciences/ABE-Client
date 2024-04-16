@@ -1,6 +1,6 @@
 import { Schema } from 'jsonschema';
 
-const reverseOutlineResponseExample: ReverseOutlineResponse = {
+export const reverseOutlineResponseExample: ReverseOutlineResponse = {
   thesisStatement:
     "Using another's property for financial gain should be seen as morally wrong, unless the sample is transformed into something new.",
   importantSupportingClaims: [
