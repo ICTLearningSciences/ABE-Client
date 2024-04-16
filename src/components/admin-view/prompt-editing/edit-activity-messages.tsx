@@ -105,6 +105,23 @@ export default function EditActivityMessages(props: {
                 overflowY: 'auto',
               }}
             >
+              {' '}
+              {editedActivity?.introduction && (
+                <Input
+                  multiline
+                  value={editedActivity.introduction}
+                  fullWidth
+                  title="Introduction"
+                  className={classes.inputField}
+                  onChange={(e) => {
+                    const newActivity = JSON.parse(
+                      JSON.stringify(editedActivity)
+                    );
+                    newActivity.introduction = e.target.value;
+                    setEditedActivity(newActivity);
+                  }}
+                />
+              )}
               {editedActivity?.steps?.map((step, index) => {
                 return (
                   <>

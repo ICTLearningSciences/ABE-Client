@@ -17,7 +17,7 @@ import {
 import { MessageDisplayType, Sender } from '../store/slices/chat';
 import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { v4 as uuidv4 } from 'uuid';
-import { DEFAULT_GPT_MODEL, GptModels } from '../constants';
+import { DEFAULT_GPT_MODEL, FREE_INPUT_GOAL_ID, GptModels } from '../constants';
 
 export default function useWithFreeInput(selectedGoal?: DocGoal) {
   const { state, sendMessage, chatLogToString, coachResponsePending } =
@@ -39,7 +39,7 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
     (state) => state.login.user?._id
   );
   const messages = state.chatLogs[googleDocId] || [];
-  const isFreeInput = selectedGoal?._id === '65823a8799045156193339b2';
+  const isFreeInput = selectedGoal?._id === FREE_INPUT_GOAL_ID;
 
   useEffect(() => {
     if (abortController) {

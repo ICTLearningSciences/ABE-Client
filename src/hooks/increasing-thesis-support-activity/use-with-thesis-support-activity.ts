@@ -162,10 +162,8 @@ export function useWithThesisSupportActivity(
 
   useEffect(() => {
     if (promptsLoading) {
-      console.log('prompts loading');
       return;
     }
-    console.log('prompts loaded');
     const reverseOutlinePrompt = prompts.find(
       (prompt) => prompt._id === REVERSE_OUTLINE_PROMPT_ID
     );
@@ -216,7 +214,6 @@ export function useWithThesisSupportActivity(
       !s2SuggestClaimSupportChangesPrompt ||
       !s3AnalyzeClaimSupportRevisionIntentionPrompt
     ) {
-      console.log('missing prompts');
       throw new Error('Missing prompts');
     }
     setActivityPrompts({

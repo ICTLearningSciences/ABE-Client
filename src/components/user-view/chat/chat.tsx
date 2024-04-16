@@ -330,8 +330,8 @@ export default function Chat(props: {
   }, [systemPrompt]);
 
   function ChatHeaderGenerator(): JSX.Element {
-    if (!selectedGoal && !selectedActivity)
-      return <ChatHeader>Coach</ChatHeader>;
+    // if (!selectedGoal && !selectedActivity)
+    //   return <ChatHeader>Coach</ChatHeader>;
     let title = selectedGoal?.title || '';
     title += selectedGoal && selectedActivity ? ' - ' : '';
     title += selectedActivity?.title || '';

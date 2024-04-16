@@ -34,7 +34,6 @@ export default function EditGoogleDoc(props: {
     goalActivityState,
     isLoading: goalsLoading,
   } = useWithCurrentGoalActivity();
-  console.log(goalActivityState);
   const useWithPrompts = _useWithPrompts();
   const { prompts } = useWithPrompts;
   const navigate = useNavigate();
@@ -100,19 +99,15 @@ export default function EditGoogleDoc(props: {
   }
 
   useEffect(() => {
-    console.log('use effect 1');
     if (goalsLoading || !docGoals || checkedUrlParams) {
       return;
     }
-    console.log('use effect 2');
 
     if (!goalFromParams && !activityFromParams) {
-      console.log('setting doc goal modal open 1');
       setDocGoalModalOpen(true);
       setCheckedUrlParams(true);
       return;
     }
-    console.log('use effect 3');
     const goal = docGoals.find((goal) => goal._id === goalFromParams);
     const activity = allActivities?.find(
       (activity) => activity?._id === activityFromParams
@@ -120,10 +115,17 @@ export default function EditGoogleDoc(props: {
     setGoalAndActivity(goal, activity);
     const goalHasActivities = goal?.activities?.length;
     if (!activity && goalHasActivities) {
-      console.log('setting doc goal modal open 2');
       setDocGoalModalOpen(true);
     }
   }, [goalFromParams, goalsLoading, activityFromParams, checkedUrlParams]);
+
+  useEffect(() => {
+    if (viewingAdmin) {
+      setGoalAndActivity(undefined, undefined);
+    } else {
+      setDocGoalModalOpen(true);
+    }
+  }, [viewingAdmin]);
 
   if (goalsLoading) {
     return (

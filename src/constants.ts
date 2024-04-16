@@ -25,3 +25,5 @@ export enum GptModels {
 }
 
 export const DEFAULT_GPT_MODEL = GptModels.GPT_3_5;
+
+export const FREE_INPUT_GOAL_ID = '65823a8799045156193339b2';

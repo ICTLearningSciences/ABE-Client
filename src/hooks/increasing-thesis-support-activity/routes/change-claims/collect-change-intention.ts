@@ -127,9 +127,7 @@ export function cCollectIntentionStep(
                 openAiResponse: res.openAiData[0].openAiResponse,
               },
             });
-            console.log('here 1');
             if (claimAction === ClaimAction.ADDING) {
-              console.log('here 2');
               setState((prevState) => {
                 return {
                   ...prevState,
@@ -139,7 +137,6 @@ export function cCollectIntentionStep(
                 };
               });
             } else if (claimAction === ClaimAction.REMOVING) {
-              console.log('here 3');
               setState((prevState) => {
                 return {
                   ...prevState,
@@ -148,7 +145,6 @@ export function cCollectIntentionStep(
                 };
               });
             } else {
-              console.log('here 4');
               setState((prevState) => {
                 return {
                   ...prevState,

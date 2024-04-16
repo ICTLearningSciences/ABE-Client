@@ -157,6 +157,7 @@ export default function DocGoalModal(props: {
   function closeModal() {
     _setSelectedGoal(undefined);
     _setSelectedActivity(undefined);
+    setCurStageIndex(0);
     close();
   }
 

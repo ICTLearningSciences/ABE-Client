@@ -217,11 +217,9 @@ export function useWithStrongerConclusionActivity(
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: [MCQ_READY_FOR_REVIEW],
       handleResponse: async () => {
-        console.log('handling response of intro step1 ');
         if (!analyzeConclusionPrompt || !commentOnKeyImplicationsPrompt) {
           return;
         }
-        console.log('handling response of intro step 2');
         await executePrompt(
           () => analyzeConclusionPrompt,
           (res) => {

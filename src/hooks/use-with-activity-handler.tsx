@@ -286,7 +286,6 @@ export function useWithActivityHandler(
   ) {
     coachResponsePending(false);
     if (callback) {
-      console.log('going to callback');
       callback(response);
     } else {
       sendMessage(

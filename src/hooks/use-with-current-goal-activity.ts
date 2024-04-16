@@ -20,8 +20,6 @@ export function useWithCurrentGoalActivity() {
   const [goalActivityState, setGoalActivityState] =
     useState<CurrentGoalAndActivity>();
 
-  console.log(docGoals);
-
   function setGoal(goal?: DocGoal) {
     setGoalActivityState(() => {
       return {
