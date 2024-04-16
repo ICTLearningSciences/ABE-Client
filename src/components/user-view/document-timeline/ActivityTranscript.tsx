@@ -3,6 +3,7 @@ import { ChatItem } from '../../../types';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { Popover, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { act } from 'react-dom/test-utils';
 
 interface ActivityTranscriptProps {
   chatLog: ChatItem[];
@@ -52,10 +53,11 @@ function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
 
   const { getActivitById } = useWithDocGoalsActivities();
   const activity = getActivitById(activityId);
+  const activityTitle = activity?.title || '';
   return (
     <div className="text-3">
       <Typography className="text-3-clickable" onClick={handleClick}>
-        ({activity.title})
+        {activityTitle ? `(${activityTitle})` : ''}
       </Typography>
       <Popover
         open={open}
