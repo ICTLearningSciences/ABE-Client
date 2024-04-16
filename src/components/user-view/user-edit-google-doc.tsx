@@ -119,14 +119,6 @@ export default function EditGoogleDoc(props: {
     }
   }, [goalFromParams, goalsLoading, activityFromParams, checkedUrlParams]);
 
-  useEffect(() => {
-    if (viewingAdmin) {
-      setGoalAndActivity(undefined, undefined);
-    } else {
-      setDocGoalModalOpen(true);
-    }
-  }, [viewingAdmin]);
-
   if (goalsLoading) {
     return (
       <>
