@@ -3,7 +3,6 @@ import { ChatItem } from '../../../types';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { Popover, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { act } from 'react-dom/test-utils';
 
 interface ActivityTranscriptProps {
   chatLog: ChatItem[];
