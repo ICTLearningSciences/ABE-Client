@@ -52,10 +52,11 @@ function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
 
   const { getActivitById } = useWithDocGoalsActivities();
   const activity = getActivitById(activityId);
+  const activityTitle = activity?.title || '';
   return (
     <div className="text-3">
       <Typography className="text-3-clickable" onClick={handleClick}>
-        ({activity.title})
+        {activityTitle ? `(${activityTitle})` : ''}
       </Typography>
       <Popover
         open={open}

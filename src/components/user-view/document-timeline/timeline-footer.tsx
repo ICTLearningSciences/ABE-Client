@@ -23,13 +23,19 @@ const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
 
   const activity = getActivitById(timelinePoint.version.activity || '');
   const googleDoc = getCurrentGoogleDoc(docId);
+  const title = activity?.title || googleDoc?.title;
 
   return (
     <Box className="timeline-footer-item-card-hover">
       <Typography className="text-2">
+        {/* Conditional rendering that determines the text content to display
+        in the `Typography` component based on the `timelinePoint.type` and the availability of
+        `activity.title` and `googleDoc?.title`. */}
         {timelinePoint.type === TimelinePointType.NEW_ACTIVITY
           ? `${googleDoc?.title}`
-          : activity.title}
+          : activity.title
+          ? activity.title
+          : title}
       </Typography>
 
       <Typography className="text-3-no-indent" style={{ textAlign: 'right' }}>
@@ -89,53 +95,56 @@ export default function TimelineFooter(props: {
       data-cy="timeline-footer-wrapper"
       ref={footerTimelineRef}
     >
-      {timelinePoints.map((timelinePoint, i) => {
-        const isSelected =
-          currentTimelinePoint?.versionTime === timelinePoint.versionTime;
-        return (
-          <ColumnDiv
-            key={i}
-            className={
-              hoverIndex !== i
-                ? 'timeline-footer-item'
-                : 'timeline-footer-item-hover'
-            }
-          >
-            <Paper
-              onClick={() => props.onSelectTimepoint(timelinePoint)}
-              elevation={1}
-              style={{ padding: '1rem' }}
-              className="timeline-footer-item-card"
-              onMouseEnter={() => handleMouseEnter(i)}
-              onMouseLeave={handleMouseLeave}
+      <div className="timeline-footer-wrapper-inner">
+        {timelinePoints.map((timelinePoint, i) => {
+          const isSelected =
+            currentTimelinePoint?.versionTime === timelinePoint.versionTime;
+          return (
+            <ColumnDiv
+              key={i}
+              className={
+                hoverIndex !== i
+                  ? 'timeline-footer-item'
+                  : 'timeline-footer-item-hover'
+              }
             >
-              {/* This part of the code is a conditional rendering within the `map` function of the
-              `timelinePoints` array. */}
-              {hoverIndex !== i ? (
-                <Typography className="text-2">
-                  {formatISODateToReadable(timelinePoint.versionTime || '')}
-                </Typography>
-              ) : (
-                <TimeLineCard timelinePoint={timelinePoints[i]} />
-              )}
-            </Paper>
-
-            <Box key={i}>
-              <FiberManualRecordIcon
+              <Paper
                 onClick={() => props.onSelectTimepoint(timelinePoint)}
-                style={{
-                  cursor: isSelected ? 'default' : 'pointer',
-                  border: isSelected
-                    ? '4px solid lightblue'
-                    : '4px solid white',
-                  borderRadius: '50%',
-                  fontSize: '1.5rem',
-                }}
-              />
-            </Box>
-          </ColumnDiv>
-        );
-      })}
+                elevation={1}
+                style={{ padding: '1rem' }}
+                className="timeline-footer-item-card"
+                onMouseEnter={() => handleMouseEnter(i)}
+                onMouseLeave={handleMouseLeave}
+              >
+                {/* This part of the code is a conditional rendering within the `map` function of the
+              `timelinePoints` array. */}
+                {hoverIndex !== i ? (
+                  <Typography className="text-2">
+                    {formatISODateToReadable(timelinePoint.versionTime || '')}
+                  </Typography>
+                ) : (
+                  <TimeLineCard timelinePoint={timelinePoints[i]} />
+                )}
+              </Paper>
+
+              <Box key={i}>
+                <FiberManualRecordIcon
+                  onClick={() => props.onSelectTimepoint(timelinePoint)}
+                  style={{
+                    cursor: isSelected ? 'default' : 'pointer',
+                    border: isSelected
+                      ? '4px solid lightblue'
+                      : '4px solid white',
+                    borderRadius: '50%',
+                    fontSize: '1.5rem',
+                    marginBottom: 15,
+                  }}
+                />
+              </Box>
+            </ColumnDiv>
+          );
+        })}
+      </div>
     </Box>
   );
 }
