@@ -14,6 +14,7 @@ import {
   GQLPrompt,
   MultistepPromptRes,
   PromptRoles,
+  Intention,
 } from '../types';
 import {
   ChatMessageTypes,
@@ -196,6 +197,9 @@ export interface StepData {
     customSystemPrompt?: string
   ) => Promise<void>;
   openSelectActivityModal: () => void;
+  sendMessage: (msg: ChatMessageTypes) => void;
+  setWaitingForUserAnswer: (waiting: boolean) => void;
+  updateSessionIntention: (intention?: Intention) => void;
 }
 
 export default function useWithStrongerHookActivity(
