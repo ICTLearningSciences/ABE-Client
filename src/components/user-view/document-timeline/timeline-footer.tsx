@@ -24,12 +24,19 @@ const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
   const activity = getActivitById(timelinePoint.version.activity || '');
   const googleDoc = getCurrentGoogleDoc(docId);
 
+  console.log('activity', activity);
+  console.log('googleDoc', googleDoc);
+
+  const title = activity?.title || googleDoc?.title;
+
   return (
     <Box className="timeline-footer-item-card-hover">
       <Typography className="text-2">
         {timelinePoint.type === TimelinePointType.NEW_ACTIVITY
           ? `${googleDoc?.title}`
-          : activity.title}
+          : activity.title
+          ? activity.title
+          : title}
       </Typography>
 
       <Typography className="text-3-no-indent" style={{ textAlign: 'right' }}>

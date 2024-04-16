@@ -198,6 +198,43 @@ describe('document timeline', () => {
             });
         });
     });
+
+    it.only('Display first revision point first', () => {
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+      // summary section should exist
+      cy.get('[data-cy=content-revision-container]')
+        .should('exist')
+        .within(() => {
+          cy.get('[data-cy=ai-outline-container]')
+            .should('exist')
+            .within(() => {
+              cy.get('[data-cy=claim-evidence-title]')
+                .should('exist')
+                .contains('Evidence Given for Each Claim');
+
+              cy.get('[data-cy=claim-evidence-1-container]').within(() => {
+                cy.get('[data-cy=claim-evidence-1-title]')
+                  .should('exist')
+                  .contains(
+                    '1. Greenhouse gas emissions from human activities are the main driver of climate change.'
+                  );
+
+                cy.get('[data-cy=claim-evidence-1-accordion]').should('exist');
+                // should contain 3 claims
+                cy.get('[data-cy=claim-evidence-1-accordion]')
+                  .children()
+                  .should('have.length', 2);
+                cy.get('[data-cy=claim-evidence-1-accordion]')
+                  .children()
+                  .eq(0)
+                  .should('exist')
+                  .contains(
+                    'Increase in carbon dioxide levels in the atmosphere due to burning of fossil fuels.'
+                  );
+              });
+            });
+        });
+    });
   });
 
   describe('UI Content Revision', () => {
