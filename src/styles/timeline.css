@@ -21,7 +21,7 @@ The full terms of this copyright and license should always be found in the root 
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 80px;
+  height: 90px;
   overflow-x: auto;
   overflow-y: hidden;
 }
@@ -34,7 +34,7 @@ The full terms of this copyright and license should always be found in the root 
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 100px;
+  height: 110px;
   overflow-x: auto;
   overflow-y: hidden;
 }
@@ -50,6 +50,18 @@ The full terms of this copyright and license should always be found in the root 
   padding: 0 0px;
   background-color: var(--timeline-bg);
   box-shadow: var(--content-shadow-inner);
+}
+
+.timeline-footer-wrapper-inner {
+  position: absolute;
+  bottom: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: auto;
+  height: 15px;
+  padding: 0 0px;
+  background-color: var(--timeline-bg);
 }
 
 .timeline-footer-item-card {

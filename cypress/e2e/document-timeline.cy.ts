@@ -199,7 +199,9 @@ describe('document timeline', () => {
         });
     });
 
-    it.only('Display first revision point first', () => {
+    /* The above code is a test written in TypeScript using Cypress for a web application. The test is
+    checking the functionality of displaying the first revision point first on a specific page. */
+    it('Display first revision point first', () => {
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // summary section should exist
       cy.get('[data-cy=content-revision-container]')

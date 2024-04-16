@@ -65,8 +65,6 @@ export function useWithDocumentTimeline() {
       ...timeline.timelinePoints,
     ];
 
-    console.log('timeline', timeline);
-
     dispatch({
       type: TimelineActionType.LOADING_SUCCEEDED,
       dataPayload: timeline,
