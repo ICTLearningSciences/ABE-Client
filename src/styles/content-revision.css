@@ -126,10 +126,6 @@ textarea {
   align-items: center;
 }
 
-.MuiOutlinedInput-notchedOutline {
-  border: 1px solid #e0e0e0a0 !important;
-  border-radius: 5px;
-}
 .ai-outline-bubble {
   color: var(--content-bg);
   border-radius: 5px;
@@ -222,10 +218,7 @@ textarea {
 .content-revision-accordion {
   margin-bottom: 20px;
 }
-.Mui-expanded {
-  min-height: 30px !important;
-  margin: 0px !important;
-}
+
 .divider {
   width: 98%;
   margin: 5px 0px !important;
