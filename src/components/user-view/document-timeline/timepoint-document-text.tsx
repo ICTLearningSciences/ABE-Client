@@ -50,7 +50,7 @@ export default function TimepointDocumentText(props: {
               className="text-3-no-indent"
               style={{ marginRight: 10 }}
             >
-              {timelinePoint.version.plainText}
+              <pre>{timelinePoint.version.plainText}</pre>
             </Typography>
           </Box>
         </motion.div>
