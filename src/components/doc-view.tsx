@@ -23,7 +23,7 @@ function DocView(): JSX.Element {
   }, [docId]);
 
   if (!docId) {
-    navigate('/');
+    navigate('/docs');
     return <></>;
   }
 

@@ -56,7 +56,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
           <IconButton
             data-cy="home-button"
             onClick={() => {
-              navigate('/');
+              navigate('/docs');
             }}
             style={{
               color: 'white',
@@ -121,6 +121,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
             variant="outlined"
             onClick={() => {
               logout();
+              // navigate('/');
             }}
           >
             Logout

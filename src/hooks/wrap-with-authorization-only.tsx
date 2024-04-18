@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CircularProgress } from '@mui/material';
 import { LoginStatus } from '../store/slices/login';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,20 @@ import { useAppSelector } from '../store/hooks';
 const withAuthorizationOnly = (Component: any) => (props: any) => {
   const loginState = useAppSelector((state) => state.login);
   const navigate = useNavigate();
+
+  useEffect(()=>{
+    if (
+      (loginState.loginStatus === LoginStatus.NOT_LOGGED_IN ||
+        loginState.loginStatus === LoginStatus.FAILED) &&
+      !loginState.accessToken
+    ) {
+      if (typeof window !== 'undefined') {
+        navigate('/');
+      }
+      navigate('/');
+    }
+  }, [loginState])
+
   if (
     loginState.loginStatus === LoginStatus.NONE ||
     loginState.loginStatus === LoginStatus.IN_PROGRESS
@@ -25,17 +39,8 @@ const withAuthorizationOnly = (Component: any) => (props: any) => {
       </div>
     );
   }
-  if (
-    (loginState.loginStatus === LoginStatus.NOT_LOGGED_IN ||
-      loginState.loginStatus === LoginStatus.FAILED) &&
-    !loginState.accessToken
-  ) {
-    if (typeof window !== 'undefined') {
-      console.log('redirecting to login');
-      navigate('/');
-    }
-    return <div />;
-  }
+
+
   return loginState.loginStatus === LoginStatus.AUTHENTICATED ? (
     <Component
       {...props}
