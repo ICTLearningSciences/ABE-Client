@@ -90,7 +90,7 @@ export function useWithPromptActivity(
   function introStep(stepData: StepData): ActiveActivityStep {
     const { executePrompt } = stepData;
     return {
-      text: "Feel free to edit your paper. Let me know when you're ready for me to analyze it.",
+      text: "This is a single prompt preview activity. The result of your request may be in JSON or other formats. Feel free to edit your paper. Let me know when you're ready for me to analyze it.",
       stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
       mcqChoices: [MCQ_READY],
       handleResponse: async () => {
