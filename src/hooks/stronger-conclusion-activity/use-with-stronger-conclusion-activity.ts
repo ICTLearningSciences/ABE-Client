@@ -43,7 +43,6 @@ interface StrongerConclusionActivityPrompts {
   impactDiscussionPrompt: GQLPrompt;
 }
 
-const HELP_ME_BRAINSTORM = 'Help me brainstorm';
 const MCQ_READY_TO_REVISE = 'Ready to revise';
 
 export function useWithStrongerConclusionActivity(
@@ -74,7 +73,6 @@ export function useWithStrongerConclusionActivity(
     commentOnKeyImplicationsPrompt,
     collectAuthorOriginalIntentionPrompt,
     soWhatQuestionPrompt,
-    brainstormingOnSoWhatPrompt,
     collectProposedRevisionPrompt,
     impactDiscussionPrompt,
   } = activityPrompts || {};
@@ -336,83 +334,42 @@ export function useWithStrongerConclusionActivity(
 
   function i3SoWhatQuestionStep(stepData: StepData): ActiveActivityStep {
     const SO_WHAT_MESSAGE_ONE_ID = '65b8859017dbb51ddc3af967';
-    const SO_WHAT_MESSAGE_TWO_ID = '65b8859017dbb51ddc3af467';
+    // const SO_WHAT_MESSAGE_TWO_ID = '65b8859017dbb51ddc3af467';
     const soWhatMessageOne = allActivityMessages.find(
       (msg) => msg._id === SO_WHAT_MESSAGE_ONE_ID
-    );
-    const soWhatMessageTwo = allActivityMessages.find(
-      (msg) => msg._id === SO_WHAT_MESSAGE_TWO_ID
     );
     const { executePrompt } = stepData;
     return {
       text:
         soWhatMessageOne?.text ||
-        'Why do you think people should care about what you are writing about? If you need help, click HELP ME BRAINSTORM.',
+        'Why do you think people should care about what you are writing about?',
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
-      mcqChoices: [HELP_ME_BRAINSTORM],
-      handleResponse: async (response) => {
-        if (!soWhatQuestionPrompt || !brainstormingOnSoWhatPrompt) {
+      mcqChoices: [],
+      handleResponse: async () => {
+        if (!soWhatQuestionPrompt) {
           return;
         }
-        if (response === HELP_ME_BRAINSTORM) {
-          await executePrompt(
-            () => brainstormingOnSoWhatPrompt,
-            (res) => {
-              sendMessage(
-                {
-                  id: uuidv4(),
-                  message: res.answer,
-                  sender: Sender.SYSTEM,
-                  displayType: MessageDisplayType.TEXT,
-                  activityStep: i3SoWhatQuestionStep(stepData),
-                  openAiInfo: {
-                    openAiPrompt: res.openAiData[0].openAiPrompt,
-                    openAiResponse: res.openAiData[0].openAiResponse,
-                  },
+        await executePrompt(
+          () => soWhatQuestionPrompt,
+          (res) => {
+            sendMessage(
+              {
+                id: uuidv4(),
+                message: res.answer,
+                sender: Sender.SYSTEM,
+                displayType: MessageDisplayType.TEXT,
+                activityStep: i3SoWhatQuestionStep(stepData),
+                openAiInfo: {
+                  openAiPrompt: res.openAiData[0].openAiPrompt,
+                  openAiResponse: res.openAiData[0].openAiResponse,
                 },
-                false,
-                googleDocId
-              );
-            }
-          );
-          setWaitingForUserAnswer(true);
-          sendMessage(
-            {
-              id: uuidv4(),
-              message:
-                soWhatMessageTwo?.text ||
-                "Hope that helped. Why do you think people should care about what you're writing about?",
-              sender: Sender.SYSTEM,
-              mcqChoices: [HELP_ME_BRAINSTORM],
-              displayType: MessageDisplayType.TEXT,
-              activityStep: i3SoWhatQuestionStep(stepData),
-            },
-            false,
-            googleDocId
-          );
-        } else {
-          await executePrompt(
-            () => soWhatQuestionPrompt,
-            (res) => {
-              sendMessage(
-                {
-                  id: uuidv4(),
-                  message: res.answer,
-                  sender: Sender.SYSTEM,
-                  displayType: MessageDisplayType.TEXT,
-                  activityStep: i3SoWhatQuestionStep(stepData),
-                  openAiInfo: {
-                    openAiPrompt: res.openAiData[0].openAiPrompt,
-                    openAiResponse: res.openAiData[0].openAiResponse,
-                  },
-                },
-                false,
-                googleDocId
-              );
-            }
-          );
-          goToStep(StepNames.IMPACT_DISCUSSION);
-        }
+              },
+              false,
+              googleDocId
+            );
+          }
+        );
+        goToStep(StepNames.IMPACT_DISCUSSION);
       },
     };
   }
