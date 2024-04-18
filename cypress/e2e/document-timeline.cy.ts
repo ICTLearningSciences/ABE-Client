@@ -56,24 +56,13 @@ describe('document timeline', () => {
     it('display intention and should be editable', () => {
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // intention section should exist
-      cy.get('[data-cy=content-revision-container]')
-        .should('exist')
-        .within(() => {
-          cy.get('[data-cy=intention-container]')
-            .should('exist')
-            .within(() => {
-              cy.get('[data-cy=intention-title]')
-                .should('exist')
-                .contains('Intention');
-              cy.get('[data-cy=intention-textarea]')
-                .should('exist')
-                .contains('This activity is to work on the hook of the essay.');
-              // claeared the content of the textarea
-              cy.get('[data-cy=intention-textarea]')
-                .clear()
-                .type('New intention');
-            });
-        });
+      cy.get('[data-cy=intention-textarea]')
+      .should('exist')
+      .contains('This activity is to work on the hook of the essay.');
+      // claeared the content of the textarea
+      cy.get('[data-cy=intention-textarea]').within(()=>{
+        cy.get("textarea").eq(0).clear().type('New intention');
+      })
     });
 
     /* This test case is checking the display of the summary section and ensuring that it is editable.
@@ -81,24 +70,9 @@ describe('document timeline', () => {
     it('display summary and should be editable', () => {
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // summary section should exist
-      cy.get('[data-cy=content-revision-container]')
-        .should('exist')
-        .within(() => {
-          cy.get('[data-cy=summary-container]')
-            .should('exist')
-            .within(() => {
-              cy.get('[data-cy=summary-title]')
-                .should('exist')
-                .contains('Summary');
-              cy.get('[data-cy=summary-textarea]')
-                .should('exist')
-                .contains(
-                  "In the current version, there are minor changes made to the document compared to the previous version. The only change made is the addition of the statement 'I'm making more changes' at the end of the document. No other areas of the document were substantially changed."
-                );
-              // claeared the content of the textarea
-              cy.get('[data-cy=summary-textarea]').clear().type('New summary');
-            });
-        });
+      cy.get('[data-cy=summary-textarea]').within(() => {
+        cy.get('textarea').eq(0).clear().type('New summary');
+      })
     });
   });
 

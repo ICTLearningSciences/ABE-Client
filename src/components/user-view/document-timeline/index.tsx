@@ -22,6 +22,7 @@ function DocumentTimelinePage(): JSX.Element {
     curTimelinePoint,
     errorMessage,
     selectTimelinePoint,
+    saveTimelinePoint,
   } = useWithDocumentTimeline();
   const navigate = useNavigate();
 
@@ -108,6 +109,7 @@ function DocumentTimelinePage(): JSX.Element {
           <TimepointOutline
             timelinePoint={curTimelinePoint}
             hasOverflowX={hasOverflowX}
+            saveTimelinePoint={saveTimelinePoint}
           />
         </div>
       </RowDiv>

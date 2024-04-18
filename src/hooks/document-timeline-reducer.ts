@@ -20,12 +20,14 @@ export interface TimelineAction {
   dataPayload?: GQLDocumentTimeline;
   selectTimepointPayload?: GQLTimelinePoint;
   errorPayload?: LoadingError;
+  savedTimelinePoint?: GQLTimelinePoint;
 }
 
 export enum TimelineActionType {
   LOADING_STARTED = 'LOADING_STARTED',
   LOADING_SUCCEEDED = 'LOADING_SUCCEEDED',
   LOADING_FAILED = 'LOADING_FAILED',
+  SAVE_TIMELINE_POINT = 'SAVE_TIMELINE_POINT',
   SELECT_TIMEPOINT = 'SELECT_TIMEPOINT',
 }
 
@@ -60,6 +62,24 @@ export function TimelineReducer(
       return {
         ...state,
         selectedTimepoint: selectTimepointPayload,
+      };
+    case TimelineActionType.SAVE_TIMELINE_POINT:
+      if (!action.savedTimelinePoint) {
+        return state;
+      }
+      return {
+        ...state,
+        data: state.data
+          ? {
+              ...state.data,
+              timelinePoints: state.data?.timelinePoints.map((tp) =>
+                tp.versionTime === action.savedTimelinePoint?.versionTime
+                  ? action.savedTimelinePoint
+                  : tp
+              ),
+            }
+          : undefined,
+        selectedTimepoint: action.savedTimelinePoint,
       };
     default:
       return { status: LoadingStatusType.NONE };
