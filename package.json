@@ -78,6 +78,7 @@
     ]
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.0",
     "@types/redux-logger": "^3.0.10",
     "@types/uuid": "^9.0.7",
     "cypress": "^13.6.2",
