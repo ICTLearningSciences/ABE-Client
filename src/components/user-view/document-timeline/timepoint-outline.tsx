@@ -251,7 +251,7 @@ and dynamically adjust the height of the input field. */
 
     return (
       <Box className="input-container" data-cy="summary-container">
-        {timelinePoint.type !== TimelinePointType.START ? (
+        {timelinePoint.type !== TimelinePointType.INTRO ? (
           <span className="input-wrapper">
             <div className="summary-title-container">
               <Typography className="text-2" data-cy="summary-title">
