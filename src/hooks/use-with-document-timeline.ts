@@ -75,7 +75,11 @@ export function useWithDocumentTimeline() {
       JSON.stringify(timeline)
     );
     timelineCopy.timelinePoints = [
-      { ...startPoint, versionTime: startPointDate },
+      {
+        ...startPoint,
+        versionTime: startPointDate,
+        type: TimelinePointType.INTRO,
+      },
       ...timeline.timelinePoints,
     ];
     return timelineCopy;

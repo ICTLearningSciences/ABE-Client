@@ -274,6 +274,7 @@ export interface DocumentTimelineJobStatus {
 }
 
 export enum TimelinePointType {
+  INTRO = 'INTRO',
   START = 'START',
   MOST_RECENT = 'MOST_RECENT',
   NEW_ACTIVITY = 'NEW_ACTIVITY',
