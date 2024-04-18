@@ -1,7 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { Box, Divider, Typography } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Divider,
+  IconButton,
+  Input,
+  Typography,
+} from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { motion } from 'framer-motion';
 
@@ -12,47 +19,9 @@ import {
   formatTimeDifferenceToReadable,
   getIntentionText,
 } from '../../../helpers/functions';
-
+import SaveAsIcon from '@mui/icons-material/SaveAs';
 import '../../../styles/content-revision.css';
 import '../../../styles/activity-transcript.css';
-
-/**
- * The `useDynamicHeight` custom hook in TypeScript React dynamically adjusts the height of a textarea
- * based on its content.
- * @param {string} initialValue - The `initialValue` parameter in the `useDynamicHeight` function is
- * the initial value that will be set for the textarea input. This value will be used to initialize the
- * state of the textarea content.
- * @returns The `useDynamicHeight` custom hook is returning an object with the following properties:
- * - `value`: The current value of the textarea.
- * - `height`: The height of the textarea element, which is dynamically adjusted based on the content.
- * - `textareaRef`: A reference to the textarea element.
- * - `handleChange`: A function to handle the change event on the textarea element.
- */
-const useDynamicHeight = (initialValue: string) => {
-  const [value, setValue] = useState(initialValue);
-  const [height, setHeight] = useState('auto');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setValue(event.target.value);
-  };
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      const { scrollHeight, clientHeight } = textareaRef.current;
-      const newHeight = `${scrollHeight}px`;
-      // If the content is removed and scrollHeight decreases, resize the textarea to a smaller height
-      if (newHeight < height) {
-        setHeight(newHeight);
-      } else if (scrollHeight !== clientHeight) {
-        // If the content is added and scrollHeight increases, resize the textarea to a larger height
-        setHeight(newHeight);
-      }
-    }
-  }, [value]);
-
-  return { value, height, textareaRef, handleChange };
-};
 
 interface EvidenceObject {
   [key: string]: string[];
@@ -61,6 +30,7 @@ interface EvidenceObject {
 export default function TimepointOutline(props: {
   timelinePoint: GQLTimelinePoint;
   hasOverflowX: boolean;
+  saveTimelinePoint: (timelinePoint: GQLTimelinePoint) => Promise<void>;
 }): JSX.Element {
   const { timelinePoint, hasOverflowX } = props;
 
@@ -192,12 +162,17 @@ export default function TimepointOutline(props: {
   height of a textarea based on the content. */
   function IntentionDisplay(props: {
     timelinePoint: GQLTimelinePoint;
+    saveTimelinePoint: (timelinePoint: GQLTimelinePoint) => Promise<void>;
   }): JSX.Element {
-    const { timelinePoint } = props;
+    const { timelinePoint, saveTimelinePoint } = props;
+    const intentionText = getIntentionText(timelinePoint);
+    const [editedInentionText, setEditedIntentionText] =
+      useState(intentionText);
+    const [saving, setSaving] = useState(false);
 
-    const { value, height, textareaRef, handleChange } = useDynamicHeight(
-      getIntentionText(timelinePoint)
-    );
+    useEffect(() => {
+      setEditedIntentionText(intentionText);
+    }, [timelinePoint]);
 
     return (
       <Box className="input-container" data-cy="intention-container">
@@ -211,14 +186,44 @@ export default function TimepointOutline(props: {
               activityId={timelinePoint.version.activity}
             />
           </div>
-          <textarea
-            ref={textareaRef}
-            value={!value ? 'No Intention text ' : value}
-            onChange={handleChange}
+
+          <Input
+            value={editedInentionText}
+            disableUnderline
+            endAdornment={
+              editedInentionText !== intentionText ? (
+                <IconButton
+                  onClick={() => {
+                    setSaving(true);
+                    const updatedTimelinePoint: GQLTimelinePoint = {
+                      ...timelinePoint,
+                      version: {
+                        ...timelinePoint.version,
+                        sessionIntention: {
+                          ...timelinePoint.version.sessionIntention,
+                          description: editedInentionText,
+                        },
+                      },
+                    };
+                    saveTimelinePoint(updatedTimelinePoint).finally(() => {
+                      setSaving(false);
+                    });
+                  }}
+                >
+                  {saving ? (
+                    <CircularProgress />
+                  ) : (
+                    <SaveAsIcon className="save-icon" />
+                  )}
+                </IconButton>
+              ) : undefined
+            }
+            multiline
+            maxRows={4}
             className="summary-input"
             placeholder="Enter your text here..."
-            style={{ height: height }}
             data-cy="intention-textarea"
+            onChange={(e) => setEditedIntentionText(e.target.value)}
           />
         </span>
       </Box>
@@ -231,14 +236,18 @@ field based on the provided `timelinePoint` prop. It uses hooks like `useWithDoc
 corresponding activity based on the `activityId` from the `timelinePoint`. The summary input field
 is conditionally rendered based on the type of `timelinePoint`, and it allows users to enter text
 and dynamically adjust the height of the input field. */
+
   function SummaryDisplay(props: {
     timelinePoint: GQLTimelinePoint;
+    saveTimelinePoint: (timelinePoint: GQLTimelinePoint) => Promise<void>;
   }): JSX.Element {
-    const { timelinePoint } = props;
-
-    const { value, height, textareaRef, handleChange } = useDynamicHeight(
-      timelinePoint.changeSummary
+    const { timelinePoint, saveTimelinePoint } = props;
+    const targetSummary =
+      timelinePoint.userInputSummary || timelinePoint.changeSummary;
+    const [editedChangeSummary, setEditedChangeSummary] = useState(
+      JSON.parse(JSON.stringify(targetSummary))
     );
+    const [saving, setSaving] = useState(false);
 
     return (
       <Box className="input-container" data-cy="summary-container">
@@ -254,13 +263,36 @@ and dynamically adjust the height of the input field. */
               />
             </div>
 
-            <textarea
-              ref={textareaRef}
-              value={value}
-              onChange={handleChange}
+            <Input
+              value={editedChangeSummary}
+              disableUnderline
+              multiline
+              endAdornment={
+                editedChangeSummary !== targetSummary ? (
+                  <IconButton
+                    onClick={() => {
+                      setSaving(true);
+                      const updatedTimelinePoint = {
+                        ...timelinePoint,
+                        userInputSummary: editedChangeSummary,
+                      };
+                      saveTimelinePoint(updatedTimelinePoint).finally(() => {
+                        setSaving(false);
+                      });
+                    }}
+                  >
+                    {saving ? (
+                      <CircularProgress />
+                    ) : (
+                      <SaveAsIcon className="save-icon" />
+                    )}
+                  </IconButton>
+                ) : undefined
+              }
+              maxRows={4}
               className="summary-input"
               placeholder="Enter your text here..."
-              style={{ height: height }}
+              onChange={(e) => setEditedChangeSummary(e.target.value)}
               data-cy="summary-textarea"
             />
           </span>
@@ -381,11 +413,17 @@ and dynamically adjust the height of the input field. */
       >
         <Divider className="divider" />
         <div style={{ marginRight: 10 }}>
-          <IntentionDisplay timelinePoint={timelinePoint} />
+          <IntentionDisplay
+            timelinePoint={timelinePoint}
+            saveTimelinePoint={props.saveTimelinePoint}
+          />
         </div>
         <Divider className="divider" />
         <div style={{ marginRight: 10 }}>
-          <SummaryDisplay timelinePoint={timelinePoint} />
+          <SummaryDisplay
+            timelinePoint={timelinePoint}
+            saveTimelinePoint={props.saveTimelinePoint}
+          />
         </div>
         <Divider className="divider" />
         {/* The above code is conditionally rendering an AIOutlineDisplay component based on the

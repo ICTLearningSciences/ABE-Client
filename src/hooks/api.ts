@@ -39,6 +39,7 @@ import { addQueryParam } from '../helpers';
 import { isBulletPointMessage } from '../store/slices/chat/helpers';
 import { GptModels } from '../constants';
 import { activityQueryData } from './api-helpers';
+import { omit } from 'lodash';
 
 const API_ENDPOINT = process.env.REACT_APP_GOOGLE_API_ENDPOINT || '/docs';
 const GRAPHQL_ENDPOINT =
@@ -901,6 +902,92 @@ export async function asyncRequestDocTimelineStatus(
       axiosConfig: {
         cancelToken: cancelToken,
       },
+    }
+  );
+  return res;
+}
+
+const storeDocTimelineMutation = `mutation StoreDocTimeline($docTimeline: DocTimelineInputType!) {
+  storeDocTimeline(docTimeline: $docTimeline) {
+      docId
+      user
+      timelinePoints{
+          type
+          versionTime
+          version{
+            docId
+            plainText
+            lastChangedId
+            sessionId
+            sessionIntention{
+              description
+              createdAt
+            }
+            documentIntention{
+              description
+              createdAt
+            }
+            dayIntention{
+              description
+              createdAt
+            }
+            chatLog{
+                sender
+                message
+            }
+            activity
+            intent
+            title
+            lastModifyingUser
+          }
+          intent
+          changeSummary
+          userInputSummary
+          reverseOutline
+          relatedFeedback
+      }
+      }
+  }`;
+
+export async function storeDocTimeline(
+  docTimeline: GQLDocumentTimeline
+): Promise<GQLDocumentTimeline> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  if (!accessToken) throw new Error('No access token');
+  const inputDocs = docTimeline.timelinePoints.map((timelinePoint) => {
+    const omittedTimestamps = omit(timelinePoint.version, [
+      'createdAt',
+      'updatedAt',
+    ]);
+    return {
+      ...timelinePoint,
+      version: {
+        ...omittedTimestamps,
+        dayIntention: timelinePoint.version.dayIntention
+          ? omit(timelinePoint.version.dayIntention, ['createdAt'])
+          : undefined,
+        sessionIntention: timelinePoint.version.sessionIntention
+          ? omit(timelinePoint.version.sessionIntention, ['createdAt'])
+          : undefined,
+        documentIntention: timelinePoint.version.documentIntention
+          ? omit(timelinePoint.version.documentIntention, ['createdAt'])
+          : undefined,
+      },
+    };
+  });
+  const res = await execGql<GQLDocumentTimeline>(
+    {
+      query: storeDocTimelineMutation,
+      variables: {
+        docTimeline: {
+          ...docTimeline,
+          timelinePoints: inputDocs,
+        },
+      },
+    },
+    {
+      dataPath: 'storeDocTimeline',
+      accessToken: accessToken,
     }
   );
   return res;

@@ -7,11 +7,16 @@ The full terms of this copyright and license should always be found in the root 
 import { useReducer } from 'react';
 import {
   DocumentTimelineJobStatus,
+  GQLDocumentTimeline,
   GQLTimelinePoint,
   JobStatus,
   TimelinePointType,
 } from '../types';
-import { asyncRequestDocTimeline, asyncRequestDocTimelineStatus } from './api';
+import {
+  asyncRequestDocTimeline,
+  asyncRequestDocTimelineStatus,
+  storeDocTimeline,
+} from './api';
 import {
   TimelineActionType,
   TimelineReducer,
@@ -56,19 +61,49 @@ export function useWithDocumentTimeline() {
       60000
     );
     const timeline = res.documentTimeline;
-    const startPointDate = subtractOneSecondFromDate(
-      timeline.timelinePoints[0].versionTime
-    );
-
-    timeline.timelinePoints = [
-      { ...startPoint, versionTime: startPointDate },
-      ...timeline.timelinePoints,
-    ];
-
     dispatch({
       type: TimelineActionType.LOADING_SUCCEEDED,
       dataPayload: timeline,
     });
+  }
+
+  function addStartPointToTimeline(timeline: GQLDocumentTimeline) {
+    const startPointDate = subtractOneSecondFromDate(
+      timeline.timelinePoints[0].versionTime
+    );
+    const timelineCopy: GQLDocumentTimeline = JSON.parse(
+      JSON.stringify(timeline)
+    );
+    timelineCopy.timelinePoints = [
+      { ...startPoint, versionTime: startPointDate },
+      ...timeline.timelinePoints,
+    ];
+    return timelineCopy;
+  }
+
+  async function saveTimelinePoint(updatedTimelinePoint: GQLTimelinePoint) {
+    if (!state.data) {
+      return;
+    }
+    try {
+      await storeDocTimeline({
+        ...state.data,
+        timelinePoints: state.data.timelinePoints.map((point) => {
+          if (point.versionTime === updatedTimelinePoint.versionTime) {
+            return updatedTimelinePoint;
+          }
+          return point;
+        }),
+      });
+      dispatch({
+        type: TimelineActionType.SAVE_TIMELINE_POINT,
+        savedTimelinePoint: updatedTimelinePoint,
+      });
+      return;
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
   }
 
   /**
@@ -102,7 +137,7 @@ export function useWithDocumentTimeline() {
   /* The `const startPoint` object is defining a starting point for a timeline activity. It contains
   various properties related to the activity being described. Here's a breakdown of what each
   property represents: */
-  const startPoint = {
+  const startPoint: GQLTimelinePoint = {
     type: TimelinePointType.NEW_ACTIVITY,
     versionTime: '',
     version: {
@@ -125,17 +160,21 @@ export function useWithDocumentTimeline() {
     },
     intent: '',
     changeSummary: '',
+    userInputSummary: '',
     reverseOutline: 'No outline available',
     relatedFeedback: '',
   };
 
   return {
-    documentTimeline: state.data,
+    documentTimeline: state.data
+      ? addStartPointToTimeline(state.data)
+      : undefined,
     curTimelinePoint: state.selectedTimepoint,
     loadInProgress: state.status === LoadingStatusType.LOADING,
     errorMessage:
       state.status === LoadingStatusType.ERROR ? state.error : undefined,
     fetchDocumentTimeline: asyncFetchDocTimeline,
     selectTimelinePoint,
+    saveTimelinePoint,
   };
 }
