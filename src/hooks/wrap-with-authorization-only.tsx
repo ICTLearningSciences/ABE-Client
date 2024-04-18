@@ -16,7 +16,7 @@ const withAuthorizationOnly = (Component: any) => (props: any) => {
   const loginState = useAppSelector((state) => state.login);
   const navigate = useNavigate();
 
-  useEffect(()=>{
+  useEffect(() => {
     if (
       (loginState.loginStatus === LoginStatus.NOT_LOGGED_IN ||
         loginState.loginStatus === LoginStatus.FAILED) &&
@@ -27,7 +27,7 @@ const withAuthorizationOnly = (Component: any) => (props: any) => {
       }
       navigate('/');
     }
-  }, [loginState])
+  }, [loginState]);
 
   if (
     loginState.loginStatus === LoginStatus.NONE ||
@@ -39,7 +39,6 @@ const withAuthorizationOnly = (Component: any) => (props: any) => {
       </div>
     );
   }
-
 
   return loginState.loginStatus === LoginStatus.AUTHENTICATED ? (
     <Component

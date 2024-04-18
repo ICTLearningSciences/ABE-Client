@@ -119,9 +119,9 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
           <Button
             style={{ height: 'fit-content', color: 'white' }}
             variant="outlined"
-            onClick={() => {
-              logout();
-              // navigate('/');
+            onClick={async () => {
+              await logout();
+              navigate('/');
             }}
           >
             Logout

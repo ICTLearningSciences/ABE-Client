@@ -24,6 +24,12 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
     },
   });
 
+  useEffect(() => {
+    if (loginState.loginStatus === LoginStatus.AUTHENTICATED) {
+      navigate('/docs');
+    }
+  }, [loginState.loginStatus]);
+
   return (
     <div
       style={{

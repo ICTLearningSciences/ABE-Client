@@ -11,7 +11,7 @@ import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
 
 export interface UseWithLogin {
   state: loginActions.LoginState;
-  logout: () => void;
+  logout: () => Promise<void>;
   loginWithGoogle: (googleAccessToken: string) => Promise<void>;
   refreshAccessToken: () => void;
 }
@@ -60,8 +60,8 @@ export function useWithLogin(): UseWithLogin {
     }
   }
 
-  function logout() {
-    dispatch(loginActions.logout());
+  async function logout() {
+    await dispatch(loginActions.logout());
   }
 
   return {
