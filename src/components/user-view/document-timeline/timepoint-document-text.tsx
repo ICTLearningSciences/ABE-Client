@@ -48,9 +48,19 @@ export default function TimepointDocumentText(props: {
           >
             <Typography
               className="text-3-no-indent"
-              style={{ marginRight: 10 }}
+              style={{
+                marginRight: 10,
+              }}
             >
-              <pre>{timelinePoint.version.plainText}</pre>
+              <pre
+                style={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+                }}
+              >
+                {timelinePoint.version.plainText}
+              </pre>
             </Typography>
           </Box>
         </motion.div>
