@@ -90,7 +90,7 @@ describe('document timeline', () => {
             .within(() => {
               cy.get('[data-cy=ai-outline-statement-title]')
                 .should('exist')
-                .contains('Statement');
+                .contains('Thesis');
 
               cy.get('[data-cy=ai-outline-statement-content]')
                 .should('exist')

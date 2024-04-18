@@ -327,7 +327,7 @@ and dynamically adjust the height of the input field. */
                 className="text-2"
                 data-cy="ai-outline-statement-title"
               >
-                Statement
+                Thesis
               </Typography>
 
               <Typography className={`text-2-bubble ai-outline-bubble`}>
