@@ -42,7 +42,7 @@ export async function asyncPromptExecute(
       return res.jobStatus === JobStatus.COMPLETE;
     },
     1000,
-    60000
+    180 * 1000
   );
   return res.openAiResponse;
 }
