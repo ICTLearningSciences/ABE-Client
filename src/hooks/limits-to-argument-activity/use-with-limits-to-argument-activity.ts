@@ -175,13 +175,13 @@ export function useWithLimitsToArgumentActivity(
           (res) => {
             const audiencesResponse =
               validateJsonResponse<AnalyzeArgumentsResponse>(
-                res.answer,
+                res.openAiData[0].openAiResponse[0].message.content || '',
                 analyzeArgumentsPromptSchema
               );
             sendMessage(
               {
                 id: uuidv4(),
-                message: audiencesResponse.overallResponse,
+                message: res.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: introStep(stepData),
