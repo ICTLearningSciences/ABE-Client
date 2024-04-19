@@ -27,3 +27,8 @@ export enum GptModels {
 export const DEFAULT_GPT_MODEL = GptModels.GPT_3_5;
 
 export const FREE_INPUT_GOAL_ID = '65823a8799045156193339b2';
+
+export const STRONGER_HOOK_ID = '658230f699045156193339ac';
+export const STRONGER_CONCLUSION_ID = '66144d071e930b07906a7833';
+export const LIMITS_TO_YOUR_ARGUMENT_ID = '6619c3fe9965e7b71fd2f215';
+export const THESIS_SUPPORT_ID = '6616fe864eba4870d62f3f3c';

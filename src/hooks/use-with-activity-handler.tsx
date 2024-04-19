@@ -32,7 +32,13 @@ import { getLastUserMessage } from '../helpers';
 import { UseWithPrompts } from './use-with-prompts';
 import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { v4 as uuidv4 } from 'uuid';
-import { GptModels } from '../constants';
+import {
+  GptModels,
+  LIMITS_TO_YOUR_ARGUMENT_ID,
+  STRONGER_CONCLUSION_ID,
+  STRONGER_HOOK_ID,
+  THESIS_SUPPORT_ID,
+} from '../constants';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { useWithStrongerConclusionActivity } from './stronger-conclusion-activity/use-with-stronger-conclusion-activity';
 import { useWithLimitsToArgumentActivity } from './limits-to-argument-activity/use-with-limits-to-argument-activity';
@@ -150,13 +156,13 @@ export function useWithActivityHandler(
   );
 
   const activity =
-    selectedActivity?.title === 'Stronger Hook'
+    selectedActivity?._id === STRONGER_HOOK_ID
       ? strongerHookActivity
-      : selectedActivity?.title === 'Stronger Conclusion'
+      : selectedActivity?._id === STRONGER_CONCLUSION_ID
       ? strongerConclusionActivity
-      : selectedActivity?.title === 'Limits To Your Argument'
+      : selectedActivity?._id === LIMITS_TO_YOUR_ARGUMENT_ID
       ? limitsToArgumentActivity
-      : selectedActivity?.title === 'Increasing Thesis Support'
+      : selectedActivity?._id === THESIS_SUPPORT_ID
       ? thesisSupportActivity
       : selectedActivity?.prompt
       ? promptActivity
