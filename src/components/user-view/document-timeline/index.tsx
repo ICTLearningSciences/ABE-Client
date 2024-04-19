@@ -32,12 +32,6 @@ function DocumentTimelinePage(): JSX.Element {
     }
   }, [userId, docId]);
 
-  if (!documentTimeline || !curTimelinePoint || loadInProgress) {
-    return <CircularProgress />;
-  }
-
-  const timelinePoints = documentTimeline.timelinePoints;
-
   if (errorMessage) {
     return (
       <div
@@ -50,13 +44,13 @@ function DocumentTimelinePage(): JSX.Element {
           alignItems: 'center',
         }}
       >
-        <div>{errorMessage.message}</div>
+        <div>Error occured: {errorMessage.message}</div>
         <Button onClick={() => navigate('/docs')}>Return</Button>
       </div>
     );
   }
-
-  if (!documentTimeline.timelinePoints.length) {
+  
+  if (!loadInProgress && !documentTimeline?.timelinePoints.length) {
     return (
       <div
         style={{
@@ -68,11 +62,18 @@ function DocumentTimelinePage(): JSX.Element {
           alignItems: 'center',
         }}
       >
-        <div>No History found</div>
+        <div>No History found.</div>
         <Button onClick={() => navigate('/docs')}>Return</Button>
       </div>
     );
   }
+
+  if (!documentTimeline || !curTimelinePoint || loadInProgress) {
+    return <CircularProgress />;
+  }
+
+  const timelinePoints = documentTimeline.timelinePoints;
+
 
   return (
     <ColumnDiv style={{ position: 'relative', height: '100%', width: '100%' }}>

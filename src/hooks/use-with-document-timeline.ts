@@ -43,31 +43,42 @@ export function useWithDocumentTimeline() {
     if (state.status === LoadingStatusType.LOADING) {
       return;
     }
-    dispatch({ type: TimelineActionType.LOADING_STARTED });
-    const docTimelineJobId = await asyncRequestDocTimeline(
-      userId,
-      docId,
-      cancelToken
-    );
-    const pollFunction = () => {
-      return asyncRequestDocTimelineStatus(docTimelineJobId, cancelToken);
-    };
-    const res = await pollUntilTrue<DocumentTimelineJobStatus>(
-      pollFunction,
-      (res: DocumentTimelineJobStatus) => {
-        return res.jobStatus === JobStatus.COMPLETE;
-      },
-      1000,
-      60000
-    );
-    const timeline = res.documentTimeline;
-    dispatch({
-      type: TimelineActionType.LOADING_SUCCEEDED,
-      dataPayload: timeline,
-    });
+    try{
+      dispatch({ type: TimelineActionType.LOADING_STARTED });
+      const docTimelineJobId = await asyncRequestDocTimeline(
+        userId,
+        docId,
+        cancelToken
+      );
+      const pollFunction = () => {
+        return asyncRequestDocTimelineStatus(docTimelineJobId, cancelToken);
+      };
+      const res = await pollUntilTrue<DocumentTimelineJobStatus>(
+        pollFunction,
+        (res: DocumentTimelineJobStatus) => {
+          return res.jobStatus === JobStatus.COMPLETE;
+        },
+        1000,
+        60000
+      );
+      const timeline = res.documentTimeline;
+      dispatch({
+        type: TimelineActionType.LOADING_SUCCEEDED,
+        dataPayload: timeline,
+      });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }catch(e: any){
+      dispatch({ type: TimelineActionType.LOADING_FAILED, errorPayload:{
+        error: e,
+        message: JSON.stringify(e.message)
+      } });
+    }
   }
 
   function addStartPointToTimeline(timeline: GQLDocumentTimeline) {
+    if (timeline.timelinePoints.length === 0) {
+      return timeline;
+    }
     const startPointDate = subtractOneSecondFromDate(
       timeline.timelinePoints[0].versionTime
     );
