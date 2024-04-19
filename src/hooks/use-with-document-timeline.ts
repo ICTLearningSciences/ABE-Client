@@ -43,7 +43,7 @@ export function useWithDocumentTimeline() {
     if (state.status === LoadingStatusType.LOADING) {
       return;
     }
-    try{
+    try {
       dispatch({ type: TimelineActionType.LOADING_STARTED });
       const docTimelineJobId = await asyncRequestDocTimeline(
         userId,
@@ -66,12 +66,15 @@ export function useWithDocumentTimeline() {
         type: TimelineActionType.LOADING_SUCCEEDED,
         dataPayload: timeline,
       });
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }catch(e: any){
-      dispatch({ type: TimelineActionType.LOADING_FAILED, errorPayload:{
-        error: e,
-        message: JSON.stringify(e.message)
-      } });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      dispatch({
+        type: TimelineActionType.LOADING_FAILED,
+        errorPayload: {
+          error: e,
+          message: JSON.stringify(e.message),
+        },
+      });
     }
   }
 

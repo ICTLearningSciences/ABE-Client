@@ -49,7 +49,7 @@ function DocumentTimelinePage(): JSX.Element {
       </div>
     );
   }
-  
+
   if (!loadInProgress && !documentTimeline?.timelinePoints.length) {
     return (
       <div
@@ -73,7 +73,6 @@ function DocumentTimelinePage(): JSX.Element {
   }
 
   const timelinePoints = documentTimeline.timelinePoints;
-
 
   return (
     <ColumnDiv style={{ position: 'relative', height: '100%', width: '100%' }}>
