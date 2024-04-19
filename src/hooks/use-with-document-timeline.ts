@@ -119,6 +119,9 @@ export function useWithDocumentTimeline() {
       const res = await pollUntilTrue<DocumentTimelineJobStatus>(
         pollFunction,
         (res: DocumentTimelineJobStatus) => {
+          if (res.jobStatus === JobStatus.FAILED) {
+            throw new Error('Failed to load document timeline');
+          }
           return res.jobStatus === JobStatus.COMPLETE;
         },
         1000,

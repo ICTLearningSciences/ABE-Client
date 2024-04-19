@@ -5,9 +5,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
+import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
 import { tenTimelinePoints } from '../fixtures/document-timeline/ten-timeline-points';
-import { cyMockDefault } from '../helpers/functions';
-import { MockDefaultType } from '../helpers/types';
+import { cyMockDefault, cyMockGetDocTimeline } from '../helpers/functions';
+import { JobStatus, MockDefaultType } from '../helpers/types';
 
 describe('document timeline', () => {
   beforeEach(() => {
@@ -217,7 +218,7 @@ describe('document timeline', () => {
     beforeEach(() => {
       cyMockDefault(cy, {
         mockType: MockDefaultType.CUSTOM_FILE_DATA,
-        customFileData: tenTimelinePoints,
+        customDocumentTimeline: tenTimelinePoints,
       });
     });
 
@@ -268,4 +269,24 @@ describe('document timeline', () => {
         .contains('No AI outline available');
     });
   });
+
+  describe("fetch timeline failed", ()=>{
+    it("server failure", ()=>{
+      cyMockGetDocTimeline(cy, {
+        response: eightHoursBetweenSessions,
+        jobStatus: JobStatus.FAILED,
+      });
+        cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+        cy.contains("Failed to load document timeline")
+    })
+
+    it("http failure", ()=>{
+      cyMockGetDocTimeline(cy, {
+        response: eightHoursBetweenSessions,
+        statusCode: 500,
+      });
+        cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+        cy.contains("Request failed with status code 500")
+    })
+  })
 });

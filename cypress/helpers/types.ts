@@ -323,6 +323,7 @@ export interface UserActivityState {
 
 export enum JobStatus {
   QUEUED = 'QUEUED',
+  FAILED = 'FAILED',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETE = 'COMPLETE',
 }

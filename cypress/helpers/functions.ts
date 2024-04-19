@@ -160,7 +160,7 @@ export function cyMockDefault(
     mockType?: MockDefaultType;
     version?: IGDocVersion;
     reverseOutline?: string;
-    customFileData?: GQLDocumentTimeline;
+    customDocumentTimeline?: GQLDocumentTimeline;
   } = {}
 ) {
   const gqlQueries = args?.gqlQueries || [];
@@ -199,7 +199,7 @@ export function cyMockDefault(
       break;
     case MockDefaultType.CUSTOM_FILE_DATA:
       cyMockGetDocTimeline(cy, {
-        response: args.customFileData,
+        response: args.customDocumentTimeline,
       });
       break;
     default:
@@ -232,6 +232,7 @@ export function cyMockGetDocTimeline(
   cy: CypressGlobal,
   params: {
     statusCode?: number;
+    jobStatus?: JobStatus;
     response?: GQLDocumentTimeline;
     delay?: number;
   } = {}
@@ -259,7 +260,7 @@ export function cyMockGetDocTimeline(
           data: {
             response: {
               documentTimeline: params.response || '',
-              jobStatus: JobStatus.COMPLETE,
+              jobStatus: params.jobStatus || JobStatus.COMPLETE,
             },
           },
         },
