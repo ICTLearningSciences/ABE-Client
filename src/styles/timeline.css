@@ -12,6 +12,10 @@ The full terms of this copyright and license should always be found in the root 
   --content-revision-text-color-3: #5c5c5c;
   --content-revision-text-color-3-disable: #898989;
 }
+.footer-timeline-scroll-container {
+  overflow-x: auto;
+  white-space: nowrap; /* Prevent items from wrapping */
+}
 
 .footer-timeline {
   max-width: 100vw;
@@ -65,19 +69,23 @@ The full terms of this copyright and license should always be found in the root 
 }
 
 .timeline-footer-item-card {
+  min-width: 120px;
   padding: 5px 10px !important;
   background-color: var(--timeline-bg);
   box-shadow: var(--content-shadow) !important;
-  margin-bottom: 5px;
   border-radius: 15px !important;
+  margin-bottom: 0px;
   z-index: 100;
 }
 
 .timeline-footer-item-card-hover {
-  display: flex;
-  flex-direction: column;
+  min-width: 120px;
+  padding: 5px 10px !important;
   background-color: var(--timeline-bg);
+  box-shadow: var(--content-shadow) !important;
   border-radius: 15px !important;
+  margin-bottom: 35px;
+  z-index: 100;
 }
 
 .timeline-footer-item {
@@ -101,11 +109,38 @@ The full terms of this copyright and license should always be found in the root 
 }
 
 .timeline-footer-item-hover-no-content {
-  max-width: 00px;
+  max-width: 100px;
   min-width: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 50px;
   cursor: pointer;
+}
+
+.timeline-test-container {
+  height: 115px;
+  position: absolute;
+  bottom: 0px;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+}
+.timeline-item-test {
+  display: flex;
+  flex-direction: column;
+  margin: 0px 40px;
+  justify-content: center;
+  align-items: center;
+}
+.timeline-bar {
+  position: absolute;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  bottom: 0px;
+  left: 0px;
+  height: 15px;
+  box-shadow: var(--content-shadow-inner);
 }

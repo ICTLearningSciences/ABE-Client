@@ -51,6 +51,7 @@ export default function TimepointOutline(props: {
  `reverseOutline` JSON data and checks if there is a 'Thesis Statement', 'Supporting Claims', and
  'Evidence Given for Each Claim' in the parsed data. */
   useEffect(() => {
+    console.log('timelinePoint', timelinePoint);
     if (timelinePoint.reverseOutline === 'No outline available') return;
 
     const reverseOutlineParsed = JSON.parse(timelinePoint.reverseOutline);

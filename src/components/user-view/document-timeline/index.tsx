@@ -9,6 +9,7 @@ import TimepointOutline from './timepoint-outline';
 import TimelineFooter from './timeline-footer';
 import withAuthorizationOnly from '../../../hooks/wrap-with-authorization-only';
 import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
+import TimelineFooter2 from './timeline-footer2';
 
 function DocumentTimelinePage(): JSX.Element {
   const footerTimelineRef = useRef<HTMLElement | null>(null);
@@ -90,59 +91,63 @@ function DocumentTimelinePage(): JSX.Element {
   const timelinePoints = documentTimeline.timelinePoints;
 
   return (
-    <ColumnDiv style={{ position: 'relative', height: '100%', width: '100%' }}>
-      <RowDiv
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+      <ColumnDiv
         style={{
-          height: '93%',
-          alignItems: 'flex-end',
+          position: 'relative',
+          height: '100%',
           width: '100%',
+          marginBottom: 80,
         }}
       >
-        <div
+        <RowDiv
           style={{
-            width: '50%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
+            height: '93%',
+            alignItems: 'flex-end',
+            width: '100%',
           }}
         >
-          <TimepointDocumentText
-            timelinePoint={curTimelinePoint}
-            hasOverflowX={hasOverflowX}
-          />
-        </div>
-        <div
-          style={{
-            width: '50%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-          }}
-        >
-          <TimepointOutline
-            timelinePoint={curTimelinePoint}
-            hasOverflowX={hasOverflowX}
-            googleDoc={currentGoogleDoc}
-            saveTimelinePoint={saveTimelinePoint}
-            updateGoogleDoc={updateGoogleDoc}
-          />
-        </div>
-      </RowDiv>
-      <div
-        className={hasOverflowX ? 'footer-timeline-scroll' : 'footer-timeline'}
-        data-cy="footer-timeline"
-      >
-        <TimelineFooter
-          currentTimelinePoint={curTimelinePoint}
-          timelinePoints={timelinePoints}
-          onSelectTimepoint={selectTimelinePoint}
-          footerTimelineRef={footerTimelineRef as RefObject<HTMLElement>}
-          setHasOverflowX={setHasOverflowX}
-        />
-      </div>
-    </ColumnDiv>
+          <div
+            style={{
+              width: '50%',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+            }}
+          >
+            <TimepointDocumentText
+              timelinePoint={curTimelinePoint}
+              hasOverflowX={hasOverflowX}
+            />
+          </div>
+          <div
+            style={{
+              width: '50%',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+            }}
+          >
+            <TimepointOutline
+              timelinePoint={curTimelinePoint}
+              hasOverflowX={hasOverflowX}
+              googleDoc={currentGoogleDoc}
+              saveTimelinePoint={saveTimelinePoint}
+              updateGoogleDoc={updateGoogleDoc}
+            />
+          </div>
+        </RowDiv>
+      </ColumnDiv>
+      <TimelineFooter2
+        currentTimelinePoint={curTimelinePoint}
+        timelinePoints={timelinePoints}
+        onSelectTimepoint={selectTimelinePoint}
+        footerTimelineRef={footerTimelineRef as RefObject<HTMLElement>}
+        setHasOverflowX={setHasOverflowX}
+      />
+    </div>
   );
 }
 
