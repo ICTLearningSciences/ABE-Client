@@ -152,7 +152,7 @@ export default function EditGoogleDoc(props: {
         <Button
           variant="text"
           onClick={() => {
-            navigate('/');
+            navigate('/docs');
           }}
         >
           Return

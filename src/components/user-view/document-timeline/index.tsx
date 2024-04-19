@@ -51,7 +51,7 @@ function DocumentTimelinePage(): JSX.Element {
         }}
       >
         <div>{errorMessage.message}</div>
-        <Button onClick={() => navigate('/')}>Return</Button>
+        <Button onClick={() => navigate('/docs')}>Return</Button>
       </div>
     );
   }
@@ -69,7 +69,7 @@ function DocumentTimelinePage(): JSX.Element {
         }}
       >
         <div>No History found</div>
-        <Button onClick={() => navigate('/')}>Return</Button>
+        <Button onClick={() => navigate('/docs')}>Return</Button>
       </div>
     );
   }

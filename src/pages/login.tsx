@@ -4,22 +4,31 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { UseWithLogin } from '../store/slices/login/use-with-login';
 import { LoginStatus } from '../store/slices/login';
 import { Button, CircularProgress } from '@mui/material';
 import { useGoogleLogin } from '@react-oauth/google';
 import AbeTitle from '../static-images/abe-title.png';
 import { ColumnCenterDiv, ColumnDiv } from '../styled-components';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
   const { loginWithGoogle, state: loginState } = useLogin;
+  const navigate = useNavigate();
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       loginWithGoogle(tokenResponse.access_token);
+      navigate('/docs');
     },
   });
+
+  useEffect(() => {
+    if (loginState.loginStatus === LoginStatus.AUTHENTICATED) {
+      navigate('/docs');
+    }
+  }, [loginState.loginStatus]);
 
   return (
     <div

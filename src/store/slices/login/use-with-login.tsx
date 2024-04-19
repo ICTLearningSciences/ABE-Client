@@ -11,8 +11,8 @@ import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
 
 export interface UseWithLogin {
   state: loginActions.LoginState;
-  logout: () => void;
-  loginWithGoogle: (googleAccessToken: string) => void;
+  logout: () => Promise<void>;
+  loginWithGoogle: (googleAccessToken: string) => Promise<void>;
   refreshAccessToken: () => void;
 }
 
@@ -36,13 +36,13 @@ export function useWithLogin(): UseWithLogin {
     }
   }, [state.loginStatus]);
 
-  function loginWithGoogle(googleAccessToken: string) {
+  async function loginWithGoogle(googleAccessToken: string) {
     if (
       state.loginStatus === loginActions.LoginStatus.NONE ||
       state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
       state.loginStatus === loginActions.LoginStatus.FAILED
     ) {
-      dispatch(
+      await dispatch(
         loginActions.googleLogin({
           accessToken: googleAccessToken,
         })
@@ -60,8 +60,8 @@ export function useWithLogin(): UseWithLogin {
     }
   }
 
-  function logout() {
-    dispatch(loginActions.logout());
+  async function logout() {
+    await dispatch(loginActions.logout());
   }
 
   return {

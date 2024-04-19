@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import './App.css';
-import { LoginStatus } from './store/slices/login';
 import AdminView from './pages/admin/admin-view';
 import Login from './pages/login';
 import { Provider } from 'react-redux';
@@ -21,7 +20,6 @@ import { useReduxHydration } from './use-redux-hydration';
 
 function MainApp() {
   const useLogin = useWithLogin();
-  const loginStatus = useLogin.state.loginStatus;
   const router = createBrowserRouter([
     {
       path: '/',
@@ -37,11 +35,26 @@ function MainApp() {
               justifyContent: 'center',
             }}
           >
-            {loginStatus === LoginStatus.AUTHENTICATED ? (
-              <AdminView />
-            ) : (
-              <Login useLogin={useLogin} />
-            )}
+            <Login useLogin={useLogin} />
+          </div>
+        </>
+      ),
+    },
+    {
+      path: '/docs',
+      element: (
+        <>
+          <Header useLogin={useLogin} />
+          <div
+            style={{
+              width: '100%',
+              height: '94%', //header takes 6%
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <AdminView />
           </div>
         </>
       ),
