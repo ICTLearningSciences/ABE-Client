@@ -209,6 +209,7 @@ export default function SelectCreateDocs(props: {
           justifyContent: 'center',
         }}
       >
+        Creating google doc, this could take a few seconds...
         <CircularProgress />
       </div>
     );

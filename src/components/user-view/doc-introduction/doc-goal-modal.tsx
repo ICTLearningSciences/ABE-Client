@@ -26,7 +26,7 @@ import { InputDocumentAssignment } from './input-document-assignment';
 import { InputDayIntention } from './input-day-inention';
 import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 import { useSearchParams } from 'react-router-dom';
-import { URL_PARAM_NEW_DOC } from '../../../constants';
+import { FREE_INPUT_GOAL_ID, URL_PARAM_NEW_DOC } from '../../../constants';
 
 const style = {
   position: 'absolute',
@@ -200,7 +200,7 @@ export default function DocGoalModal(props: {
     });
   }
 
-  if (!docGoals) return <></>;
+  if (!docGoals || !docGoals.length) return <CircularProgress />;
 
   function getDisplayByStage(stage: SelectingStage) {
     if (stage === SelectingStage.LOADING) {
@@ -333,108 +333,126 @@ export default function DocGoalModal(props: {
     <div>
       <Modal open={Boolean(open)}>
         <Box sx={style} data-cy="doc-goal-modal">
-          <div
-            data-cy="selected-goal-display"
-            style={{
-              position: 'absolute',
-              top: 30,
-              left: 30,
-            }}
-          >
-            {_selectedGoal && (
-              <>
-                <span
-                  style={{
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                  }}
-                  onClick={goBackToGoalStage}
-                >
-                  {_selectedGoal.title}
-                </span>
-                <IconButton onClick={goBackToGoalStage}>
-                  <ChangeIcon />
-                </IconButton>
-              </>
-            )}
-          </div>
-          <ColumnDiv
-            style={{
-              height: '100%',
-              width: '100%',
-              alignItems: 'center',
-              justifyContent: 'space-around',
-            }}
-          >
-            {curStageIndex < stages.length ? (
-              getDisplayByStage(stages[curStageIndex])
-            ) : (
-              <span>current stage index out of bounds</span>
-            )}
-
-            <RowDiv
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Button
-                data-cy="doc-goal-cancel-button"
-                variant="text"
+          {firstLoadComplete ? (
+            <>
+              <div
+                data-cy="selected-goal-display"
                 style={{
-                  marginRight: '40px',
-                  color: 'black',
                   position: 'absolute',
-                  top: 20,
-                  right: 0,
-                }}
-                onClick={() => {
-                  closeModal();
+                  top: 30,
+                  left: 30,
                 }}
               >
-                Cancel
-              </Button>
-              <RowDiv
+                {_selectedGoal && (
+                  <>
+                    <span
+                      style={{
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                      }}
+                      onClick={goBackToGoalStage}
+                    >
+                      {_selectedGoal.title}
+                    </span>
+                    <IconButton onClick={goBackToGoalStage}>
+                      <ChangeIcon />
+                    </IconButton>
+                  </>
+                )}
+              </div>
+              <ColumnDiv
                 style={{
-                  margin: '20px',
+                  height: '100%',
+                  width: '100%',
+                  alignItems: 'center',
+                  justifyContent: 'space-around',
                 }}
               >
-                <Button
-                  data-cy="doc-goal-modal-back-button"
-                  variant="text"
+                {curStageIndex < stages.length ? (
+                  getDisplayByStage(stages[curStageIndex])
+                ) : (
+                  <span>current stage index out of bounds</span>
+                )}
+
+                <RowDiv
                   style={{
-                    borderRadius: '20px',
-                    marginRight: '40px',
-                  }}
-                  onClick={() => {
-                    _setSelectedGoal(undefined);
-                    _setSelectedActivity(undefined);
-                    // _setStage(SelectingStage.GOAL);
-                    prevStage();
-                  }}
-                  disabled={curStageIndex === 0}
-                >
-                  Back
-                </Button>
-                <Button
-                  variant="contained"
-                  data-cy="doc-goal-modal-next-button"
-                  style={{
-                    borderRadius: '20px',
-                  }}
-                  disabled={currentStage === SelectingStage.GOAL}
-                  onClick={() => {
-                    handleNextClick(currentStage);
+                    display: 'flex',
+                    justifyContent: 'space-between',
                   }}
                 >
-                  {currentStage === SelectingStage.ACTIVITY ||
-                  currentStage === SelectingStage.GOAL
-                    ? 'Start'
-                    : 'Next'}
-                </Button>
-              </RowDiv>
-            </RowDiv>
-          </ColumnDiv>
+                  <Button
+                    data-cy="doc-goal-cancel-button"
+                    variant="text"
+                    style={{
+                      marginRight: '40px',
+                      color: 'black',
+                      position: 'absolute',
+                      top: 20,
+                      right: 0,
+                    }}
+                    onClick={() => {
+                      if (!props.selectedActivity) {
+                        const freeInputGoal = docGoals?.find(
+                          (goal) => goal._id === FREE_INPUT_GOAL_ID
+                        );
+                        if (freeInputGoal) {
+                          beginGoal(freeInputGoal);
+                        }
+                      }
+                      closeModal();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <RowDiv
+                    style={{
+                      margin: '20px',
+                    }}
+                  >
+                    <Button
+                      data-cy="doc-goal-modal-back-button"
+                      variant="text"
+                      style={{
+                        borderRadius: '20px',
+                        marginRight: '40px',
+                      }}
+                      onClick={() => {
+                        _setSelectedGoal(undefined);
+                        _setSelectedActivity(undefined);
+                        // _setStage(SelectingStage.GOAL);
+                        prevStage();
+                      }}
+                      disabled={curStageIndex === 0}
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      variant="contained"
+                      data-cy="doc-goal-modal-next-button"
+                      style={{
+                        borderRadius: '20px',
+                      }}
+                      disabled={
+                        currentStage === SelectingStage.GOAL ||
+                        (currentStage === SelectingStage.ACTIVITY &&
+                          !_selectedActivity)
+                      }
+                      onClick={() => {
+                        handleNextClick(currentStage);
+                      }}
+                    >
+                      {currentStage === SelectingStage.ACTIVITY ||
+                      currentStage === SelectingStage.GOAL
+                        ? 'Start'
+                        : 'Next'}
+                    </Button>
+                  </RowDiv>
+                </RowDiv>
+              </ColumnDiv>
+            </>
+          ) : (
+            <CircularProgress />
+          )}
         </Box>
       </Modal>
     </div>
