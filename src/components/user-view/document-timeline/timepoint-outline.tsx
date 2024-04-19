@@ -14,7 +14,12 @@ import { motion } from 'framer-motion';
 
 import ActivityTranscript from './ActivityTranscript';
 import { formatISODateToReadable } from '../../../helpers';
-import { GQLTimelinePoint, TimelinePointType } from '../../../types';
+import {
+  GQLTimelinePoint,
+  GoogleDoc,
+  StoreGoogleDoc,
+  TimelinePointType,
+} from '../../../types';
 import {
   formatTimeDifferenceToReadable,
   getIntentionText,
@@ -29,10 +34,12 @@ interface EvidenceObject {
 
 export default function TimepointOutline(props: {
   timelinePoint: GQLTimelinePoint;
+  googleDoc?: GoogleDoc;
   hasOverflowX: boolean;
   saveTimelinePoint: (timelinePoint: GQLTimelinePoint) => Promise<void>;
+  updateGoogleDoc: (googleDoc: StoreGoogleDoc) => Promise<GoogleDoc>;
 }): JSX.Element {
-  const { timelinePoint, hasOverflowX } = props;
+  const { timelinePoint, hasOverflowX, googleDoc, updateGoogleDoc } = props;
 
   const [thesis, setThesis] = useState<boolean>(false);
   const [supportingClaims, setSupportingClaims] = useState<boolean>(false);
@@ -190,6 +197,7 @@ export default function TimepointOutline(props: {
           <Input
             value={editedInentionText}
             disableUnderline
+            disabled={timelinePoint.type === TimelinePointType.INTRO}
             endAdornment={
               editedInentionText !== intentionText ? (
                 <IconButton
@@ -230,6 +238,64 @@ export default function TimepointOutline(props: {
     );
   }
 
+  function AssignmentDescriptionDisplay(props: {
+    assignmentDescription: string;
+    saveTimelineDescription: (description: string) => Promise<void>;
+  }): JSX.Element {
+    const { assignmentDescription, saveTimelineDescription } = props;
+    const [editedAssignmentDescription, setEditedAssignmentDescription] =
+      useState(assignmentDescription);
+    const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+      setEditedAssignmentDescription(assignmentDescription);
+    }, [assignmentDescription]);
+
+    return (
+      <Box className="input-container" data-cy="assignment-container">
+        <span className="input-wrapper">
+          <div className="assignment-description-container">
+            <Typography className="text-2" data-cy="assignment-description">
+              Assignment Description
+            </Typography>
+          </div>
+
+          <Input
+            value={editedAssignmentDescription}
+            disableUnderline
+            disabled={timelinePoint.type === TimelinePointType.INTRO}
+            endAdornment={
+              editedAssignmentDescription !== assignmentDescription ? (
+                <IconButton
+                  onClick={() => {
+                    setSaving(true);
+                    saveTimelineDescription(
+                      editedAssignmentDescription
+                    ).finally(() => {
+                      setSaving(false);
+                    });
+                  }}
+                >
+                  {saving ? (
+                    <CircularProgress />
+                  ) : (
+                    <SaveAsIcon className="save-icon" />
+                  )}
+                </IconButton>
+              ) : undefined
+            }
+            multiline
+            maxRows={4}
+            className="summary-input"
+            placeholder="Enter your assignment description here..."
+            data-cy="assignment-textarea"
+            onChange={(e) => setEditedAssignmentDescription(e.target.value)}
+          />
+        </span>
+      </Box>
+    );
+  }
+
   /* The above code is a TypeScript React component called `SummaryDisplay` that displays a summary input
 field based on the provided `timelinePoint` prop. It uses hooks like `useWithDocGoalsActivities` and
 `useDynamicHeight` to manage state and behavior of the input field. It also retrieves the
@@ -253,6 +319,8 @@ and dynamically adjust the height of the input field. */
       <Box className="input-container" data-cy="summary-container">
         {timelinePoint.type !== TimelinePointType.INTRO ? (
           <span className="input-wrapper">
+            <Divider className="divider" />
+
             <div className="summary-title-container">
               <Typography className="text-2" data-cy="summary-title">
                 Summary
@@ -411,6 +479,21 @@ and dynamically adjust the height of the input field. */
         }
         data-cy="right-content-container"
       >
+        <div style={{ marginRight: 10 }}>
+          <Divider className="divider" />
+          <AssignmentDescriptionDisplay
+            assignmentDescription={googleDoc?.assignmentDescription || ''}
+            saveTimelineDescription={async (description: string) => {
+              if (!googleDoc) return;
+              const updatedGoogleDoc = {
+                user: googleDoc.user,
+                googleDocId: googleDoc.googleDocId,
+                assignmentDescription: description,
+              };
+              await updateGoogleDoc(updatedGoogleDoc);
+            }}
+          />
+        </div>
         <Divider className="divider" />
         <div style={{ marginRight: 10 }}>
           <IntentionDisplay
@@ -418,7 +501,6 @@ and dynamically adjust the height of the input field. */
             saveTimelinePoint={props.saveTimelinePoint}
           />
         </div>
-        <Divider className="divider" />
         <div style={{ marginRight: 10 }}>
           <SummaryDisplay
             timelinePoint={timelinePoint}
@@ -433,7 +515,11 @@ and dynamically adjust the height of the input field. */
         outline available" is rendered instead. */}
         {
           // if thesis, supporting claims, and claim evidence display
-          thesis && supportingClaims && claimEvidence && aiOutline ? (
+          thesis &&
+          supportingClaims &&
+          claimEvidence &&
+          aiOutline &&
+          timelinePoint.type !== TimelinePointType.INTRO ? (
             <div style={{ marginRight: 10 }}>
               <AIOutlineDisplay reverseOutline={timelinePoint.reverseOutline} />
             </div>

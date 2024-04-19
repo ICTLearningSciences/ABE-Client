@@ -8,13 +8,15 @@ import TimepointDocumentText from './timepoint-document-text';
 import TimepointOutline from './timepoint-outline';
 import TimelineFooter from './timeline-footer';
 import withAuthorizationOnly from '../../../hooks/wrap-with-authorization-only';
+import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 
 function DocumentTimelinePage(): JSX.Element {
   const footerTimelineRef = useRef<HTMLElement | null>(null);
   const userId = useAppSelector((state) => state.login.user?._id);
   const { docId } = useParams<Record<string, string>>();
   const [hasOverflowX, setHasOverflowX] = useState<boolean>(false);
-
+  const { googleDocs, updateGoogleDoc } = UseWithGoogleDocs();
+  const currentGoogleDoc = googleDocs.find((doc) => doc.googleDocId === docId);
   const {
     fetchDocumentTimeline,
     loadInProgress,
@@ -69,7 +71,20 @@ function DocumentTimelinePage(): JSX.Element {
   }
 
   if (!documentTimeline || !curTimelinePoint || loadInProgress) {
-    return <CircularProgress />;
+    return (
+      <ColumnDiv
+        style={{
+          alignItems: 'center',
+        }}
+      >
+        Generating History, this could take a bit...
+        <CircularProgress
+          style={{
+            marginTop: 20,
+          }}
+        />
+      </ColumnDiv>
+    );
   }
 
   const timelinePoints = documentTimeline.timelinePoints;
@@ -109,7 +124,9 @@ function DocumentTimelinePage(): JSX.Element {
           <TimepointOutline
             timelinePoint={curTimelinePoint}
             hasOverflowX={hasOverflowX}
+            googleDoc={currentGoogleDoc}
             saveTimelinePoint={saveTimelinePoint}
+            updateGoogleDoc={updateGoogleDoc}
           />
         </div>
       </RowDiv>
