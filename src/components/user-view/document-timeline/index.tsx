@@ -9,7 +9,6 @@ import TimepointOutline from './timepoint-outline';
 import TimelineFooter from './timeline-footer';
 import withAuthorizationOnly from '../../../hooks/wrap-with-authorization-only';
 import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
-import TimelineFooter2 from './timeline-footer2';
 
 function DocumentTimelinePage(): JSX.Element {
   const footerTimelineRef = useRef<HTMLElement | null>(null);

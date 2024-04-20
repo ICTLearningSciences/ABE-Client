@@ -1,5 +1,5 @@
 import React, { RefObject, useEffect, useState } from 'react';
-import { Box, makeStyles, Paper, styled, Typography } from '@mui/material';
+import { Box, Paper, styled, Typography } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useParams } from 'react-router-dom';
 
@@ -20,7 +20,7 @@ import StepConnector, {
 } from '@mui/material/StepConnector';
 import { StepIconProps } from '@mui/material/StepIcon';
 
-const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
+const ColorlibConnector = styled(StepConnector)(() => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 22,
   },
@@ -67,7 +67,7 @@ const StepperSx = {
 };
 
 function QontoStepIcon(props: StepIconProps) {
-  const { active, completed, className } = props;
+  const { active, className } = props;
 
   return (
     <QontoStepIconRoot ownerState={{ active }} className={className}>

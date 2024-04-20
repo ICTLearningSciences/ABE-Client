@@ -58,12 +58,12 @@ describe('document timeline', () => {
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // intention section should exist
       cy.get('[data-cy=intention-textarea]')
-      .should('exist')
-      .contains('This activity is to work on the hook of the essay.');
+        .should('exist')
+        .contains('This activity is to work on the hook of the essay.');
       // claeared the content of the textarea
-      cy.get('[data-cy=intention-textarea]').within(()=>{
-        cy.get("textarea").eq(0).clear().type('New intention');
-      })
+      cy.get('[data-cy=intention-textarea]').within(() => {
+        cy.get('textarea').eq(0).clear().type('New intention');
+      });
     });
 
     /* This test case is checking the display of the summary section and ensuring that it is editable.
@@ -73,7 +73,7 @@ describe('document timeline', () => {
       // summary section should exist
       cy.get('[data-cy=summary-textarea]').within(() => {
         cy.get('textarea').eq(0).clear().type('New summary');
-      })
+      });
     });
   });
 
@@ -237,7 +237,7 @@ describe('document timeline', () => {
     it('Shows scroll bar if needed (Footer Timeline)', () => {
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // left-content-container should have scroll bar
-      cy.get('[data-cy=footer-timeline]').should(
+      cy.get('[data-cy=timeline-footer-wrapper]').should(
         'have.css',
         'overflow-x',
         'auto'
@@ -270,23 +270,23 @@ describe('document timeline', () => {
     });
   });
 
-  describe("fetch timeline failed", ()=>{
-    it("server failure", ()=>{
+  describe('fetch timeline failed', () => {
+    it('server failure', () => {
       cyMockGetDocTimeline(cy, {
         response: eightHoursBetweenSessions,
         jobStatus: JobStatus.FAILED,
       });
-        cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
-        cy.contains("Failed to load document timeline")
-    })
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+      cy.contains('Failed to load document timeline');
+    });
 
-    it("http failure", ()=>{
+    it('http failure', () => {
       cyMockGetDocTimeline(cy, {
         response: eightHoursBetweenSessions,
         statusCode: 500,
       });
-        cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
-        cy.contains("Request failed with status code 500")
-    })
-  })
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+      cy.contains('Request failed with status code 500');
+    });
+  });
 });
