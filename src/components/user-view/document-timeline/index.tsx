@@ -102,9 +102,9 @@ function DocumentTimelinePage(): JSX.Element {
       <ColumnDiv
         style={{
           position: 'absolute',
-          height: '100%',
+          height: 'calc(100% - 10%)',
           width: '100%',
-          top: 0,
+          top: 60,
         }}
       >
         <RowDiv
@@ -147,7 +147,7 @@ function DocumentTimelinePage(): JSX.Element {
           </div>
         </RowDiv>
       </ColumnDiv>
-      <TimelineFooter2
+      <TimelineFooter
         currentTimelinePoint={curTimelinePoint}
         timelinePoints={timelinePoints}
         onSelectTimepoint={selectTimelinePoint}
