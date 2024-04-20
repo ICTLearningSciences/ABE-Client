@@ -91,18 +91,25 @@ function DocumentTimelinePage(): JSX.Element {
   const timelinePoints = documentTimeline.timelinePoints;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        height: '100%',
+      }}
+    >
       <ColumnDiv
         style={{
-          position: 'relative',
+          position: 'absolute',
           height: '100%',
           width: '100%',
-          marginBottom: 80,
+          top: 0,
         }}
       >
         <RowDiv
           style={{
-            height: '93%',
+            height: '90%',
             alignItems: 'flex-end',
             width: '100%',
           }}

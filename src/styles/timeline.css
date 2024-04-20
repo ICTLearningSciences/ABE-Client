@@ -84,7 +84,7 @@ The full terms of this copyright and license should always be found in the root 
   background-color: var(--timeline-bg);
   box-shadow: var(--content-shadow) !important;
   border-radius: 15px !important;
-  margin-bottom: 35px;
+  /* margin-bottom: 35px; */
   z-index: 100;
 }
 
@@ -130,17 +130,44 @@ The full terms of this copyright and license should always be found in the root 
 .timeline-item-test {
   display: flex;
   flex-direction: column;
-  margin: 0px 40px;
+  /* margin: 0px 40px; */
+  margin-right: 10px;
   justify-content: center;
   align-items: center;
 }
-.timeline-bar {
+/* .timeline-bar {
   position: absolute;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  bottom: 0px;
+  bottom: 25px;
   left: 0px;
   height: 15px;
-  box-shadow: var(--content-shadow-inner);
+} */
+
+.timeline-bar {
+  position: absolute;
+  display: flex;
+  bottom: 55px;
+  left: 0px;
+  height: 15px;
+}
+
+.timeline-footer-wrapper-cards {
+  display: flex;
+  justify-content: space-around;
+}
+.timeline-item-dot {
+  min-width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* margin: 0px 40px; */
+  margin-right: 10px;
+}
+
+.selected-card {
+  border: 2.5px solid #1b6a9c;
+  border-radius: 15px;
+  z-index: 1000;
 }
