@@ -202,7 +202,7 @@ textarea {
 .text-3-clickable {
   font-size: 0.8rem !important;
   font-weight: 500 !important;
-  margin-left: 10px !important;
+  /* margin-left: 10px !important; */
   color: var(--content-revision-text-color-3);
   cursor: pointer;
 }

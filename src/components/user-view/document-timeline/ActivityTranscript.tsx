@@ -1,7 +1,8 @@
 import React from 'react';
 import { ChatItem } from '../../../types';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import { Popover, Typography } from '@mui/material';
+import ChatIcon from '@mui/icons-material/Chat';
+import { IconButton, Popover, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 interface ActivityTranscriptProps {
@@ -55,9 +56,15 @@ function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
   const activityTitle = activity?.title || '';
   return (
     <div className="text-3">
-      <Typography className="text-3-clickable" onClick={handleClick}>
-        {activityTitle ? `(${activityTitle})` : ''}
-      </Typography>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <Typography className="text-3-clickable" onClick={handleClick}>
+          {activityTitle ? `${activityTitle}` : ''}
+        </Typography>
+        <IconButton aria-label="chat" onClick={handleClick}>
+          <ChatIcon style={{ fontSize: 18 }} />
+        </IconButton>
+      </div>
+
       <Popover
         open={open}
         anchorEl={anchorEl}

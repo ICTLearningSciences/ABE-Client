@@ -189,10 +189,6 @@ export default function TimepointOutline(props: {
             <Typography className="text-2" data-cy="intention-title">
               Intention
             </Typography>
-            <ActivityTranscript
-              chatLog={timelinePoint.version.chatLog}
-              activityId={timelinePoint.version.activity}
-            />
           </div>
 
           <Input
