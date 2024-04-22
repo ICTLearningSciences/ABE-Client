@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   GoogleDoc,
+  GQLTimelinePoint,
   Intention,
   StoreGoogleDoc,
   UserActivityState,
@@ -37,6 +38,7 @@ export interface State {
   overideGptModel: GptModels;
   viewingRole: UserRole;
   viewingAdvancedOptions: boolean;
+  timelinePoints: GQLTimelinePoint[];
 }
 
 const initialState: State = {
@@ -48,6 +50,7 @@ const initialState: State = {
   overideGptModel: GptModels.NONE,
   viewingRole: UserRole.USER,
   viewingAdvancedOptions: false,
+  timelinePoints: [],
 };
 
 export const loadUserGoogleDocs = createAsyncThunk(
@@ -112,6 +115,17 @@ export const stateSlice = createSlice({
     ) => {
       state.viewingAdvancedOptions = action.payload;
     },
+    /* The `loadTimelinePoints` function in the reducer is updating the `timelinePoints` array in the state
+with the timeline points provided in the payload of the action. */
+    loadTimelinePoints: (
+      state: State,
+      action: PayloadAction<{
+        timelinePoints: GQLTimelinePoint[];
+      }>
+    ) => {
+      const { timelinePoints } = action.payload;
+      state.timelinePoints = timelinePoints;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(loadUserGoogleDocs.fulfilled, (state, action) => {
@@ -152,6 +166,7 @@ export const {
   updateViewingAdvancedOptions,
   newSession,
   setSessionIntention,
+  loadTimelinePoints,
 } = stateSlice.actions;
 
 export default stateSlice.reducer;

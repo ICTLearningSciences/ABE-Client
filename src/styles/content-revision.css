@@ -257,14 +257,3 @@ textarea {
   transition: max-height 0.5s ease;
   display: none;
 }
-
-.custom-timeline-dot {
-  height: 15px;
-  width: 70px;
-  margin-top: -3px;
-  margin-left: -50px;
-  display: flex;
-  align-items: center;
-  border-radius: 10px;
-  background-color: #eaeaf0;
-}

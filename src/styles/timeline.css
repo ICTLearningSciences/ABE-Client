@@ -179,11 +179,26 @@ The full terms of this copyright and license should always be found in the root 
   z-index: 1000;
 }
 
-.MuiStepConnector-root {
-  left: calc(-50% + 15px) !important;
-  right: calc(50% + 15px) !important;
+.custom-timeline-dot-first,
+.custom-timeline-dot-last {
+  height: 15px;
+  width: 70px;
+  margin-top: -3px;
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  text-align: center;
+  background-color: #eaeaf0;
 }
 
-.MuiStepConnector-line {
-  margin-top: 35px !important;
+.custom-timeline-dot-first {
+  margin-left: -50px;
+}
+
+.custom-timeline-dot-last {
+  margin-left: 50px;
+}
+.active-dot {
+  background-color: #1b6a9c;
+  color: white !important;
 }

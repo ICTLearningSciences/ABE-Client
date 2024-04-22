@@ -253,6 +253,15 @@ export function hasMinutesPassed(
   );
 }
 
+/**
+ * This TypeScript function converts a given date string into a formatted date and time string in UTC
+ * timezone.
+ * @param {string} date - The `convertDateTimelinePointDate` function takes a `date` parameter as a
+ * string input. This date parameter represents a timestamp that needs to be converted into a specific
+ * format using the `toLocaleString` method with the provided options.
+ * @returns The function `convertDateTimelinePointDate` takes a date string as input, converts it to a
+ * Date object, and then formats it using the specified options. The formatted date string is returned.
+ */
 export const convertDateTimelinePointDate = (date: string): string => {
   if (!date) return '';
   const timestamp = new Date(date);
@@ -270,6 +279,18 @@ export const convertDateTimelinePointDate = (date: string): string => {
   return timestamp.toLocaleString('en-US', options);
 };
 
+/**
+ * The function `convertDateTimelinePointTime` takes a date string as input and returns the time in
+ * 12-hour format with hours and minutes.
+ * @param {string} date - The `convertDateTimelinePointTime` function takes a `date` parameter as a
+ * string input. This date string is then converted into a timestamp using the `new Date(date)`
+ * constructor. The function then formats this timestamp into a string representation of the time in
+ * 12-hour format with hours and minutes
+ * @returns The function `convertDateTimelinePointTime` takes a date string as input, converts it to a
+ * Date object, and then formats the time part of the date in 12-hour format with hours and minutes
+ * displayed in 2-digit format. The time is displayed in UTC timezone. The function returns a string
+ * representing the formatted time.
+ */
 export const convertDateTimelinePointTime = (date: string): string => {
   if (!date) return '';
   const timestamp = new Date(date);
