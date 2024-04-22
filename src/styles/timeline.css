@@ -68,24 +68,31 @@ The full terms of this copyright and license should always be found in the root 
   background-color: var(--timeline-bg);
 }
 
-.timeline-footer-item-card {
+.timeline-footer-item-card,
+.timeline-footer-item-card-hover {
   min-width: 120px;
-  padding: 5px 10px !important;
+  padding: 2px 0px !important;
   background-color: var(--timeline-bg);
   box-shadow: var(--content-shadow) !important;
   border-radius: 15px !important;
-  margin-bottom: 0px;
   z-index: 100;
+  transition:
+    min-width 0.9s ease,
+    padding 0.9s ease,
+    opacity 0.9s ease; /* Added opacity transition */
+  opacity: 1; /* Initial opacity */
 }
 
 .timeline-footer-item-card-hover {
-  min-width: 120px;
-  padding: 5px 10px !important;
-  background-color: var(--timeline-bg);
-  box-shadow: var(--content-shadow) !important;
-  border-radius: 15px !important;
-  /* margin-bottom: 35px; */
-  z-index: 100;
+  min-width: 150px;
+  padding: 2px 10px !important;
+}
+
+.timeline-footer-item-card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .timeline-footer-item {
@@ -148,7 +155,7 @@ The full terms of this copyright and license should always be found in the root 
 .timeline-bar {
   position: absolute;
   display: flex;
-  bottom: 55px;
+  bottom: 60px;
   left: 0px;
   height: 15px;
 }
@@ -175,4 +182,8 @@ The full terms of this copyright and license should always be found in the root 
 .MuiStepConnector-root {
   left: calc(-50% + 15px) !important;
   right: calc(50% + 15px) !important;
+}
+
+.MuiStepConnector-line {
+  margin-top: 35px !important;
 }

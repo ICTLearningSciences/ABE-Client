@@ -9,7 +9,11 @@ import StepLabel from '@mui/material/StepLabel';
 
 import { GQLTimelinePoint, TimelinePointType } from '../../../types';
 import { ColumnDiv } from '../../../styled-components';
-import { formatISODateToReadable } from '../../../helpers';
+import {
+  convertDateTimelinePointDate,
+  formatISODateToReadable,
+  convertDateTimelinePointTime,
+} from '../../../helpers';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 
@@ -19,6 +23,7 @@ import StepConnector, {
   stepConnectorClasses,
 } from '@mui/material/StepConnector';
 import { StepIconProps } from '@mui/material/StepIcon';
+import { motion } from 'framer-motion';
 
 const ColorlibConnector = styled(StepConnector)(() => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -69,9 +74,29 @@ const StepperSx = {
 function QontoStepIcon(props: StepIconProps) {
   const { active, className } = props;
 
+  const first = (
+    <div className={`custom-timeline-dot ${className}`}>
+      <Typography className="text-3-bold">Started</Typography>
+    </div>
+  );
+  const last = (
+    <div className="custom-timeline-dot">
+      <Typography className="text-3-bold">last</Typography>
+    </div>
+  );
+
+  const icons: { [index: string]: React.ReactElement } = {
+    1: first,
+    2: last,
+  };
+
   return (
-    <QontoStepIconRoot ownerState={{ active }} className={className}>
-      <FiberManualRecordIcon />
+    <QontoStepIconRoot
+      ownerState={{ active }}
+      className={className}
+      style={{ marginTop: 8 }}
+    >
+      {props.icon === 1 ? first : <FiberManualRecordIcon />}
     </QontoStepIconRoot>
   );
 }
@@ -91,19 +116,15 @@ const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
 
   return (
     <Box>
-      <Typography className="text-3-bold">
+      <Typography className="text-2">
         {/* Conditional rendering that determines the text content to display
         in the `Typography` component based on the `timelinePoint.type` and the availability of
         `activity.title` and `googleDoc?.title`. */}
-        {timelinePoint.type === TimelinePointType.NEW_ACTIVITY
-          ? `${googleDoc?.title}`
-          : activity.title
-          ? activity.title
-          : title}
+        {activity.title ? activity.title : title}
       </Typography>
 
       <Typography className="text-3-no-indent" style={{ textAlign: 'right' }}>
-        {formatISODateToReadable(timelinePoint.versionTime || '')}
+        {convertDateTimelinePointTime(timelinePoint.versionTime) || ''}
       </Typography>
     </Box>
   );
@@ -180,29 +201,44 @@ export default function TimelineFooter(props: {
           return (
             <Step key={i} active={isSelected}>
               <ColumnDiv key={i} className="timeline-item-test">
-                <Paper
-                  onClick={() => props.onSelectTimepoint(timelinePoint)}
-                  elevation={1}
-                  style={{ padding: '1rem' }}
-                  className={
-                    hoverIndex !== i
-                      ? 'timeline-footer-item-card'
-                      : 'timeline-footer-item-card-hover'
-                  }
-                  onMouseEnter={() => handleMouseEnter(i)}
-                  onMouseLeave={handleMouseLeave}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  key={i}
                 >
-                  {hoverIndex !== i ? (
-                    <Typography
-                      className="text-2"
-                      style={{ textAlign: 'center' }}
-                    >
-                      {formatISODateToReadable(timelinePoint.versionTime || '')}
-                    </Typography>
-                  ) : (
-                    <TimeLineCard timelinePoint={timelinePoints[i]} />
-                  )}
-                </Paper>
+                  <Paper
+                    onClick={() => props.onSelectTimepoint(timelinePoint)}
+                    elevation={1}
+                    style={{ padding: '1rem' }}
+                    className={
+                      hoverIndex !== i
+                        ? 'timeline-footer-item-card'
+                        : 'timeline-footer-item-card-hover'
+                    }
+                    onMouseEnter={() => handleMouseEnter(i)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    {hoverIndex !== i ? (
+                      <div className="timeline-footer-item-card-inner">
+                        <Typography
+                          className="text-2"
+                          style={{ textAlign: 'center' }}
+                        >
+                          {formatISODateToReadable(timelinePoint.versionTime) ||
+                            ''}
+                        </Typography>
+                        <Typography className="text-3">
+                          {convertDateTimelinePointTime(
+                            timelinePoint.versionTime
+                          ) || ''}
+                        </Typography>
+                      </div>
+                    ) : (
+                      <TimeLineCard timelinePoint={timelinePoints[i]} />
+                    )}
+                  </Paper>
+                </motion.div>
               </ColumnDiv>
               <StepLabel StepIconComponent={QontoStepIcon} />
             </Step>

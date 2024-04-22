@@ -103,7 +103,7 @@ function DocumentTimelinePage(): JSX.Element {
           position: 'absolute',
           height: 'calc(100% - 10%)',
           width: '100%',
-          top: 60,
+          top: 45,
         }}
       >
         <RowDiv

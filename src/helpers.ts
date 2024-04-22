@@ -252,3 +252,34 @@ export function hasMinutesPassed(
     new Date().getTime() - new Date(timeToCheck).getTime() > minutes * 60 * 1000
   );
 }
+
+export const convertDateTimelinePointDate = (date: string): string => {
+  if (!date) return '';
+  const timestamp = new Date(date);
+
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+    timeZone: 'UTC',
+  };
+
+  return timestamp.toLocaleString('en-US', options);
+};
+
+export const convertDateTimelinePointTime = (date: string): string => {
+  if (!date) return '';
+  const timestamp = new Date(date);
+
+  const options: Intl.DateTimeFormatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'UTC',
+  };
+
+  return timestamp.toLocaleString('en-US', options);
+};
