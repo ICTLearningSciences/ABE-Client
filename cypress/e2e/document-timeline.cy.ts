@@ -62,7 +62,7 @@ describe('document timeline', () => {
         .contains('This activity is to work on the hook of the essay.');
       // claeared the content of the textarea
       cy.get('[data-cy=intention-textarea]').within(() => {
-        cy.get('textarea').eq(0).clear().type('New intention');
+        cy.get('textarea', { timeout: 1000 }).eq(0).type('New intention');
       });
     });
 
@@ -72,7 +72,7 @@ describe('document timeline', () => {
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // summary section should exist
       cy.get('[data-cy=summary-textarea]').within(() => {
-        cy.get('textarea').eq(0).clear().type('New summary');
+        cy.get('textarea').eq(0).type('New summary');
       });
     });
   });
