@@ -252,3 +252,42 @@ export function hasMinutesPassed(
     new Date().getTime() - new Date(timeToCheck).getTime() > minutes * 60 * 1000
   );
 }
+
+/**
+ * This TypeScript function converts a given date string into a formatted date and time string in UTC
+ * timezone.
+ */
+export const convertDateTimelinePointDate = (date: string): string => {
+  if (!date) return '';
+  const timestamp = new Date(date);
+
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+    timeZone: 'UTC',
+  };
+
+  return timestamp.toLocaleString('en-US', options);
+};
+
+/**
+ * The function `convertDateTimelinePointTime` takes a date string as input and returns the time in
+ * 12-hour format with hours and minutes.
+ */
+export const convertDateTimelinePointTime = (date: string): string => {
+  if (!date) return '';
+  const timestamp = new Date(date);
+
+  const options: Intl.DateTimeFormatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'UTC',
+  };
+
+  return timestamp.toLocaleString('en-US', options);
+};

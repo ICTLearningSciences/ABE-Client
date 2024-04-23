@@ -1,15 +1,29 @@
 import React, { RefObject, useEffect, useState } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useParams } from 'react-router-dom';
 
-import { GQLTimelinePoint, TimelinePointType } from '../../../types';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import AssistantPhotoIcon from '@mui/icons-material/AssistantPhoto';
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
+
+import { motion } from 'framer-motion';
+
+import { GQLTimelinePoint } from '../../../types';
 import { ColumnDiv } from '../../../styled-components';
-import { formatISODateToReadable } from '../../../helpers';
+import {
+  formatISODateToReadable,
+  convertDateTimelinePointTime,
+} from '../../../helpers';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
-
 import '../../../styles/timeline.css';
+import {
+  ColorlibConnector,
+  QontoStepIcon,
+  StepperSx,
+} from './ColorlibConnector';
 
 /* The `TimeLineCard` component is a functional component that takes in a prop `timelinePoint` of type
 `GQLTimelinePoint`. Inside the component, it retrieves the `getActivitById` function from the
@@ -26,20 +40,16 @@ const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
   const title = activity?.title || googleDoc?.title;
 
   return (
-    <Box className="timeline-footer-item-card-hover">
+    <Box>
       <Typography className="text-2">
         {/* Conditional rendering that determines the text content to display
         in the `Typography` component based on the `timelinePoint.type` and the availability of
         `activity.title` and `googleDoc?.title`. */}
-        {timelinePoint.type === TimelinePointType.NEW_ACTIVITY
-          ? `${googleDoc?.title}`
-          : activity.title
-          ? activity.title
-          : title}
+        {activity.title ? activity.title : title}
       </Typography>
 
       <Typography className="text-3-no-indent" style={{ textAlign: 'right' }}>
-        {formatISODateToReadable(timelinePoint.versionTime || '')}
+        {convertDateTimelinePointTime(timelinePoint.versionTime) || ''}
       </Typography>
     </Box>
   );
@@ -89,62 +99,96 @@ export default function TimelineFooter(props: {
     }
   }, [footerTimelineRef]);
 
+  const currentVersionIndex = timelinePoints.length - 1;
+
   return (
     <Box
-      className="timeline-footer-wrapper"
+      className="timeline-test-container"
       data-cy="timeline-footer-wrapper"
       ref={footerTimelineRef}
+      style={{
+        width: footerTimelineRef.current?.scrollWidth || window.innerWidth,
+      }}
     >
-      <div className="timeline-footer-wrapper-inner">
+      <Stepper
+        alternativeLabel
+        connector={<ColorlibConnector />}
+        sx={StepperSx}
+        className="timeline-bar"
+        style={{
+          width:
+            footerTimelineRef.current?.scrollWidth ||
+            window.innerWidth ||
+            '100%',
+        }}
+      >
         {timelinePoints.map((timelinePoint, i) => {
           const isSelected =
             currentTimelinePoint?.versionTime === timelinePoint.versionTime;
           return (
-            <ColumnDiv
+            <Step
               key={i}
-              className={
-                hoverIndex !== i
-                  ? 'timeline-footer-item'
-                  : 'timeline-footer-item-hover'
-              }
+              active={isSelected}
+              onClick={() => props.onSelectTimepoint(timelinePoint)}
+              // style={i === 0 || i === currentVersionIndex ? { bottom: 25 } : {}}
             >
-              <Paper
-                onClick={() => props.onSelectTimepoint(timelinePoint)}
-                elevation={1}
-                style={{ padding: '1rem' }}
-                className="timeline-footer-item-card"
-                onMouseEnter={() => handleMouseEnter(i)}
-                onMouseLeave={handleMouseLeave}
-              >
-                {/* This part of the code is a conditional rendering within the `map` function of the
-              `timelinePoints` array. */}
-                {hoverIndex !== i ? (
-                  <Typography className="text-2">
-                    {formatISODateToReadable(timelinePoint.versionTime || '')}
-                  </Typography>
-                ) : (
-                  <TimeLineCard timelinePoint={timelinePoints[i]} />
-                )}
-              </Paper>
-
-              <Box key={i}>
-                <FiberManualRecordIcon
-                  onClick={() => props.onSelectTimepoint(timelinePoint)}
-                  style={{
-                    cursor: isSelected ? 'default' : 'pointer',
-                    border: isSelected
-                      ? '4px solid lightblue'
-                      : '4px solid white',
-                    borderRadius: '50%',
-                    fontSize: '1.5rem',
-                    marginBottom: 15,
-                  }}
-                />
-              </Box>
-            </ColumnDiv>
+              <ColumnDiv key={i} className="timeline-item-test">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  key={i}
+                >
+                  <Paper
+                    onClick={() => props.onSelectTimepoint(timelinePoint)}
+                    elevation={1}
+                    style={{ padding: '1rem' }}
+                    className={
+                      hoverIndex !== i
+                        ? 'timeline-footer-item-card'
+                        : 'timeline-footer-item-card-hover'
+                    }
+                    onMouseEnter={() => handleMouseEnter(i)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    {hoverIndex !== i ? (
+                      <div className="timeline-footer-item-card-inner">
+                        <Typography
+                          className="text-2"
+                          style={{
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          {formatISODateToReadable(timelinePoint.versionTime)}
+                          {i === 0 ? (
+                            <DoubleArrowIcon
+                              style={{ marginLeft: 5, fontSize: 18 }}
+                            />
+                          ) : i === currentVersionIndex ? (
+                            <AssistantPhotoIcon
+                              style={{ marginLeft: 5, fontSize: 18 }}
+                            />
+                          ) : null}
+                        </Typography>
+                        <Typography className="text-3">
+                          {convertDateTimelinePointTime(
+                            timelinePoint.versionTime
+                          )}
+                        </Typography>
+                      </div>
+                    ) : (
+                      <TimeLineCard timelinePoint={timelinePoints[i]} />
+                    )}
+                  </Paper>
+                </motion.div>
+              </ColumnDiv>
+              <StepLabel StepIconComponent={QontoStepIcon} />
+            </Step>
           );
         })}
-      </div>
+      </Stepper>
     </Box>
   );
 }
