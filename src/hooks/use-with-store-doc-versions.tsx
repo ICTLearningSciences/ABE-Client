@@ -11,6 +11,7 @@ import { useAppSelector } from '../store/hooks';
 import useInterval from './use-interval';
 import { DocVersion, Intention } from '../types';
 import { hasHoursPassed } from '../helpers';
+import { UseWithGoogleDocs } from './use-with-google-docs';
 
 export function useWithStoreDocVersions(selectedActivityId: string) {
   const { state } = useWithChat();
@@ -24,6 +25,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
   const curGoogleDoc = useAppSelector((state) =>
     state.state.userGoogleDocs.find((doc) => doc.googleDocId === googleDocId)
   );
+  const { updateGoogleDocTitleLocally } = UseWithGoogleDocs();
   const useDayIntention = curGoogleDoc?.currentDayIntention?.createdAt
     ? !hasHoursPassed(
         curGoogleDoc.currentDayIntention.createdAt,
@@ -47,6 +49,9 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
           return;
         }
         const docData = await getDocData(googleDocId);
+        if (docData.title !== lastUpdatedTitle) {
+          updateGoogleDocTitleLocally(googleDocId, docData.title);
+        }
         if (
           docData.lastChangedId === lastUpdatedId &&
           docData.title === lastUpdatedTitle &&

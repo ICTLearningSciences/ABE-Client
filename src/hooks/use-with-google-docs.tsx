@@ -15,6 +15,7 @@ import {
   loadUserGoogleDocs,
   updateGoogleDoc as _updateGoogleDoc,
   deleteUserGoogleDoc,
+  updateGoogleDocTitleLocally as _updateGoogleDocTitle,
 } from '../store/slices/state';
 import { URL_PARAM_NEW_DOC } from '../constants';
 
@@ -46,6 +47,7 @@ export interface UseWithGoogleDocs {
   loadUsersGoogleDocs: () => void;
   handleDeleteGoogleDoc: (docId: string) => Promise<void>;
   getCurrentGoogleDoc: (docId: string | undefined) => GoogleDoc | undefined;
+  updateGoogleDocTitleLocally: (googleDocId: string, title: string) => void;
 }
 
 export function UseWithGoogleDocs(): UseWithGoogleDocs {
@@ -136,6 +138,16 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     await dispatch(deleteUserGoogleDoc({ googleDocId: docId, userId }));
   }
 
+  /**
+   * Note: This will only update the google doc as it is titled in local redux, not in any server
+   */
+  async function updateGoogleDocTitleLocally(
+    googleDocId: string,
+    title: string
+  ) {
+    dispatch(_updateGoogleDocTitle({ googleDocId, title }));
+  }
+
   return {
     docId: googleDocId,
     docUrl: googleDocId
@@ -152,5 +164,6 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     loadUsersGoogleDocs,
     handleDeleteGoogleDoc,
     getCurrentGoogleDoc,
+    updateGoogleDocTitleLocally,
   };
 }
