@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   GoogleDoc,
-  GQLTimelinePoint,
   Intention,
   StoreGoogleDoc,
   UserActivityState,
@@ -38,7 +37,6 @@ export interface State {
   overideGptModel: GptModels;
   viewingRole: UserRole;
   viewingAdvancedOptions: boolean;
-  timelinePoints: GQLTimelinePoint[];
 }
 
 const initialState: State = {
@@ -50,7 +48,6 @@ const initialState: State = {
   overideGptModel: GptModels.NONE,
   viewingRole: UserRole.USER,
   viewingAdvancedOptions: false,
-  timelinePoints: [],
 };
 
 export const loadUserGoogleDocs = createAsyncThunk(
