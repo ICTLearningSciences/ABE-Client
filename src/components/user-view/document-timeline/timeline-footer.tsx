@@ -1,19 +1,15 @@
 import React, { RefObject, useEffect, useState } from 'react';
-import { Box, Paper, styled, Typography } from '@mui/material';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import { Box, Paper, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import StepConnector, {
-  stepConnectorClasses,
-} from '@mui/material/StepConnector';
-import { StepIconProps } from '@mui/material/StepIcon';
+import AssistantPhotoIcon from '@mui/icons-material/AssistantPhoto';
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
+
 import { motion } from 'framer-motion';
 
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { loadTimelinePoints } from '../../../store/slices/state';
 import { GQLTimelinePoint } from '../../../types';
 import { ColumnDiv } from '../../../styled-components';
 import {
@@ -23,120 +19,11 @@ import {
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 import '../../../styles/timeline.css';
-
-/* The `const ColorlibConnector` declaration is using the `styled` function from Material-UI to create
-a styled component for the `StepConnector` component. This styled component is defining the styles
-for the connector line used in a `Stepper` component. */
-const ColorlibConnector = styled(StepConnector)(() => ({
-  [`&.${stepConnectorClasses.alternativeLabel}`]: {
-    top: 22,
-  },
-  [`& .${stepConnectorClasses.line}`]: {
-    height: 10,
-    border: 0,
-    backgroundColor: '#fff',
-    boxShadow: '0px 2px 15px 0px rgba(90, 82, 128, 0.2)',
-    borderRadius: 5,
-  },
-}));
-
-/* The `const QontoStepIconRoot` is using Emotion's styled function to create a styled component for a
-`div` element. This styled component accepts props with a specific structure defined by `{
-ownerState: { active?: boolean } }`. */
-const QontoStepIconRoot = styled('div')<{ ownerState: { active?: boolean } }>(
-  ({ theme, ownerState }) => ({
-    color: theme.palette.mode === 'dark' ? theme.palette.grey[700] : '#eaeaf0',
-    display: 'flex',
-    height: 22,
-    alignItems: 'center',
-    ...(ownerState.active && {
-      color: '#1b6a9c',
-    }),
-    '& .QontoStepIcon-completedIcon': {
-      color: '#784af4',
-      zIndex: 1,
-      fontSize: 18,
-    },
-    '& .QontoStepIcon-circle': {
-      width: 8,
-      height: 8,
-      borderRadius: '50%',
-      backgroundColor: 'currentColor',
-    },
-  })
-);
-
-/* The `StepperSx` constant is an object that contains styling properties using the syntax provided by
-Emotion's CSS prop. In this case, it is defining styles for the `Stepper` component in the React
-code snippet. */
-const StepperSx = {
-  '& .MuiStepConnector-root': {
-    left: 'calc(-50% + 15px)',
-    right: 'calc(50% + 15px)',
-  },
-  '& .MuiStepConnector-line': {
-    marginTop: '35px', // To position the line lower
-  },
-};
-
-/* The `QontoStepIcon` function is a custom component used as the `StepIconComponent` in the
-`StepLabel` component within the `Stepper` component. This custom component is responsible for
-rendering the icons displayed for each step in the timeline. */
-function QontoStepIcon(props: StepIconProps) {
-  const { active, className } = props;
-  const timelinePointsLength = useAppSelector(
-    (state) => state.state.timelinePoints.length
-  );
-
-  const first = (
-    <div
-      className={
-        active
-          ? 'custom-timeline-dot-first active-dot'
-          : 'custom-timeline-dot-first'
-      }
-    >
-      <Typography
-        className="text-3-bold"
-        style={{ textAlign: 'center', color: active ? '#fff' : '' }}
-      >
-        Started
-      </Typography>
-    </div>
-  );
-  const last = (
-    <div
-      className={
-        active
-          ? 'custom-timeline-dot-last active-dot'
-          : 'custom-timeline-dot-last'
-      }
-    >
-      <Typography
-        className="text-3-bold"
-        style={{ textAlign: 'center', color: active ? '#fff' : '' }}
-      >
-        Current
-      </Typography>
-    </div>
-  );
-
-  return (
-    <QontoStepIconRoot
-      ownerState={{ active }}
-      className={className}
-      style={{ marginTop: 8 }}
-    >
-      {props.icon === 1 ? (
-        first
-      ) : props.icon === timelinePointsLength ? (
-        last
-      ) : (
-        <FiberManualRecordIcon />
-      )}
-    </QontoStepIconRoot>
-  );
-}
+import {
+  ColorlibConnector,
+  QontoStepIcon,
+  StepperSx,
+} from './ColorlibConnector';
 
 /* The `TimeLineCard` component is a functional component that takes in a prop `timelinePoint` of type
 `GQLTimelinePoint`. Inside the component, it retrieves the `getActivitById` function from the
@@ -182,7 +69,6 @@ export default function TimelineFooter(props: {
     setHasOverflowX,
   } = props;
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-  const dispatch = useAppDispatch();
 
   /**
    * The handleMouseEnter function sets the hover index based on the provided index parameter.
@@ -205,7 +91,6 @@ export default function TimelineFooter(props: {
  exists, it calculates whether the content inside the element overflows horizontally. */
   useEffect(() => {
     if (footerTimelineRef.current === null) return;
-    dispatch(loadTimelinePoints({ timelinePoints }));
     const footerTimelineElement = footerTimelineRef?.current;
     if (footerTimelineElement) {
       setHasOverflowX(
@@ -213,6 +98,8 @@ export default function TimelineFooter(props: {
       );
     }
   }, [footerTimelineRef]);
+
+  const currentVersionIndex = timelinePoints.length - 1;
 
   return (
     <Box
@@ -243,6 +130,7 @@ export default function TimelineFooter(props: {
               key={i}
               active={isSelected}
               onClick={() => props.onSelectTimepoint(timelinePoint)}
+              // style={i === 0 || i === currentVersionIndex ? { bottom: 25 } : {}}
             >
               <ColumnDiv key={i} className="timeline-item-test">
                 <motion.div
@@ -267,15 +155,27 @@ export default function TimelineFooter(props: {
                       <div className="timeline-footer-item-card-inner">
                         <Typography
                           className="text-2"
-                          style={{ textAlign: 'center' }}
+                          style={{
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
                         >
-                          {formatISODateToReadable(timelinePoint.versionTime) ||
-                            ''}
+                          {formatISODateToReadable(timelinePoint.versionTime)}
+                          {i === 0 ? (
+                            <DoubleArrowIcon
+                              style={{ marginLeft: 5, fontSize: 18 }}
+                            />
+                          ) : i === currentVersionIndex ? (
+                            <AssistantPhotoIcon
+                              style={{ marginLeft: 5, fontSize: 18 }}
+                            />
+                          ) : null}
                         </Typography>
                         <Typography className="text-3">
                           {convertDateTimelinePointTime(
                             timelinePoint.versionTime
-                          ) || ''}
+                          )}
                         </Typography>
                       </div>
                     ) : (

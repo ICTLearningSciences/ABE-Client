@@ -115,17 +115,6 @@ export const stateSlice = createSlice({
     ) => {
       state.viewingAdvancedOptions = action.payload;
     },
-    /* The `loadTimelinePoints` function in the reducer is updating the `timelinePoints` array in the state
-with the timeline points provided in the payload of the action. */
-    loadTimelinePoints: (
-      state: State,
-      action: PayloadAction<{
-        timelinePoints: GQLTimelinePoint[];
-      }>
-    ) => {
-      const { timelinePoints } = action.payload;
-      state.timelinePoints = timelinePoints;
-    },
   },
   extraReducers: (builder) => {
     builder.addCase(loadUserGoogleDocs.fulfilled, (state, action) => {
@@ -166,7 +155,6 @@ export const {
   updateViewingAdvancedOptions,
   newSession,
   setSessionIntention,
-  loadTimelinePoints,
 } = stateSlice.actions;
 
 export default stateSlice.reducer;
