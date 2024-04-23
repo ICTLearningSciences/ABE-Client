@@ -79,6 +79,11 @@ export const updateGoogleDoc = createAsyncThunk(
   }
 );
 
+interface UpdateGoogleDocTitle {
+  googleDocId: string;
+  title: string;
+}
+
 /** Reducer */
 export const stateSlice = createSlice({
   name: 'state',
@@ -114,6 +119,17 @@ export const stateSlice = createSlice({
       action: PayloadAction<boolean>
     ) => {
       state.viewingAdvancedOptions = action.payload;
+    },
+    updateGoogleDocTitleLocally: (
+      state: State,
+      action: PayloadAction<UpdateGoogleDocTitle>
+    ) => {
+      state.userGoogleDocs = state.userGoogleDocs.map((doc) => {
+        if (doc.googleDocId === action.payload.googleDocId) {
+          doc.title = action.payload.title;
+        }
+        return doc;
+      });
     },
   },
   extraReducers: (builder) => {
@@ -155,6 +171,7 @@ export const {
   updateViewingAdvancedOptions,
   newSession,
   setSessionIntention,
+  updateGoogleDocTitleLocally,
 } = stateSlice.actions;
 
 export default stateSlice.reducer;
