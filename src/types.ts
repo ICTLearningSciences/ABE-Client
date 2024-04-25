@@ -270,7 +270,7 @@ export interface OpenAiJobStatus {
 
 export interface DocumentTimelineJobStatus {
   jobStatus: JobStatus;
-  documentTimeline: GQLDocumentTimeline;
+  documentTimeline?: GQLDocumentTimeline;
 }
 
 export enum TimelinePointType {
@@ -288,14 +288,23 @@ export enum MockDefaultType {
   CUSTOM_FILE_DATA = 'CUSTOM_FILE_DATA',
   ALL = 'ALL',
 }
+
+export enum OpenAiGenerationStatus {
+  NONE = 'NONE',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+}
 export interface GQLTimelinePoint {
   type: TimelinePointType;
   versionTime: string;
   version: IGDocVersion;
   intent: string;
   changeSummary: string;
+  changeSummaryStatus: OpenAiGenerationStatus;
   userInputSummary: string;
   reverseOutline: string;
+  reverseOutlineStatus: OpenAiGenerationStatus;
   relatedFeedback: string;
 }
 

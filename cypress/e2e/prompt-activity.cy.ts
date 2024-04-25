@@ -14,7 +14,7 @@ import { ACCESS_TOKEN_KEY } from '../helpers/local-storage';
 import { JobStatus, UserRole } from '../helpers/types';
 
 describe('Prompt Activities', () => {
-  it.only('can visit prompt activity', () => {
+  it('can visit prompt activity', () => {
     cyMockDefault(cy);
     cyMockOpenAiCall(cy, {
       response: analyzeHookResponse(2, 2, JobStatus.COMPLETE),
@@ -111,7 +111,7 @@ describe('Prompt Activities', () => {
     );
   });
 
-  it.only('walk through prompt activity', () => {
+  it('walk through prompt activity', () => {
     cyMockDefault(cy);
     cyMockOpenAiCall(cy, { response: analyzeHookResponse(2, 2) });
     toPromptActivity(cy);
@@ -185,7 +185,7 @@ describe('Prompt Activities', () => {
     cyMockDefault(cy, { userRole: UserRole.ADMIN });
     cy.visit('/');
     cy.get('[data-cy=role-switch]').click();
-    cy.get('[data-cy=doc-list-item-Aliens]').click();
+    cy.get('[data-cy=doc-list-item-Aliens]').eq(0).click();
     cy.get('[data-cy=preview-button-Army-Style-Review]').click();
     cyMockOpenAiCall(cy, { response: analyzeHookResponse(2, 2) });
     cy.get('[data-cy=chat-header]').should('have.text', 'Army Style Checklist');
@@ -203,7 +203,7 @@ describe('Prompt Activities', () => {
     cyMockOpenAiCall(cy, { response: analyzeHookResponse(2, 2) });
     cy.visit('/');
     cy.get('[data-cy=role-switch]').click();
-    cy.get('[data-cy=doc-list-item-Aliens]').click();
+    cy.get('[data-cy=doc-list-item-Aliens]').eq(0).click();
     cy.get('[data-cy=preview-button-N-3-Compare-Story-to-Hook]').click();
     cy.get('[data-cy=chat-header]').should(
       'have.text',

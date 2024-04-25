@@ -10,6 +10,7 @@ import {
   GQLDocumentTimeline,
   GQLTimelinePoint,
   JobStatus,
+  OpenAiGenerationStatus,
   TimelinePointType,
 } from '../types';
 import {
@@ -55,8 +56,10 @@ const startPoint: GQLTimelinePoint = {
   },
   intent: '',
   changeSummary: '',
+  changeSummaryStatus: OpenAiGenerationStatus.COMPLETED,
   userInputSummary: '',
   reverseOutline: 'No outline available',
+  reverseOutlineStatus: OpenAiGenerationStatus.COMPLETED,
   relatedFeedback: '',
 };
 
@@ -97,7 +100,6 @@ export function addStartPointToTimeline(timeline: GQLDocumentTimeline) {
 
 export function useWithDocumentTimeline() {
   const [state, dispatch] = useReducer(TimelineReducer, initialState);
-
   async function asyncFetchDocTimeline(
     userId: string,
     docId: string,
@@ -122,10 +124,19 @@ export function useWithDocumentTimeline() {
           if (res.jobStatus === JobStatus.FAILED) {
             throw new Error('Failed to load document timeline');
           }
+          if (
+            res.jobStatus === JobStatus.IN_PROGRESS &&
+            Boolean(res.documentTimeline)
+          ) {
+            dispatch({
+              type: TimelineActionType.PARTIAL_DATA_LOADED,
+              dataPayload: res.documentTimeline,
+            });
+          }
           return res.jobStatus === JobStatus.COMPLETE;
         },
-        1000,
-        60000
+        2 * 1000,
+        300 * 1000
       );
       const timeline = res.documentTimeline;
       dispatch({
@@ -180,7 +191,9 @@ export function useWithDocumentTimeline() {
     documentTimeline: state.data,
     // ? addStartPointToTimeline(state.data)
     // : undefined,
-    curTimelinePoint: state.selectedTimepoint,
+    curTimelinePoint: state.data?.timelinePoints.find(
+      (tp) => tp.versionTime === state.selectedTimepointVersionTime
+    ),
     loadInProgress: state.status === LoadingStatusType.LOADING,
     errorMessage:
       state.status === LoadingStatusType.ERROR ? state.error : undefined,
