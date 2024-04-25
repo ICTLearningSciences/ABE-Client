@@ -270,7 +270,7 @@ export interface OpenAiJobStatus {
 
 export interface DocumentTimelineJobStatus {
   jobStatus: JobStatus;
-  documentTimeline: GQLDocumentTimeline;
+  documentTimeline?: GQLDocumentTimeline;
 }
 
 export enum TimelinePointType {

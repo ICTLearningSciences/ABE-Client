@@ -27,6 +27,7 @@ export enum TimelineActionType {
   LOADING_STARTED = 'LOADING_STARTED',
   LOADING_SUCCEEDED = 'LOADING_SUCCEEDED',
   LOADING_FAILED = 'LOADING_FAILED',
+  PARTIAL_DATA_LOADED = 'PARTIAL_DATA_LOADED',
   SAVE_TIMELINE_POINT = 'SAVE_TIMELINE_POINT',
   SELECT_TIMEPOINT = 'SELECT_TIMEPOINT',
 }
@@ -42,6 +43,16 @@ export function TimelineReducer(
         status: LoadingStatusType.LOADING,
         data: undefined,
         selectedTimepoint: undefined,
+        error: undefined,
+      };
+    case TimelineActionType.PARTIAL_DATA_LOADED:
+      return {
+        status: LoadingStatusType.LOADING,
+        data: dataPayload,
+        selectedTimepoint:
+          dataPayload && dataPayload.timelinePoints.length > 0
+            ? dataPayload.timelinePoints[0]
+            : undefined,
         error: undefined,
       };
     case TimelineActionType.LOADING_SUCCEEDED:

@@ -122,6 +122,15 @@ export function useWithDocumentTimeline() {
           if (res.jobStatus === JobStatus.FAILED) {
             throw new Error('Failed to load document timeline');
           }
+          if (
+            res.jobStatus === JobStatus.IN_PROGRESS &&
+            Boolean(res.documentTimeline)
+          ) {
+            dispatch({
+              type: TimelineActionType.PARTIAL_DATA_LOADED,
+              dataPayload: res.documentTimeline,
+            });
+          }
           return res.jobStatus === JobStatus.COMPLETE;
         },
         1000,
