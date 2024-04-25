@@ -11,6 +11,8 @@ import {
   CircularProgress,
   IconButton,
   Modal,
+  SxProps,
+  Theme,
 } from '@mui/material';
 import { ActivityGQL, DocGoal, GoogleDoc, Intention } from '../../../types';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
@@ -28,15 +30,17 @@ import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 import { useSearchParams } from 'react-router-dom';
 import { FREE_INPUT_GOAL_ID, URL_PARAM_NEW_DOC } from '../../../constants';
 
-const style = {
+const style: SxProps<Theme> = {
   position: 'absolute',
   top: '50%',
   left: '50%',
+  WebkitTransform: 'translate(-50%, -50%)',
   transform: 'translate(-50%, -50%)',
   width: 'fit-content',
   height: 'fit-content',
   p: 4,
   display: 'flex',
+  boxSizing: 'border-box',
   flexDirection: 'column',
   justifyContent: 'space-between',
   backgroundColor: 'white',
@@ -362,8 +366,8 @@ export default function DocGoalModal(props: {
               </div>
               <ColumnDiv
                 style={{
-                  height: '100%',
-                  width: '100%',
+                  height: 'fit-content',
+                  width: 'fit-content',
                   alignItems: 'center',
                   justifyContent: 'space-around',
                 }}
