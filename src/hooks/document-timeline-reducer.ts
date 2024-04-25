@@ -11,7 +11,7 @@ import { LoadingError, LoadingStatusType } from './generic-loading-reducer';
 export interface TimelineState {
   status: LoadingStatusType;
   data?: GQLDocumentTimeline;
-  selectedTimepoint?: GQLTimelinePoint;
+  selectedTimepointVersionTime?: string;
   error?: LoadingError;
 }
 
@@ -42,27 +42,33 @@ export function TimelineReducer(
       return {
         status: LoadingStatusType.LOADING,
         data: undefined,
-        selectedTimepoint: undefined,
+        selectedTimepointVersionTime: undefined,
         error: undefined,
       };
     case TimelineActionType.PARTIAL_DATA_LOADED:
       return {
         status: LoadingStatusType.LOADING,
         data: dataPayload,
-        selectedTimepoint:
+        selectedTimepointVersionTime:
           dataPayload &&
           dataPayload.timelinePoints.length > 0 &&
-          !state.selectedTimepoint
-            ? dataPayload.timelinePoints[0]
-            : state.selectedTimepoint,
+          !state.selectedTimepointVersionTime
+            ? dataPayload.timelinePoints[dataPayload.timelinePoints.length - 1]
+                .versionTime
+            : state.selectedTimepointVersionTime,
         error: undefined,
       };
     case TimelineActionType.LOADING_SUCCEEDED:
       return {
         status: LoadingStatusType.SUCCESS,
         data: dataPayload,
-        selectedTimepoint:
-          dataPayload?.timelinePoints[dataPayload.timelinePoints.length - 1],
+        selectedTimepointVersionTime:
+          dataPayload &&
+          dataPayload.timelinePoints.length > 0 &&
+          !state.selectedTimepointVersionTime
+            ? dataPayload.timelinePoints[dataPayload.timelinePoints.length - 1]
+                .versionTime
+            : state.selectedTimepointVersionTime,
         error: undefined,
       };
     case TimelineActionType.LOADING_FAILED:
@@ -74,7 +80,7 @@ export function TimelineReducer(
     case TimelineActionType.SELECT_TIMEPOINT:
       return {
         ...state,
-        selectedTimepoint: selectTimepointPayload,
+        selectedTimepointVersionTime: selectTimepointPayload?.versionTime,
       };
     case TimelineActionType.SAVE_TIMELINE_POINT:
       if (!action.savedTimelinePoint) {
@@ -92,7 +98,7 @@ export function TimelineReducer(
               ),
             }
           : undefined,
-        selectedTimepoint: action.savedTimelinePoint,
+        selectedTimepointVersionTime: action.savedTimelinePoint.versionTime,
       };
     default:
       return { status: LoadingStatusType.NONE };

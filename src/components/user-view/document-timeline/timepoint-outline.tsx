@@ -36,12 +36,19 @@ interface EvidenceObject {
 export const TimepointOutline = React.memo(
   function TimepointOutline(props: {
     timelinePoint: GQLTimelinePoint;
+    timelineGenerationInProgress: boolean;
     googleDoc?: GoogleDoc;
     hasOverflowX: boolean;
     saveTimelinePoint: (timelinePoint: GQLTimelinePoint) => Promise<void>;
     updateGoogleDoc: (googleDoc: StoreGoogleDoc) => Promise<GoogleDoc>;
   }): JSX.Element {
-    const { timelinePoint, hasOverflowX, googleDoc, updateGoogleDoc } = props;
+    const {
+      timelinePoint,
+      hasOverflowX,
+      googleDoc,
+      updateGoogleDoc,
+      timelineGenerationInProgress,
+    } = props;
 
     const [thesis, setThesis] = useState<boolean>(false);
     const [supportingClaims, setSupportingClaims] = useState<boolean>(false);
@@ -199,7 +206,10 @@ export const TimepointOutline = React.memo(
             <Input
               value={editedInentionText}
               disableUnderline
-              disabled={timelinePoint.type === TimelinePointType.INTRO}
+              disabled={
+                timelinePoint.type === TimelinePointType.INTRO ||
+                timelineGenerationInProgress
+              }
               endAdornment={
                 editedInentionText !== intentionText ? (
                   <IconButton
@@ -265,7 +275,10 @@ export const TimepointOutline = React.memo(
             <Input
               value={editedAssignmentDescription}
               disableUnderline
-              disabled={timelinePoint.type === TimelinePointType.INTRO}
+              disabled={
+                timelinePoint.type === TimelinePointType.INTRO ||
+                timelineGenerationInProgress
+              }
               endAdornment={
                 editedAssignmentDescription !== assignmentDescription ? (
                   <IconButton
@@ -321,11 +334,22 @@ and dynamically adjust the height of the input field. */
         timelinePoint.changeSummaryStatus === OpenAiGenerationStatus.IN_PROGRESS
       ) {
         return (
-          <Box className="ai-outline-container">
+          <Box
+            className="ai-outline-container"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
             <Typography className="text-2" data-cy="ai-summary-in-progress">
               Generating AI Summary...
             </Typography>
-            <CircularProgress />
+            <CircularProgress
+              style={{
+                alignSelf: 'center',
+                justifySelf: 'center',
+              }}
+            />
           </Box>
         );
       }
@@ -350,6 +374,7 @@ and dynamically adjust the height of the input field. */
                 value={editedChangeSummary}
                 disableUnderline
                 multiline
+                disabled={timelineGenerationInProgress}
                 endAdornment={
                   editedChangeSummary !== targetSummary ? (
                     <IconButton
@@ -550,11 +575,23 @@ and dynamically adjust the height of the input field. */
                 No AI outline available
               </Typography>
             ) : (
-              <Box className="ai-outline-container" data-cy="">
+              <Box
+                className="ai-outline-container"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  marginRight: 10,
+                }}
+              >
                 <Typography className="text-2" data-cy="ai-outline-in-progress">
                   Generating AI Outline...
                 </Typography>
-                <CircularProgress />
+                <CircularProgress
+                  style={{
+                    alignSelf: 'center',
+                    justifySelf: 'center',
+                  }}
+                />
               </Box>
             )
           }
@@ -571,6 +608,11 @@ and dynamically adjust the height of the input field. */
       prevProps.googleDoc &&
       nextProps.googleDoc &&
       !equals<GoogleDoc>(prevProps.googleDoc, nextProps.googleDoc);
-    return !timelinePointChanges && !googleDocChanges;
+    const generationInProgressChanges =
+      prevProps.timelineGenerationInProgress !==
+      nextProps.timelineGenerationInProgress;
+    return (
+      !timelinePointChanges && !googleDocChanges && !generationInProgressChanges
+    );
   }
 );

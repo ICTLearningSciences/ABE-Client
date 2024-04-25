@@ -30,7 +30,7 @@ export const fetchGoogleDocsResponse: { fetchGoogleDocs: GoogleDoc[] } = {
     {
       googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Z',
       user: testUser._id,
-      title: 'Intention',
+      title: 'Aliens',
       documentIntention: {
         description: 'Aliens document intention',
         createdAt: new Date().toISOString(),

@@ -191,7 +191,9 @@ export function useWithDocumentTimeline() {
     documentTimeline: state.data,
     // ? addStartPointToTimeline(state.data)
     // : undefined,
-    curTimelinePoint: state.selectedTimepoint,
+    curTimelinePoint: state.data?.timelinePoints.find(
+      (tp) => tp.versionTime === state.selectedTimepointVersionTime
+    ),
     loadInProgress: state.status === LoadingStatusType.LOADING,
     errorMessage:
       state.status === LoadingStatusType.ERROR ? state.error : undefined,

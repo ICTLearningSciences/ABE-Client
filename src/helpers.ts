@@ -8,6 +8,8 @@ import axios from 'axios';
 import {
   ActivityGQL,
   GQLPrompt,
+  GQLTimelinePoint,
+  OpenAiGenerationStatus,
   OpenAiReqRes,
   PromptConfiguration,
 } from './types';
@@ -290,4 +292,13 @@ export const convertDateTimelinePointTime = (date: string): string => {
   };
 
   return timestamp.toLocaleString('en-US', options);
+};
+
+export const isTimelinePointFullyLoaded = (
+  timelinePoint: GQLTimelinePoint
+): boolean => {
+  return (
+    timelinePoint.changeSummaryStatus === OpenAiGenerationStatus.COMPLETED &&
+    timelinePoint.reverseOutlineStatus === OpenAiGenerationStatus.COMPLETED
+  );
 };

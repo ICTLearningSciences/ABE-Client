@@ -141,6 +141,7 @@ function DocumentTimelinePage(): JSX.Element {
               googleDoc={currentGoogleDoc}
               saveTimelinePoint={saveTimelinePoint}
               updateGoogleDoc={updateGoogleDoc}
+              timelineGenerationInProgress={loadInProgress}
             />
           </div>
         </RowDiv>
