@@ -50,9 +50,11 @@ export function TimelineReducer(
         status: LoadingStatusType.LOADING,
         data: dataPayload,
         selectedTimepoint:
-          dataPayload && dataPayload.timelinePoints.length > 0
+          dataPayload &&
+          dataPayload.timelinePoints.length > 0 &&
+          !state.selectedTimepoint
             ? dataPayload.timelinePoints[0]
-            : undefined,
+            : state.selectedTimepoint,
         error: undefined,
       };
     case TimelineActionType.LOADING_SUCCEEDED:

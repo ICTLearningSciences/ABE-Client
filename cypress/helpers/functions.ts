@@ -253,6 +253,7 @@ export function cyMockGetDocTimeline(
     );
   });
   cy.intercept('**/async_document_timeline_status/**', (req) => {
+    req.alias='FetchDocumentTimelineStatus';
     req.reply(
       staticResponse({
         statusCode: params.statusCode || 200,

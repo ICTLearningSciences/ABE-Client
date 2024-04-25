@@ -10,6 +10,7 @@ import {
   GQLDocumentTimeline,
   GQLTimelinePoint,
   JobStatus,
+  OpenAiGenerationStatus,
   TimelinePointType,
 } from '../types';
 import {
@@ -55,8 +56,10 @@ const startPoint: GQLTimelinePoint = {
   },
   intent: '',
   changeSummary: '',
+  changeSummaryStatus: OpenAiGenerationStatus.COMPLETED,
   userInputSummary: '',
   reverseOutline: 'No outline available',
+  reverseOutlineStatus: OpenAiGenerationStatus.COMPLETED,
   relatedFeedback: '',
 };
 
@@ -97,7 +100,6 @@ export function addStartPointToTimeline(timeline: GQLDocumentTimeline) {
 
 export function useWithDocumentTimeline() {
   const [state, dispatch] = useReducer(TimelineReducer, initialState);
-
   async function asyncFetchDocTimeline(
     userId: string,
     docId: string,
@@ -133,8 +135,8 @@ export function useWithDocumentTimeline() {
           }
           return res.jobStatus === JobStatus.COMPLETE;
         },
-        1000,
-        60000
+        2 * 1000,
+        300 * 1000
       );
       const timeline = res.documentTimeline;
       dispatch({

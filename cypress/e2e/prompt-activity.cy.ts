@@ -14,7 +14,7 @@ import { ACCESS_TOKEN_KEY } from '../helpers/local-storage';
 import { JobStatus, UserRole } from '../helpers/types';
 
 describe('Prompt Activities', () => {
-  it.only('can visit prompt activity', () => {
+  it('can visit prompt activity', () => {
     cyMockDefault(cy);
     cyMockOpenAiCall(cy, {
       response: analyzeHookResponse(2, 2, JobStatus.COMPLETE),
@@ -111,7 +111,7 @@ describe('Prompt Activities', () => {
     );
   });
 
-  it.only('walk through prompt activity', () => {
+  it('walk through prompt activity', () => {
     cyMockDefault(cy);
     cyMockOpenAiCall(cy, { response: analyzeHookResponse(2, 2) });
     toPromptActivity(cy);

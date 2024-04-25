@@ -454,7 +454,7 @@ describe('collectin user intentions', () => {
       checkNumberSessionIds(cy, 1);
     });
 
-    it.only('sessionId changes when user revisits a document', () => {
+    it('sessionId changes when user revisits a document', () => {
       cyMockDefault(cy);
       cy.visit(`/docs/${testGoogleDocId}`);
       goToStrongerHookActivity(cy);

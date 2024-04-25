@@ -17,6 +17,7 @@ import { equals, formatISODateToReadable } from '../../../helpers';
 import {
   GQLTimelinePoint,
   GoogleDoc,
+  OpenAiGenerationStatus,
   StoreGoogleDoc,
   TimelinePointType,
 } from '../../../types';
@@ -31,9 +32,6 @@ import '../../../styles/activity-transcript.css';
 interface EvidenceObject {
   [key: string]: string[];
 }
-
-// memoize TimepointOutline for whenever the timelinePoint changes
-// this is a performance optimization
 
 export const TimepointOutline = React.memo(
   function TimepointOutline(props: {
@@ -57,17 +55,21 @@ export const TimepointOutline = React.memo(
     useEffect(() => {
       if (timelinePoint.reverseOutline === 'No outline available') return;
 
-      const reverseOutlineParsed = JSON.parse(timelinePoint.reverseOutline);
-      setAIOutline(true);
+      try {
+        const reverseOutlineParsed = JSON.parse(timelinePoint.reverseOutline);
+        setAIOutline(true);
 
-      if (reverseOutlineParsed['Thesis Statement'] !== '') {
-        setThesis(true);
-      }
-      if (reverseOutlineParsed['Supporting Claims'].length > 0) {
-        setSupportingClaims(true);
-      }
-      if (reverseOutlineParsed['Evidence Given for Each Claim'].length > 0) {
-        setClaimEvidence(true);
+        if (reverseOutlineParsed['Thesis Statement'] !== '') {
+          setThesis(true);
+        }
+        if (reverseOutlineParsed['Supporting Claims'].length > 0) {
+          setSupportingClaims(true);
+        }
+        if (reverseOutlineParsed['Evidence Given for Each Claim'].length > 0) {
+          setClaimEvidence(true);
+        }
+      } catch (e) {
+        console.error('Error parsing reverse outline', e);
       }
     }, [timelinePoint]);
 
@@ -315,6 +317,19 @@ and dynamically adjust the height of the input field. */
       );
       const [saving, setSaving] = useState(false);
 
+      if (
+        timelinePoint.changeSummaryStatus === OpenAiGenerationStatus.IN_PROGRESS
+      ) {
+        return (
+          <Box className="ai-outline-container">
+            <Typography className="text-2" data-cy="ai-summary-in-progress">
+              Generating AI Summary...
+            </Typography>
+            <CircularProgress />
+          </Box>
+        );
+      }
+
       return (
         <Box className="input-container" data-cy="summary-container">
           {timelinePoint.type !== TimelinePointType.INTRO ? (
@@ -374,6 +389,7 @@ and dynamically adjust the height of the input field. */
   `supportingClaims`, `claimEvidence`). Here's a breakdown of what the code is doing: */
     function AIOutlineDisplay(props: { reverseOutline: string }): JSX.Element {
       const { reverseOutline } = props;
+
       if (reverseOutline === 'No outline available')
         return (
           <Typography className="text-2" data-cy="no-ai-outline">
@@ -513,22 +529,33 @@ and dynamically adjust the height of the input field. */
         three variables have values, the AIOutlineDisplay component is rendered with a specific
         style. If any of the variables is missing a value, a Typography component displaying "No AI
         outline available" is rendered instead. */}
+
           {
             // if thesis, supporting claims, and claim evidence display
             thesis &&
             supportingClaims &&
             claimEvidence &&
             aiOutline &&
+            timelinePoint.reverseOutlineStatus ===
+              OpenAiGenerationStatus.COMPLETED &&
             timelinePoint.type !== TimelinePointType.INTRO ? (
               <div style={{ marginRight: 10 }}>
                 <AIOutlineDisplay
                   reverseOutline={timelinePoint.reverseOutline}
                 />
               </div>
-            ) : (
+            ) : timelinePoint.reverseOutlineStatus ===
+              OpenAiGenerationStatus.COMPLETED ? (
               <Typography className="text-2" data-cy="no-ai-outline">
                 No AI outline available
               </Typography>
+            ) : (
+              <Box className="ai-outline-container" data-cy="">
+                <Typography className="text-2" data-cy="ai-outline-in-progress">
+                  Generating AI Outline...
+                </Typography>
+                <CircularProgress />
+              </Box>
             )
           }
         </Box>
@@ -540,18 +567,10 @@ and dynamically adjust the height of the input field. */
       prevProps.timelinePoint,
       nextProps.timelinePoint
     );
-    if (timelinePointChanges) {
-      console.log('prevProps.timelinePoint', prevProps.timelinePoint);
-      console.log('nextProps.timelinePoint', nextProps.timelinePoint);
-    }
     const googleDocChanges =
       prevProps.googleDoc &&
       nextProps.googleDoc &&
       !equals<GoogleDoc>(prevProps.googleDoc, nextProps.googleDoc);
-    if (googleDocChanges) {
-      console.log('prevProps.googleDoc', prevProps.googleDoc);
-      console.log('nextProps.googleDoc', nextProps.googleDoc);
-    }
     return !timelinePointChanges && !googleDocChanges;
   }
 );

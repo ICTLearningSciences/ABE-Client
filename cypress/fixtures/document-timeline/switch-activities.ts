@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { GQLDocumentTimeline, TimelinePointType } from '../../helpers/types';
+import { GQLDocumentTimeline, OpenAiGenerationStatus, TimelinePointType } from '../../helpers/types';
 
 export const switchActivities: GQLDocumentTimeline = {
   docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
@@ -51,9 +51,11 @@ export const switchActivities: GQLDocumentTimeline = {
       },
       intent: '',
       changeSummary: '',
+      changeSummaryStatus: OpenAiGenerationStatus.COMPLETED,
       reverseOutline:
         '{\n                "Thesis Statement": "CDC vaccines are great!",\n            \n                "Supporting Claims": [\n                    "Vaccines prevent the spread of diseases",\n                    "Vaccines save lives",\n                    "Vaccines are safe and effective"\n                ],\n            \n                "Evidence Given for Each Claim": [\n                    {\n                        "Claim A": "Vaccines prevent the spread of diseases",\n                        "Claim A Evidence": [\n                            "Numerous studies have shown that vaccines effectively reduce the transmission of diseases.",\n                            "Vaccinated individuals are less likely to contract and spread infectious diseases.",\n                            "The eradication of diseases like polio and smallpox can be attributed to vaccines."\n                        ]\n                    },\n                    {\n                        "Claim B": "Vaccines save lives",\n                        "Claim B Evidence": [\n                            "Vaccines have significantly reduced mortality rates from infectious diseases.",\n                            "Vaccines have prevented millions of deaths worldwide.",\n                            "Childhood vaccines alone have saved an estimated 732,000 lives in the United States."\n                        ]\n                    },\n                    {\n                        "Claim C": "Vaccines are safe and effective",\n                        "Claim C Evidence": [\n                            "Extensive testing and research has proven the safety of vaccines.",\n                            "Vaccine side effects are typically mild and temporary.",\n                            "Vaccines go through a rigorous approval process before being made available to the public."\n                        ]\n                    }\n                ]\n            }',
-      relatedFeedback: '',
+        reverseOutlineStatus: OpenAiGenerationStatus.COMPLETED,
+        relatedFeedback: '',
     },
     {
       type: TimelinePointType.NEW_ACTIVITY,
@@ -99,6 +101,9 @@ export const switchActivities: GQLDocumentTimeline = {
       },
       intent: '',
       changeSummary: 'No changes from previous version',
+      changeSummaryStatus: OpenAiGenerationStatus.COMPLETED,
+      reverseOutlineStatus: OpenAiGenerationStatus.COMPLETED,
+
       reverseOutline:
         '{\n                "Thesis Statement": "CDC vaccines are great!",\n            \n                "Supporting Claims": [\n                    "Vaccines prevent the spread of diseases",\n                    "Vaccines save lives",\n                    "Vaccines are safe and effective"\n                ],\n            \n                "Evidence Given for Each Claim": [\n                    {\n                        "Claim A": "Vaccines prevent the spread of diseases",\n                        "Claim A Evidence": [\n                            "Numerous studies have shown that vaccines effectively reduce the transmission of diseases.",\n                            "Vaccinated individuals are less likely to contract and spread infectious diseases.",\n                            "The eradication of diseases like polio and smallpox can be attributed to vaccines."\n                        ]\n                    },\n                    {\n                        "Claim B": "Vaccines save lives",\n                        "Claim B Evidence": [\n                            "Vaccines have significantly reduced mortality rates from infectious diseases.",\n                            "Vaccines have prevented millions of deaths worldwide.",\n                            "Childhood vaccines alone have saved an estimated 732,000 lives in the United States."\n                        ]\n                    },\n                    {\n                        "Claim C": "Vaccines are safe and effective",\n                        "Claim C Evidence": [\n                            "Extensive testing and research has proven the safety of vaccines.",\n                            "Vaccine side effects are typically mild and temporary.",\n                            "Vaccines go through a rigorous approval process before being made available to the public."\n                        ]\n                    }\n                ]\n            }',
       relatedFeedback: '',
