@@ -5,7 +5,7 @@ import { Button, CircularProgress } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import TimepointDocumentText from './timepoint-document-text';
-import TimepointOutline from './timepoint-outline';
+import { TimepointOutline } from './timepoint-outline';
 import TimelineFooter from './timeline-footer';
 import withAuthorizationOnly from '../../../hooks/wrap-with-authorization-only';
 import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
@@ -69,8 +69,7 @@ function DocumentTimelinePage(): JSX.Element {
       </div>
     );
   }
-
-  if (!documentTimeline || !curTimelinePoint || loadInProgress) {
+  if ((loadInProgress && !documentTimeline) || !curTimelinePoint) {
     return (
       <ColumnDiv
         style={{
@@ -87,7 +86,7 @@ function DocumentTimelinePage(): JSX.Element {
     );
   }
 
-  const timelinePoints = documentTimeline.timelinePoints;
+  const timelinePoints = documentTimeline?.timelinePoints || [];
 
   return (
     <div
@@ -142,6 +141,7 @@ function DocumentTimelinePage(): JSX.Element {
               googleDoc={currentGoogleDoc}
               saveTimelinePoint={saveTimelinePoint}
               updateGoogleDoc={updateGoogleDoc}
+              timelineGenerationInProgress={loadInProgress}
             />
           </div>
         </RowDiv>

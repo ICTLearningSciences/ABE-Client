@@ -6,6 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
+import { generationCompleted, generationInProgress } from '../fixtures/document-timeline/generations-in-progress';
 import { tenTimelinePoints } from '../fixtures/document-timeline/ten-timeline-points';
 import { cyMockDefault, cyMockGetDocTimeline } from '../helpers/functions';
 import { JobStatus, MockDefaultType } from '../helpers/types';
@@ -289,4 +290,113 @@ describe('document timeline', () => {
       cy.contains('Request failed with status code 500');
     });
   });
+
+  describe("summary and outline generation in progress", ()=>{
+    it("shows loading status if generation not complete", ()=>{
+      cyMockDefault(cy)
+      cyMockGetDocTimeline(cy, {
+        response: generationInProgress,
+        jobStatus: JobStatus.IN_PROGRESS,
+      });
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+      cy.get("[data-cy=ai-summary-in-progress]").should("exist")
+      cy.get("[data-cy=ai-outline-in-progress]").should("exist")
+      cy.get("[data-cy=timeline-footer-item-card-0]").should("have.css", "opacity", "0.5")
+      cy.get("[data-cy=timeline-footer-item-card-1]").should("have.css", "opacity", "0.5")
+    })
+
+    it("keeps polling while generation is in progress", ()=>{
+      cyMockDefault(cy)
+      cyMockGetDocTimeline(cy, {
+        response: generationInProgress,
+        jobStatus: JobStatus.IN_PROGRESS,
+      });
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+      cy.get("[data-cy=ai-summary-in-progress]").should("exist")
+      cy.get("[data-cy=ai-outline-in-progress]").should("exist")
+      // TODO: check for polls
+      cy.wait("@FetchDocumentTimelineStatus", {timeout: 3000});
+      cy.wait("@FetchDocumentTimelineStatus", {timeout: 3000});
+      cy.wait("@FetchDocumentTimelineStatus", {timeout: 3000});
+      cy.wait("@FetchDocumentTimelineStatus", {timeout: 3000});
+      cy.wait("@FetchDocumentTimelineStatus", {timeout: 3000});
+
+    })
+
+    it("can view other parts of the document while generation is in progress", ()=>{
+      cyMockDefault(cy)
+      cyMockGetDocTimeline(cy, {
+        response: generationInProgress,
+        jobStatus: JobStatus.IN_PROGRESS,
+      });
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+      cy.get("[data-cy=ai-summary-in-progress]").should("exist")
+      cy.get("[data-cy=ai-outline-in-progress]").should("exist")
+      cy.get("[data-cy=intention-container]").should("contain.text", "This activity is to work on the hook of the essay.")
+      cy.get("[data-cy=assignment-container]").should("contain.text", "Aliens assignment description")
+    })
+
+    it("properly displays summary and outline when generation is complete", ()=>{
+      cyMockDefault(cy)
+      cyMockGetDocTimeline(cy, {
+        response: generationInProgress,
+        jobStatus: JobStatus.IN_PROGRESS,
+      });
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+      cy.get("[data-cy=ai-summary-in-progress]").should("exist")
+      cy.get("[data-cy=ai-outline-in-progress]").should("exist")
+      cyMockGetDocTimeline(cy, {
+        response: generationCompleted,
+        jobStatus: JobStatus.COMPLETE,
+      });
+      cy.get("[data-cy=timeline-footer-item-card-0]").should("have.css", "opacity", "0.5")
+      cy.get("[data-cy=timeline-footer-item-card-1]").should("have.css", "opacity", "0.5")
+      cy.wait("@FetchDocumentTimelineStatus", {timeout: 3000});
+      cy.get("[data-cy=summary-container]").should("contain.text", "Complete Summary")
+      cy.get("[data-cy=ai-outline-container]").should("contain.text", "The impact of climate change on global food security")
+      cy.get("[data-cy=timeline-footer-item-card-0]").should("have.css", "opacity", "1")
+      cy.get("[data-cy=timeline-footer-item-card-1]").should("have.css", "opacity", "1")
+    })
+  
+    it("stops polling when generation is complete", ()=>{
+      cyMockDefault(cy)
+      cyMockGetDocTimeline(cy, {
+        response: generationInProgress,
+        jobStatus: JobStatus.IN_PROGRESS,
+      });
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+      cy.get("[data-cy=ai-summary-in-progress]").should("exist")
+      cy.get("[data-cy=ai-outline-in-progress]").should("exist")
+      cyMockGetDocTimeline(cy, {
+        response: generationCompleted,
+        jobStatus: JobStatus.COMPLETE,
+      });
+      cy.wait("@FetchDocumentTimelineStatus", {timeout: 3000});
+      cy.get("[data-cy=summary-container]").should("contain.text", "Complete Summary")
+      cy.get("[data-cy=ai-outline-container]").should("contain.text", "The impact of climate change on global food security")
+      cy.wait(2000)
+      cy.get("@FetchDocumentTimelineStatus.all").its("length").then((len)=>{
+        cy.wait(4000)
+        cy.get("@FetchDocumentTimelineStatus.all").should("have.length", len)
+      })
+    })
+
+    it("cannot edit fields while timeline is being generated", ()=>{
+      cyMockDefault(cy)
+      cyMockGetDocTimeline(cy, {
+        response: generationCompleted,
+        jobStatus: JobStatus.IN_PROGRESS,
+      });
+      cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
+      cy.get("[data-cy=assignment-textarea]").within(()=>{
+        cy.get("textarea").should("be.disabled")
+      })
+      cy.get("[data-cy=intention-textarea]").within(()=>{
+        cy.get("textarea").should("be.disabled")
+      })
+      cy.get("[data-cy=summary-textarea]").within(()=>{
+        cy.get("textarea").should("be.disabled")
+      })
+    })
+  })
 });

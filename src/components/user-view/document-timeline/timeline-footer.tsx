@@ -15,6 +15,7 @@ import { ColumnDiv } from '../../../styled-components';
 import {
   formatISODateToReadable,
   convertDateTimelinePointTime,
+  isTimelinePointFullyLoaded,
 } from '../../../helpers';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
@@ -125,11 +126,13 @@ export default function TimelineFooter(props: {
         {timelinePoints.map((timelinePoint, i) => {
           const isSelected =
             currentTimelinePoint?.versionTime === timelinePoint.versionTime;
+          const isFullyLoaded = isTimelinePointFullyLoaded(timelinePoint);
           return (
             <Step
               key={i}
               active={isSelected}
               onClick={() => props.onSelectTimepoint(timelinePoint)}
+              data-cy={`timeline-footer-item-${i}`}
               // style={i === 0 || i === currentVersionIndex ? { bottom: 25 } : {}}
             >
               <ColumnDiv key={i} className="timeline-item-test">
@@ -142,12 +145,16 @@ export default function TimelineFooter(props: {
                   <Paper
                     onClick={() => props.onSelectTimepoint(timelinePoint)}
                     elevation={1}
-                    style={{ padding: '1rem' }}
+                    style={{
+                      padding: '1rem',
+                      opacity: isFullyLoaded ? 1 : 0.5,
+                    }}
                     className={
                       hoverIndex !== i
                         ? 'timeline-footer-item-card'
                         : 'timeline-footer-item-card-hover'
                     }
+                    data-cy={`timeline-footer-item-card-${i}`}
                     onMouseEnter={() => handleMouseEnter(i)}
                     onMouseLeave={handleMouseLeave}
                   >
