@@ -7,10 +7,9 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { Box, Button, Modal, Theme } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
-import { PromptOutputTypes } from '../../types';
 import { ColumnDiv, JsonDisplay } from '../../styled-components';
 import { useState } from 'react';
-import { parseOpenAIResContent } from '../../helpers';
+import { isJsonString, parseOpenAIResContent } from '../../helpers';
 import { JsonView, allExpanded, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
@@ -65,14 +64,12 @@ export default function ViewPreviousRunModal(props: {
           <div style={{ overflow: 'auto' }}>
             {previousRun.aiAllStepsData.map((promptStep, index) => {
               const parsedData = parseOpenAIResContent(promptStep);
-              const isJsonOutput =
-                parsedData.originalRequestPrompt?.outputDataType ===
-                PromptOutputTypes.JSON;
-              const showOutputAsText =
-                parsedData.originalRequestPrompt?.outputDataType ===
-                  PromptOutputTypes.TEXT || showJsonAsText;
               const responseMessage =
-                parsedData.aiServiceResponse[0].message.content;
+                parsedData.aiServiceResponse[0].message.content || '';
+              const isJsonOutput = isJsonString(responseMessage);
+              const showOutputAsText =
+                !(isJsonOutput && !showJsonAsText) || showJsonAsText;
+
               return (
                 <ColumnDiv key={index}>
                   <h2 style={{ alignSelf: 'center' }}>{`Step ${index + 1}`}</h2>
