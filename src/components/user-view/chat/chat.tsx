@@ -20,12 +20,7 @@ import {
 import { ChatHeader, RowDiv, SmallGreyText } from '../../../styled-components';
 import { useWithStoreDocVersions } from '../../../hooks/use-with-store-doc-versions';
 import { useAppSelector } from '../../../store/hooks';
-import {
-  ActivityGQL,
-  ActivityStepTypes,
-  DocGoal,
-  OpenAiReqRes,
-} from '../../../types';
+import { ActivityGQL, ActivityStepTypes, DocGoal } from '../../../types';
 import OpenAiInfoModal from './open-ai-info-modal';
 import SystemPromptModal from './system-prompt-modal';
 import { useWithSystemPromptsConfig } from '../../../hooks/use-with-system-prompts-config';
@@ -41,11 +36,12 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import { UseWithPrompts } from '../../../hooks/use-with-prompts';
 import { v4 as uuidv4 } from 'uuid';
 import { GptModels } from '../../../constants';
+import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 
 function ChatMessagesContainer(props: {
   coachResponsePending: boolean;
   googleDocId: string;
-  setOpenAiInfoToDisplay: (openAiInfo?: OpenAiReqRes) => void;
+  setOpenAiInfoToDisplay: (openAiInfo?: AiServiceStepDataTypes) => void;
   sendMessage: (message: ChatMessageTypes) => void;
 }): JSX.Element {
   const {
@@ -311,7 +307,7 @@ export default function Chat(props: {
             ActivityStepTypes.FREE_RESPONSE_QUESTION
       ));
   const [openAiInfoToDisplay, setOpenAiInfoToDisplay] =
-    useState<OpenAiReqRes>();
+    useState<AiServiceStepDataTypes>();
   const [viewSystemPrompts, setViewSystemPrompts] = useState<boolean>(false);
   const [targetSystemPrompt, setTargetSystemPrompt] = useState<number>(0);
   const [viewActivitySummary, setViewActivitySummary] =

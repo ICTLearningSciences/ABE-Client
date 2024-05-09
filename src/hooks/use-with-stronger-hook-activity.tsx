@@ -12,7 +12,6 @@ import {
   ActivityStepTypes,
   DocGoal,
   GQLPrompt,
-  MultistepPromptRes,
   PromptRoles,
   Intention,
 } from '../types';
@@ -27,6 +26,7 @@ import { useAppSelector } from '../store/hooks';
 import { freeInputPrompt } from './use-with-prompt-activity';
 import { v4 as uuidv4 } from 'uuid';
 import { Schema } from 'jsonschema';
+import { AiServicesResponseTypes } from '../ai-services/ai-service-types';
 
 export const WEAK_THRESHOLD = 4;
 export const MCQ_READY_FOR_REVIEW = 'Ready';
@@ -193,7 +193,7 @@ export const emotionCannedResponses: Record<number, string[]> = {
 export interface StepData {
   executePrompt: (
     prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
-    callback?: (response: MultistepPromptRes) => void,
+    callback?: (response: AiServicesResponseTypes) => void,
     customSystemPrompt?: string
   ) => Promise<void>;
   openSelectActivityModal: () => void;
@@ -444,7 +444,7 @@ export default function useWithStrongerHookActivity(
   }
 
   function handleEntityDetectionResponse(
-    response: MultistepPromptRes,
+    response: AiServicesResponseTypes,
     stepData: StepData
   ) {
     const result = validateJsonResponse<EntityDetectionPromptResponse>(
@@ -500,7 +500,7 @@ export default function useWithStrongerHookActivity(
   }
 
   function handleAnalyzePromptResponse(
-    response: MultistepPromptRes,
+    response: AiServicesResponseTypes,
     stepData: StepData,
     nextStage?: StepNames
   ) {
@@ -541,8 +541,9 @@ export default function useWithStrongerHookActivity(
           activityStep: introStep(stepData),
 
           openAiInfo: {
-            openAiPrompt: response.openAiData[0].openAiPrompt,
-            openAiResponse: response.openAiData[0].openAiResponse,
+            aiServiceRequestParams:
+              response.aiAllStepsData[0].aiServiceRequestParams,
+            aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
           },
         },
         false,
@@ -571,7 +572,7 @@ export default function useWithStrongerHookActivity(
   }
 
   function handleAudienceAndEmotionsPromptResponse(
-    res: MultistepPromptRes,
+    res: AiServicesResponseTypes,
     stepData: StepData
   ) {
     if (!audienceAnalysisPrompt) {
@@ -608,8 +609,9 @@ export default function useWithStrongerHookActivity(
           activityStep: emotionWeakStepOne(stepData),
 
           openAiInfo: {
-            openAiPrompt: res.openAiData[0].openAiPrompt,
-            openAiResponse: res.openAiData[0].openAiResponse,
+            aiServiceRequestParams:
+              res.aiAllStepsData[0].aiServiceRequestParams,
+            aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
           },
         },
         false,
@@ -634,7 +636,7 @@ export default function useWithStrongerHookActivity(
       );
       executePrompt(
         () => updatedAudienceAnalysisPrompt,
-        (response: MultistepPromptRes) => {
+        (response: AiServicesResponseTypes) => {
           sendMessage(
             {
               id: uuidv4(),
@@ -644,8 +646,9 @@ export default function useWithStrongerHookActivity(
               activityStep: emotionWeakStepOne(stepData),
 
               openAiInfo: {
-                openAiPrompt: response.openAiData[0].openAiPrompt,
-                openAiResponse: response.openAiData[0].openAiResponse,
+                aiServiceRequestParams:
+                  response.aiAllStepsData[0].aiServiceRequestParams,
+                aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
               },
             },
             false,
@@ -763,7 +766,7 @@ export default function useWithStrongerHookActivity(
         if (response === HELP_ME_BRAINSTORM) {
           executePrompt(
             () => helpBrainstormPrompt,
-            (res: MultistepPromptRes) => {
+            (res: AiServicesResponseTypes) => {
               setWaitingForUserAnswer(true);
               sendMessage(
                 {
@@ -774,8 +777,9 @@ export default function useWithStrongerHookActivity(
                   activityStep: narrativeWeakStepTwo(stepData),
 
                   openAiInfo: {
-                    openAiPrompt: res.openAiData[0].openAiPrompt,
-                    openAiResponse: res.openAiData[0].openAiResponse,
+                    aiServiceRequestParams:
+                      res.aiAllStepsData[0].aiServiceRequestParams,
+                    aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
                   },
                 },
                 false,
@@ -798,7 +802,7 @@ export default function useWithStrongerHookActivity(
         } else {
           executePrompt(
             () => entityDetectionPrompt,
-            (res: MultistepPromptRes) =>
+            (res: AiServicesResponseTypes) =>
               handleEntityDetectionResponse(res, stepData)
           );
         }
@@ -834,7 +838,7 @@ export default function useWithStrongerHookActivity(
         }
         executePrompt(
           () => compareStoryToHookPrompt,
-          (response: MultistepPromptRes) => {
+          (response: AiServicesResponseTypes) => {
             sendMessage(
               {
                 id: uuidv4(),
@@ -844,8 +848,10 @@ export default function useWithStrongerHookActivity(
                 activityStep: narrativeWeakStepFour(stepData),
 
                 openAiInfo: {
-                  openAiPrompt: response.openAiData[0].openAiPrompt,
-                  openAiResponse: response.openAiData[0].openAiResponse,
+                  aiServiceRequestParams:
+                    response.aiAllStepsData[0].aiServiceRequestParams,
+                  aiServiceResponse:
+                    response.aiAllStepsData[0].aiServiceResponse,
                 },
               },
               false,
@@ -923,7 +929,7 @@ export default function useWithStrongerHookActivity(
         );
         executePrompt(
           () => updatedPrompt,
-          (response: MultistepPromptRes) => {
+          (response: AiServicesResponseTypes) => {
             sendMessage(
               {
                 id: uuidv4(),
@@ -933,8 +939,10 @@ export default function useWithStrongerHookActivity(
                 activityStep: narrativeWeakStepSix(stepData),
 
                 openAiInfo: {
-                  openAiPrompt: response.openAiData[0].openAiPrompt,
-                  openAiResponse: response.openAiData[0].openAiResponse,
+                  aiServiceRequestParams:
+                    response.aiAllStepsData[0].aiServiceRequestParams,
+                  aiServiceResponse:
+                    response.aiAllStepsData[0].aiServiceResponse,
                 },
               },
               false,
@@ -994,7 +1002,7 @@ export default function useWithStrongerHookActivity(
         const { executePrompt } = stepData;
         executePrompt(
           () => audienceAndEmotionsDetectionPrompt,
-          (res: MultistepPromptRes) =>
+          (res: AiServicesResponseTypes) =>
             handleAudienceAndEmotionsPromptResponse(res, stepData)
         );
       },
@@ -1015,7 +1023,7 @@ export default function useWithStrongerHookActivity(
         }
         executePrompt(
           () => eCommentOnProposedRevisionPrompt,
-          (res: MultistepPromptRes) => {
+          (res: AiServicesResponseTypes) => {
             sendMessage(
               {
                 id: uuidv4(),
@@ -1024,8 +1032,9 @@ export default function useWithStrongerHookActivity(
                 displayType: MessageDisplayType.TEXT,
                 activityStep: emotionWeakStepTwo(stepData),
                 openAiInfo: {
-                  openAiPrompt: res.openAiData[0].openAiPrompt,
-                  openAiResponse: res.openAiData[0].openAiResponse,
+                  aiServiceRequestParams:
+                    res.aiAllStepsData[0].aiServiceRequestParams,
+                  aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
                 },
               },
               false,
@@ -1056,7 +1065,7 @@ export default function useWithStrongerHookActivity(
         }
         executePrompt(
           () => eAnalyzeDocRevisionPrompt,
-          (response: MultistepPromptRes) => {
+          (response: AiServicesResponseTypes) => {
             sendMessage(
               {
                 id: uuidv4(),
@@ -1065,8 +1074,10 @@ export default function useWithStrongerHookActivity(
                 displayType: MessageDisplayType.TEXT,
                 activityStep: emotionWeakStepThree(stepData),
                 openAiInfo: {
-                  openAiPrompt: response.openAiData[0].openAiPrompt,
-                  openAiResponse: response.openAiData[0].openAiResponse,
+                  aiServiceRequestParams:
+                    response.aiAllStepsData[0].aiServiceRequestParams,
+                  aiServiceResponse:
+                    response.aiAllStepsData[0].aiServiceResponse,
                 },
               },
               false,
@@ -1085,7 +1096,7 @@ export default function useWithStrongerHookActivity(
       text: "Okay, feel free to ask me anything you'd like",
       stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
       handleResponse: async () => {
-        executePrompt(freeInputPrompt, (response: MultistepPromptRes) => {
+        executePrompt(freeInputPrompt, (response: AiServicesResponseTypes) => {
           setWaitingForUserAnswer(true);
           sendMessage(
             {
@@ -1096,8 +1107,9 @@ export default function useWithStrongerHookActivity(
               activityStep: freeInputStep(stepData),
 
               openAiInfo: {
-                openAiPrompt: response.openAiData[0].openAiPrompt,
-                openAiResponse: response.openAiData[0].openAiResponse,
+                aiServiceRequestParams:
+                  response.aiAllStepsData[0].aiServiceRequestParams,
+                aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
               },
             },
             false,

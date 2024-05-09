@@ -73,8 +73,9 @@ export function cCollectIntentionStep(
               ),
               mcqChoices: [MCQ_BRAINSTORM],
               openAiInfo: {
-                openAiPrompt: res.openAiData[0].openAiPrompt,
-                openAiResponse: res.openAiData[0].openAiResponse,
+                aiServiceRequestParams:
+                  res.aiAllStepsData[0].aiServiceRequestParams,
+                aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
               },
             });
           }
@@ -123,8 +124,9 @@ export function cCollectIntentionStep(
                 allActivityMessages
               ),
               openAiInfo: {
-                openAiPrompt: res.openAiData[0].openAiPrompt,
-                openAiResponse: res.openAiData[0].openAiResponse,
+                aiServiceRequestParams:
+                  res.aiAllStepsData[0].aiServiceRequestParams,
+                aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
               },
             });
             if (claimAction === ClaimAction.ADDING) {

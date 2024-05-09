@@ -11,7 +11,7 @@ import {
   ActivityGQL,
   ActivityPrompt,
   GQLPrompt,
-  OpenAiPromptStep,
+  AiPromptStep,
   PromptOutputTypes,
   PromptRoles,
 } from '../../types';
@@ -26,7 +26,7 @@ import { isPromptInActivity } from '../../helpers';
 import { DEFAULT_GPT_MODEL } from '../../constants';
 import { EditPrompt } from './prompt-editing/edit-prompt';
 
-export const emptyOpenAiPromptStep: OpenAiPromptStep = {
+export const emptyOpenAiPromptStep: AiPromptStep = {
   prompts: [
     {
       promptText: '',
@@ -163,7 +163,7 @@ export function MultiPromptTesting(props: {
               _id: newId,
               title: '',
               clientId: newId,
-              openAiPromptSteps: [emptyOpenAiPromptStep],
+              aiPromptSteps: [emptyOpenAiPromptStep],
             });
             setTargetPromptId(newId);
           }}

@@ -13,7 +13,7 @@ export const fetchPromptTemplates =  {
           "title": "Reverse Outline Thesis, Claims, Evidence",
           "clientId": "",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -35,7 +35,7 @@ export const fetchPromptTemplates =  {
           "title": "Review Sources",
           "clientId": "",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -71,7 +71,7 @@ export const fetchPromptTemplates =  {
           "title": "Originality & New Angles",
           "clientId": "",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -93,7 +93,7 @@ export const fetchPromptTemplates =  {
           "title": "Expand Perspectives",
           "clientId": "",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -129,7 +129,7 @@ export const fetchPromptTemplates =  {
           "title": "Vagueness Detection",
           "clientId": "",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -151,7 +151,7 @@ export const fetchPromptTemplates =  {
           "title": "1 Hook Analysis",
           "clientId": "",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -173,7 +173,7 @@ export const fetchPromptTemplates =  {
           "title": "N Entity Detection and Ranking",
           "clientId": "9175c103-b86a-49db-8e1a-a63e1154b41b",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -195,7 +195,7 @@ export const fetchPromptTemplates =  {
           "title": "Army Style Review",
           "clientId": "4a224649-8a00-45df-929d-a4299b277b82",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -231,7 +231,7 @@ export const fetchPromptTemplates =  {
           "title": "N-3 Compare Story to Hook",
           "clientId": "0c289f10-9d47-4ea0-90e1-d7c4d2dc79be",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -253,7 +253,7 @@ export const fetchPromptTemplates =  {
           "title": "E-1A Audience and Emotion detection",
           "clientId": "230fadff-8b42-43f6-988e-f9612535ee9f",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -275,7 +275,7 @@ export const fetchPromptTemplates =  {
           "title": "Hook Emotions",
           "clientId": "ae4605ff-601f-4b9c-bcbb-9ea70b98c564",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -297,7 +297,7 @@ export const fetchPromptTemplates =  {
           "title": "(Test) Stronger Hook",
           "clientId": "64199576-4931-438d-b7d4-3b9a215d7b93",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -319,7 +319,7 @@ export const fetchPromptTemplates =  {
           "title": "Reverse Outline",
           "clientId": "fdacda84-e67c-46ed-9e17-1723e0f85e09",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -341,7 +341,7 @@ export const fetchPromptTemplates =  {
           "title": "N-2 Help Me Brainstorm",
           "clientId": "13adae3d-bd41-43a6-ac9a-c06810deda7b",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -363,7 +363,7 @@ export const fetchPromptTemplates =  {
           "title": "N-4 Relate story and revision to hook",
           "clientId": "4d960d95-fb1e-4ab5-aba7-8f80396b2154",
           "userInputIsIntention": true,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -385,7 +385,7 @@ export const fetchPromptTemplates =  {
           "title": "E-2 Comment on Proposed Revision",
           "clientId": "2ee889f3-9ec9-4d11-a42e-e9bcfe5fac82",
           "userInputIsIntention": true,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -407,7 +407,7 @@ export const fetchPromptTemplates =  {
           "title": "E-3 Analyze Doc Revision",
           "clientId": "060581ea-1a99-4830-be38-42a9f627b36b",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -429,7 +429,7 @@ export const fetchPromptTemplates =  {
           "title": "E-1B Audience Analysis",
           "clientId": "3b8c3e83-70a8-4155-8086-17942d1a198e",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -451,7 +451,7 @@ export const fetchPromptTemplates =  {
           "title": "Key Phrases Thesaurus",
           "clientId": "61169e89-ae24-419f-aae2-4c0bcac1be52",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -473,7 +473,7 @@ export const fetchPromptTemplates =  {
           "title": "Raison d'être",
           "clientId": "0675999e-e983-4177-826f-9edc92c81248",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -509,7 +509,7 @@ export const fetchPromptTemplates =  {
           "title": "Chip's Highlight Prompt",
           "clientId": "efbd6941-4cce-48d3-9829-d06ba9a5310c",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -531,7 +531,7 @@ export const fetchPromptTemplates =  {
           "title": "Jargon Use",
           "clientId": "37aff806-48a3-4340-afec-981a4be6d636",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -553,7 +553,7 @@ export const fetchPromptTemplates =  {
           "title": "Red Teaming an Essay",
           "clientId": "ced20c0d-f6bf-4f29-8e4b-6cb1e2342ada",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -575,7 +575,7 @@ export const fetchPromptTemplates =  {
           "title": "Conclusion Analysis",
           "clientId": "40d97364-6a32-4eaa-8fda-e7b865dbf229",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -611,7 +611,7 @@ export const fetchPromptTemplates =  {
           "title": "N Audience, Implications, and Emotion Detection",
           "clientId": "37872dfb-e70e-4c71-9e65-c666375ad074",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -633,7 +633,7 @@ export const fetchPromptTemplates =  {
           "title": "I-1 Comment on Key Implications",
           "clientId": "c7eb14e7-cd86-4325-839a-8fdcda41ac49",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -655,7 +655,7 @@ export const fetchPromptTemplates =  {
           "title": "I-2 Collect Author Original Intention",
           "clientId": "db152347-ca27-4945-a39c-ece09dfd176b",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -677,7 +677,7 @@ export const fetchPromptTemplates =  {
           "title": "I-3 \"So What\" Question",
           "clientId": "dacf9ec6-0369-4d5e-8363-978ae4e8e3cd",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -699,7 +699,7 @@ export const fetchPromptTemplates =  {
           "title": "I-4 Brainstorming on So-What",
           "clientId": "43bdb40b-49b3-4c7f-8725-e628bcd27c05",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -721,7 +721,7 @@ export const fetchPromptTemplates =  {
           "title": "I-5 Collect Proposed Revision",
           "clientId": "aea36f3b-62d1-495e-880b-9a9666deb29d",
           "userInputIsIntention": true,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -743,7 +743,7 @@ export const fetchPromptTemplates =  {
           "title": "A wizard reads your essay",
           "clientId": "d195c143-a112-4d05-9282-4ed091ec47f3",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -765,7 +765,7 @@ export const fetchPromptTemplates =  {
           "title": "(Old) Conclusion Analysis",
           "clientId": "a2868bbd-e9aa-4337-818c-8b0fd2644650",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -787,7 +787,7 @@ export const fetchPromptTemplates =  {
           "title": "C-1: Brainstorm Claims To Add/Remove/Revise",
           "clientId": "def909f1-96e2-4e42-85cd-e31d67a1c591",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -809,7 +809,7 @@ export const fetchPromptTemplates =  {
           "title": "C-2: Analyze Inteded Claim Usage",
           "clientId": "39235691-4790-4a2a-b442-e365e114efd5",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -831,7 +831,7 @@ export const fetchPromptTemplates =  {
           "title": "CA-1: Brainstorm Arguments For New Claim",
           "clientId": "1031a62d-7cc9-4bb9-a638-d086a599f5ca",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -853,7 +853,7 @@ export const fetchPromptTemplates =  {
           "title": "CA-2: Analyze Intended Arguments For Claim",
           "clientId": "03d593c3-350f-4b18-b144-55560d8b70c1",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -875,7 +875,7 @@ export const fetchPromptTemplates =  {
           "title": "CA-3: Analyze Claim Added To Paper",
           "clientId": "b4b2a8e3-1353-4e26-893c-fbb2b8e097c7",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -897,7 +897,7 @@ export const fetchPromptTemplates =  {
           "title": "CR-1: Brainstorm Claim Removal Tips",
           "clientId": "085919c0-30ae-4f74-bf06-23f43787c74c",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -919,7 +919,7 @@ export const fetchPromptTemplates =  {
           "title": "CR-2: Analyze Claim Removal From Paper",
           "clientId": "be20945a-bb35-4012-8996-05aea8142f3c",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -941,7 +941,7 @@ export const fetchPromptTemplates =  {
           "title": "S-1: Analyze Intention vs. Outline",
           "clientId": "9d9c2997-fdd8-4a80-996b-0eca86245a17",
           "userInputIsIntention": true,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -963,7 +963,7 @@ export const fetchPromptTemplates =  {
           "title": "S-2: Suggest Claim Support Changes",
           "clientId": "ca970bfe-3f59-4566-96c6-9123ce5edf9b",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -985,7 +985,7 @@ export const fetchPromptTemplates =  {
           "title": "Impact Open Discussion",
           "clientId": "ea882449-352b-41ac-920c-86889e998108",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -1007,7 +1007,7 @@ export const fetchPromptTemplates =  {
           "title": "Analyze Argument",
           "clientId": "c3936440-e66c-445e-ab12-195ca8274b09",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -1029,7 +1029,7 @@ export const fetchPromptTemplates =  {
           "title": "Initiate Conversation",
           "clientId": "d77969d5-c0ac-4e65-8ad2-3dc3fc6240ed",
           "userInputIsIntention": false,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {
@@ -1051,7 +1051,7 @@ export const fetchPromptTemplates =  {
           "title": "S-3: Analyze Claim Support Revision Intention",
           "clientId": "f8461654-f0f8-4d75-9952-cc717dddd692",
           "userInputIsIntention": true,
-          "openAiPromptSteps": [
+          "aiPromptSteps": [
             {
               "prompts": [
                 {

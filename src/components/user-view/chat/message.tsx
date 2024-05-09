@@ -8,9 +8,9 @@ import {
 } from '../../../store/slices/chat';
 import { useAppSelector } from '../../../store/hooks';
 import { UserRole } from '../../../store/slices/login';
-import { OpenAiReqRes } from '../../../types';
 import { useEffect, useState } from 'react';
 import './message.css';
+import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 
 const baseMessageStyle: React.CSSProperties = {
   borderRadius: '1rem',
@@ -24,7 +24,7 @@ const baseMessageStyle: React.CSSProperties = {
 
 function DisplayOpenAiInfoButton(props: {
   chatMessage: ChatMessageTypes;
-  setOpenAiInfoToDisplay: (openAiInfo?: OpenAiReqRes) => void;
+  setOpenAiInfoToDisplay: (openAiInfo?: AiServiceStepDataTypes) => void;
 }): JSX.Element {
   const { chatMessage, setOpenAiInfoToDisplay } = props;
   const userRole = useAppSelector((state) => state.login.userRole);
@@ -89,7 +89,7 @@ const FadingText: React.FC<{ strings: string[] }> = ({ strings }) => {
 
 export default function Message(props: {
   message: ChatMessageTypes;
-  setOpenAiInfoToDisplay: (openAiInfo?: OpenAiReqRes) => void;
+  setOpenAiInfoToDisplay: (openAiInfo?: AiServiceStepDataTypes) => void;
   messageIndex: number;
 }): JSX.Element {
   const { message, setOpenAiInfoToDisplay, messageIndex } = props;

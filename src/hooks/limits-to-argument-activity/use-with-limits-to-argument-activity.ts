@@ -175,7 +175,8 @@ export function useWithLimitsToArgumentActivity(
           (res) => {
             const audiencesResponse =
               validateJsonResponse<AnalyzeArgumentsResponse>(
-                res.openAiData[0].openAiResponse[0].message.content || '',
+                res.aiAllStepsData[0].aiServiceResponse[0].message.content ||
+                  '',
                 analyzeArgumentsPromptSchema
               );
             sendMessage(
@@ -186,8 +187,9 @@ export function useWithLimitsToArgumentActivity(
                 displayType: MessageDisplayType.TEXT,
                 activityStep: introStep(stepData),
                 openAiInfo: {
-                  openAiPrompt: res.openAiData[0].openAiPrompt,
-                  openAiResponse: res.openAiData[0].openAiResponse,
+                  aiServiceRequestParams:
+                    res.aiAllStepsData[0].aiServiceRequestParams,
+                  aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
                 },
               },
               false,
@@ -275,8 +277,9 @@ export function useWithLimitsToArgumentActivity(
                   displayType: MessageDisplayType.TEXT,
                   activityStep: speakWithAudienceStep(stepData),
                   openAiInfo: {
-                    openAiPrompt: res.openAiData[0].openAiPrompt,
-                    openAiResponse: res.openAiData[0].openAiResponse,
+                    aiServiceRequestParams:
+                      res.aiAllStepsData[0].aiServiceRequestParams,
+                    aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
                   },
                 },
                 false,

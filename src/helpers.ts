@@ -9,13 +9,13 @@ import {
   ActivityGQL,
   GQLPrompt,
   GQLTimelinePoint,
-  OpenAiGenerationStatus,
-  OpenAiReqRes,
+  AiGenerationStatus,
   PromptConfiguration,
 } from './types';
 import { ChatCompletion, ChatCompletionCreateParams } from 'openai/resources';
 import Validator from 'jsonschema';
 import { ChatLog, Sender, UserInputType } from './store/slices/chat';
+import { OpenAiStepDataType } from './ai-services/open-ai-service';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function extractErrorMessageFromError(err: any | unknown): string {
   if (err?.response?.data) {
@@ -90,8 +90,10 @@ export function isJsonString(str: string): boolean {
   return true;
 }
 
-export function parseOpenAIResContent(openAiRes: OpenAiReqRes): OpenAiReqRes {
-  const promptData = openAiRes.openAiPrompt;
+export function parseOpenAIResContent(
+  openAiRes: OpenAiStepDataType
+): OpenAiStepDataType {
+  const promptData = openAiRes.aiServiceRequestParams;
   const processedPromptData: ChatCompletionCreateParams = {
     ...promptData,
     messages: promptData.messages.map((m) => {
@@ -108,7 +110,7 @@ export function parseOpenAIResContent(openAiRes: OpenAiReqRes): OpenAiReqRes {
       };
     }),
   };
-  const resData = openAiRes.openAiResponse;
+  const resData = openAiRes.aiServiceResponse;
   const processedResData: ChatCompletion.Choice[] = resData.map((r) => {
     if (!r.message.content || !isJsonString(r.message.content)) return r;
     return {
@@ -121,8 +123,8 @@ export function parseOpenAIResContent(openAiRes: OpenAiReqRes): OpenAiReqRes {
   });
   return {
     ...openAiRes,
-    openAiResponse: processedResData,
-    openAiPrompt: processedPromptData,
+    aiServiceResponse: processedResData,
+    aiServiceRequestParams: processedPromptData,
   };
 }
 
@@ -210,7 +212,7 @@ export function addContextToPromptSteps(
 ) {
   return {
     ...prompt,
-    openAiPromptSteps: prompt.openAiPromptSteps.map((step) => {
+    aiPromptSteps: prompt.aiPromptSteps.map((step) => {
       return {
         ...step,
         prompts: [...context, ...step.prompts],
@@ -298,7 +300,7 @@ export const isTimelinePointFullyLoaded = (
   timelinePoint: GQLTimelinePoint
 ): boolean => {
   return (
-    timelinePoint.changeSummaryStatus === OpenAiGenerationStatus.COMPLETED &&
-    timelinePoint.reverseOutlineStatus === OpenAiGenerationStatus.COMPLETED
+    timelinePoint.changeSummaryStatus === AiGenerationStatus.COMPLETED &&
+    timelinePoint.reverseOutlineStatus === AiGenerationStatus.COMPLETED
   );
 };

@@ -4,11 +4,29 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-export const fetchConfigResponse = {
-    "fetchConfig": {
-        "aiSystemPrompt": [
-            "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-3.5 architecture. Knowledge cutoff: 2021-09.",
-            "You are a professor that speaks very eloquently and in short sentences."
-        ]
-    }
+
+import { OpenAiStepDataType } from './open-ai-service';
+
+export interface AiStepData<ReqType, ResType> {
+  aiServiceRequestParams: ReqType; // OpenAI.Chat.Completions.ChatCompletionCreateParams for OpenAi
+  aiServiceResponse: ResType; // OpenAI.Chat.Completions.ChatCompletion.Choice[] for OpenAi
 }
+
+export interface AiResponseType<AiStepDataType> {
+  aiAllStepsData: AiStepDataType[];
+  answer: string;
+}
+
+export interface AiJobStatusType<ServiceResponseType> {
+  jobStatus: string;
+  aiServiceResponse: ServiceResponseType;
+}
+
+/**
+ * Merge all types here for use in abstract locations
+ */
+
+export type AiServiceStepDataTypes = OpenAiStepDataType;
+export type AiServicesResponseTypes = AiResponseType<AiServiceStepDataTypes>;
+export type AiServicesJobStatusResponseTypes =
+  AiJobStatusType<AiServicesResponseTypes>;

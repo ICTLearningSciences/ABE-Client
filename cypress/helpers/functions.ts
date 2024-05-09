@@ -329,7 +329,7 @@ export function cyMockOpenAiCall(
     );
   });
   cy.intercept('**/async_open_ai_doc_question_status/**', (req) => {
-    req.alias = 'openAiResponse';
+    req.alias = 'aiServiceResponse';
     req.reply(
       staticResponse({
         statusCode: params.statusCode || 200,

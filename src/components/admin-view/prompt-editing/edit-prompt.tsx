@@ -15,18 +15,14 @@ import { GptModels } from '../../../constants';
 import { equals, extractErrorMessageFromError } from '../../../helpers';
 import { asyncPromptExecute } from '../../../hooks/use-with-synchronous-polling';
 import { ColumnDiv, RowDivSB } from '../../../styled-components';
-import {
-  PromptOutputTypes,
-  MultistepPromptRes,
-  GQLPrompt,
-  ActivityGQL,
-} from '../../../types';
+import { PromptOutputTypes, GQLPrompt, ActivityGQL } from '../../../types';
 import { ErrorDialog } from '../../dialog';
 import ViewPreviousRunModal from '../view-previous-run-modal';
 import ViewPreviousRunsModal from '../view-previous-runs-modal';
 import { useState } from 'react';
 import { emptyOpenAiPromptStep } from '../multi-prompt-buttonology';
 import { useAppSelector } from '../../../store/hooks';
+import { AiServicesResponseTypes } from '../../../ai-services/ai-service-types';
 
 export function EditPrompt(props: {
   promptTemplate: GQLPrompt;
@@ -56,9 +52,11 @@ export function EditPrompt(props: {
   const [error, setError] = useState<string>('');
   const [focusedPromptIndex, setFocusedPromptIndex] = useState<number>(0);
   const [inProgress, setInProgress] = useState<boolean>(false);
-  const [previousRuns, setPreviousRuns] = useState<MultistepPromptRes[]>([]);
+  const [previousRuns, setPreviousRuns] = useState<AiServicesResponseTypes[]>(
+    []
+  );
   const [viewPrevRunResults, setViewPrevRunResults] = useState<boolean>(false);
-  const [runToView, setRunToView] = useState<MultistepPromptRes>();
+  const [runToView, setRunToView] = useState<AiServicesResponseTypes>();
   const [promptTemplateCopy, setPromptTemplateCopy] = useState<GQLPrompt>(
     JSON.parse(JSON.stringify(promptTemplate))
   );
@@ -118,7 +116,7 @@ export function EditPrompt(props: {
           padding: '10px',
         }}
       >
-        {promptTemplateCopy.openAiPromptSteps.map((openAiPromptStep, index) => (
+        {promptTemplateCopy.aiPromptSteps.map((openAiPromptStep, index) => (
           <ColumnDiv
             key={index}
             style={{
@@ -143,7 +141,7 @@ export function EditPrompt(props: {
               onChange={(e) => {
                 setPromptTemplateCopy({
                   ...promptTemplateCopy,
-                  openAiPromptSteps: promptTemplateCopy.openAiPromptSteps.map(
+                  aiPromptSteps: promptTemplateCopy.aiPromptSteps.map(
                     (openAiPromptStep, openAiPromptStepIndex) => {
                       if (openAiPromptStepIndex === index) {
                         return {
@@ -175,19 +173,18 @@ export function EditPrompt(props: {
                     onChange={(e) => {
                       setPromptTemplateCopy({
                         ...promptTemplateCopy,
-                        openAiPromptSteps:
-                          promptTemplateCopy.openAiPromptSteps.map(
-                            (openAiPromptStep, openAiPromptStepIndex) => {
-                              if (openAiPromptStepIndex === index) {
-                                return {
-                                  ...openAiPromptStep,
-                                  includeChatLogContext: e.target.checked,
-                                };
-                              } else {
-                                return openAiPromptStep;
-                              }
+                        aiPromptSteps: promptTemplateCopy.aiPromptSteps.map(
+                          (openAiPromptStep, openAiPromptStepIndex) => {
+                            if (openAiPromptStepIndex === index) {
+                              return {
+                                ...openAiPromptStep,
+                                includeChatLogContext: e.target.checked,
+                              };
+                            } else {
+                              return openAiPromptStep;
                             }
-                          ),
+                          }
+                        ),
                       });
                     }}
                   />
@@ -204,24 +201,23 @@ export function EditPrompt(props: {
                     onChange={(e) => {
                       setPromptTemplateCopy({
                         ...promptTemplateCopy,
-                        openAiPromptSteps:
-                          promptTemplateCopy.openAiPromptSteps.map(
-                            (openAiPromptStep, openAiPromptStepIndex) => {
-                              if (openAiPromptStepIndex === index) {
-                                return {
-                                  ...openAiPromptStep,
-                                  prompts: [
-                                    {
-                                      ...openAiPromptStep.prompts[0],
-                                      includeEssay: e.target.checked,
-                                    },
-                                  ],
-                                };
-                              } else {
-                                return openAiPromptStep;
-                              }
+                        aiPromptSteps: promptTemplateCopy.aiPromptSteps.map(
+                          (openAiPromptStep, openAiPromptStepIndex) => {
+                            if (openAiPromptStepIndex === index) {
+                              return {
+                                ...openAiPromptStep,
+                                prompts: [
+                                  {
+                                    ...openAiPromptStep.prompts[0],
+                                    includeEssay: e.target.checked,
+                                  },
+                                ],
+                              };
+                            } else {
+                              return openAiPromptStep;
                             }
-                          ),
+                          }
+                        ),
                       });
                     }}
                   />
@@ -240,24 +236,23 @@ export function EditPrompt(props: {
                     onChange={(e) => {
                       setPromptTemplateCopy({
                         ...promptTemplateCopy,
-                        openAiPromptSteps:
-                          promptTemplateCopy.openAiPromptSteps.map(
-                            (openAiPromptStep, openAiPromptStepIndex) => {
-                              if (openAiPromptStepIndex === index) {
-                                return {
-                                  ...openAiPromptStep,
-                                  prompts: [
-                                    {
-                                      ...openAiPromptStep.prompts[0],
-                                      includeUserInput: e.target.checked,
-                                    },
-                                  ],
-                                };
-                              } else {
-                                return openAiPromptStep;
-                              }
+                        aiPromptSteps: promptTemplateCopy.aiPromptSteps.map(
+                          (openAiPromptStep, openAiPromptStepIndex) => {
+                            if (openAiPromptStepIndex === index) {
+                              return {
+                                ...openAiPromptStep,
+                                prompts: [
+                                  {
+                                    ...openAiPromptStep.prompts[0],
+                                    includeUserInput: e.target.checked,
+                                  },
+                                ],
+                              };
+                            } else {
+                              return openAiPromptStep;
                             }
-                          ),
+                          }
+                        ),
                       });
                     }}
                   />
@@ -274,19 +269,18 @@ export function EditPrompt(props: {
                   onChange={(e) => {
                     setPromptTemplateCopy({
                       ...promptTemplateCopy,
-                      openAiPromptSteps:
-                        promptTemplateCopy.openAiPromptSteps.map(
-                          (openAiPromptStep, openAiPromptStepIndex) => {
-                            if (openAiPromptStepIndex === index) {
-                              return {
-                                ...openAiPromptStep,
-                                customSystemRole: e.target.value,
-                              };
-                            } else {
-                              return openAiPromptStep;
-                            }
+                      aiPromptSteps: promptTemplateCopy.aiPromptSteps.map(
+                        (openAiPromptStep, openAiPromptStepIndex) => {
+                          if (openAiPromptStepIndex === index) {
+                            return {
+                              ...openAiPromptStep,
+                              customSystemRole: e.target.value,
+                            };
+                          } else {
+                            return openAiPromptStep;
                           }
-                        ),
+                        }
+                      ),
                     });
                   }}
                   // label="Custom System Role"
@@ -304,20 +298,19 @@ export function EditPrompt(props: {
                   onChange={(e) => {
                     setPromptTemplateCopy({
                       ...promptTemplateCopy,
-                      openAiPromptSteps:
-                        promptTemplateCopy.openAiPromptSteps.map(
-                          (openAiPromptStep, openAiPromptStepIndex) => {
-                            if (openAiPromptStepIndex === index) {
-                              return {
-                                ...openAiPromptStep,
-                                outputDataType: e.target
-                                  .value as PromptOutputTypes,
-                              };
-                            } else {
-                              return openAiPromptStep;
-                            }
+                      aiPromptSteps: promptTemplateCopy.aiPromptSteps.map(
+                        (openAiPromptStep, openAiPromptStepIndex) => {
+                          if (openAiPromptStepIndex === index) {
+                            return {
+                              ...openAiPromptStep,
+                              outputDataType: e.target
+                                .value as PromptOutputTypes,
+                            };
+                          } else {
+                            return openAiPromptStep;
                           }
-                        ),
+                        }
+                      ),
                     });
                   }}
                   label="Output Data Type"
@@ -335,19 +328,18 @@ export function EditPrompt(props: {
                   onChange={(e) => {
                     setPromptTemplateCopy({
                       ...promptTemplateCopy,
-                      openAiPromptSteps:
-                        promptTemplateCopy.openAiPromptSteps.map(
-                          (openAiPromptStep, openAiPromptStepIndex) => {
-                            if (openAiPromptStepIndex === index) {
-                              return {
-                                ...openAiPromptStep,
-                                targetGptModel: e.target.value as GptModels,
-                              };
-                            } else {
-                              return openAiPromptStep;
-                            }
+                      aiPromptSteps: promptTemplateCopy.aiPromptSteps.map(
+                        (openAiPromptStep, openAiPromptStepIndex) => {
+                          if (openAiPromptStepIndex === index) {
+                            return {
+                              ...openAiPromptStep,
+                              targetGptModel: e.target.value as GptModels,
+                            };
+                          } else {
+                            return openAiPromptStep;
                           }
-                        ),
+                        }
+                      ),
                     });
                   }}
                   label="Output Data Type"
@@ -365,12 +357,11 @@ export function EditPrompt(props: {
               onClick={() => {
                 setPromptTemplateCopy({
                   ...promptTemplateCopy,
-                  openAiPromptSteps:
-                    promptTemplateCopy.openAiPromptSteps.filter(
-                      (step, stepIndex) => {
-                        return stepIndex !== index;
-                      }
-                    ),
+                  aiPromptSteps: promptTemplateCopy.aiPromptSteps.filter(
+                    (step, stepIndex) => {
+                      return stepIndex !== index;
+                    }
+                  ),
                 });
               }}
               style={{ height: 'fit-content' }}
@@ -389,10 +380,9 @@ export function EditPrompt(props: {
               onClick={() => {
                 setPromptTemplateCopy({
                   ...promptTemplateCopy,
-                  openAiPromptSteps:
-                    promptTemplateCopy.openAiPromptSteps.concat(
-                      emptyOpenAiPromptStep
-                    ),
+                  aiPromptSteps: promptTemplateCopy.aiPromptSteps.concat(
+                    emptyOpenAiPromptStep
+                  ),
                 });
               }}
             >
@@ -416,7 +406,7 @@ export function EditPrompt(props: {
                 try {
                   const res = await asyncPromptExecute(
                     googleDocId,
-                    promptTemplateCopy.openAiPromptSteps,
+                    promptTemplateCopy.aiPromptSteps,
                     userId,
                     systemPrompt,
                     overrideGptModel
@@ -475,7 +465,7 @@ export function EditPrompt(props: {
           setViewPrevRunResults(false);
         }}
         previousRuns={previousRuns}
-        setRunToView={(run?: MultistepPromptRes) => {
+        setRunToView={(run?: AiServicesResponseTypes) => {
           setRunToView(run);
         }}
       />

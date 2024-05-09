@@ -9,7 +9,6 @@ import { DisplayIcons } from './helpers/display-icon-helper';
 import { StepData } from './hooks/use-with-stronger-hook-activity';
 import { ChatMessageTypes, UserInputType } from './store/slices/chat';
 import { UserRole } from './store/slices/login';
-import OpenAI from 'openai';
 
 export interface Connection<T> {
   edges: Edge<T>[];
@@ -98,11 +97,16 @@ export interface DocVersion {
   modifiedTime: string;
 }
 
-export interface OpenAiReqRes {
-  openAiPrompt: OpenAI.Chat.Completions.ChatCompletionCreateParams;
-  openAiResponse: OpenAI.Chat.Completions.ChatCompletion.Choice[];
-  originalRequestPrompt?: OpenAiPromptStep;
-}
+// export interface AiStepData {
+//   aiServiceRequestParams: OpenAI.Chat.Completions.ChatCompletionCreateParams;
+//   aiServiceResponse: OpenAI.Chat.Completions.ChatCompletion.Choice[];
+//   originalRequestPrompt?: AiPromptStep;
+// }
+
+// export interface AiServiceResponse {
+//   aiStepData: AiStepData[];
+//   answer: string;
+// }
 
 export enum UserActions {
   ASK_QUESTION = 'ASK_QUESTION',
@@ -124,7 +128,7 @@ export interface GQLPrompt {
   _id: string;
   clientId: string;
   userInputIsIntention?: boolean;
-  openAiPromptSteps: OpenAiPromptStep[];
+  aiPromptSteps: AiPromptStep[];
   title: string;
 }
 
@@ -146,17 +150,12 @@ export interface PromptConfiguration {
   includeUserInput?: boolean;
 }
 
-export interface OpenAiPromptStep {
+export interface AiPromptStep {
   prompts: PromptConfiguration[];
   targetGptModel: GptModels;
   customSystemRole?: string;
   outputDataType: PromptOutputTypes;
   includeChatLogContext?: boolean;
-}
-
-export interface MultistepPromptRes {
-  openAiData: OpenAiReqRes[];
-  answer: string;
 }
 
 export enum PromptOutputTypes {
@@ -165,7 +164,7 @@ export enum PromptOutputTypes {
 }
 
 export interface Config {
-  openaiSystemPrompt: string[];
+  aiSystemPrompt: string[];
 }
 
 export enum ActivityStepTypes {
@@ -259,15 +258,6 @@ export enum JobStatus {
   FAILED = 'FAILED',
 }
 
-export interface OpenAiJobStatusApiRes {
-  response: OpenAiJobStatus;
-}
-
-export interface OpenAiJobStatus {
-  jobStatus: JobStatus;
-  openAiResponse: MultistepPromptRes;
-}
-
 export interface DocumentTimelineJobStatus {
   jobStatus: JobStatus;
   documentTimeline?: GQLDocumentTimeline;
@@ -289,7 +279,7 @@ export enum MockDefaultType {
   ALL = 'ALL',
 }
 
-export enum OpenAiGenerationStatus {
+export enum AiGenerationStatus {
   NONE = 'NONE',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
@@ -301,10 +291,10 @@ export interface GQLTimelinePoint {
   version: IGDocVersion;
   intent: string;
   changeSummary: string;
-  changeSummaryStatus: OpenAiGenerationStatus;
+  changeSummaryStatus: AiGenerationStatus;
   userInputSummary: string;
   reverseOutline: string;
-  reverseOutlineStatus: OpenAiGenerationStatus;
+  reverseOutlineStatus: AiGenerationStatus;
   relatedFeedback: string;
 }
 

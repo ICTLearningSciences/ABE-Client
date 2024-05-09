@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { JobStatus, OpenAiJobStatusApiRes } from "../../helpers/types";
+import { JobStatus, AiJobStatusApiRes } from "../../helpers/types";
 
 
 export interface Experience {
@@ -20,7 +20,7 @@ export interface Experience {
     response: string;
   }
 
-export const entityFoundResponse = (entities: Experience[], jobStatus?: JobStatus): OpenAiJobStatusApiRes => {
+export const entityFoundResponse = (entities: Experience[], jobStatus?: JobStatus): AiJobStatusApiRes => {
     const _response: EntityDetectionPromptResponse = {
         experiences: entities,
         response: "This is the entity found response."
@@ -29,10 +29,10 @@ export const entityFoundResponse = (entities: Experience[], jobStatus?: JobStatu
 
     return {
         "response": {
-            "openAiResponse": {
-                "openAiData": [
+            "aiServiceResponse": {
+                "aiAllStepsData": [
                     {
-                        "openAiPrompt": {
+                        "aiServiceRequestParams": {
                             "messages": [
                                 {
                                     "role": "system",
@@ -45,7 +45,7 @@ export const entityFoundResponse = (entities: Experience[], jobStatus?: JobStatu
                             ],
                             "model": "gpt-3.5-turbo-16k"
                         },
-                        "openAiResponse": [
+                        "aiServiceResponse": [
                             {
                                 "index": 0,
                                 "message": {

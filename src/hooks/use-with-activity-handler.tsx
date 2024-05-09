@@ -14,8 +14,7 @@ import {
   ActivityStepTypes,
   DocGoal,
   GQLPrompt,
-  MultistepPromptRes,
-  OpenAiPromptStep,
+  AiPromptStep,
   PromptConfiguration,
   PromptRoles,
 } from '../types';
@@ -43,6 +42,7 @@ import { useWithState } from '../store/slices/state/use-with-state';
 import { useWithStrongerConclusionActivity } from './stronger-conclusion-activity/use-with-stronger-conclusion-activity';
 import { useWithLimitsToArgumentActivity } from './limits-to-argument-activity/use-with-limits-to-argument-activity';
 import { useWithThesisSupportActivity } from './increasing-thesis-support-activity/use-with-thesis-support-activity';
+import { AiServicesResponseTypes } from '../ai-services/ai-service-types';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -73,8 +73,8 @@ export const emptyActivity: Activity = {
 };
 
 interface PromptRetryData {
-  callback?: (response: MultistepPromptRes) => void;
-  prompts: OpenAiPromptStep[];
+  callback?: (response: AiServicesResponseTypes) => void;
+  prompts: AiPromptStep[];
   customSystemPrompt?: string;
   numRetries: number;
 }
@@ -215,7 +215,7 @@ export function useWithActivityHandler(
 
   async function executePrompt(
     _prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
-    callback?: (response: MultistepPromptRes) => void,
+    callback?: (response: AiServicesResponseTypes) => void,
     customSystemPrompt?: string
   ) {
     if (!activity) return;
@@ -223,12 +223,12 @@ export function useWithActivityHandler(
     if (!messages.length) return;
     const lastUserMessage = getLastUserMessage(messages);
     const chatLogString = chatLogToString(googleDocId);
-    const openAiPromptSteps: OpenAiPromptStep[] = [];
+    const aiPromptSteps: AiPromptStep[] = [];
     const prompt = _prompt(messages);
     if (prompt.userInputIsIntention && lastUserMessage) {
       updateSessionIntention({ description: lastUserMessage });
     }
-    prompt.openAiPromptSteps.map((openAiPromptStep) => {
+    prompt.aiPromptSteps.map((openAiPromptStep) => {
       const prompts: PromptConfiguration[] = [];
 
       if (openAiPromptStep.includeChatLogContext) {
@@ -250,7 +250,7 @@ export function useWithActivityHandler(
         });
       });
 
-      openAiPromptSteps.push({
+      aiPromptSteps.push({
         ...openAiPromptStep,
         prompts,
       });
@@ -265,7 +265,7 @@ export function useWithActivityHandler(
     });
     await asyncPromptExecute(
       googleDocId,
-      openAiPromptSteps,
+      aiPromptSteps,
       userId,
       customSystemPrompt || systemPrompt,
       overrideGptModel,
@@ -278,7 +278,7 @@ export function useWithActivityHandler(
         if (abortController.signal.aborted) return;
         setRetryData({
           callback,
-          prompts: openAiPromptSteps,
+          prompts: aiPromptSteps,
           numRetries: 0,
           customSystemPrompt,
         });
@@ -287,8 +287,8 @@ export function useWithActivityHandler(
 
   function handleOpenAiSuccess(
     activity: Activity,
-    response: MultistepPromptRes,
-    callback?: (response: MultistepPromptRes) => void
+    response: AiServicesResponseTypes,
+    callback?: (response: AiServicesResponseTypes) => void
   ) {
     coachResponsePending(false);
     if (callback) {
@@ -301,8 +301,9 @@ export function useWithActivityHandler(
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
           openAiInfo: {
-            openAiPrompt: response.openAiData[0].openAiPrompt,
-            openAiResponse: response.openAiData[0].openAiResponse,
+            aiServiceRequestParams:
+              response.aiAllStepsData[0].aiServiceRequestParams,
+            aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
           },
         },
         false,

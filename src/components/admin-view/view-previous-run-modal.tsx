@@ -7,12 +7,13 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { Box, Button, Modal, Theme } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
-import { MultistepPromptRes, PromptOutputTypes } from '../../types';
+import { PromptOutputTypes } from '../../types';
 import { ColumnDiv, JsonDisplay } from '../../styled-components';
 import { useState } from 'react';
 import { parseOpenAIResContent } from '../../helpers';
 import { JsonView, allExpanded, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
+import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
 
 const useStyles = makeStyles({ name: { ViewPreviousRunModal } })(
   (theme: Theme) => ({
@@ -32,7 +33,7 @@ const useStyles = makeStyles({ name: { ViewPreviousRunModal } })(
 );
 
 export default function ViewPreviousRunModal(props: {
-  previousRun?: MultistepPromptRes;
+  previousRun?: AiServicesResponseTypes;
   open: boolean;
   close: () => void;
 }): JSX.Element {
@@ -62,7 +63,7 @@ export default function ViewPreviousRunModal(props: {
       <Modal open={Boolean(open)} className={classes.modal}>
         <Box sx={style}>
           <div style={{ overflow: 'auto' }}>
-            {previousRun.openAiData.map((promptStep, index) => {
+            {previousRun.aiAllStepsData.map((promptStep, index) => {
               const parsedData = parseOpenAIResContent(promptStep);
               const isJsonOutput =
                 parsedData.originalRequestPrompt?.outputDataType ===
@@ -71,14 +72,14 @@ export default function ViewPreviousRunModal(props: {
                 parsedData.originalRequestPrompt?.outputDataType ===
                   PromptOutputTypes.TEXT || showJsonAsText;
               const responseMessage =
-                parsedData.openAiResponse[0].message.content;
+                parsedData.aiServiceResponse[0].message.content;
               return (
                 <ColumnDiv key={index}>
                   <h2 style={{ alignSelf: 'center' }}>{`Step ${index + 1}`}</h2>
                   <div>Prompt</div>
                   <div style={{ border: '1px solid black' }}>
                     <JsonView
-                      data={parsedData.openAiPrompt}
+                      data={parsedData.aiServiceRequestParams}
                       shouldExpandNode={allExpanded}
                       style={defaultStyles}
                     />
@@ -108,7 +109,7 @@ export default function ViewPreviousRunModal(props: {
                     ) : (
                       <div>
                         <JsonView
-                          data={parsedData.openAiResponse}
+                          data={parsedData.aiServiceResponse}
                           shouldExpandNode={allExpanded}
                           style={defaultStyles}
                         />

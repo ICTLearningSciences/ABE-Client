@@ -179,8 +179,9 @@ export function sSelectIntendedImprovement(
                 ...suggestedImprovementsRes.suggestedImprovements,
               ],
               openAiInfo: {
-                openAiPrompt: res.openAiData[0].openAiPrompt,
-                openAiResponse: res.openAiData[0].openAiResponse,
+                aiServiceRequestParams:
+                  res.aiAllStepsData[0].aiServiceRequestParams,
+                aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
               },
             });
             setWaitingForUserAnswer(true);
@@ -223,8 +224,9 @@ export function sSelectIntendedImprovement(
                 allActivityMessages
               ),
               openAiInfo: {
-                openAiPrompt: res.openAiData[0].openAiPrompt,
-                openAiResponse: res.openAiData[0].openAiResponse,
+                aiServiceRequestParams:
+                  res.aiAllStepsData[0].aiServiceRequestParams,
+                aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
               },
             });
             setState((prevValue) => ({

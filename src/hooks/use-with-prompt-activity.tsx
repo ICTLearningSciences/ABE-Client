@@ -36,7 +36,7 @@ export const freeInputPrompt = (chatLog: ChatMessageTypes[]): GQLPrompt => {
   return {
     _id: '',
     clientId: '',
-    openAiPromptSteps: [
+    aiPromptSteps: [
       {
         prompts: [
           {
@@ -105,8 +105,10 @@ export function useWithPromptActivity(
                 displayType: MessageDisplayType.TEXT,
                 activityStep: introStep(stepData),
                 openAiInfo: {
-                  openAiPrompt: response.openAiData[0].openAiPrompt,
-                  openAiResponse: response.openAiData[0].openAiResponse,
+                  aiServiceRequestParams:
+                    response.aiAllStepsData[0].aiServiceRequestParams,
+                  aiServiceResponse:
+                    response.aiAllStepsData[0].aiServiceResponse,
                 },
               },
               false,
@@ -139,8 +141,10 @@ export function useWithPromptActivity(
                   displayType: MessageDisplayType.TEXT,
                   activityStep: freeInputStep(stepData),
                   openAiInfo: {
-                    openAiPrompt: response.openAiData[0].openAiPrompt,
-                    openAiResponse: response.openAiData[0].openAiResponse,
+                    aiServiceRequestParams:
+                      response.aiAllStepsData[0].aiServiceRequestParams,
+                    aiServiceResponse:
+                      response.aiAllStepsData[0].aiServiceResponse,
                   },
                 },
                 false,
@@ -172,8 +176,10 @@ export function useWithPromptActivity(
                 displayType: MessageDisplayType.TEXT,
                 activityStep: freeInputStep(stepData),
                 openAiInfo: {
-                  openAiPrompt: response.openAiData[0].openAiPrompt,
-                  openAiResponse: response.openAiData[0].openAiResponse,
+                  aiServiceRequestParams:
+                    response.aiAllStepsData[0].aiServiceRequestParams,
+                  aiServiceResponse:
+                    response.aiAllStepsData[0].aiServiceResponse,
                 },
               },
               false,

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Button, Modal, Theme } from '@mui/material';
-import { OpenAiReqRes } from '../../../types';
 import { makeStyles } from 'tss-react/mui';
 import { JsonDisplay } from '../../../styled-components';
+import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 
 const useStyles = makeStyles({ name: { OpenAiInfoModal } })((theme: Theme) => ({
   inputField: {
@@ -20,7 +20,7 @@ const useStyles = makeStyles({ name: { OpenAiInfoModal } })((theme: Theme) => ({
 }));
 
 export default function OpenAiInfoModal(props: {
-  openAiInfo?: OpenAiReqRes;
+  openAiInfo?: AiServiceStepDataTypes;
   close: () => void;
 }): JSX.Element {
   const { openAiInfo, close } = props;
@@ -67,7 +67,7 @@ export default function OpenAiInfoModal(props: {
                 }}
               >
                 <JsonDisplay>
-                  {JSON.stringify(openAiInfo?.openAiPrompt, null, 2)}
+                  {JSON.stringify(openAiInfo?.aiServiceRequestParams, null, 2)}
                 </JsonDisplay>
               </div>
             </div>
@@ -88,7 +88,7 @@ export default function OpenAiInfoModal(props: {
                 }}
               >
                 <JsonDisplay>
-                  {JSON.stringify(openAiInfo?.openAiResponse, null, 2)}
+                  {JSON.stringify(openAiInfo?.aiServiceResponse, null, 2)}
                 </JsonDisplay>
               </div>
             </div>

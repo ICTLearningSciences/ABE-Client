@@ -27,7 +27,7 @@ disabled
 displayIcon
 prompt{
   _id
-  openAiPromptSteps{
+  aiPromptSteps{
     prompts{
       promptText
       includeEssay

@@ -41,7 +41,7 @@ export const fetchActivitiesResponse = {
                     "prompt": {
                         "_id": "659dd7664575cc2a8f595375",
                         "clientId": "4a224649-8a00-45df-929d-a4299b277b82",
-                        "openAiPromptSteps": [
+                        "aiPromptSteps": [
                           {
                             "prompts": [
                               {
@@ -79,7 +79,7 @@ export const fetchActivitiesResponse = {
                     "prompt": {
                         "_id": "659dd7664575cc2a8f595375",
                         "clientId": "4a224649-8a00-45df-929d-a4299b277b82",
-                        "openAiPromptSteps": [
+                        "aiPromptSteps": [
                           {
                             "prompts": [
                               {

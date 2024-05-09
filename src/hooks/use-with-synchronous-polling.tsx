@@ -5,26 +5,25 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { CancelToken } from 'axios';
-import {
-  JobStatus,
-  MultistepPromptRes,
-  OpenAiJobStatus,
-  OpenAiPromptStep,
-} from '../types';
+import { JobStatus, AiPromptStep } from '../types';
 import { asyncOpenAiJobStatus, asyncOpenAiRequest } from './api';
 import { GptModels } from '../constants';
+import {
+  AiServicesResponseTypes,
+  AiServicesJobStatusResponseTypes,
+} from '../ai-services/ai-service-types';
 
 export async function asyncPromptExecute(
   googleDocId: string,
-  openAiPromptSteps: OpenAiPromptStep[],
+  aiPromptSteps: AiPromptStep[],
   userId: string,
   systemPrompt: string,
   overrideGptModel: GptModels,
   cancelToken?: CancelToken
-): Promise<MultistepPromptRes> {
+): Promise<AiServicesResponseTypes> {
   const openAiJobId = await asyncOpenAiRequest(
     googleDocId,
-    openAiPromptSteps,
+    aiPromptSteps,
     userId,
     systemPrompt,
     overrideGptModel,
@@ -33,9 +32,9 @@ export async function asyncPromptExecute(
   const pollFunction = () => {
     return asyncOpenAiJobStatus(openAiJobId, cancelToken);
   };
-  const res = await pollUntilTrue<OpenAiJobStatus>(
+  const res = await pollUntilTrue<AiServicesJobStatusResponseTypes>(
     pollFunction,
-    (res: OpenAiJobStatus) => {
+    (res: AiServicesJobStatusResponseTypes) => {
       if (res.jobStatus === JobStatus.FAILED) {
         throw new Error('OpenAI job failed');
       }
@@ -44,7 +43,7 @@ export async function asyncPromptExecute(
     1000,
     180 * 1000
   );
-  return res.openAiResponse;
+  return res.aiServiceResponse;
 }
 
 export function pollUntilTrue<T>(

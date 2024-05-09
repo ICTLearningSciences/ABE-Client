@@ -377,8 +377,9 @@ export function useWithThesisSupportActivity(
                 displayType: MessageDisplayType.TEXT,
                 activityStep: introStep(stepData, allActivityMessages),
                 openAiInfo: {
-                  openAiPrompt: res.openAiData[0].openAiPrompt,
-                  openAiResponse: res.openAiData[0].openAiResponse,
+                  aiServiceRequestParams:
+                    res.aiAllStepsData[0].aiServiceRequestParams,
+                  aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
                 },
               },
               false,

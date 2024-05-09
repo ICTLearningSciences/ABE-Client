@@ -10,7 +10,7 @@ import { useWithChat } from '../store/slices/chat/use-with-chat';
 import axios, { CancelTokenSource } from 'axios';
 import {
   DocGoal,
-  OpenAiPromptStep,
+  AiPromptStep,
   PromptOutputTypes,
   PromptRoles,
 } from '../types';
@@ -58,7 +58,7 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
     }
     const mostRecentMessage = messages[messages.length - 1];
     if (mostRecentMessage.sender === Sender.USER) {
-      const prompts: OpenAiPromptStep[] = [
+      const prompts: AiPromptStep[] = [
         {
           prompts: [
             {
@@ -107,8 +107,9 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
               openAiInfo: {
-                openAiPrompt: response.openAiData[0].openAiPrompt,
-                openAiResponse: response.openAiData[0].openAiResponse,
+                aiServiceRequestParams:
+                  response.aiAllStepsData[0].aiServiceRequestParams,
+                aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
               },
             },
             false,

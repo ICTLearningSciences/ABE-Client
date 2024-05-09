@@ -17,7 +17,7 @@ import { equals, formatISODateToReadable } from '../../../helpers';
 import {
   GQLTimelinePoint,
   GoogleDoc,
-  OpenAiGenerationStatus,
+  AiGenerationStatus,
   StoreGoogleDoc,
   TimelinePointType,
 } from '../../../types';
@@ -331,7 +331,7 @@ and dynamically adjust the height of the input field. */
       const [saving, setSaving] = useState(false);
 
       if (
-        timelinePoint.changeSummaryStatus === OpenAiGenerationStatus.IN_PROGRESS
+        timelinePoint.changeSummaryStatus === AiGenerationStatus.IN_PROGRESS
       ) {
         return (
           <Box
@@ -562,7 +562,7 @@ and dynamically adjust the height of the input field. */
             claimEvidence &&
             aiOutline &&
             timelinePoint.reverseOutlineStatus ===
-              OpenAiGenerationStatus.COMPLETED &&
+              AiGenerationStatus.COMPLETED &&
             timelinePoint.type !== TimelinePointType.INTRO ? (
               <div style={{ marginRight: 10 }}>
                 <AIOutlineDisplay
@@ -570,7 +570,7 @@ and dynamically adjust the height of the input field. */
                 />
               </div>
             ) : timelinePoint.reverseOutlineStatus ===
-              OpenAiGenerationStatus.COMPLETED ? (
+              AiGenerationStatus.COMPLETED ? (
               <Typography className="text-2" data-cy="no-ai-outline">
                 No AI outline available
               </Typography>

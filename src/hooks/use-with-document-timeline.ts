@@ -10,7 +10,7 @@ import {
   GQLDocumentTimeline,
   GQLTimelinePoint,
   JobStatus,
-  OpenAiGenerationStatus,
+  AiGenerationStatus,
   TimelinePointType,
 } from '../types';
 import {
@@ -56,10 +56,10 @@ const startPoint: GQLTimelinePoint = {
   },
   intent: '',
   changeSummary: '',
-  changeSummaryStatus: OpenAiGenerationStatus.COMPLETED,
+  changeSummaryStatus: AiGenerationStatus.COMPLETED,
   userInputSummary: '',
   reverseOutline: 'No outline available',
-  reverseOutlineStatus: OpenAiGenerationStatus.COMPLETED,
+  reverseOutlineStatus: AiGenerationStatus.COMPLETED,
   relatedFeedback: '',
 };
 
