@@ -9,7 +9,7 @@ import {
   State,
   updateDocId,
   updateUserActivityStates,
-  overrideOpenAiModel as _overrideOpenAiModel,
+  overrideAiModel as _overrideOpenAiModel,
   updateViewingUserRole,
   updateViewingAdvancedOptions,
   newSession as _newSession,
@@ -33,7 +33,7 @@ interface UseWithState {
     activityId: string,
     metadata: string
   ) => Promise<void>;
-  overrideOpenAiModel: (model: GptModels) => void;
+  overrideAiModel: (model: GptModels) => void;
   updateViewingUserRole: (role: UserRole) => void;
   updateViewingAdvancedOptions: (advancedOptions: boolean) => void;
   newSession: () => void;
@@ -45,7 +45,7 @@ export function useWithState(): UseWithState {
   const dispatch = useAppDispatch();
   const state: State = useAppSelector((state) => state.state);
 
-  function overrideOpenAiModel(model: GptModels) {
+  function overrideAiModel(model: GptModels) {
     dispatch(_overrideOpenAiModel(model));
   }
 
@@ -107,7 +107,7 @@ export function useWithState(): UseWithState {
     updateCurrentDocId,
     loadUserActivityStates,
     updateUserActivityState,
-    overrideOpenAiModel,
+    overrideAiModel,
     updateViewingUserRole: _updateViewingUserRole,
     updateViewingAdvancedOptions: _updateViewingAdvancedOptions,
     newSession,

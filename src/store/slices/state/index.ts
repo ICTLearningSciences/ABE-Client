@@ -105,7 +105,7 @@ export const stateSlice = createSlice({
     ) => {
       state.userActivityStates = action.payload;
     },
-    overrideOpenAiModel: (state: State, action: PayloadAction<GptModels>) => {
+    overrideAiModel: (state: State, action: PayloadAction<GptModels>) => {
       state.overideGptModel = action.payload;
     },
     updateViewingUserRole: (state: State, action: PayloadAction<UserRole>) => {
@@ -163,7 +163,7 @@ export const stateSlice = createSlice({
 export const {
   updateDocId,
   updateUserActivityStates,
-  overrideOpenAiModel,
+  overrideAiModel,
   updateViewingUserRole,
   updateViewingAdvancedOptions,
   newSession,

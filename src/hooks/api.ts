@@ -762,7 +762,7 @@ export async function asyncOpenAiRequest(
   aiPromptSteps: AiPromptStep[],
   userId: string,
   systemPrompt: string,
-  overrideOpenAiModel: GptModels,
+  overrideAiModel: GptModels,
   cancelToken?: CancelToken
 ): Promise<OpenAiJobId> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
@@ -772,7 +772,7 @@ export async function asyncOpenAiRequest(
     `${API_ENDPOINT}/async_open_ai_doc_question/?docId=${docsId}&userAction=${
       UserActions.MULTISTEP_PROMPTS
     }&userId=${userId}&systemPrompt=${systemPrompt}${
-      overrideOpenAiModel ? `&openAiModel=${overrideOpenAiModel}` : ''
+      overrideAiModel ? `&overrideAiModel=${overrideAiModel}` : ''
     }`,
     {
       accessToken: accessToken,

@@ -277,7 +277,7 @@ export default function Chat(props: {
     deleteSystemPrompt,
     isSaving,
   } = useWithSystemPromptsConfig();
-  const { overrideOpenAiModel, state } = useWithState();
+  const { overrideAiModel, state } = useWithState();
   const { userActivityStates, googleDocId } = state;
   const coachResponsePending = useAppSelector(
     (state) => state.chat.coachResponsePending
@@ -430,7 +430,7 @@ export default function Chat(props: {
                         : state.overideGptModel
                     }
                     onChange={(e) => {
-                      overrideOpenAiModel(e.target.value as GptModels);
+                      overrideAiModel(e.target.value as GptModels);
                     }}
                     label="Output Data Type"
                   >
