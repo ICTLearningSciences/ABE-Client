@@ -533,6 +533,12 @@ export async function fetchConfig(): Promise<Config> {
         query FetchConfig{
           fetchConfig {
             aiSystemPrompt
+            displayedGoals
+            displayedActivities
+            overrideAiModel{
+              serviceName
+              model
+            }
           }
         }
       `,

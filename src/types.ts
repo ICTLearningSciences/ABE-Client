@@ -163,8 +163,20 @@ export enum PromptOutputTypes {
   JSON = 'JSON',
 }
 
+export enum AiServiceNames {
+  AZURE = 'AZURE',
+  OPEN_AI = 'OPEN_AI',
+  GEMINI = 'GEMINI',
+}
+
 export interface Config {
   aiSystemPrompt: string[];
+  displayedGoals?: string[];
+  displayedActivities?: string[];
+  overrideAiModel?: {
+    serviceName: AiServiceNames;
+    model: string;
+  };
 }
 
 export enum ActivityStepTypes {
