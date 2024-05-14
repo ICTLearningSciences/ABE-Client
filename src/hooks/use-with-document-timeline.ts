@@ -26,6 +26,8 @@ import {
 import { LoadingStatusType } from './generic-loading-reducer';
 import { CancelToken } from 'axios';
 import { pollUntilTrue } from './use-with-synchronous-polling';
+import { useWithConfig } from '../store/slices/config/use-with-config';
+import { DEFAULT_TARGET_AI_SERVICE_MODEL } from '../constants';
 
 const initialState: TimelineState = {
   status: LoadingStatusType.NONE,
@@ -100,6 +102,8 @@ export function addStartPointToTimeline(timeline: GQLDocumentTimeline) {
 
 export function useWithDocumentTimeline() {
   const [state, dispatch] = useReducer(TimelineReducer, initialState);
+  const { state: config } = useWithConfig();
+
   async function asyncFetchDocTimeline(
     userId: string,
     docId: string,
@@ -113,6 +117,7 @@ export function useWithDocumentTimeline() {
       const docTimelineJobId = await asyncRequestDocTimeline(
         userId,
         docId,
+        config.config?.defaultAiModel || DEFAULT_TARGET_AI_SERVICE_MODEL,
         cancelToken
       );
       const pollFunction = () => {
@@ -147,6 +152,7 @@ export function useWithDocumentTimeline() {
     } catch (e: any) {
       dispatch({
         type: TimelineActionType.LOADING_FAILED,
+
         errorPayload: {
           error: e,
           message: JSON.stringify(e.message),

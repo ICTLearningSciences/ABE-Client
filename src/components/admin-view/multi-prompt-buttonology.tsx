@@ -14,6 +14,7 @@ import {
   AiPromptStep,
   PromptOutputTypes,
   PromptRoles,
+  AiServiceModel,
 } from '../../types';
 import { UseWithPrompts } from '../../hooks/use-with-prompts';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,19 +24,24 @@ import {
 } from './prompt-editing/saved-prompts-view';
 import { SavedActivityPromptsView } from './prompt-editing/saved-activity-prompts-view';
 import { isPromptInActivity } from '../../helpers';
-import { DEFAULT_GPT_MODEL } from '../../constants';
 import { EditPrompt } from './prompt-editing/edit-prompt';
+import { useWithConfig } from '../../store/slices/config/use-with-config';
+import { DEFAULT_TARGET_AI_SERVICE_MODEL } from '../../constants';
 
-export const emptyOpenAiPromptStep: AiPromptStep = {
-  prompts: [
-    {
-      promptText: '',
-      includeEssay: true,
-      promptRole: PromptRoles.USER,
-    },
-  ],
-  targetGptModel: DEFAULT_GPT_MODEL,
-  outputDataType: PromptOutputTypes.TEXT,
+export const emptyOpenAiPromptStep = (
+  targetAiServiceModel: AiServiceModel
+): AiPromptStep => {
+  return {
+    prompts: [
+      {
+        promptText: '',
+        includeEssay: true,
+        promptRole: PromptRoles.USER,
+      },
+    ],
+    targetAiServiceModel: targetAiServiceModel,
+    outputDataType: PromptOutputTypes.TEXT,
+  };
 };
 
 export function MultiPromptTesting(props: {
@@ -48,6 +54,7 @@ export function MultiPromptTesting(props: {
   const [targetPromptId, setTargetPromptId] = useState<string>();
   const { prompts, handleSavePrompt, editOrAddPrompt, isLoading } =
     useWithPrompts;
+  const { state: config } = useWithConfig();
   const activitiesWithPrompts = activities.filter(
     (activity) => (activity.prompts?.length || 0) > 0
   );
@@ -163,7 +170,12 @@ export function MultiPromptTesting(props: {
               _id: newId,
               title: '',
               clientId: newId,
-              aiPromptSteps: [emptyOpenAiPromptStep],
+              aiPromptSteps: [
+                emptyOpenAiPromptStep(
+                  config.config?.defaultAiModel ||
+                    DEFAULT_TARGET_AI_SERVICE_MODEL
+                ),
+              ],
             });
             setTargetPromptId(newId);
           }}

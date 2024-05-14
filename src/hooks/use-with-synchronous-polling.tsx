@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 import { CancelToken } from 'axios';
 import { JobStatus, AiPromptStep } from '../types';
 import { asyncOpenAiJobStatus, asyncOpenAiRequest } from './api';
-import { GptModels } from '../constants';
 import {
   AiServicesResponseTypes,
   AiServicesJobStatusResponseTypes,
@@ -17,16 +16,12 @@ export async function asyncPromptExecute(
   googleDocId: string,
   aiPromptSteps: AiPromptStep[],
   userId: string,
-  systemPrompt: string,
-  overrideGptModel: GptModels,
   cancelToken?: CancelToken
 ): Promise<AiServicesResponseTypes> {
   const openAiJobId = await asyncOpenAiRequest(
     googleDocId,
     aiPromptSteps,
     userId,
-    systemPrompt,
-    overrideGptModel,
     cancelToken
   );
   const pollFunction = () => {

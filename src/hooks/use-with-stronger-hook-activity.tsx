@@ -195,7 +195,7 @@ export interface StepData {
     prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
     callback?: (response: AiServicesResponseTypes) => void,
     customSystemPrompt?: string
-  ) => Promise<void>;
+  ) => Promise<AiServicesResponseTypes | undefined>;
   openSelectActivityModal: () => void;
   sendMessage: (msg: ChatMessageTypes) => void;
   setWaitingForUserAnswer: (waiting: boolean) => void;

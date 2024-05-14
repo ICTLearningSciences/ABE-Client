@@ -11,11 +11,15 @@ import {
   Button,
   CircularProgress,
 } from '@mui/material';
-import { GptModels } from '../../../constants';
+import { DEFAULT_TARGET_AI_SERVICE_MODEL } from '../../../constants';
 import { equals, extractErrorMessageFromError } from '../../../helpers';
-import { asyncPromptExecute } from '../../../hooks/use-with-synchronous-polling';
 import { ColumnDiv, RowDivSB } from '../../../styled-components';
-import { PromptOutputTypes, GQLPrompt, ActivityGQL } from '../../../types';
+import {
+  PromptOutputTypes,
+  GQLPrompt,
+  ActivityGQL,
+  AiServiceModel,
+} from '../../../types';
 import { ErrorDialog } from '../../dialog';
 import ViewPreviousRunModal from '../view-previous-run-modal';
 import ViewPreviousRunsModal from '../view-previous-runs-modal';
@@ -23,6 +27,7 @@ import { useState } from 'react';
 import { emptyOpenAiPromptStep } from '../multi-prompt-buttonology';
 import { useAppSelector } from '../../../store/hooks';
 import { AiServicesResponseTypes } from '../../../ai-services/ai-service-types';
+import { useWithExecutePrompt } from '../../../hooks/use-with-execute-prompts';
 
 export function EditPrompt(props: {
   promptTemplate: GQLPrompt;
@@ -34,12 +39,11 @@ export function EditPrompt(props: {
 }): JSX.Element {
   const user = useAppSelector((state) => state.login.user);
   const userId = user?._id;
-  const googleDocId = useAppSelector((state) => state.state.googleDocId);
-  const systemPrompt: string = useAppSelector(
-    (state) => state.chat.systemPrompt
+  const availableAiServiceModels = useAppSelector(
+    (state) => state.config.config?.availableAiServiceModels
   );
-  const overrideGptModel = useAppSelector(
-    (state) => state.state.overideGptModel
+  const defaultAiModel = useAppSelector(
+    (state) => state.config.config?.defaultAiModel
   );
   const {
     promptTemplate,
@@ -60,6 +64,7 @@ export function EditPrompt(props: {
   const [promptTemplateCopy, setPromptTemplateCopy] = useState<GQLPrompt>(
     JSON.parse(JSON.stringify(promptTemplate))
   );
+  const { executePrompt } = useWithExecutePrompt(false);
 
   useEffect(() => {
     setPromptTemplateCopy(JSON.parse(JSON.stringify(promptTemplate)));
@@ -263,7 +268,7 @@ export function EditPrompt(props: {
                   Custom System Role
                 </InputLabel>
                 <Input
-                  value={openAiPromptStep.customSystemRole}
+                  value={openAiPromptStep.systemRole}
                   multiline
                   maxRows={4}
                   onChange={(e) => {
@@ -274,7 +279,7 @@ export function EditPrompt(props: {
                           if (openAiPromptStepIndex === index) {
                             return {
                               ...openAiPromptStep,
-                              customSystemRole: e.target.value,
+                              systemRole: e.target.value,
                             };
                           } else {
                             return openAiPromptStep;
@@ -324,8 +329,11 @@ export function EditPrompt(props: {
                 <Select
                   labelId="select-gpt-model"
                   id="gpt-model-select"
-                  value={openAiPromptStep.targetGptModel}
+                  value={openAiPromptStep.targetAiServiceModel.model}
                   onChange={(e) => {
+                    const targetAiServiceModel: AiServiceModel = JSON.parse(
+                      e.target.value
+                    );
                     setPromptTemplateCopy({
                       ...promptTemplateCopy,
                       aiPromptSteps: promptTemplateCopy.aiPromptSteps.map(
@@ -333,7 +341,7 @@ export function EditPrompt(props: {
                           if (openAiPromptStepIndex === index) {
                             return {
                               ...openAiPromptStep,
-                              targetGptModel: e.target.value as GptModels,
+                              targetAiServiceModel: targetAiServiceModel,
                             };
                           } else {
                             return openAiPromptStep;
@@ -344,11 +352,30 @@ export function EditPrompt(props: {
                   }}
                   label="Output Data Type"
                 >
-                  <MenuItem value={GptModels.GPT_3_5}>GPT 3.5</MenuItem>
+                  {availableAiServiceModels?.map((serviceAndModels) => {
+                    return (
+                      <>
+                        {serviceAndModels.models.map((model, i) => {
+                          return (
+                            <MenuItem
+                              key={i}
+                              value={JSON.stringify({
+                                serviceName: serviceAndModels.serviceName,
+                                model: model,
+                              } as AiServiceModel)}
+                            >
+                              {model}
+                            </MenuItem>
+                          );
+                        })}
+                      </>
+                    );
+                  })}
+                  {/* <MenuItem value={GptModels.GPT_3_5}>GPT 3.5</MenuItem>
                   <MenuItem value={GptModels.GPT_4}>GPT 4</MenuItem>
                   <MenuItem value={GptModels.GPT_4_TURBO_PREVIEW}>
                     GPT 4 Turbo Preview (128k token context)
-                  </MenuItem>
+                  </MenuItem> */}
                 </Select>
               </FormControl>
             </ColumnDiv>
@@ -381,7 +408,9 @@ export function EditPrompt(props: {
                 setPromptTemplateCopy({
                   ...promptTemplateCopy,
                   aiPromptSteps: promptTemplateCopy.aiPromptSteps.concat(
-                    emptyOpenAiPromptStep
+                    emptyOpenAiPromptStep(
+                      defaultAiModel || DEFAULT_TARGET_AI_SERVICE_MODEL
+                    )
                   ),
                 });
               }}
@@ -404,13 +433,10 @@ export function EditPrompt(props: {
                 }
                 setInProgress(true);
                 try {
-                  const res = await asyncPromptExecute(
-                    googleDocId,
-                    promptTemplateCopy.aiPromptSteps,
-                    userId,
-                    systemPrompt,
-                    overrideGptModel
-                  );
+                  const res = await executePrompt(() => promptTemplateCopy);
+                  if (!res) {
+                    throw new Error('No response from AI service');
+                  }
                   setPreviousRuns((prevRuns) => {
                     return [...prevRuns, res];
                   });

@@ -30,12 +30,12 @@ import {
   StoreGoogleDoc,
   ActivityGQL,
   DocGoalGQL,
+  AiServiceModel,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
 import { addQueryParam } from '../helpers';
 import { isBulletPointMessage } from '../store/slices/chat/helpers';
-import { GptModels } from '../constants';
 import { activityQueryData } from './api-helpers';
 import { omit } from 'lodash';
 import { OpenAiServiceJobStatusResponseType } from '../ai-services/open-ai-service';
@@ -319,7 +319,7 @@ export async function fetchPrompts(): Promise<GQLResPrompts> {
                       promptRole
                     }
                   targetGptModel
-                  customSystemRole
+                  systemRole
                   outputDataType
                     includeChatLogContext
                   }
@@ -387,7 +387,7 @@ export async function storePrompts(
               }
               outputDataType
               targetGptModel
-              customSystemRole
+              systemRole
               includeChatLogContext
             }
           }
@@ -426,7 +426,7 @@ export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
               }
               outputDataType
               targetGptModel
-              customSystemRole
+              systemRole
               includeChatLogContext
             }
           }
@@ -538,6 +538,14 @@ export async function fetchConfig(): Promise<Config> {
             overrideAiModel{
               serviceName
               model
+            }
+            defaultAiModel{
+              serviceName
+              model
+            }
+            availableAiServiceModels{
+              serviceName
+              models
             }
           }
         }
@@ -767,19 +775,13 @@ export async function asyncOpenAiRequest(
   docsId: string,
   aiPromptSteps: AiPromptStep[],
   userId: string,
-  systemPrompt: string,
-  overrideAiModel: GptModels,
   cancelToken?: CancelToken
 ): Promise<OpenAiJobId> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   if (!accessToken) throw new Error('No access token');
   const res = await execHttp<OpenAiJobId>(
     'POST',
-    `${API_ENDPOINT}/async_open_ai_doc_question/?docId=${docsId}&userAction=${
-      UserActions.MULTISTEP_PROMPTS
-    }&userId=${userId}&systemPrompt=${systemPrompt}${
-      overrideAiModel ? `&overrideAiModel=${overrideAiModel}` : ''
-    }`,
+    `${API_ENDPOINT}/async_open_ai_doc_question/?docId=${docsId}&userAction=${UserActions.MULTISTEP_PROMPTS}&userId=${userId}`,
     {
       accessToken: accessToken,
       dataPath: ['response', 'jobId'],
@@ -814,32 +816,12 @@ export async function asyncOpenAiJobStatus(
   return res;
 }
 
-export async function requestDocTimeline(
-  userId: string,
-  docId: string,
-  cancelToken?: CancelToken
-): Promise<GQLDocumentTimeline> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
-  const res = await execHttp<GQLDocumentTimeline>(
-    'POST',
-    `${API_ENDPOINT}/get_document_timeline/?docId=${docId}&userId=${userId}`,
-    {
-      accessToken: accessToken,
-      dataPath: [],
-      axiosConfig: {
-        cancelToken: cancelToken,
-      },
-    }
-  );
-  return res;
-}
-
 export type DocumentTimelineJobId = string;
 
 export async function asyncRequestDocTimeline(
   userId: string,
   docId: string,
+  targetAiService: AiServiceModel,
   cancelToken?: CancelToken
 ): Promise<DocumentTimelineJobId> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
@@ -852,6 +834,9 @@ export async function asyncRequestDocTimeline(
       dataPath: ['response', 'jobId'],
       axiosConfig: {
         cancelToken: cancelToken,
+        data: {
+          targetAiService: targetAiService,
+        },
       },
     }
   );

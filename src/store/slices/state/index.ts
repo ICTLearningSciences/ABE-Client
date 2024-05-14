@@ -6,13 +6,13 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
+  AiServiceModel,
   GoogleDoc,
   Intention,
   StoreGoogleDoc,
   UserActivityState,
 } from '../../../types';
 import { UserRole } from '../login';
-import { GptModels } from '../../../constants';
 import { v4 as uuidv4 } from 'uuid';
 import {
   deleteGoogleDoc,
@@ -34,7 +34,7 @@ export interface State {
   sessionId: string;
   sessionIntention?: Intention;
   userActivityStates: UserActivityState[];
-  overideGptModel: GptModels;
+  overrideAiServiceModel?: AiServiceModel;
   viewingRole: UserRole;
   viewingAdvancedOptions: boolean;
 }
@@ -45,7 +45,7 @@ const initialState: State = {
   userGoogleDocs: [],
   sessionId: uuidv4(),
   userActivityStates: [],
-  overideGptModel: GptModels.NONE,
+  overrideAiServiceModel: undefined,
   viewingRole: UserRole.USER,
   viewingAdvancedOptions: false,
 };
@@ -105,8 +105,8 @@ export const stateSlice = createSlice({
     ) => {
       state.userActivityStates = action.payload;
     },
-    overrideAiModel: (state: State, action: PayloadAction<GptModels>) => {
-      state.overideGptModel = action.payload;
+    overrideAiModel: (state: State, action: PayloadAction<AiServiceModel>) => {
+      state.overrideAiServiceModel = action.payload;
     },
     updateViewingUserRole: (state: State, action: PayloadAction<UserRole>) => {
       state.viewingRole = action.payload;

@@ -24,7 +24,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             }
@@ -46,7 +46,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             },
@@ -60,7 +60,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -82,7 +82,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             }
@@ -104,7 +104,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             },
@@ -118,7 +118,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -140,7 +140,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-4",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             }
@@ -162,7 +162,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             }
@@ -184,7 +184,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             }
@@ -206,7 +206,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             },
@@ -220,7 +220,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -242,7 +242,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -264,7 +264,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -286,7 +286,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -308,7 +308,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             }
@@ -330,7 +330,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             }
@@ -352,7 +352,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -374,7 +374,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -396,7 +396,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -418,7 +418,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -440,7 +440,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -462,7 +462,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -484,7 +484,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             },
@@ -498,7 +498,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -520,7 +520,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -542,7 +542,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             }
@@ -564,7 +564,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -586,7 +586,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             },
@@ -600,7 +600,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -622,7 +622,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -644,7 +644,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -666,7 +666,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -688,7 +688,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -710,7 +710,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -732,7 +732,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -754,7 +754,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-4-turbo-preview",
-              "customSystemRole": "You are a wizard that lives in a castle. You speak in a very old English dialect. You receive letters from students in another dimension that you must write back to. This is one of those letters.",
+              "systemRole": "You are a wizard that lives in a castle. You speak in a very old English dialect. You receive letters from students in another dimension that you must write back to. This is one of those letters.",
               "outputDataType": "JSON",
               "includeChatLogContext": false
             }
@@ -776,7 +776,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -798,7 +798,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -820,7 +820,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -842,7 +842,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -864,7 +864,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -886,7 +886,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -908,7 +908,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -930,7 +930,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -952,7 +952,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -974,7 +974,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -996,7 +996,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": true
             }
@@ -1018,7 +1018,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -1040,7 +1040,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }
@@ -1062,7 +1062,7 @@ export const fetchPromptTemplates =  {
                 }
               ],
               "targetGptModel": "gpt-3.5-turbo-16k",
-              "customSystemRole": "",
+              "systemRole": "",
               "outputDataType": "TEXT",
               "includeChatLogContext": false
             }

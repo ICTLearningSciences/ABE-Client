@@ -60,13 +60,13 @@ export type GoogleDocId = string;
 export interface ChatState {
   chatLogs: Record<GoogleDocId, ChatLog>;
   coachResponsePending: boolean;
-  systemPrompt: string;
+  systemRole: string;
 }
 
 const initialState: ChatState = {
   chatLogs: {},
   coachResponsePending: false,
-  systemPrompt: '',
+  systemRole: '',
 };
 
 /** Reducer */
@@ -76,7 +76,7 @@ export const chatSlice = createSlice({
   initialState,
   reducers: {
     updateSystemPrompt: (state: ChatState, action: PayloadAction<string>) => {
-      state.systemPrompt = action.payload;
+      state.systemRole = action.payload;
     },
     addMessage: (
       state: ChatState,

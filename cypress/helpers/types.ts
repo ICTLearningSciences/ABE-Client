@@ -93,6 +93,7 @@ export enum UserRole {
   USER = 'USER',
 }
 import OpenAI from 'openai';
+import { AiServiceModel } from '../../src/types';
 
 export interface Connection<T> {
   edges: Edge<T>[];
@@ -231,7 +232,7 @@ export interface PromptConfiguration {
 
 export interface AiPromptStep {
   prompts: PromptConfiguration[];
-  targetGptModel: GptModels;
+  targetAiServiceModel: AiServiceModel;
   outputDataType: PromptOutputTypes;
   includeChatLogContext?: boolean;
 }

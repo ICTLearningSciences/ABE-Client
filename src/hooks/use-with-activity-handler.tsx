@@ -7,17 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
-import axios, { CancelTokenSource } from 'axios';
-import {
-  Activity,
-  ActivityGQL,
-  ActivityStepTypes,
-  DocGoal,
-  GQLPrompt,
-  AiPromptStep,
-  PromptConfiguration,
-  PromptRoles,
-} from '../types';
+import { Activity, ActivityGQL, ActivityStepTypes, DocGoal } from '../types';
 import {
   ChatMessageTypes,
   MessageDisplayType,
@@ -27,12 +17,9 @@ import {
 import useWithStrongerHookActivity from './use-with-stronger-hook-activity';
 import { DisplayIcons } from '../helpers/display-icon-helper';
 import { useWithPromptActivity } from './use-with-prompt-activity';
-import { getLastUserMessage } from '../helpers';
 import { UseWithPrompts } from './use-with-prompts';
-import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  GptModels,
   LIMITS_TO_YOUR_ARGUMENT_ID,
   STRONGER_CONCLUSION_ID,
   STRONGER_HOOK_ID,
@@ -42,7 +29,7 @@ import { useWithState } from '../store/slices/state/use-with-state';
 import { useWithStrongerConclusionActivity } from './stronger-conclusion-activity/use-with-stronger-conclusion-activity';
 import { useWithLimitsToArgumentActivity } from './limits-to-argument-activity/use-with-limits-to-argument-activity';
 import { useWithThesisSupportActivity } from './increasing-thesis-support-activity/use-with-thesis-support-activity';
-import { AiServicesResponseTypes } from '../ai-services/ai-service-types';
+import { useWithExecutePrompt } from './use-with-execute-prompts';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -72,13 +59,6 @@ export const emptyActivity: Activity = {
   isReady: true,
 };
 
-interface PromptRetryData {
-  callback?: (response: AiServicesResponseTypes) => void;
-  prompts: AiPromptStep[];
-  customSystemPrompt?: string;
-  numRetries: number;
-}
-
 export function useWithActivityHandler(
   useWithPrompts: UseWithPrompts,
   editDocGoal: () => void,
@@ -90,32 +70,18 @@ export function useWithActivityHandler(
     state,
     sendMessage,
     sendMessages,
-    chatLogToString,
     clearChatLog,
     coachResponsePending,
   } = useWithChat();
+  const { executePrompt, abortController } = useWithExecutePrompt(true);
   const { newSession, updateSessionIntention } = useWithState();
-  const [retryData, setRetryData] = useState<PromptRetryData>();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
   );
-  const systemPrompt: string = useAppSelector(
-    (state) => state.chat.systemPrompt
-  );
   const messages = state.chatLogs[googleDocId] || [];
-  const userId: string | undefined = useAppSelector(
-    (state) => state.login.user?._id
-  );
   const [waitingForUserAnswer, setWaitingForUserAnswer] =
     useState<boolean>(false);
-  const [abortController, setAbortController] = useState<{
-    controller: AbortController;
-    source: CancelTokenSource;
-  }>();
   const { prompts, isLoading: promptsLoading } = useWithPrompts;
-  const overrideGptModel: GptModels = useAppSelector(
-    (state) => state.state.overideGptModel
-  );
 
   const strongerHookActivity = useWithStrongerHookActivity(
     selectedActivity || emptyActivity,
@@ -213,105 +179,6 @@ export function useWithActivityHandler(
     sendMessages(messagesToSend, true, googleDocId);
   }
 
-  async function executePrompt(
-    _prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
-    callback?: (response: AiServicesResponseTypes) => void,
-    customSystemPrompt?: string
-  ) {
-    if (!activity) return;
-    if (!userId) return;
-    if (!messages.length) return;
-    const lastUserMessage = getLastUserMessage(messages);
-    const chatLogString = chatLogToString(googleDocId);
-    const aiPromptSteps: AiPromptStep[] = [];
-    const prompt = _prompt(messages);
-    if (prompt.userInputIsIntention && lastUserMessage) {
-      updateSessionIntention({ description: lastUserMessage });
-    }
-    prompt.aiPromptSteps.map((openAiPromptStep) => {
-      const prompts: PromptConfiguration[] = [];
-
-      if (openAiPromptStep.includeChatLogContext) {
-        prompts.push({
-          promptRole: PromptRoles.SYSTEM,
-          promptText: `Here is the chat between the user and the system: ${chatLogString}`,
-          includeEssay: false,
-        });
-      }
-
-      openAiPromptStep.prompts.forEach((prompt) => {
-        prompts.push({
-          ...prompt,
-          promptText: `${prompt.promptText} ${
-            prompt.includeUserInput
-              ? `\n\nHere is the users input: ${lastUserMessage}`
-              : ''
-          }`,
-        });
-      });
-
-      aiPromptSteps.push({
-        ...openAiPromptStep,
-        prompts,
-      });
-    });
-    coachResponsePending(true);
-
-    const abortController = new AbortController();
-    const source = axios.CancelToken.source();
-    setAbortController({
-      controller: abortController,
-      source,
-    });
-    await asyncPromptExecute(
-      googleDocId,
-      aiPromptSteps,
-      userId,
-      customSystemPrompt || systemPrompt,
-      overrideGptModel,
-      source.token
-    )
-      .then((response) => {
-        handleOpenAiSuccess(activity, response, callback);
-      })
-      .catch(() => {
-        if (abortController.signal.aborted) return;
-        setRetryData({
-          callback,
-          prompts: aiPromptSteps,
-          numRetries: 0,
-          customSystemPrompt,
-        });
-      });
-  }
-
-  function handleOpenAiSuccess(
-    activity: Activity,
-    response: AiServicesResponseTypes,
-    callback?: (response: AiServicesResponseTypes) => void
-  ) {
-    coachResponsePending(false);
-    if (callback) {
-      callback(response);
-    } else {
-      sendMessage(
-        {
-          id: uuidv4(),
-          message: response.answer,
-          sender: Sender.SYSTEM,
-          displayType: MessageDisplayType.TEXT,
-          openAiInfo: {
-            aiServiceRequestParams:
-              response.aiAllStepsData[0].aiServiceRequestParams,
-            aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
-          },
-        },
-        false,
-        googleDocId
-      );
-    }
-  }
-
   useEffect(() => {
     if (resetActivityCounter === 0) return;
     clearChatLog(googleDocId);
@@ -324,58 +191,6 @@ export function useWithActivityHandler(
       // newSession();
     }
   }, [activity?._id, selectedGoal?._id]);
-
-  // handle retry data
-  useEffect(() => {
-    if (!retryData) return;
-    if (!userId) return;
-    if (!activity) return;
-    if (retryData.numRetries > 2) {
-      coachResponsePending(false);
-      sendMessage(
-        {
-          id: uuidv4(),
-          message: 'Request failed, please try again later.',
-          sender: Sender.SYSTEM,
-          displayType: MessageDisplayType.TEXT,
-          mcqChoices: [MCQ_RETRY_FAILED_REQUEST],
-        },
-        false,
-        googleDocId
-      );
-      return;
-    }
-    coachResponsePending(true);
-    setTimeout(() => {
-      const { callback, prompts, numRetries } = retryData;
-      const abortController = new AbortController();
-      const source = axios.CancelToken.source();
-      setAbortController({
-        controller: abortController,
-        source,
-      });
-      asyncPromptExecute(
-        googleDocId,
-        retryData.prompts,
-        userId,
-        systemPrompt,
-        overrideGptModel,
-        source.token
-      )
-        .then((response) => {
-          handleOpenAiSuccess(activity, response, callback);
-        })
-        .catch(() => {
-          if (abortController.signal.aborted) return;
-          setRetryData({
-            callback,
-            prompts: prompts,
-            numRetries: numRetries + 1,
-            customSystemPrompt: retryData.customSystemPrompt,
-          });
-        });
-    }, 1000);
-  }, [retryData, userId]);
 
   // Handles initial load
   useEffect(() => {
@@ -412,22 +227,6 @@ export function useWithActivityHandler(
     );
     setWaitingForUserAnswer(true);
   }, [activity?.stepName]);
-
-  useEffect(() => {
-    if (!messages.length) return;
-    const mostRecentMessage = messages[messages.length - 1];
-    const userMessage = mostRecentMessage.sender === Sender.USER;
-    if (userMessage && mostRecentMessage.message === MCQ_RETRY_FAILED_REQUEST) {
-      setRetryData((prevData) => {
-        if (prevData) {
-          return {
-            ...prevData,
-            numRetries: 0,
-          };
-        }
-      });
-    }
-  }, [messages]);
 
   // Handles user response to activity step via messages
   useEffect(() => {

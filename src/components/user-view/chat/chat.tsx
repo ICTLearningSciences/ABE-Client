@@ -268,7 +268,7 @@ export default function Chat(props: {
   useWithPrompts: UseWithPrompts;
 }) {
   const { selectedGoal, selectedActivity, editDocGoal, useWithPrompts } = props;
-  const { sendMessage, state: chatState, setSystemPrompt } = useWithChat();
+  const { sendMessage, state: chatState, setSystemRole } = useWithChat();
   const {
     editedData: systemPromptData,
     editOrAddSystemPrompt,
@@ -312,7 +312,7 @@ export default function Chat(props: {
   const [targetSystemPrompt, setTargetSystemPrompt] = useState<number>(0);
   const [viewActivitySummary, setViewActivitySummary] =
     useState<boolean>(false);
-  const systemPrompt = systemPromptData
+  const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
     : '';
   const currentActivitySummary = userActivityStates.find(
@@ -322,8 +322,8 @@ export default function Chat(props: {
   )?.metadata;
 
   useEffect(() => {
-    setSystemPrompt(systemPrompt);
-  }, [systemPrompt]);
+    setSystemRole(systemRole);
+  }, [systemRole]);
 
   function ChatHeaderGenerator(): JSX.Element {
     // if (!selectedGoal && !selectedActivity)
@@ -446,7 +446,7 @@ export default function Chat(props: {
                   }}
                 >
                   <h5>{'System Prompt: '}</h5>
-                  <SmallGreyText>{systemPrompt}</SmallGreyText>
+                  <SmallGreyText>{systemRole}</SmallGreyText>
                   <Button
                     onClick={() => {
                       setViewSystemPrompts(true);
