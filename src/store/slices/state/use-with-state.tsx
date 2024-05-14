@@ -19,9 +19,8 @@ import {
   fetchUserActivityStates,
   updateUserActivityState as _updateUserActivityState,
 } from '../../../hooks/api';
-import { Intention, UserActivityState } from '../../../types';
+import { AiServiceModel, Intention, UserActivityState } from '../../../types';
 import { UserRole } from '../login';
-import { GptModels } from '../../../constants';
 
 interface UseWithState {
   state: State;
@@ -33,7 +32,7 @@ interface UseWithState {
     activityId: string,
     metadata: string
   ) => Promise<void>;
-  overrideAiModel: (model: GptModels) => void;
+  overrideAiModel: (aiServiceModel?: AiServiceModel) => void;
   updateViewingUserRole: (role: UserRole) => void;
   updateViewingAdvancedOptions: (advancedOptions: boolean) => void;
   newSession: () => void;
@@ -45,7 +44,7 @@ export function useWithState(): UseWithState {
   const dispatch = useAppDispatch();
   const state: State = useAppSelector((state) => state.state);
 
-  function overrideAiModel(model: GptModels) {
+  function overrideAiModel(model?: AiServiceModel) {
     dispatch(_overrideOpenAiModel(model));
   }
 

@@ -232,7 +232,7 @@ export interface PromptConfiguration {
 
 export interface AiPromptStep {
   prompts: PromptConfiguration[];
-  targetAiServiceModel: AiServiceModel;
+  targetAiServiceModel?: AiServiceModel;
   outputDataType: PromptOutputTypes;
   includeChatLogContext?: boolean;
 }

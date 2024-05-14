@@ -39,7 +39,7 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
   );
   const messages = state.chatLogs[googleDocId] || [];
   const isFreeInput = selectedGoal?._id === FREE_INPUT_GOAL_ID;
-  const { abortController, executePrompt } = useWithExecutePrompt(true);
+  const { abortController, executePromptSteps } = useWithExecutePrompt();
   useEffect(() => {
     if (abortController) {
       try {
@@ -92,26 +92,23 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
         title: '',
       };
       coachResponsePending(true);
-      executePrompt(
-        () => prompt,
-        (response) => {
-          sendMessage(
-            {
-              id: uuidv4(),
-              message: response.answer,
-              sender: Sender.SYSTEM,
-              displayType: MessageDisplayType.TEXT,
-              openAiInfo: {
-                aiServiceRequestParams:
-                  response.aiAllStepsData[0].aiServiceRequestParams,
-                aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
-              },
+      executePromptSteps(prompt.aiPromptSteps, (response) => {
+        sendMessage(
+          {
+            id: uuidv4(),
+            message: response.answer,
+            sender: Sender.SYSTEM,
+            displayType: MessageDisplayType.TEXT,
+            openAiInfo: {
+              aiServiceRequestParams:
+                response.aiAllStepsData[0].aiServiceRequestParams,
+              aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
             },
-            false,
-            googleDocId
-          );
-        }
-      )
+          },
+          false,
+          googleDocId
+        );
+      })
         .catch((err) => {
           console.log(err);
         })

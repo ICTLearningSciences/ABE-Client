@@ -7,7 +7,16 @@ The full terms of this copyright and license should always be found in the root 
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
-import { Activity, ActivityGQL, ActivityStepTypes, DocGoal } from '../types';
+import {
+  Activity,
+  ActivityGQL,
+  ActivityStepTypes,
+  AiPromptStep,
+  DocGoal,
+  GQLPrompt,
+  PromptConfiguration,
+  PromptRoles,
+} from '../types';
 import {
   ChatMessageTypes,
   MessageDisplayType,
@@ -20,6 +29,7 @@ import { useWithPromptActivity } from './use-with-prompt-activity';
 import { UseWithPrompts } from './use-with-prompts';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  DEFAULT_TARGET_AI_SERVICE_MODEL,
   LIMITS_TO_YOUR_ARGUMENT_ID,
   STRONGER_CONCLUSION_ID,
   STRONGER_HOOK_ID,
@@ -30,6 +40,8 @@ import { useWithStrongerConclusionActivity } from './stronger-conclusion-activit
 import { useWithLimitsToArgumentActivity } from './limits-to-argument-activity/use-with-limits-to-argument-activity';
 import { useWithThesisSupportActivity } from './increasing-thesis-support-activity/use-with-thesis-support-activity';
 import { useWithExecutePrompt } from './use-with-execute-prompts';
+import { AiServicesResponseTypes } from '../ai-services/ai-service-types';
+import { getLastUserMessage } from '../helpers';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -72,12 +84,19 @@ export function useWithActivityHandler(
     sendMessages,
     clearChatLog,
     coachResponsePending,
+    chatLogToString,
   } = useWithChat();
-  const { executePrompt, abortController } = useWithExecutePrompt(true);
+  const { executePromptSteps: executePrompt, abortController } =
+    useWithExecutePrompt();
+  const overrideAiServiceModel = useAppSelector(
+    (state) => state.state.overrideAiServiceModel
+  );
+  const config = useAppSelector((state) => state.config);
   const { newSession, updateSessionIntention } = useWithState();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
   );
+  const systemRole: string = useAppSelector((state) => state.chat.systemRole);
   const messages = state.chatLogs[googleDocId] || [];
   const [waitingForUserAnswer, setWaitingForUserAnswer] =
     useState<boolean>(false);
@@ -133,6 +152,121 @@ export function useWithActivityHandler(
       : selectedActivity?.prompt
       ? promptActivity
       : undefined;
+
+  async function executePromptWithMessage(
+    _prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
+    callback?: (response: AiServicesResponseTypes) => void,
+    customSystemRoleMessage?: string
+  ) {
+    if (!messages.length) return;
+    const lastUserMessage = getLastUserMessage(messages);
+    const chatLogString = chatLogToString(googleDocId);
+    const prompt = _prompt(messages);
+    const aiPromptSteps: AiPromptStep[] = preparePromptSteps(
+      prompt,
+      chatLogString,
+      lastUserMessage,
+      customSystemRoleMessage || systemRole
+    );
+    if (prompt.userInputIsIntention && lastUserMessage) {
+      updateSessionIntention({ description: lastUserMessage });
+    }
+    coachResponsePending(true);
+    executePrompt(aiPromptSteps)
+      .then((res) => {
+        handleOpenAiSuccess(res, callback);
+      })
+      .catch(() => {
+        coachResponsePending(false);
+        sendMessage(
+          {
+            id: uuidv4(),
+            message: 'Request failed, please try again later.',
+            sender: Sender.SYSTEM,
+            displayType: MessageDisplayType.TEXT,
+            mcqChoices: [MCQ_RETRY_FAILED_REQUEST],
+            retryFunction: () => {
+              executePromptWithMessage(
+                _prompt,
+                callback,
+                customSystemRoleMessage
+              );
+            },
+          },
+          false,
+          googleDocId
+        );
+      });
+  }
+
+  function preparePromptSteps(
+    prompt: GQLPrompt,
+    chatLogString: string,
+    lastUserMessage: string,
+    globalSystemRole: string
+  ): AiPromptStep[] {
+    const aiPromptSteps: AiPromptStep[] = [];
+    prompt.aiPromptSteps.forEach((openAiPromptStep) => {
+      const prompts: PromptConfiguration[] = [];
+
+      if (openAiPromptStep.includeChatLogContext) {
+        prompts.push({
+          promptRole: PromptRoles.SYSTEM,
+          promptText: `Here is the chat between the user and the system: ${chatLogString}`,
+          includeEssay: false,
+        });
+      }
+
+      openAiPromptStep.prompts.forEach((prompt) => {
+        prompts.push({
+          ...prompt,
+          promptText: `${prompt.promptText} ${
+            prompt.includeUserInput
+              ? `\n\nHere is the users input: ${lastUserMessage}`
+              : ''
+          }`,
+        });
+      });
+
+      aiPromptSteps.push({
+        ...openAiPromptStep,
+        systemRole: openAiPromptStep.systemRole || globalSystemRole,
+        targetAiServiceModel:
+          overrideAiServiceModel ||
+          openAiPromptStep.targetAiServiceModel ||
+          config.config?.defaultAiModel ||
+          DEFAULT_TARGET_AI_SERVICE_MODEL,
+        prompts,
+      });
+    });
+    return aiPromptSteps;
+  }
+
+  function handleOpenAiSuccess(
+    response: AiServicesResponseTypes,
+    callback?: (response: AiServicesResponseTypes) => void
+  ) {
+    coachResponsePending(false);
+    if (callback) {
+      callback(response);
+    } else {
+      sendMessage(
+        {
+          id: uuidv4(),
+          message: response.answer,
+          sender: Sender.SYSTEM,
+          displayType: MessageDisplayType.TEXT,
+          openAiInfo: {
+            aiServiceRequestParams:
+              response.aiAllStepsData[0].aiServiceRequestParams,
+            aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
+          },
+        },
+        false,
+        googleDocId
+      );
+    }
+  }
 
   function resetActivity() {
     // cancel any pending requests
@@ -206,7 +340,7 @@ export function useWithActivityHandler(
   useEffect(() => {
     if (!activity) return;
     const currentStep = activity.getStep({
-      executePrompt,
+      executePrompt: executePromptWithMessage,
       openSelectActivityModal: editDocGoal,
       sendMessage: sendMessageHelper,
       setWaitingForUserAnswer,
@@ -232,7 +366,7 @@ export function useWithActivityHandler(
   useEffect(() => {
     if (!activity) return;
     const currentStep = activity.getStep({
-      executePrompt,
+      executePrompt: executePromptWithMessage,
       openSelectActivityModal: editDocGoal,
       sendMessage: sendMessageHelper,
       setWaitingForUserAnswer,

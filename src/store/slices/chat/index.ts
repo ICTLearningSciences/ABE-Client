@@ -34,6 +34,7 @@ export interface ChatMessage {
   activityStep?: ActiveActivityStep;
   selectedGoal?: DocGoal;
   userInputType?: UserInputType;
+  retryFunction?: () => void;
 }
 
 export type ChatMessageTypes =

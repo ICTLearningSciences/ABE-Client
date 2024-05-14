@@ -9,6 +9,30 @@ export const fetchConfigResponse = {
         "aiSystemPrompt": [
             "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-3.5 architecture. Knowledge cutoff: 2021-09.",
             "You are a professor that speaks very eloquently and in short sentences."
+        ],
+        "displayedGoals": null,
+        "displayedActivities": null,
+        "overrideAiModel": null,
+        "defaultAiModel": {
+            "serviceName": "OPEN_AI",
+            "model": "gpt-3.5-turbo-16k"
+        },
+        "availableAiServiceModels": [
+            {
+                "serviceName": "OPEN_AI",
+                "models": [
+                    "gpt-3.5-turbo-16k",
+                    "gpt-4",
+                    "gpt-4-turbo-preview"
+                ]
+            },
+            {
+                "serviceName": "AZURE",
+                "models": [
+                    "ABE-GPT-3_5_turbo_16k",
+                    "ABE-gpt-4-turbo-preview"
+                ]
+            }
         ]
     }
 }

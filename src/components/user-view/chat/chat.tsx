@@ -20,7 +20,12 @@ import {
 import { ChatHeader, RowDiv, SmallGreyText } from '../../../styled-components';
 import { useWithStoreDocVersions } from '../../../hooks/use-with-store-doc-versions';
 import { useAppSelector } from '../../../store/hooks';
-import { ActivityGQL, ActivityStepTypes, DocGoal } from '../../../types';
+import {
+  ActivityGQL,
+  ActivityStepTypes,
+  AiServiceModel,
+  DocGoal,
+} from '../../../types';
 import OpenAiInfoModal from './open-ai-info-modal';
 import SystemPromptModal from './system-prompt-modal';
 import { useWithSystemPromptsConfig } from '../../../hooks/use-with-system-prompts-config';
@@ -35,8 +40,11 @@ import Message from './message';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { UseWithPrompts } from '../../../hooks/use-with-prompts';
 import { v4 as uuidv4 } from 'uuid';
-import { GptModels } from '../../../constants';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
+import {
+  aiServiceModelStringParse,
+  aiServiceModelToString,
+} from '../../../helpers';
 
 function ChatMessagesContainer(props: {
   coachResponsePending: boolean;
@@ -150,6 +158,9 @@ function ChatMessagesContainer(props: {
                           displayType: MessageDisplayType.TEXT,
                           userInputType: UserInputType.MCQ,
                         });
+                        if (message.retryFunction) {
+                          message.retryFunction();
+                        }
                       }}
                     >
                       {choice}
@@ -277,6 +288,9 @@ export default function Chat(props: {
     deleteSystemPrompt,
     isSaving,
   } = useWithSystemPromptsConfig();
+  const availableAiServiceModels = useAppSelector(
+    (state) => state.config.config?.availableAiServiceModels
+  );
   const { overrideAiModel, state } = useWithState();
   const { userActivityStates, googleDocId } = state;
   const coachResponsePending = useAppSelector(
@@ -418,25 +432,45 @@ export default function Chat(props: {
             {userIsAdmin && state.viewingAdvancedOptions && (
               <RowDiv>
                 <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                  <InputLabel size="small" id="override-gpt-model">
+                  <InputLabel size="small" id="override-ai-service-model">
                     Override Model
                   </InputLabel>
                   <Select
-                    labelId="override-gpt-model"
-                    id="gpt-model-override"
+                    labelId="override-ai-service-model"
+                    id="ai-service-override"
                     value={
-                      state.overideGptModel === GptModels.NONE
-                        ? ''
-                        : state.overideGptModel
+                      state.overrideAiServiceModel
+                        ? aiServiceModelToString(state.overrideAiServiceModel)
+                        : ''
                     }
                     onChange={(e) => {
-                      overrideAiModel(e.target.value as GptModels);
+                      const targetAiServiceModel: AiServiceModel | undefined =
+                        e.target.value == 'CLEAR'
+                          ? undefined
+                          : aiServiceModelStringParse(e.target.value);
+                      overrideAiModel(targetAiServiceModel);
                     }}
                     label="Output Data Type"
                   >
-                    <MenuItem value={GptModels.NONE}>None</MenuItem>
-                    <MenuItem value={GptModels.GPT_3_5}>GPT 3.5</MenuItem>
-                    <MenuItem value={GptModels.GPT_4}>GPT 4</MenuItem>
+                    <MenuItem value={'CLEAR'}>CLEAR</MenuItem>
+                    {availableAiServiceModels?.map((serviceAndModels) => {
+                      return serviceAndModels.models.map((model, j) => {
+                        return (
+                          <MenuItem
+                            key={j}
+                            value={aiServiceModelToString({
+                              serviceName: serviceAndModels.serviceName,
+                              model: model,
+                            })}
+                          >
+                            {aiServiceModelToString({
+                              serviceName: serviceAndModels.serviceName,
+                              model: model,
+                            })}
+                          </MenuItem>
+                        );
+                      });
+                    })}
                   </Select>
                 </FormControl>
                 <RowDiv

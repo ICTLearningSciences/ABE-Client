@@ -105,7 +105,10 @@ export const stateSlice = createSlice({
     ) => {
       state.userActivityStates = action.payload;
     },
-    overrideAiModel: (state: State, action: PayloadAction<AiServiceModel>) => {
+    overrideAiModel: (
+      state: State,
+      action: PayloadAction<AiServiceModel | undefined>
+    ) => {
       state.overrideAiServiceModel = action.payload;
     },
     updateViewingUserRole: (state: State, action: PayloadAction<UserRole>) => {

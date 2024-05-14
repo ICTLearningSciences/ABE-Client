@@ -151,7 +151,7 @@ export interface PromptConfiguration {
 
 export interface AiPromptStep {
   prompts: PromptConfiguration[];
-  targetAiServiceModel: AiServiceModel;
+  targetAiServiceModel?: AiServiceModel;
   systemRole?: string;
   outputDataType: PromptOutputTypes;
   includeChatLogContext?: boolean;

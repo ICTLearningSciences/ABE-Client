@@ -318,7 +318,10 @@ export async function fetchPrompts(): Promise<GQLResPrompts> {
                       includeUserInput
                       promptRole
                     }
-                  targetGptModel
+                    targetAiServiceModel{
+                      serviceName
+                      model
+                    }
                   systemRole
                   outputDataType
                     includeChatLogContext
@@ -386,7 +389,10 @@ export async function storePrompts(
                 promptRole
               }
               outputDataType
-              targetGptModel
+              targetAiServiceModel{
+                serviceName
+                model
+              }
               systemRole
               includeChatLogContext
             }
@@ -425,7 +431,10 @@ export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
                 promptRole
               }
               outputDataType
-              targetGptModel
+              targetAiServiceModel{
+                serviceName
+                model
+              }
               systemRole
               includeChatLogContext
             }

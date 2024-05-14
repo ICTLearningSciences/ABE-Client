@@ -11,6 +11,8 @@ import {
   GQLTimelinePoint,
   AiGenerationStatus,
   PromptConfiguration,
+  AiServiceModel,
+  AiServiceNames,
 } from './types';
 import { ChatCompletion, ChatCompletionCreateParams } from 'openai/resources';
 import Validator from 'jsonschema';
@@ -303,4 +305,23 @@ export const isTimelinePointFullyLoaded = (
     timelinePoint.changeSummaryStatus === AiGenerationStatus.COMPLETED &&
     timelinePoint.reverseOutlineStatus === AiGenerationStatus.COMPLETED
   );
+};
+
+export const aiServiceModelToString = (
+  aiServiceModel: AiServiceModel,
+  isDefault?: boolean
+): string => {
+  return `${isDefault ? '(DEFAULT) ' : ''}${aiServiceModel.serviceName} : ${
+    aiServiceModel.model
+  }`;
+};
+
+export const aiServiceModelStringParse = (
+  aiServiceModelString: string
+): AiServiceModel => {
+  const [serviceName, model] = aiServiceModelString.split(' : ');
+  return {
+    serviceName: serviceName as AiServiceNames,
+    model,
+  };
 };
