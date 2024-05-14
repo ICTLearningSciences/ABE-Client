@@ -177,25 +177,27 @@ export function useWithActivityHandler(
         handleOpenAiSuccess(res, callback);
       })
       .catch(() => {
-        coachResponsePending(false);
-        sendMessage(
-          {
-            id: uuidv4(),
-            message: 'Request failed, please try again later.',
-            sender: Sender.SYSTEM,
-            displayType: MessageDisplayType.TEXT,
-            mcqChoices: [MCQ_RETRY_FAILED_REQUEST],
-            retryFunction: () => {
-              executePromptWithMessage(
-                _prompt,
-                callback,
-                customSystemRoleMessage
-              );
+        if (!abortController?.controller.signal.aborted) {
+          sendMessage(
+            {
+              id: uuidv4(),
+              message: 'Request failed, please try again later.',
+              sender: Sender.SYSTEM,
+              displayType: MessageDisplayType.TEXT,
+              mcqChoices: [MCQ_RETRY_FAILED_REQUEST],
+              retryFunction: () => {
+                executePromptWithMessage(
+                  _prompt,
+                  callback,
+                  customSystemRoleMessage
+                );
+              },
             },
-          },
-          false,
-          googleDocId
-        );
+            false,
+            googleDocId
+          );
+        }
+        coachResponsePending(false);
       });
   }
 
