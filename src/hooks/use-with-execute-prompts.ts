@@ -33,21 +33,14 @@ export function useWithExecutePrompt() {
       controller: abortController,
       source,
     });
-    for (let i = 0; i < 3; i++) {
-      try {
-        const res = await asyncPromptExecute(
-          googleDocId,
-          aiPromptSteps,
-          userId || '',
-          source.token
-        );
-        if (callback) callback(res);
-        return res;
-      } catch {
-        continue;
-      }
-    }
-    throw new Error('Failed to execute prompt steps');
+    const res = await asyncPromptExecute(
+      googleDocId,
+      aiPromptSteps,
+      userId || '',
+      source.token
+    );
+    if (callback && !abortController.signal.aborted) callback(res);
+    return res;
   }
 
   return {

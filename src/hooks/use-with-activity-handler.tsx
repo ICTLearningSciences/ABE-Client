@@ -42,6 +42,7 @@ import { useWithThesisSupportActivity } from './increasing-thesis-support-activi
 import { useWithExecutePrompt } from './use-with-execute-prompts';
 import { AiServicesResponseTypes } from '../ai-services/ai-service-types';
 import { getLastUserMessage } from '../helpers';
+import axios from 'axios';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -176,8 +177,8 @@ export function useWithActivityHandler(
       .then((res) => {
         handleOpenAiSuccess(res, callback);
       })
-      .catch(() => {
-        if (!abortController?.controller.signal.aborted) {
+      .catch((e) => {
+        if (!axios.isCancel(e)) {
           sendMessage(
             {
               id: uuidv4(),

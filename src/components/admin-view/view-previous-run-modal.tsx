@@ -9,7 +9,6 @@ import { Box, Button, Modal, Theme } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import { ColumnDiv, JsonDisplay } from '../../styled-components';
 import { useState } from 'react';
-import { isJsonString, parseOpenAIResContent } from '../../helpers';
 import { JsonView, allExpanded, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
@@ -63,12 +62,7 @@ export default function ViewPreviousRunModal(props: {
         <Box sx={style}>
           <div style={{ overflow: 'auto' }}>
             {previousRun.aiAllStepsData.map((promptStep, index) => {
-              const parsedData = parseOpenAIResContent(promptStep);
-              const responseMessage =
-                parsedData.aiServiceResponse[0].message.content || '';
-              const isJsonOutput = isJsonString(responseMessage);
-              const showOutputAsText =
-                !(isJsonOutput && !showJsonAsText) || showJsonAsText;
+              const responseMessage = promptStep.aiServiceResponse;
 
               return (
                 <ColumnDiv key={index}>
@@ -76,7 +70,7 @@ export default function ViewPreviousRunModal(props: {
                   <div>Prompt</div>
                   <div style={{ border: '1px solid black' }}>
                     <JsonView
-                      data={parsedData.aiServiceRequestParams}
+                      data={promptStep.aiServiceRequestParams}
                       shouldExpandNode={allExpanded}
                       style={defaultStyles}
                     />
@@ -84,42 +78,29 @@ export default function ViewPreviousRunModal(props: {
                   <br />
                   <div>Response</div>
                   <div style={{ border: '1px solid black' }}>
-                    {showOutputAsText ? (
-                      <div>
-                        <JsonDisplay>
-                          {isJsonOutput
-                            ? JSON.stringify(responseMessage, null, 2)
-                            : responseMessage}
-                        </JsonDisplay>
-                        {isJsonOutput ? (
-                          <Button
-                            onClick={() => {
-                              setShowJsonAsText(!showJsonAsText);
-                            }}
-                          >
-                            {showJsonAsText ? 'Show as JSON' : 'Show as Text'}
-                          </Button>
-                        ) : (
-                          <></>
-                        )}
-                      </div>
-                    ) : (
+                    {!showJsonAsText ? (
                       <div>
                         <JsonView
-                          data={parsedData.aiServiceResponse}
+                          data={responseMessage}
                           shouldExpandNode={allExpanded}
                           style={defaultStyles}
                         />
-                        <Button
-                          onClick={() => {
-                            setShowJsonAsText(!showJsonAsText);
-                          }}
-                        >
-                          {showJsonAsText ? 'Show as JSON' : 'Show as Text'}
-                        </Button>
+                      </div>
+                    ) : (
+                      <div>
+                        <JsonDisplay>
+                          {JSON.stringify(responseMessage, null, 2)}
+                        </JsonDisplay>
                       </div>
                     )}
                   </div>
+                  <Button
+                    onClick={() => {
+                      setShowJsonAsText(!showJsonAsText);
+                    }}
+                  >
+                    {showJsonAsText ? 'Show as JSON' : 'Show as Text'}
+                  </Button>
                 </ColumnDiv>
               );
             })}
