@@ -4,12 +4,16 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import OpenAI from 'openai';
 export enum GptModels {
   GPT_3_5 = 'gpt-3.5-turbo-16k',
   GPT_4 = 'gpt-4',
   GPT_4_TURBO_PREVIEW = 'gpt-4-turbo-preview',
   NONE = '',
 }
+
+
+
 export enum DisplayIcons {
   LIGHT_BULB = 'LIGHT_BULB',
   PENCIL = 'PENCIL',
@@ -92,8 +96,6 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   USER = 'USER',
 }
-import OpenAI from 'openai';
-import { AiServiceModel, AiServiceNames } from '../../src/types';
 
 export interface Connection<T> {
   edges: Edge<T>[];
@@ -228,6 +230,17 @@ export interface PromptConfiguration {
   includeEssay: boolean;
   promptRole?: PromptRoles;
   includeUserInput?: boolean;
+}
+
+export enum AiServiceNames {
+  AZURE = 'AZURE_OPEN_AI',
+  OPEN_AI = 'OPEN_AI',
+  GEMINI = 'GEMINI',
+}
+
+export interface AiServiceModel {
+  serviceName: AiServiceNames;
+  model: string;
 }
 
 export interface AiPromptStep {

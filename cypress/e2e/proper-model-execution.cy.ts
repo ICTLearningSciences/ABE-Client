@@ -4,12 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { AiServiceModel, AiServiceNames } from "../../src/types";
 import { fetchConfigResponse } from "../fixtures/fetch-config";
 import { FetchPromptsResponse, fetchPromptTemplates } from "../fixtures/fetch-prompt-templates";
 import { openAiTextResponse } from "../fixtures/stronger-hook-activity/basic-text-response";
 import { cyMockDefault, cyMockOpenAiCall, mockGQL, toPromptEditing } from "../helpers/functions";
-import { AiPromptStep, UserRole } from "../helpers/types";
+import { AiPromptStep, AiServiceModel, AiServiceNames, UserRole } from "../helpers/types";
 
 function confirmModelInAiRequest(model: AiServiceModel){
     cy.wait("@openAiStartCall").then((xhr)=>{
