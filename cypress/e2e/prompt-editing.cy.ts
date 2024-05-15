@@ -18,7 +18,7 @@ describe('Prompt Editing', () => {
       cyMockOpenAiCall(cy, {response: {data:{error:"Error Message"}}, statusCode: 500})
       toPromptEditing(cy);
       cy.get("[data-cy=run-prompt-button]").click();
-      cy.get("[data-cy=error-dialog]").should("contain.text", "Failed to execute prompt steps")
+      cy.get("[data-cy=error-dialog]").should("contain.text", "Error Message")
     })
 
     it("shows activities prompts")
