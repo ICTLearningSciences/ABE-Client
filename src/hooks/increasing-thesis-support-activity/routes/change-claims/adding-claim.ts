@@ -60,11 +60,7 @@ export function caCollectArgumentForNewClaim(
                 allActivityMessages
               ),
               mcqChoices: [MCQ_BRAINSTORM],
-              openAiInfo: {
-                aiServiceRequestParams:
-                  res.aiAllStepsData[0].aiServiceRequestParams,
-                aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-              },
+              aiServiceStepData: res.aiAllStepsData,
             });
           }
         );
@@ -100,11 +96,7 @@ export function caCollectArgumentForNewClaim(
                 allActivityMessages
               ),
               mcqChoices: [],
-              openAiInfo: {
-                aiServiceRequestParams:
-                  res.aiAllStepsData[0].aiServiceRequestParams,
-                aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-              },
+              aiServiceStepData: res.aiAllStepsData,
             });
           }
         );
@@ -165,11 +157,7 @@ export function addClaimToPaperAnalyzeStep(
               analyzeClaimAddedToPaper,
               allActivityMessages
             ),
-            openAiInfo: {
-              aiServiceRequestParams:
-                res.aiAllStepsData[0].aiServiceRequestParams,
-              aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-            },
+            aiServiceStepData: res.aiAllStepsData,
           });
         }
       );

@@ -24,24 +24,24 @@ const baseMessageStyle: React.CSSProperties = {
 
 function DisplayOpenAiInfoButton(props: {
   chatMessage: ChatMessageTypes;
-  setOpenAiInfoToDisplay: (openAiInfo?: AiServiceStepDataTypes) => void;
+  setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
 }): JSX.Element {
-  const { chatMessage, setOpenAiInfoToDisplay } = props;
+  const { chatMessage, setAiInfoToDisplay } = props;
   const userRole = useAppSelector((state) => state.login.userRole);
   const showAdvancedOptions = useAppSelector(
     (state) => state.state.viewingAdvancedOptions
   );
   const isAdmin = userRole === UserRole.ADMIN;
-  if (!chatMessage.openAiInfo || !isAdmin || !showAdvancedOptions) {
+  if (!chatMessage.aiServiceStepData || !isAdmin || !showAdvancedOptions) {
     return <></>;
   }
   return (
     <Button
       onClick={() => {
-        setOpenAiInfoToDisplay(chatMessage.openAiInfo);
+        setAiInfoToDisplay(chatMessage.aiServiceStepData);
       }}
     >
-      OpenAI Info
+      AI Request Info
     </Button>
   );
 }
@@ -89,10 +89,10 @@ const FadingText: React.FC<{ strings: string[] }> = ({ strings }) => {
 
 export default function Message(props: {
   message: ChatMessageTypes;
-  setOpenAiInfoToDisplay: (openAiInfo?: AiServiceStepDataTypes) => void;
+  setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
   messageIndex: number;
 }): JSX.Element {
-  const { message, setOpenAiInfoToDisplay, messageIndex } = props;
+  const { message, setAiInfoToDisplay, messageIndex } = props;
   const backgroundColor =
     message.sender === Sender.USER ? LIGHT_BLUE_HEX : DARK_BLUE_HEX;
   const alignSelf = message.sender === Sender.USER ? 'flex-end' : 'flex-start';
@@ -117,7 +117,7 @@ export default function Message(props: {
       )}
       <DisplayOpenAiInfoButton
         chatMessage={message}
-        setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
+        setAiInfoToDisplay={setAiInfoToDisplay}
       />
     </div>
   );

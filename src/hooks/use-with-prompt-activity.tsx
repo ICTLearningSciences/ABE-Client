@@ -102,12 +102,7 @@ export function useWithPromptActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: introStep(stepData),
-                openAiInfo: {
-                  aiServiceRequestParams:
-                    response.aiAllStepsData[0].aiServiceRequestParams,
-                  aiServiceResponse:
-                    response.aiAllStepsData[0].aiServiceResponse,
-                },
+                aiServiceStepData: response.aiAllStepsData,
               },
               false,
               googleDocId
@@ -138,12 +133,7 @@ export function useWithPromptActivity(
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
                   activityStep: freeInputStep(stepData),
-                  openAiInfo: {
-                    aiServiceRequestParams:
-                      response.aiAllStepsData[0].aiServiceRequestParams,
-                    aiServiceResponse:
-                      response.aiAllStepsData[0].aiServiceResponse,
-                  },
+                  aiServiceStepData: response.aiAllStepsData,
                 },
                 false,
                 googleDocId
@@ -173,12 +163,7 @@ export function useWithPromptActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: freeInputStep(stepData),
-                openAiInfo: {
-                  aiServiceRequestParams:
-                    response.aiAllStepsData[0].aiServiceRequestParams,
-                  aiServiceResponse:
-                    response.aiAllStepsData[0].aiServiceResponse,
-                },
+                aiServiceStepData: response.aiAllStepsData,
               },
               false,
               googleDocId

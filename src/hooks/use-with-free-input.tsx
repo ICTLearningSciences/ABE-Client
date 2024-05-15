@@ -86,11 +86,7 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
             message: response.answer,
             sender: Sender.SYSTEM,
             displayType: MessageDisplayType.TEXT,
-            openAiInfo: {
-              aiServiceRequestParams:
-                response.aiAllStepsData[0].aiServiceRequestParams,
-              aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
-            },
+            aiServiceStepData: response.aiAllStepsData,
           },
           false,
           googleDocId

@@ -26,7 +26,6 @@ import {
   AiServiceModel,
   DocGoal,
 } from '../../../types';
-import OpenAiInfoModal from './open-ai-info-modal';
 import SystemPromptModal from './system-prompt-modal';
 import { useWithSystemPromptsConfig } from '../../../hooks/use-with-system-prompts-config';
 import { UserRole } from '../../../store/slices/login';
@@ -45,19 +44,16 @@ import {
   aiServiceModelStringParse,
   aiServiceModelToString,
 } from '../../../helpers';
+import ViewPreviousRunModal from '../../admin-view/view-previous-run-modal';
 
 function ChatMessagesContainer(props: {
   coachResponsePending: boolean;
   googleDocId: string;
-  setOpenAiInfoToDisplay: (openAiInfo?: AiServiceStepDataTypes) => void;
+  setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
   sendMessage: (message: ChatMessageTypes) => void;
 }): JSX.Element {
-  const {
-    coachResponsePending,
-    googleDocId,
-    setOpenAiInfoToDisplay,
-    sendMessage,
-  } = props;
+  const { coachResponsePending, googleDocId, setAiInfoToDisplay, sendMessage } =
+    props;
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
   const { state } = useWithChat();
@@ -127,11 +123,12 @@ function ChatMessagesContainer(props: {
             <Message
               key={index}
               message={message}
-              setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
+              setAiInfoToDisplay={setAiInfoToDisplay}
               messageIndex={index}
             />
             {message.mcqChoices && index === chatMessages.length - 1 && (
               <div
+                key={`mcq-choices-${index}`}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -320,8 +317,8 @@ export default function Chat(props: {
           messages[messages.length - 1].activityStep?.stepType !==
             ActivityStepTypes.FREE_RESPONSE_QUESTION
       ));
-  const [openAiInfoToDisplay, setOpenAiInfoToDisplay] =
-    useState<AiServiceStepDataTypes>();
+  const [openAiInfoToDisplay, setAiInfoToDisplay] =
+    useState<AiServiceStepDataTypes[]>();
   const [viewSystemPrompts, setViewSystemPrompts] = useState<boolean>(false);
   const [targetSystemPrompt, setTargetSystemPrompt] = useState<number>(0);
   const [viewActivitySummary, setViewActivitySummary] =
@@ -420,7 +417,7 @@ export default function Chat(props: {
               }}
               coachResponsePending={coachResponsePending}
               googleDocId={googleDocId}
-              setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
+              setAiInfoToDisplay={setAiInfoToDisplay}
             />
             <ChatInput
               sendMessage={(message) => {
@@ -508,10 +505,11 @@ export default function Chat(props: {
               }}
             />
           )}
-          <OpenAiInfoModal
-            openAiInfo={openAiInfoToDisplay}
+          <ViewPreviousRunModal
+            previousRunStepData={openAiInfoToDisplay}
+            open={Boolean(openAiInfoToDisplay)}
             close={() => {
-              setOpenAiInfoToDisplay(undefined);
+              setAiInfoToDisplay(undefined);
             }}
           />
           <ActivitySummaryModal

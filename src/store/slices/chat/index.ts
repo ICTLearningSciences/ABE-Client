@@ -28,7 +28,7 @@ export interface ChatMessage {
   id: string;
   sender: Sender;
   displayType: MessageDisplayType;
-  openAiInfo?: AiServiceStepDataTypes;
+  aiServiceStepData?: AiServiceStepDataTypes[];
   mcqChoices?: string[];
   selectActivities?: Activity[];
   activityStep?: ActiveActivityStep;

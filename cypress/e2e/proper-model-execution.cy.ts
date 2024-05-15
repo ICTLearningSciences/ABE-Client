@@ -39,7 +39,6 @@ function setPromptsTargetModel(model?: AiServiceModel): FetchPromptsResponse{
 describe("prompt requests use proper model execution", ()=>{
     describe("prompt has no target model", ()=>{
     it("uses config override model if available", ()=>{
-        cy.visit("/");
         cyMockDefault(cy, {
             userRole: UserRole.ADMIN,
             gqlQueries:[
@@ -67,7 +66,6 @@ describe("prompt requests use proper model execution", ()=>{
                                       
 
         it("uses configs default model if available", ()=>{
-            cy.visit("/");
             cyMockDefault(cy, {
                 userRole: UserRole.ADMIN,
                 gqlQueries:[
@@ -95,7 +93,6 @@ describe("prompt requests use proper model execution", ()=>{
         })
 
         it("uses the first available model as default model if no default provided", ()=>{
-            cy.visit("/");
                         cyMockDefault(cy, {
                             userRole: UserRole.ADMIN,
                             gqlQueries:[
@@ -109,7 +106,7 @@ describe("prompt requests use proper model execution", ()=>{
                                 mockGQL('FetchPrompts', setPromptsTargetModel(undefined)),
                             ]
                         });
-                        cyMockOpenAiCall(cy, {response: openAiTextResponse("Hello"), statusCode: 200})
+            cyMockOpenAiCall(cy, {response: openAiTextResponse("Hello"), statusCode: 200})
                         toPromptEditing(cy);
                         cy.get("[data-cy=run-prompt-button]").click();
                         confirmModelInAiRequest({
@@ -119,7 +116,6 @@ describe("prompt requests use proper model execution", ()=>{
                     })
             
                     it("uses the override model over default if both available", ()=>{
-                        cy.visit("/");
                         cyMockDefault(cy, {
                             userRole: UserRole.ADMIN,
                             gqlQueries:[
@@ -150,7 +146,6 @@ describe("prompt requests use proper model execution", ()=>{
                     
 
         it("throws an error if no default model and no available models", ()=>{
-            cy.visit("/");
             cyMockDefault(cy, {
                 userRole: UserRole.ADMIN,
                 gqlQueries:[
@@ -172,7 +167,6 @@ describe("prompt requests use proper model execution", ()=>{
 
     describe("prompt has a target model", ()=>{
         it("uses the override model if available", ()=>{
-            cy.visit("/");
             cyMockDefault(cy, {
                 userRole: UserRole.ADMIN,
                 gqlQueries:[
@@ -202,7 +196,6 @@ describe("prompt requests use proper model execution", ()=>{
         })
 
         it("uses the target model if available", ()=>{
-            cy.visit("/");
             cyMockDefault(cy, {
                 userRole: UserRole.ADMIN,
                 gqlQueries:[

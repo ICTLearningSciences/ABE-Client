@@ -446,7 +446,7 @@ export function EditPrompt(props: {
         }}
       />
       <ViewPreviousRunModal
-        previousRun={runToView}
+        previousRunStepData={runToView?.aiAllStepsData}
         open={Boolean(runToView)}
         close={() => {
           setRunToView(undefined);

@@ -186,11 +186,7 @@ export function useWithLimitsToArgumentActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: introStep(stepData),
-                openAiInfo: {
-                  aiServiceRequestParams:
-                    res.aiAllStepsData[0].aiServiceRequestParams,
-                  aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-                },
+                aiServiceStepData: res.aiAllStepsData,
               },
               false,
               googleDocId
@@ -276,11 +272,7 @@ export function useWithLimitsToArgumentActivity(
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
                   activityStep: speakWithAudienceStep(stepData),
-                  openAiInfo: {
-                    aiServiceRequestParams:
-                      res.aiAllStepsData[0].aiServiceRequestParams,
-                    aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-                  },
+                  aiServiceStepData: res.aiAllStepsData,
                 },
                 false,
                 googleDocId

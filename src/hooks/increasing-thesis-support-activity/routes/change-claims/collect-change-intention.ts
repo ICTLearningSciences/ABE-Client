@@ -72,11 +72,7 @@ export function cCollectIntentionStep(
                 allActivityMessages
               ),
               mcqChoices: [MCQ_BRAINSTORM],
-              openAiInfo: {
-                aiServiceRequestParams:
-                  res.aiAllStepsData[0].aiServiceRequestParams,
-                aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-              },
+              aiServiceStepData: res.aiAllStepsData,
             });
           }
         );
@@ -123,11 +119,7 @@ export function cCollectIntentionStep(
                 analyzeIntendedClaimUsagePrompt,
                 allActivityMessages
               ),
-              openAiInfo: {
-                aiServiceRequestParams:
-                  res.aiAllStepsData[0].aiServiceRequestParams,
-                aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-              },
+              aiServiceStepData: res.aiAllStepsData,
             });
             if (claimAction === ClaimAction.ADDING) {
               setState((prevState) => {

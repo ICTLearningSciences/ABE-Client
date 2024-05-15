@@ -264,12 +264,7 @@ export function useWithStrongerConclusionActivity(
                     sender: Sender.SYSTEM,
                     displayType: MessageDisplayType.TEXT,
                     activityStep: introStep(stepData),
-                    openAiInfo: {
-                      aiServiceRequestParams:
-                        res.aiAllStepsData[0].aiServiceRequestParams,
-                      aiServiceResponse:
-                        res.aiAllStepsData[0].aiServiceResponse,
-                    },
+                    aiServiceStepData: res.aiAllStepsData,
                   },
                   false,
                   googleDocId
@@ -318,11 +313,7 @@ export function useWithStrongerConclusionActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: i2CollectAuthorOriginalIntentionStep(stepData),
-                openAiInfo: {
-                  aiServiceRequestParams:
-                    res.aiAllStepsData[0].aiServiceRequestParams,
-                  aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-                },
+                aiServiceStepData: res.aiAllStepsData,
               },
               false,
               googleDocId
@@ -362,11 +353,7 @@ export function useWithStrongerConclusionActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: i3SoWhatQuestionStep(stepData),
-                openAiInfo: {
-                  aiServiceRequestParams:
-                    res.aiAllStepsData[0].aiServiceRequestParams,
-                  aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-                },
+                aiServiceStepData: res.aiAllStepsData,
               },
               false,
               googleDocId
@@ -408,11 +395,7 @@ export function useWithStrongerConclusionActivity(
                   mcqChoices: [MCQ_READY_TO_REVISE],
                   displayType: MessageDisplayType.TEXT,
                   activityStep: impactDiscussionStep(stepData),
-                  openAiInfo: {
-                    aiServiceRequestParams:
-                      res.aiAllStepsData[0].aiServiceRequestParams,
-                    aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-                  },
+                  aiServiceStepData: res.aiAllStepsData,
                 },
                 false,
                 googleDocId
@@ -452,11 +435,7 @@ export function useWithStrongerConclusionActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: i5CollectProposedRevisionStep(stepData),
-                openAiInfo: {
-                  aiServiceRequestParams:
-                    res.aiAllStepsData[0].aiServiceRequestParams,
-                  aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-                },
+                aiServiceStepData: res.aiAllStepsData,
               },
               false,
               googleDocId

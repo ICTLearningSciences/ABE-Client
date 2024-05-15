@@ -11,7 +11,7 @@ import { ColumnDiv, JsonDisplay } from '../../styled-components';
 import { useState } from 'react';
 import { JsonView, allExpanded, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
-import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
+import { AiServiceStepDataTypes } from '../../ai-services/ai-service-types';
 
 const useStyles = makeStyles({ name: { ViewPreviousRunModal } })(
   (theme: Theme) => ({
@@ -31,11 +31,11 @@ const useStyles = makeStyles({ name: { ViewPreviousRunModal } })(
 );
 
 export default function ViewPreviousRunModal(props: {
-  previousRun?: AiServicesResponseTypes;
+  previousRunStepData?: AiServiceStepDataTypes[];
   open: boolean;
   close: () => void;
 }): JSX.Element {
-  const { previousRun, open, close } = props;
+  const { previousRunStepData, open, close } = props;
   const { classes } = useStyles();
   const [showJsonAsText, setShowJsonAsText] = useState(false);
   const style = {
@@ -53,7 +53,7 @@ export default function ViewPreviousRunModal(props: {
     flexDirection: 'column',
   };
 
-  if (!previousRun) {
+  if (!previousRunStepData) {
     return <></>;
   }
   return (
@@ -61,7 +61,7 @@ export default function ViewPreviousRunModal(props: {
       <Modal open={Boolean(open)} className={classes.modal}>
         <Box sx={style}>
           <div style={{ overflow: 'auto' }}>
-            {previousRun.aiAllStepsData.map((promptStep, index) => {
+            {previousRunStepData.map((promptStep, index) => {
               const responseMessage = promptStep.aiServiceResponse;
 
               return (

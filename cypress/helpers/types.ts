@@ -5,6 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import OpenAI from 'openai';
+import { AiServiceStepDataTypes } from '../../src/ai-services/ai-service-types';
 export enum GptModels {
   GPT_3_5 = 'gpt-3.5-turbo-16k',
   GPT_4 = 'gpt-4',
@@ -66,7 +67,7 @@ export interface ChatMessage {
   id: string;
   sender: Sender;
   displayType: MessageDisplayType;
-  openAiInfo?: AiStepData;
+  aiServiceStepData?: AiServiceStepDataTypes[];
   mcqChoices?: string[];
   selectActivities?: Activity[];
   activityStep?: ActiveActivityStep;

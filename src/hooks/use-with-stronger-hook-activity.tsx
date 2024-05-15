@@ -540,11 +540,7 @@ export default function useWithStrongerHookActivity(
           displayType: MessageDisplayType.TEXT,
           activityStep: introStep(stepData),
 
-          openAiInfo: {
-            aiServiceRequestParams:
-              response.aiAllStepsData[0].aiServiceRequestParams,
-            aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
-          },
+          aiServiceStepData: response.aiAllStepsData,
         },
         false,
         googleDocId
@@ -608,11 +604,7 @@ export default function useWithStrongerHookActivity(
           displayType: MessageDisplayType.TEXT,
           activityStep: emotionWeakStepOne(stepData),
 
-          openAiInfo: {
-            aiServiceRequestParams:
-              res.aiAllStepsData[0].aiServiceRequestParams,
-            aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-          },
+          aiServiceStepData: res.aiAllStepsData,
         },
         false,
         googleDocId
@@ -645,11 +637,7 @@ export default function useWithStrongerHookActivity(
               displayType: MessageDisplayType.TEXT,
               activityStep: emotionWeakStepOne(stepData),
 
-              openAiInfo: {
-                aiServiceRequestParams:
-                  response.aiAllStepsData[0].aiServiceRequestParams,
-                aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
-              },
+              aiServiceStepData: response.aiAllStepsData,
             },
             false,
             googleDocId
@@ -776,11 +764,7 @@ export default function useWithStrongerHookActivity(
                   displayType: MessageDisplayType.TEXT,
                   activityStep: narrativeWeakStepTwo(stepData),
 
-                  openAiInfo: {
-                    aiServiceRequestParams:
-                      res.aiAllStepsData[0].aiServiceRequestParams,
-                    aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-                  },
+                  aiServiceStepData: res.aiAllStepsData,
                 },
                 false,
                 googleDocId
@@ -847,12 +831,7 @@ export default function useWithStrongerHookActivity(
                 displayType: MessageDisplayType.TEXT,
                 activityStep: narrativeWeakStepFour(stepData),
 
-                openAiInfo: {
-                  aiServiceRequestParams:
-                    response.aiAllStepsData[0].aiServiceRequestParams,
-                  aiServiceResponse:
-                    response.aiAllStepsData[0].aiServiceResponse,
-                },
+                aiServiceStepData: response.aiAllStepsData,
               },
               false,
               googleDocId
@@ -938,12 +917,7 @@ export default function useWithStrongerHookActivity(
                 displayType: MessageDisplayType.TEXT,
                 activityStep: narrativeWeakStepSix(stepData),
 
-                openAiInfo: {
-                  aiServiceRequestParams:
-                    response.aiAllStepsData[0].aiServiceRequestParams,
-                  aiServiceResponse:
-                    response.aiAllStepsData[0].aiServiceResponse,
-                },
+                aiServiceStepData: response.aiAllStepsData,
               },
               false,
               googleDocId
@@ -1031,11 +1005,7 @@ export default function useWithStrongerHookActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: emotionWeakStepTwo(stepData),
-                openAiInfo: {
-                  aiServiceRequestParams:
-                    res.aiAllStepsData[0].aiServiceRequestParams,
-                  aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-                },
+                aiServiceStepData: res.aiAllStepsData,
               },
               false,
               googleDocId
@@ -1073,12 +1043,7 @@ export default function useWithStrongerHookActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: emotionWeakStepThree(stepData),
-                openAiInfo: {
-                  aiServiceRequestParams:
-                    response.aiAllStepsData[0].aiServiceRequestParams,
-                  aiServiceResponse:
-                    response.aiAllStepsData[0].aiServiceResponse,
-                },
+                aiServiceStepData: response.aiAllStepsData,
               },
               false,
               googleDocId
@@ -1106,11 +1071,7 @@ export default function useWithStrongerHookActivity(
               displayType: MessageDisplayType.TEXT,
               activityStep: freeInputStep(stepData),
 
-              openAiInfo: {
-                aiServiceRequestParams:
-                  response.aiAllStepsData[0].aiServiceRequestParams,
-                aiServiceResponse: response.aiAllStepsData[0].aiServiceResponse,
-              },
+              aiServiceStepData: response.aiAllStepsData,
             },
             false,
             googleDocId

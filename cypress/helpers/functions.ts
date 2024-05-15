@@ -102,7 +102,7 @@ export function cyInterceptGraphQL(
   for (const mock of mocks) {
     queryCalls[mock.query] = 0;
   }
-  cy.intercept('/graphql/graphql', (req) => {
+  cy.intercept('**/graphql', (req) => {
     const { body } = req;
     const queryBody = body.query.replace(/\s+/g, ' ').replace('\n', '').trim();
     let handled = false;

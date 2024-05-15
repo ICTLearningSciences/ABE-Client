@@ -376,11 +376,7 @@ export function useWithThesisSupportActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: introStep(stepData, allActivityMessages),
-                openAiInfo: {
-                  aiServiceRequestParams:
-                    res.aiAllStepsData[0].aiServiceRequestParams,
-                  aiServiceResponse: res.aiAllStepsData[0].aiServiceResponse,
-                },
+                aiServiceStepData: res.aiAllStepsData,
               },
               false,
               googleDocId
