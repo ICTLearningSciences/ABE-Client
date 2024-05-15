@@ -4,22 +4,30 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-export const fetchConfigResponse = {
+
+import { AiServiceNames } from "../../src/types";
+import { Config } from "../helpers/types"
+
+interface FetchConfigResponse {
+    fetchConfig: Config;
+}
+
+export const fetchConfigResponse: FetchConfigResponse = {
     "fetchConfig": {
         "aiSystemPrompt": [
             "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-3.5 architecture. Knowledge cutoff: 2021-09.",
             "You are a professor that speaks very eloquently and in short sentences."
         ],
-        "displayedGoals": null,
-        "displayedActivities": null,
-        "overrideAiModel": null,
+        "displayedGoals": undefined,
+        "displayedActivities": undefined,
+        "overrideAiModel": undefined,
         "defaultAiModel": {
-            "serviceName": "OPEN_AI",
+            "serviceName": AiServiceNames.OPEN_AI,
             "model": "gpt-3.5-turbo-16k"
         },
         "availableAiServiceModels": [
             {
-                "serviceName": "OPEN_AI",
+                "serviceName": AiServiceNames.OPEN_AI,
                 "models": [
                     "gpt-3.5-turbo-16k",
                     "gpt-4",
@@ -27,7 +35,7 @@ export const fetchConfigResponse = {
                 ]
             },
             {
-                "serviceName": "AZURE",
+                "serviceName": AiServiceNames.AZURE,
                 "models": [
                     "ABE-GPT-3_5_turbo_16k",
                     "ABE-gpt-4-turbo-preview"

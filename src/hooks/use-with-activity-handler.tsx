@@ -29,7 +29,6 @@ import { useWithPromptActivity } from './use-with-prompt-activity';
 import { UseWithPrompts } from './use-with-prompts';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  DEFAULT_TARGET_AI_SERVICE_MODEL,
   LIMITS_TO_YOUR_ARGUMENT_ID,
   STRONGER_CONCLUSION_ID,
   STRONGER_HOOK_ID,
@@ -89,10 +88,6 @@ export function useWithActivityHandler(
   } = useWithChat();
   const { executePromptSteps: executePrompt, abortController } =
     useWithExecutePrompt();
-  const overrideAiServiceModel = useAppSelector(
-    (state) => state.state.overrideAiServiceModel
-  );
-  const config = useAppSelector((state) => state.config);
   const { newSession, updateSessionIntention } = useWithState();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
@@ -230,15 +225,9 @@ export function useWithActivityHandler(
           }`,
         });
       });
-
       aiPromptSteps.push({
         ...openAiPromptStep,
         systemRole: openAiPromptStep.systemRole || globalSystemRole,
-        targetAiServiceModel:
-          overrideAiServiceModel ||
-          openAiPromptStep.targetAiServiceModel ||
-          config.config?.defaultAiModel ||
-          DEFAULT_TARGET_AI_SERVICE_MODEL,
         prompts,
       });
     });

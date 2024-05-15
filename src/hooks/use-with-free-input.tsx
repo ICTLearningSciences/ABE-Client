@@ -16,10 +16,7 @@ import {
 } from '../types';
 import { MessageDisplayType, Sender } from '../store/slices/chat';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  DEFAULT_TARGET_AI_SERVICE_MODEL,
-  FREE_INPUT_GOAL_ID,
-} from '../constants';
+import { FREE_INPUT_GOAL_ID } from '../constants';
 import { useWithExecutePrompt } from './use-with-execute-prompts';
 
 export default function useWithFreeInput(selectedGoal?: DocGoal) {
@@ -27,12 +24,6 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
     useWithChat();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
-  );
-  const overrideAiServiceModel = useAppSelector(
-    (state) => state.state.overrideAiServiceModel
-  );
-  const defaultAiServiceModel = useAppSelector(
-    (state) => state.config.config?.defaultAiModel
   );
   const userId: string | undefined = useAppSelector(
     (state) => state.login.user?._id
@@ -78,10 +69,6 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
               promptRole: PromptRoles.ASSISSANT,
             },
           ],
-          targetAiServiceModel:
-            overrideAiServiceModel ||
-            defaultAiServiceModel ||
-            DEFAULT_TARGET_AI_SERVICE_MODEL,
           outputDataType: PromptOutputTypes.TEXT,
         },
       ];

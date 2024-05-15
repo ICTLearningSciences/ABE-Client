@@ -314,7 +314,7 @@ describe('document timeline', () => {
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       cy.get("[data-cy=ai-summary-in-progress]").should("exist")
       cy.get("[data-cy=ai-outline-in-progress]").should("exist")
-      // TODO: check for polls
+      // check for polls
       cy.wait("@FetchDocumentTimelineStatus", {timeout: 3000});
       cy.wait("@FetchDocumentTimelineStatus", {timeout: 3000});
       cy.wait("@FetchDocumentTimelineStatus", {timeout: 3000});

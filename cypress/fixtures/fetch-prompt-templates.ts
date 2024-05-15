@@ -6,7 +6,11 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { GQLPrompt } from "../helpers/types";
 
-export const fetchPromptTemplates =  {
+export interface FetchPromptsResponse {
+    fetchPrompts: GQLPrompt[];
+}
+
+export const fetchPromptTemplates: FetchPromptsResponse =  {
     "fetchPrompts": [
       {
           "_id": "654e926e7aaab424574a7de6",

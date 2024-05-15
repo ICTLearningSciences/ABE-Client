@@ -11,7 +11,6 @@ import {
   Button,
   CircularProgress,
 } from '@mui/material';
-import { DEFAULT_TARGET_AI_SERVICE_MODEL } from '../../../constants';
 import {
   aiServiceModelStringParse,
   aiServiceModelToString,
@@ -48,9 +47,9 @@ export function EditPrompt(props: {
   const availableAiServiceModels = useAppSelector(
     (state) => state.config.config?.availableAiServiceModels
   );
-  const defaultAiModel =
-    useAppSelector((state) => state.config.config?.defaultAiModel) ||
-    DEFAULT_TARGET_AI_SERVICE_MODEL;
+  const defaultAiModel = useAppSelector(
+    (state) => state.config.config?.defaultAiModel
+  );
   const {
     promptTemplate,
     handleSavePrompt,
@@ -119,6 +118,10 @@ export function EditPrompt(props: {
     } finally {
       setInProgress(false);
     }
+  }
+
+  if (!defaultAiModel) {
+    return <div>Default AI Model not set</div>;
   }
 
   return (
@@ -377,7 +380,7 @@ export function EditPrompt(props: {
                 setPromptTemplateCopy({
                   ...promptTemplateCopy,
                   aiPromptSteps: promptTemplateCopy.aiPromptSteps.concat(
-                    emptyOpenAiPromptStep(defaultAiModel)
+                    emptyOpenAiPromptStep()
                   ),
                 });
               }}

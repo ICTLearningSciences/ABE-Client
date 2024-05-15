@@ -33,7 +33,6 @@ export function useConfigLoader() {
           <Button
             data-cy="config-load-retry-button"
             onClick={() => {
-              console.log('here');
               loadConfig();
             }}
           >

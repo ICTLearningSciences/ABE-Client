@@ -22,6 +22,50 @@ export function useWithExecutePrompt() {
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
   );
+  const availableAiServiceModels =
+    useAppSelector((state) => state.config.config?.availableAiServiceModels) ||
+    [];
+  const defaultAiServiceModel = useAppSelector(
+    (state) => state.config.config?.defaultAiModel
+  );
+  const configAiServiceModelOverride = useAppSelector(
+    (state) => state.config.config?.overrideAiModel
+  );
+  const localAiServiceModelOverride = useAppSelector(
+    (state) => state.state.overrideAiServiceModel
+  );
+
+  /**
+   * Process to ENSURE only available models are used in prompt steps
+   */
+  function applyAvailableModelsToPromptSteps(
+    promptSteps: AiPromptStep[]
+  ): AiPromptStep[] {
+    return promptSteps.map((step) => {
+      step.targetAiServiceModel =
+        localAiServiceModelOverride ||
+        configAiServiceModelOverride ||
+        step.targetAiServiceModel;
+      const targetAvailableAiService = availableAiServiceModels.find(
+        (model) => model.serviceName === step.targetAiServiceModel?.serviceName
+      );
+      const targetServiceIsAvailable = Boolean(
+        targetAvailableAiService?.models.find(
+          (model) => model === step.targetAiServiceModel?.model
+        )
+      );
+      if (targetServiceIsAvailable) {
+        return step;
+      } else if (defaultAiServiceModel) {
+        step.targetAiServiceModel = defaultAiServiceModel;
+        return step;
+      } else {
+        throw new Error(
+          'Target AI Service Model is not available. Please select a different model.'
+        );
+      }
+    });
+  }
 
   async function executePromptSteps(
     aiPromptSteps: AiPromptStep[],
@@ -33,9 +77,12 @@ export function useWithExecutePrompt() {
       controller: abortController,
       source,
     });
+    const processedAiPromptSteps =
+      applyAvailableModelsToPromptSteps(aiPromptSteps);
+
     const res = await asyncPromptExecute(
       googleDocId,
-      aiPromptSteps,
+      processedAiPromptSteps,
       userId || '',
       source.token
     );

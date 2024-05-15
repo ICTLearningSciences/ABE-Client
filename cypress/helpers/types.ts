@@ -93,7 +93,7 @@ export enum UserRole {
   USER = 'USER',
 }
 import OpenAI from 'openai';
-import { AiServiceModel } from '../../src/types';
+import { AiServiceModel, AiServiceNames } from '../../src/types';
 
 export interface Connection<T> {
   edges: Edge<T>[];
@@ -247,8 +247,18 @@ export enum PromptOutputTypes {
   JSON = 'JSON',
 }
 
+export interface AvailableAiServiceModels {
+  serviceName: AiServiceNames;
+  models: string[];
+}
+
 export interface Config {
   aiSystemPrompt: string[];
+  displayedGoals?: string[];
+  displayedActivities?: string[];
+  overrideAiModel?: AiServiceModel;
+  defaultAiModel?: AiServiceModel;
+  availableAiServiceModels?: AvailableAiServiceModels[];
 }
 
 export enum ActivityStepTypes {

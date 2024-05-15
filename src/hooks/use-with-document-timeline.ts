@@ -27,7 +27,6 @@ import { LoadingStatusType } from './generic-loading-reducer';
 import { CancelToken } from 'axios';
 import { pollUntilTrue } from './use-with-synchronous-polling';
 import { useWithConfig } from '../store/slices/config/use-with-config';
-import { DEFAULT_TARGET_AI_SERVICE_MODEL } from '../constants';
 
 const initialState: TimelineState = {
   status: LoadingStatusType.NONE,
@@ -109,7 +108,10 @@ export function useWithDocumentTimeline() {
     docId: string,
     cancelToken?: CancelToken
   ): Promise<void> {
-    if (state.status === LoadingStatusType.LOADING) {
+    if (
+      state.status === LoadingStatusType.LOADING ||
+      !config.config?.defaultAiModel
+    ) {
       return;
     }
     try {
@@ -117,7 +119,7 @@ export function useWithDocumentTimeline() {
       const docTimelineJobId = await asyncRequestDocTimeline(
         userId,
         docId,
-        config.config?.defaultAiModel || DEFAULT_TARGET_AI_SERVICE_MODEL,
+        config.config.defaultAiModel,
         cancelToken
       );
       const pollFunction = () => {

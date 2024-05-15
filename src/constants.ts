@@ -4,7 +4,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { AiServiceModel, AiServiceNames } from './types';
 
 export const LS_GOOGLE_DOC_IDS_KEY = 'LS_GOOGLE_DOC_IDS_KEY';
 
@@ -27,11 +26,6 @@ export enum GptModels {
   AZURE_GPT_4_TURBO_PREVIEW = 'ABE-gpt-4-turbo-preview',
   NONE = '',
 }
-
-export const DEFAULT_TARGET_AI_SERVICE_MODEL: AiServiceModel = {
-  serviceName: AiServiceNames.OPEN_AI,
-  model: GptModels.OPEN_AI_GPT_3_5,
-};
 
 export const FREE_INPUT_GOAL_ID = '65823a8799045156193339b2';
 
