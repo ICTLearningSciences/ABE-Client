@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { GQLDocumentTimeline, OpenAiGenerationStatus, TimelinePointType } from '../../helpers/types';
+import { GQLDocumentTimeline, AiGenerationStatus, TimelinePointType } from '../../helpers/types';
 
 export const generationInProgress: GQLDocumentTimeline = {
   docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
@@ -76,10 +76,10 @@ export const generationInProgress: GQLDocumentTimeline = {
       },
       intent: '',
       changeSummary: '',
-      changeSummaryStatus: OpenAiGenerationStatus.IN_PROGRESS,
+      changeSummaryStatus: AiGenerationStatus.IN_PROGRESS,
       reverseOutline:
         '',
-      reverseOutlineStatus: OpenAiGenerationStatus.IN_PROGRESS,
+      reverseOutlineStatus: AiGenerationStatus.IN_PROGRESS,
       relatedFeedback: '',
     },
     {
@@ -131,10 +131,10 @@ export const generationInProgress: GQLDocumentTimeline = {
       intent: '',
       changeSummary:
         "",
-      changeSummaryStatus: OpenAiGenerationStatus.IN_PROGRESS,
+      changeSummaryStatus: AiGenerationStatus.IN_PROGRESS,
         reverseOutline:
         '',
-      reverseOutlineStatus: OpenAiGenerationStatus.IN_PROGRESS,
+      reverseOutlineStatus: AiGenerationStatus.IN_PROGRESS,
         relatedFeedback: '',
     },
   ],
@@ -209,10 +209,10 @@ export const generationCompleted: GQLDocumentTimeline = {
         },
         intent: '',
         changeSummary: '',
-        changeSummaryStatus: OpenAiGenerationStatus.COMPLETED,
+        changeSummaryStatus: AiGenerationStatus.COMPLETED,
         reverseOutline:
           '{\n  "Thesis Statement": "The impact of climate change on global food security",\n  "Supporting Claims": [\n    "Decreased crop yields",\n    "Altered growing conditions",\n    "Water scarcity"\n  ],\n  "Evidence Given for Each Claim": [\n    {\n      "Claim A": "Decreased crop yields",\n      "Claim A Evidence": [\n        "Studies show that global warming leads to a decline in crop yields.",\n        "Extreme weather events caused by climate change have a negative impact on crop production.",\n      "Rising temperatures affect the nutritional value and quality of crops."\n      ]\n    },\n    {\n      "Claim B": "Altered growing conditions",\n      "Claim B Evidence": [\n        "Changing rainfall patterns affect the timing and success of planting.",\n        "Increasing temperatures and heatwaves reduce the viability of certain crops.",\n      "Shifts in temperature and humidity create new challenges for farmers."\n      ]\n    },\n    {\n      "Claim C": "Water scarcity",\n      "Claim C Evidence": [\n        "Rising temperatures cause higher rates of evaporation, leading to water scarcity.",\n        "Decreased snowpack and glacier melt reduce available water for agriculture.",\n      "Droughts and extreme weather events disrupt irrigation and water supply."\n      ]\n    }\n  ]\n}',
-        reverseOutlineStatus: OpenAiGenerationStatus.COMPLETED,
+        reverseOutlineStatus: AiGenerationStatus.COMPLETED,
         relatedFeedback: '',
       },
       {
@@ -264,10 +264,10 @@ export const generationCompleted: GQLDocumentTimeline = {
         intent: '',
         changeSummary:
           "Complete Summary",
-        changeSummaryStatus: OpenAiGenerationStatus.COMPLETED,
+        changeSummaryStatus: AiGenerationStatus.COMPLETED,
           reverseOutline:
           '{\n  "Thesis Statement": "The impact of climate change on global food security",\n  "Supporting Claims": [\n    "Decreased crop yields",\n    "Altered growing conditions",\n    "Water scarcity"\n  ],\n  "Evidence Given for Each Claim": [\n    {\n      "Claim A": "Decreased crop yields",\n      "Claim A Evidence": [\n        "Studies show that global warming leads to a decline in crop yields.",\n        "Extreme weather events caused by climate change have a negative impact on crop production.",\n      "Rising temperatures affect the nutritional value and quality of crops."\n      ]\n    },\n    {\n      "Claim B": "Altered growing conditions",\n      "Claim B Evidence": [\n        "Changing rainfall patterns affect the timing and success of planting.",\n        "Increasing temperatures and heatwaves reduce the viability of certain crops.",\n      "Shifts in temperature and humidity create new challenges for farmers."\n      ]\n    },\n    {\n      "Claim C": "Water scarcity",\n      "Claim C Evidence": [\n        "Rising temperatures cause higher rates of evaporation, leading to water scarcity.",\n        "Decreased snowpack and glacier melt reduce available water for agriculture.",\n      "Droughts and extreme weather events disrupt irrigation and water supply."\n      ]\n    }\n  ]\n}',
-        reverseOutlineStatus: OpenAiGenerationStatus.COMPLETED,
+        reverseOutlineStatus: AiGenerationStatus.COMPLETED,
           relatedFeedback: '',
       },
     ],

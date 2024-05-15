@@ -175,7 +175,8 @@ export function useWithLimitsToArgumentActivity(
           (res) => {
             const audiencesResponse =
               validateJsonResponse<AnalyzeArgumentsResponse>(
-                res.openAiData[0].openAiResponse[0].message.content || '',
+                res.aiAllStepsData[0].aiServiceResponse[0].message.content ||
+                  '',
                 analyzeArgumentsPromptSchema
               );
             sendMessage(
@@ -185,10 +186,7 @@ export function useWithLimitsToArgumentActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: introStep(stepData),
-                openAiInfo: {
-                  openAiPrompt: res.openAiData[0].openAiPrompt,
-                  openAiResponse: res.openAiData[0].openAiResponse,
-                },
+                aiServiceStepData: res.aiAllStepsData,
               },
               false,
               googleDocId
@@ -274,10 +272,7 @@ export function useWithLimitsToArgumentActivity(
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
                   activityStep: speakWithAudienceStep(stepData),
-                  openAiInfo: {
-                    openAiPrompt: res.openAiData[0].openAiPrompt,
-                    openAiResponse: res.openAiData[0].openAiResponse,
-                  },
+                  aiServiceStepData: res.aiAllStepsData,
                 },
                 false,
                 googleDocId

@@ -209,19 +209,6 @@ export default function ExampleGoogleDocModal(props: {
                 >
                   Edit
                 </Button>
-                {/* <Button
-                  onClick={() => {
-                    // TODO: delete
-                  }}
-                  style={{
-                    marginRight: '20px',
-                  }}
-                  disabled={!selectedGoogleDoc}
-                  size="large"
-                  variant="outlined"
-                >
-                  Delete
-                </Button> */}
               </RowDiv>
             )}
           </div>

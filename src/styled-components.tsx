@@ -49,3 +49,12 @@ export const SmallGreyText = styled.span`
   font-size: 0.8rem;
   color: grey;
 `;
+
+export const FullScreenCenterDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+`;

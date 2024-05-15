@@ -17,6 +17,7 @@ import DocView from './components/doc-view';
 import { useWithLogin } from './store/slices/login/use-with-login';
 import DocumentTimelinePage from './components/user-view/document-timeline';
 import { useReduxHydration } from './use-redux-hydration';
+import { useConfigLoader } from './components/config-loading/use-config-loader';
 
 function MainApp() {
   const useLogin = useWithLogin();
@@ -98,7 +99,11 @@ function MainApp() {
       ),
     },
   ]);
+  const { ConfigLoader, configLoaded } = useConfigLoader();
   useReduxHydration();
+  if (!configLoaded) {
+    return <ConfigLoader />;
+  }
   return <RouterProvider router={router} />;
 }
 

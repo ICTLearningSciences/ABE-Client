@@ -4,43 +4,33 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
-import axios, { CancelTokenSource } from 'axios';
 import {
   DocGoal,
-  OpenAiPromptStep,
+  AiPromptStep,
   PromptOutputTypes,
   PromptRoles,
+  GQLPrompt,
 } from '../types';
 import { MessageDisplayType, Sender } from '../store/slices/chat';
-import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { v4 as uuidv4 } from 'uuid';
-import { DEFAULT_GPT_MODEL, FREE_INPUT_GOAL_ID, GptModels } from '../constants';
+import { FREE_INPUT_GOAL_ID } from '../constants';
+import { useWithExecutePrompt } from './use-with-execute-prompts';
 
 export default function useWithFreeInput(selectedGoal?: DocGoal) {
   const { state, sendMessage, chatLogToString, coachResponsePending } =
     useWithChat();
-  const [abortController, setAbortController] = useState<{
-    controller: AbortController;
-    source: CancelTokenSource;
-  }>();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
-  );
-  const overrideGptModel: GptModels = useAppSelector(
-    (state) => state.state.overideGptModel
-  );
-  const systemPrompt: string = useAppSelector(
-    (state) => state.chat.systemPrompt
   );
   const userId: string | undefined = useAppSelector(
     (state) => state.login.user?._id
   );
   const messages = state.chatLogs[googleDocId] || [];
   const isFreeInput = selectedGoal?._id === FREE_INPUT_GOAL_ID;
-
+  const { abortController, executePromptSteps } = useWithExecutePrompt();
   useEffect(() => {
     if (abortController) {
       try {
@@ -58,7 +48,7 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
     }
     const mostRecentMessage = messages[messages.length - 1];
     if (mostRecentMessage.sender === Sender.USER) {
-      const prompts: OpenAiPromptStep[] = [
+      const prompts: AiPromptStep[] = [
         {
           prompts: [
             {
@@ -79,42 +69,29 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
               promptRole: PromptRoles.ASSISSANT,
             },
           ],
-          targetGptModel: DEFAULT_GPT_MODEL,
           outputDataType: PromptOutputTypes.TEXT,
         },
       ];
+      const prompt: GQLPrompt = {
+        _id: uuidv4(),
+        clientId: uuidv4(),
+        aiPromptSteps: prompts,
+        title: '',
+      };
       coachResponsePending(true);
-
-      const abortController = new AbortController();
-      const source = axios.CancelToken.source();
-      setAbortController({
-        controller: abortController,
-        source,
-      });
-      asyncPromptExecute(
-        googleDocId,
-        prompts,
-        userId,
-        systemPrompt,
-        overrideGptModel,
-        source.token
-      )
-        .then((response) => {
-          sendMessage(
-            {
-              id: uuidv4(),
-              message: response.answer,
-              sender: Sender.SYSTEM,
-              displayType: MessageDisplayType.TEXT,
-              openAiInfo: {
-                openAiPrompt: response.openAiData[0].openAiPrompt,
-                openAiResponse: response.openAiData[0].openAiResponse,
-              },
-            },
-            false,
-            googleDocId
-          );
-        })
+      executePromptSteps(prompt.aiPromptSteps, (response) => {
+        sendMessage(
+          {
+            id: uuidv4(),
+            message: response.answer,
+            sender: Sender.SYSTEM,
+            displayType: MessageDisplayType.TEXT,
+            aiServiceStepData: response.aiAllStepsData,
+          },
+          false,
+          googleDocId
+        );
+      })
         .catch((err) => {
           console.log(err);
         })

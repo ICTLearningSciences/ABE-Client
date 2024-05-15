@@ -16,7 +16,6 @@ import {
   DocVersion,
   GoogleDoc,
   GoogleDocTextModifyActions,
-  MultistepPromptRes,
   NewDocData,
   UserAccessToken,
   UserActions,
@@ -24,22 +23,22 @@ import {
   GQLResPrompts,
   Config,
   Connection,
-  OpenAiPromptStep,
+  AiPromptStep,
   UserActivityState,
-  OpenAiJobStatus,
   GQLDocumentTimeline,
   DocumentTimelineJobStatus,
   StoreGoogleDoc,
   ActivityGQL,
   DocGoalGQL,
+  AiServiceModel,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
 import { addQueryParam } from '../helpers';
 import { isBulletPointMessage } from '../store/slices/chat/helpers';
-import { GptModels } from '../constants';
 import { activityQueryData } from './api-helpers';
 import { omit } from 'lodash';
+import { OpenAiServiceJobStatusResponseType } from '../ai-services/open-ai-service';
 
 const API_ENDPOINT = process.env.REACT_APP_GOOGLE_API_ENDPOINT || '/docs';
 const GRAPHQL_ENDPOINT =
@@ -312,15 +311,18 @@ export async function fetchPrompts(): Promise<GQLResPrompts> {
                   title
                   clientId
                   userInputIsIntention
-                  openAiPromptSteps {
+                  aiPromptSteps {
                     prompts{
                       promptText
                       includeEssay
                       includeUserInput
                       promptRole
                     }
-                  targetGptModel
-                  customSystemRole
+                    targetAiServiceModel{
+                      serviceName
+                      model
+                    }
+                  systemRole
                   outputDataType
                     includeChatLogContext
                   }
@@ -379,7 +381,7 @@ export async function storePrompts(
             title
             clientId
             userInputIsIntention
-            openAiPromptSteps {
+            aiPromptSteps {
               prompts{
                 promptText
                 includeEssay
@@ -387,8 +389,11 @@ export async function storePrompts(
                 promptRole
               }
               outputDataType
-              targetGptModel
-              customSystemRole
+              targetAiServiceModel{
+                serviceName
+                model
+              }
+              systemRole
               includeChatLogContext
             }
           }
@@ -418,7 +423,7 @@ export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
             title
             clientId
             userInputIsIntention
-            openAiPromptSteps {
+            aiPromptSteps {
               prompts{
                 promptText
                 includeEssay
@@ -426,8 +431,11 @@ export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
                 promptRole
               }
               outputDataType
-              targetGptModel
-              customSystemRole
+              targetAiServiceModel{
+                serviceName
+                model
+              }
+              systemRole
               includeChatLogContext
             }
           }
@@ -533,7 +541,21 @@ export async function fetchConfig(): Promise<Config> {
       query: `
         query FetchConfig{
           fetchConfig {
-            openaiSystemPrompt
+            aiSystemPrompt
+            displayedGoals
+            displayedActivities
+            overrideAiModel{
+              serviceName
+              model
+            }
+            defaultAiModel{
+              serviceName
+              model
+            }
+            availableAiServiceModels{
+              serviceName
+              models
+            }
           }
         }
       `,
@@ -550,13 +572,13 @@ export async function fetchSystemPrompts(): Promise<string[]> {
       query: `
           query FetchSystemPrompts{
             fetchConfig {
-              openaiSystemPrompt
+              aiSystemPrompt
             }
           }
         `,
     },
     {
-      dataPath: ['fetchConfig', 'openaiSystemPrompt'],
+      dataPath: ['fetchConfig', 'aiSystemPrompt'],
     }
   );
 }
@@ -576,7 +598,7 @@ export async function updateConfigByKey(key: string, value: any): Promise<any> {
       query: `
       mutation ConfigUpdateByKey($key: String!, $value: AnythingScalarType!) {
         configUpdateByKey(key: $key, value: $value) {
-          openaiSystemPrompt
+          aiSystemPrompt
       }
   }
     `,
@@ -698,40 +720,6 @@ export async function fetchActivities(): Promise<ActivityGQL[]> {
   return res.edges.map((edge) => edge.node);
 }
 
-/**
- * uses prompts to build multiple requests to openai
- */
-export async function openAiMultistepPrompts(
-  docsId: string,
-  openAiPromptSteps: OpenAiPromptStep[],
-  userId: string,
-  systemPrompt: string,
-  useGpt4: boolean,
-  cancelToken?: CancelToken
-): Promise<MultistepPromptRes> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
-  const res = await execHttp<MultistepPromptRes>(
-    'POST',
-    `${API_ENDPOINT}/open_ai_doc_question/?docId=${docsId}&userAction=${
-      UserActions.MULTISTEP_PROMPTS
-    }&userId=${userId}&systemPrompt=${systemPrompt}${
-      useGpt4 ? '&openAiModel=gpt-4' : ''
-    }`,
-    {
-      accessToken: accessToken,
-      dataPath: ['response'],
-      axiosConfig: {
-        data: {
-          openAiPromptSteps: openAiPromptSteps,
-        },
-        cancelToken: cancelToken,
-      },
-    }
-  );
-  return res;
-}
-
 export async function updateUserActivityState(
   userId: string,
   activityId: string,
@@ -794,27 +782,21 @@ export type OpenAiJobId = string;
 
 export async function asyncOpenAiRequest(
   docsId: string,
-  openAiPromptSteps: OpenAiPromptStep[],
+  aiPromptSteps: AiPromptStep[],
   userId: string,
-  systemPrompt: string,
-  overrideOpenAiModel: GptModels,
   cancelToken?: CancelToken
 ): Promise<OpenAiJobId> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   if (!accessToken) throw new Error('No access token');
   const res = await execHttp<OpenAiJobId>(
     'POST',
-    `${API_ENDPOINT}/async_open_ai_doc_question/?docId=${docsId}&userAction=${
-      UserActions.MULTISTEP_PROMPTS
-    }&userId=${userId}&systemPrompt=${systemPrompt}${
-      overrideOpenAiModel ? `&openAiModel=${overrideOpenAiModel}` : ''
-    }`,
+    `${API_ENDPOINT}/async_open_ai_doc_question/?docId=${docsId}&userAction=${UserActions.MULTISTEP_PROMPTS}&userId=${userId}`,
     {
       accessToken: accessToken,
       dataPath: ['response', 'jobId'],
       axiosConfig: {
         data: {
-          openAiPromptSteps: openAiPromptSteps,
+          aiPromptSteps: aiPromptSteps,
         },
         cancelToken: cancelToken,
       },
@@ -826,10 +808,10 @@ export async function asyncOpenAiRequest(
 export async function asyncOpenAiJobStatus(
   jobId: string,
   cancelToken?: CancelToken
-): Promise<OpenAiJobStatus> {
+): Promise<OpenAiServiceJobStatusResponseType> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   if (!accessToken) throw new Error('No access token');
-  const res = await execHttp<OpenAiJobStatus>(
+  const res = await execHttp<OpenAiServiceJobStatusResponseType>(
     'POST',
     `${API_ENDPOINT}/async_open_ai_doc_question_status/?jobId=${jobId}`,
     {
@@ -843,32 +825,12 @@ export async function asyncOpenAiJobStatus(
   return res;
 }
 
-export async function requestDocTimeline(
-  userId: string,
-  docId: string,
-  cancelToken?: CancelToken
-): Promise<GQLDocumentTimeline> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
-  const res = await execHttp<GQLDocumentTimeline>(
-    'POST',
-    `${API_ENDPOINT}/get_document_timeline/?docId=${docId}&userId=${userId}`,
-    {
-      accessToken: accessToken,
-      dataPath: [],
-      axiosConfig: {
-        cancelToken: cancelToken,
-      },
-    }
-  );
-  return res;
-}
-
 export type DocumentTimelineJobId = string;
 
 export async function asyncRequestDocTimeline(
   userId: string,
   docId: string,
+  targetAiService: AiServiceModel,
   cancelToken?: CancelToken
 ): Promise<DocumentTimelineJobId> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
@@ -881,6 +843,9 @@ export async function asyncRequestDocTimeline(
       dataPath: ['response', 'jobId'],
       axiosConfig: {
         cancelToken: cancelToken,
+        data: {
+          targetAiService: targetAiService,
+        },
       },
     }
   );

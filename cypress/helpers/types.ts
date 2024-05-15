@@ -4,12 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import OpenAI from 'openai';
+import { AiServiceStepDataTypes } from '../../src/ai-services/ai-service-types';
 export enum GptModels {
   GPT_3_5 = 'gpt-3.5-turbo-16k',
   GPT_4 = 'gpt-4',
   GPT_4_TURBO_PREVIEW = 'gpt-4-turbo-preview',
   NONE = '',
 }
+
+
+
 export enum DisplayIcons {
   LIGHT_BULB = 'LIGHT_BULB',
   PENCIL = 'PENCIL',
@@ -19,7 +24,7 @@ export enum DisplayIcons {
 export interface StepData {
   executePrompt: (
     prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
-    callback: (response: MultistepPromptRes) => void
+    callback: (response: AiServiceResponse) => void
   ) => void;
   openSelectActivityModal: () => void;
 }
@@ -62,7 +67,7 @@ export interface ChatMessage {
   id: string;
   sender: Sender;
   displayType: MessageDisplayType;
-  openAiInfo?: OpenAiReqRes;
+  aiServiceStepData?: AiServiceStepDataTypes[];
   mcqChoices?: string[];
   selectActivities?: Activity[];
   activityStep?: ActiveActivityStep;
@@ -92,7 +97,6 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   USER = 'USER',
 }
-import OpenAI from 'openai';
 
 export interface Connection<T> {
   edges: Edge<T>[];
@@ -181,10 +185,10 @@ export interface DocVersion {
   modifiedTime: string;
 }
 
-export interface OpenAiReqRes {
-  openAiPrompt: OpenAI.Chat.Completions.ChatCompletionCreateParams;
-  openAiResponse: OpenAI.Chat.Completions.ChatCompletion.Choice[];
-  originalRequestPrompt?: OpenAiPromptStep;
+export interface AiStepData {
+  aiServiceRequestParams: OpenAI.Chat.Completions.ChatCompletionCreateParams;
+  aiServiceResponse: OpenAI.Chat.Completions.ChatCompletion.Choice[];
+  originalRequestPrompt?: AiPromptStep;
 }
 
 export enum UserActions {
@@ -206,7 +210,7 @@ export interface StoreGoogleDoc {
 export interface GQLPrompt {
   _id: string;
   clientId: string;
-  openAiPromptSteps: OpenAiPromptStep[];
+  aiPromptSteps: AiPromptStep[];
   title: string;
   userInputIsIntention?: boolean;
 }
@@ -229,15 +233,26 @@ export interface PromptConfiguration {
   includeUserInput?: boolean;
 }
 
-export interface OpenAiPromptStep {
+export enum AiServiceNames {
+  AZURE = 'AZURE_OPEN_AI',
+  OPEN_AI = 'OPEN_AI',
+  GEMINI = 'GEMINI',
+}
+
+export interface AiServiceModel {
+  serviceName: AiServiceNames;
+  model: string;
+}
+
+export interface AiPromptStep {
   prompts: PromptConfiguration[];
-  targetGptModel: GptModels;
+  targetAiServiceModel?: AiServiceModel;
   outputDataType: PromptOutputTypes;
   includeChatLogContext?: boolean;
 }
 
-export interface MultistepPromptRes {
-  openAiData: OpenAiReqRes[];
+export interface AiServiceResponse {
+  aiAllStepsData: AiStepData[];
   answer: string;
 }
 
@@ -246,8 +261,18 @@ export enum PromptOutputTypes {
   JSON = 'JSON',
 }
 
+export interface AvailableAiServiceModels {
+  serviceName: AiServiceNames;
+  models: string[];
+}
+
 export interface Config {
-  openaiSystemPrompt: string[];
+  aiSystemPrompt: string[];
+  displayedGoals?: string[];
+  displayedActivities?: string[];
+  overrideAiModel?: AiServiceModel;
+  defaultAiModel?: AiServiceModel;
+  availableAiServiceModels?: AvailableAiServiceModels[];
 }
 
 export enum ActivityStepTypes {
@@ -328,13 +353,13 @@ export enum JobStatus {
   COMPLETE = 'COMPLETE',
 }
 
-export interface OpenAiJobStatusApiRes {
+export interface AiJobStatusApiRes {
   response: OpenAiJobStatus;
 }
 
 export interface OpenAiJobStatus {
   jobStatus: JobStatus;
-  openAiResponse: MultistepPromptRes;
+  aiServiceResponse: AiServiceResponse;
 }
 
 export interface DocumentTimelineJobStatus {
@@ -350,7 +375,7 @@ export enum TimelinePointType {
   NONE = '',
 }
 
-export enum OpenAiGenerationStatus {
+export enum AiGenerationStatus {
   NONE = 'NONE',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
@@ -363,9 +388,9 @@ export interface GQLTimelinePoint {
   version: IGDocVersion;
   intent: string;
   changeSummary: string;
-  changeSummaryStatus: OpenAiGenerationStatus;
+  changeSummaryStatus: AiGenerationStatus;
   reverseOutline: string;
-  reverseOutlineStatus: OpenAiGenerationStatus;
+  reverseOutlineStatus: AiGenerationStatus;
   relatedFeedback: string;
 }
 

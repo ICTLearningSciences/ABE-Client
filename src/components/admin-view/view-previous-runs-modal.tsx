@@ -7,8 +7,8 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { Box, Button, Modal, Theme } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
-import { MultistepPromptRes } from '../../types';
 import { RowDivSB } from '../../styled-components';
+import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
 
 const useStyles = makeStyles({ name: { ViewPreviousRunsModal } })(
   (theme: Theme) => ({
@@ -28,10 +28,10 @@ const useStyles = makeStyles({ name: { ViewPreviousRunsModal } })(
 );
 
 export default function ViewPreviousRunsModal(props: {
-  previousRuns: MultistepPromptRes[];
+  previousRuns: AiServicesResponseTypes[];
   open: boolean;
   close: () => void;
-  setRunToView: (run?: MultistepPromptRes) => void;
+  setRunToView: (run?: AiServicesResponseTypes) => void;
 }): JSX.Element {
   const { previousRuns, open, close, setRunToView } = props;
   const { classes } = useStyles();

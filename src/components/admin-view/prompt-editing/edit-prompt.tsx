@@ -11,15 +11,19 @@ import {
   Button,
   CircularProgress,
 } from '@mui/material';
-import { GptModels } from '../../../constants';
-import { equals, extractErrorMessageFromError } from '../../../helpers';
-import { asyncPromptExecute } from '../../../hooks/use-with-synchronous-polling';
+import {
+  aiServiceModelStringParse,
+  aiServiceModelToString,
+  equals,
+  extractErrorMessageFromError,
+} from '../../../helpers';
 import { ColumnDiv, RowDivSB } from '../../../styled-components';
 import {
   PromptOutputTypes,
-  MultistepPromptRes,
   GQLPrompt,
   ActivityGQL,
+  AiServiceModel,
+  AiPromptStep,
 } from '../../../types';
 import { ErrorDialog } from '../../dialog';
 import ViewPreviousRunModal from '../view-previous-run-modal';
@@ -27,6 +31,8 @@ import ViewPreviousRunsModal from '../view-previous-runs-modal';
 import { useState } from 'react';
 import { emptyOpenAiPromptStep } from '../multi-prompt-buttonology';
 import { useAppSelector } from '../../../store/hooks';
+import { AiServicesResponseTypes } from '../../../ai-services/ai-service-types';
+import { useWithExecutePrompt } from '../../../hooks/use-with-execute-prompts';
 
 export function EditPrompt(props: {
   promptTemplate: GQLPrompt;
@@ -38,12 +44,11 @@ export function EditPrompt(props: {
 }): JSX.Element {
   const user = useAppSelector((state) => state.login.user);
   const userId = user?._id;
-  const googleDocId = useAppSelector((state) => state.state.googleDocId);
-  const systemPrompt: string = useAppSelector(
-    (state) => state.chat.systemPrompt
+  const availableAiServiceModels = useAppSelector(
+    (state) => state.config.config?.availableAiServiceModels
   );
-  const overrideGptModel = useAppSelector(
-    (state) => state.state.overideGptModel
+  const defaultAiModel = useAppSelector(
+    (state) => state.config.config?.defaultAiModel
   );
   const {
     promptTemplate,
@@ -56,18 +61,68 @@ export function EditPrompt(props: {
   const [error, setError] = useState<string>('');
   const [focusedPromptIndex, setFocusedPromptIndex] = useState<number>(0);
   const [inProgress, setInProgress] = useState<boolean>(false);
-  const [previousRuns, setPreviousRuns] = useState<MultistepPromptRes[]>([]);
+  const [previousRuns, setPreviousRuns] = useState<AiServicesResponseTypes[]>(
+    []
+  );
   const [viewPrevRunResults, setViewPrevRunResults] = useState<boolean>(false);
-  const [runToView, setRunToView] = useState<MultistepPromptRes>();
+  const [runToView, setRunToView] = useState<AiServicesResponseTypes>();
   const [promptTemplateCopy, setPromptTemplateCopy] = useState<GQLPrompt>(
     JSON.parse(JSON.stringify(promptTemplate))
   );
+  const { executePromptSteps } = useWithExecutePrompt();
 
   useEffect(() => {
     setPromptTemplateCopy(JSON.parse(JSON.stringify(promptTemplate)));
   }, [promptTemplate]);
 
   const isEdited = !equals(promptTemplate, promptTemplateCopy);
+
+  function updateAiPromptStep(
+    stepIndex: number,
+    changes: Partial<AiPromptStep>
+  ) {
+    setPromptTemplateCopy({
+      ...promptTemplateCopy,
+      aiPromptSteps: promptTemplateCopy.aiPromptSteps.map(
+        (openAiPromptStep, openAiPromptStepIndex) => {
+          if (openAiPromptStepIndex === stepIndex) {
+            return {
+              ...openAiPromptStep,
+              ...changes,
+            };
+          } else {
+            return openAiPromptStep;
+          }
+        }
+      ),
+    });
+  }
+
+  async function runPrompt() {
+    if (!userId) {
+      return;
+    }
+    setInProgress(true);
+    try {
+      const res = await executePromptSteps(promptTemplateCopy.aiPromptSteps);
+      if (!res) {
+        throw new Error('No response from AI service');
+      }
+      setPreviousRuns((prevRuns) => {
+        return [...prevRuns, res];
+      });
+      setRunToView(res);
+    } catch (err) {
+      const error = extractErrorMessageFromError(err);
+      setError(error);
+    } finally {
+      setInProgress(false);
+    }
+  }
+
+  if (!defaultAiModel) {
+    return <div>Default AI Model not set</div>;
+  }
 
   return (
     <ColumnDiv style={{ width: '95%', maxHeight: '95%' }}>
@@ -118,267 +173,202 @@ export function EditPrompt(props: {
           padding: '10px',
         }}
       >
-        {promptTemplateCopy.openAiPromptSteps.map((openAiPromptStep, index) => (
-          <ColumnDiv
-            key={index}
-            style={{
-              minHeight: 'fit-content',
-              border: '1px solid grey',
-              padding: '10px',
-              margin: '10px',
-            }}
-          >
-            <Input
-              fullWidth
-              multiline
-              onFocus={() => {
-                setFocusedPromptIndex(index);
-              }}
+        {promptTemplateCopy.aiPromptSteps.map((openAiPromptStep, index) => {
+          const modelDisplay = openAiPromptStep.targetAiServiceModel
+            ? aiServiceModelToString(openAiPromptStep.targetAiServiceModel)
+            : aiServiceModelToString(defaultAiModel, true);
+
+          return (
+            <ColumnDiv
               key={index}
-              rows={focusedPromptIndex !== index ? 3 : undefined}
-              minRows={focusedPromptIndex === index ? 10 : 3}
-              disabled={inProgress}
-              value={openAiPromptStep.prompts[0].promptText}
-              placeholder={`Prompt ${index + 1}`}
-              onChange={(e) => {
-                setPromptTemplateCopy({
-                  ...promptTemplateCopy,
-                  openAiPromptSteps: promptTemplateCopy.openAiPromptSteps.map(
-                    (openAiPromptStep, openAiPromptStepIndex) => {
-                      if (openAiPromptStepIndex === index) {
-                        return {
-                          ...openAiPromptStep,
+              style={{
+                minHeight: 'fit-content',
+                border: '1px solid grey',
+                padding: '10px',
+                margin: '10px',
+              }}
+            >
+              <Input
+                fullWidth
+                multiline
+                onFocus={() => {
+                  setFocusedPromptIndex(index);
+                }}
+                key={index}
+                rows={focusedPromptIndex !== index ? 3 : undefined}
+                minRows={focusedPromptIndex === index ? 10 : 3}
+                disabled={inProgress}
+                value={openAiPromptStep.prompts[0].promptText}
+                placeholder={`Prompt ${index + 1}`}
+                onChange={(e) => {
+                  updateAiPromptStep(index, {
+                    prompts: [
+                      {
+                        ...openAiPromptStep.prompts[0],
+                        promptText: e.target.value,
+                      },
+                    ],
+                  });
+                }}
+              />
+              <ColumnDiv>
+                <FormControlLabel
+                  label="Include Chat Log as context?"
+                  style={{ height: 'fit-content', textAlign: 'center' }}
+                  control={
+                    <Checkbox
+                      checked={openAiPromptStep.includeChatLogContext}
+                      indeterminate={false}
+                      disabled={inProgress}
+                      onChange={(e) => {
+                        updateAiPromptStep(index, {
+                          includeChatLogContext: e.target.checked,
+                        });
+                      }}
+                    />
+                  }
+                />
+                <FormControlLabel
+                  label="Include Essay?"
+                  style={{ height: 'fit-content', textAlign: 'center' }}
+                  control={
+                    <Checkbox
+                      checked={openAiPromptStep.prompts[0].includeEssay}
+                      indeterminate={false}
+                      disabled={inProgress}
+                      onChange={(e) => {
+                        updateAiPromptStep(index, {
                           prompts: [
                             {
                               ...openAiPromptStep.prompts[0],
-                              promptText: e.target.value,
+                              includeEssay: e.target.checked,
                             },
                           ],
-                        };
-                      } else {
-                        return openAiPromptStep;
-                      }
-                    }
-                  ),
-                });
-              }}
-            />
-            <ColumnDiv>
-              <FormControlLabel
-                label="Include Chat Log as context?"
-                style={{ height: 'fit-content', textAlign: 'center' }}
-                control={
-                  <Checkbox
-                    checked={openAiPromptStep.includeChatLogContext}
-                    indeterminate={false}
-                    disabled={inProgress}
-                    onChange={(e) => {
-                      setPromptTemplateCopy({
-                        ...promptTemplateCopy,
-                        openAiPromptSteps:
-                          promptTemplateCopy.openAiPromptSteps.map(
-                            (openAiPromptStep, openAiPromptStepIndex) => {
-                              if (openAiPromptStepIndex === index) {
-                                return {
-                                  ...openAiPromptStep,
-                                  includeChatLogContext: e.target.checked,
-                                };
-                              } else {
-                                return openAiPromptStep;
-                              }
-                            }
-                          ),
-                      });
-                    }}
-                  />
-                }
-              />
-              <FormControlLabel
-                label="Include Essay?"
-                style={{ height: 'fit-content', textAlign: 'center' }}
-                control={
-                  <Checkbox
-                    checked={openAiPromptStep.prompts[0].includeEssay}
-                    indeterminate={false}
-                    disabled={inProgress}
-                    onChange={(e) => {
-                      setPromptTemplateCopy({
-                        ...promptTemplateCopy,
-                        openAiPromptSteps:
-                          promptTemplateCopy.openAiPromptSteps.map(
-                            (openAiPromptStep, openAiPromptStepIndex) => {
-                              if (openAiPromptStepIndex === index) {
-                                return {
-                                  ...openAiPromptStep,
-                                  prompts: [
-                                    {
-                                      ...openAiPromptStep.prompts[0],
-                                      includeEssay: e.target.checked,
-                                    },
-                                  ],
-                                };
-                              } else {
-                                return openAiPromptStep;
-                              }
-                            }
-                          ),
-                      });
-                    }}
-                  />
-                }
-              />
-              <FormControlLabel
-                label="Include user input?"
-                style={{ height: 'fit-content', textAlign: 'center' }}
-                control={
-                  <Checkbox
-                    checked={Boolean(
-                      openAiPromptStep.prompts[0].includeUserInput
-                    )}
-                    indeterminate={false}
-                    disabled={inProgress}
-                    onChange={(e) => {
-                      setPromptTemplateCopy({
-                        ...promptTemplateCopy,
-                        openAiPromptSteps:
-                          promptTemplateCopy.openAiPromptSteps.map(
-                            (openAiPromptStep, openAiPromptStepIndex) => {
-                              if (openAiPromptStepIndex === index) {
-                                return {
-                                  ...openAiPromptStep,
-                                  prompts: [
-                                    {
-                                      ...openAiPromptStep.prompts[0],
-                                      includeUserInput: e.target.checked,
-                                    },
-                                  ],
-                                };
-                              } else {
-                                return openAiPromptStep;
-                              }
-                            }
-                          ),
-                      });
-                    }}
-                  />
-                }
-              />
-              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id="demo-simple-select-standard-label">
-                  Custom System Role
-                </InputLabel>
-                <Input
-                  value={openAiPromptStep.customSystemRole}
-                  multiline
-                  maxRows={4}
-                  onChange={(e) => {
-                    setPromptTemplateCopy({
-                      ...promptTemplateCopy,
-                      openAiPromptSteps:
-                        promptTemplateCopy.openAiPromptSteps.map(
-                          (openAiPromptStep, openAiPromptStepIndex) => {
-                            if (openAiPromptStepIndex === index) {
-                              return {
-                                ...openAiPromptStep,
-                                customSystemRole: e.target.value,
-                              };
-                            } else {
-                              return openAiPromptStep;
-                            }
-                          }
-                        ),
-                    });
-                  }}
-                  // label="Custom System Role"
+                        });
+                      }}
+                    />
+                  }
                 />
-              </FormControl>
+                <FormControlLabel
+                  label="Include user input?"
+                  style={{ height: 'fit-content', textAlign: 'center' }}
+                  control={
+                    <Checkbox
+                      checked={Boolean(
+                        openAiPromptStep.prompts[0].includeUserInput
+                      )}
+                      indeterminate={false}
+                      disabled={inProgress}
+                      onChange={(e) => {
+                        updateAiPromptStep(index, {
+                          prompts: [
+                            {
+                              ...openAiPromptStep.prompts[0],
+                              includeUserInput: e.target.checked,
+                            },
+                          ],
+                        });
+                      }}
+                    />
+                  }
+                />
+                <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                  <InputLabel id="demo-simple-select-standard-label">
+                    Custom System Role
+                  </InputLabel>
+                  <Input
+                    value={openAiPromptStep.systemRole}
+                    multiline
+                    maxRows={4}
+                    onChange={(e) => {
+                      updateAiPromptStep(index, {
+                        systemRole: e.target.value,
+                      });
+                    }}
+                    // label="Custom System Role"
+                  />
+                </FormControl>
 
-              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id="demo-simple-select-standard-label">
-                  Output Data Type
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-standard-label"
-                  id="demo-simple-select-standard"
-                  value={openAiPromptStep.outputDataType}
-                  onChange={(e) => {
-                    setPromptTemplateCopy({
-                      ...promptTemplateCopy,
-                      openAiPromptSteps:
-                        promptTemplateCopy.openAiPromptSteps.map(
-                          (openAiPromptStep, openAiPromptStepIndex) => {
-                            if (openAiPromptStepIndex === index) {
-                              return {
-                                ...openAiPromptStep,
-                                outputDataType: e.target
-                                  .value as PromptOutputTypes,
-                              };
-                            } else {
-                              return openAiPromptStep;
-                            }
-                          }
-                        ),
-                    });
-                  }}
-                  label="Output Data Type"
-                >
-                  <MenuItem value={PromptOutputTypes.TEXT}>TEXT</MenuItem>
-                  <MenuItem value={PromptOutputTypes.JSON}>JSON</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id="select-gpt-model">GPT Model</InputLabel>
-                <Select
-                  labelId="select-gpt-model"
-                  id="gpt-model-select"
-                  value={openAiPromptStep.targetGptModel}
-                  onChange={(e) => {
-                    setPromptTemplateCopy({
-                      ...promptTemplateCopy,
-                      openAiPromptSteps:
-                        promptTemplateCopy.openAiPromptSteps.map(
-                          (openAiPromptStep, openAiPromptStepIndex) => {
-                            if (openAiPromptStepIndex === index) {
-                              return {
-                                ...openAiPromptStep,
-                                targetGptModel: e.target.value as GptModels,
-                              };
-                            } else {
-                              return openAiPromptStep;
-                            }
-                          }
-                        ),
-                    });
-                  }}
-                  label="Output Data Type"
-                >
-                  <MenuItem value={GptModels.GPT_3_5}>GPT 3.5</MenuItem>
-                  <MenuItem value={GptModels.GPT_4}>GPT 4</MenuItem>
-                  <MenuItem value={GptModels.GPT_4_TURBO_PREVIEW}>
-                    GPT 4 Turbo Preview (128k token context)
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </ColumnDiv>
-            <Button
-              disabled={inProgress}
-              onClick={() => {
-                setPromptTemplateCopy({
-                  ...promptTemplateCopy,
-                  openAiPromptSteps:
-                    promptTemplateCopy.openAiPromptSteps.filter(
+                <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                  <InputLabel id="demo-simple-select-standard-label">
+                    Output Data Type
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={openAiPromptStep.outputDataType}
+                    onChange={(e) => {
+                      updateAiPromptStep(index, {
+                        outputDataType: e.target.value as PromptOutputTypes,
+                      });
+                    }}
+                    label="Output Data Type"
+                  >
+                    <MenuItem value={PromptOutputTypes.TEXT}>TEXT</MenuItem>
+                    <MenuItem value={PromptOutputTypes.JSON}>JSON</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                  <InputLabel id="select-gpt-model">GPT Model</InputLabel>
+                  <Select
+                    labelId="select-gpt-model"
+                    id="gpt-model-select"
+                    value={modelDisplay}
+                    onChange={(e) => {
+                      const targetAiServiceModel: AiServiceModel | undefined = e
+                        .target.value
+                        ? aiServiceModelStringParse(e.target.value)
+                        : undefined;
+                      updateAiPromptStep(index, {
+                        targetAiServiceModel: targetAiServiceModel,
+                      });
+                    }}
+                  >
+                    <MenuItem
+                      value={aiServiceModelToString(defaultAiModel, true)}
+                    >
+                      {aiServiceModelToString(defaultAiModel, true)}
+                    </MenuItem>
+                    {availableAiServiceModels?.map((serviceAndModels) => {
+                      return serviceAndModels.models.map((model, j) => {
+                        return (
+                          <MenuItem
+                            key={j}
+                            value={aiServiceModelToString({
+                              serviceName: serviceAndModels.serviceName,
+                              model: model,
+                            })}
+                          >
+                            {aiServiceModelToString({
+                              serviceName: serviceAndModels.serviceName,
+                              model: model,
+                            })}
+                          </MenuItem>
+                        );
+                      });
+                    })}
+                  </Select>
+                </FormControl>
+              </ColumnDiv>
+              <Button
+                disabled={inProgress}
+                onClick={() => {
+                  setPromptTemplateCopy({
+                    ...promptTemplateCopy,
+                    aiPromptSteps: promptTemplateCopy.aiPromptSteps.filter(
                       (step, stepIndex) => {
                         return stepIndex !== index;
                       }
                     ),
-                });
-              }}
-              style={{ height: 'fit-content' }}
-            >
-              Delete
-            </Button>
-          </ColumnDiv>
-        ))}
+                  });
+                }}
+                style={{ height: 'fit-content' }}
+              >
+                Delete
+              </Button>
+            </ColumnDiv>
+          );
+        })}
       </div>
       {inProgress ? (
         <CircularProgress style={{ alignSelf: 'center' }} />
@@ -389,10 +379,9 @@ export function EditPrompt(props: {
               onClick={() => {
                 setPromptTemplateCopy({
                   ...promptTemplateCopy,
-                  openAiPromptSteps:
-                    promptTemplateCopy.openAiPromptSteps.concat(
-                      emptyOpenAiPromptStep
-                    ),
+                  aiPromptSteps: promptTemplateCopy.aiPromptSteps.concat(
+                    emptyOpenAiPromptStep()
+                  ),
                 });
               }}
             >
@@ -408,30 +397,7 @@ export function EditPrompt(props: {
             </Button>
             <Button
               data-cy="run-prompt-button"
-              onClick={async () => {
-                if (!userId) {
-                  return;
-                }
-                setInProgress(true);
-                try {
-                  const res = await asyncPromptExecute(
-                    googleDocId,
-                    promptTemplateCopy.openAiPromptSteps,
-                    userId,
-                    systemPrompt,
-                    overrideGptModel
-                  );
-                  setPreviousRuns((prevRuns) => {
-                    return [...prevRuns, res];
-                  });
-                  setRunToView(res);
-                } catch (err) {
-                  const error = extractErrorMessageFromError(err);
-                  setError(error);
-                } finally {
-                  setInProgress(false);
-                }
-              }}
+              onClick={runPrompt}
               size={'large'}
             >
               Run
@@ -475,12 +441,12 @@ export function EditPrompt(props: {
           setViewPrevRunResults(false);
         }}
         previousRuns={previousRuns}
-        setRunToView={(run?: MultistepPromptRes) => {
+        setRunToView={(run?: AiServicesResponseTypes) => {
           setRunToView(run);
         }}
       />
       <ViewPreviousRunModal
-        previousRun={runToView}
+        previousRunStepData={runToView?.aiAllStepsData}
         open={Boolean(runToView)}
         close={() => {
           setRunToView(undefined);

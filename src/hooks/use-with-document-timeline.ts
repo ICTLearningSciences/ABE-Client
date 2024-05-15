@@ -10,7 +10,7 @@ import {
   GQLDocumentTimeline,
   GQLTimelinePoint,
   JobStatus,
-  OpenAiGenerationStatus,
+  AiGenerationStatus,
   TimelinePointType,
 } from '../types';
 import {
@@ -26,6 +26,7 @@ import {
 import { LoadingStatusType } from './generic-loading-reducer';
 import { CancelToken } from 'axios';
 import { pollUntilTrue } from './use-with-synchronous-polling';
+import { useWithConfig } from '../store/slices/config/use-with-config';
 
 const initialState: TimelineState = {
   status: LoadingStatusType.NONE,
@@ -56,10 +57,10 @@ const startPoint: GQLTimelinePoint = {
   },
   intent: '',
   changeSummary: '',
-  changeSummaryStatus: OpenAiGenerationStatus.COMPLETED,
+  changeSummaryStatus: AiGenerationStatus.COMPLETED,
   userInputSummary: '',
   reverseOutline: 'No outline available',
-  reverseOutlineStatus: OpenAiGenerationStatus.COMPLETED,
+  reverseOutlineStatus: AiGenerationStatus.COMPLETED,
   relatedFeedback: '',
 };
 
@@ -100,12 +101,17 @@ export function addStartPointToTimeline(timeline: GQLDocumentTimeline) {
 
 export function useWithDocumentTimeline() {
   const [state, dispatch] = useReducer(TimelineReducer, initialState);
+  const { state: config } = useWithConfig();
+
   async function asyncFetchDocTimeline(
     userId: string,
     docId: string,
     cancelToken?: CancelToken
   ): Promise<void> {
-    if (state.status === LoadingStatusType.LOADING) {
+    if (
+      state.status === LoadingStatusType.LOADING ||
+      !config.config?.defaultAiModel
+    ) {
       return;
     }
     try {
@@ -113,6 +119,7 @@ export function useWithDocumentTimeline() {
       const docTimelineJobId = await asyncRequestDocTimeline(
         userId,
         docId,
+        config.config.defaultAiModel,
         cancelToken
       );
       const pollFunction = () => {
@@ -147,6 +154,7 @@ export function useWithDocumentTimeline() {
     } catch (e: any) {
       dispatch({
         type: TimelineActionType.LOADING_FAILED,
+
         errorPayload: {
           error: e,
           message: JSON.stringify(e.message),

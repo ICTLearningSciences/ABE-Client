@@ -178,10 +178,7 @@ export function sSelectIntendedImprovement(
                 MCQ_BRAINSTORM,
                 ...suggestedImprovementsRes.suggestedImprovements,
               ],
-              openAiInfo: {
-                openAiPrompt: res.openAiData[0].openAiPrompt,
-                openAiResponse: res.openAiData[0].openAiResponse,
-              },
+              aiServiceStepData: res.aiAllStepsData,
             });
             setWaitingForUserAnswer(true);
           }
@@ -222,10 +219,7 @@ export function sSelectIntendedImprovement(
                 analyzeRevisionIntention,
                 allActivityMessages
               ),
-              openAiInfo: {
-                openAiPrompt: res.openAiData[0].openAiPrompt,
-                openAiResponse: res.openAiData[0].openAiResponse,
-              },
+              aiServiceStepData: res.aiAllStepsData,
             });
             setState((prevValue) => ({
               ...prevValue,

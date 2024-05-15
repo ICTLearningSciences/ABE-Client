@@ -11,7 +11,7 @@ import {
   ActivityGQL,
   ActivityPrompt,
   GQLPrompt,
-  OpenAiPromptStep,
+  AiPromptStep,
   PromptOutputTypes,
   PromptRoles,
 } from '../../types';
@@ -23,19 +23,19 @@ import {
 } from './prompt-editing/saved-prompts-view';
 import { SavedActivityPromptsView } from './prompt-editing/saved-activity-prompts-view';
 import { isPromptInActivity } from '../../helpers';
-import { DEFAULT_GPT_MODEL } from '../../constants';
 import { EditPrompt } from './prompt-editing/edit-prompt';
 
-export const emptyOpenAiPromptStep: OpenAiPromptStep = {
-  prompts: [
-    {
-      promptText: '',
-      includeEssay: true,
-      promptRole: PromptRoles.USER,
-    },
-  ],
-  targetGptModel: DEFAULT_GPT_MODEL,
-  outputDataType: PromptOutputTypes.TEXT,
+export const emptyOpenAiPromptStep = (): AiPromptStep => {
+  return {
+    prompts: [
+      {
+        promptText: '',
+        includeEssay: true,
+        promptRole: PromptRoles.USER,
+      },
+    ],
+    outputDataType: PromptOutputTypes.TEXT,
+  };
 };
 
 export function MultiPromptTesting(props: {
@@ -163,7 +163,7 @@ export function MultiPromptTesting(props: {
               _id: newId,
               title: '',
               clientId: newId,
-              openAiPromptSteps: [emptyOpenAiPromptStep],
+              aiPromptSteps: [emptyOpenAiPromptStep()],
             });
             setTargetPromptId(newId);
           }}

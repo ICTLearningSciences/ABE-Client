@@ -23,10 +23,9 @@ import { useAppSelector } from '../../../store/hooks';
 import {
   ActivityGQL,
   ActivityStepTypes,
+  AiServiceModel,
   DocGoal,
-  OpenAiReqRes,
 } from '../../../types';
-import OpenAiInfoModal from './open-ai-info-modal';
 import SystemPromptModal from './system-prompt-modal';
 import { useWithSystemPromptsConfig } from '../../../hooks/use-with-system-prompts-config';
 import { UserRole } from '../../../store/slices/login';
@@ -40,20 +39,21 @@ import Message from './message';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { UseWithPrompts } from '../../../hooks/use-with-prompts';
 import { v4 as uuidv4 } from 'uuid';
-import { GptModels } from '../../../constants';
+import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
+import {
+  aiServiceModelStringParse,
+  aiServiceModelToString,
+} from '../../../helpers';
+import ViewPreviousRunModal from '../../admin-view/view-previous-run-modal';
 
 function ChatMessagesContainer(props: {
   coachResponsePending: boolean;
   googleDocId: string;
-  setOpenAiInfoToDisplay: (openAiInfo?: OpenAiReqRes) => void;
+  setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
   sendMessage: (message: ChatMessageTypes) => void;
 }): JSX.Element {
-  const {
-    coachResponsePending,
-    googleDocId,
-    setOpenAiInfoToDisplay,
-    sendMessage,
-  } = props;
+  const { coachResponsePending, googleDocId, setAiInfoToDisplay, sendMessage } =
+    props;
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
   const { state } = useWithChat();
@@ -123,11 +123,12 @@ function ChatMessagesContainer(props: {
             <Message
               key={index}
               message={message}
-              setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
+              setAiInfoToDisplay={setAiInfoToDisplay}
               messageIndex={index}
             />
             {message.mcqChoices && index === chatMessages.length - 1 && (
               <div
+                key={`mcq-choices-${index}`}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -154,6 +155,9 @@ function ChatMessagesContainer(props: {
                           displayType: MessageDisplayType.TEXT,
                           userInputType: UserInputType.MCQ,
                         });
+                        if (message.retryFunction) {
+                          message.retryFunction();
+                        }
                       }}
                     >
                       {choice}
@@ -272,7 +276,7 @@ export default function Chat(props: {
   useWithPrompts: UseWithPrompts;
 }) {
   const { selectedGoal, selectedActivity, editDocGoal, useWithPrompts } = props;
-  const { sendMessage, state: chatState, setSystemPrompt } = useWithChat();
+  const { sendMessage, state: chatState, setSystemRole } = useWithChat();
   const {
     editedData: systemPromptData,
     editOrAddSystemPrompt,
@@ -281,7 +285,10 @@ export default function Chat(props: {
     deleteSystemPrompt,
     isSaving,
   } = useWithSystemPromptsConfig();
-  const { overrideOpenAiModel, state } = useWithState();
+  const availableAiServiceModels = useAppSelector(
+    (state) => state.config.config?.availableAiServiceModels
+  );
+  const { overrideAiModel, state } = useWithState();
   const { userActivityStates, googleDocId } = state;
   const coachResponsePending = useAppSelector(
     (state) => state.chat.coachResponsePending
@@ -310,13 +317,13 @@ export default function Chat(props: {
           messages[messages.length - 1].activityStep?.stepType !==
             ActivityStepTypes.FREE_RESPONSE_QUESTION
       ));
-  const [openAiInfoToDisplay, setOpenAiInfoToDisplay] =
-    useState<OpenAiReqRes>();
+  const [openAiInfoToDisplay, setAiInfoToDisplay] =
+    useState<AiServiceStepDataTypes[]>();
   const [viewSystemPrompts, setViewSystemPrompts] = useState<boolean>(false);
   const [targetSystemPrompt, setTargetSystemPrompt] = useState<number>(0);
   const [viewActivitySummary, setViewActivitySummary] =
     useState<boolean>(false);
-  const systemPrompt = systemPromptData
+  const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
     : '';
   const currentActivitySummary = userActivityStates.find(
@@ -326,8 +333,8 @@ export default function Chat(props: {
   )?.metadata;
 
   useEffect(() => {
-    setSystemPrompt(systemPrompt);
-  }, [systemPrompt]);
+    setSystemRole(systemRole);
+  }, [systemRole]);
 
   function ChatHeaderGenerator(): JSX.Element {
     // if (!selectedGoal && !selectedActivity)
@@ -410,7 +417,7 @@ export default function Chat(props: {
               }}
               coachResponsePending={coachResponsePending}
               googleDocId={googleDocId}
-              setOpenAiInfoToDisplay={setOpenAiInfoToDisplay}
+              setAiInfoToDisplay={setAiInfoToDisplay}
             />
             <ChatInput
               sendMessage={(message) => {
@@ -422,25 +429,45 @@ export default function Chat(props: {
             {userIsAdmin && state.viewingAdvancedOptions && (
               <RowDiv>
                 <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                  <InputLabel size="small" id="override-gpt-model">
+                  <InputLabel size="small" id="override-ai-service-model">
                     Override Model
                   </InputLabel>
                   <Select
-                    labelId="override-gpt-model"
-                    id="gpt-model-override"
+                    labelId="override-ai-service-model"
+                    id="ai-service-override"
                     value={
-                      state.overideGptModel === GptModels.NONE
-                        ? ''
-                        : state.overideGptModel
+                      state.overrideAiServiceModel
+                        ? aiServiceModelToString(state.overrideAiServiceModel)
+                        : ''
                     }
                     onChange={(e) => {
-                      overrideOpenAiModel(e.target.value as GptModels);
+                      const targetAiServiceModel: AiServiceModel | undefined =
+                        e.target.value == 'CLEAR'
+                          ? undefined
+                          : aiServiceModelStringParse(e.target.value);
+                      overrideAiModel(targetAiServiceModel);
                     }}
                     label="Output Data Type"
                   >
-                    <MenuItem value={GptModels.NONE}>None</MenuItem>
-                    <MenuItem value={GptModels.GPT_3_5}>GPT 3.5</MenuItem>
-                    <MenuItem value={GptModels.GPT_4}>GPT 4</MenuItem>
+                    <MenuItem value={'CLEAR'}>CLEAR</MenuItem>
+                    {availableAiServiceModels?.map((serviceAndModels) => {
+                      return serviceAndModels.models.map((model, j) => {
+                        return (
+                          <MenuItem
+                            key={j}
+                            value={aiServiceModelToString({
+                              serviceName: serviceAndModels.serviceName,
+                              model: model,
+                            })}
+                          >
+                            {aiServiceModelToString({
+                              serviceName: serviceAndModels.serviceName,
+                              model: model,
+                            })}
+                          </MenuItem>
+                        );
+                      });
+                    })}
                   </Select>
                 </FormControl>
                 <RowDiv
@@ -450,7 +477,7 @@ export default function Chat(props: {
                   }}
                 >
                   <h5>{'System Prompt: '}</h5>
-                  <SmallGreyText>{systemPrompt}</SmallGreyText>
+                  <SmallGreyText>{systemRole}</SmallGreyText>
                   <Button
                     onClick={() => {
                       setViewSystemPrompts(true);
@@ -478,10 +505,11 @@ export default function Chat(props: {
               }}
             />
           )}
-          <OpenAiInfoModal
-            openAiInfo={openAiInfoToDisplay}
+          <ViewPreviousRunModal
+            previousRunStepData={openAiInfoToDisplay}
+            open={Boolean(openAiInfoToDisplay)}
             close={() => {
-              setOpenAiInfoToDisplay(undefined);
+              setAiInfoToDisplay(undefined);
             }}
           />
           <ActivitySummaryModal

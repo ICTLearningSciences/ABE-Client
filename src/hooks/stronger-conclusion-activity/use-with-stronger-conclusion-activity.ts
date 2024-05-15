@@ -221,12 +221,12 @@ export function useWithStrongerConclusionActivity(
         await executePrompt(
           () => analyzeConclusionPrompt,
           (res) => {
-            if (!res.openAiData || res.openAiData.length < 2) {
+            if (!res.aiAllStepsData || res.aiAllStepsData.length < 2) {
               throw new Error('Missing step data');
             }
             const firstStepRes =
-              res.openAiData[0].openAiResponse[0].message.content || '';
-            // const secondStepRes = res.openAiData[1].openAiResponse[0].message.content || "";
+              res.aiAllStepsData[0].aiServiceResponse[0].message.content || '';
+            // const secondStepRes = res.aiStepData[1].aiServiceResponse[0].message.content || "";
             const audienceImplicationContentRes =
               validateJsonResponse<AnalyzeConclusionFirstStep>(
                 firstStepRes,
@@ -264,10 +264,7 @@ export function useWithStrongerConclusionActivity(
                     sender: Sender.SYSTEM,
                     displayType: MessageDisplayType.TEXT,
                     activityStep: introStep(stepData),
-                    openAiInfo: {
-                      openAiPrompt: res.openAiData[0].openAiPrompt,
-                      openAiResponse: res.openAiData[0].openAiResponse,
-                    },
+                    aiServiceStepData: res.aiAllStepsData,
                   },
                   false,
                   googleDocId
@@ -316,10 +313,7 @@ export function useWithStrongerConclusionActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: i2CollectAuthorOriginalIntentionStep(stepData),
-                openAiInfo: {
-                  openAiPrompt: res.openAiData[0].openAiPrompt,
-                  openAiResponse: res.openAiData[0].openAiResponse,
-                },
+                aiServiceStepData: res.aiAllStepsData,
               },
               false,
               googleDocId
@@ -359,10 +353,7 @@ export function useWithStrongerConclusionActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: i3SoWhatQuestionStep(stepData),
-                openAiInfo: {
-                  openAiPrompt: res.openAiData[0].openAiPrompt,
-                  openAiResponse: res.openAiData[0].openAiResponse,
-                },
+                aiServiceStepData: res.aiAllStepsData,
               },
               false,
               googleDocId
@@ -404,10 +395,7 @@ export function useWithStrongerConclusionActivity(
                   mcqChoices: [MCQ_READY_TO_REVISE],
                   displayType: MessageDisplayType.TEXT,
                   activityStep: impactDiscussionStep(stepData),
-                  openAiInfo: {
-                    openAiPrompt: res.openAiData[0].openAiPrompt,
-                    openAiResponse: res.openAiData[0].openAiResponse,
-                  },
+                  aiServiceStepData: res.aiAllStepsData,
                 },
                 false,
                 googleDocId
@@ -447,10 +435,7 @@ export function useWithStrongerConclusionActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: i5CollectProposedRevisionStep(stepData),
-                openAiInfo: {
-                  openAiPrompt: res.openAiData[0].openAiPrompt,
-                  openAiResponse: res.openAiData[0].openAiResponse,
-                },
+                aiServiceStepData: res.aiAllStepsData,
               },
               false,
               googleDocId

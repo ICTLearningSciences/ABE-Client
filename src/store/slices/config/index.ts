@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as api from '../../../hooks/api';
-import { Config } from '../../../types';
+import { AiServiceModel, Config } from '../../../types';
 
 export enum ConfigStatus {
   NONE = 0,
@@ -57,7 +57,21 @@ export const configSlice = createSlice({
         state.status = ConfigStatus.IN_PROGRESS;
       })
       .addCase(getConfig.fulfilled, (state, action) => {
-        state.config = action.payload;
+        const availableAiServiceModels =
+          action.payload.availableAiServiceModels;
+        const firstAvailableAiServiceModel: AiServiceModel | undefined =
+          availableAiServiceModels && availableAiServiceModels.length > 0
+            ? {
+                serviceName: availableAiServiceModels[0].serviceName,
+                model: availableAiServiceModels[0].models[0],
+              }
+            : undefined;
+        const defaultAiModel =
+          action.payload.defaultAiModel || firstAvailableAiServiceModel;
+        state.config = {
+          ...action.payload,
+          defaultAiModel,
+        };
         state.status = ConfigStatus.SUCCEEDED;
       })
       .addCase(getConfig.rejected, (state) => {

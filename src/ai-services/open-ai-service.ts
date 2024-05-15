@@ -4,45 +4,23 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
+import OpenAI from 'openai';
+import {
+  AiResponseType,
+  AiJobStatusType,
+  AiStepData,
+} from './ai-service-types';
 
-export const activityQueryData = `
-_id
-title
-steps{
-    messages{
-      _id
-      text
-    }
-    stepName
-    stepType
-    mcqChoices
-    prompts
-}
-description
-responsePendingMessage
-responseReadyMessage
-newDocRecommend
-introduction
-disabled
-displayIcon
-prompt{
-  _id
-  aiPromptSteps{
-    prompts{
-      promptText
-      includeEssay
-      includeUserInput
-      promptRole
-    }
-    outputDataType
-    includeChatLogContext
-  }
-  title
-  userInputIsIntention
-}
-prompts{
-  _id
-  promptId
-  order
-}
-`;
+// The typing for params sent to open ai and the response received
+export type OpenAiReqType = ChatCompletionCreateParamsNonStreaming;
+export type OpenAiResType = OpenAI.Chat.Completions.ChatCompletion.Choice[];
+
+// The data sent to/received from the AI service, unprocessed
+export type OpenAiStepDataType = AiStepData<OpenAiReqType, OpenAiResType>;
+
+// The data received from our API, processed
+export type OpenAiServiceResponse = AiResponseType<OpenAiStepDataType>;
+
+export type OpenAiServiceJobStatusResponseType =
+  AiJobStatusType<OpenAiServiceResponse>;

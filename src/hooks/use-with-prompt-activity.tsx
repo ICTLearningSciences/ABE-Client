@@ -22,7 +22,6 @@ import {
 import { StepData } from './use-with-stronger-hook-activity';
 import { useAppSelector } from '../store/hooks';
 import { v4 as uuidv4 } from 'uuid';
-import { DEFAULT_GPT_MODEL } from '../constants';
 
 const MCQ_READY = 'Ready';
 const MCQ_ANALYZE = 'Analyze';
@@ -36,7 +35,7 @@ export const freeInputPrompt = (chatLog: ChatMessageTypes[]): GQLPrompt => {
   return {
     _id: '',
     clientId: '',
-    openAiPromptSteps: [
+    aiPromptSteps: [
       {
         prompts: [
           {
@@ -45,7 +44,6 @@ export const freeInputPrompt = (chatLog: ChatMessageTypes[]): GQLPrompt => {
           },
         ],
         outputDataType: PromptOutputTypes.TEXT,
-        targetGptModel: DEFAULT_GPT_MODEL,
         includeChatLogContext: true,
       },
     ],
@@ -104,10 +102,7 @@ export function useWithPromptActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: introStep(stepData),
-                openAiInfo: {
-                  openAiPrompt: response.openAiData[0].openAiPrompt,
-                  openAiResponse: response.openAiData[0].openAiResponse,
-                },
+                aiServiceStepData: response.aiAllStepsData,
               },
               false,
               googleDocId
@@ -138,10 +133,7 @@ export function useWithPromptActivity(
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
                   activityStep: freeInputStep(stepData),
-                  openAiInfo: {
-                    openAiPrompt: response.openAiData[0].openAiPrompt,
-                    openAiResponse: response.openAiData[0].openAiResponse,
-                  },
+                  aiServiceStepData: response.aiAllStepsData,
                 },
                 false,
                 googleDocId
@@ -171,10 +163,7 @@ export function useWithPromptActivity(
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
                 activityStep: freeInputStep(stepData),
-                openAiInfo: {
-                  openAiPrompt: response.openAiData[0].openAiPrompt,
-                  openAiResponse: response.openAiData[0].openAiResponse,
-                },
+                aiServiceStepData: response.aiAllStepsData,
               },
               false,
               googleDocId

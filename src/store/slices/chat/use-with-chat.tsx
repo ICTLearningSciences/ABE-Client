@@ -30,7 +30,7 @@ interface UseWithChat {
   coachResponsePending: (waiting: boolean) => void;
   clearChatLog: (docId: string) => void;
   chatLogToString: (docId: string) => string;
-  setSystemPrompt: (prompt: string) => void;
+  setSystemRole: (prompt: string) => void;
 }
 
 export function useWithChat(): UseWithChat {
@@ -81,7 +81,7 @@ export function useWithChat(): UseWithChat {
     dispatch(clearChat(docId));
   }
 
-  function setSystemPrompt(prompt: string) {
+  function setSystemRole(prompt: string) {
     dispatch(updateSystemPrompt(prompt));
   }
 
@@ -101,6 +101,6 @@ export function useWithChat(): UseWithChat {
     coachResponsePending,
     clearChatLog,
     chatLogToString,
-    setSystemPrompt,
+    setSystemRole,
   };
 }

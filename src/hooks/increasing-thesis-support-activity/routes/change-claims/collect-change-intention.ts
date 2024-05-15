@@ -72,10 +72,7 @@ export function cCollectIntentionStep(
                 allActivityMessages
               ),
               mcqChoices: [MCQ_BRAINSTORM],
-              openAiInfo: {
-                openAiPrompt: res.openAiData[0].openAiPrompt,
-                openAiResponse: res.openAiData[0].openAiResponse,
-              },
+              aiServiceStepData: res.aiAllStepsData,
             });
           }
         );
@@ -122,10 +119,7 @@ export function cCollectIntentionStep(
                 analyzeIntendedClaimUsagePrompt,
                 allActivityMessages
               ),
-              openAiInfo: {
-                openAiPrompt: res.openAiData[0].openAiPrompt,
-                openAiResponse: res.openAiData[0].openAiResponse,
-              },
+              aiServiceStepData: res.aiAllStepsData,
             });
             if (claimAction === ClaimAction.ADDING) {
               setState((prevState) => {

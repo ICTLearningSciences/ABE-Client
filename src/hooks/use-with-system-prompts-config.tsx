@@ -42,7 +42,7 @@ export function useWithSystemPromptsConfig() {
   }
 
   function saveWrapper(value: string[]) {
-    return updateConfigByKey('openaiSystemPrompt', value);
+    return updateConfigByKey('aiSystemPrompt', value);
   }
 
   function save() {

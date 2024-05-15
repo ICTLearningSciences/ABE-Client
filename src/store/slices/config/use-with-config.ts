@@ -4,7 +4,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect } from 'react';
 import * as config from '.';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
@@ -13,24 +12,26 @@ export interface UseWithConfig {
   loadConfig: () => void;
   isConfigLoaded: () => boolean;
   updateConfig: (accessToken: string, key: string, value: string) => void;
+  loadFailed: () => boolean;
 }
 
 export function useWithConfig(): UseWithConfig {
   const dispatch = useAppDispatch();
   const state = useAppSelector((state) => state.config);
 
-  useEffect(() => {
-    loadConfig();
-  }, []);
-
   function isConfigLoaded(): boolean {
     return state.status === config.ConfigStatus.SUCCEEDED;
+  }
+
+  function loadFailed(): boolean {
+    return state.status === config.ConfigStatus.FAILED;
   }
 
   function loadConfig() {
     if (
       state.status === config.ConfigStatus.NONE ||
-      state.status === config.ConfigStatus.FAILED
+      state.status === config.ConfigStatus.FAILED ||
+      state.status === config.ConfigStatus.SUCCEEDED
     ) {
       dispatch(config.getConfig());
     }
@@ -45,5 +46,6 @@ export function useWithConfig(): UseWithConfig {
     loadConfig,
     isConfigLoaded,
     updateConfig,
+    loadFailed,
   };
 }

@@ -5,10 +5,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { JobStatus, OpenAiJobStatusApiRes } from "../../helpers/types";
+import { JobStatus, AiJobStatusApiRes } from "../../helpers/types";
 
 
-export const analyzeHookResponse = (emotionRating: number, narrativityRating: number, jobStatus?: JobStatus): OpenAiJobStatusApiRes => {
+export const analyzeHookResponse = (emotionRating: number, narrativityRating: number, jobStatus?: JobStatus): AiJobStatusApiRes => {
     let finalJustification = "";
     if (emotionRating >=1 && emotionRating <= 3) {
         finalJustification += "Your hook mostly lacks any emotion.";
@@ -25,10 +25,10 @@ export const analyzeHookResponse = (emotionRating: number, narrativityRating: nu
     
     return {
         response: {
-            "openAiResponse": {
-                "openAiData": [
+            "aiServiceResponse": {
+                "aiAllStepsData": [
                     {
-                        "openAiPrompt": {
+                        "aiServiceRequestParams": {
                             "messages": [
                                 {
                                     "role": "system",
@@ -41,7 +41,7 @@ export const analyzeHookResponse = (emotionRating: number, narrativityRating: nu
                             ],
                             "model": "gpt-3.5-turbo-16k"
                         },
-                        "openAiResponse": [
+                        "aiServiceResponse": [
                             {
                                 "index": 0,
                                 "message": {

@@ -74,7 +74,7 @@ interface StaticResponse {
 interface MockGraphQLQuery {
   query: string;
   data: any | any[];
-  params?: { statusCode: number };
+  params?: { statusCode?: number, delayMs?: number };
 }
 
 function staticResponse(s: StaticResponse): StaticResponse {
@@ -102,7 +102,7 @@ export function cyInterceptGraphQL(
   for (const mock of mocks) {
     queryCalls[mock.query] = 0;
   }
-  cy.intercept('/graphql/graphql', (req) => {
+  cy.intercept('**/graphql', (req) => {
     const { body } = req;
     const queryBody = body.query.replace(/\s+/g, ' ').replace('\n', '').trim();
     let handled = false;
@@ -121,6 +121,7 @@ export function cyInterceptGraphQL(
               data: body,
               errors: null,
             },
+            delayMs: mock.params?.delayMs || 0,
           })
         );
         queryCalls[mock.query] += 1;
@@ -138,7 +139,7 @@ export function cyInterceptGraphQL(
 export function mockGQL(
   query: string,
   data: any | any[],
-  params?: { statusCode: number }
+  params?: { statusCode?: number, delayMs?: number }
 ): MockGraphQLQuery {
   return {
     query,
@@ -329,7 +330,7 @@ export function cyMockOpenAiCall(
     );
   });
   cy.intercept('**/async_open_ai_doc_question_status/**', (req) => {
-    req.alias = 'openAiResponse';
+    req.alias = 'aiServiceResponse';
     req.reply(
       staticResponse({
         statusCode: params.statusCode || 200,
