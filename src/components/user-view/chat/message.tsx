@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@mui/material';
-import { DARK_BLUE_HEX, LIGHT_BLUE_HEX } from '../../../constants';
+import { DEFAULT_COLOR_THEME } from '../../../constants';
 import {
   ChatMessageTypes,
   MessageDisplayType,
@@ -92,9 +92,13 @@ export default function Message(props: {
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
   messageIndex: number;
 }): JSX.Element {
+  const config = useAppSelector((state) => state.config);
+  const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
   const { message, setAiInfoToDisplay, messageIndex } = props;
   const backgroundColor =
-    message.sender === Sender.USER ? LIGHT_BLUE_HEX : DARK_BLUE_HEX;
+    message.sender === Sender.USER
+      ? colorTheme.chatUserBubbleColor
+      : colorTheme.chatSystemBubbleColor;
   const alignSelf = message.sender === Sender.USER ? 'flex-end' : 'flex-start';
   const textColor = message.sender === Sender.USER ? 'black' : 'white';
 

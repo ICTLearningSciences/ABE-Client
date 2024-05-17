@@ -4,12 +4,19 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { Button, FormControlLabel, IconButton, Switch } from '@mui/material';
+import {
+  Button,
+  FormControlLabel,
+  IconButton,
+  Switch,
+  ThemeProvider,
+  createTheme,
+} from '@mui/material';
 import React from 'react';
 import { UseWithLogin } from '../store/slices/login/use-with-login';
 import { useAppSelector } from '../store/hooks';
 import { LoginStatus, UserRole } from '../store/slices/login';
-import { BLUE_HEX, MOBILE_CUTOFF_SIZE } from '../constants';
+import { DEFAULT_COLOR_THEME, MOBILE_CUTOFF_SIZE } from '../constants';
 import HeaderLogo from '../static-images/gold_white_logo.png';
 import { Home } from '@mui/icons-material';
 import { useWithWindowSize } from '../hooks/use-with-window-size';
@@ -29,105 +36,149 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
   const { width: windowWidth } = useWithWindowSize();
   const navigate = useNavigate();
   const headerSize = windowWidth < MOBILE_CUTOFF_SIZE ? '400px' : '600px';
+  const config = useAppSelector((state) => state.config);
+  const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
+  const theme = createTheme({
+    palette: {
+      primary: {
+        // gold
+        main: colorTheme.headerButtonsColor,
+      },
+    },
+  });
+
+  const roleSwitchChecked = viewingRole === UserRole.ADMIN;
+  const switchTheme = (checked: boolean) =>
+    createTheme({
+      components: {
+        MuiSwitch: {
+          styleOverrides: {
+            switchBase: {
+              color: checked ? colorTheme.headerButtonsColor : 'white',
+              '&.Mui-checked': {
+                color: checked ? colorTheme.headerButtonsColor : 'white',
+              },
+              '&.Mui-checked + .MuiSwitch-track': {
+                backgroundColor: checked
+                  ? colorTheme.headerButtonsColor
+                  : 'white',
+              },
+            },
+            track: {
+              backgroundColor: checked
+                ? colorTheme.headerButtonsColor
+                : 'lightgrey',
+            },
+          },
+        },
+      },
+    });
 
   return (
-    <header
-      data-cy="header"
-      style={{
-        width: '100%',
-        height: '6%',
-        backgroundColor: BLUE_HEX,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-      }}
-    >
-      <div
+    <ThemeProvider theme={theme}>
+      <header
+        data-cy="header"
         style={{
-          position: 'absolute',
-          left: 40,
+          width: '100%',
+          height: '6%',
+          backgroundColor: colorTheme.headerColor,
           display: 'flex',
-          justifyContent: 'center',
           alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
         }}
       >
-        {loggedIn && (
-          <IconButton
-            data-cy="home-button"
-            onClick={() => {
-              navigate('/docs');
-            }}
-            style={{
-              color: 'white',
-            }}
-          >
-            <Home />
-          </IconButton>
-        )}
-      </div>
-      <img
-        style={{ width: headerSize, height: 'auto' }}
-        src={HeaderLogo}
-        alt="USC Center for Generative AI and Society"
-      />
-      {loggedIn && (
         <div
           style={{
             position: 'absolute',
-            right: 20,
+            left: 40,
             display: 'flex',
-            height: 'fit-content',
+            justifyContent: 'center',
             alignItems: 'center',
           }}
         >
-          {isAdmin ? (
-            <>
-              <FormControlLabel
-                data-cy="role-switch"
-                labelPlacement="end"
-                control={
-                  <Switch
-                    size="small"
-                    checked={viewingRole === UserRole.ADMIN}
-                    onChange={() => {
-                      updateViewingUserRole(
-                        viewingRole === UserRole.ADMIN
-                          ? UserRole.USER
-                          : UserRole.ADMIN
-                      );
-                    }}
-                  />
-                }
-                label={viewingRole === UserRole.ADMIN ? 'Admin' : 'User'}
-              />
-              <FormControlLabel
-                labelPlacement="end"
-                control={
-                  <Switch
-                    size="small"
-                    checked={state.viewingAdvancedOptions}
-                    onChange={(value) => {
-                      updateViewingAdvancedOptions(value.target.checked);
-                    }}
-                  />
-                }
-                label="Advanced"
-              />
-            </>
-          ) : undefined}
-          <Button
-            style={{ height: 'fit-content', color: 'white' }}
-            variant="outlined"
-            onClick={async () => {
-              await logout();
-              navigate('/');
+          {loggedIn && (
+            <IconButton
+              data-cy="home-button"
+              onClick={() => {
+                navigate('/docs');
+              }}
+              color="primary"
+            >
+              <Home />
+            </IconButton>
+          )}
+        </div>
+        <img
+          style={{ width: headerSize, height: 'auto' }}
+          src={HeaderLogo}
+          alt="USC Center for Generative AI and Society"
+        />
+        {loggedIn && (
+          <div
+            style={{
+              position: 'absolute',
+              right: 20,
+              display: 'flex',
+              height: 'fit-content',
+              alignItems: 'center',
             }}
           >
-            Logout
-          </Button>
-        </div>
-      )}
-    </header>
+            {isAdmin ? (
+              <>
+                <ThemeProvider theme={() => switchTheme(roleSwitchChecked)}>
+                  <FormControlLabel
+                    data-cy="role-switch"
+                    labelPlacement="end"
+                    control={
+                      <Switch
+                        size="small"
+                        checked={roleSwitchChecked}
+                        onChange={() => {
+                          updateViewingUserRole(
+                            viewingRole === UserRole.ADMIN
+                              ? UserRole.USER
+                              : UserRole.ADMIN
+                          );
+                        }}
+                      />
+                    }
+                    label={viewingRole === UserRole.ADMIN ? 'Admin' : 'User'}
+                  />
+                </ThemeProvider>
+                <ThemeProvider
+                  theme={() => switchTheme(state.viewingAdvancedOptions)}
+                >
+                  <FormControlLabel
+                    labelPlacement="end"
+                    control={
+                      <Switch
+                        size="small"
+                        color="primary"
+                        checked={state.viewingAdvancedOptions}
+                        onChange={(value) => {
+                          updateViewingAdvancedOptions(value.target.checked);
+                        }}
+                      />
+                    }
+                    label="Advanced"
+                  />
+                </ThemeProvider>
+              </>
+            ) : undefined}
+            <Button
+              style={{ height: 'fit-content', color: 'white' }}
+              variant="outlined"
+              onClick={async () => {
+                await logout();
+                navigate('/');
+              }}
+            >
+              Logout
+            </Button>
+          </div>
+        )}
+      </header>
+    </ThemeProvider>
   );
 }

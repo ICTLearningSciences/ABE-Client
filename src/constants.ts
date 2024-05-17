@@ -5,14 +5,22 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
+import { ColorThemeConfig } from './types';
+
 export const LS_GOOGLE_DOC_IDS_KEY = 'LS_GOOGLE_DOC_IDS_KEY';
 
 export const URL_PARAM_NEW_DOC = 'newDoc';
 
 export const BLUE_HEX = '#1B6A9C';
-export const BLUE_RGB = '27,106,156';
 export const DARK_BLUE_HEX = '#42A5F5';
 export const LIGHT_BLUE_HEX = '#a6e3ff';
+
+export const DEFAULT_COLOR_THEME: ColorThemeConfig = {
+  headerColor: BLUE_HEX,
+  headerButtonsColor: LIGHT_BLUE_HEX,
+  chatSystemBubbleColor: DARK_BLUE_HEX,
+  chatUserBubbleColor: LIGHT_BLUE_HEX,
+};
 
 export const LOADING_NAME = 'Loading';
 

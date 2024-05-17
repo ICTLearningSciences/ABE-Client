@@ -546,6 +546,12 @@ export async function fetchConfig(): Promise<Config> {
               goal
               activities
             }
+            colorTheme{
+              headerColor
+              headerButtonsColor
+              chatSystemBubbleColor
+              chatUserBubbleColor
+            }
             exampleGoogleDocs
             overrideAiModel{
               serviceName

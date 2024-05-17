@@ -271,8 +271,16 @@ export interface IGoalActivites{
   activities:string[];
 }
 
+export interface ColorThemeConfig {
+  headerColor: string;
+  headerButtonsColor: string;
+  chatSystemBubbleColor: string;
+  chatUserBubbleColor: string;
+}
+
 export interface Config {
   aiSystemPrompt: string[];
+  colorTheme?: ColorThemeConfig;
   displayedGoalActivities?: IGoalActivites[];
   exampleGoogleDocs?: string[];
   overrideAiModel?: AiServiceModel;
