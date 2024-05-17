@@ -17,8 +17,21 @@ export const fetchConfigResponse: FetchConfigResponse = {
             "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-3.5 architecture. Knowledge cutoff: 2021-09.",
             "You are a professor that speaks very eloquently and in short sentences."
         ],
-        "displayedGoals": undefined,
-        "displayedActivities": undefined,
+        "displayedGoalActivities":[
+            {
+                "goal": "65823a8799045156193339b2",
+                "activities": []
+              },
+              {
+                "goal": "6580e5640ac7bcb42fc8d27f",
+                "activities": [
+                    "6580e4e80ac7bcb42fc8d279","658230f699045156193339ac","65a8592b26523c7ce5acac9e","65a8592b26523c7ce5acacsa"
+                ]
+              },
+        ],
+        "exampleGoogleDocs": [
+            "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"
+        ],
         "overrideAiModel": undefined,
         "defaultAiModel": {
             "serviceName": AiServiceNames.OPEN_AI,

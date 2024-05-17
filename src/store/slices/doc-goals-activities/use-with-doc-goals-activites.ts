@@ -27,6 +27,11 @@ export function useWithDocGoalsActivities() {
   const activities = useAppSelector(
     (state) => state.docGoalsActivities.activities
   );
+  const docGoalsGql = useAppSelector(
+    (state) => state.docGoalsActivities.docGoals
+  );
+  const config = useAppSelector((state) => state.config);
+  const displayedGoalActivities = config.config?.displayedGoalActivities || [];
 
   /**
    * The function `getActivityById` retrieves an activity object by its ID from an array of activities.
@@ -40,21 +45,19 @@ export function useWithDocGoalsActivities() {
     return activities.find((a) => a._id === id) || ({} as ActivityGQL);
   };
 
-  const docGoalsGql = useAppSelector(
-    (state) => state.docGoalsActivities.docGoals
-  );
-  const docGoals: DocGoal[] = docGoalsGql.map((dg) => {
-    return {
-      ...dg,
-      activities: (dg.activities || []).reduce((acc, aId) => {
-        const act = activities.find((a) => a._id === aId);
-        if (act) {
-          acc.push(act);
-        }
+  const docGoalsActivities: DocGoal[] = displayedGoalActivities.reduce(
+    (acc, goalActivity) => {
+      const goal = docGoalsGql.find((g) => g._id === goalActivity.goal);
+      if (!goal) {
         return acc;
-      }, [] as ActivityGQL[]),
-    };
-  });
+      }
+      const activities = goalActivity.activities
+        .map((activityId) => getActivitById(activityId))
+        .filter((a) => !!a);
+      return [...acc, { ...goal, activities }];
+    },
+    [] as DocGoal[]
+  );
 
   async function loadDocGoals() {
     return await dispatch(_fetchDocGoals());
@@ -74,7 +77,7 @@ export function useWithDocGoalsActivities() {
     loadActivities,
     addOrUpdateActivity,
     activities,
-    docGoals,
+    docGoals: docGoalsActivities,
     isLoading:
       activitiesLoadingState === LoadStatus.LOADING ||
       docGoalsLoadingState === LoadStatus.LOADING,

@@ -178,10 +178,15 @@ export interface AvailableAiServiceModels {
   models: string[];
 }
 
+export interface IGoalActivites {
+  goal: string;
+  activities: string[];
+}
+
 export interface Config {
   aiSystemPrompt: string[];
-  displayedGoals?: string[];
-  displayedActivities?: string[];
+  displayedGoalActivities?: IGoalActivites[];
+  exampleGoogleDocs?: string[];
   overrideAiModel?: AiServiceModel;
   defaultAiModel?: AiServiceModel;
   availableAiServiceModels?: AvailableAiServiceModels[];
@@ -249,18 +254,16 @@ export interface ActivityGQL {
   newDocRecommend?: boolean;
 }
 
-export interface DocGoalGQL {
+export interface DocGoalGQl {
   _id: string;
   title: string;
   description: string;
   displayIcon: DisplayIcons;
-  activities?: string[];
-  activityOrder: string[];
   introduction: string;
   newDocRecommend?: boolean;
 }
 
-export interface DocGoal extends Omit<DocGoalGQL, 'activities'> {
+export interface DocGoal extends DocGoalGQl {
   activities: ActivityGQL[];
 }
 

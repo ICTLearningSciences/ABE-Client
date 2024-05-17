@@ -62,9 +62,13 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
     (state) => state.state.userGoogleDocsLoadStatus
   );
   const dispatch = useAppDispatch();
+  const config = useAppSelector((state) => state.config);
   const isLoading = googleDocsLoadStatus === GoogleDocsLoadStatus.LOADING;
   const userGoogleDocs = googleDocs?.filter((doc) => !doc.admin);
-  const copyGoogleDocs = googleDocs?.filter((doc) => doc.admin);
+  const exampleGoogleDocs = config.config?.exampleGoogleDocs || [];
+  const copyGoogleDocs = googleDocs?.filter((doc) => {
+    return exampleGoogleDocs.includes(doc.googleDocId);
+  });
   const navigate = useNavigate();
   const [creationInProgress, setCreationInProgress] =
     React.useState<boolean>(false);

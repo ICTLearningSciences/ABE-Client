@@ -260,7 +260,6 @@ export default function DocGoalModal(props: {
         _selectedGoal?.activities && (
           <ActivitiesDisplay
             activities={_selectedGoal.activities}
-            activityOrder={_selectedGoal.activityOrder}
             setSelectedActivity={_setSelectedActivity}
             selectedActivity={_selectedActivity}
           />
