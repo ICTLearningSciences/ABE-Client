@@ -6,7 +6,8 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as api from '../../../hooks/api';
-import { AiServiceModel, Config } from '../../../types';
+import { AiServiceModel, ColorThemeConfig, Config } from '../../../types';
+import { DEFAULT_COLOR_THEME } from '../../../constants';
 
 export enum ConfigStatus {
   NONE = 0,
@@ -68,10 +69,18 @@ export const configSlice = createSlice({
             : undefined;
         const defaultAiModel =
           action.payload.defaultAiModel || firstAvailableAiServiceModel;
+
+        const colorTheme: ColorThemeConfig = {
+          ...DEFAULT_COLOR_THEME,
+          ...(action.payload.colorTheme || {}),
+        };
+
         state.config = {
           ...action.payload,
           defaultAiModel,
+          colorTheme,
         };
+
         state.status = ConfigStatus.SUCCEEDED;
       })
       .addCase(getConfig.rejected, (state) => {

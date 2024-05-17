@@ -78,23 +78,17 @@ function ActivityDisplay(props: {
 
 export function ActivitiesDisplay(props: {
   activities: ActivityGQL[];
-  activityOrder: string[];
   setSelectedActivity: (activity: ActivityGQL) => void;
   selectedActivity?: ActivityGQL;
   isNewGoogleDoc?: boolean;
 }): JSX.Element {
-  const {
-    activities,
-    setSelectedActivity,
-    selectedActivity,
-    activityOrder,
-    isNewGoogleDoc,
-  } = props;
+  const { activities, setSelectedActivity, selectedActivity, isNewGoogleDoc } =
+    props;
   const activitiesCopy: ActivityGQL[] = [...activities];
-  const activitiesInOrder = activitiesCopy.sort((a, b) => {
-    return activityOrder.indexOf(a._id) - activityOrder.indexOf(b._id);
-  });
-  const activitiesSplitByThree = activitiesInOrder.reduce(
+  // const activitiesInOrder = activitiesCopy.sort((a, b) => {
+  //   return activityOrder.indexOf(a._id) - activityOrder.indexOf(b._id);
+  // });
+  const activitiesSplitByThree = activitiesCopy.reduce(
     (acc: ActivityGQL[][], activity, i) => {
       if (i % 3 === 0) {
         acc.push([activity]);

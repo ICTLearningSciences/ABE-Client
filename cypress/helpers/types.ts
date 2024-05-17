@@ -266,15 +266,27 @@ export interface AvailableAiServiceModels {
   models: string[];
 }
 
+export interface IGoalActivites{
+  goal:string;
+  activities:string[];
+}
+
+export interface ColorThemeConfig {
+  headerColor: string;
+  headerButtonsColor: string;
+  chatSystemBubbleColor: string;
+  chatUserBubbleColor: string;
+}
+
 export interface Config {
   aiSystemPrompt: string[];
-  displayedGoals?: string[];
-  displayedActivities?: string[];
+  colorTheme?: ColorThemeConfig;
+  displayedGoalActivities?: IGoalActivites[];
+  exampleGoogleDocs?: string[];
   overrideAiModel?: AiServiceModel;
   defaultAiModel?: AiServiceModel;
   availableAiServiceModels?: AvailableAiServiceModels[];
 }
-
 export enum ActivityStepTypes {
   FREE_RESPONSE_QUESTION = 'FREE_RESPONSE_QUESTION',
   MULTIPLE_CHOICE_QUESTIONS = 'MULTIPLE_CHOICE_QUESTIONS',
@@ -324,19 +336,13 @@ export interface ActivityGQL {
   prompts?: ActivityPromptGQL[];
 }
 
-export interface DocGoalGQL {
+export interface DocGoal {
   _id: string;
   title: string;
   description: string;
   displayIcon: DisplayIcons;
-  activities?: string[];
-  activityOrder: string[];
   introduction: string;
   newDocRecommend?: boolean;
-}
-
-export interface DocGoal extends Omit<DocGoalGQL, 'activities'> {
-  activities: ActivityGQL[];
 }
 
 export interface UserActivityState {

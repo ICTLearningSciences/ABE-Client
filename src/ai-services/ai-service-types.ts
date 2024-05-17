@@ -19,6 +19,7 @@ export interface AiResponseType<AiStepDataType> {
 
 export interface AiJobStatusType<ServiceResponseType> {
   jobStatus: string;
+  apiError: string;
   aiServiceResponse: ServiceResponseType;
 }
 

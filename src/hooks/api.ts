@@ -29,8 +29,8 @@ import {
   DocumentTimelineJobStatus,
   StoreGoogleDoc,
   ActivityGQL,
-  DocGoalGQL,
   AiServiceModel,
+  DocGoalGQl,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -542,8 +542,17 @@ export async function fetchConfig(): Promise<Config> {
         query FetchConfig{
           fetchConfig {
             aiSystemPrompt
-            displayedGoals
-            displayedActivities
+            displayedGoalActivities{
+              goal
+              activities
+            }
+            colorTheme{
+              headerColor
+              headerButtonsColor
+              chatSystemBubbleColor
+              chatUserBubbleColor
+            }
+            exampleGoogleDocs
             overrideAiModel{
               serviceName
               model
@@ -666,8 +675,8 @@ export async function addOrUpdateActivity(
   return res;
 }
 
-export async function fetchDocGoals(): Promise<DocGoalGQL[]> {
-  const res = await execGql<Connection<DocGoalGQL>>(
+export async function fetchDocGoals(): Promise<DocGoalGQl[]> {
+  const res = await execGql<Connection<DocGoalGQl>>(
     {
       query: `
         query FetchDocGoals{
@@ -679,9 +688,7 @@ export async function fetchDocGoals(): Promise<DocGoalGQL[]> {
                 description
                 displayIcon
                 introduction
-                activityOrder
                 newDocRecommend
-                activities
               }
             }
           }
