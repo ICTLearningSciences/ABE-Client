@@ -70,7 +70,9 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
             alt={orgName}
           />
           <span data-cy="login-title" style={{ fontSize: '22px' }}>
-            {orgName === 'AWE' ? "Army Writing Enhancement" : "AI for Brainstorming and Editing"}
+            {orgName === 'AWE'
+              ? 'Army Writing Enhancement'
+              : 'AI for Brainstorming and Editing'}
           </span>
         </ColumnDiv>
         <span style={{ fontSize: '28px', fontWeight: 'bold' }}>
