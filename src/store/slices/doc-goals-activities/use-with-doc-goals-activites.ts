@@ -51,7 +51,7 @@ export function useWithDocGoalsActivities() {
       if (!goal) {
         return acc;
       }
-      const activities = goalActivity.activities
+      const activities: ActivityGQL[] = goalActivity.activities
         .map((activityId) => {
           const activity = getActivitById(activityId.activity);
           return {

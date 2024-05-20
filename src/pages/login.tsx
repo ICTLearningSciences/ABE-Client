@@ -10,13 +10,17 @@ import { LoginStatus } from '../store/slices/login';
 import { Button, CircularProgress } from '@mui/material';
 import { useGoogleLogin } from '@react-oauth/google';
 import AbeTitle from '../static-images/abe-title.png';
+import AweTitle from '../static-images/awe-title.png';
 import { ColumnCenterDiv, ColumnDiv } from '../styled-components';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../store/hooks';
 
 export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
   const { loginWithGoogle, state: loginState } = useLogin;
   const navigate = useNavigate();
+  const config = useAppSelector((state) => state.config);
+  const orgName = config.config?.orgName || 'ABE';
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       loginWithGoogle(tokenResponse.access_token);
@@ -55,8 +59,8 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
         >
           <img
             style={{ width: '320px', height: 'auto' }}
-            src={AbeTitle}
-            alt="ABE"
+            src={orgName === 'AWE' ? AweTitle : AbeTitle}
+            alt={orgName}
           />
           <span data-cy="login-title" style={{ fontSize: '22px' }}>
             AI for Brainstorming and Editing

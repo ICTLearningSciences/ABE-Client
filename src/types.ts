@@ -180,7 +180,7 @@ export interface AvailableAiServiceModels {
 
 export interface IActivityConfig {
   activity: string;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 export interface IGoalActivites {
@@ -207,6 +207,7 @@ export interface Config {
   availableAiServiceModels?: AvailableAiServiceModels[];
 
   headerTitle?: string; // first word will be golden
+  orgName?: string;
 }
 
 export enum ActivityStepTypes {
@@ -265,7 +266,7 @@ export interface ActivityGQL {
   displayIcon: DisplayIcons;
   responsePendingMessage: string;
   responseReadyMessage: string;
-  disabled: boolean;
+  disabled?: boolean;
   prompt?: GQLPrompt;
   prompts?: ActivityPromptGQL[];
   newDocRecommend?: boolean;

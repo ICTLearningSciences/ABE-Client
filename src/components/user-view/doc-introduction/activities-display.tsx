@@ -85,9 +85,6 @@ export function ActivitiesDisplay(props: {
   const { activities, setSelectedActivity, selectedActivity, isNewGoogleDoc } =
     props;
   const activitiesCopy: ActivityGQL[] = [...activities];
-  // const activitiesInOrder = activitiesCopy.sort((a, b) => {
-  //   return activityOrder.indexOf(a._id) - activityOrder.indexOf(b._id);
-  // });
   const activitiesSplitByThree = activitiesCopy.reduce(
     (acc: ActivityGQL[][], activity, i) => {
       if (i % 3 === 0) {

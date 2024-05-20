@@ -295,6 +295,7 @@ export interface Config {
   availableAiServiceModels?: AvailableAiServiceModels[];
 
   headerTitle?: string;
+  orgName?: string;
 }
 export enum ActivityStepTypes {
   FREE_RESPONSE_QUESTION = 'FREE_RESPONSE_QUESTION',

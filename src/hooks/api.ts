@@ -571,6 +571,7 @@ export async function fetchConfig(): Promise<Config> {
               models
             }
             headerTitle
+            orgName
           }
         }
       `,
