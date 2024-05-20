@@ -178,9 +178,14 @@ export interface AvailableAiServiceModels {
   models: string[];
 }
 
+export interface IActivityConfig {
+  activity: string;
+  disabled: boolean;
+}
+
 export interface IGoalActivites {
   goal: string;
-  activities: string[];
+  activities: IActivityConfig[];
 }
 
 export interface ColorThemeConfig {

@@ -52,7 +52,13 @@ export function useWithDocGoalsActivities() {
         return acc;
       }
       const activities = goalActivity.activities
-        .map((activityId) => getActivitById(activityId))
+        .map((activityId) => {
+          const activity = getActivitById(activityId.activity);
+          return {
+            ...activity,
+            disabled: activityId.disabled,
+          };
+        })
         .filter((a) => !!a);
       return [...acc, { ...goal, activities }];
     },

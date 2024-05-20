@@ -20,8 +20,4 @@ describe('Prompt Editing', () => {
       cy.get("[data-cy=run-prompt-button]").click();
       cy.get("[data-cy=error-dialog]").should("contain.text", "Error Message")
     })
-
-    it("shows activities prompts")
-
-    it("prompts that are linked to an activity are not displayed separately")
   });

@@ -544,7 +544,10 @@ export async function fetchConfig(): Promise<Config> {
             aiSystemPrompt
             displayedGoalActivities{
               goal
-              activities
+              activities{
+                activity
+                disabled
+              }
             }
             colorTheme{
               headerColor
@@ -565,6 +568,7 @@ export async function fetchConfig(): Promise<Config> {
               serviceName
               models
             }
+            headerTitle
           }
         }
       `,
