@@ -100,7 +100,10 @@ export default function Message(props: {
       ? colorTheme.chatUserBubbleColor
       : colorTheme.chatSystemBubbleColor;
   const alignSelf = message.sender === Sender.USER ? 'flex-end' : 'flex-start';
-  const textColor = message.sender === Sender.USER ? 'black' : 'white';
+  const textColor =
+    message.sender === Sender.USER
+      ? colorTheme.chatUserTextColor
+      : colorTheme.chatSystemTextColor;
 
   return (
     <div

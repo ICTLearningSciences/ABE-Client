@@ -36,7 +36,9 @@ export const fetchConfigResponse: FetchConfigResponse = {
             "headerColor": "#1B6A9C",
             "headerButtonsColor": "#ffffff",
             "chatSystemBubbleColor": "#42A5F5",
-            "chatUserBubbleColor": "#a6e3ff"
+            "chatSystemTextColor": "#ffffff",
+            "chatUserBubbleColor": "#a6e3ff",
+            "chatUserTextColor": "#000000",
         },
         "exampleGoogleDocs": [
             "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"

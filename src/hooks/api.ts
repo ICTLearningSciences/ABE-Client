@@ -553,7 +553,9 @@ export async function fetchConfig(): Promise<Config> {
               headerColor
               headerButtonsColor
               chatSystemBubbleColor
+              chatSystemTextColor
               chatUserBubbleColor
+              chatUserTextColor
             }
             exampleGoogleDocs
             overrideAiModel{

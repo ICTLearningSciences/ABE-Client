@@ -280,7 +280,9 @@ export interface ColorThemeConfig {
   headerColor: string;
   headerButtonsColor: string;
   chatSystemBubbleColor: string;
+  chatSystemTextColor: string;
   chatUserBubbleColor: string;
+  chatUserTextColor: string;
 }
 
 export interface Config {
