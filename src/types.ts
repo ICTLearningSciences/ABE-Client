@@ -198,6 +198,8 @@ export interface Config {
   overrideAiModel?: AiServiceModel;
   defaultAiModel?: AiServiceModel;
   availableAiServiceModels?: AvailableAiServiceModels[];
+
+  headerTitle?: string; // first word will be golden
 }
 
 export enum ActivityStepTypes {

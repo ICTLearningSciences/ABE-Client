@@ -25,7 +25,8 @@ export const fetchConfigResponse: FetchConfigResponse = {
               {
                 "goal": "6580e5640ac7bcb42fc8d27f",
                 "activities": [
-                    "6580e4e80ac7bcb42fc8d279","658230f699045156193339ac","65a8592b26523c7ce5acac9e","65a8592b26523c7ce5acacsa"
+                    "6580e4e80ac7bcb42fc8d279",
+                    "658230f699045156193339ac","65a8592b26523c7ce5acac9e","65a8592b26523c7ce5acacsa"
                 ]
               },
         ],
@@ -59,6 +60,7 @@ export const fetchConfigResponse: FetchConfigResponse = {
                     "ABE-gpt-4-turbo-preview"
                 ]
             }
-        ]
-    }
+        ],
+        headerTitle: "AWE Army Writing Enhancement"
+    }   
 }

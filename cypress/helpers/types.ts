@@ -286,6 +286,8 @@ export interface Config {
   overrideAiModel?: AiServiceModel;
   defaultAiModel?: AiServiceModel;
   availableAiServiceModels?: AvailableAiServiceModels[];
+
+  headerTitle?: string;
 }
 export enum ActivityStepTypes {
   FREE_RESPONSE_QUESTION = 'FREE_RESPONSE_QUESTION',

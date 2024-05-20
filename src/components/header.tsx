@@ -16,12 +16,11 @@ import React from 'react';
 import { UseWithLogin } from '../store/slices/login/use-with-login';
 import { useAppSelector } from '../store/hooks';
 import { LoginStatus, UserRole } from '../store/slices/login';
-import { DEFAULT_COLOR_THEME, MOBILE_CUTOFF_SIZE } from '../constants';
-import HeaderLogo from '../static-images/gold_white_logo.png';
+import { DEFAULT_COLOR_THEME } from '../constants';
 import { Home } from '@mui/icons-material';
-import { useWithWindowSize } from '../hooks/use-with-window-size';
 import { useNavigate } from 'react-router-dom';
 import { useWithState } from '../store/slices/state/use-with-state';
+import { HeaderTitle } from './header-title';
 
 export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
@@ -33,9 +32,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const loggedIn = loginStatus === LoginStatus.AUTHENTICATED;
   const isAdmin = userRole === UserRole.ADMIN;
-  const { width: windowWidth } = useWithWindowSize();
   const navigate = useNavigate();
-  const headerSize = windowWidth < MOBILE_CUTOFF_SIZE ? '400px' : '600px';
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
   const theme = createTheme({
@@ -109,11 +106,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
             </IconButton>
           )}
         </div>
-        <img
-          style={{ width: headerSize, height: 'auto' }}
-          src={HeaderLogo}
-          alt="USC Center for Generative AI and Society"
-        />
+        <HeaderTitle />
         {loggedIn && (
           <div
             style={{
