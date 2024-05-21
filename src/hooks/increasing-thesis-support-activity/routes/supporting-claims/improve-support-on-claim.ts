@@ -80,8 +80,8 @@ export function sCollectWhyNotSayOrDidSayThings(
         suggestClaimSupportChanges,
         [
           {
-            promptText: `This is the claim that the student intends to improve: ${state.intendedClaimAdjustment}`,
-            promptRole: PromptRoles.SYSTEM,
+            promptText: `This is the claim that I intend to improve: ${state.intendedClaimAdjustment}`,
+            promptRole: PromptRoles.USER,
             includeEssay: false,
           },
         ]
@@ -139,15 +139,15 @@ export function sSelectIntendedImprovement(
           suggestClaimSupportChanges,
           [
             {
-              promptText: `This is the claim that the student intends to improve: ${state.intendedClaimAdjustment}`,
-              promptRole: PromptRoles.SYSTEM,
+              promptText: `This is the claim that I intend to improve: ${state.intendedClaimAdjustment}`,
+              promptRole: PromptRoles.USER,
               includeEssay: false,
             },
             {
               promptText: `Do not suggest these improvements: ${state.suggestedImprovements.join(
                 ', '
               )}`,
-              promptRole: PromptRoles.SYSTEM,
+              promptRole: PromptRoles.USER,
               includeEssay: false,
             },
           ]
@@ -191,13 +191,13 @@ export function sSelectIntendedImprovement(
           analyzeRevisionIntention,
           [
             {
-              promptText: `This is the claim that the student intends to improve: ${state.intendedClaimAdjustment}`,
-              promptRole: PromptRoles.SYSTEM,
+              promptText: `This is the claim that I intend to improve: ${state.intendedClaimAdjustment}`,
+              promptRole: PromptRoles.USER,
               includeEssay: false,
             },
             {
-              promptText: `This is the improvement that the student intends to make: ${response}`,
-              promptRole: PromptRoles.SYSTEM,
+              promptText: `This is the improvement that I intend to make: ${response}`,
+              promptRole: PromptRoles.USER,
               includeEssay: false,
             },
           ]

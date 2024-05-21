@@ -64,8 +64,8 @@ export function crRemoveClaimFromPaper(
           analyzeClaimRemoval,
           [
             {
-              promptText: `This is the claim that the student intends to remove from the paper: ${state.intendedClaimAdjustment}`,
-              promptRole: PromptRoles.SYSTEM,
+              promptText: `This is the claim that I intend to remove from the paper: ${state.intendedClaimAdjustment}`,
+              promptRole: PromptRoles.USER,
               includeEssay: false,
             },
           ]

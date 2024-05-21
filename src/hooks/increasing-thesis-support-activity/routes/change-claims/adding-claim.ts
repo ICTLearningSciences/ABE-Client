@@ -73,9 +73,9 @@ export function caCollectArgumentForNewClaim(
           analyzeIntendedArgForClaim,
           [
             {
-              promptText: `The students intended claim to add is: ${state.intendedClaimAdjustment}`,
+              promptText: `The claim I intend to add: ${state.intendedClaimAdjustment}`,
               includeEssay: false,
-              promptRole: PromptRoles.SYSTEM,
+              promptRole: PromptRoles.USER,
             },
           ]
         );
@@ -136,9 +136,9 @@ export function addClaimToPaperAnalyzeStep(
         analyzeClaimAddedToPaper,
         [
           {
-            promptText: `The students intended claim to add is: ${state.intendedClaimAdjustment}`,
+            promptText: `The claim I intend to add: ${state.intendedClaimAdjustment}`,
             includeEssay: false,
-            promptRole: PromptRoles.SYSTEM,
+            promptRole: PromptRoles.USER,
           },
         ]
       );

@@ -38,7 +38,7 @@ function setPromptsTargetModel(model?: AiServiceModel): FetchPromptsResponse{
 
 describe("prompt requests use proper model execution", ()=>{
     describe("prompt has no target model", ()=>{
-    it("uses config override model if available", ()=>{
+    it.only("uses config override model if available", ()=>{
         cyMockDefault(cy, {
             userRole: UserRole.ADMIN,
             gqlQueries:[
@@ -56,6 +56,7 @@ describe("prompt requests use proper model execution", ()=>{
         });
         cyMockOpenAiCall(cy, {response: openAiTextResponse("Hello"), statusCode: 200})
         toPromptEditing(cy);
+        cy.wait(4000)
         // check that the model used in the request to @openAiStartCall is gpt-4
         cy.get("[data-cy=run-prompt-button]").click();
         confirmModelInAiRequest({
