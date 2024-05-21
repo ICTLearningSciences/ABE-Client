@@ -622,7 +622,7 @@ export default function useWithStrongerHookActivity(
               )
               .join(', ')}`,
             includeEssay: false,
-            promptRole: PromptRoles.SYSTEM,
+            promptRole: PromptRoles.USER,
           },
         ]
       );
@@ -900,9 +900,9 @@ export default function useWithStrongerHookActivity(
           [
             // use to apply revision here too but this should get picked up now
             {
-              promptText: `Here is the users narrative story that they'd like to apply to their essays hook: ${state.narrativityStory}`,
+              promptText: `Here is the users narrative story that I'd like to apply to my essays hook: ${state.narrativityStory}`,
               includeEssay: false,
-              promptRole: PromptRoles.SYSTEM,
+              promptRole: PromptRoles.USER,
             },
           ]
         );

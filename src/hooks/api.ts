@@ -36,7 +36,7 @@ import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
 import { addQueryParam } from '../helpers';
 import { isBulletPointMessage } from '../store/slices/chat/helpers';
-import { activityQueryData } from './api-helpers';
+import { activityQueryData, promptQueryData } from './api-helpers';
 import { omit } from 'lodash';
 import { OpenAiServiceJobStatusResponseType } from '../ai-services/open-ai-service';
 
@@ -307,25 +307,7 @@ export async function fetchPrompts(): Promise<GQLResPrompts> {
       query: `
       query FetchPrompts {
         fetchPrompts {
-                  _id
-                  title
-                  clientId
-                  userInputIsIntention
-                  aiPromptSteps {
-                    prompts{
-                      promptText
-                      includeEssay
-                      includeUserInput
-                      promptRole
-                    }
-                    targetAiServiceModel{
-                      serviceName
-                      model
-                    }
-                  systemRole
-                  outputDataType
-                    includeChatLogContext
-                  }
+                  ${promptQueryData}
                 }
             }
     `,
@@ -377,25 +359,7 @@ export async function storePrompts(
       query: `
       mutation StorePrompts($prompts: [PromptInputType]!) {
         storePrompts(prompts: $prompts) {
-            _id
-            title
-            clientId
-            userInputIsIntention
-            aiPromptSteps {
-              prompts{
-                promptText
-                includeEssay
-                includeUserInput
-                promptRole
-              }
-              outputDataType
-              targetAiServiceModel{
-                serviceName
-                model
-              }
-              systemRole
-              includeChatLogContext
-            }
+            ${promptQueryData}
           }
      }
     `,
@@ -419,25 +383,7 @@ export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
       query: `
       mutation StorePrompt($prompt: PromptInputType!) {
         storePrompt(prompt: $prompt) {
-            _id
-            title
-            clientId
-            userInputIsIntention
-            aiPromptSteps {
-              prompts{
-                promptText
-                includeEssay
-                includeUserInput
-                promptRole
-              }
-              outputDataType
-              targetAiServiceModel{
-                serviceName
-                model
-              }
-              systemRole
-              includeChatLogContext
-            }
+            ${promptQueryData}
           }
      }
     `,

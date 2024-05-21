@@ -4,8 +4,13 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import "cypress-localstorage-commands";
-
-Cypress.on("uncaught:exception", (err, runnable) => {
-    return false;
-});
+import React from 'react';
+import { Tooltip } from '@mui/material';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+export function MyTooltip(props: { title: string }): JSX.Element {
+  return (
+    <Tooltip placement="top" title={props.title}>
+      <HelpOutlineIcon />
+    </Tooltip>
+  );
+}

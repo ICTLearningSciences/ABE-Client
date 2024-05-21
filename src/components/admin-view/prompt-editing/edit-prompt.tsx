@@ -17,7 +17,7 @@ import {
   equals,
   extractErrorMessageFromError,
 } from '../../../helpers';
-import { ColumnDiv, RowDivSB } from '../../../styled-components';
+import { ColumnDiv, RowDiv, RowDivSB } from '../../../styled-components';
 import {
   PromptOutputTypes,
   GQLPrompt,
@@ -33,6 +33,18 @@ import { emptyOpenAiPromptStep } from '../multi-prompt-buttonology';
 import { useAppSelector } from '../../../store/hooks';
 import { AiServicesResponseTypes } from '../../../ai-services/ai-service-types';
 import { useWithExecutePrompt } from '../../../hooks/use-with-execute-prompts';
+import { MyTooltip } from '../../tooltip';
+
+enum PromptFields {
+  PROMPT_TEXT = 'promptText',
+  SYSTEM_ROLE = 'systemRole',
+  RESPONSE_FORMAT = 'responseFormat',
+}
+
+interface FocusedPromptField {
+  promptIndex: number;
+  focusedField: PromptFields;
+}
 
 export function EditPrompt(props: {
   promptTemplate: GQLPrompt;
@@ -59,7 +71,12 @@ export function EditPrompt(props: {
     onReturnToTemplates,
   } = props;
   const [error, setError] = useState<string>('');
-  const [focusedPromptIndex, setFocusedPromptIndex] = useState<number>(0);
+
+  const [focusedPromptField, setFocusedPromptField] =
+    useState<FocusedPromptField>({
+      promptIndex: 0,
+      focusedField: PromptFields.PROMPT_TEXT,
+    });
   const [inProgress, setInProgress] = useState<boolean>(false);
   const [previousRuns, setPreviousRuns] = useState<AiServicesResponseTypes[]>(
     []
@@ -166,6 +183,7 @@ export function EditPrompt(props: {
         }
       />
       <div
+        data-cy={'individual-prompt-container'}
         style={{
           height: '100%',
           overflow: 'auto',
@@ -177,6 +195,12 @@ export function EditPrompt(props: {
           const modelDisplay = openAiPromptStep.targetAiServiceModel
             ? aiServiceModelToString(openAiPromptStep.targetAiServiceModel)
             : aiServiceModelToString(defaultAiModel, true);
+          const isFocused = (promptIndex: number, field: PromptFields) => {
+            return (
+              focusedPromptField.promptIndex === promptIndex &&
+              focusedPromptField.focusedField === field
+            );
+          };
 
           return (
             <ColumnDiv
@@ -188,29 +212,75 @@ export function EditPrompt(props: {
                 margin: '10px',
               }}
             >
-              <Input
-                fullWidth
-                multiline
-                onFocus={() => {
-                  setFocusedPromptIndex(index);
-                }}
-                key={index}
-                rows={focusedPromptIndex !== index ? 3 : undefined}
-                minRows={focusedPromptIndex === index ? 10 : 3}
-                disabled={inProgress}
-                value={openAiPromptStep.prompts[0].promptText}
-                placeholder={`Prompt ${index + 1}`}
-                onChange={(e) => {
-                  updateAiPromptStep(index, {
-                    prompts: [
-                      {
-                        ...openAiPromptStep.prompts[0],
-                        promptText: e.target.value,
-                      },
-                    ],
-                  });
-                }}
-              />
+              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                <RowDiv>
+                  <h5 style={{ margin: 5, padding: 0 }}>Prompt Text</h5>
+                  <MyTooltip title="The main text that the AI will utilize to generate a response. This should encompass the primary task, question, and/or any relevant information necessary for the AI to formulate an appropriate response." />
+                </RowDiv>
+                <TextField
+                  fullWidth
+                  multiline
+                  variant="outlined"
+                  onFocus={() => {
+                    setFocusedPromptField({
+                      promptIndex: index,
+                      focusedField: PromptFields.PROMPT_TEXT,
+                    });
+                  }}
+                  key={index}
+                  rows={
+                    !isFocused(index, PromptFields.PROMPT_TEXT) ? 3 : undefined
+                  }
+                  minRows={!isFocused(index, PromptFields.PROMPT_TEXT) ? 3 : 10}
+                  disabled={inProgress}
+                  value={openAiPromptStep.prompts[0].promptText}
+                  onChange={(e) => {
+                    updateAiPromptStep(index, {
+                      prompts: [
+                        {
+                          ...openAiPromptStep.prompts[0],
+                          promptText: e.target.value,
+                        },
+                      ],
+                    });
+                  }}
+                />
+              </FormControl>
+
+              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                <RowDiv>
+                  <h5 style={{ margin: 5, padding: 0 }}>Response Format</h5>
+                  <MyTooltip title="Specific guidelines for formatting the AI's responses. For instance, if the output should be in JSON format, specify the keys that need to be included in the JSON object." />
+                </RowDiv>
+                <TextField
+                  fullWidth
+                  multiline
+                  variant="outlined"
+                  onFocus={() => {
+                    setFocusedPromptField({
+                      promptIndex: index,
+                      focusedField: PromptFields.RESPONSE_FORMAT,
+                    });
+                  }}
+                  key={index}
+                  rows={
+                    !isFocused(index, PromptFields.RESPONSE_FORMAT)
+                      ? 3
+                      : undefined
+                  }
+                  minRows={
+                    !isFocused(index, PromptFields.RESPONSE_FORMAT) ? 3 : 10
+                  }
+                  disabled={inProgress}
+                  value={openAiPromptStep.responseFormat}
+                  onChange={(e) => {
+                    updateAiPromptStep(index, {
+                      responseFormat: e.target.value,
+                    });
+                  }}
+                />
+              </FormControl>
+
               <ColumnDiv>
                 <FormControlLabel
                   label="Include Chat Log as context?"
@@ -249,45 +319,57 @@ export function EditPrompt(props: {
                     />
                   }
                 />
-                <FormControlLabel
-                  label="Include user input?"
-                  style={{ height: 'fit-content', textAlign: 'center' }}
-                  control={
-                    <Checkbox
-                      checked={Boolean(
-                        openAiPromptStep.prompts[0].includeUserInput
-                      )}
-                      indeterminate={false}
-                      disabled={inProgress}
+                <RowDiv>
+                  <FormControlLabel
+                    label="Include user response input?"
+                    style={{ height: 'fit-content', textAlign: 'center' }}
+                    control={
+                      <Checkbox
+                        checked={Boolean(
+                          openAiPromptStep.prompts[0].includeUserInput
+                        )}
+                        indeterminate={false}
+                        disabled={inProgress}
+                        onChange={(e) => {
+                          updateAiPromptStep(index, {
+                            prompts: [
+                              {
+                                ...openAiPromptStep.prompts[0],
+                                includeUserInput: e.target.checked,
+                              },
+                            ],
+                          });
+                        }}
+                      />
+                    }
+                  />
+                  <MyTooltip title="Most prompts are paired with a question in an activity. If this is checked, the users response to that question will be used." />
+                </RowDiv>
+                <RowDiv
+                  style={{
+                    width: '100%',
+                  }}
+                >
+                  <FormControl
+                    variant="standard"
+                    sx={{ m: 1, minWidth: 120, width: '100%' }}
+                  >
+                    <InputLabel id="demo-simple-select-standard-label">
+                      Custom System Role
+                    </InputLabel>
+                    <Input
+                      value={openAiPromptStep.systemRole}
+                      multiline
+                      maxRows={4}
                       onChange={(e) => {
                         updateAiPromptStep(index, {
-                          prompts: [
-                            {
-                              ...openAiPromptStep.prompts[0],
-                              includeUserInput: e.target.checked,
-                            },
-                          ],
+                          systemRole: e.target.value,
                         });
                       }}
                     />
-                  }
-                />
-                <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                  <InputLabel id="demo-simple-select-standard-label">
-                    Custom System Role
-                  </InputLabel>
-                  <Input
-                    value={openAiPromptStep.systemRole}
-                    multiline
-                    maxRows={4}
-                    onChange={(e) => {
-                      updateAiPromptStep(index, {
-                        systemRole: e.target.value,
-                      });
-                    }}
-                    // label="Custom System Role"
-                  />
-                </FormControl>
+                  </FormControl>
+                  <MyTooltip title="A persona or role for the AI to take on when generating a response. This custom system role will only affect this step of the prompt." />
+                </RowDiv>
 
                 <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                   <InputLabel id="demo-simple-select-standard-label">

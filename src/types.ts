@@ -96,17 +96,6 @@ export interface DocVersion {
   modifiedTime: string;
 }
 
-// export interface AiStepData {
-//   aiServiceRequestParams: OpenAI.Chat.Completions.ChatCompletionCreateParams;
-//   aiServiceResponse: OpenAI.Chat.Completions.ChatCompletion.Choice[];
-//   originalRequestPrompt?: AiPromptStep;
-// }
-
-// export interface AiServiceResponse {
-//   aiStepData: AiStepData[];
-//   answer: string;
-// }
-
 export enum UserActions {
   ASK_QUESTION = 'ASK_QUESTION',
   MULTISTEP_PROMPTS = 'MULTISTEP_PROMPTS',
@@ -155,6 +144,7 @@ export interface AiPromptStep {
   systemRole?: string;
   outputDataType: PromptOutputTypes;
   includeChatLogContext?: boolean;
+  responseFormat?: string;
 }
 
 export enum PromptOutputTypes {

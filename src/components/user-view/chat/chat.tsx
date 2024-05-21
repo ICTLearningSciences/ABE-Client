@@ -32,7 +32,6 @@ import { UserRole } from '../../../store/slices/login';
 import ChangeIcon from '@mui/icons-material/Construction';
 import useWithFreeInput from '../../../hooks/use-with-free-input';
 import { useWithActivityHandler } from '../../../hooks/use-with-activity-handler';
-import ActivitySummaryModal from '../activity-summary-modal';
 import { useWithState } from '../../../store/slices/state/use-with-state';
 import './chat.css';
 import Message from './message';
@@ -289,7 +288,7 @@ export default function Chat(props: {
     (state) => state.config.config?.availableAiServiceModels
   );
   const { overrideAiModel, state } = useWithState();
-  const { userActivityStates, googleDocId } = state;
+  const { googleDocId } = state;
   const coachResponsePending = useAppSelector(
     (state) => state.chat.coachResponsePending
   );
@@ -321,16 +320,9 @@ export default function Chat(props: {
     useState<AiServiceStepDataTypes[]>();
   const [viewSystemPrompts, setViewSystemPrompts] = useState<boolean>(false);
   const [targetSystemPrompt, setTargetSystemPrompt] = useState<number>(0);
-  const [viewActivitySummary, setViewActivitySummary] =
-    useState<boolean>(false);
   const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
     : '';
-  const currentActivitySummary = userActivityStates.find(
-    (userActivityState) =>
-      userActivityState.activityId === selectedActivity?._id &&
-      userActivityState.googleDocId === googleDocId
-  )?.metadata;
 
   useEffect(() => {
     setSystemRole(systemRole);
@@ -345,14 +337,6 @@ export default function Chat(props: {
     if (!title) title = 'Coach';
     return (
       <ChatHeader>
-        <Button
-          onClick={() => {
-            setViewActivitySummary(true);
-          }}
-          style={{ color: 'white' }}
-        >
-          X
-        </Button>
         <span data-cy="chat-header">{title}</span>
         <IconButton
           data-cy="edit-goal-button"
@@ -510,13 +494,6 @@ export default function Chat(props: {
             open={Boolean(openAiInfoToDisplay)}
             close={() => {
               setAiInfoToDisplay(undefined);
-            }}
-          />
-          <ActivitySummaryModal
-            activitySummary={currentActivitySummary}
-            open={viewActivitySummary}
-            close={() => {
-              setViewActivitySummary(false);
             }}
           />
         </>

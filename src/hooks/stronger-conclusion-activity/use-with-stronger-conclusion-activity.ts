@@ -298,9 +298,9 @@ export function useWithStrongerConclusionActivity(
         const collectIntentionPromptWithData: GQLPrompt =
           addContextToPromptSteps(collectAuthorOriginalIntentionPrompt, [
             {
-              promptText: `When the user originally wrote this paper, this was their intention: ${response}`,
+              promptText: `When I orginally wrote this paper, this was my intention: ${response}`,
               includeEssay: false,
-              promptRole: PromptRoles.SYSTEM,
+              promptRole: PromptRoles.USER,
             },
           ]);
         await executePrompt(

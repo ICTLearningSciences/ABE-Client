@@ -4,6 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import React from 'react';
 import {
   Button,
   FormControlLabel,
@@ -12,7 +13,6 @@ import {
   ThemeProvider,
   createTheme,
 } from '@mui/material';
-import React from 'react';
 import { UseWithLogin } from '../store/slices/login/use-with-login';
 import { useAppSelector } from '../store/hooks';
 import { LoginStatus, UserRole } from '../store/slices/login';
@@ -21,6 +21,7 @@ import { Home } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { HeaderTitle } from './header-title';
+import { ColumnDiv } from '../styled-components';
 
 export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
@@ -118,7 +119,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
             }}
           >
             {isAdmin ? (
-              <>
+              <ColumnDiv>
                 <ThemeProvider theme={() => switchTheme(roleSwitchChecked)}>
                   <FormControlLabel
                     data-cy="role-switch"
@@ -157,7 +158,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
                     label="Advanced"
                   />
                 </ThemeProvider>
-              </>
+              </ColumnDiv>
             ) : undefined}
             <Button
               style={{ height: 'fit-content', color: 'white' }}
