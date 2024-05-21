@@ -572,6 +572,7 @@ export async function fetchConfig(): Promise<Config> {
             }
             headerTitle
             orgName
+            loginScreenTitle
           }
         }
       `,

@@ -208,6 +208,7 @@ export interface Config {
 
   headerTitle?: string; // first word will be golden
   orgName?: string;
+  loginScreenTitle?: string;
 }
 
 export enum ActivityStepTypes {

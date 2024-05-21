@@ -20,7 +20,7 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
   const { loginWithGoogle, state: loginState } = useLogin;
   const navigate = useNavigate();
   const config = useAppSelector((state) => state.config);
-  const orgName = config.config?.orgName || 'AWE';
+  const orgName = config.config?.orgName || 'ABE';
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       loginWithGoogle(tokenResponse.access_token);
@@ -62,7 +62,7 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
               width: '320px',
               height: 'auto',
               boxShadow:
-                orgName === 'AWE'
+                orgName !== 'ABE'
                   ? '0px 0px 10px 0px rgba(0,0,0,0.75)'
                   : undefined,
             }}
@@ -70,9 +70,8 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
             alt={orgName}
           />
           <span data-cy="login-title" style={{ fontSize: '22px' }}>
-            {orgName === 'AWE'
-              ? 'Army Writing Enhancement'
-              : 'AI for Brainstorming and Editing'}
+            {config.config?.loginScreenTitle ||
+              'AI for Brainstorming and Editing'}
           </span>
         </ColumnDiv>
         <span style={{ fontSize: '28px', fontWeight: 'bold' }}>
