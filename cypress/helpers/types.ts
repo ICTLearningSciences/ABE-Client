@@ -249,6 +249,7 @@ export interface AiPromptStep {
   targetAiServiceModel?: AiServiceModel;
   outputDataType: PromptOutputTypes;
   includeChatLogContext?: boolean;
+  responseFormat?:string;
 }
 
 export interface AiServiceResponse {

@@ -46,3 +46,26 @@ prompts{
   order
 }
 `;
+
+export const promptQueryData = `
+_id
+                  title
+                  clientId
+                  userInputIsIntention
+                  aiPromptSteps {
+                    prompts{
+                      promptText
+                      includeEssay
+                      includeUserInput
+                      promptRole
+                    }
+                    targetAiServiceModel{
+                      serviceName
+                      model
+                    }
+                  systemRole
+                  outputDataType
+                    includeChatLogContext
+                    responseFormat
+                  }
+                  `;
