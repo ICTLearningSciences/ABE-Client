@@ -178,16 +178,23 @@ export interface AvailableAiServiceModels {
   models: string[];
 }
 
+export interface IActivityConfig {
+  activity: string;
+  disabled?: boolean;
+}
+
 export interface IGoalActivites {
   goal: string;
-  activities: string[];
+  activities: IActivityConfig[];
 }
 
 export interface ColorThemeConfig {
   headerColor: string;
   headerButtonsColor: string;
   chatSystemBubbleColor: string;
+  chatSystemTextColor: string;
   chatUserBubbleColor: string;
+  chatUserTextColor: string;
 }
 
 export interface Config {
@@ -198,6 +205,10 @@ export interface Config {
   overrideAiModel?: AiServiceModel;
   defaultAiModel?: AiServiceModel;
   availableAiServiceModels?: AvailableAiServiceModels[];
+
+  headerTitle?: string; // first word will be golden
+  orgName?: string;
+  loginScreenTitle?: string;
 }
 
 export enum ActivityStepTypes {
@@ -256,7 +267,7 @@ export interface ActivityGQL {
   displayIcon: DisplayIcons;
   responsePendingMessage: string;
   responseReadyMessage: string;
-  disabled: boolean;
+  disabled?: boolean;
   prompt?: GQLPrompt;
   prompts?: ActivityPromptGQL[];
   newDocRecommend?: boolean;

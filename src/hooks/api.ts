@@ -544,13 +544,18 @@ export async function fetchConfig(): Promise<Config> {
             aiSystemPrompt
             displayedGoalActivities{
               goal
-              activities
+              activities{
+                activity
+                disabled
+              }
             }
             colorTheme{
               headerColor
               headerButtonsColor
               chatSystemBubbleColor
+              chatSystemTextColor
               chatUserBubbleColor
+              chatUserTextColor
             }
             exampleGoogleDocs
             overrideAiModel{
@@ -565,6 +570,9 @@ export async function fetchConfig(): Promise<Config> {
               serviceName
               models
             }
+            headerTitle
+            orgName
+            loginScreenTitle
           }
         }
       `,

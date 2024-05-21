@@ -4,20 +4,35 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { cyMockDefault, cyMockOpenAiCall, toPromptEditing } from "../helpers/functions";
-import { UserRole } from "../helpers/types";
+import React from 'react';
+import { useAppSelector } from '../store/hooks';
+import { RowDiv } from '../styled-components';
 
+export const DEFAULT_HEADER_TITLE = 'USC Center for Generative AI and Society';
 
-
-describe('Prompt Editing', () => {
-
-    it("Can visit prompt editing", ()=>{
-      cyMockDefault(cy, {
-        userRole: UserRole.ADMIN
-      });
-      cyMockOpenAiCall(cy, {response: {data:{error:"Error Message"}}, statusCode: 500})
-      toPromptEditing(cy);
-      cy.get("[data-cy=run-prompt-button]").click();
-      cy.get("[data-cy=error-dialog]").should("contain.text", "Error Message")
-    })
-  });
+export function HeaderTitle(): JSX.Element {
+  const config = useAppSelector((state) => state.config);
+  const title = config.config?.headerTitle || DEFAULT_HEADER_TITLE;
+  const goldTitleWord = title.split(' ').length > 0 ? title.split(' ')[0] : '';
+  const restOfTitle =
+    title.split(' ').length > 1 ? title.split(' ').slice(1).join(' ') : '';
+  return (
+    <RowDiv
+      style={{
+        height: '100%',
+        fontSize: '2.5vw',
+        fontFamily: 'serif',
+      }}
+    >
+      <div
+        style={{
+          color: 'gold',
+          marginRight: '5px',
+        }}
+      >
+        {goldTitleWord}
+      </div>
+      <div>{restOfTitle}</div>
+    </RowDiv>
+  );
+}

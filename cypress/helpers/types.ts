@@ -266,16 +266,23 @@ export interface AvailableAiServiceModels {
   models: string[];
 }
 
+export interface IActivityConfig{
+  activity: string;
+  disabled: boolean;
+}
+
 export interface IGoalActivites{
   goal:string;
-  activities:string[];
+  activities: IActivityConfig[];
 }
 
 export interface ColorThemeConfig {
   headerColor: string;
   headerButtonsColor: string;
   chatSystemBubbleColor: string;
+  chatSystemTextColor: string;
   chatUserBubbleColor: string;
+  chatUserTextColor: string;
 }
 
 export interface Config {
@@ -286,6 +293,9 @@ export interface Config {
   overrideAiModel?: AiServiceModel;
   defaultAiModel?: AiServiceModel;
   availableAiServiceModels?: AvailableAiServiceModels[];
+
+  headerTitle?: string;
+  orgName?: string;
 }
 export enum ActivityStepTypes {
   FREE_RESPONSE_QUESTION = 'FREE_RESPONSE_QUESTION',

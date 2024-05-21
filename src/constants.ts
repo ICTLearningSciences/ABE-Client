@@ -19,7 +19,9 @@ export const DEFAULT_COLOR_THEME: ColorThemeConfig = {
   headerColor: BLUE_HEX,
   headerButtonsColor: LIGHT_BLUE_HEX,
   chatSystemBubbleColor: DARK_BLUE_HEX,
+  chatSystemTextColor: 'white',
   chatUserBubbleColor: LIGHT_BLUE_HEX,
+  chatUserTextColor: 'black',
 };
 
 export const LOADING_NAME = 'Loading';

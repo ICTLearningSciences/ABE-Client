@@ -22,18 +22,23 @@ export const fetchConfigResponse: FetchConfigResponse = {
                 "goal": "65823a8799045156193339b2",
                 "activities": []
               },
-              {
+            {
                 "goal": "6580e5640ac7bcb42fc8d27f",
-                "activities": [
-                    "6580e4e80ac7bcb42fc8d279","658230f699045156193339ac","65a8592b26523c7ce5acac9e","65a8592b26523c7ce5acacsa"
-                ]
+                activities: [
+                { activity: '6580e4e80ac7bcb42fc8d279', disabled: false },
+                { activity: '658230f699045156193339ac', disabled: false },
+                { activity: '65a8592b26523c7ce5acac9e', disabled: false },
+                { activity: '65a8592b26523c7ce5acacsa', disabled: false },
+                ],
               },
         ],
         "colorTheme": {
             "headerColor": "#1B6A9C",
             "headerButtonsColor": "#ffffff",
             "chatSystemBubbleColor": "#42A5F5",
-            "chatUserBubbleColor": "#a6e3ff"
+            "chatSystemTextColor": "#ffffff",
+            "chatUserBubbleColor": "#a6e3ff",
+            "chatUserTextColor": "#000000",
         },
         "exampleGoogleDocs": [
             "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"
@@ -59,6 +64,8 @@ export const fetchConfigResponse: FetchConfigResponse = {
                     "ABE-gpt-4-turbo-preview"
                 ]
             }
-        ]
-    }
+        ],
+        headerTitle: "AWE Army Writing Enhancement",
+        orgName: ""
+    }   
 }
