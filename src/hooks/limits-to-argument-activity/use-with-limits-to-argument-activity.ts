@@ -32,6 +32,7 @@ import {
   AnalyzeArgumentsResponse,
   analyzeArgumentsPromptSchema,
 } from './prompt-helpers';
+import { extractServiceStepResponse } from '../../ai-services/ai-service-types';
 
 interface LimitsToArgumentActivityPrompts {
   analyzeArgumentPrompt: GQLPrompt;
@@ -173,10 +174,10 @@ export function useWithLimitsToArgumentActivity(
         await executePrompt(
           () => analyzeArgumentPrompt,
           (res) => {
+            const firstStepRes = extractServiceStepResponse(res, 0);
             const audiencesResponse =
               validateJsonResponse<AnalyzeArgumentsResponse>(
-                res.aiAllStepsData[0].aiServiceResponse[0].message.content ||
-                  '',
+                firstStepRes,
                 analyzeArgumentsPromptSchema
               );
             sendMessage(

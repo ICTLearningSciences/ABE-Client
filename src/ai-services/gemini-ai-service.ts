@@ -4,29 +4,52 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
-import OpenAI from 'openai';
+import {
+  FunctionCall,
+  GenerateContentCandidate,
+  PromptFeedback,
+  StartChatParams,
+  UsageMetadata,
+} from '@google/generative-ai';
 import {
   AiResponseType,
   AiJobStatusType,
   AiStepData,
+  AiServiceStepDataTypes,
 } from './ai-service-types';
+import { OpenAiServiceResponse } from './open-ai-service';
 
-// The typing for params sent to open ai and the response received
-export type OpenAiReqType = ChatCompletionCreateParamsNonStreaming;
-export type OpenAiResType = OpenAI.Chat.Completions.ChatCompletion.Choice[];
+export interface GeminiChatCompletionRequest {
+  startChatParams: StartChatParams;
+  model: string;
+  requestText: string;
+}
 
-// The data sent to/received from the AI service, unprocessed
-export type OpenAiStepDataType = AiStepData<OpenAiReqType, OpenAiResType>;
+export interface GeminiJsonResponse {
+  text: string;
+  functionCalls?: FunctionCall[];
+  candidates?: GenerateContentCandidate[];
+  promptFeedback?: PromptFeedback;
+  usageMetadata?: UsageMetadata;
+}
 
-// The data received from our API, processed
-export type OpenAiServiceResponse = AiResponseType<OpenAiStepDataType>;
+export type GeminiReqType = GeminiChatCompletionRequest;
+export type GeminiResType = GeminiJsonResponse;
+
+export type GeminiStepDataType = AiStepData<GeminiReqType, GeminiResType>;
+export type GeminiServiceResponse = AiResponseType<GeminiStepDataType>;
+
+export interface GeminiChatCompletionRequest {
+  startChatParams: StartChatParams;
+  model: string;
+  requestText: string;
+}
 
 export type OpenAiServiceJobStatusResponseType =
   AiJobStatusType<OpenAiServiceResponse>;
 
-export function isOpenAiData(
-  stepData: OpenAiStepDataType
-): stepData is OpenAiStepDataType {
-  return Array.isArray(stepData.aiServiceResponse);
+export function isGeminiData(
+  stepData: AiServiceStepDataTypes
+): stepData is GeminiStepDataType {
+  return 'text' in stepData.aiServiceResponse;
 }

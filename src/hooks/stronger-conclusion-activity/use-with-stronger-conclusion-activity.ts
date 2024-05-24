@@ -31,6 +31,7 @@ import {
   AnalyzeConclusionFirstStep,
   analyzeConclusionFirstStepSchema,
 } from './prompts/analyze-conclusion';
+import { extractServiceStepResponse } from '../../ai-services/ai-service-types';
 
 interface StrongerConclusionActivityPrompts {
   analyzeConclusionPrompt: GQLPrompt;
@@ -224,8 +225,7 @@ export function useWithStrongerConclusionActivity(
             if (!res.aiAllStepsData || res.aiAllStepsData.length < 2) {
               throw new Error('Missing step data');
             }
-            const firstStepRes =
-              res.aiAllStepsData[0].aiServiceResponse[0].message.content || '';
+            const firstStepRes = extractServiceStepResponse(res, 0);
             // const secondStepRes = res.aiStepData[1].aiServiceResponse[0].message.content || "";
             const audienceImplicationContentRes =
               validateJsonResponse<AnalyzeConclusionFirstStep>(

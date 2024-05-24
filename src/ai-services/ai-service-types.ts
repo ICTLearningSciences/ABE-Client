@@ -5,6 +5,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
+import { AzureOpenAiStepDataType, isAzureOpenAiData } from './azure-ai-service';
+import { GeminiStepDataType, isGeminiData } from './gemini-ai-service';
 import { OpenAiStepDataType } from './open-ai-service';
 
 export interface AiStepData<ReqType, ResType> {
@@ -27,7 +29,24 @@ export interface AiJobStatusType<ServiceResponseType> {
  * Merge all types here for use in abstract locations
  */
 
-export type AiServiceStepDataTypes = OpenAiStepDataType;
+export type AiServiceStepDataTypes =
+  | OpenAiStepDataType
+  | GeminiStepDataType
+  | AzureOpenAiStepDataType;
 export type AiServicesResponseTypes = AiResponseType<AiServiceStepDataTypes>;
 export type AiServicesJobStatusResponseTypes =
   AiJobStatusType<AiServicesResponseTypes>;
+
+export function extractServiceStepResponse(
+  aiServiceResponse: AiServicesResponseTypes,
+  stepNumber: number
+): string {
+  const currentStep = aiServiceResponse.aiAllStepsData[stepNumber];
+  if (isGeminiData(currentStep)) {
+    return currentStep.aiServiceResponse.text || '';
+  } else if (isAzureOpenAiData(currentStep)) {
+    return currentStep.aiServiceResponse.choices[0].message?.content || '';
+  } else {
+    return currentStep.aiServiceResponse[0].message.content || '';
+  }
+}
