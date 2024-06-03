@@ -168,33 +168,32 @@ export function useWithActivityHandler(
       updateSessionIntention({ description: lastUserMessage });
     }
     coachResponsePending(true);
-    executePrompt(aiPromptSteps)
-      .then((res) => {
-        handleOpenAiSuccess(res, callback);
-      })
-      .catch((e) => {
-        if (!axios.isCancel(e)) {
-          sendMessage(
-            {
-              id: uuidv4(),
-              message: 'Request failed, please try again later.',
-              sender: Sender.SYSTEM,
-              displayType: MessageDisplayType.TEXT,
-              mcqChoices: [MCQ_RETRY_FAILED_REQUEST],
-              retryFunction: () => {
-                executePromptWithMessage(
-                  _prompt,
-                  callback,
-                  customSystemRoleMessage
-                );
-              },
+    try {
+      const res = await executePrompt(aiPromptSteps);
+      handleOpenAiSuccess(res, callback);
+    } catch (e) {
+      if (!axios.isCancel(e)) {
+        sendMessage(
+          {
+            id: uuidv4(),
+            message: 'Request failed, please try again later.',
+            sender: Sender.SYSTEM,
+            displayType: MessageDisplayType.TEXT,
+            mcqChoices: [MCQ_RETRY_FAILED_REQUEST],
+            retryFunction: () => {
+              executePromptWithMessage(
+                _prompt,
+                callback,
+                customSystemRoleMessage
+              );
             },
-            false,
-            googleDocId
-          );
-        }
-        coachResponsePending(false);
-      });
+          },
+          false,
+          googleDocId
+        );
+      }
+      coachResponsePending(false);
+    }
   }
 
   function preparePromptSteps(
