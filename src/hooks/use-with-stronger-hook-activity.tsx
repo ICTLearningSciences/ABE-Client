@@ -443,10 +443,7 @@ export default function useWithStrongerHookActivity(
     setCannedResponse('');
   }
 
-  function handleEntityDetectionResponse(
-    response: AiServicesResponseTypes,
-    stepData: StepData
-  ) {
+  function handleEntityDetectionResponse(response: AiServicesResponseTypes) {
     const result = validateJsonResponse<EntityDetectionPromptResponse>(
       response.answer,
       entityDetectionPromptResponseSchema
@@ -780,8 +777,7 @@ export default function useWithStrongerHookActivity(
         } else {
           executePrompt(
             () => entityDetectionPrompt,
-            (res: AiServicesResponseTypes) =>
-              handleEntityDetectionResponse(res, stepData)
+            (res: AiServicesResponseTypes) => handleEntityDetectionResponse(res)
           );
         }
       },

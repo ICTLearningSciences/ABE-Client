@@ -5,14 +5,13 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { useEffect, useState } from 'react';
-import { BuiltActivityHandler } from '../classes/activity-builder-activity/built-activity-handler';
 import { useAppSelector } from '../store/hooks';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
-import { Sender } from '../store/slices/chat';
+import { ChatLog } from '../store/slices/chat';
 
-export function useWithUserMessageSubscribers() {
+export function useWithChatLogSubscribers() {
   const [subscriberFunctions, setSubscriberFunctions] = useState<
-    ((userMessage: string) => void)[]
+    ((chatLog: ChatLog) => void)[]
   >([]);
 
   const { state } = useWithChat();
@@ -22,17 +21,12 @@ export function useWithUserMessageSubscribers() {
   const messages = state.chatLogs[googleDocId] || [];
 
   useEffect(() => {
-    if (!messages.length) return;
-    const mostRecentMessage = messages[messages.length - 1];
-    const userMessage = mostRecentMessage.sender === Sender.USER;
-    if (userMessage) {
-      subscriberFunctions.forEach((subscriber) => {
-        subscriber(mostRecentMessage.message);
-      });
-    }
+    subscriberFunctions.forEach((subscriber) => {
+      subscriber(messages);
+    });
   }, [messages]);
 
-  function addNewSubscriber(subscriber: (userMessage: string) => void) {
+  function addNewSubscriber(subscriber: (chatLog: ChatLog) => void) {
     setSubscriberFunctions((prev) => [...prev, subscriber]);
   }
 

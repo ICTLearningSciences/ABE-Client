@@ -4,16 +4,29 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { PromptOutputTypes } from '../../types';
+import { PromptOutputTypes } from '../types';
 import {
   ActivityBuilder,
   ActivityBuilderStepType,
   SystemMessageActivityStep,
-  UserMessageActivityStep,
+  RequestUserInputActivityStep,
   PromptActivityStep,
-} from './types';
+} from '../components/activity-builder/types';
+import { Schema } from 'jsonschema';
+
+export const jsonResponseSchema: Schema = {
+  type: 'object',
+  properties: {
+    nickname: {
+      type: 'string',
+    },
+  },
+  required: ['nickname'],
+  additionalProperties: false,
+};
 
 export const testActivityBuilder: ActivityBuilder = {
+  _id: 'test-activity-builder-12',
   title: 'Test Activity',
   steps: [
     {
@@ -23,33 +36,38 @@ export const testActivityBuilder: ActivityBuilder = {
     } as SystemMessageActivityStep,
     {
       stepId: '2',
-      stepType: ActivityBuilderStepType.USER_MESSAGE,
+      stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
       message: 'What is your name?',
-      saveAsIntention: true,
+      saveAsIntention: false,
       saveResponseVariableName: 'name',
       disableFreeInput: false,
-      predefinedResponses: [
-        {
-          message: 'John',
-        },
-        {
-          message: 'Jane',
-        },
-      ],
-    } as UserMessageActivityStep,
+      predefinedResponses: [],
+    } as RequestUserInputActivityStep,
     {
       stepId: '3',
+      stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+      message: 'Hello, {{name}}!',
+    } as SystemMessageActivityStep,
+    {
+      stepId: '4',
       stepType: 'Prompt',
-      promptText: 'What is your age?',
-      responseFormat: 'number',
+      promptText: 'Please generate a nickname for {{name}}',
+      responseFormat: '',
+      jsonResponseDataString: `
+        {
+          "nickname": "string" // provide a nickname here for the user
+        }
+      `,
       includeChatLogContext: true,
-      outputDataType: PromptOutputTypes.TEXT,
+      includeEssay: true,
+      outputDataType: PromptOutputTypes.JSON,
       customSystemRole: 'user',
     } as PromptActivityStep,
     {
-      stepId: '4',
+      stepId: '5',
       stepType: 'SystemMessage',
-      message: 'Thank you for participating in the test activity',
+      message:
+        'Thank you for participating in the test activity, {{nickname}}!',
       jumpToStepId: '1',
     } as SystemMessageActivityStep,
   ],

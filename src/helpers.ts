@@ -15,7 +15,7 @@ import {
   AiServiceNames,
 } from './types';
 import { ChatCompletion, ChatCompletionCreateParams } from 'openai/resources';
-import Validator from 'jsonschema';
+import Validator, { Schema } from 'jsonschema';
 import { ChatLog, Sender, UserInputType } from './store/slices/chat';
 import { OpenAiStepDataType } from './ai-services/open-ai-service';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -130,8 +130,7 @@ export function parseOpenAIResContent(
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function validateJsonResponse<T>(response: string, schema: any): T {
+export function validateJsonResponse<T>(response: string, schema: Schema): T {
   try {
     const v = new Validator.Validator();
     const responseJson: T = JSON.parse(response);
@@ -325,3 +324,10 @@ export const aiServiceModelStringParse = (
     model,
   };
 };
+export function chatLogToString(chatLog: ChatLog) {
+  let chatLogString = '';
+  for (let i = 0; i < chatLog.length; i++) {
+    chatLogString += `${chatLog[i].sender}: ${chatLog[i].message}\n`;
+  }
+  return chatLogString;
+}

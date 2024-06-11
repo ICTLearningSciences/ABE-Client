@@ -14,31 +14,30 @@ export interface ActivityBuilder {
 
 export enum ActivityBuilderStepType {
   SYSTEM_MESSAGE = 'SystemMessage',
-  USER_MESSAGE = 'UserMessage',
+  REQUEST_USER_INPUT = 'RequestUserInput',
   PROMPT = 'Prompt',
 }
 
 export interface ActivityBuilderStep {
   stepId: string;
   stepType: ActivityBuilderStepType;
+  jumpToStepId?: string;
 }
 
 // SystemMessage
 export interface SystemMessageActivityStep extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.SYSTEM_MESSAGE;
   message: string;
-  jumpToStepId?: string;
 }
 
-// UserMessage
+// RequestUserInput
 export interface PredefinedResponse {
   message: string;
 }
 
-export interface UserMessageActivityStep extends ActivityBuilderStep {
-  stepType: ActivityBuilderStepType.USER_MESSAGE;
+export interface RequestUserInputActivityStep extends ActivityBuilderStep {
+  stepType: ActivityBuilderStepType.REQUEST_USER_INPUT;
   message: string;
-  jumpToStepId?: string;
   saveAsIntention: boolean;
   saveResponseVariableName: string;
   disableFreeInput: boolean;
@@ -48,11 +47,11 @@ export interface UserMessageActivityStep extends ActivityBuilderStep {
 //Prompt
 export interface PromptActivityStep extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.PROMPT;
-  jumpToStepId?: string;
   promptText: string;
   responseFormat: string;
   includeChatLogContext: boolean;
+  includeEssay: boolean;
   outputDataType: PromptOutputTypes;
-  jsonResponseSchema?: string;
+  jsonResponseDataString?: string;
   customSystemRole: string;
 }
