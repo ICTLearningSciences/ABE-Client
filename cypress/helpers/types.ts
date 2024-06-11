@@ -70,7 +70,7 @@ export interface ChatMessage {
   aiServiceStepData?: AiServiceStepDataTypes[];
   mcqChoices?: string[];
   selectActivities?: Activity[];
-  activityStep?: ActiveActivityStep;
+  disableUserInput?: boolean;
   selectedGoal?: DocGoal;
   userInputType?: UserInputType;
 }

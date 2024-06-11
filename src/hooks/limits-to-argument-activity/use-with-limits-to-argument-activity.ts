@@ -186,7 +186,7 @@ export function useWithLimitsToArgumentActivity(
                 message: res.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: introStep(stepData),
+                disableUserInput: true,
                 aiServiceStepData: res.aiAllStepsData,
               },
               false,
@@ -272,7 +272,7 @@ export function useWithLimitsToArgumentActivity(
                   mcqChoices: [MCQ_PICK_ANOTHER_ROLE, MCQ_REVISE_ESSAY],
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
-                  activityStep: speakWithAudienceStep(stepData),
+
                   aiServiceStepData: res.aiAllStepsData,
                 },
                 false,

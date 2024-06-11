@@ -263,7 +263,7 @@ export function useWithStrongerConclusionActivity(
                     message: res.answer,
                     sender: Sender.SYSTEM,
                     displayType: MessageDisplayType.TEXT,
-                    activityStep: introStep(stepData),
+                    disableUserInput: true,
                     aiServiceStepData: res.aiAllStepsData,
                   },
                   false,
@@ -312,7 +312,7 @@ export function useWithStrongerConclusionActivity(
                 message: res.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: i2CollectAuthorOriginalIntentionStep(stepData),
+
                 aiServiceStepData: res.aiAllStepsData,
               },
               false,
@@ -352,7 +352,7 @@ export function useWithStrongerConclusionActivity(
                 message: res.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: i3SoWhatQuestionStep(stepData),
+
                 aiServiceStepData: res.aiAllStepsData,
               },
               false,
@@ -394,7 +394,7 @@ export function useWithStrongerConclusionActivity(
                   sender: Sender.SYSTEM,
                   mcqChoices: [MCQ_READY_TO_REVISE],
                   displayType: MessageDisplayType.TEXT,
-                  activityStep: impactDiscussionStep(stepData),
+
                   aiServiceStepData: res.aiAllStepsData,
                 },
                 false,
@@ -434,7 +434,7 @@ export function useWithStrongerConclusionActivity(
                 message: res.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: i5CollectProposedRevisionStep(stepData),
+
                 aiServiceStepData: res.aiAllStepsData,
               },
               false,

@@ -332,7 +332,8 @@ export function useWithActivityHandler(
         sender: Sender.SYSTEM,
         displayType: MessageDisplayType.TEXT,
         mcqChoices: currentStep.mcqChoices,
-        activityStep: currentStep,
+        disableUserInput:
+          currentStep.stepType !== ActivityStepTypes.FREE_RESPONSE_QUESTION,
         selectedGoal: selectedGoal,
       },
       false,
