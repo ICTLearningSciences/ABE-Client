@@ -19,8 +19,6 @@ steps{
     prompts
 }
 description
-responsePendingMessage
-responseReadyMessage
 newDocRecommend
 introduction
 disabled

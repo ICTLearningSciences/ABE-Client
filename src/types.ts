@@ -209,6 +209,7 @@ export enum ActivityStepTypes {
 }
 
 export interface ActiveActivityStep {
+  id?: string;
   text: string;
   stepType: ActivityStepTypes;
   mcqChoices?: string[];
@@ -255,8 +256,6 @@ export interface ActivityGQL {
   description: string;
   steps?: ActivityStepGQL[];
   displayIcon: DisplayIcons;
-  responsePendingMessage: string;
-  responseReadyMessage: string;
   disabled?: boolean;
   prompt?: GQLPrompt;
   prompts?: ActivityPromptGQL[];

@@ -49,8 +49,6 @@ export const emptyActivity: Activity = {
   _id: '',
   title: '',
   introduction: '',
-  responsePendingMessage: '',
-  responseReadyMessage: '',
   disabled: false,
   steps: [],
   description: '',
@@ -306,12 +304,6 @@ export function useWithActivityHandler(
     sendIntroMessages();
     resetActivity();
   }, [resetActivityCounter]);
-
-  useEffect(() => {
-    if (activity?._id && selectedGoal?._id) {
-      // newSession();
-    }
-  }, [activity?._id, selectedGoal?._id]);
 
   // Handles initial load
   useEffect(() => {
