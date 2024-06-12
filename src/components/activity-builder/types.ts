@@ -54,6 +54,7 @@ export enum JsonResponseDataType {
 export interface JsonResponseData {
   name: string;
   type: JsonResponseDataType;
+  isRequired: boolean;
   additionalInfo?: string;
 }
 

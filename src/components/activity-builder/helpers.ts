@@ -5,24 +5,44 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { JsonResponseData } from './types';
+import Validator, { Schema } from 'jsonschema';
+
+function convertExpectedDataIntoSchema(
+  expectedData: JsonResponseData[]
+): Schema {
+  const schema: Schema = {
+    type: 'object',
+    properties: {},
+    required: [],
+  };
+  for (const expectedField of expectedData) {
+    schema.properties![expectedField.name] = {
+      type: expectedField.type,
+    };
+    if (expectedField.isRequired) {
+      (schema.required! as string[]).push(expectedField.name);
+    }
+  }
+  return schema;
+}
 
 export function receivedExpectedData(
   expectedData: JsonResponseData[],
   jsonResponse: string
 ) {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const responseData: Record<any, any> = JSON.parse(jsonResponse);
-    for (const expectedField of expectedData) {
-      if (!responseData[expectedField.name]) {
-        console.log(
-          `Expected field ${expectedField.name} not found in response`
-        );
-        return false;
-      }
+    const v = new Validator.Validator();
+    const schema = convertExpectedDataIntoSchema(expectedData);
+    console.log(schema);
+    const responseJson = JSON.parse(jsonResponse);
+    const result = v.validate(responseJson, schema);
+    if (result.errors.length > 0) {
+      console.error(result.errors);
+      return false;
     }
     return true;
   } catch (error) {
+    console.error(error);
     return false;
   }
 }

@@ -11,19 +11,8 @@ import {
   SystemMessageActivityStep,
   RequestUserInputActivityStep,
   PromptActivityStep,
+  JsonResponseDataType,
 } from '../components/activity-builder/types';
-import { Schema } from 'jsonschema';
-
-export const jsonResponseSchema: Schema = {
-  type: 'object',
-  properties: {
-    nickname: {
-      type: 'string',
-    },
-  },
-  required: ['nickname'],
-  additionalProperties: false,
-};
 
 export const collectUserNameActivity: ActivityBuilder = {
   _id: 'collect-user-name',
@@ -93,6 +82,7 @@ export const collectAiDataAndDisplayActivity: ActivityBuilder = {
         {
           name: 'nickname',
           type: 'string',
+          isRequired: true,
         },
       ],
       includeChatLogContext: false,
@@ -150,8 +140,9 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
       jsonResponseDataString: [
         {
           name: 'nickname',
-          type: 'string',
+          type: JsonResponseDataType.STRING,
           additionalInfo: 'a nickname generated for the supplied name',
+          isRequired: true,
         },
       ],
       includeChatLogContext: true,
