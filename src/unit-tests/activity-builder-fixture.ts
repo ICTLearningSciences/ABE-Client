@@ -89,11 +89,12 @@ export const collectAiDataAndDisplayActivity: ActivityBuilder = {
       stepType: 'Prompt',
       promptText: 'Please generate a nickname for Aaron',
       responseFormat: '',
-      jsonResponseDataString: `
+      jsonResponseData: [
         {
-          "nickname": "string" // provide a nickname here for the user
-        }
-      `,
+          name: 'nickname',
+          type: 'string',
+        },
+      ],
       includeChatLogContext: false,
       includeEssay: false,
       outputDataType: PromptOutputTypes.JSON,
@@ -146,11 +147,13 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
       stepType: 'Prompt',
       promptText: 'Please generate a nickname for {{name}}',
       responseFormat: '',
-      jsonResponseDataString: `
+      jsonResponseDataString: [
         {
-          "nickname": "string" // provide a nickname here for the user
-        }
-      `,
+          name: 'nickname',
+          type: 'string',
+          additionalInfo: 'a nickname generated for the supplied name',
+        },
+      ],
       includeChatLogContext: true,
       includeEssay: true,
       outputDataType: PromptOutputTypes.JSON,

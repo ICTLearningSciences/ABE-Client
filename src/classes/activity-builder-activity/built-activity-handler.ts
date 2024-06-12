@@ -30,6 +30,7 @@ import {
   PromptRoles,
 } from '../../types';
 import { chatLogToString, isJsonString } from '../../helpers';
+import { receivedExpectedData } from '../../components/activity-builder/helpers';
 
 export class BuiltActivityHandler {
   builtActivityData: ActivityBuilder;
@@ -37,6 +38,7 @@ export class BuiltActivityHandler {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stateData: Record<string, any>;
   chatLog: ChatLog = [];
+  errorMessage: string | null = null;
   sendMessage: (msg: ChatMessageTypes) => void;
   setWaitingForUserAnswer: (waiting: boolean) => void;
   updateSessionIntention: (intention: string) => void;
@@ -229,10 +231,15 @@ export class BuiltActivityHandler {
 
     if (step.outputDataType === PromptOutputTypes.JSON) {
       if (!isJsonString(response)) {
-        throw new Error('Invalid JSON response');
+        this.errorMessage = 'Did not receive valid JSON data';
+        throw new Error('Did not receive valid JSON data');
       }
-      // TODO: Confirm that the JSON response matches the json data form
-      // Do this by creating a json object out of the desiredJsonData and asserting that all expected fields exist
+      if (step.jsonResponseData) {
+        if (!receivedExpectedData(step.jsonResponseData, response)) {
+          this.errorMessage = 'Did not receive expected JSON data';
+          throw new Error('Did not receive expected JSON data');
+        }
+      }
       const resData = JSON.parse(response);
       this.stateData = { ...this.stateData, ...resData };
     }

@@ -45,6 +45,18 @@ export interface RequestUserInputActivityStep extends ActivityBuilderStep {
 }
 
 //Prompt
+export enum JsonResponseDataType {
+  STRING = 'string',
+  OBJECT = 'object',
+  ARRAY = 'array',
+}
+
+export interface JsonResponseData {
+  name: string;
+  type: JsonResponseDataType;
+  additionalInfo?: string;
+}
+
 export interface PromptActivityStep extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.PROMPT;
   promptText: string;
@@ -52,6 +64,6 @@ export interface PromptActivityStep extends ActivityBuilderStep {
   includeChatLogContext: boolean;
   includeEssay: boolean;
   outputDataType: PromptOutputTypes;
-  jsonResponseDataString?: string;
+  jsonResponseData?: JsonResponseData[];
   customSystemRole: string;
 }
