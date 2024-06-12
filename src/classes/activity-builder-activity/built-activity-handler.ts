@@ -138,13 +138,13 @@ export class BuiltActivityHandler {
       sender: Sender.SYSTEM,
       displayType: MessageDisplayType.TEXT,
     });
-    this.goToNextStep();
+    await this.goToNextStep();
   }
 
   async handleRequestUserInputStep(step: RequestUserInputActivityStep) {
     this.sendMessage({
       id: uuidv4(),
-      message: step.message,
+      message: this.replaceStoredDataInString(step.message),
       sender: Sender.SYSTEM,
       displayType: MessageDisplayType.TEXT,
       disableUserInput: step.disableFreeInput,
@@ -154,9 +154,9 @@ export class BuiltActivityHandler {
     // Will now wait for user input before progressing to next step
   }
 
-  goToNextStep() {
+  async goToNextStep() {
     this.curStep = this.getNextStep(this.curStep);
-    this.handleStep(this.curStep);
+    await this.handleStep(this.curStep);
   }
 
   newChatLogReceived(chatLog: ChatLog) {
@@ -170,7 +170,7 @@ export class BuiltActivityHandler {
     }
   }
 
-  handleNewUserMessage(message: string) {
+  async handleNewUserMessage(message: string) {
     if (this.curStep.stepType !== ActivityBuilderStepType.REQUEST_USER_INPUT) {
       return;
     }
@@ -182,7 +182,7 @@ export class BuiltActivityHandler {
       this.stateData[userInputStep.saveResponseVariableName] = message;
     }
     this.setWaitingForUserAnswer(false);
-    this.goToNextStep();
+    await this.goToNextStep();
   }
 
   async handlePromptStep(step: PromptActivityStep) {
@@ -236,8 +236,7 @@ export class BuiltActivityHandler {
       const resData = JSON.parse(response);
       this.stateData = { ...this.stateData, ...resData };
     }
-
-    this.goToNextStep();
+    await this.goToNextStep();
   }
 
   replaceStoredDataInString(str: string): string {

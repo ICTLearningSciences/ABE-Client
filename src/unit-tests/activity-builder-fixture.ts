@@ -25,9 +25,102 @@ export const jsonResponseSchema: Schema = {
   additionalProperties: false,
 };
 
-export const testActivityBuilder: ActivityBuilder = {
-  _id: 'test-activity-builder-12',
-  title: 'Test Activity',
+export const collectUserNameActivity: ActivityBuilder = {
+  _id: 'collect-user-name',
+  title: 'Collect User Name',
+  steps: [
+    {
+      stepId: '2',
+      stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+      message: 'What is your name?',
+      saveAsIntention: false,
+      saveResponseVariableName: 'name',
+      disableFreeInput: false,
+      predefinedResponses: [],
+    } as RequestUserInputActivityStep,
+    {
+      stepId: '3',
+      stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+      message: 'Hello, {{name}}!',
+    } as SystemMessageActivityStep,
+    {
+      stepId: '4',
+      stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+      message: 'What would you like to do next?',
+      saveAsIntention: false,
+      saveResponseVariableName: '',
+      disableFreeInput: true,
+      predefinedResponses: [
+        {
+          message: 'Next activity.',
+        },
+      ],
+    } as RequestUserInputActivityStep,
+  ],
+};
+
+export const collectIntentionActivity: ActivityBuilder = {
+  _id: 'collect-user-intention',
+  title: 'Collect User Intention',
+  steps: [
+    {
+      stepId: '1',
+      stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+      message: 'What would you like to do next?',
+      saveAsIntention: true,
+      saveResponseVariableName: 'intention',
+      disableFreeInput: false,
+      predefinedResponses: [],
+    } as RequestUserInputActivityStep,
+    {
+      stepId: '2',
+      stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+      message: 'Your intention: {{intention}}',
+    } as SystemMessageActivityStep,
+  ],
+};
+
+export const collectAiDataAndDisplayActivity: ActivityBuilder = {
+  _id: 'test-ai-response-data',
+  title: 'Test AI Response Data',
+  steps: [
+    {
+      stepId: '1',
+      stepType: 'Prompt',
+      promptText: 'Please generate a nickname for Aaron',
+      responseFormat: '',
+      jsonResponseDataString: `
+        {
+          "nickname": "string" // provide a nickname here for the user
+        }
+      `,
+      includeChatLogContext: false,
+      includeEssay: false,
+      outputDataType: PromptOutputTypes.JSON,
+      customSystemRole: 'user',
+    } as PromptActivityStep,
+    {
+      stepId: '2',
+      stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+      saveAsIntention: false,
+      saveResponseVariableName: '',
+      disableFreeInput: false,
+      predefinedResponses: [
+        {
+          message: 'I like it!',
+        },
+        {
+          message: 'I do not like it.',
+        },
+      ],
+      message: 'Do you like this nickname: {{nickname}}?',
+    } as RequestUserInputActivityStep,
+  ],
+};
+
+export const sendDataToPromptsActivity: ActivityBuilder = {
+  _id: 'test-ai-response-data',
+  title: 'Test AI Response Data',
   steps: [
     {
       stepId: '1',

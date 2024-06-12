@@ -14,7 +14,12 @@ import {
   Sender,
 } from '../store/slices/chat';
 import { AiPromptStep, PromptOutputTypes, PromptRoles } from '../types';
-import { testActivityBuilder } from './activity-builder-fixture';
+import {
+  collectAiDataAndDisplayActivity,
+  sendDataToPromptsActivity,
+  collectIntentionActivity,
+  collectUserNameActivity,
+} from './activity-builder-fixture';
 import { openAiTextResponse } from './fixtures/basic-text-response';
 
 enum ExecutedStepTypes {
@@ -85,10 +90,10 @@ function confirmStepWaiting(step: ExecutedStep, expectedWaiting: boolean) {
   expect(step.value).toBe(expectedWaiting);
 }
 
-// function confirmStepIntention(step: ExecutedStep, expectedIntention: string) {
-//   expect(step.type).toBe(ExecutedStepTypes.SESSION_INTENTION);
-//   expect(step.value).toBe(expectedIntention);
-// }
+function confirmStepIntention(step: ExecutedStep, expectedIntention: string) {
+  expect(step.type).toBe(ExecutedStepTypes.SESSION_INTENTION);
+  expect(step.value).toBe(expectedIntention);
+}
 
 function confirmStepPromptExecution(
   step: ExecutedStep,
@@ -99,14 +104,12 @@ function confirmStepPromptExecution(
   expect(typeStep).toStrictEqual(expectedPrompts);
 }
 
-test('Small full activity run-through.', async () => {
-  const activityData: ActivityBuilder = testActivityBuilder;
-  const activityBuilderStepAccumulator = new ActivityBuilderDataAccumulator([
-    openAiTextResponse('{"nickname":"air-in"}'),
-  ]);
-
-  const activityBuilder = new BuiltActivityHandler(
-    activityData,
+function prepareActivityBuilder(
+  activityBuilderData: ActivityBuilder,
+  activityBuilderStepAccumulator: ActivityBuilderDataAccumulator
+) {
+  return new BuiltActivityHandler(
+    activityBuilderData,
     (msg: ChatMessageTypes) => activityBuilderStepAccumulator.sendMessage(msg),
     (waiting: boolean) =>
       activityBuilderStepAccumulator.setWaitingForUserAnswer(waiting),
@@ -114,6 +117,121 @@ test('Small full activity run-through.', async () => {
       activityBuilderStepAccumulator.updateSessionIntention(intention),
     async (aiPromptSteps: AiPromptStep[]) =>
       activityBuilderStepAccumulator.executePrompt(aiPromptSteps)
+  );
+}
+
+test('can collect users name and display', () => {
+  const activityBuilderStepAccumulator = new ActivityBuilderDataAccumulator([]);
+  const activityBuilder = prepareActivityBuilder(
+    collectUserNameActivity,
+    activityBuilderStepAccumulator
+  );
+  activityBuilder.initializeActivity();
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(2);
+  activityBuilder.newChatLogReceived([
+    {
+      id: '123',
+      sender: Sender.USER,
+      displayType: MessageDisplayType.TEXT,
+      message: 'Aaron',
+    },
+  ]);
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(6);
+  confirmStepMessage(
+    activityBuilderStepAccumulator.stepsExecuted[0],
+    'What is your name?'
+  );
+  confirmStepWaiting(activityBuilderStepAccumulator.stepsExecuted[1], true);
+  confirmStepWaiting(activityBuilderStepAccumulator.stepsExecuted[2], false);
+  confirmStepMessage(
+    activityBuilderStepAccumulator.stepsExecuted[3],
+    'Hello, Aaron!'
+  );
+  confirmStepMessage(
+    activityBuilderStepAccumulator.stepsExecuted[4],
+    'What would you like to do next?'
+  );
+  confirmStepWaiting(activityBuilderStepAccumulator.stepsExecuted[5], true);
+});
+
+test('can collect session intention and display', () => {
+  const activityBuilderStepAccumulator = new ActivityBuilderDataAccumulator([]);
+  const activityBuilder = prepareActivityBuilder(
+    collectIntentionActivity,
+    activityBuilderStepAccumulator
+  );
+  activityBuilder.initializeActivity();
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(2);
+  activityBuilder.newChatLogReceived([
+    {
+      id: '123',
+      sender: Sender.USER,
+      displayType: MessageDisplayType.TEXT,
+      message: 'fix the intro',
+    },
+  ]);
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(7);
+  confirmStepMessage(
+    activityBuilderStepAccumulator.stepsExecuted[0],
+    'What would you like to do next?'
+  );
+  confirmStepWaiting(activityBuilderStepAccumulator.stepsExecuted[1], true);
+  confirmStepIntention(
+    activityBuilderStepAccumulator.stepsExecuted[2],
+    'fix the intro'
+  );
+  confirmStepWaiting(activityBuilderStepAccumulator.stepsExecuted[3], false);
+  confirmStepMessage(
+    activityBuilderStepAccumulator.stepsExecuted[4],
+    'Your intention: fix the intro'
+  );
+  confirmStepMessage(
+    activityBuilderStepAccumulator.stepsExecuted[5],
+    'What would you like to do next?'
+  );
+  confirmStepWaiting(activityBuilderStepAccumulator.stepsExecuted[6], true);
+});
+
+test('can collect data from ai response and display', async () => {
+  const activityBuilderStepAccumulator = new ActivityBuilderDataAccumulator([
+    openAiTextResponse('{"nickname":"air-in"}'),
+  ]);
+  const activityBuilder = prepareActivityBuilder(
+    collectAiDataAndDisplayActivity,
+    activityBuilderStepAccumulator
+  );
+  activityBuilder.initializeActivity();
+  await new Promise((r) => setTimeout(r, 1000));
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(3);
+  confirmStepPromptExecution(activityBuilderStepAccumulator.stepsExecuted[0], [
+    {
+      prompts: [
+        {
+          promptText: 'Please generate a nickname for Aaron',
+          includeEssay: false,
+          promptRole: PromptRoles.USER,
+        },
+      ],
+      outputDataType: PromptOutputTypes.JSON,
+      responseFormat: '',
+      systemRole: 'user',
+    },
+  ]);
+  confirmStepMessage(
+    activityBuilderStepAccumulator.stepsExecuted[1],
+    'Do you like this nickname: air-in?'
+  );
+  confirmStepWaiting(activityBuilderStepAccumulator.stepsExecuted[2], true);
+});
+
+test('can send data to prompt requests', async () => {
+  const activityBuilderStepAccumulator = new ActivityBuilderDataAccumulator([
+    openAiTextResponse('{"nickname":"air-in"}'),
+  ]);
+
+  const activityBuilder = prepareActivityBuilder(
+    sendDataToPromptsActivity,
+    activityBuilderStepAccumulator
   );
   activityBuilder.initializeActivity();
 
@@ -153,7 +271,7 @@ test('Small full activity run-through.', async () => {
           promptRole: PromptRoles.USER,
         },
         {
-          promptText: 'Please generate a nickname for Aaron',
+          promptText: 'Please generate a nickname for Aaron', // Aaron is inserted
           includeEssay: true,
           promptRole: PromptRoles.USER,
         },

@@ -54,7 +54,7 @@
     "start": "PORT=80 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "unit-tests": "npx jest --config=./src/unit-tests/jest.config.js",
+    "test:unit": "npx jest --config=./src/unit-tests/jest.config.js",
     "eject": "react-scripts eject",
     "format": "prettier --write \"src/**/*.{js,ts,tsx}\"",
     "cy:open": "npx cypress open",
