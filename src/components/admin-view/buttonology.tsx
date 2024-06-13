@@ -80,7 +80,7 @@ function InputButtonAction(props: {
   );
 }
 
-export default function Buttonology(props: {
+export default function ActivityGqlButtonology(props: {
   googleDocId: string;
   activities: ActivityGQL[];
   goToActivity: (activity: ActivityGQL) => void;

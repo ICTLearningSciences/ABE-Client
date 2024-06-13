@@ -13,10 +13,15 @@ import {
   PromptActivityStep,
   JsonResponseDataType,
 } from '../components/activity-builder/types';
+import { DisplayIcons } from '../helpers/display-icon-helper';
 
 export const collectUserNameActivity: ActivityBuilder = {
   _id: 'collect-user-name',
   title: 'Collect User Name',
+  activityType: 'builder',
+  description: '',
+  displayIcon: DisplayIcons.DEFAULT,
+  extraField: '',
   steps: [
     {
       stepId: '2',
@@ -51,6 +56,10 @@ export const collectUserNameActivity: ActivityBuilder = {
 export const collectIntentionActivity: ActivityBuilder = {
   _id: 'collect-user-intention',
   title: 'Collect User Intention',
+  activityType: 'builder',
+  description: '',
+  extraField: '',
+  displayIcon: DisplayIcons.DEFAULT,
   steps: [
     {
       stepId: '1',
@@ -72,6 +81,10 @@ export const collectIntentionActivity: ActivityBuilder = {
 export const collectAiDataAndDisplayActivity: ActivityBuilder = {
   _id: 'test-ai-response-data',
   title: 'Test AI Response Data',
+  activityType: 'builder',
+  description: '',
+  extraField: '',
+  displayIcon: DisplayIcons.DEFAULT,
   steps: [
     {
       stepId: '1',
@@ -112,6 +125,10 @@ export const collectAiDataAndDisplayActivity: ActivityBuilder = {
 export const sendDataToPromptsActivity: ActivityBuilder = {
   _id: 'test-ai-response-data',
   title: 'Test AI Response Data',
+  activityType: 'builder',
+  description: '',
+  extraField: '',
+  displayIcon: DisplayIcons.DEFAULT,
   steps: [
     {
       stepId: '1',

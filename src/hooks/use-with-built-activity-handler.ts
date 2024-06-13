@@ -10,11 +10,13 @@ import { BuiltActivityHandler } from '../classes/activity-builder-activity/built
 import { ChatMessageTypes } from '../store/slices/chat';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
 import { useWithState } from '../store/slices/state/use-with-state';
-import { collectAiDataAndDisplayActivity } from '../unit-tests/activity-builder-fixture';
 import { useWithChatLogSubscribers } from './use-with-chat-log-subscribers';
 import { useWithExecutePrompt } from './use-with-execute-prompts';
+import { ActivityBuilder } from '../components/activity-builder/types';
 
-export function useWithBuiltActivityHandler() {
+export function useWithBuiltActivityHandler(
+  selectedActivityBuilder?: ActivityBuilder
+) {
   const { sendMessage } = useWithChat();
   const { state, updateSessionIntention } = useWithState();
   const googleDocId = state.googleDocId;
@@ -27,7 +29,7 @@ export function useWithBuiltActivityHandler() {
     useState<BuiltActivityHandler>();
 
   useEffect(() => {
-    if (!googleDocId) {
+    if (!googleDocId || !selectedActivityBuilder) {
       //hack to ensure that sendMessageHelper is fully loaded with googleDocId
       return;
     }
@@ -38,7 +40,7 @@ export function useWithBuiltActivityHandler() {
       },
       updateSessionIntentionHelper,
       executePromptSteps,
-      collectAiDataAndDisplayActivity
+      selectedActivityBuilder
     );
 
     addNewSubscriber(newActivityHandler);
@@ -47,7 +49,7 @@ export function useWithBuiltActivityHandler() {
     return () => {
       removeAllSubscribers();
     };
-  }, [googleDocId]);
+  }, [googleDocId, selectedActivityBuilder]);
 
   function sendMessageHelper(msg: ChatMessageTypes, clearChat?: boolean) {
     sendMessage(msg, clearChat || false, googleDocId);
@@ -60,8 +62,7 @@ export function useWithBuiltActivityHandler() {
   }
 
   return {
-    activityReady: true,
+    activityReady: Boolean(builtActivityHandler),
     startActivityHandler: builtActivityHandler?.initializeActivity,
   };
 }
-``;

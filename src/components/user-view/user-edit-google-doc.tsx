@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
-import Buttonology from '../admin-view/buttonology';
+import ActivityGqlButtonology from '../admin-view/buttonology';
 import { useWithState } from '../../store/slices/state/use-with-state';
 import { ActivityGQL, DocGoal } from '../../types';
 import { useWithPrompts as _useWithPrompts } from '../../hooks/use-with-prompts';
@@ -83,6 +83,7 @@ export default function EditGoogleDoc(props: {
       (prompt) => {
         return {
           _id: uuidv4(),
+          activityType: 'gql',
           prompt,
           steps: [],
           title: prompt.title,
@@ -163,7 +164,7 @@ export default function EditGoogleDoc(props: {
         }}
       >
         {viewingAdmin ? (
-          <Buttonology
+          <ActivityGqlButtonology
             googleDocId={googleDocId}
             activities={allActivities}
             goToActivity={goToActivityPreview}

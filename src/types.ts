@@ -4,6 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import {
+  ActivityBuilder,
+  IActivity,
+} from './components/activity-builder/types';
 import { DisplayIcons } from './helpers/display-icon-helper';
 import { StepData } from './hooks/use-with-stronger-hook-activity';
 import { ChatMessageTypes, UserInputType } from './store/slices/chat';
@@ -249,9 +253,21 @@ export interface ActivityPrompt {
   prompt: GQLPrompt;
 }
 
-export interface ActivityGQL {
+export type ActivityTypes = ActivityGQL | ActivityBuilder;
+
+export function isActivityGql(
+  activity: ActivityGQL | ActivityBuilder
+): activity is ActivityGQL {
+  return (
+    !(activity as ActivityGQL).activityType ||
+    (activity as ActivityGQL).activityType === 'gql'
+  );
+}
+
+export interface ActivityGQL extends IActivity {
   _id: string;
   title: string;
+  activityType: 'gql';
   introduction: string;
   description: string;
   steps?: ActivityStepGQL[];
@@ -273,6 +289,7 @@ export interface DocGoalGQl {
 
 export interface DocGoal extends DocGoalGQl {
   activities: ActivityGQL[];
+  builtActivities: ActivityBuilder[];
 }
 
 export interface UserActivityState {

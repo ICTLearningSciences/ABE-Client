@@ -12,7 +12,13 @@ import { useWithChat } from '../../../store/slices/chat/use-with-chat';
 import { ChatHeader, RowDiv, SmallGreyText } from '../../../styled-components';
 import { useWithStoreDocVersions } from '../../../hooks/use-with-store-doc-versions';
 import { useAppSelector } from '../../../store/hooks';
-import { ActivityGQL, AiServiceModel, DocGoal } from '../../../types';
+import {
+  ActivityGQL,
+  ActivityTypes,
+  AiServiceModel,
+  DocGoal,
+  isActivityGql,
+} from '../../../types';
 import SystemPromptModal from './system-prompt-modal';
 import { useWithSystemPromptsConfig } from '../../../hooks/use-with-system-prompts-config';
 import { UserRole } from '../../../store/slices/login';
@@ -31,10 +37,11 @@ import { ChatMessagesContainer } from './chat-message-container';
 import { ChatInput } from './chat-input';
 import { ChatHeaderGenerator } from './chat-header-generator';
 // import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activity-handler';
+// import { isActivityBuilder } from '../../activity-builder/types';
 
 export default function Chat(props: {
   selectedGoal?: DocGoal;
-  selectedActivity?: ActivityGQL;
+  selectedActivity?: ActivityTypes;
   editDocGoal: () => void;
   setSelectedActivity: (activity: ActivityGQL) => void;
   useWithPrompts: UseWithPrompts;
@@ -67,10 +74,15 @@ export default function Chat(props: {
     editDocGoal,
     resetActivityCounter,
     selectedGoal,
-    selectedActivity
+    selectedActivity && isActivityGql(selectedActivity)
+      ? selectedActivity
+      : undefined
   );
-  // const { activityReady: builtActivityReady, startActivityHandler } =
-  //   useWithBuiltActivityHandler();
+  // const { startActivityHandler } = useWithBuiltActivityHandler(
+  //   selectedActivity && isActivityBuilder(selectedActivity)
+  //     ? selectedActivity
+  //     : undefined
+  // );
   const messages = googleDocId ? chatState.chatLogs[googleDocId] : [];
   const goalHasActivities = Boolean(
     selectedGoal?.activities && selectedGoal.activities.length > 0

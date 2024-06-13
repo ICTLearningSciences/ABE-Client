@@ -1,14 +1,14 @@
 import React from 'react';
 import { DisplayIcon } from '../../../helpers/display-icon-helper';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
-import { ActivityGQL } from '../../../types';
+import { ActivityTypes } from '../../../types';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import './doc-goal-modal.css';
 
 function ActivityDisplay(props: {
-  activity: ActivityGQL;
-  setSelectedActivity: (activity: ActivityGQL) => void;
+  activity: ActivityTypes;
+  setSelectedActivity: (activity: ActivityTypes) => void;
   isSelected?: boolean;
   isNewGoogleDoc?: boolean;
 }): JSX.Element {
@@ -77,16 +77,16 @@ function ActivityDisplay(props: {
 }
 
 export function ActivitiesDisplay(props: {
-  activities: ActivityGQL[];
-  setSelectedActivity: (activity: ActivityGQL) => void;
-  selectedActivity?: ActivityGQL;
+  activities: ActivityTypes[];
+  setSelectedActivity: (activity: ActivityTypes) => void;
+  selectedActivity?: ActivityTypes;
   isNewGoogleDoc?: boolean;
 }): JSX.Element {
   const { activities, setSelectedActivity, selectedActivity, isNewGoogleDoc } =
     props;
-  const activitiesCopy: ActivityGQL[] = [...activities];
+  const activitiesCopy: ActivityTypes[] = [...activities];
   const activitiesSplitByThree = activitiesCopy.reduce(
-    (acc: ActivityGQL[][], activity, i) => {
+    (acc: ActivityTypes[][], activity, i) => {
       if (i % 3 === 0) {
         acc.push([activity]);
       } else {

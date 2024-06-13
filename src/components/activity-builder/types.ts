@@ -4,11 +4,28 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { PromptOutputTypes } from '../../types';
+import { DisplayIcons } from '../../helpers/display-icon-helper';
+import { ActivityGQL, PromptOutputTypes } from '../../types';
 
-export interface ActivityBuilder {
+export function isActivityBuilder(
+  activity: ActivityGQL | ActivityBuilder
+): activity is ActivityBuilder {
+  return (activity as ActivityBuilder).activityType === 'builder';
+}
+
+export interface IActivity {
+  activityType: 'builder' | 'gql';
+}
+
+export interface ActivityBuilder extends IActivity {
   _id: string;
+  activityType: 'builder';
   title: string;
+  description: string;
+  displayIcon: DisplayIcons;
+  newDocRecommend?: boolean;
+  disabled?: boolean;
+  extraField: string;
   steps: ActivityBuilderStep[];
 }
 

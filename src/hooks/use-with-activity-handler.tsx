@@ -49,6 +49,7 @@ export const emptyActivity: Activity = {
   _id: '',
   title: '',
   introduction: '',
+  activityType: 'gql',
   disabled: false,
   steps: [],
   description: '',
@@ -301,25 +302,25 @@ export function useWithActivityHandler(
   }
 
   useEffect(() => {
-    if (resetActivityCounter === 0) return;
+    if (resetActivityCounter === 0 || !selectedActivity) return;
     clearChatLog(googleDocId);
     sendIntroMessages();
     resetActivity();
-  }, [resetActivityCounter]);
+  }, [resetActivityCounter, Boolean(selectedActivity)]);
 
   // Handles initial load
   useEffect(() => {
-    if (!googleDocId) {
+    if (!googleDocId || !selectedActivity) {
       return;
     }
     clearChatLog(googleDocId);
     resetActivity();
     sendIntroMessages();
-  }, [selectedActivity, selectedGoal]);
+  }, [Boolean(selectedActivity), selectedGoal]);
 
   // Handles new step
   useEffect(() => {
-    if (!activity) return;
+    if (!activity || !selectedActivity) return;
     const currentStep = activity.getStep({
       executePrompt: executePromptWithMessage,
       openSelectActivityModal: editDocGoal,
@@ -342,10 +343,11 @@ export function useWithActivityHandler(
       googleDocId
     );
     setWaitingForUserAnswer(true);
-  }, [activity?.stepName]);
+  }, [activity?.stepName, Boolean(selectedActivity)]);
 
   // Handles user response to activity step via messages
   useEffect(() => {
+    if (!selectedActivity) return;
     if (!activity) return;
     const currentStep = activity.getStep({
       executePrompt: executePromptWithMessage,
@@ -370,7 +372,12 @@ export function useWithActivityHandler(
       }
       setWaitingForUserAnswer(false);
     }
-  }, [waitingForUserAnswer, messages, activity?.stepName]);
+  }, [
+    waitingForUserAnswer,
+    messages,
+    activity?.stepName,
+    Boolean(selectedActivity),
+  ]);
 
   return {
     activityReady: activity?.isReady || !selectedActivity,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { IconButton } from '@mui/material';
 import { ChatHeader } from '../../../styled-components';
-import { DocGoal, ActivityGQL } from '../../../types';
+import { DocGoal, ActivityTypes } from '../../../types';
 import ChangeIcon from '@mui/icons-material/Construction';
 import ReplayIcon from '@mui/icons-material/Replay';
 
@@ -9,7 +9,7 @@ export function ChatHeaderGenerator(props: {
   incrementActivityCounter: () => void;
   editDocGoal: () => void;
   selectedGoal?: DocGoal;
-  selectedActivity?: ActivityGQL;
+  selectedActivity?: ActivityTypes;
 }): JSX.Element {
   const {
     incrementActivityCounter,
