@@ -30,6 +30,7 @@ import ViewPreviousRunModal from '../../admin-view/view-previous-run-modal';
 import { ChatMessagesContainer } from './chat-message-container';
 import { ChatInput } from './chat-input';
 import { ChatHeaderGenerator } from './chat-header-generator';
+// import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activity-handler';
 
 export default function Chat(props: {
   selectedGoal?: DocGoal;
@@ -68,6 +69,8 @@ export default function Chat(props: {
     selectedGoal,
     selectedActivity
   );
+  // const { activityReady: builtActivityReady, startActivityHandler } =
+  //   useWithBuiltActivityHandler();
   const messages = googleDocId ? chatState.chatLogs[googleDocId] : [];
   const goalHasActivities = Boolean(
     selectedGoal?.activities && selectedGoal.activities.length > 0

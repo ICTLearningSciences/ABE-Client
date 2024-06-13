@@ -295,7 +295,9 @@ export function useWithActivityHandler(
         displayType: MessageDisplayType.TEXT,
       });
     }
-    sendMessages(messagesToSend, true, googleDocId);
+    if (messagesToSend.length) {
+      sendMessages(messagesToSend, true, googleDocId);
+    }
   }
 
   useEffect(() => {

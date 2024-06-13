@@ -31,10 +31,11 @@ import {
 } from '../../types';
 import { chatLogToString, isJsonString } from '../../helpers';
 import { receivedExpectedData } from '../../components/activity-builder/helpers';
+import { ChatLogSubscriber } from '../../hooks/use-with-chat-log-subscribers';
 
-export class BuiltActivityHandler {
-  builtActivityData: ActivityBuilder;
-  curStep: ActivityBuilderStep;
+export class BuiltActivityHandler implements ChatLogSubscriber {
+  builtActivityData: ActivityBuilder | undefined;
+  curStep: ActivityBuilderStep | undefined;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stateData: Record<string, any>;
   chatLog: ChatLog = [];
@@ -51,9 +52,15 @@ export class BuiltActivityHandler {
   }
 
   getNextStep(step: ActivityBuilderStep): ActivityBuilderStep {
+    if (!this.builtActivityData) {
+      throw new Error('No activity data found');
+    }
+    if (!this.curStep) {
+      throw new Error('No current step found');
+    }
     if (step.jumpToStepId) {
       const jumpStep = this.builtActivityData.steps.find(
-        (step) => step.stepId === this.curStep.jumpToStepId
+        (step) => step.stepId === this.curStep!.jumpToStepId
       );
       if (!jumpStep) {
         throw new Error(
@@ -63,7 +70,7 @@ export class BuiltActivityHandler {
       return jumpStep;
     } else {
       const currentStepIndex = this.builtActivityData.steps.findIndex(
-        (step) => step.stepId === this.curStep.stepId
+        (step) => step.stepId === this.curStep!.stepId
       );
       if (currentStepIndex === -1) {
         throw new Error(
@@ -80,34 +87,54 @@ export class BuiltActivityHandler {
   }
 
   constructor(
-    builtActivityData: ActivityBuilder,
     sendMessage: (msg: ChatMessageTypes) => void,
     setWaitingForUserAnswer: (waiting: boolean) => void,
     updateSessionIntention: (intention: string) => void,
     executePrompt: (
       aiPromptSteps: AiPromptStep[]
-    ) => Promise<AiServicesResponseTypes>
+    ) => Promise<AiServicesResponseTypes>,
+    builtActivityData?: ActivityBuilder
   ) {
-    if (!builtActivityData || !builtActivityData.steps.length) {
-      throw new Error('No steps found in built activity data');
-    }
     this.builtActivityData = builtActivityData;
-    this.curStep = builtActivityData.steps[0];
     this.stateData = {};
     this.sendMessage = sendMessage;
     this.setWaitingForUserAnswer = setWaitingForUserAnswer;
     this.updateSessionIntention = updateSessionIntention;
     this.executePrompt = executePrompt;
+
+    this.setBuiltActivityData = this.setBuiltActivityData.bind(this);
+    this.initializeActivity = this.initializeActivity.bind(this);
+    this.resetActivity = this.resetActivity.bind(this);
+    this.handleStep = this.handleStep.bind(this);
+    this.handleSystemMessageStep = this.handleSystemMessageStep.bind(this);
+    this.handleRequestUserInputStep =
+      this.handleRequestUserInputStep.bind(this);
+    this.goToNextStep = this.goToNextStep.bind(this);
+    this.handleNewUserMessage = this.handleNewUserMessage.bind(this);
+    this.handlePromptStep = this.handlePromptStep.bind(this);
+    this.replaceStoredDataInString = this.replaceStoredDataInString.bind(this);
+    this.removeDataFromStoredData = this.removeDataFromStoredData.bind(this);
+    this.getNextStep = this.getNextStep.bind(this);
+  }
+
+  setBuiltActivityData(builtActivityData: ActivityBuilder) {
+    this.builtActivityData = builtActivityData;
   }
 
   initializeActivity() {
+    if (!this.builtActivityData || !this.builtActivityData.steps.length) {
+      throw new Error('No built activity data found');
+    }
     this.resetActivity();
+    if (!this.curStep) {
+      throw new Error('No current step found');
+    }
     this.handleStep(this.curStep);
   }
 
   resetActivity() {
     if (!this.builtActivityData || !this.builtActivityData.steps.length) {
-      return;
+      throw new Error('No built activity data found');
     }
     this.curStep = this.builtActivityData.steps[0];
     this.stateData = {};
@@ -157,22 +184,17 @@ export class BuiltActivityHandler {
   }
 
   async goToNextStep() {
+    if (!this.curStep) {
+      throw new Error('No current step found');
+    }
     this.curStep = this.getNextStep(this.curStep);
     await this.handleStep(this.curStep);
   }
 
-  newChatLogReceived(chatLog: ChatLog) {
-    this.chatLog = chatLog;
-    if (chatLog.length === 0) {
-      return;
-    }
-    const newMessage = chatLog[chatLog.length - 1];
-    if (newMessage.sender === Sender.USER) {
-      this.handleNewUserMessage(newMessage.message);
-    }
-  }
-
   async handleNewUserMessage(message: string) {
+    if (!this.curStep) {
+      throw new Error('No current step found');
+    }
     if (this.curStep.stepType !== ActivityBuilderStepType.REQUEST_USER_INPUT) {
       return;
     }
@@ -185,6 +207,17 @@ export class BuiltActivityHandler {
     }
     this.setWaitingForUserAnswer(false);
     await this.goToNextStep();
+  }
+
+  newChatLogReceived(chatLog: ChatLog) {
+    this.chatLog = chatLog;
+    if (chatLog.length === 0) {
+      return;
+    }
+    const newMessage = chatLog[chatLog.length - 1];
+    if (newMessage.sender === Sender.USER) {
+      this.handleNewUserMessage(newMessage.message);
+    }
   }
 
   async handlePromptStep(step: PromptActivityStep) {

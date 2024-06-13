@@ -9,10 +9,12 @@ import { useAppSelector } from '../store/hooks';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
 import { ChatLog } from '../store/slices/chat';
 
+export abstract class ChatLogSubscriber {
+  abstract newChatLogReceived(chatLog: ChatLog): void;
+}
+
 export function useWithChatLogSubscribers() {
-  const [subscriberFunctions, setSubscriberFunctions] = useState<
-    ((chatLog: ChatLog) => void)[]
-  >([]);
+  const [subscribers, setSubscribers] = useState<ChatLogSubscriber[]>([]);
 
   const { state } = useWithChat();
   const googleDocId: string = useAppSelector(
@@ -21,16 +23,24 @@ export function useWithChatLogSubscribers() {
   const messages = state.chatLogs[googleDocId] || [];
 
   useEffect(() => {
-    subscriberFunctions.forEach((subscriber) => {
-      subscriber(messages);
-    });
+    for (let i = 0; i < subscribers.length; i++) {
+      const newChatLogFunction = subscribers[i].newChatLogReceived.bind(
+        subscribers[i]
+      );
+      newChatLogFunction(messages);
+    }
   }, [messages]);
 
-  function addNewSubscriber(subscriber: (chatLog: ChatLog) => void) {
-    setSubscriberFunctions((prev) => [...prev, subscriber]);
+  function addNewSubscriber(subscriber: ChatLogSubscriber) {
+    setSubscribers([...subscribers, subscriber]);
+  }
+
+  function removeAllSubscribers() {
+    setSubscribers([]);
   }
 
   return {
     addNewSubscriber,
+    removeAllSubscribers,
   };
 }

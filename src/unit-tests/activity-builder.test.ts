@@ -109,14 +109,14 @@ function prepareActivityBuilder(
   activityBuilderStepAccumulator: ActivityBuilderDataAccumulator
 ) {
   return new BuiltActivityHandler(
-    activityBuilderData,
     (msg: ChatMessageTypes) => activityBuilderStepAccumulator.sendMessage(msg),
     (waiting: boolean) =>
       activityBuilderStepAccumulator.setWaitingForUserAnswer(waiting),
     (intention: string) =>
       activityBuilderStepAccumulator.updateSessionIntention(intention),
     async (aiPromptSteps: AiPromptStep[]) =>
-      activityBuilderStepAccumulator.executePrompt(aiPromptSteps)
+      activityBuilderStepAccumulator.executePrompt(aiPromptSteps),
+    activityBuilderData
   );
 }
 
