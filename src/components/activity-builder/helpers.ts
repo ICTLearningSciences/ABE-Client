@@ -33,7 +33,6 @@ export function receivedExpectedData(
   try {
     const v = new Validator.Validator();
     const schema = convertExpectedDataIntoSchema(expectedData);
-    console.log(schema);
     const responseJson = JSON.parse(jsonResponse);
     const result = v.validate(responseJson, schema);
     if (result.errors.length > 0) {
