@@ -15,13 +15,13 @@ import { useWithExecutePrompt } from './use-with-execute-prompts';
 import { ActivityBuilder } from '../components/activity-builder/types';
 
 export function useWithBuiltActivityHandler(
+  resetActivityCounter: number,
   selectedActivityBuilder?: ActivityBuilder
 ) {
-  const { sendMessage } = useWithChat();
-  const { state, updateSessionIntention } = useWithState();
+  const { sendMessage, clearChatLog, coachResponsePending } = useWithChat();
+  const { state, updateSessionIntention, newSession } = useWithState();
   const googleDocId = state.googleDocId;
   const { executePromptSteps } = useWithExecutePrompt();
-
   const { addNewSubscriber, removeAllSubscribers } =
     useWithChatLogSubscribers();
 
@@ -29,27 +29,51 @@ export function useWithBuiltActivityHandler(
     useState<BuiltActivityHandler>();
 
   useEffect(() => {
-    if (!googleDocId || !selectedActivityBuilder) {
+    if (!googleDocId) {
       //hack to ensure that sendMessageHelper is fully loaded with googleDocId
       return;
     }
-    const newActivityHandler = new BuiltActivityHandler(
-      sendMessageHelper,
-      (waiting: boolean) => {
-        console.log(waiting);
-      },
-      updateSessionIntentionHelper,
-      executePromptSteps,
-      selectedActivityBuilder
-    );
-
-    addNewSubscriber(newActivityHandler);
-    setBuiltActivityHandler(newActivityHandler);
-
-    return () => {
+    if (!selectedActivityBuilder?._id) {
       removeAllSubscribers();
-    };
-  }, [googleDocId, selectedActivityBuilder]);
+      setBuiltActivityHandler(undefined);
+      clearChatLog(googleDocId);
+    } else if (!builtActivityHandler) {
+      const newActivityHandler = new BuiltActivityHandler(
+        sendMessageHelper,
+        () => {
+          clearChatLog(googleDocId);
+        },
+        (waiting: boolean) => {
+          console.log(waiting);
+        },
+        coachResponsePending,
+        updateSessionIntentionHelper,
+        executePromptSteps,
+        selectedActivityBuilder
+      );
+      newActivityHandler.initializeActivity();
+      setBuiltActivityHandler(newActivityHandler);
+      addNewSubscriber(newActivityHandler);
+    } else if (
+      builtActivityHandler.builtActivityData?._id !==
+      selectedActivityBuilder._id
+    ) {
+      builtActivityHandler.setBuiltActivityData(selectedActivityBuilder);
+      builtActivityHandler.resetActivity();
+    }
+  }, [
+    googleDocId,
+    selectedActivityBuilder?._id,
+    Boolean(builtActivityHandler),
+  ]);
+
+  useEffect(() => {
+    if (!builtActivityHandler) {
+      return;
+    }
+    newSession();
+    builtActivityHandler.resetActivity();
+  }, [resetActivityCounter]);
 
   function sendMessageHelper(msg: ChatMessageTypes, clearChat?: boolean) {
     sendMessage(msg, clearChat || false, googleDocId);
@@ -63,6 +87,5 @@ export function useWithBuiltActivityHandler(
 
   return {
     activityReady: Boolean(builtActivityHandler),
-    startActivityHandler: builtActivityHandler?.initializeActivity,
   };
 }

@@ -254,8 +254,7 @@ export function useWithActivityHandler(
     }
   }
 
-  function resetActivity() {
-    // cancel any pending requests
+  function abortCalls() {
     if (abortController) {
       try {
         abortController.controller.abort();
@@ -264,6 +263,11 @@ export function useWithActivityHandler(
         console.log(e);
       }
     }
+  }
+
+  function resetActivity() {
+    // cancel any pending requests
+    abortCalls();
     newSession();
     coachResponsePending(false);
     setWaitingForUserAnswer(false);
@@ -302,7 +306,9 @@ export function useWithActivityHandler(
   }
 
   useEffect(() => {
-    if (resetActivityCounter === 0 || !selectedActivity) return;
+    abortCalls();
+    if (resetActivityCounter === 0) return;
+    if (!selectedActivity) return;
     clearChatLog(googleDocId);
     sendIntroMessages();
     resetActivity();
@@ -380,6 +386,6 @@ export function useWithActivityHandler(
   ]);
 
   return {
-    activityReady: activity?.isReady || !selectedActivity,
+    activityReady: Boolean(activity?.isReady) && Boolean(selectedActivity),
   };
 }

@@ -11,6 +11,12 @@ import {
   fetchActivities as _fetchActivities,
   addOrUpdateActivity as _addOrUpdateActivity,
 } from '../../../hooks/api';
+import {
+  collectIntentionActivity,
+  collectUserNameActivity,
+  sendDataToPromptsActivity,
+} from '../../../unit-tests/activity-builder-fixture';
+import { ActivityBuilder } from '../../../components/activity-builder/types';
 
 export enum LoadStatus {
   NONE,
@@ -24,6 +30,8 @@ export interface State {
   docGoalsLoadStatus: LoadStatus;
   activities: ActivityGQL[];
   activitiesLoadStatus: LoadStatus;
+  builtActivities: ActivityBuilder[];
+  builtActivitiesLoadStatus: LoadStatus;
 }
 
 const initialState: State = {
@@ -31,6 +39,8 @@ const initialState: State = {
   docGoalsLoadStatus: LoadStatus.NONE,
   activities: [],
   activitiesLoadStatus: LoadStatus.NONE,
+  builtActivities: [],
+  builtActivitiesLoadStatus: LoadStatus.NONE,
 };
 
 export const fetchDocGoals = createAsyncThunk(
@@ -44,6 +54,19 @@ export const fetchActivities = createAsyncThunk(
   'state/fetchActivities',
   async () => {
     return await _fetchActivities();
+  }
+);
+
+export const fetchBuiltActivities = createAsyncThunk(
+  'state/fetchBuiltActivities',
+  async () => {
+    // TODO: implement this
+    // return await _fetchBuiltActivities();
+    return [
+      collectUserNameActivity,
+      collectIntentionActivity,
+      sendDataToPromptsActivity,
+    ];
   }
 );
 
@@ -81,6 +104,17 @@ export const stateSlice = createSlice({
       })
       .addCase(fetchActivities.rejected, (state) => {
         state.activitiesLoadStatus = LoadStatus.FAILED;
+      })
+
+      .addCase(fetchBuiltActivities.pending, (state) => {
+        state.builtActivitiesLoadStatus = LoadStatus.LOADING;
+      })
+      .addCase(fetchBuiltActivities.fulfilled, (state, action) => {
+        state.builtActivities = action.payload;
+        state.builtActivitiesLoadStatus = LoadStatus.SUCCEEDED;
+      })
+      .addCase(fetchBuiltActivities.rejected, (state) => {
+        state.builtActivitiesLoadStatus = LoadStatus.FAILED;
       })
 
       .addCase(addOrUpdateActivity.fulfilled, (state, action) => {

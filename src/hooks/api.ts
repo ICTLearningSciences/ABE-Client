@@ -494,6 +494,10 @@ export async function fetchConfig(): Promise<Config> {
                 activity
                 disabled
               }
+              builtActivities{
+                activity
+                disabled
+              }
             }
             colorTheme{
               headerColor

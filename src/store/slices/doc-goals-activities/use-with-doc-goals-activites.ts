@@ -2,8 +2,10 @@ import {
   fetchDocGoals as _fetchDocGoals,
   fetchActivities as _fetchActivities,
   addOrUpdateActivity as _addOrUpdateActivity,
+  fetchBuiltActivities as _fetchBuiltActivities,
   LoadStatus,
 } from '.';
+import { ActivityBuilder } from '../../../components/activity-builder/types';
 import { ActivityGQL, ActivityTypes, DocGoal } from '../../../types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
@@ -27,14 +29,21 @@ export function useWithDocGoalsActivities() {
   const activities = useAppSelector(
     (state) => state.docGoalsActivities.activities
   );
+  const builtActivities = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivities
+  );
   const docGoalsGql = useAppSelector(
     (state) => state.docGoalsActivities.docGoals
   );
   const config = useAppSelector((state) => state.config);
   const displayedGoalActivities = config.config?.displayedGoalActivities || [];
 
-  const getActivitById = (id: string): ActivityGQL => {
-    return activities.find((a) => a._id === id) || ({} as ActivityGQL);
+  const getActivitById = (id: string): ActivityGQL | undefined => {
+    return activities.find((a) => a._id === id);
+  };
+
+  const getBuiltActivityById = (id: string): ActivityBuilder | undefined => {
+    return builtActivities.find((a) => a._id === id);
   };
 
   const docGoalsActivities: DocGoal[] = displayedGoalActivities.reduce(
@@ -43,16 +52,27 @@ export function useWithDocGoalsActivities() {
       if (!goal) {
         return acc;
       }
-      const activities: ActivityGQL[] = goalActivity.activities
-        .map((activityId) => {
-          const activity = getActivitById(activityId.activity);
-          return {
-            ...activity,
-            disabled: activityId.disabled,
-          };
-        })
-        .filter((a) => !!a);
-      return [...acc, { ...goal, activities, builtActivities: [] }];
+      const activities = goalActivity.activities.reduce((acc, activityId) => {
+        const activity = getActivitById(activityId.activity);
+        if (!activity) {
+          return acc;
+        }
+        return [...acc, { ...activity, disabled: activityId.disabled }];
+      }, [] as ActivityGQL[]);
+      const builtActivities = goalActivity.builtActivities?.reduce(
+        (acc, builtActivity) => {
+          const activity = getBuiltActivityById(builtActivity.activity);
+          if (!activity) {
+            return acc;
+          }
+          return [...acc, { ...activity, disabled: builtActivity.disabled }];
+        },
+        [] as ActivityBuilder[]
+      );
+      return [
+        ...acc,
+        { ...goal, activities, builtActivities: builtActivities || [] },
+      ];
     },
     [] as DocGoal[]
   );
@@ -65,6 +85,10 @@ export function useWithDocGoalsActivities() {
     return await dispatch(_fetchActivities());
   }
 
+  async function loadBuiltActivities() {
+    return await dispatch(_fetchBuiltActivities());
+  }
+
   async function addOrUpdateActivity(activity: ActivityGQL) {
     return await dispatch(_addOrUpdateActivity(activity));
   }
@@ -73,6 +97,7 @@ export function useWithDocGoalsActivities() {
     getActivitById,
     loadDocGoals,
     loadActivities,
+    loadBuiltActivities,
     addOrUpdateActivity,
     activities,
     docGoals: docGoalsActivities,

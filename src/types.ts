@@ -180,6 +180,7 @@ export interface IActivityConfig {
 export interface IGoalActivites {
   goal: string;
   activities: IActivityConfig[];
+  builtActivities: IActivityConfig[];
 }
 
 export interface ColorThemeConfig {

@@ -259,7 +259,10 @@ export default function DocGoalModal(props: {
       return (
         _selectedGoal?.activities && (
           <ActivitiesDisplay
-            activities={_selectedGoal.activities}
+            activities={[
+              ..._selectedGoal.activities,
+              ..._selectedGoal.builtActivities,
+            ]}
             setSelectedActivity={_setSelectedActivity}
             selectedActivity={_selectedActivity}
           />

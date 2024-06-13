@@ -12,12 +12,14 @@ import { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/u
 export async function useReduxHydration() {
   const userId = useAppSelector((state) => state.login.user?._id);
   const dispatch = useAppDispatch();
-  const { loadActivities, loadDocGoals } = useWithDocGoalsActivities();
+  const { loadActivities, loadDocGoals, loadBuiltActivities } =
+    useWithDocGoalsActivities();
 
   useEffect(() => {
     if (!userId) return;
     dispatch(loadUserGoogleDocs({ userId }));
     loadActivities();
+    loadBuiltActivities();
     loadDocGoals();
   }, [userId]);
 }

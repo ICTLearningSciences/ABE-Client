@@ -62,7 +62,10 @@ export function ChatInput(props: {
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
-            handleSendUserMessage(message);
+            e.preventDefault();
+            if (message) {
+              handleSendUserMessage(message);
+            }
           }
         }}
       />

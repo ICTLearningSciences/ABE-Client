@@ -110,8 +110,14 @@ function prepareActivityBuilder(
 ) {
   return new BuiltActivityHandler(
     (msg: ChatMessageTypes) => activityBuilderStepAccumulator.sendMessage(msg),
+    () => {
+      console.log('clear chat');
+    },
     (waiting: boolean) =>
       activityBuilderStepAccumulator.setWaitingForUserAnswer(waiting),
+    (responsePending: boolean) => {
+      console.log(responsePending);
+    },
     (intention: string) =>
       activityBuilderStepAccumulator.updateSessionIntention(intention),
     async (aiPromptSteps: AiPromptStep[]) =>
@@ -262,6 +268,9 @@ test('can send data to prompt requests', async () => {
     activityBuilderStepAccumulator.stepsExecuted[4],
     'Hello, Aaron!'
   );
+  console.log(
+    JSON.stringify(activityBuilderStepAccumulator.stepsExecuted[5], null, 2)
+  );
   confirmStepPromptExecution(activityBuilderStepAccumulator.stepsExecuted[5], [
     {
       prompts: [
@@ -273,12 +282,13 @@ test('can send data to prompt requests', async () => {
         },
         {
           promptText: 'Please generate a nickname for Aaron', // Aaron is inserted
-          includeEssay: true,
+          includeEssay: false,
           promptRole: PromptRoles.USER,
         },
       ],
       outputDataType: PromptOutputTypes.JSON,
-      responseFormat: '',
+      responseFormat:
+        'Please only respond with JSON with these fields:\nnickname: string\t\t a nickname generated for the supplied name \n',
       systemRole: 'user',
     },
   ]);

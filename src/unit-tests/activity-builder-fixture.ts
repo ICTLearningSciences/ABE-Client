@@ -154,7 +154,7 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
       stepType: 'Prompt',
       promptText: 'Please generate a nickname for {{name}}',
       responseFormat: '',
-      jsonResponseDataString: [
+      jsonResponseData: [
         {
           name: 'nickname',
           type: JsonResponseDataType.STRING,
@@ -163,7 +163,7 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
         },
       ],
       includeChatLogContext: true,
-      includeEssay: true,
+      includeEssay: false,
       outputDataType: PromptOutputTypes.JSON,
       customSystemRole: 'user',
     } as PromptActivityStep,

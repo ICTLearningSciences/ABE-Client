@@ -44,7 +44,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   chatLog: ChatLog = [];
   errorMessage: string | null = null;
   sendMessage: (msg: ChatMessageTypes) => void;
+  clearChat: () => void;
   setWaitingForUserAnswer: (waiting: boolean) => void;
+  setResponsePending: (pending: boolean) => void;
   updateSessionIntention: (intention: string) => void;
   executePrompt: (
     aiPromptSteps: AiPromptStep[]
@@ -91,7 +93,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
   constructor(
     sendMessage: (msg: ChatMessageTypes) => void,
+    clearChat: () => void,
     setWaitingForUserAnswer: (waiting: boolean) => void,
+    setResponsePending: (pending: boolean) => void,
     updateSessionIntention: (intention: string) => void,
     executePrompt: (
       aiPromptSteps: AiPromptStep[]
@@ -101,9 +105,11 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.builtActivityData = builtActivityData;
     this.stateData = {};
     this.sendMessage = sendMessage;
+    this.clearChat = clearChat;
     this.setWaitingForUserAnswer = setWaitingForUserAnswer;
     this.updateSessionIntention = updateSessionIntention;
     this.executePrompt = executePrompt;
+    this.setResponsePending = setResponsePending;
 
     this.setBuiltActivityData = this.setBuiltActivityData.bind(this);
     this.initializeActivity = this.initializeActivity.bind(this);
@@ -120,7 +126,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.getNextStep = this.getNextStep.bind(this);
   }
 
-  setBuiltActivityData(builtActivityData: ActivityBuilder) {
+  setBuiltActivityData(builtActivityData?: ActivityBuilder) {
     this.builtActivityData = builtActivityData;
   }
 
@@ -129,18 +135,16 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       throw new Error('No built activity data found');
     }
     this.resetActivity();
-    if (!this.curStep) {
-      throw new Error('No current step found');
-    }
-    this.handleStep(this.curStep);
   }
 
   resetActivity() {
     if (!this.builtActivityData || !this.builtActivityData.steps.length) {
       throw new Error('No built activity data found');
     }
+    this.clearChat();
     this.curStep = this.builtActivityData.steps[0];
     this.stateData = {};
+    this.handleStep(this.curStep);
   }
 
   async handleStep(step: ActivityBuilderStep) {
@@ -224,6 +228,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async handlePromptStep(step: PromptActivityStep) {
+    this.setResponsePending(true);
     // handle replacing promptText with stored data
     const promptText = this.replaceStoredDataInString(step.promptText);
     // handle replacing responseFormat with stored data
@@ -284,6 +289,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       const resData = JSON.parse(response);
       this.stateData = { ...this.stateData, ...resData };
     }
+    this.setResponsePending(false);
     await this.goToNextStep();
   }
 
