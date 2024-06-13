@@ -26,6 +26,18 @@ function convertExpectedDataIntoSchema(
   return schema;
 }
 
+export function convertExpectedDataToAiPromptString(
+  expectedData: JsonResponseData[]
+) {
+  let promptString = 'Please only respond with JSON with these fields:\n';
+  for (const expectedField of expectedData) {
+    promptString += `${expectedField.name}: ${expectedField.type}\t\t ${
+      expectedField.additionalInfo || ''
+    } \n`;
+  }
+  return promptString;
+}
+
 export function receivedExpectedData(
   expectedData: JsonResponseData[],
   jsonResponse: string

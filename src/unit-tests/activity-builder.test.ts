@@ -213,7 +213,8 @@ test('can collect data from ai response and display', async () => {
         },
       ],
       outputDataType: PromptOutputTypes.JSON,
-      responseFormat: '',
+      responseFormat:
+        'Please only respond with JSON with these fields:\nnickname: string\t\t  \n',
       systemRole: 'user',
     },
   ]);

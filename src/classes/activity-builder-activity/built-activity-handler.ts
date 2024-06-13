@@ -30,7 +30,10 @@ import {
   PromptRoles,
 } from '../../types';
 import { chatLogToString, isJsonString } from '../../helpers';
-import { receivedExpectedData } from '../../components/activity-builder/helpers';
+import {
+  convertExpectedDataToAiPromptString,
+  receivedExpectedData,
+} from '../../components/activity-builder/helpers';
 import { ChatLogSubscriber } from '../../hooks/use-with-chat-log-subscribers';
 
 export class BuiltActivityHandler implements ChatLogSubscriber {
@@ -257,6 +260,11 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     };
 
     aiPromptSteps[0].prompts.push(promptConfig);
+    if (step.jsonResponseData) {
+      aiPromptSteps[0].responseFormat = convertExpectedDataToAiPromptString(
+        step.jsonResponseData
+      );
+    }
 
     // handle sending prompt
     const _response = await this.executePrompt(aiPromptSteps);

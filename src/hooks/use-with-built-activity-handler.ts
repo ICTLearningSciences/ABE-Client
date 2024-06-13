@@ -10,7 +10,7 @@ import { BuiltActivityHandler } from '../classes/activity-builder-activity/built
 import { ChatMessageTypes } from '../store/slices/chat';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
 import { useWithState } from '../store/slices/state/use-with-state';
-import { collectUserNameActivity } from '../unit-tests/activity-builder-fixture';
+import { collectAiDataAndDisplayActivity } from '../unit-tests/activity-builder-fixture';
 import { useWithChatLogSubscribers } from './use-with-chat-log-subscribers';
 import { useWithExecutePrompt } from './use-with-execute-prompts';
 
@@ -38,7 +38,7 @@ export function useWithBuiltActivityHandler() {
       },
       updateSessionIntentionHelper,
       executePromptSteps,
-      collectUserNameActivity
+      collectAiDataAndDisplayActivity
     );
 
     addNewSubscriber(newActivityHandler);
