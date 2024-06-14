@@ -25,7 +25,6 @@ export interface ActivityBuilder extends IActivity {
   displayIcon: DisplayIcons;
   newDocRecommend?: boolean;
   disabled?: boolean;
-  extraField: string;
   steps: ActivityBuilderStep[];
 }
 

@@ -21,7 +21,6 @@ export const collectUserNameActivity: ActivityBuilder = {
   activityType: 'builder',
   description: '',
   displayIcon: DisplayIcons.DEFAULT,
-  extraField: '',
   steps: [
     {
       stepId: '2',
@@ -58,7 +57,6 @@ export const collectIntentionActivity: ActivityBuilder = {
   title: 'Collect User Intention',
   activityType: 'builder',
   description: '',
-  extraField: '',
   displayIcon: DisplayIcons.DEFAULT,
   steps: [
     {
@@ -83,7 +81,6 @@ export const collectAiDataAndDisplayActivity: ActivityBuilder = {
   title: 'Test AI Response Data',
   activityType: 'builder',
   description: '',
-  extraField: '',
   displayIcon: DisplayIcons.DEFAULT,
   steps: [
     {
@@ -127,7 +124,6 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
   title: 'Test AI Response Data',
   activityType: 'builder',
   description: '',
-  extraField: '',
   displayIcon: DisplayIcons.DEFAULT,
   steps: [
     {
