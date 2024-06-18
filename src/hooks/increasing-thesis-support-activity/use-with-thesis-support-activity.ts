@@ -375,7 +375,7 @@ export function useWithThesisSupportActivity(
                 message: reverseOutlineRes.overall.justification,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: introStep(stepData, allActivityMessages),
+                disableUserInput: true,
                 aiServiceStepData: res.aiAllStepsData,
               },
               false,

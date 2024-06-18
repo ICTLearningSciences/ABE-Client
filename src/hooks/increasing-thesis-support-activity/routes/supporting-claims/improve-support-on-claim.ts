@@ -166,14 +166,7 @@ export function sSelectIntendedImprovement(
                 'Here are some more suggestions to improve your claim. You may select one below, input your own, or we can brainstorm some more changes',
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
-              activityStep: sSelectIntendedImprovement(
-                stepData,
-                state,
-                setState,
-                suggestClaimSupportChanges,
-                analyzeRevisionIntention,
-                allActivityMessages
-              ),
+              disableUserInput: true,
               mcqChoices: [
                 MCQ_BRAINSTORM,
                 ...suggestedImprovementsRes.suggestedImprovements,
@@ -211,14 +204,7 @@ export function sSelectIntendedImprovement(
               message: res.answer,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
-              activityStep: sSelectIntendedImprovement(
-                stepData,
-                state,
-                setState,
-                suggestClaimSupportChanges,
-                analyzeRevisionIntention,
-                allActivityMessages
-              ),
+              disableUserInput: true,
               aiServiceStepData: res.aiAllStepsData,
             });
             setState((prevValue) => ({

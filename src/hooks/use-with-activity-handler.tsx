@@ -33,7 +33,7 @@ import {
   STRONGER_CONCLUSION_ID,
   STRONGER_HOOK_ID,
   THESIS_SUPPORT_ID,
-  ECI_ACTIVITY_ID
+  ECI_ACTIVITY_ID,
 } from '../constants';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { useWithStrongerConclusionActivity } from './stronger-conclusion-activity/use-with-stronger-conclusion-activity';
@@ -142,7 +142,7 @@ export function useWithActivityHandler(
     promptsLoading,
     prompts,
     selectedGoal
-  )
+  );
 
   const activity =
     selectedActivity?._id === STRONGER_HOOK_ID
@@ -350,7 +350,8 @@ export function useWithActivityHandler(
         sender: Sender.SYSTEM,
         displayType: MessageDisplayType.TEXT,
         mcqChoices: currentStep.mcqChoices,
-        activityStep: currentStep,
+        disableUserInput:
+          currentStep.stepType !== ActivityStepTypes.FREE_RESPONSE_QUESTION,
         selectedGoal: selectedGoal,
       },
       false,

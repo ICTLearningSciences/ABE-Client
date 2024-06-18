@@ -51,14 +51,6 @@ export function caCollectArgumentForNewClaim(
               message: res.answer,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
-              activityStep: caCollectArgumentForNewClaim(
-                stepData,
-                state,
-                setState,
-                brainstormArgsForNewClaim,
-                analyzeIntendedArgForClaim,
-                allActivityMessages
-              ),
               mcqChoices: [MCQ_BRAINSTORM],
               aiServiceStepData: res.aiAllStepsData,
             });
@@ -87,14 +79,6 @@ export function caCollectArgumentForNewClaim(
               message: res.answer,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
-              activityStep: caCollectArgumentForNewClaim(
-                stepData,
-                state,
-                setState,
-                brainstormArgsForNewClaim,
-                analyzeIntendedArgForClaim,
-                allActivityMessages
-              ),
               mcqChoices: [],
               aiServiceStepData: res.aiAllStepsData,
             });
@@ -150,13 +134,6 @@ export function addClaimToPaperAnalyzeStep(
             message: res.answer,
             sender: Sender.SYSTEM,
             displayType: MessageDisplayType.TEXT,
-            activityStep: addClaimToPaperAnalyzeStep(
-              stepData,
-              state,
-              setState,
-              analyzeClaimAddedToPaper,
-              allActivityMessages
-            ),
             aiServiceStepData: res.aiAllStepsData,
           });
         }

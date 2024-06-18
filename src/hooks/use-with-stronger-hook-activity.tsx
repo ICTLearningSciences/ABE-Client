@@ -478,7 +478,6 @@ export default function useWithStrongerHookActivity(
           message: `I didn't find any people or places in your responses. Please try again.`,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
-          activityStep: narrativeWeakStepTwo(stepData),
         },
         false,
         googleDocId
@@ -490,7 +489,6 @@ export default function useWithStrongerHookActivity(
           message: result.response,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
-          activityStep: narrativeWeakStepTwo(stepData),
         },
         false,
         googleDocId
@@ -538,7 +536,7 @@ export default function useWithStrongerHookActivity(
           message: cannedResponse,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
-          activityStep: introStep(stepData),
+          disableUserInput: true,
 
           aiServiceStepData: response.aiAllStepsData,
         },
@@ -602,7 +600,6 @@ export default function useWithStrongerHookActivity(
           message: `Okay. Are there any other audiences or stakeholders who are important to this? How should they feel?`,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
-          activityStep: emotionWeakStepOne(stepData),
 
           aiServiceStepData: res.aiAllStepsData,
         },
@@ -635,7 +632,6 @@ export default function useWithStrongerHookActivity(
               message: response.answer,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
-              activityStep: emotionWeakStepOne(stepData),
 
               aiServiceStepData: response.aiAllStepsData,
             },
@@ -762,7 +758,6 @@ export default function useWithStrongerHookActivity(
                   message: res.answer,
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
-                  activityStep: narrativeWeakStepTwo(stepData),
 
                   aiServiceStepData: res.aiAllStepsData,
                 },
@@ -776,7 +771,6 @@ export default function useWithStrongerHookActivity(
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
                   mcqChoices: [HELP_ME_BRAINSTORM],
-                  activityStep: narrativeWeakStepTwo(stepData),
                 },
                 false,
                 googleDocId
@@ -829,7 +823,6 @@ export default function useWithStrongerHookActivity(
                 message: response.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: narrativeWeakStepFour(stepData),
 
                 aiServiceStepData: response.aiAllStepsData,
               },
@@ -915,7 +908,7 @@ export default function useWithStrongerHookActivity(
                 message: response.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: narrativeWeakStepSix(stepData),
+                disableUserInput: true,
 
                 aiServiceStepData: response.aiAllStepsData,
               },
@@ -1004,7 +997,7 @@ export default function useWithStrongerHookActivity(
                 message: res.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: emotionWeakStepTwo(stepData),
+
                 aiServiceStepData: res.aiAllStepsData,
               },
               false,
@@ -1042,7 +1035,7 @@ export default function useWithStrongerHookActivity(
                 message: response.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: emotionWeakStepThree(stepData),
+                disableUserInput: true,
                 aiServiceStepData: response.aiAllStepsData,
               },
               false,
@@ -1069,7 +1062,6 @@ export default function useWithStrongerHookActivity(
               message: response.answer,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
-              activityStep: freeInputStep(stepData),
 
               aiServiceStepData: response.aiAllStepsData,
             },

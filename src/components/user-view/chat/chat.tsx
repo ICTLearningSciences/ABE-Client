@@ -312,9 +312,7 @@ export default function Chat(props: {
     coachResponsePending ||
     (goalHasActivities &&
       Boolean(
-        messages?.length > 0 &&
-          messages[messages.length - 1].activityStep?.stepType !==
-            ActivityStepTypes.FREE_RESPONSE_QUESTION
+        messages?.length > 0 && messages[messages.length - 1].disableUserInput
       ));
   const [openAiInfoToDisplay, setAiInfoToDisplay] =
     useState<AiServiceStepDataTypes[]>();

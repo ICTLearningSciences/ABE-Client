@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Activity, ActiveActivityStep, DocGoal } from '../../../types';
+import { Activity, DocGoal } from '../../../types';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 
 export enum Sender {
@@ -31,7 +31,7 @@ export interface ChatMessage {
   aiServiceStepData?: AiServiceStepDataTypes[];
   mcqChoices?: string[];
   selectActivities?: Activity[];
-  activityStep?: ActiveActivityStep;
+  disableUserInput?: boolean;
   selectedGoal?: DocGoal;
   userInputType?: UserInputType;
   retryFunction?: () => void;

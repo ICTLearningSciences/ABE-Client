@@ -42,16 +42,7 @@ export function useWithChat(): UseWithChat {
     clearChat = false,
     docId: string
   ) {
-    const messageToSend: ChatMessageTypes = {
-      ...msg,
-      activityStep: msg.activityStep
-        ? {
-            ...msg.activityStep,
-            handleResponse: undefined,
-          }
-        : undefined,
-    };
-    dispatch(addMessage({ message: messageToSend, clearChat, docId }));
+    dispatch(addMessage({ message: msg, clearChat, docId }));
   }
 
   function sendMessages(
@@ -59,18 +50,7 @@ export function useWithChat(): UseWithChat {
     clearChat = false,
     docId: string
   ) {
-    const messagesToSend = msgs.map((msg) => {
-      return {
-        ...msg,
-        activityStep: msg.activityStep
-          ? {
-              ...msg.activityStep,
-              handleResponse: undefined,
-            }
-          : undefined,
-      };
-    });
-    dispatch(addMessages({ messages: messagesToSend, clearChat, docId }));
+    dispatch(addMessages({ messages: msgs, clearChat, docId }));
   }
 
   function coachResponsePending(pending: boolean) {
