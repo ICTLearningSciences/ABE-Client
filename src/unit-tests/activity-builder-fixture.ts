@@ -20,6 +20,8 @@ export const collectUserNameActivity: ActivityBuilder = {
   title: 'Collect User Name',
   activityType: 'builder',
   description: '',
+  user: '123',
+  visibility: 'public',
   displayIcon: DisplayIcons.DEFAULT,
   steps: [
     {
@@ -56,6 +58,8 @@ export const collectIntentionActivity: ActivityBuilder = {
   _id: 'collect-user-intention',
   title: 'Collect User Intention',
   activityType: 'builder',
+  user: '123',
+  visibility: 'public',
   description: '',
   displayIcon: DisplayIcons.DEFAULT,
   steps: [
@@ -80,6 +84,8 @@ export const collectAiDataAndDisplayActivity: ActivityBuilder = {
   _id: 'test-ai-response-data',
   title: 'Test AI Response Data',
   activityType: 'builder',
+  user: '123',
+  visibility: 'public',
   description: '',
   displayIcon: DisplayIcons.DEFAULT,
   steps: [
@@ -123,6 +129,8 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
   _id: 'test-ai-response-data',
   title: 'Test AI Response Data',
   activityType: 'builder',
+  user: '123',
+  visibility: 'public',
   description: '',
   displayIcon: DisplayIcons.DEFAULT,
   steps: [

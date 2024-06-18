@@ -12,10 +12,9 @@ import {
   addOrUpdateActivity as _addOrUpdateActivity,
 } from '../../../hooks/api';
 import {
-  collectIntentionActivity,
-  collectUserNameActivity,
-  sendDataToPromptsActivity,
-} from '../../../unit-tests/activity-builder-fixture';
+  fetchBuiltActivities as _fetchBuiltActivities,
+  addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
+} from '../../../hooks/built-activity-api';
 import { ActivityBuilder } from '../../../components/activity-builder/types';
 
 export enum LoadStatus {
@@ -57,23 +56,24 @@ export const fetchActivities = createAsyncThunk(
   }
 );
 
-export const fetchBuiltActivities = createAsyncThunk(
-  'state/fetchBuiltActivities',
-  async () => {
-    // TODO: implement this
-    // return await _fetchBuiltActivities();
-    return [
-      collectUserNameActivity,
-      collectIntentionActivity,
-      sendDataToPromptsActivity,
-    ];
-  }
-);
-
 export const addOrUpdateActivity = createAsyncThunk(
   'state/addOrUpdateActivity',
   async (activity: ActivityGQL) => {
     return await _addOrUpdateActivity(activity);
+  }
+);
+
+export const fetchBuiltActivities = createAsyncThunk(
+  'state/fetchBuiltActivities',
+  async () => {
+    return await _fetchBuiltActivities();
+  }
+);
+
+export const addOrUpdateBuiltActivity = createAsyncThunk(
+  'state/addOrUpdateBuiltActivity',
+  async (activity: ActivityBuilder) => {
+    return await _addOrUpdateBuiltActivity(activity);
   }
 );
 
@@ -119,6 +119,15 @@ export const stateSlice = createSlice({
 
       .addCase(addOrUpdateActivity.fulfilled, (state, action) => {
         state.activities = state.activities.map((a) => {
+          if (a._id === action.payload._id) {
+            return action.payload;
+          }
+          return a;
+        });
+      })
+
+      .addCase(addOrUpdateBuiltActivity.fulfilled, (state, action) => {
+        state.builtActivities = state.builtActivities.map((a) => {
           if (a._id === action.payload._id) {
             return action.payload;
           }

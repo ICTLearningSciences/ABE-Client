@@ -3,6 +3,7 @@ import {
   fetchActivities as _fetchActivities,
   addOrUpdateActivity as _addOrUpdateActivity,
   fetchBuiltActivities as _fetchBuiltActivities,
+  addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
   LoadStatus,
 } from '.';
 import { ActivityBuilder } from '../../../components/activity-builder/types';
@@ -85,12 +86,16 @@ export function useWithDocGoalsActivities() {
     return await dispatch(_fetchActivities());
   }
 
+  async function addOrUpdateActivity(activity: ActivityGQL) {
+    return await dispatch(_addOrUpdateActivity(activity));
+  }
+
   async function loadBuiltActivities() {
     return await dispatch(_fetchBuiltActivities());
   }
 
-  async function addOrUpdateActivity(activity: ActivityGQL) {
-    return await dispatch(_addOrUpdateActivity(activity));
+  async function addOrUpdateBuiltActivity(activity: ActivityBuilder) {
+    return await dispatch(_addOrUpdateBuiltActivity(activity));
   }
 
   return {
@@ -99,6 +104,7 @@ export function useWithDocGoalsActivities() {
     loadActivities,
     loadBuiltActivities,
     addOrUpdateActivity,
+    addOrUpdateBuiltActivity,
     activities,
     docGoals: docGoalsActivities,
     isLoading:

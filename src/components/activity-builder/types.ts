@@ -21,6 +21,8 @@ export interface ActivityBuilder extends IActivity {
   _id: string;
   activityType: 'builder';
   title: string;
+  user: string;
+  visibility: string;
   description: string;
   displayIcon: DisplayIcons;
   newDocRecommend?: boolean;
