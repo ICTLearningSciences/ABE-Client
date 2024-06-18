@@ -89,8 +89,6 @@ export default function EditGoogleDoc(props: {
           description: '',
           introduction: '',
           displayIcon: DisplayIcons.DEFAULT,
-          responsePendingMessage: '',
-          responseReadyMessage: '',
           disabled: false,
         };
       }

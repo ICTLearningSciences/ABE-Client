@@ -339,9 +339,7 @@ export interface ActivityGQL {
   introduction: string;
   description: string;
   displayIcon: DisplayIcons;
-  responsePendingMessage: string;
   newDocRecommend?: boolean;
-  responseReadyMessage: string;
   disabled: boolean;
   prompt?: GQLPrompt;
   prompts?: ActivityPromptGQL[];

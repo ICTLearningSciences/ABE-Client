@@ -49,8 +49,6 @@ export const emptyActivity: Activity = {
   _id: '',
   title: '',
   introduction: '',
-  responsePendingMessage: '',
-  responseReadyMessage: '',
   disabled: false,
   steps: [],
   description: '',

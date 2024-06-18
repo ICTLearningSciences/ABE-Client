@@ -14,8 +14,6 @@ export const fetchActivitiesResponse = {
                     "description": "Discuss ideas related to your thesis.",
                     "displayIcon": null,
                     "introduction": "In this activity we will be exploring improvements to your thesis.",
-                    "responsePendingMessage": "Analyzing your essays thesis...",
-                    "responseReadyMessage": "Here are my thoughts:",
                 },
             },
             {
@@ -25,8 +23,6 @@ export const fetchActivitiesResponse = {
                     "description": "Work on improving the hook of your essay.",
                     "displayIcon": null,
                     "introduction": "This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.",
-                    "responsePendingMessage": "Analyzing...",
-                    "responseReadyMessage": "Here are my thoughts:",
                 },
             },
             {
@@ -36,8 +32,6 @@ export const fetchActivitiesResponse = {
                     "steps": [],
                     "description": "Army Style Prompt Checklist",
                     "introduction": "",
-                    "responsePendingMessage": "Analyzing...",
-                    "responseReadyMessage": "Here are my thoughts:",
                     "prompt": {
                         "_id": "659dd7664575cc2a8f595375",
                         "clientId": "4a224649-8a00-45df-929d-a4299b277b82",
@@ -74,8 +68,6 @@ export const fetchActivitiesResponse = {
                     "steps": [],
                     "description": "Army Style Prompt Checklist",
                     "introduction": "",
-                    "responsePendingMessage": "Analyzing...",
-                    "responseReadyMessage": "Here are my thoughts:",
                     "prompt": {
                         "_id": "659dd7664575cc2a8f595375",
                         "clientId": "4a224649-8a00-45df-929d-a4299b277b82",

@@ -255,8 +255,6 @@ export interface ActivityGQL {
   description: string;
   steps?: ActivityStepGQL[];
   displayIcon: DisplayIcons;
-  responsePendingMessage: string;
-  responseReadyMessage: string;
   disabled?: boolean;
   prompt?: GQLPrompt;
   prompts?: ActivityPromptGQL[];
