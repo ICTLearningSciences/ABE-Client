@@ -15,6 +15,46 @@ import {
 } from '../components/activity-builder/types';
 import { DisplayIcons } from '../helpers/display-icon-helper';
 
+export const exampleSystemMessageActivityStep: SystemMessageActivityStep = {
+  stepId: '1',
+  stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+  message: 'Hello, world!',
+};
+
+export const exampleRequestUserInputActivityStep: RequestUserInputActivityStep =
+  {
+    stepId: '1',
+    stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+    message: 'What is your name?',
+    saveAsIntention: false,
+    saveResponseVariableName: 'name',
+    disableFreeInput: false,
+    predefinedResponses: [
+      {
+        message: 'I like it!',
+        jumpToStepId: '2',
+      },
+    ],
+  };
+
+export const examplePromptActivityStep: PromptActivityStep = {
+  stepId: '1',
+  stepType: ActivityBuilderStepType.PROMPT,
+  promptText: 'Please generate a nickname for Aaron',
+  responseFormat: '',
+  jsonResponseData: [
+    {
+      name: 'nickname',
+      type: JsonResponseDataType.STRING,
+      isRequired: true,
+    },
+  ],
+  includeChatLogContext: false,
+  includeEssay: false,
+  outputDataType: PromptOutputTypes.JSON,
+  customSystemRole: 'user',
+};
+
 export const collectUserNameActivity: ActivityBuilder = {
   _id: 'collect-user-name',
   title: 'Collect User Name',
@@ -178,6 +218,75 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
           stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
           message: 'Hello, {{name}}!',
         } as SystemMessageActivityStep,
+        {
+          stepId: '4',
+          stepType: 'Prompt',
+          promptText: 'Please generate a nickname for {{name}}',
+          responseFormat: '',
+          jsonResponseData: [
+            {
+              name: 'nickname',
+              type: JsonResponseDataType.STRING,
+              additionalInfo: 'a nickname generated for the supplied name',
+              isRequired: true,
+            },
+          ],
+          includeChatLogContext: true,
+          includeEssay: false,
+          outputDataType: PromptOutputTypes.JSON,
+          customSystemRole: 'user',
+        } as PromptActivityStep,
+        {
+          stepId: '5',
+          stepType: 'SystemMessage',
+          message:
+            'Thank you for participating in the test activity, {{nickname}}!',
+          jumpToStepId: '1',
+        } as SystemMessageActivityStep,
+      ],
+    },
+  ],
+};
+
+export const multipleFlowActivity: ActivityBuilder = {
+  _id: 'multiple-flow-activity',
+  title: 'Multiple Flow Activity',
+  activityType: 'builder',
+  user: '123',
+  visibility: 'public',
+  description: '',
+  displayIcon: DisplayIcons.DEFAULT,
+  flowsList: [
+    {
+      _id: '1',
+      name: 'flow 1',
+      steps: [
+        {
+          stepId: '1',
+          stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+          message: 'Welcome to the test activity',
+        } as SystemMessageActivityStep,
+        {
+          stepId: '2',
+          stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+          message: 'What is your name?',
+          saveAsIntention: false,
+          saveResponseVariableName: 'name',
+          disableFreeInput: false,
+          predefinedResponses: [],
+        } as RequestUserInputActivityStep,
+        {
+          stepId: '3',
+          stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+          message: 'Hello, {{name}}!',
+          jumpToStepId: '4',
+        } as SystemMessageActivityStep,
+      ],
+    },
+    {
+      _id: '2',
+      name: 'flow 2',
+      steps: [
         {
           stepId: '4',
           stepType: 'Prompt',

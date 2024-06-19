@@ -224,7 +224,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       sender: Sender.SYSTEM,
       displayType: MessageDisplayType.TEXT,
       disableUserInput: step.disableFreeInput,
-      mcqChoices: step.predefinedResponses.map((response) => response.message),
+      mcqChoices: step.predefinedResponses.map((response) =>
+        this.replaceStoredDataInString(response.message)
+      ),
     });
     this.setWaitingForUserAnswer(true);
     // Will now wait for user input before progressing to next step
