@@ -34,6 +34,7 @@ import {
   STRONGER_HOOK_ID,
   THESIS_SUPPORT_ID,
   ECI_ACTIVITY_ID,
+  LINCHPINGS_ACTIVITY_ID,
 } from '../constants';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { useWithStrongerConclusionActivity } from './stronger-conclusion-activity/use-with-stronger-conclusion-activity';
@@ -44,6 +45,7 @@ import { AiServicesResponseTypes } from '../ai-services/ai-service-types';
 import { getLastUserMessage } from '../helpers';
 import axios from 'axios';
 import { useWithEciActivity } from './eci-activity/use-with-eci-activity';
+import { useWithLinchpinsActivity } from './linchpins-activity/use-with-linchpins-activity';
 
 export const MCQ_RETRY_FAILED_REQUEST = 'Retry';
 
@@ -143,6 +145,14 @@ export function useWithActivityHandler(
     prompts,
     selectedGoal
   );
+  const linchpinsActivity = useWithLinchpinsActivity(
+    selectedActivity || emptyActivity,
+    sendMessageHelper,
+    setWaitingForUserAnswer,
+    promptsLoading,
+    prompts,
+    selectedGoal
+  );
 
   const activity =
     selectedActivity?._id === STRONGER_HOOK_ID
@@ -155,6 +165,8 @@ export function useWithActivityHandler(
       ? thesisSupportActivity
       : selectedActivity?._id === ECI_ACTIVITY_ID
       ? eciActivity
+      : selectedActivity?._id === LINCHPINGS_ACTIVITY_ID
+      ? linchpinsActivity
       : selectedActivity?.prompt
       ? promptActivity
       : undefined;
