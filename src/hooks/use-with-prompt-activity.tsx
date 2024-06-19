@@ -101,7 +101,7 @@ export function useWithPromptActivity(
                 message: response.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: introStep(stepData),
+                disableUserInput: true,
                 aiServiceStepData: response.aiAllStepsData,
               },
               false,
@@ -132,7 +132,7 @@ export function useWithPromptActivity(
                   message: response.answer,
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
-                  activityStep: freeInputStep(stepData),
+
                   aiServiceStepData: response.aiAllStepsData,
                 },
                 false,
@@ -145,7 +145,7 @@ export function useWithPromptActivity(
                     'Feel free to ask me anything else about your essay, or I can anaylze it again for you.',
                   sender: Sender.SYSTEM,
                   displayType: MessageDisplayType.TEXT,
-                  activityStep: freeInputStep(stepData),
+
                   mcqChoices: [MCQ_ANALYZE],
                 },
                 false,
@@ -162,7 +162,7 @@ export function useWithPromptActivity(
                 message: response.answer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: freeInputStep(stepData),
+
                 aiServiceStepData: response.aiAllStepsData,
               },
               false,
@@ -175,7 +175,7 @@ export function useWithPromptActivity(
                   'Feel free to ask me anything else about your essay, or I can anaylze it again for you.',
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
-                activityStep: freeInputStep(stepData),
+
                 mcqChoices: [MCQ_ANALYZE],
               },
               false,

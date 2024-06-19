@@ -47,14 +47,7 @@ export function crRemoveClaimFromPaper(
               sender: Sender.SYSTEM,
               mcqChoices: [MCQ_BRAINSTORM, MCQ_READY_FOR_REVIEW],
               displayType: MessageDisplayType.TEXT,
-              activityStep: crRemoveClaimFromPaper(
-                stepData,
-                state,
-                setState,
-                brainstormClaimRemoval,
-                analyzeClaimRemoval,
-                allActivityMessages
-              ),
+              disableUserInput: true,
             });
           }
         );
@@ -79,14 +72,7 @@ export function crRemoveClaimFromPaper(
               sender: Sender.SYSTEM,
               mcqChoices: [],
               displayType: MessageDisplayType.TEXT,
-              activityStep: crRemoveClaimFromPaper(
-                stepData,
-                state,
-                setState,
-                brainstormClaimRemoval,
-                analyzeClaimRemoval,
-                allActivityMessages
-              ),
+              disableUserInput: true,
             });
             setState({
               ...state,

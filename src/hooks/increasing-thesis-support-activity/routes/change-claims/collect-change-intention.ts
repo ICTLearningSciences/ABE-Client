@@ -63,14 +63,7 @@ export function cCollectIntentionStep(
               message: res.answer,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
-              activityStep: cCollectIntentionStep(
-                stepData,
-                state,
-                setState,
-                brainstormPrompt,
-                analyzeIntendedClaimUsagePrompt,
-                allActivityMessages
-              ),
+
               mcqChoices: [MCQ_BRAINSTORM],
               aiServiceStepData: res.aiAllStepsData,
             });
@@ -83,14 +76,6 @@ export function cCollectIntentionStep(
             'Hope that helped. What claim would you like to add, remove, or revise?',
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
-          activityStep: cCollectIntentionStep(
-            stepData,
-            state,
-            setState,
-            brainstormPrompt,
-            analyzeIntendedClaimUsagePrompt,
-            allActivityMessages
-          ),
           mcqChoices: [MCQ_BRAINSTORM],
         });
         setWaitingForUserAnswer(true);
@@ -111,14 +96,7 @@ export function cCollectIntentionStep(
               message: analyzeIntendedClaimResponse.intentionFeedback,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
-              activityStep: cCollectIntentionStep(
-                stepData,
-                state,
-                setState,
-                brainstormPrompt,
-                analyzeIntendedClaimUsagePrompt,
-                allActivityMessages
-              ),
+
               aiServiceStepData: res.aiAllStepsData,
             });
             if (claimAction === ClaimAction.ADDING) {
