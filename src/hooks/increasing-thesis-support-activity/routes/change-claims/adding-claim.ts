@@ -51,7 +51,6 @@ export function caCollectArgumentForNewClaim(
               message: res.answer,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
-
               mcqChoices: [MCQ_BRAINSTORM],
               aiServiceStepData: res.aiAllStepsData,
             });
@@ -80,7 +79,6 @@ export function caCollectArgumentForNewClaim(
               message: res.answer,
               sender: Sender.SYSTEM,
               displayType: MessageDisplayType.TEXT,
-
               mcqChoices: [],
               aiServiceStepData: res.aiAllStepsData,
             });
@@ -136,7 +134,6 @@ export function addClaimToPaperAnalyzeStep(
             message: res.answer,
             sender: Sender.SYSTEM,
             displayType: MessageDisplayType.TEXT,
-
             aiServiceStepData: res.aiAllStepsData,
           });
         }

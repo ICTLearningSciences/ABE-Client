@@ -496,6 +496,7 @@ export default function useWithStrongerHookActivity(
 
   function handleAnalyzePromptResponse(
     response: AiServicesResponseTypes,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     stepData: StepData,
     nextStage?: StepNames
   ) {

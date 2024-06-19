@@ -76,7 +76,6 @@ export function cCollectIntentionStep(
             'Hope that helped. What claim would you like to add, remove, or revise?',
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
-
           mcqChoices: [MCQ_BRAINSTORM],
         });
         setWaitingForUserAnswer(true);
