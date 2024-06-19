@@ -17,6 +17,12 @@ export interface IActivity {
   activityType: 'builder' | 'gql';
 }
 
+export interface FlowItem {
+  _id: string;
+  name: string;
+  steps: ActivityBuilderStep[];
+}
+
 export interface ActivityBuilder extends IActivity {
   _id: string;
   activityType: 'builder';
@@ -27,7 +33,7 @@ export interface ActivityBuilder extends IActivity {
   displayIcon: DisplayIcons;
   newDocRecommend?: boolean;
   disabled?: boolean;
-  steps: ActivityBuilderStep[];
+  flowsList: FlowItem[];
 }
 
 export enum ActivityBuilderStepType {
@@ -51,6 +57,7 @@ export interface SystemMessageActivityStep extends ActivityBuilderStep {
 // RequestUserInput
 export interface PredefinedResponse {
   message: string;
+  jumpToStepId?: string;
 }
 
 export interface RequestUserInputActivityStep extends ActivityBuilderStep {

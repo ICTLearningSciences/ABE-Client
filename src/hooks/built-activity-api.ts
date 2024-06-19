@@ -18,7 +18,10 @@ export const fullBuiltActivityQueryData = `
                       displayIcon
                       disabled
                       newDocRecommend
-                      steps{
+                      flowsList{
+                        _id
+                        name
+                        steps{
                           ... on SystemMessageActivityStepType {
                               stepId
                               stepType
@@ -36,6 +39,7 @@ export const fullBuiltActivityQueryData = `
                               disableFreeInput
                               predefinedResponses{
                                   message
+                                  jumpToStepId
                               }
                           }
 
@@ -56,6 +60,7 @@ export const fullBuiltActivityQueryData = `
                               }
                               customSystemRole
                           }
+                      }
                       }
 `;
 

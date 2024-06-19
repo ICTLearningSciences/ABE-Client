@@ -23,34 +23,41 @@ export const collectUserNameActivity: ActivityBuilder = {
   user: '123',
   visibility: 'public',
   displayIcon: DisplayIcons.DEFAULT,
-  steps: [
+  flowsList: [
     {
-      stepId: '2',
-      stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
-      message: 'What is your name?',
-      saveAsIntention: false,
-      saveResponseVariableName: 'name',
-      disableFreeInput: false,
-      predefinedResponses: [],
-    } as RequestUserInputActivityStep,
-    {
-      stepId: '3',
-      stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
-      message: 'Hello, {{name}}!',
-    } as SystemMessageActivityStep,
-    {
-      stepId: '4',
-      stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
-      message: 'What would you like to do next?',
-      saveAsIntention: false,
-      saveResponseVariableName: '',
-      disableFreeInput: true,
-      predefinedResponses: [
+      _id: '2',
+      name: '',
+      steps: [
         {
-          message: 'Next activity.',
-        },
+          stepId: '2',
+          stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+          message: 'What is your name?',
+          saveAsIntention: false,
+          saveResponseVariableName: 'name',
+          disableFreeInput: false,
+          predefinedResponses: [],
+        } as RequestUserInputActivityStep,
+        {
+          stepId: '3',
+          stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+          message: 'Hello, {{name}}!',
+        } as SystemMessageActivityStep,
+        {
+          stepId: '4',
+          stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+          message: 'What would you like to do next?',
+          saveAsIntention: false,
+          saveResponseVariableName: '',
+          disableFreeInput: true,
+          predefinedResponses: [
+            {
+              message: 'Next activity.',
+            },
+          ],
+          jumpToStepId: '2',
+        } as RequestUserInputActivityStep,
       ],
-    } as RequestUserInputActivityStep,
+    },
   ],
 };
 
@@ -62,21 +69,28 @@ export const collectIntentionActivity: ActivityBuilder = {
   visibility: 'public',
   description: '',
   displayIcon: DisplayIcons.DEFAULT,
-  steps: [
+  flowsList: [
     {
-      stepId: '1',
-      stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
-      message: 'What would you like to do next?',
-      saveAsIntention: true,
-      saveResponseVariableName: 'intention',
-      disableFreeInput: false,
-      predefinedResponses: [],
-    } as RequestUserInputActivityStep,
-    {
-      stepId: '2',
-      stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
-      message: 'Your intention: {{intention}}',
-    } as SystemMessageActivityStep,
+      _id: '2',
+      name: '',
+      steps: [
+        {
+          stepId: '1',
+          stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+          message: 'What would you like to do next?',
+          saveAsIntention: true,
+          saveResponseVariableName: 'intention',
+          disableFreeInput: false,
+          predefinedResponses: [],
+        } as RequestUserInputActivityStep,
+        {
+          stepId: '2',
+          stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+          message: 'Your intention: {{intention}}',
+          jumpToStepId: '1',
+        } as SystemMessageActivityStep,
+      ],
+    },
   ],
 };
 
@@ -88,40 +102,47 @@ export const collectAiDataAndDisplayActivity: ActivityBuilder = {
   visibility: 'public',
   description: '',
   displayIcon: DisplayIcons.DEFAULT,
-  steps: [
+  flowsList: [
     {
-      stepId: '1',
-      stepType: 'Prompt',
-      promptText: 'Please generate a nickname for Aaron',
-      responseFormat: '',
-      jsonResponseData: [
+      _id: '2',
+      name: '',
+      steps: [
         {
-          name: 'nickname',
-          type: 'string',
-          isRequired: true,
-        },
+          stepId: '1',
+          stepType: 'Prompt',
+          promptText: 'Please generate a nickname for Aaron',
+          responseFormat: '',
+          jsonResponseData: [
+            {
+              name: 'nickname',
+              type: 'string',
+              isRequired: true,
+            },
+          ],
+          includeChatLogContext: false,
+          includeEssay: false,
+          outputDataType: PromptOutputTypes.JSON,
+          customSystemRole: 'user',
+        } as PromptActivityStep,
+        {
+          stepId: '2',
+          stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+          saveAsIntention: false,
+          saveResponseVariableName: '',
+          disableFreeInput: false,
+          predefinedResponses: [
+            {
+              message: 'I like it!',
+            },
+            {
+              message: 'I do not like it.',
+            },
+          ],
+          message: 'Do you like this nickname: {{nickname}}?',
+          jumpToStepId: '1',
+        } as RequestUserInputActivityStep,
       ],
-      includeChatLogContext: false,
-      includeEssay: false,
-      outputDataType: PromptOutputTypes.JSON,
-      customSystemRole: 'user',
-    } as PromptActivityStep,
-    {
-      stepId: '2',
-      stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
-      saveAsIntention: false,
-      saveResponseVariableName: '',
-      disableFreeInput: false,
-      predefinedResponses: [
-        {
-          message: 'I like it!',
-        },
-        {
-          message: 'I do not like it.',
-        },
-      ],
-      message: 'Do you like this nickname: {{nickname}}?',
-    } as RequestUserInputActivityStep,
+    },
   ],
 };
 
@@ -133,50 +154,56 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
   visibility: 'public',
   description: '',
   displayIcon: DisplayIcons.DEFAULT,
-  steps: [
+  flowsList: [
     {
-      stepId: '1',
-      stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
-      message: 'Welcome to the test activity',
-    } as SystemMessageActivityStep,
-    {
-      stepId: '2',
-      stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
-      message: 'What is your name?',
-      saveAsIntention: false,
-      saveResponseVariableName: 'name',
-      disableFreeInput: false,
-      predefinedResponses: [],
-    } as RequestUserInputActivityStep,
-    {
-      stepId: '3',
-      stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
-      message: 'Hello, {{name}}!',
-    } as SystemMessageActivityStep,
-    {
-      stepId: '4',
-      stepType: 'Prompt',
-      promptText: 'Please generate a nickname for {{name}}',
-      responseFormat: '',
-      jsonResponseData: [
+      _id: '1',
+      name: '',
+      steps: [
         {
-          name: 'nickname',
-          type: JsonResponseDataType.STRING,
-          additionalInfo: 'a nickname generated for the supplied name',
-          isRequired: true,
-        },
+          stepId: '1',
+          stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+          message: 'Welcome to the test activity',
+        } as SystemMessageActivityStep,
+        {
+          stepId: '2',
+          stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+          message: 'What is your name?',
+          saveAsIntention: false,
+          saveResponseVariableName: 'name',
+          disableFreeInput: false,
+          predefinedResponses: [],
+        } as RequestUserInputActivityStep,
+        {
+          stepId: '3',
+          stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+          message: 'Hello, {{name}}!',
+        } as SystemMessageActivityStep,
+        {
+          stepId: '4',
+          stepType: 'Prompt',
+          promptText: 'Please generate a nickname for {{name}}',
+          responseFormat: '',
+          jsonResponseData: [
+            {
+              name: 'nickname',
+              type: JsonResponseDataType.STRING,
+              additionalInfo: 'a nickname generated for the supplied name',
+              isRequired: true,
+            },
+          ],
+          includeChatLogContext: true,
+          includeEssay: false,
+          outputDataType: PromptOutputTypes.JSON,
+          customSystemRole: 'user',
+        } as PromptActivityStep,
+        {
+          stepId: '5',
+          stepType: 'SystemMessage',
+          message:
+            'Thank you for participating in the test activity, {{nickname}}!',
+          jumpToStepId: '1',
+        } as SystemMessageActivityStep,
       ],
-      includeChatLogContext: true,
-      includeEssay: false,
-      outputDataType: PromptOutputTypes.JSON,
-      customSystemRole: 'user',
-    } as PromptActivityStep,
-    {
-      stepId: '5',
-      stepType: 'SystemMessage',
-      message:
-        'Thank you for participating in the test activity, {{nickname}}!',
-      jumpToStepId: '1',
-    } as SystemMessageActivityStep,
+    },
   ],
 };

@@ -56,37 +56,65 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     delete this.stateData[key];
   }
 
-  getNextStep(step: ActivityBuilderStep): ActivityBuilderStep {
+  getStepById(stepId: string): ActivityBuilderStep | undefined {
+    if (
+      !this.builtActivityData ||
+      !this.builtActivityData.flowsList.length ||
+      !this.builtActivityData.flowsList[0].steps.length
+    ) {
+      throw new Error('No activity data found');
+    }
+    for (let i = 0; i < this.builtActivityData.flowsList.length; i++) {
+      const flow = this.builtActivityData.flowsList[i];
+      for (let j = 0; j < flow.steps.length; j++) {
+        const step = flow.steps[j];
+        if (step.stepId === stepId) {
+          return step;
+        }
+      }
+    }
+    return undefined;
+  }
+
+  getNextStep(currentStep: ActivityBuilderStep): ActivityBuilderStep {
     if (!this.builtActivityData) {
       throw new Error('No activity data found');
     }
-    if (!this.curStep) {
-      throw new Error('No current step found');
-    }
-    if (step.jumpToStepId) {
-      const jumpStep = this.builtActivityData.steps.find(
-        (step) => step.stepId === this.curStep!.jumpToStepId
-      );
+
+    if (currentStep.jumpToStepId) {
+      const jumpStep = this.getStepById(currentStep.jumpToStepId);
       if (!jumpStep) {
         throw new Error(
-          `Unable to find requested step: ${this.curStep.jumpToStepId}`
+          `Unable to find target step ${currentStep.jumpToStepId}, maybe you deleted it and forgot to update this step?`
         );
       }
       return jumpStep;
     } else {
-      const currentStepIndex = this.builtActivityData.steps.findIndex(
-        (step) => step.stepId === this.curStep!.stepId
+      // go to next step in current flow
+      const currentStepFlowList = this.builtActivityData.flowsList.find(
+        (flow) => flow.steps.find((step) => step.stepId === currentStep.stepId)
       );
+
+      if (!currentStepFlowList) {
+        throw new Error(`Unable to find flow for step: ${currentStep.stepId}`);
+      }
+
+      const currentStepIndex = currentStepFlowList.steps.findIndex(
+        (step) => step.stepId === currentStep.stepId
+      );
+
       if (currentStepIndex === -1) {
         throw new Error(
-          `Unable to find requested step: ${this.curStep.stepId}`
+          `Unable to find requested step: ${currentStep.stepId} in flow ${currentStepFlowList.name}`
         );
       }
       const nextStepIndex = currentStepIndex + 1;
-      if (nextStepIndex >= this.builtActivityData.steps.length) {
-        return this.builtActivityData.steps[0];
+      if (nextStepIndex >= currentStepFlowList.steps.length) {
+        throw new Error(
+          'No next step found, maybe you forgot to add a jumpToStepId for the last step in a flow?'
+        );
       } else {
-        return this.builtActivityData.steps[nextStepIndex];
+        return currentStepFlowList.steps[nextStepIndex];
       }
     }
   }
@@ -124,6 +152,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.replaceStoredDataInString = this.replaceStoredDataInString.bind(this);
     this.removeDataFromStoredData = this.removeDataFromStoredData.bind(this);
     this.getNextStep = this.getNextStep.bind(this);
+    this.getStepById = this.getStepById.bind(this);
   }
 
   setBuiltActivityData(builtActivityData?: ActivityBuilder) {
@@ -131,23 +160,34 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   initializeActivity() {
-    if (!this.builtActivityData || !this.builtActivityData.steps.length) {
+    if (
+      !this.builtActivityData ||
+      !this.builtActivityData.flowsList.length ||
+      !this.builtActivityData.flowsList[0].steps.length
+    ) {
       throw new Error('No built activity data found');
     }
     this.resetActivity();
   }
 
   resetActivity() {
-    if (!this.builtActivityData || !this.builtActivityData.steps.length) {
+    if (
+      !this.builtActivityData ||
+      !this.builtActivityData.flowsList.length ||
+      !this.builtActivityData.flowsList[0].steps.length
+    ) {
       throw new Error('No built activity data found');
     }
     this.clearChat();
-    this.curStep = this.builtActivityData.steps[0];
+    this.curStep = this.builtActivityData.flowsList[0].steps[0];
     this.stateData = {};
     this.handleStep(this.curStep);
   }
 
   async handleStep(step: ActivityBuilderStep) {
+    if (this.curStep?.stepId !== step.stepId) {
+      this.curStep = step;
+    }
     // work through steps until we get to a user message step, then wait to be notified of a user message
     // handle the step
     switch (step.stepType) {
@@ -204,6 +244,27 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     }
     if (this.curStep.stepType !== ActivityBuilderStepType.REQUEST_USER_INPUT) {
       return;
+    }
+    const requestUserInputStep = this.curStep as RequestUserInputActivityStep;
+    if (requestUserInputStep.predefinedResponses.length > 0) {
+      const predefinedResponseMatch =
+        requestUserInputStep.predefinedResponses.find(
+          (response) => response.message === message
+        );
+      if (predefinedResponseMatch) {
+        if (predefinedResponseMatch.jumpToStepId) {
+          const jumpStep = this.getStepById(
+            predefinedResponseMatch.jumpToStepId
+          );
+          if (!jumpStep) {
+            throw new Error(
+              `Unable to find target step ${predefinedResponseMatch.jumpToStepId} for predefined input ${predefinedResponseMatch.message}, maybe you deleted it and forgot to update this step?`
+            );
+          }
+          this.handleStep(jumpStep);
+          return;
+        }
+      }
     }
     const userInputStep = this.curStep as RequestUserInputActivityStep;
     if (userInputStep.saveAsIntention) {
