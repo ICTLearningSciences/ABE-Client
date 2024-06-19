@@ -31,12 +31,7 @@ export function startReviewDocumentContent(
   setState: (value: React.SetStateAction<EciActivityState>) => void,
   compareDocumentContentToCmdIntent: GQLPrompt
 ): ActiveActivityStep {
-  const {
-    executePrompt,
-    sendMessage,
-    setWaitingForUserAnswer,
-    updateSessionIntention,
-  } = stepData;
+  const { executePrompt, sendMessage } = stepData;
   const introMessage = getMessage('65b3559017dcb51adc3bf967');
   return {
     text: introMessage || 'Let me know when your paper is ready for review.',
@@ -92,12 +87,7 @@ export function pickCritiqueToDiscuss(
   setState: (value: React.SetStateAction<EciActivityState>) => void,
   initiateConversationPrompt: GQLPrompt
 ): ActiveActivityStep {
-  const {
-    executePrompt,
-    sendMessage,
-    setWaitingForUserAnswer,
-    updateSessionIntention,
-  } = stepData;
+  const { executePrompt } = stepData;
   const pickCritiqueMessage = getMessage('75b3559017dcb51adc3bf967');
   return {
     text:
@@ -126,6 +116,7 @@ export function pickCritiqueToDiscuss(
           compareDocumentToCmdIntent: {
             ...state.compareDocumentToCmdIntent,
             critiqueDiscussing,
+            discussCritiqueIntroMessage: res.answer,
           },
           curStepName: EciStepNames.DISCUSS_CRITIQUE,
         });
@@ -142,12 +133,7 @@ export function discussCritique(
   state: EciActivityState,
   setState: (value: React.SetStateAction<EciActivityState>) => void
 ): ActiveActivityStep {
-  const {
-    executePrompt,
-    sendMessage,
-    setWaitingForUserAnswer,
-    updateSessionIntention,
-  } = stepData;
+  const { executePrompt, sendMessage, setWaitingForUserAnswer } = stepData;
   function setupFreeInputPrompt(chat: ChatMessageTypes[]) {
     const prompt = freeInputPrompt(chat);
     const updatedPrompt = addContextToPromptSteps(prompt, [
@@ -163,7 +149,7 @@ export function discussCritique(
     return updatedPrompt;
   }
   return {
-    text: state.usersInterpretationOfCmdIntent.discussQuestionIntroMessage,
+    text: state.compareDocumentToCmdIntent.discussCritiqueIntroMessage,
     stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
     mcqChoices: [REVISE_PAPER, PICK_ANOTHER_CRITIQUE],
     handleResponse: async (response) => {
@@ -182,6 +168,7 @@ export function discussCritique(
           sendMessage({
             id: uuidv4(),
             message: res.answer,
+            mcqChoices: [REVISE_PAPER, PICK_ANOTHER_CRITIQUE],
             sender: Sender.SYSTEM,
             displayType: MessageDisplayType.TEXT,
           });
@@ -202,14 +189,14 @@ export function revisePaper(
   const reivisonMessage = getMessage('85b3559017dcb51adc3bf967');
   return {
     text: reivisonMessage || 'What revision would you like to make?',
-    stepType: ActivityStepTypes.MESSAGE,
+    stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
     handleResponse: async (intendedRevision) => {
       updateSessionIntention({
         description: intendedRevision,
       });
       setState({
         ...state,
-        curStepName: EciStepNames.START_REVIEW_DOCUMENT_CONTENT,
+        curStepName: EciStepNames.REVIEW_DOCUMENT_CONTENT,
       });
     },
   };

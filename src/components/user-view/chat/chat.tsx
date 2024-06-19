@@ -20,12 +20,7 @@ import {
 import { ChatHeader, RowDiv, SmallGreyText } from '../../../styled-components';
 import { useWithStoreDocVersions } from '../../../hooks/use-with-store-doc-versions';
 import { useAppSelector } from '../../../store/hooks';
-import {
-  ActivityGQL,
-  ActivityStepTypes,
-  AiServiceModel,
-  DocGoal,
-} from '../../../types';
+import { ActivityGQL, AiServiceModel, DocGoal } from '../../../types';
 import SystemPromptModal from './system-prompt-modal';
 import { useWithSystemPromptsConfig } from '../../../hooks/use-with-system-prompts-config';
 import { UserRole } from '../../../store/slices/login';
@@ -249,6 +244,7 @@ function ChatInput(props: {
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
+            e.preventDefault();
             handleSendUserMessage(message);
           }
         }}

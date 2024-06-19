@@ -29,12 +29,7 @@ export function startReviewUnderstandingCmdIntention(
   setState: (value: React.SetStateAction<EciActivityState>) => void,
   compareUserInterpretationOfCmdIntentPrompt: GQLPrompt
 ): ActiveActivityStep {
-  const {
-    executePrompt,
-    sendMessage,
-    setWaitingForUserAnswer,
-    updateSessionIntention,
-  } = stepData;
+  const { executePrompt, sendMessage } = stepData;
   const introMessage = getMessage('35b8459017dcb51adc3bf967');
   return {
     text:
@@ -91,12 +86,7 @@ export function pickQuestionAboutInterpretation(
   setState: (value: React.SetStateAction<EciActivityState>) => void,
   initiateConverstaionPrompt: GQLPrompt
 ): ActiveActivityStep {
-  const {
-    executePrompt,
-    sendMessage,
-    setWaitingForUserAnswer,
-    updateSessionIntention,
-  } = stepData;
+  const { executePrompt } = stepData;
   const pickQuestionMessage = getMessage('45b3559017dcb51adc3bf967');
   return {
     text:
@@ -143,12 +133,7 @@ export function discussInterpretationQuestion(
   state: EciActivityState,
   setState: (value: React.SetStateAction<EciActivityState>) => void
 ): ActiveActivityStep {
-  const {
-    executePrompt,
-    sendMessage,
-    setWaitingForUserAnswer,
-    updateSessionIntention,
-  } = stepData;
+  const { executePrompt, sendMessage, setWaitingForUserAnswer } = stepData;
   function setupFreeInputPrompt(chat: ChatMessageTypes[]) {
     const prompt = freeInputPrompt(chat);
     const updatedPrompt = addContextToPromptSteps(prompt, [
@@ -178,7 +163,6 @@ export function discussInterpretationQuestion(
           curStepName: EciStepNames.REVISE_INTERPRETATION,
         });
       } else {
-        setWaitingForUserAnswer(true);
         await executePrompt(
           (chat) => setupFreeInputPrompt(chat),
           (res) => {
@@ -188,10 +172,11 @@ export function discussInterpretationQuestion(
               sender: Sender.SYSTEM,
               mcqChoices: [REVISE_INTERPRETATION, PICK_ANOTHER_CRITIQUE],
               displayType: MessageDisplayType.TEXT,
-              disableUserInput: false,
             });
+            setWaitingForUserAnswer(true);
           }
         );
+        setWaitingForUserAnswer(true);
       }
     },
   };
@@ -203,12 +188,7 @@ export function reviseInterpretation(
   state: EciActivityState,
   setState: (value: React.SetStateAction<EciActivityState>) => void
 ): ActiveActivityStep {
-  const {
-    executePrompt,
-    sendMessage,
-    setWaitingForUserAnswer,
-    updateSessionIntention,
-  } = stepData;
+  const { updateSessionIntention } = stepData;
   const reivisonMessage = getMessage('55b3559017dcb51adc3bf967');
   return {
     text: reivisonMessage || 'What revision would you like to make?',

@@ -445,6 +445,7 @@ export default function useWithStrongerHookActivity(
 
   function handleEntityDetectionResponse(
     response: AiServicesResponseTypes,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     stepData: StepData
   ) {
     const result = validateJsonResponse<EntityDetectionPromptResponse>(
@@ -499,6 +500,7 @@ export default function useWithStrongerHookActivity(
 
   function handleAnalyzePromptResponse(
     response: AiServicesResponseTypes,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     stepData: StepData,
     nextStage?: StepNames
   ) {

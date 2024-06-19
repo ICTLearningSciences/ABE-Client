@@ -5,12 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { useEffect, useState } from 'react';
-import {
-  ChatLog,
-  ChatMessageTypes,
-  MessageDisplayType,
-  Sender,
-} from '../../store/slices/chat';
+import { ChatLog, ChatMessageTypes, Sender } from '../../store/slices/chat';
 import {
   Activity,
   ActivityGQL,
@@ -22,9 +17,6 @@ import {
   StepMessage,
 } from '../../types';
 import { StepData } from '../use-with-stronger-hook-activity';
-import { useAppSelector } from '../../store/hooks';
-import { v4 as uuidv4 } from 'uuid';
-import { useWithState } from '../../store/slices/state/use-with-state';
 import {
   startReviewUnderstandingCmdIntention,
   pickQuestionAboutInterpretation,
@@ -37,9 +29,6 @@ import {
   discussCritique,
   revisePaper,
 } from './routes/review-document-content/start-review-document-content';
-
-const MCQ_READY = 'Ready';
-const MCQ_ANALYZE = 'Analyze';
 
 export const freeInputPrompt = (chatLog: ChatMessageTypes[]): GQLPrompt => {
   const reversedChatLog: ChatLog = [...chatLog].reverse();
@@ -81,13 +70,12 @@ export enum EciStepNames {
 
   // REVIEW UNDERSTANDING OF COMMANDERS INTENTION
   REVIEW_UNDERSTANDING_CMD_INTENTION = 'REVIEW_UNDERSTANDING_CMD_INTENTION',
-  REVIEW_DOCUMENT_CONTENT = 'REVIEW_DOCUMENT_CONTENT',
   PICK_QUESTION_ABOUT_INTERPRETATION = 'PICK_QUESTION_ABOUT_INTERPRETATION',
   DISCUSS_INTERPRETATION_QUESTION = 'DISCUSS_INTERPRETATION_QUESTION',
   REVISE_INTERPRETATION = 'REVISE_INTERPRETATION',
 
   // REVIEW DOCUMENT CONTENT
-  START_REVIEW_DOCUMENT_CONTENT = 'START_REVIEW_DOCUMENT_CONTENT',
+  REVIEW_DOCUMENT_CONTENT = 'REVIEW_DOCUMENT_CONTENT',
   PICK_CRITIQUE_TO_DISCUSS = 'PICK_CRITIQUE_TO_DISCUSS',
   DISCUSS_CRITIQUE = 'DISCUSS_CRITIQUE',
   REVISE_PAPER = 'REVISE_PAPER',
@@ -119,8 +107,6 @@ export function useWithEciActivity(
   prompts: GQLPrompt[],
   goal?: DocGoal
 ): Activity {
-  const { updateSessionIntention } = useWithState();
-  const googleDocId = useAppSelector((state) => state.state.googleDocId);
   const allActivityMessages: StepMessage[] = (activityGql.steps || [])?.reduce(
     (acc, step) => {
       return [...acc, ...step.messages];
@@ -287,8 +273,8 @@ export function useWithEciActivity(
       ?.text;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function introStep(stepData: StepData): ActiveActivityStep {
-    const { executePrompt } = stepData;
     const introMessage = getMessage('16b8559017dcb51adc3bf967');
     return {
       text: introMessage || 'What is the commanders provided intent?',
@@ -303,6 +289,7 @@ export function useWithEciActivity(
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function shouldWeReviewUnderstanding(stepData: StepData): ActiveActivityStep {
     const reviewUnderstandingMessage = getMessage('25c8559017dcb51adc3bf967');
     return {
