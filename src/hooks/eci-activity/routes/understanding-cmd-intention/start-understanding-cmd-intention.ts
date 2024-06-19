@@ -27,7 +27,7 @@ export function startReviewUnderstandingCmdIntention(
   getMessage: (messageId: string) => string | undefined,
   state: EciActivityState,
   setState: (value: React.SetStateAction<EciActivityState>) => void,
-  compareUserInterpretationOfCmdIntentPrompt: GQLPrompt
+  compareUserInterpretationOfCmdIntentPrompt?: GQLPrompt
 ): ActiveActivityStep {
   const { executePrompt, sendMessage } = stepData;
   const introMessage = getMessage('35b8459017dcb51adc3bf967');
@@ -37,6 +37,9 @@ export function startReviewUnderstandingCmdIntention(
       "Pretend that I'm a new officer that has just arrived to the unit. All I have been told is the Commander's intent. How would you explain their intent to me? What else would I need to know?",
     stepType: ActivityStepTypes.FREE_RESPONSE_QUESTION,
     handleResponse: async (userInterpretationOfCmdIntent) => {
+      if (!compareUserInterpretationOfCmdIntentPrompt) {
+        return;
+      }
       const updatedPrompt = addContextToPromptSteps(
         compareUserInterpretationOfCmdIntentPrompt,
         [
@@ -84,7 +87,7 @@ export function pickQuestionAboutInterpretation(
   getMessage: (messageId: string) => string | undefined,
   state: EciActivityState,
   setState: (value: React.SetStateAction<EciActivityState>) => void,
-  initiateConverstaionPrompt: GQLPrompt
+  initiateConverstaionPrompt?: GQLPrompt
 ): ActiveActivityStep {
   const { executePrompt } = stepData;
   const pickQuestionMessage = getMessage('45b3559017dcb51adc3bf967');
@@ -94,9 +97,12 @@ export function pickQuestionAboutInterpretation(
     stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
     mcqChoices: state.usersInterpretationOfCmdIntent.aiQuestionList,
     handleResponse: async (selectedQuestion) => {
+      if (!initiateConverstaionPrompt) {
+        return;
+      }
       const questionDiscussing = selectedQuestion;
       function setupInitiateConversationPrompt() {
-        const prompt = initiateConverstaionPrompt;
+        const prompt = initiateConverstaionPrompt!;
         const updatedPrompt = addContextToPromptSteps(prompt, [
           {
             promptRole: PromptRoles.SYSTEM,

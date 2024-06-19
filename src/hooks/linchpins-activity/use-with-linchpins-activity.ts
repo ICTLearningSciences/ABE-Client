@@ -144,13 +144,6 @@ export function useWithLinchpinsActivity(
   }
 
   function getStep(stepData: StepData): ActiveActivityStep {
-    if (
-      !listCrucialElementsPrompt ||
-      !brainstormSuccessElementsPrompt ||
-      !brainstormFailureElementsPrompt
-    ) {
-      throw new Error('Missing prompts');
-    }
     switch (state.curStepName) {
       case LinchpinStepNames.INTRO:
       case LinchpinStepNames.INTRO_2:

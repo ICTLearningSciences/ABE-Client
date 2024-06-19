@@ -209,14 +209,6 @@ export function useWithEciActivity(
   }
 
   function getStep(stepData: StepData): ActiveActivityStep {
-    if (
-      !initiateCompareInterpreationDiscussion ||
-      !compareUserInterpretationOfCmdIntent ||
-      !initiateDocumentContentDiscussion ||
-      !compareDocumentContentToCmdIntent
-    ) {
-      throw new Error('Missing prompts');
-    }
     switch (state.curStepName) {
       case EciStepNames.INTRO:
       case EciStepNames.INTRO_2:

@@ -29,7 +29,7 @@ export function startReviewDocumentContent(
   getMessage: (messageId: string) => string | undefined,
   state: EciActivityState,
   setState: (value: React.SetStateAction<EciActivityState>) => void,
-  compareDocumentContentToCmdIntent: GQLPrompt
+  compareDocumentContentToCmdIntent?: GQLPrompt
 ): ActiveActivityStep {
   const { executePrompt, sendMessage } = stepData;
   const introMessage = getMessage('65b3559017dcb51adc3bf967');
@@ -38,6 +38,9 @@ export function startReviewDocumentContent(
     stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
     mcqChoices: [MCQ_READY],
     handleResponse: async () => {
+      if (!compareDocumentContentToCmdIntent) {
+        return;
+      }
       const updatedPrompt: GQLPrompt = addContextToPromptSteps(
         compareDocumentContentToCmdIntent,
         [
@@ -85,7 +88,7 @@ export function pickCritiqueToDiscuss(
   getMessage: (messageId: string) => string | undefined,
   state: EciActivityState,
   setState: (value: React.SetStateAction<EciActivityState>) => void,
-  initiateConversationPrompt: GQLPrompt
+  initiateConversationPrompt?: GQLPrompt
 ): ActiveActivityStep {
   const { executePrompt } = stepData;
   const pickCritiqueMessage = getMessage('75b3559017dcb51adc3bf967');
@@ -95,9 +98,12 @@ export function pickCritiqueToDiscuss(
     stepType: ActivityStepTypes.MULTIPLE_CHOICE_QUESTIONS,
     mcqChoices: state.compareDocumentToCmdIntent.aiQuestionList,
     handleResponse: async (selectedCritique) => {
+      if (!initiateConversationPrompt) {
+        return;
+      }
       const critiqueDiscussing = selectedCritique;
       function setupInitiateConversationPrompt() {
-        const prompt = initiateConversationPrompt;
+        const prompt = initiateConversationPrompt!;
         const updatedPrompt = addContextToPromptSteps(prompt, [
           {
             promptRole: PromptRoles.SYSTEM,
