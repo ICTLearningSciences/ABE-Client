@@ -6,6 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import {
+  ActivityBuilderStepType,
   FlowItem,
   JsonResponseData,
   JsonResponseDataType,
@@ -22,10 +23,11 @@ import {
   InputField,
   SelectInputField,
 } from './shared/input-components';
-import { FlowStepSelector } from './shared/flow-step-selector';
 import { PromptOutputTypes } from '../../types';
 import { Button, IconButton } from '@mui/material';
 import { Delete } from '@mui/icons-material';
+import { v4 as uuid } from 'uuid';
+import { JumpToAlternateStep } from './shared/jump-to-alternate-step';
 
 export const emptyJsonResponseData: JsonResponseData = {
   name: '',
@@ -34,14 +36,31 @@ export const emptyJsonResponseData: JsonResponseData = {
   additionalInfo: '',
 };
 
+export function defaultPromptBuilder(): PromptActivityStep {
+  return {
+    stepId: uuid(),
+    stepType: ActivityBuilderStepType.PROMPT,
+    promptText: '',
+    responseFormat: '',
+    outputDataType: PromptOutputTypes.TEXT,
+    jsonResponseData: [],
+    includeChatLogContext: false,
+    includeEssay: false,
+    customSystemRole: '',
+    jumpToStepId: '',
+  };
+}
+
 export function PromptStepBuilder(props: {
   step: PromptActivityStep;
   updateStep: (step: PromptActivityStep) => void;
+  deleteStep: () => void;
   flowsList: FlowItem[];
+  stepIndex: number;
   width?: string;
   height?: string;
 }): JSX.Element {
-  const { step } = props;
+  const { step, stepIndex } = props;
 
   function updateField(
     field: string,
@@ -59,11 +78,22 @@ export function PromptStepBuilder(props: {
         width: props.width || '100%',
         height: props.height || '100%',
         display: 'flex',
+        position: 'relative',
         flexDirection: 'column',
         padding: 10,
       }}
     >
-      <TopLeftText>{step.stepId}</TopLeftText>
+      <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>
+      <IconButton
+        style={{
+          position: 'absolute',
+          right: 10,
+          top: 10,
+        }}
+        onClick={props.deleteStep}
+      >
+        <Delete />
+      </IconButton>
       <h4 style={{ alignSelf: 'center' }}>Prompt</h4>
       <InputField
         label="Prompt Text"
@@ -125,23 +155,13 @@ export function PromptStepBuilder(props: {
         width="100%"
       />
 
-      <ColumnCenterDiv
-        style={{
-          width: '50%',
-          border: '1px solid black',
-          padding: 10,
-          alignSelf: 'center',
+      <JumpToAlternateStep
+        step={step}
+        flowsList={props.flowsList}
+        onNewStepSelected={(stepId) => {
+          updateField('jumpToStepId', stepId);
         }}
-      >
-        <span style={{ fontWeight: 'bold' }}>Custom Step Jump</span>
-        <FlowStepSelector
-          flowsList={props.flowsList || []}
-          currentJumpToStepId={step.jumpToStepId}
-          onStepSelected={(stepId) => {
-            updateField('jumpToStepId', stepId);
-          }}
-        />
-      </ColumnCenterDiv>
+      />
     </RoundedBorderDiv>
   );
 }

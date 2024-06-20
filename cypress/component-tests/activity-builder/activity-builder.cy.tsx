@@ -10,5 +10,6 @@ import { multipleFlowActivity } from "../../../src/unit-tests/activity-builder-f
 
 it("should render", ()=>{
     let activity = multipleFlowActivity;
+    cy.viewport(1200, 800);
     cy.mount(<ActivityBuilder activity={activity} updateActivity={(activity)=>{return Promise.resolve(activity)}}/>);
 })

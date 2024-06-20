@@ -6,6 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import {
+  ActivityBuilderStepType,
   FlowItem,
   PredefinedResponse,
   RequestUserInputActivityStep,
@@ -20,6 +21,21 @@ import { CheckBoxInput, InputField } from './shared/input-components';
 import { FlowStepSelector } from './shared/flow-step-selector';
 import { Button, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { v4 as uuid } from 'uuid';
+import { Delete } from '@mui/icons-material';
+import { JumpToAlternateStep } from './shared/jump-to-alternate-step';
+
+export function getDefaultRequestUserInputBuilder(): RequestUserInputActivityStep {
+  return {
+    stepId: uuid(),
+    stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+    message: '',
+    saveResponseVariableName: '',
+    saveAsIntention: false,
+    disableFreeInput: false,
+    predefinedResponses: [],
+  };
+}
 
 function PredefinedResponseUpdater(props: {
   predefinedResponse: PredefinedResponse;
@@ -73,15 +89,17 @@ function PredefinedResponsesUpdater(props: {
   step: RequestUserInputActivityStep;
   updateStep: (step: RequestUserInputActivityStep) => void;
   flowsList: FlowItem[];
+  width?: string;
 }): JSX.Element {
   const { step, updateStep } = props;
   return (
     <ColumnCenterDiv
       style={{
-        width: '100%',
+        width: props.width || '100%',
         border: '1px solid black',
         alignSelf: 'center',
         justifyContent: 'center',
+        padding: 10,
       }}
     >
       <span style={{ fontWeight: 'bold' }}>Custom Response Buttons</span>
@@ -132,11 +150,13 @@ function PredefinedResponsesUpdater(props: {
 export function RequestUserInputStepBuilder(props: {
   step: RequestUserInputActivityStep;
   updateStep: (step: RequestUserInputActivityStep) => void;
+  deleteStep: () => void;
   flowsList: FlowItem[];
+  stepIndex: number;
   width?: string;
   height?: string;
 }): JSX.Element {
-  const { step, updateStep } = props;
+  const { step, updateStep, stepIndex } = props;
 
   function updateField(field: string, value: string | boolean) {
     props.updateStep({
@@ -151,11 +171,22 @@ export function RequestUserInputStepBuilder(props: {
         width: props.width || '100%',
         height: props.height || '100%',
         display: 'flex',
+        position: 'relative',
         flexDirection: 'column',
         padding: 10,
       }}
     >
-      <TopLeftText>{step.stepId}</TopLeftText>
+      <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>
+      <IconButton
+        style={{
+          position: 'absolute',
+          right: 10,
+          top: 10,
+        }}
+        onClick={props.deleteStep}
+      >
+        <Delete />
+      </IconButton>
       <h4 style={{ alignSelf: 'center' }}>Request User Input</h4>
       <InputField
         label="Request Message (Optional)"
@@ -186,9 +217,18 @@ export function RequestUserInputStepBuilder(props: {
         }}
       />
       <PredefinedResponsesUpdater
+        width="50%"
         step={step}
         updateStep={updateStep}
         flowsList={props.flowsList}
+      />
+
+      <JumpToAlternateStep
+        step={step}
+        flowsList={props.flowsList}
+        onNewStepSelected={(stepId) => {
+          updateField('jumpToStepId', stepId);
+        }}
       />
     </RoundedBorderDiv>
   );

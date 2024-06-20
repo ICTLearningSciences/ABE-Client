@@ -1,6 +1,5 @@
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import React, { useEffect } from 'react';
-import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { FlowItem } from '../types';
 import { getFlowForStepId } from '../helpers';
 
@@ -9,6 +8,7 @@ export function FlowStepSelector(props: {
   currentJumpToStepId?: string;
   onStepSelected: (stepId: string) => void;
   rowOrColumn?: 'row' | 'column';
+  disableStepsList?: string[];
   width?: string;
   title?: string;
 }): JSX.Element {
@@ -92,10 +92,14 @@ export function FlowStepSelector(props: {
           >
             {flowsList
               .find((flow) => flow._id === selectedFlowId)
-              ?.steps.map((step) => {
+              ?.steps.map((step, i) => {
                 return (
-                  <MenuItem key={step.stepId} value={step.stepId}>
-                    {step.stepId}
+                  <MenuItem
+                    key={step.stepId}
+                    value={step.stepId}
+                    disabled={props.disableStepsList?.includes(step.stepId)}
+                  >
+                    {`Step ${i + 1}`}
                   </MenuItem>
                 );
               })}

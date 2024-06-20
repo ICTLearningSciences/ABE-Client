@@ -15,7 +15,10 @@ describe("System Message Step Builder", ()=>{
             updateStep: (step)=>{
                 step = step;
             },
-            flowsList: multipleFlowActivity.flowsList
+            deleteStep: ()=>{
+            },
+            stepIndex: 0,
+            flowsList: multipleFlowActivity.flowsList,
         });
         cy.mount(systemMessageStepBuilder);
     })

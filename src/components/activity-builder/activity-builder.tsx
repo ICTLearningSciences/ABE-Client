@@ -45,7 +45,7 @@ export function ActivityBuilder(props: {
     activity: ActivityBuilderType
   ) => Promise<ActivityBuilderType>;
 }): JSX.Element {
-  const { activity, updateActivity } = props;
+  const { activity } = props;
   const [localActivityCopy, setLocalActivityCopy] =
     useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
   const flowsList = localActivityCopy.flowsList;

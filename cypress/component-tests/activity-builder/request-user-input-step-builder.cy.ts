@@ -15,6 +15,9 @@ describe("Request User Input Step Builder", ()=>{
             updateStep: (step)=>{
                 step = step;
             },
+            deleteStep: ()=>{
+            },
+            stepIndex: 0,
             flowsList: multipleFlowActivity.flowsList
         });
         cy.mount(systemMessageStepBuilder);

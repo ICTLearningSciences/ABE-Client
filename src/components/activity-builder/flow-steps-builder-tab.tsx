@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   ActivityBuilder,
   ActivityBuilderStep,
@@ -15,11 +15,20 @@ import {
   SystemMessageActivityStep,
 } from './types';
 import { ColumnDiv } from '../../styled-components';
-import { SystemMessageStepBuilder } from './system-message-step-builder';
-import { RequestUserInputStepBuilder } from './request-user-input-step-builder';
-import { PromptStepBuilder } from './prompt-step-builder';
+import {
+  SystemMessageStepBuilder,
+  getDefaultSystemMessage,
+} from './system-message-step-builder';
+import {
+  RequestUserInputStepBuilder,
+  getDefaultRequestUserInputBuilder,
+} from './request-user-input-step-builder';
+import { PromptStepBuilder, defaultPromptBuilder } from './prompt-step-builder';
 import { InputField } from './shared/input-components';
-
+import { AddNewActivityButton } from './shared/add-new-activity-button';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { IconButton } from '@mui/material';
 export function FlowStepsBuilderTab(props: {
   flow: FlowItem;
   flowsList: FlowItem[];
@@ -54,14 +63,24 @@ export function FlowStepsBuilderTab(props: {
     });
   }
 
+  function deleteStep(stepId: string) {
+    const updatedSteps = flow.steps.filter((s) => s.stepId !== stepId);
+    setLocalFlowCopy({
+      ...flow,
+      steps: updatedSteps,
+    });
+  }
+
   function renderActivityStep(step: ActivityBuilderStep, i: number) {
     switch (step.stepType) {
       case ActivityBuilderStepType.SYSTEM_MESSAGE:
         return (
           <SystemMessageStepBuilder
             key={i}
+            stepIndex={i}
             step={step as SystemMessageActivityStep}
             updateStep={updateStep}
+            deleteStep={() => deleteStep(step.stepId)}
             flowsList={flowsList}
           />
         );
@@ -69,7 +88,9 @@ export function FlowStepsBuilderTab(props: {
         return (
           <RequestUserInputStepBuilder
             key={i}
+            stepIndex={i}
             step={step as RequestUserInputActivityStep}
+            deleteStep={() => deleteStep(step.stepId)}
             updateStep={updateStep}
             flowsList={flowsList}
           />
@@ -78,7 +99,9 @@ export function FlowStepsBuilderTab(props: {
         return (
           <PromptStepBuilder
             key={i}
+            stepIndex={i}
             step={step as PromptActivityStep}
+            deleteStep={() => deleteStep(step.stepId)}
             updateStep={updateStep}
             flowsList={flowsList}
           />
@@ -88,20 +111,139 @@ export function FlowStepsBuilderTab(props: {
     }
   }
 
-  return (
-    <ColumnDiv>
-      <InputField
-        label="Flow Title"
-        value={flow.name}
-        onChange={(e) => {
-          setLocalFlowCopy({
-            ...flow,
-            name: e,
-          });
+  function insertNewActivityStep(stepType: ActivityBuilderStepType, i: number) {
+    const newStep: ActivityBuilderStep =
+      stepType === ActivityBuilderStepType.SYSTEM_MESSAGE
+        ? getDefaultSystemMessage()
+        : stepType === ActivityBuilderStepType.REQUEST_USER_INPUT
+        ? getDefaultRequestUserInputBuilder()
+        : defaultPromptBuilder();
+    setLocalFlowCopy({
+      ...flow,
+      steps: [
+        ...flow.steps.slice(0, i + 1),
+        newStep,
+        ...flow.steps.slice(i + 1),
+      ],
+    });
+  }
+
+  function moveStepUp(i: number) {
+    if (i === 0) {
+      return;
+    }
+    const newSteps = [...flow.steps];
+    const temp = newSteps[i];
+    newSteps[i] = newSteps[i - 1];
+    newSteps[i - 1] = temp;
+    setLocalFlowCopy({
+      ...flow,
+      steps: newSteps,
+    });
+  }
+
+  function moveStepDown(i: number) {
+    if (i === flow.steps.length - 1) {
+      return;
+    }
+    const newSteps = [...flow.steps];
+    const temp = newSteps[i];
+    newSteps[i] = newSteps[i + 1];
+    newSteps[i + 1] = temp;
+    setLocalFlowCopy({
+      ...flow,
+      steps: newSteps,
+    });
+  }
+
+  function MoveStepArrows(props: {
+    i: number;
+    disableUp: boolean;
+    disableDown: boolean;
+  }): JSX.Element {
+    const { i, disableDown, disableUp } = props;
+    return (
+      <ColumnDiv
+        style={{
+          position: 'absolute',
+          right: '0',
+          top: '40%',
+          transform: 'translateY(-40%)',
         }}
-      />
+      >
+        <IconButton
+          onClick={() => {
+            moveStepUp(i);
+          }}
+          disabled={disableUp}
+        >
+          <ArrowUpwardIcon />
+        </IconButton>
+        <IconButton
+          disabled={disableDown}
+          onClick={() => {
+            moveStepDown(i);
+          }}
+        >
+          <ArrowDownwardIcon />
+        </IconButton>
+      </ColumnDiv>
+    );
+  }
+
+  return (
+    <ColumnDiv
+      style={{
+        alignItems: 'center',
+      }}
+    >
+      <div
+        style={{
+          alignSelf: 'center',
+        }}
+      >
+        <InputField
+          label="Flow Title"
+          value={flow.name}
+          onChange={(e) => {
+            setLocalFlowCopy({
+              ...flow,
+              name: e,
+            });
+          }}
+        />
+      </div>
+      {
+        <AddNewActivityButton
+          insertNewActivityStep={(stepType) =>
+            insertNewActivityStep(stepType, -1)
+          }
+        />
+      }
       {flow.steps.map((step, i) => {
-        return renderActivityStep(step, i);
+        return (
+          <ColumnDiv
+            key={i}
+            style={{
+              alignItems: 'center',
+              width: '100%',
+              maxWidth: '900px',
+              position: 'relative',
+            }}
+          >
+            {renderActivityStep(step, i)}
+            <AddNewActivityButton
+              insertNewActivityStep={(stepType) =>
+                insertNewActivityStep(stepType, i)
+              }
+            />
+            <MoveStepArrows
+              i={i}
+              disableUp={i === 0}
+              disableDown={i === flow.steps.length - 1}
+            />
+          </ColumnDiv>
+        );
       })}
     </ColumnDiv>
   );
