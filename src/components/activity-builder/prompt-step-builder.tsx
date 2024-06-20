@@ -24,7 +24,8 @@ import {
 } from './shared/input-components';
 import { FlowStepSelector } from './shared/flow-step-selector';
 import { PromptOutputTypes } from '../../types';
-import { Button } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
+import { Delete } from '@mui/icons-material';
 
 export const emptyJsonResponseData: JsonResponseData = {
   name: '',
@@ -90,6 +91,15 @@ export function PromptStepBuilder(props: {
         }}
       />
 
+      {step.outputDataType === PromptOutputTypes.JSON && (
+        <JsonResponseDataUpdater
+          jsonResponseData={step.jsonResponseData || []}
+          updateJsonResponseData={(jsonResponseData) => {
+            updateField('jsonResponseData', jsonResponseData);
+          }}
+        />
+      )}
+
       <CheckBoxInput
         label="Include Chat History"
         value={step.includeChatLogContext}
@@ -115,13 +125,6 @@ export function PromptStepBuilder(props: {
         width="100%"
       />
 
-      <JsonResponseDataUpdater
-        jsonResponseData={step.jsonResponseData || []}
-        updateJsonResponseData={(jsonResponseData) => {
-          updateField('jsonResponseData', jsonResponseData);
-        }}
-      />
-
       <ColumnCenterDiv
         style={{
           width: '50%',
@@ -133,6 +136,7 @@ export function PromptStepBuilder(props: {
         <span style={{ fontWeight: 'bold' }}>Custom Step Jump</span>
         <FlowStepSelector
           flowsList={props.flowsList || []}
+          currentJumpToStepId={step.jumpToStepId}
           onStepSelected={(stepId) => {
             updateField('jumpToStepId', stepId);
           }}
@@ -161,6 +165,8 @@ function JsonResponseDataUpdater(props: {
             key={index}
             style={{
               border: '1px solid black',
+              position: 'relative',
+              width: '95%',
             }}
           >
             <InputField
@@ -201,6 +207,20 @@ function JsonResponseDataUpdater(props: {
                 props.updateJsonResponseData(updatedJsonResponseData);
               }}
             />
+            <IconButton
+              style={{
+                position: 'absolute',
+                top: 10,
+                right: 10,
+              }}
+              onClick={() => {
+                const updatedJsonResponseData = [...props.jsonResponseData];
+                updatedJsonResponseData.splice(index, 1);
+                props.updateJsonResponseData(updatedJsonResponseData);
+              }}
+            >
+              <Delete />
+            </IconButton>
           </ColumnDiv>
         );
       })}

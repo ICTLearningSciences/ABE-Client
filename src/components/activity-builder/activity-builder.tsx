@@ -4,12 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
 import { ColumnDiv } from '../../styled-components';
 import { ActivityBuilder as ActivityBuilderType } from './types';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { FlowStepsBuilder } from './flow-steps-builder';
+import { FlowStepsBuilderTab } from './flow-steps-builder-tab';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -47,12 +46,18 @@ export function ActivityBuilder(props: {
   ) => Promise<ActivityBuilderType>;
 }): JSX.Element {
   const { activity, updateActivity } = props;
-  const flowsList = activity.flowsList;
+  const [localActivityCopy, setLocalActivityCopy] =
+    useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
+  const flowsList = localActivityCopy.flowsList;
 
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  useEffect(() => {
+    setLocalActivityCopy(JSON.parse(JSON.stringify(activity)));
+  }, [activity]);
 
   const tabs = flowsList.map((flow, index) => {
     return (
@@ -67,7 +72,11 @@ export function ActivityBuilder(props: {
   const customTabPanels = flowsList.map((flow, index) => {
     return (
       <CustomTabPanel key={flow._id} value={value} index={index}>
-        <FlowStepsBuilder flow={flow} />
+        <FlowStepsBuilderTab
+          flow={flow}
+          flowsList={flowsList}
+          updateLocalActivity={setLocalActivityCopy}
+        />
       </CustomTabPanel>
     );
   });
@@ -76,7 +85,7 @@ export function ActivityBuilder(props: {
     <ColumnDiv
       style={{
         height: '100%',
-        width: '50%',
+        width: '100%',
       }}
     >
       <Box sx={{ width: '100%' }}>
@@ -91,7 +100,6 @@ export function ActivityBuilder(props: {
         </Box>
         {customTabPanels}
       </Box>
-      {/* Add tabs, keep first tab open */}
     </ColumnDiv>
   );
 }

@@ -41,6 +41,9 @@ export function CheckBoxInput(props: {
   return (
     <FormControlLabel
       label={props.label}
+      style={{
+        margin: 0,
+      }}
       control={
         <Checkbox
           checked={Boolean(props.value)}

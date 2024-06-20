@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { JsonResponseData } from './types';
+import { FlowItem, JsonResponseData } from './types';
 import Validator, { Schema } from 'jsonschema';
 
 function convertExpectedDataIntoSchema(
@@ -56,4 +56,15 @@ export function receivedExpectedData(
     console.error(error);
     return false;
   }
+}
+
+export function getFlowForStepId(
+  flow: FlowItem[],
+  stepId: string
+): FlowItem | undefined {
+  return flow.find((flowItem) => {
+    return flowItem.steps.find((step) => {
+      return step.stepId === stepId;
+    });
+  });
 }

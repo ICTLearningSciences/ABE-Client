@@ -51,7 +51,7 @@ export function SystemMessageStepBuilder(props: {
       />
       <ColumnCenterDiv
         style={{
-          width: '50%',
+          width: '80%',
           border: '1px solid black',
           padding: 10,
           alignSelf: 'center',
@@ -60,6 +60,9 @@ export function SystemMessageStepBuilder(props: {
         <span style={{ fontWeight: 'bold' }}>Custom Step Jump</span>
         <FlowStepSelector
           flowsList={props.flowsList || []}
+          rowOrColumn="row"
+          currentJumpToStepId={step.jumpToStepId}
+          width="fit-content"
           onStepSelected={(stepId) => {
             updateField('jumpToStepId', stepId);
           }}

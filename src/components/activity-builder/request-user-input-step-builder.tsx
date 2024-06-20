@@ -32,7 +32,8 @@ function PredefinedResponseUpdater(props: {
   return (
     <RowDiv
       style={{
-        alignItems: 'flex-end',
+        alignItems: 'center',
+        borderTop: '1px dotted black',
       }}
     >
       <InputField
@@ -48,7 +49,8 @@ function PredefinedResponseUpdater(props: {
       <FlowStepSelector
         title="Jump to Step (OPTIONAL)"
         flowsList={flowsList}
-        rowOrColumn="row"
+        currentJumpToStepId={predefinedResponse.jumpToStepId}
+        rowOrColumn="column"
         onStepSelected={(stepId) => {
           updateResponse({
             ...predefinedResponse,
@@ -73,41 +75,41 @@ function PredefinedResponsesUpdater(props: {
   flowsList: FlowItem[];
 }): JSX.Element {
   const { step, updateStep } = props;
-  if (!step.predefinedResponses?.length) {
-    return <></>;
-  }
   return (
     <ColumnCenterDiv
       style={{
         width: '100%',
         border: '1px solid black',
         alignSelf: 'center',
+        justifyContent: 'center',
       }}
     >
       <span style={{ fontWeight: 'bold' }}>Custom Response Buttons</span>
 
-      {step.predefinedResponses.map((response, index) => (
-        <PredefinedResponseUpdater
-          predefinedResponse={response}
-          updateResponse={(updatedResponse) => {
-            const updatedResponses = [...step.predefinedResponses];
-            updatedResponses[index] = updatedResponse;
-            updateStep({
-              ...step,
-              predefinedResponses: updatedResponses,
-            });
-          }}
-          deleteResponse={() => {
-            const updatedResponses = [...step.predefinedResponses];
-            updatedResponses.splice(index, 1);
-            updateStep({
-              ...step,
-              predefinedResponses: updatedResponses,
-            });
-          }}
-          flowsList={props.flowsList}
-        />
-      ))}
+      {step.predefinedResponses?.length &&
+        step.predefinedResponses.map((response, index) => (
+          <PredefinedResponseUpdater
+            key={index}
+            predefinedResponse={response}
+            updateResponse={(updatedResponse) => {
+              const updatedResponses = [...step.predefinedResponses];
+              updatedResponses[index] = updatedResponse;
+              updateStep({
+                ...step,
+                predefinedResponses: updatedResponses,
+              });
+            }}
+            deleteResponse={() => {
+              const updatedResponses = [...step.predefinedResponses];
+              updatedResponses.splice(index, 1);
+              updateStep({
+                ...step,
+                predefinedResponses: updatedResponses,
+              });
+            }}
+            flowsList={props.flowsList}
+          />
+        ))}
       <Button
         onClick={() => {
           updateStep({

@@ -1,18 +1,32 @@
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { FlowItem } from '../types';
+import { getFlowForStepId } from '../helpers';
 
 export function FlowStepSelector(props: {
   flowsList: FlowItem[];
+  currentJumpToStepId?: string;
   onStepSelected: (stepId: string) => void;
   rowOrColumn?: 'row' | 'column';
   width?: string;
   title?: string;
 }): JSX.Element {
-  const { flowsList, onStepSelected } = props;
+  const { flowsList, onStepSelected, currentJumpToStepId } = props;
   const [selectedFlowId, setSelectedFlowId] = React.useState<string>('');
   const [selectedStepId, setSelectedStepId] = React.useState<string>('');
+  console.log(currentJumpToStepId);
+  useEffect(() => {
+    if (currentJumpToStepId) {
+      const flow = getFlowForStepId(flowsList, currentJumpToStepId);
+      if (!flow) {
+        return;
+      }
+      setSelectedFlowId(flow._id);
+      setSelectedStepId(currentJumpToStepId);
+    }
+  }, [currentJumpToStepId]);
+
   return (
     <div
       style={{

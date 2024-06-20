@@ -4,24 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useEffect, useState } from 'react';
-import { FlowItem } from './types';
+import React from "react";
+import { ActivityBuilder } from "../../../src/components/activity-builder/activity-builder";
+import { multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
 
-export function FlowStepsBuilder(props: { flow: FlowItem }) {
-  const { flow } = props;
-  // TODO: This component will be used to actually build the steps for a flow.
-
-  const [localFlowCopy, setLocalFlowCopy] = useState<FlowItem>(
-    JSON.parse(JSON.stringify(flow))
-  );
-
-  useEffect(() => {
-    setLocalFlowCopy(JSON.parse(JSON.stringify(flow)));
-  }, [flow]);
-
-  return (
-    <div>
-      <h1>FlowStepsBuilder {flow.name}</h1>
-    </div>
-  );
-}
+it("should render", ()=>{
+    let activity = multipleFlowActivity;
+    cy.mount(<ActivityBuilder activity={activity} updateActivity={(activity)=>{return Promise.resolve(activity)}}/>);
+})
