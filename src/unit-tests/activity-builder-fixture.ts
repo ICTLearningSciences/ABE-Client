@@ -65,7 +65,7 @@ export const collectUserNameActivity: ActivityBuilder = {
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {
-      _id: '2',
+      clientId: '2',
       name: '',
       steps: [
         {
@@ -111,7 +111,7 @@ export const collectIntentionActivity: ActivityBuilder = {
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {
-      _id: '2',
+      clientId: '2',
       name: '',
       steps: [
         {
@@ -144,7 +144,7 @@ export const collectAiDataAndDisplayActivity: ActivityBuilder = {
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {
-      _id: '2',
+      clientId: '2',
       name: 'Flow 1',
       steps: [
         {
@@ -196,7 +196,7 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {
-      _id: '1',
+      clientId: '1',
       name: '',
       steps: [
         {
@@ -258,7 +258,7 @@ export const multipleFlowActivity: ActivityBuilder = {
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {
-      _id: '1',
+      clientId: '1',
       name: 'flow 1',
       steps: [
         {
@@ -284,7 +284,7 @@ export const multipleFlowActivity: ActivityBuilder = {
       ],
     },
     {
-      _id: '2',
+      clientId: '2',
       name: 'flow 2',
       steps: [
         {
@@ -315,7 +315,7 @@ export const multipleFlowActivity: ActivityBuilder = {
       ],
     },
     {
-      _id: '3',
+      clientId: '3',
       name: 'flow 3',
       steps: [],
     },

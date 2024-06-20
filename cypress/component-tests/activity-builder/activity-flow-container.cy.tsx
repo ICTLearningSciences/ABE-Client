@@ -5,11 +5,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from "react";
-import { ActivityBuilder } from "../../../src/components/activity-builder/activity-builder";
+import { ActivityFlowContainer } from "../../../src/components/activity-builder/activity-flow-container";
 import { multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
 
 it("should render", ()=>{
     let activity = multipleFlowActivity;
     cy.viewport(1200, 800);
-    cy.mount(<ActivityBuilder activity={activity} updateActivity={(activity)=>{return Promise.resolve(activity)}}/>);
+    cy.mount(<ActivityFlowContainer activity={activity} updateActivity={(activity)=>{return Promise.resolve(activity)}}/>);
 })

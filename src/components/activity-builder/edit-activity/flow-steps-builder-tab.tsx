@@ -13,22 +13,25 @@ import {
   PromptActivityStep,
   RequestUserInputActivityStep,
   SystemMessageActivityStep,
-} from './types';
-import { ColumnDiv } from '../../styled-components';
-import {
-  SystemMessageStepBuilder,
-  getDefaultSystemMessage,
-} from './system-message-step-builder';
+} from '../types';
+import { ColumnDiv } from '../../../styled-components';
 import {
   RequestUserInputStepBuilder,
   getDefaultRequestUserInputBuilder,
-} from './request-user-input-step-builder';
-import { PromptStepBuilder, defaultPromptBuilder } from './prompt-step-builder';
-import { InputField } from './shared/input-components';
-import { AddNewActivityButton } from './shared/add-new-activity-button';
+} from './step-builder/request-user-input-step-builder';
+import {
+  PromptStepBuilder,
+  defaultPromptBuilder,
+} from './step-builder/prompt-step-builder';
+import { InputField } from '../shared/input-components';
+import { AddNewActivityButton } from '../shared/add-new-activity-button';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { IconButton } from '@mui/material';
+import {
+  SystemMessageStepBuilder,
+  getDefaultSystemMessage,
+} from './step-builder/system-message-step-builder';
 export function FlowStepsBuilderTab(props: {
   flow: FlowItem;
   flowsList: FlowItem[];
@@ -41,7 +44,7 @@ export function FlowStepsBuilderTab(props: {
       return {
         ...prevValue,
         flowsList: prevValue.flowsList.map((f) => {
-          if (f._id === flow._id) {
+          if (f.clientId === flow.clientId) {
             return flow;
           }
           return f;

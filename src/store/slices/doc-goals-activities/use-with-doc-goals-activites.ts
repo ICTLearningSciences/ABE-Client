@@ -94,8 +94,11 @@ export function useWithDocGoalsActivities() {
     return await dispatch(_fetchBuiltActivities());
   }
 
-  async function addOrUpdateBuiltActivity(activity: ActivityBuilder) {
-    return await dispatch(_addOrUpdateBuiltActivity(activity));
+  async function addOrUpdateBuiltActivity(
+    activity: ActivityBuilder
+  ): Promise<ActivityBuilder> {
+    const res = await dispatch(_addOrUpdateBuiltActivity(activity));
+    return res.payload as ActivityBuilder;
   }
 
   return {
@@ -105,6 +108,7 @@ export function useWithDocGoalsActivities() {
     loadBuiltActivities,
     addOrUpdateActivity,
     addOrUpdateBuiltActivity,
+    builtActivities,
     activities,
     docGoals: docGoalsActivities,
     isLoading:

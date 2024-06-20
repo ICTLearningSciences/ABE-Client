@@ -4,22 +4,28 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { useRef, useEffect } from 'react';
+import { debounce } from 'lodash';
 
-import { RequestUserInputStepBuilder } from "../../../src/components/activity-builder/edit-activity/step-builder/request-user-input-step-builder";
-import { exampleRequestUserInputActivityStep, exampleSystemMessageActivityStep, multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
-describe("Request User Input Step Builder", ()=>{
-    it("should render", ()=>{
-        let step = exampleRequestUserInputActivityStep;
-        const systemMessageStepBuilder = RequestUserInputStepBuilder({
-            step,
-            updateStep: (step)=>{
-                step = step;
-            },
-            deleteStep: ()=>{
-            },
-            stepIndex: 0,
-            flowsList: multipleFlowActivity.flowsList
-        });
-        cy.mount(systemMessageStepBuilder);
-    })
-})
+// Custom hook for debouncing a callback
+export const useDebouncedCallback = (
+  callback: (...args: any[]) => void,
+  delay: number
+) => {
+  const debouncedFn = useRef(debounce(callback, delay)).current;
+
+  useEffect(() => {
+    // Update the debounced function if callback or delay changes
+    debouncedFn.cancel(); // Cancel the previous debounce instance
+    debouncedFn.flush = debounce(callback, delay);
+  }, [callback, delay]);
+
+  useEffect(() => {
+    // Cleanup on unmount
+    return () => {
+      debouncedFn.cancel();
+    };
+  }, [debouncedFn]);
+
+  return debouncedFn;
+};

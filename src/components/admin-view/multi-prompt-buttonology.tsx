@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { Button } from '@mui/material';
 import { ColumnDiv } from '../../styled-components';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ActivityGQL,
   ActivityPrompt,
@@ -46,6 +47,7 @@ export function MultiPromptTesting(props: {
 }): JSX.Element {
   const { activities, goToActivity, useWithPrompts } = props;
   const [targetPromptId, setTargetPromptId] = useState<string>();
+  const navigate = useNavigate();
   const { prompts, handleSavePrompt, editOrAddPrompt, isLoading } =
     useWithPrompts;
   const activitiesWithPrompts = activities.filter(
@@ -134,6 +136,13 @@ export function MultiPromptTesting(props: {
       >
         <div style={{ overflow: 'auto', padding: '10px', width: '95%' }}>
           <h2 style={{ textAlign: 'center' }}>Activities</h2>
+          <Button
+            onClick={() => {
+              navigate('/build/activity');
+            }}
+          >
+            Build Activities
+          </Button>
           <SavedActivityPromptsView
             activitiesWithPrompts={activityPrompts}
             promptsLoading={isLoading}

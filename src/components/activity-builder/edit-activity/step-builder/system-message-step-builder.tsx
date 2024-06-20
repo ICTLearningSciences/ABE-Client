@@ -5,17 +5,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import {
-  ActivityBuilderStepType,
-  FlowItem,
-  SystemMessageActivityStep,
-} from './types';
-import { RoundedBorderDiv, TopLeftText } from '../../styled-components';
-import { InputField } from './shared/input-components';
 import { v4 as uuid } from 'uuid';
 import { IconButton } from '@mui/material';
 import { Delete } from '@mui/icons-material';
-import { JumpToAlternateStep } from './shared/jump-to-alternate-step';
+import { RoundedBorderDiv, TopLeftText } from '../../../../styled-components';
+import { InputField } from '../../shared/input-components';
+import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
+import {
+  SystemMessageActivityStep,
+  ActivityBuilderStepType,
+  FlowItem,
+} from '../../types';
 
 export function getDefaultSystemMessage(): SystemMessageActivityStep {
   return {

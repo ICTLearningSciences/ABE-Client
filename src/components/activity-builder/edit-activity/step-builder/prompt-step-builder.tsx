@@ -11,23 +11,23 @@ import {
   JsonResponseData,
   JsonResponseDataType,
   PromptActivityStep,
-} from './types';
+} from '../../types';
 import {
   ColumnCenterDiv,
   ColumnDiv,
   RoundedBorderDiv,
   TopLeftText,
-} from '../../styled-components';
+} from '../../../../styled-components';
 import {
   CheckBoxInput,
   InputField,
   SelectInputField,
-} from './shared/input-components';
-import { PromptOutputTypes } from '../../types';
+} from '../../shared/input-components';
+import { PromptOutputTypes } from '../../../../types';
 import { Button, IconButton } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { v4 as uuid } from 'uuid';
-import { JumpToAlternateStep } from './shared/jump-to-alternate-step';
+import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
 
 export const emptyJsonResponseData: JsonResponseData = {
   name: '',

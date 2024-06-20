@@ -6,6 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { DisplayIcons } from '../../helpers/display-icon-helper';
 import { ActivityGQL, PromptOutputTypes } from '../../types';
+import { v4 as uuidv4 } from 'uuid';
 
 export function isActivityBuilder(
   activity: ActivityGQL | ActivityBuilder
@@ -18,9 +19,30 @@ export interface IActivity {
 }
 
 export interface FlowItem {
-  _id: string;
+  clientId: string;
   name: string;
   steps: ActivityBuilderStep[];
+}
+
+export function defaultActivityBuilder(userId: string): ActivityBuilder {
+  return {
+    _id: uuidv4(),
+    activityType: 'builder',
+    title: 'New Activity',
+    user: userId,
+    visibility: 'public',
+    description: '',
+    displayIcon: DisplayIcons.DEFAULT,
+    newDocRecommend: false,
+    disabled: false,
+    flowsList: [
+      {
+        clientId: uuidv4(),
+        name: 'Flow 1',
+        steps: [],
+      },
+    ],
+  };
 }
 
 export interface ActivityBuilder extends IActivity {

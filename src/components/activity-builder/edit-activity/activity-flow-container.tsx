@@ -6,9 +6,10 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React, { useEffect, useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
-import { ColumnDiv } from '../../styled-components';
-import { ActivityBuilder as ActivityBuilderType } from './types';
+import { ColumnDiv } from '../../../styled-components';
+import { ActivityBuilder as ActivityBuilderType } from '../types';
 import { FlowStepsBuilderTab } from './flow-steps-builder-tab';
+import { debounce } from 'lodash';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -39,30 +40,24 @@ function a11yProps(index: number) {
   };
 }
 
-export function ActivityBuilder(props: {
-  activity: ActivityBuilderType;
-  updateActivity: (
-    activity: ActivityBuilderType
-  ) => Promise<ActivityBuilderType>;
+export function ActivityFlowContainer(props: {
+  localActivity: ActivityBuilderType;
+  updateLocalActivity: React.Dispatch<
+    React.SetStateAction<ActivityBuilderType>
+  >;
 }): JSX.Element {
-  const { activity } = props;
-  const [localActivityCopy, setLocalActivityCopy] =
-    useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
-  const flowsList = localActivityCopy.flowsList;
+  const { localActivity, updateLocalActivity } = props;
+  const flowsList = localActivity.flowsList;
 
   const [value, setValue] = useState(0);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
-  useEffect(() => {
-    setLocalActivityCopy(JSON.parse(JSON.stringify(activity)));
-  }, [activity]);
-
   const tabs = flowsList.map((flow, index) => {
     return (
       <Tab
-        key={flow._id}
+        key={flow.clientId}
         label={`${flow.name || `Flow ${index + 1}`}`}
         {...a11yProps(index)}
       />
@@ -71,11 +66,11 @@ export function ActivityBuilder(props: {
 
   const customTabPanels = flowsList.map((flow, index) => {
     return (
-      <CustomTabPanel key={flow._id} value={value} index={index}>
+      <CustomTabPanel key={flow.clientId} value={value} index={index}>
         <FlowStepsBuilderTab
           flow={flow}
           flowsList={flowsList}
-          updateLocalActivity={setLocalActivityCopy}
+          updateLocalActivity={updateLocalActivity}
         />
       </CustomTabPanel>
     );

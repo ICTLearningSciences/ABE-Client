@@ -10,20 +10,20 @@ import {
   FlowItem,
   PredefinedResponse,
   RequestUserInputActivityStep,
-} from './types';
+} from '../../types';
 import {
   ColumnCenterDiv,
   RoundedBorderDiv,
   RowDiv,
   TopLeftText,
-} from '../../styled-components';
-import { CheckBoxInput, InputField } from './shared/input-components';
-import { FlowStepSelector } from './shared/flow-step-selector';
+} from '../../../../styled-components';
+import { CheckBoxInput, InputField } from '../../shared/input-components';
+import { FlowStepSelector } from '../../shared/flow-step-selector';
 import { Button, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuid } from 'uuid';
 import { Delete } from '@mui/icons-material';
-import { JumpToAlternateStep } from './shared/jump-to-alternate-step';
+import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
 
 export function getDefaultRequestUserInputBuilder(): RequestUserInputActivityStep {
   return {

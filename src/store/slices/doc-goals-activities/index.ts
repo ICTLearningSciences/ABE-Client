@@ -127,12 +127,14 @@ export const stateSlice = createSlice({
       })
 
       .addCase(addOrUpdateBuiltActivity.fulfilled, (state, action) => {
-        state.builtActivities = state.builtActivities.map((a) => {
-          if (a._id === action.payload._id) {
-            return action.payload;
-          }
-          return a;
-        });
+        const activityIndex = state.builtActivities.findIndex(
+          (a) => a._id === action.payload._id
+        );
+        if (activityIndex >= 0) {
+          state.builtActivities[activityIndex] = action.payload;
+        } else {
+          state.builtActivities.push(action.payload);
+        }
       });
   },
 });

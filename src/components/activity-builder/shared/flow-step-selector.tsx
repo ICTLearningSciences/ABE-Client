@@ -22,7 +22,7 @@ export function FlowStepSelector(props: {
       if (!flow) {
         return;
       }
-      setSelectedFlowId(flow._id);
+      setSelectedFlowId(flow.clientId);
       setSelectedStepId(currentJumpToStepId);
     }
   }, [currentJumpToStepId]);
@@ -69,7 +69,7 @@ export function FlowStepSelector(props: {
           >
             {flowsList.map((flow) => {
               return (
-                <MenuItem key={flow._id} value={flow._id}>
+                <MenuItem key={flow.clientId} value={flow.clientId}>
                   {flow.name}
                 </MenuItem>
               );
@@ -91,7 +91,7 @@ export function FlowStepSelector(props: {
             label="Output Data Type"
           >
             {flowsList
-              .find((flow) => flow._id === selectedFlowId)
+              .find((flow) => flow.clientId === selectedFlowId)
               ?.steps.map((step, i) => {
                 return (
                   <MenuItem

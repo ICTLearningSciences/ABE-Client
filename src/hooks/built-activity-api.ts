@@ -19,7 +19,7 @@ export const fullBuiltActivityQueryData = `
                       disabled
                       newDocRecommend
                       flowsList{
-                        _id
+                        clientId
                         name
                         steps{
                           ... on SystemMessageActivityStepType {
