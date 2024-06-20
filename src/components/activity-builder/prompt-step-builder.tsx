@@ -7,12 +7,15 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import {
   FlowItem,
+  JsonResponseData,
+  JsonResponseDataType,
   PromptActivityStep,
   SystemMessageActivityStep,
 } from './types';
 import {
   ColumnCenterDiv,
   RoundedBorderDiv,
+  RowDiv,
   TopLeftText,
 } from '../../styled-components';
 import {
@@ -22,6 +25,14 @@ import {
 } from './shared/input-components';
 import { FlowStepSelector } from './shared/flow-step-selector';
 import { PromptOutputTypes } from '../../types';
+import { Button } from '@mui/material';
+
+export const emptyJsonResponseData: JsonResponseData = {
+  name: '',
+  type: JsonResponseDataType.STRING,
+  isRequired: false,
+  additionalInfo: '',
+};
 
 export function PromptStepBuilder(props: {
   step: PromptActivityStep;
@@ -32,7 +43,10 @@ export function PromptStepBuilder(props: {
 }): JSX.Element {
   const { step } = props;
 
-  function updateField(field: string, value: string | boolean) {
+  function updateField(
+    field: string,
+    value: string | boolean | JsonResponseData[]
+  ) {
     props.updateStep({
       ...step,
       [field]: value,
@@ -102,6 +116,13 @@ export function PromptStepBuilder(props: {
         width="100%"
       />
 
+      <JsonResponseDataUpdater
+        jsonResponseData={step.jsonResponseData || []}
+        updateJsonResponseData={(jsonResponseData) => {
+          updateField('jsonResponseData', jsonResponseData);
+        }}
+      />
+
       <ColumnCenterDiv
         style={{
           width: '50%',
@@ -119,5 +140,65 @@ export function PromptStepBuilder(props: {
         />
       </ColumnCenterDiv>
     </RoundedBorderDiv>
+  );
+}
+
+function JsonResponseDataUpdater(props: {
+  jsonResponseData: JsonResponseData[];
+  updateJsonResponseData: (jsonResponseData: JsonResponseData[]) => void;
+}): JSX.Element {
+  return (
+    <ColumnCenterDiv
+      style={{
+        border: '1px dotted grey',
+        marginBottom: '10px',
+        marginTop: '10px',
+      }}
+    >
+      <h3>Json Response Data</h3>
+      {props.jsonResponseData.map((jsonResponseData, index) => {
+        return (
+          <RowDiv key={index}>
+            <InputField
+              label="Name"
+              value={jsonResponseData.name}
+              onChange={(e) => {
+                const updatedJsonResponseData = [...props.jsonResponseData];
+                updatedJsonResponseData[index].name = e;
+                props.updateJsonResponseData(updatedJsonResponseData);
+              }}
+            />
+            <SelectInputField
+              label="Type"
+              value={jsonResponseData.type}
+              options={[...Object.values(JsonResponseDataType)]}
+              onChange={(e) => {
+                const updatedJsonResponseData = [...props.jsonResponseData];
+                updatedJsonResponseData[index].type = e as JsonResponseDataType;
+                props.updateJsonResponseData(updatedJsonResponseData);
+              }}
+            />
+            <CheckBoxInput
+              label="Is Required"
+              value={jsonResponseData.isRequired}
+              onChange={(e) => {
+                const updatedJsonResponseData = [...props.jsonResponseData];
+                updatedJsonResponseData[index].isRequired = e;
+                props.updateJsonResponseData(updatedJsonResponseData);
+              }}
+            />
+          </RowDiv>
+        );
+      })}
+      <Button
+        onClick={() => {
+          const updatedJsonResponseData = [...props.jsonResponseData];
+          updatedJsonResponseData.push(emptyJsonResponseData);
+          props.updateJsonResponseData(updatedJsonResponseData);
+        }}
+      >
+        + Add Data Field
+      </Button>
+    </ColumnCenterDiv>
   );
 }
