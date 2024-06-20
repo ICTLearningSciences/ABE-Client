@@ -72,8 +72,8 @@ export interface RequestUserInputActivityStep extends ActivityBuilderStep {
 //Prompt
 export enum JsonResponseDataType {
   STRING = 'string',
-  OBJECT = 'object',
-  ARRAY = 'array',
+  // OBJECT = 'object',
+  // ARRAY = 'array',
 }
 
 export interface JsonResponseData {

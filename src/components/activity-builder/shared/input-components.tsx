@@ -13,6 +13,7 @@ export function InputField(props: {
   value: string;
   onChange: (value: string) => void;
   width?: string;
+  maxRows?: number;
 }): JSX.Element {
   return (
     <FormControl
@@ -22,6 +23,8 @@ export function InputField(props: {
       <InputLabel>{props.label}</InputLabel>
       <Input
         value={props.value}
+        multiline
+        maxRows={props.maxRows || 1}
         onChange={(e) => {
           props.onChange(e.target.value);
         }}
@@ -70,8 +73,10 @@ export function SelectInputField(props: {
         }}
         label="Output Data Type"
       >
-        {options.map((option) => (
-          <MenuItem value={option}>{option}</MenuItem>
+        {options.map((option, i) => (
+          <MenuItem key={i} value={option}>
+            {option}
+          </MenuItem>
         ))}
       </Select>
     </FormControl>

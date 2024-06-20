@@ -10,12 +10,11 @@ import {
   JsonResponseData,
   JsonResponseDataType,
   PromptActivityStep,
-  SystemMessageActivityStep,
 } from './types';
 import {
   ColumnCenterDiv,
+  ColumnDiv,
   RoundedBorderDiv,
-  RowDiv,
   TopLeftText,
 } from '../../styled-components';
 import {
@@ -158,9 +157,14 @@ function JsonResponseDataUpdater(props: {
       <h3>Json Response Data</h3>
       {props.jsonResponseData.map((jsonResponseData, index) => {
         return (
-          <RowDiv key={index}>
+          <ColumnDiv
+            key={index}
+            style={{
+              border: '1px solid black',
+            }}
+          >
             <InputField
-              label="Name"
+              label="Variable Name"
               value={jsonResponseData.name}
               onChange={(e) => {
                 const updatedJsonResponseData = [...props.jsonResponseData];
@@ -187,7 +191,17 @@ function JsonResponseDataUpdater(props: {
                 props.updateJsonResponseData(updatedJsonResponseData);
               }}
             />
-          </RowDiv>
+            <InputField
+              label="Additional Info"
+              maxRows={4}
+              value={jsonResponseData.additionalInfo || ''}
+              onChange={(e) => {
+                const updatedJsonResponseData = [...props.jsonResponseData];
+                updatedJsonResponseData[index].additionalInfo = e;
+                props.updateJsonResponseData(updatedJsonResponseData);
+              }}
+            />
+          </ColumnDiv>
         );
       })}
       <Button
