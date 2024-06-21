@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { SystemMessageStepBuilder } from "../../../src/components/activity-builder/system-message-step-builder";
+import { SystemMessageStepBuilder } from "../../../src/components/activity-builder/edit-activity/step-builder/system-message-step-builder";
 import { exampleSystemMessageActivityStep, multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
 describe("System Message Step Builder", ()=>{
     it("should render", ()=>{

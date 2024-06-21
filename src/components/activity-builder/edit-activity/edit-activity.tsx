@@ -3,6 +3,7 @@ import { ActivityBuilder as ActivityBuilderType } from '../types';
 import { ActivityFlowContainer } from './activity-flow-container';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { Button } from '@mui/material';
+import { InputField } from '../shared/input-components';
 export function EditActivity(props: {
   activity: ActivityBuilderType;
   saveActivity: (activity: ActivityBuilderType) => Promise<ActivityBuilderType>;
@@ -28,9 +29,21 @@ export function EditActivity(props: {
         data-cy="edit-activity-header"
         style={{
           alignSelf: 'center',
+          alignItems: 'center',
+          height: '200px',
         }}
       >
-        <h3>{activity.title}</h3>
+        <InputField
+          label="Activity Name"
+          value={localActivityCopy.title}
+          width="100%"
+          onChange={(v) => {
+            setLocalActivityCopy({
+              ...localActivityCopy,
+              title: v,
+            });
+          }}
+        />
         <RowDiv>
           <Button
             onClick={async () => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   FormControl,
   InputLabel,
@@ -8,6 +8,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
+import { useDebouncedCallback } from '../../../hooks/use-debounced-callback';
 
 export function InputField(props: {
   label: string;
@@ -16,6 +17,15 @@ export function InputField(props: {
   width?: string;
   maxRows?: number;
 }): JSX.Element {
+  const [localValue, setLocalValue] = React.useState(props.value);
+  const debounceOnChange = useDebouncedCallback((v: string) => {
+    props.onChange(v);
+  }, 500);
+
+  useEffect(() => {
+    debounceOnChange(localValue);
+  }, [localValue]);
+
   return (
     <FormControl
       variant="standard"
@@ -23,11 +33,11 @@ export function InputField(props: {
     >
       <InputLabel>{props.label}</InputLabel>
       <Input
-        value={props.value}
+        value={localValue}
         multiline
         maxRows={props.maxRows || 1}
         onChange={(e) => {
-          props.onChange(e.target.value);
+          setLocalValue(e.target.value);
         }}
       />
     </FormControl>
