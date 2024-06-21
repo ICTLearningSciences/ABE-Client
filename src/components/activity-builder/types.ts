@@ -99,6 +99,7 @@ export enum JsonResponseDataType {
 }
 
 export interface JsonResponseData {
+  clientId: string;
   name: string;
   type: JsonResponseDataType;
   isRequired: boolean;

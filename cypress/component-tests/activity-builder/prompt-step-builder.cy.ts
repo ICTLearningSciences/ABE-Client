@@ -12,6 +12,8 @@ describe("Prompt Step Builder", ()=>{
         let step = examplePromptActivityStep;
         const systemMessageStepBuilder = PromptStepBuilder({
             step,
+            updateLocalActivity: ()=>{
+            },
             updateStep: (step)=>{
                 step = step;
             },

@@ -35,7 +35,7 @@ export function InputField(props: {
       <Input
         value={localValue}
         multiline
-        maxRows={props.maxRows || 1}
+        maxRows={props.maxRows ?? undefined}
         onChange={(e) => {
           setLocalValue(e.target.value);
         }}

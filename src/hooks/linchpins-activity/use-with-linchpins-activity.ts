@@ -394,8 +394,6 @@ export function useWithLinchpinsActivity(
     };
   }
 
-  console.log('state', state);
-
   const activity: Activity = {
     ...activityGql,
     steps: [],

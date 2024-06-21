@@ -9,7 +9,6 @@ export function EditActivity(props: {
   saveActivity: (activity: ActivityBuilderType) => Promise<ActivityBuilderType>;
 }): JSX.Element {
   const { activity, saveActivity } = props;
-  console.log(`Selected Activity: ${JSON.stringify(activity)}`);
 
   const [localActivityCopy, setLocalActivityCopy] =
     React.useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
@@ -30,13 +29,12 @@ export function EditActivity(props: {
         style={{
           alignSelf: 'center',
           alignItems: 'center',
-          height: '200px',
         }}
       >
         <InputField
           label="Activity Name"
           value={localActivityCopy.title}
-          width="100%"
+          width="fit-content"
           onChange={(v) => {
             setLocalActivityCopy({
               ...localActivityCopy,

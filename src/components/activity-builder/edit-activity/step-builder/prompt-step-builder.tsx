@@ -6,6 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import {
+  ActivityBuilder,
   ActivityBuilderStepType,
   FlowItem,
   JsonResponseData,
@@ -29,12 +30,15 @@ import { Delete } from '@mui/icons-material';
 import { v4 as uuid } from 'uuid';
 import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
 
-export const emptyJsonResponseData: JsonResponseData = {
-  name: '',
-  type: JsonResponseDataType.STRING,
-  isRequired: false,
-  additionalInfo: '',
-};
+export function getEmptyJsonResponseData(): JsonResponseData {
+  return {
+    clientId: uuid(),
+    name: '',
+    type: JsonResponseDataType.STRING,
+    isRequired: false,
+    additionalInfo: '',
+  };
+}
 
 export function defaultPromptBuilder(): PromptActivityStep {
   return {
@@ -54,21 +58,107 @@ export function defaultPromptBuilder(): PromptActivityStep {
 export function PromptStepBuilder(props: {
   step: PromptActivityStep;
   updateStep: (step: PromptActivityStep) => void;
+  updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
   deleteStep: () => void;
   flowsList: FlowItem[];
   stepIndex: number;
   width?: string;
   height?: string;
 }): JSX.Element {
-  const { step, stepIndex } = props;
+  const { step, stepIndex, updateLocalActivity } = props;
 
   function updateField(
     field: string,
     value: string | boolean | JsonResponseData[]
   ) {
-    props.updateStep({
-      ...step,
-      [field]: value,
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                return {
+                  ...s,
+                  [field]: value,
+                };
+              }
+              return s;
+            }),
+          };
+        }),
+      };
+    });
+  }
+
+  function addOrEditJsonResponseData(jsonResponseData: JsonResponseData) {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                const responseData =
+                  (s as PromptActivityStep).jsonResponseData || [];
+                const index = responseData.findIndex(
+                  (jrd) => jrd.clientId === jsonResponseData.clientId
+                );
+                if (index >= 0) {
+                  return {
+                    ...s,
+                    jsonResponseData: responseData.map((jrd) => {
+                      if (jrd.clientId === jsonResponseData.clientId) {
+                        return jsonResponseData;
+                      }
+                      return jrd;
+                    }),
+                  };
+                } else {
+                  return {
+                    ...s,
+                    jsonResponseData: [...responseData, jsonResponseData],
+                  };
+                }
+              }
+              return s;
+            }),
+          };
+        }),
+      };
+    });
+  }
+
+  function deleteJsonResponseData(jsonResponseData: JsonResponseData) {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                const responseData =
+                  (s as PromptActivityStep).jsonResponseData || [];
+                const index = responseData.findIndex(
+                  (jrd) => jrd.clientId === jsonResponseData.clientId
+                );
+                if (index >= 0) {
+                  return {
+                    ...s,
+                    jsonResponseData: responseData.filter(
+                      (jrd) => jrd.clientId !== jsonResponseData.clientId
+                    ),
+                  };
+                }
+              }
+              return s;
+            }),
+          };
+        }),
+      };
     });
   }
 
@@ -124,9 +214,8 @@ export function PromptStepBuilder(props: {
       {step.outputDataType === PromptOutputTypes.JSON && (
         <JsonResponseDataUpdater
           jsonResponseData={step.jsonResponseData || []}
-          updateJsonResponseData={(jsonResponseData) => {
-            updateField('jsonResponseData', jsonResponseData);
-          }}
+          addOrEdit={addOrEditJsonResponseData}
+          deleteJsonResponseData={deleteJsonResponseData}
         />
       )}
 
@@ -168,8 +257,10 @@ export function PromptStepBuilder(props: {
 
 function JsonResponseDataUpdater(props: {
   jsonResponseData: JsonResponseData[];
-  updateJsonResponseData: (jsonResponseData: JsonResponseData[]) => void;
+  addOrEdit: (jsonResponseData: JsonResponseData) => void;
+  deleteJsonResponseData: (jsonResponseData: JsonResponseData) => void;
 }): JSX.Element {
+  const { jsonResponseData, addOrEdit, deleteJsonResponseData } = props;
   return (
     <ColumnCenterDiv
       style={{
@@ -179,7 +270,7 @@ function JsonResponseDataUpdater(props: {
       }}
     >
       <h3>Json Response Data</h3>
-      {props.jsonResponseData.map((jsonResponseData, index) => {
+      {jsonResponseData.map((jsonResponseData, index) => {
         return (
           <ColumnDiv
             key={index}
@@ -193,9 +284,10 @@ function JsonResponseDataUpdater(props: {
               label="Variable Name"
               value={jsonResponseData.name}
               onChange={(e) => {
-                const updatedJsonResponseData = [...props.jsonResponseData];
-                updatedJsonResponseData[index].name = e;
-                props.updateJsonResponseData(updatedJsonResponseData);
+                addOrEdit({
+                  ...jsonResponseData,
+                  name: e,
+                });
               }}
             />
             <SelectInputField
@@ -203,18 +295,20 @@ function JsonResponseDataUpdater(props: {
               value={jsonResponseData.type}
               options={[...Object.values(JsonResponseDataType)]}
               onChange={(e) => {
-                const updatedJsonResponseData = [...props.jsonResponseData];
-                updatedJsonResponseData[index].type = e as JsonResponseDataType;
-                props.updateJsonResponseData(updatedJsonResponseData);
+                addOrEdit({
+                  ...jsonResponseData,
+                  type: e as JsonResponseDataType,
+                });
               }}
             />
             <CheckBoxInput
               label="Is Required"
               value={jsonResponseData.isRequired}
               onChange={(e) => {
-                const updatedJsonResponseData = [...props.jsonResponseData];
-                updatedJsonResponseData[index].isRequired = e;
-                props.updateJsonResponseData(updatedJsonResponseData);
+                addOrEdit({
+                  ...jsonResponseData,
+                  isRequired: e,
+                });
               }}
             />
             <InputField
@@ -222,9 +316,10 @@ function JsonResponseDataUpdater(props: {
               maxRows={4}
               value={jsonResponseData.additionalInfo || ''}
               onChange={(e) => {
-                const updatedJsonResponseData = [...props.jsonResponseData];
-                updatedJsonResponseData[index].additionalInfo = e;
-                props.updateJsonResponseData(updatedJsonResponseData);
+                addOrEdit({
+                  ...jsonResponseData,
+                  additionalInfo: e,
+                });
               }}
             />
             <IconButton
@@ -234,9 +329,7 @@ function JsonResponseDataUpdater(props: {
                 right: 10,
               }}
               onClick={() => {
-                const updatedJsonResponseData = [...props.jsonResponseData];
-                updatedJsonResponseData.splice(index, 1);
-                props.updateJsonResponseData(updatedJsonResponseData);
+                deleteJsonResponseData(jsonResponseData);
               }}
             >
               <Delete />
@@ -246,9 +339,7 @@ function JsonResponseDataUpdater(props: {
       })}
       <Button
         onClick={() => {
-          const updatedJsonResponseData = [...props.jsonResponseData];
-          updatedJsonResponseData.push(emptyJsonResponseData);
-          props.updateJsonResponseData(updatedJsonResponseData);
+          addOrEdit(getEmptyJsonResponseData());
         }}
       >
         + Add Data Field

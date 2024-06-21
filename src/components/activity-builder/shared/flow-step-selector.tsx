@@ -15,7 +15,6 @@ export function FlowStepSelector(props: {
   const { flowsList, onStepSelected, currentJumpToStepId } = props;
   const [selectedFlowId, setSelectedFlowId] = React.useState<string>('');
   const [selectedStepId, setSelectedStepId] = React.useState<string>('');
-  console.log(currentJumpToStepId);
   useEffect(() => {
     if (currentJumpToStepId) {
       const flow = getFlowForStepId(flowsList, currentJumpToStepId);

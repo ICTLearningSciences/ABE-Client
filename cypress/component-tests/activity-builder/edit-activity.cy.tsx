@@ -4,24 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import React from "react";
+import { EditActivity } from "../../../src/components/activity-builder/edit-activity/edit-activity";
+import { multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
 
-import { SystemMessageStepBuilder } from "../../../src/components/activity-builder/edit-activity/step-builder/system-message-step-builder";
-import { exampleSystemMessageActivityStep, multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
-describe("System Message Step Builder", ()=>{
-    it("should render", ()=>{
-        let step = exampleSystemMessageActivityStep;
-        const systemMessageStepBuilder = SystemMessageStepBuilder({
-            step,
-            updateLocalActivity: ()=>{
-            },
-            updateStep: (step)=>{
-                step = step;
-            },
-            deleteStep: ()=>{
-            },
-            stepIndex: 0,
-            flowsList: multipleFlowActivity.flowsList,
-        });
-        cy.mount(systemMessageStepBuilder);
-    })
+it("should render", ()=>{
+    let activity = multipleFlowActivity;
+    cy.viewport(1200, 800);
+    cy.mount(<EditActivity activity={activity} saveActivity={(activity)=>{return Promise.resolve(activity)}}/>);
 })

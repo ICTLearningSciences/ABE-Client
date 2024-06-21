@@ -12,6 +12,8 @@ describe("Request User Input Step Builder", ()=>{
         let step = exampleRequestUserInputActivityStep;
         const systemMessageStepBuilder = RequestUserInputStepBuilder({
             step,
+            updateLocalActivity: ()=>{
+            },
             updateStep: (step)=>{
                 step = step;
             },

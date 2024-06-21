@@ -44,6 +44,7 @@ export const examplePromptActivityStep: PromptActivityStep = {
   responseFormat: '',
   jsonResponseData: [
     {
+      clientId: '1',
       name: 'nickname',
       type: JsonResponseDataType.STRING,
       isRequired: true,
@@ -154,6 +155,7 @@ export const collectAiDataAndDisplayActivity: ActivityBuilder = {
           responseFormat: '',
           jsonResponseData: [
             {
+              clientId: '1',
               name: 'nickname',
               type: 'string',
               isRequired: true,
@@ -225,6 +227,7 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
           responseFormat: '',
           jsonResponseData: [
             {
+              clientId: '1',
               name: 'nickname',
               type: JsonResponseDataType.STRING,
               additionalInfo: 'a nickname generated for the supplied name',
@@ -294,6 +297,7 @@ export const multipleFlowActivity: ActivityBuilder = {
           responseFormat: '',
           jsonResponseData: [
             {
+              clientId: '1',
               name: 'nickname',
               type: JsonResponseDataType.STRING,
               additionalInfo: 'a nickname generated for the supplied name',

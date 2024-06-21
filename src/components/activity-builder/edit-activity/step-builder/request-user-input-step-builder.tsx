@@ -6,6 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import {
+  ActivityBuilder,
   ActivityBuilderStepType,
   FlowItem,
   PredefinedResponse,
@@ -150,18 +151,34 @@ function PredefinedResponsesUpdater(props: {
 export function RequestUserInputStepBuilder(props: {
   step: RequestUserInputActivityStep;
   updateStep: (step: RequestUserInputActivityStep) => void;
+  updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
   deleteStep: () => void;
   flowsList: FlowItem[];
   stepIndex: number;
   width?: string;
   height?: string;
 }): JSX.Element {
-  const { step, updateStep, stepIndex } = props;
+  const { step, updateStep, stepIndex, updateLocalActivity } = props;
 
   function updateField(field: string, value: string | boolean) {
-    props.updateStep({
-      ...step,
-      [field]: value,
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                return {
+                  ...s,
+                  [field]: value,
+                };
+              }
+              return s;
+            }),
+          };
+        }),
+      };
     });
   }
 

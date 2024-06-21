@@ -15,6 +15,7 @@ import {
   SystemMessageActivityStep,
   ActivityBuilderStepType,
   FlowItem,
+  ActivityBuilder,
 } from '../../types';
 
 export function getDefaultSystemMessage(): SystemMessageActivityStep {
@@ -27,6 +28,7 @@ export function getDefaultSystemMessage(): SystemMessageActivityStep {
 }
 export function SystemMessageStepBuilder(props: {
   step: SystemMessageActivityStep;
+  updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
   updateStep: (step: SystemMessageActivityStep) => void;
   deleteStep: () => void;
   flowsList: FlowItem[];
@@ -34,12 +36,27 @@ export function SystemMessageStepBuilder(props: {
   width?: string;
   height?: string;
 }): JSX.Element {
-  const { step, stepIndex } = props;
+  const { step, stepIndex, updateLocalActivity } = props;
 
-  function updateField(field: string, value: string) {
-    props.updateStep({
-      ...step,
-      [field]: value,
+  function updateField(field: string, value: string | boolean) {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                return {
+                  ...s,
+                  [field]: value,
+                };
+              }
+              return s;
+            }),
+          };
+        }),
+      };
     });
   }
 
