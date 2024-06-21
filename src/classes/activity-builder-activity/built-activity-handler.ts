@@ -66,6 +66,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     aiPromptSteps: AiPromptStep[]
   ) => Promise<AiServicesResponseTypes>;
   userResponseHandleState: UserResponseHandleState;
+  stepIdsSinceLastInput: string[];
 
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
@@ -143,6 +144,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   ) {
     this.builtActivityData = builtActivityData;
     this.stateData = {};
+    this.stepIdsSinceLastInput = [];
     this.userResponseHandleState = getDefaultUserResponseHandleState();
     this.sendMessage = sendMessage;
     this.clearChat = clearChat;
@@ -193,6 +195,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.clearChat();
     this.curStep = this.builtActivityData.flowsList[0].steps[0];
     this.stateData = {};
+    this.stepIdsSinceLastInput = [];
     this.userResponseHandleState = getDefaultUserResponseHandleState();
     this.handleStep(this.curStep);
   }
@@ -201,6 +204,20 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     if (this.curStep?.stepId !== step.stepId) {
       this.curStep = step;
     }
+    if (step.stepType === ActivityBuilderStepType.REQUEST_USER_INPUT) {
+      this.stepIdsSinceLastInput = [];
+    }
+    if (this.stepIdsSinceLastInput.includes(step.stepId)) {
+      this.sendMessage({
+        id: uuidv4(),
+        message:
+          'Oops! A loop was detected in this activity, we are halting the activity to prevent an infinite loop. Please contact the activity creator to fix this issue.',
+        sender: Sender.SYSTEM,
+        displayType: MessageDisplayType.TEXT,
+      });
+      return;
+    }
+    this.stepIdsSinceLastInput.push(step.stepId);
     // work through steps until we get to a user message step, then wait to be notified of a user message
     // handle the step
     switch (step.stepType) {

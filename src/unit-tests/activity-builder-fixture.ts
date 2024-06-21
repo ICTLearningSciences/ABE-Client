@@ -377,3 +377,56 @@ export const utilizeListMcqActivity: ActivityBuilder = {
     },
   ],
 };
+
+export const accidentalLoopActivity: ActivityBuilder = {
+  _id: 'utilize-list-mcq',
+  title: 'Utilize List MCQ',
+  activityType: 'builder',
+  description: '',
+  user: '123',
+  visibility: 'public',
+  displayIcon: DisplayIcons.DEFAULT,
+  flowsList: [
+    {
+      clientId: '2',
+      name: 'Flow 1',
+      steps: [
+        {
+          stepId: '1',
+          stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+          message: 'Hello, there!',
+        } as SystemMessageActivityStep,
+        {
+          stepId: '2',
+          stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+          message: 'Going to restart now!',
+          jumpToStepId: '1',
+        } as SystemMessageActivityStep,
+      ],
+    },
+  ],
+};
+
+export const stepLoopsIntoSelfActivity: ActivityBuilder = {
+  _id: 'utilize-list-mcq',
+  title: 'Utilize List MCQ',
+  activityType: 'builder',
+  description: '',
+  user: '123',
+  visibility: 'public',
+  displayIcon: DisplayIcons.DEFAULT,
+  flowsList: [
+    {
+      clientId: '2',
+      name: 'Flow 1',
+      steps: [
+        {
+          stepId: '1',
+          stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+          message: 'Hello, there!',
+          jumpToStepId: '1',
+        } as SystemMessageActivityStep,
+      ],
+    },
+  ],
+};

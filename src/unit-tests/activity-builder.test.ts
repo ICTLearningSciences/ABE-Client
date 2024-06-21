@@ -20,6 +20,8 @@ import {
   collectIntentionActivity,
   collectUserNameActivity,
   utilizeListMcqActivity,
+  accidentalLoopActivity,
+  stepLoopsIntoSelfActivity,
 } from './activity-builder-fixture';
 import { openAiTextResponse } from './fixtures/basic-text-response';
 
@@ -359,4 +361,48 @@ test('utlize mcq ai responses and maps to steps', async () => {
     response: 'ray-in',
     jumpToStepId: '1',
   });
+});
+
+test('halts activity if loop is detected in activity steps', async () => {
+  // loops occur when a step is repeated before reaching a user input.
+  const activityBuilderStepAccumulator = new ActivityBuilderDataAccumulator([]);
+
+  const activityBuilder = prepareActivityBuilder(
+    accidentalLoopActivity,
+    activityBuilderStepAccumulator
+  );
+  activityBuilder.initializeActivity();
+
+  await new Promise((r) => setTimeout(r, 1000));
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(3);
+  expect(activityBuilderStepAccumulator.stepsExecuted[2].type).toBe(
+    ExecutedStepTypes.CHAT_MESSAGE
+  );
+  expect(
+    (activityBuilderStepAccumulator.stepsExecuted[2].value as ChatMessageTypes)
+      .message
+  ).toBe(
+    'Oops! A loop was detected in this activity, we are halting the activity to prevent an infinite loop. Please contact the activity creator to fix this issue.'
+  );
+
+  const activityBuilderStepAccumulator2 = new ActivityBuilderDataAccumulator(
+    []
+  );
+  const activityBuilder2 = prepareActivityBuilder(
+    stepLoopsIntoSelfActivity,
+    activityBuilderStepAccumulator2
+  );
+  activityBuilder2.initializeActivity();
+
+  await new Promise((r) => setTimeout(r, 1000));
+  expect(activityBuilderStepAccumulator2.stepsExecuted.length).toBe(2);
+  expect(activityBuilderStepAccumulator2.stepsExecuted[1].type).toBe(
+    ExecutedStepTypes.CHAT_MESSAGE
+  );
+  expect(
+    (activityBuilderStepAccumulator2.stepsExecuted[1].value as ChatMessageTypes)
+      .message
+  ).toBe(
+    'Oops! A loop was detected in this activity, we are halting the activity to prevent an infinite loop. Please contact the activity creator to fix this issue.'
+  );
 });
