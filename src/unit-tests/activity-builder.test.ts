@@ -220,7 +220,7 @@ test('can collect data from ai response and display', async () => {
       ],
       outputDataType: PromptOutputTypes.JSON,
       responseFormat:
-        'Please only respond with JSON with these fields:\nnickname: string\t\t  \n',
+        '\n  Respond in JSON. Validate that your response is valid JSON. Your JSON must follow this format:\n{\n"nickname": string\t  \n}\n',
       systemRole: 'user',
     },
   ]);
@@ -268,9 +268,6 @@ test('can send data to prompt requests', async () => {
     activityBuilderStepAccumulator.stepsExecuted[4],
     'Hello, Aaron!'
   );
-  console.log(
-    JSON.stringify(activityBuilderStepAccumulator.stepsExecuted[5], null, 2)
-  );
   confirmStepPromptExecution(activityBuilderStepAccumulator.stepsExecuted[5], [
     {
       prompts: [
@@ -288,7 +285,7 @@ test('can send data to prompt requests', async () => {
       ],
       outputDataType: PromptOutputTypes.JSON,
       responseFormat:
-        'Please only respond with JSON with these fields:\nnickname: string\t\t a nickname generated for the supplied name \n',
+        '\n  Respond in JSON. Validate that your response is valid JSON. Your JSON must follow this format:\n{\n"nickname": string\t // a nickname generated for the supplied name \n}\n',
       systemRole: 'user',
     },
   ]);

@@ -29,12 +29,15 @@ function convertExpectedDataIntoSchema(
 export function convertExpectedDataToAiPromptString(
   expectedData: JsonResponseData[]
 ) {
-  let promptString = 'Please only respond with JSON with these fields:\n';
+  let promptString = `
+  Respond in JSON. Validate that your response is valid JSON. Your JSON must follow this format:\n`;
+  promptString += `{\n`;
   for (const expectedField of expectedData) {
-    promptString += `${expectedField.name}: ${expectedField.type}\t\t ${
-      expectedField.additionalInfo || ''
+    promptString += `"${expectedField.name}": ${expectedField.type}\t ${
+      expectedField.additionalInfo ? `// ${expectedField.additionalInfo}` : ''
     } \n`;
   }
+  promptString += `}\n`;
   return promptString;
 }
 
