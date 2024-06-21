@@ -78,6 +78,7 @@ export interface SystemMessageActivityStep extends ActivityBuilderStep {
 
 // RequestUserInput
 export interface PredefinedResponse {
+  isArray?: boolean;
   message: string;
   jumpToStepId?: string;
 }
@@ -95,7 +96,7 @@ export interface RequestUserInputActivityStep extends ActivityBuilderStep {
 export enum JsonResponseDataType {
   STRING = 'string',
   // OBJECT = 'object',
-  // ARRAY = 'array',
+  ARRAY = 'array',
 }
 
 export interface JsonResponseData {

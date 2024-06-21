@@ -15,6 +15,7 @@ import {
   PromptActivityStep,
   SystemMessageActivityStep,
   RequestUserInputActivityStep,
+  PredefinedResponse,
 } from '../../components/activity-builder/types';
 import {
   ChatLog,
@@ -36,6 +37,19 @@ import {
 } from '../../components/activity-builder/helpers';
 import { ChatLogSubscriber } from '../../hooks/use-with-chat-log-subscribers';
 
+interface UserResponseHandleState {
+  responseNavigations: {
+    response: string;
+    jumpToStepId: string;
+  }[];
+}
+
+function getDefaultUserResponseHandleState(): UserResponseHandleState {
+  return {
+    responseNavigations: [],
+  };
+}
+
 export class BuiltActivityHandler implements ChatLogSubscriber {
   builtActivityData: ActivityBuilder | undefined;
   curStep: ActivityBuilderStep | undefined;
@@ -51,10 +65,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   executePrompt: (
     aiPromptSteps: AiPromptStep[]
   ) => Promise<AiServicesResponseTypes>;
-
-  removeDataFromStoredData(key: string) {
-    delete this.stateData[key];
-  }
+  userResponseHandleState: UserResponseHandleState;
 
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
@@ -132,6 +143,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   ) {
     this.builtActivityData = builtActivityData;
     this.stateData = {};
+    this.userResponseHandleState = getDefaultUserResponseHandleState();
     this.sendMessage = sendMessage;
     this.clearChat = clearChat;
     this.setWaitingForUserAnswer = setWaitingForUserAnswer;
@@ -150,11 +162,11 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.handleNewUserMessage = this.handleNewUserMessage.bind(this);
     this.handlePromptStep = this.handlePromptStep.bind(this);
     this.replaceStoredDataInString = this.replaceStoredDataInString.bind(this);
-    this.removeDataFromStoredData = this.removeDataFromStoredData.bind(this);
     this.getNextStep = this.getNextStep.bind(this);
     this.getStepById = this.getStepById.bind(this);
+    this.addResponseNavigation = this.addResponseNavigation.bind(this);
+    this.handleExtractMcqChoices = this.handleExtractMcqChoices.bind(this);
   }
-
   setBuiltActivityData(builtActivityData?: ActivityBuilder) {
     this.builtActivityData = builtActivityData;
   }
@@ -181,6 +193,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.clearChat();
     this.curStep = this.builtActivityData.flowsList[0].steps[0];
     this.stateData = {};
+    this.userResponseHandleState = getDefaultUserResponseHandleState();
     this.handleStep(this.curStep);
   }
 
@@ -224,12 +237,60 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       sender: Sender.SYSTEM,
       displayType: MessageDisplayType.TEXT,
       disableUserInput: step.disableFreeInput,
-      mcqChoices: step.predefinedResponses.map((response) =>
-        this.replaceStoredDataInString(response.message)
-      ),
+      mcqChoices: this.handleExtractMcqChoices(step.predefinedResponses),
     });
     this.setWaitingForUserAnswer(true);
     // Will now wait for user input before progressing to next step
+  }
+
+  handleExtractMcqChoices(predefinedResponses: PredefinedResponse[]): string[] {
+    const finalRes: string[] = [];
+    for (let i = 0; i < predefinedResponses.length; i++) {
+      const res = predefinedResponses[i];
+      if (res.isArray) {
+        const responsesArray = this.getStoredArray(res.message);
+        if (res.jumpToStepId) {
+          for (let j = 0; j < responsesArray.length; j++) {
+            this.addResponseNavigation(responsesArray[j], res.jumpToStepId);
+          }
+        }
+        finalRes.push(...responsesArray);
+      } else {
+        const resString = this.replaceStoredDataInString(res.message);
+        if (res.jumpToStepId) {
+          this.addResponseNavigation(resString, res.jumpToStepId);
+        }
+        finalRes.push(resString);
+      }
+    }
+    return finalRes;
+  }
+
+  addResponseNavigation(response: string, jumpToStepId: string) {
+    this.userResponseHandleState.responseNavigations.push({
+      response,
+      jumpToStepId,
+    });
+  }
+
+  getStoredArray(str: string): string[] {
+    const regex = /{{(.*?)}}/g;
+    const key = str.match(regex);
+    if (key) {
+      const keyName = key[0].slice(2, -2);
+      if (Array.isArray(this.stateData[keyName])) {
+        return this.stateData[keyName];
+      }
+    }
+    return [str];
+  }
+
+  replaceStoredDataInString(str: string): string {
+    // replace all instances of {{key}} in str with stored data[key]
+    const regex = /{{(.*?)}}/g;
+    return str.trim().replace(regex, (match, key) => {
+      return this.stateData[key] || match;
+    });
   }
 
   async goToNextStep() {
@@ -276,6 +337,28 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       this.stateData[userInputStep.saveResponseVariableName] = message;
     }
     this.setWaitingForUserAnswer(false);
+    if (this.userResponseHandleState.responseNavigations.length > 0) {
+      for (
+        let i = 0;
+        i < this.userResponseHandleState.responseNavigations.length;
+        i++
+      ) {
+        const responseNavigation =
+          this.userResponseHandleState.responseNavigations[i];
+        if (responseNavigation.response === message) {
+          const jumpStep = this.getStepById(responseNavigation.jumpToStepId);
+          if (!jumpStep) {
+            throw new Error(
+              `Unable to find target step ${responseNavigation.jumpToStepId} for predefined input ${responseNavigation.response}, maybe you deleted it and forgot to update this step?`
+            );
+          }
+          this.handleStep(jumpStep);
+          return;
+        }
+      }
+    }
+    // reset user response handle state since we handled the user response
+    this.userResponseHandleState = getDefaultUserResponseHandleState();
     await this.goToNextStep();
   }
 
@@ -354,13 +437,5 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     }
     this.setResponsePending(false);
     await this.goToNextStep();
-  }
-
-  replaceStoredDataInString(str: string): string {
-    // replace all instances of {{key}} in str with stored data[key]
-    const regex = /{{(.*?)}}/g;
-    return str.replace(regex, (match, key) => {
-      return this.stateData[key] || match;
-    });
   }
 }

@@ -40,6 +40,7 @@ export const fullBuiltActivityQueryData = `
                               predefinedResponses{
                                   message
                                   jumpToStepId
+                                  isArray
                               }
                           }
 

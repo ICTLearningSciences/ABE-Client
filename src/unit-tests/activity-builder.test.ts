@@ -19,6 +19,7 @@ import {
   sendDataToPromptsActivity,
   collectIntentionActivity,
   collectUserNameActivity,
+  utilizeListMcqActivity,
 } from './activity-builder-fixture';
 import { openAiTextResponse } from './fixtures/basic-text-response';
 
@@ -293,4 +294,69 @@ test('can send data to prompt requests', async () => {
     activityBuilderStepAccumulator.stepsExecuted[6],
     'Thank you for participating in the test activity, air-in!'
   );
+});
+
+test('utlize mcq ai responses and maps to steps', async () => {
+  const activityBuilderStepAccumulator = new ActivityBuilderDataAccumulator([
+    openAiTextResponse(
+      '{\n  "nicknames": [\n    "aaron",\n    "airbear",\n    "air-in"\n  ]\n}'
+    ),
+    openAiTextResponse(
+      '{\n  "nicknames": [\n    "ryan",\n    "ry-ry",\n    "ray-in"\n  ]\n}'
+    ),
+  ]);
+
+  const activityBuilder = prepareActivityBuilder(
+    utilizeListMcqActivity,
+    activityBuilderStepAccumulator
+  );
+  activityBuilder.initializeActivity();
+  await new Promise((r) => setTimeout(r, 1000));
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(3);
+  expect(
+    activityBuilder.userResponseHandleState.responseNavigations
+  ).toContainEqual({
+    response: 'aaron',
+    jumpToStepId: '1',
+  });
+  expect(
+    activityBuilder.userResponseHandleState.responseNavigations
+  ).toContainEqual({
+    response: 'airbear',
+    jumpToStepId: '1',
+  });
+  expect(
+    activityBuilder.userResponseHandleState.responseNavigations
+  ).toContainEqual({
+    response: 'air-in',
+    jumpToStepId: '1',
+  });
+  activityBuilder.newChatLogReceived([
+    {
+      id: '123',
+      sender: Sender.USER,
+      displayType: MessageDisplayType.TEXT,
+      message: 'aaron',
+    },
+  ]);
+  await new Promise((r) => setTimeout(r, 1000));
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(7);
+  expect(
+    activityBuilder.userResponseHandleState.responseNavigations
+  ).toContainEqual({
+    response: 'ryan',
+    jumpToStepId: '1',
+  });
+  expect(
+    activityBuilder.userResponseHandleState.responseNavigations
+  ).toContainEqual({
+    response: 'ry-ry',
+    jumpToStepId: '1',
+  });
+  expect(
+    activityBuilder.userResponseHandleState.responseNavigations
+  ).toContainEqual({
+    response: 'ray-in',
+    jumpToStepId: '1',
+  });
 });

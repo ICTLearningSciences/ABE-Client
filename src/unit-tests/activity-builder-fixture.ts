@@ -325,3 +325,55 @@ export const multipleFlowActivity: ActivityBuilder = {
     },
   ],
 };
+
+export const utilizeListMcqActivity: ActivityBuilder = {
+  _id: 'utilize-list-mcq',
+  title: 'Utilize List MCQ',
+  activityType: 'builder',
+  description: '',
+  user: '123',
+  visibility: 'public',
+  displayIcon: DisplayIcons.DEFAULT,
+  flowsList: [
+    {
+      clientId: '2',
+      name: 'Flow 1',
+      steps: [
+        {
+          stepId: '1',
+          stepType: ActivityBuilderStepType.PROMPT,
+          promptText: 'Please generate 3 nicknames for Aaron',
+          responseFormat: '',
+          jsonResponseData: [
+            {
+              clientId: '1',
+              name: 'nicknames',
+              type: 'array',
+              isRequired: true,
+            },
+          ],
+          includeChatLogContext: false,
+          includeEssay: false,
+          outputDataType: PromptOutputTypes.JSON,
+          customSystemRole: 'user',
+        } as PromptActivityStep,
+        {
+          stepId: '2',
+          stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+          saveAsIntention: false,
+          saveResponseVariableName: '',
+          disableFreeInput: false,
+          predefinedResponses: [
+            {
+              message: '{{nicknames}}',
+              isArray: true,
+              jumpToStepId: '1',
+            },
+          ],
+          message: 'Which nickname do you like best?',
+          // jumpToStepId: '1',
+        } as RequestUserInputActivityStep,
+      ],
+    },
+  ],
+};

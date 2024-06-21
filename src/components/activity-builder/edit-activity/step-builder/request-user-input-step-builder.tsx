@@ -14,6 +14,7 @@ import {
 } from '../../types';
 import {
   ColumnCenterDiv,
+  ColumnDiv,
   RoundedBorderDiv,
   RowDiv,
   TopLeftText,
@@ -53,16 +54,28 @@ function PredefinedResponseUpdater(props: {
         borderTop: '1px dotted black',
       }}
     >
-      <InputField
-        label="Custom User Message"
-        value={predefinedResponse.message}
-        onChange={(e) => {
-          props.updateResponse({
-            ...predefinedResponse,
-            message: e,
-          });
-        }}
-      />
+      <ColumnDiv>
+        <InputField
+          label="Custom User Message"
+          value={predefinedResponse.message}
+          onChange={(e) => {
+            props.updateResponse({
+              ...predefinedResponse,
+              message: e,
+            });
+          }}
+        />
+        <CheckBoxInput
+          label="Is Array Data?"
+          value={predefinedResponse.isArray || false}
+          onChange={(e) => {
+            props.updateResponse({
+              ...predefinedResponse,
+              isArray: e,
+            });
+          }}
+        />
+      </ColumnDiv>
       <FlowStepSelector
         title="Jump to Step (OPTIONAL)"
         flowsList={flowsList}
