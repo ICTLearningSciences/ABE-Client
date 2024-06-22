@@ -430,3 +430,77 @@ export const stepLoopsIntoSelfActivity: ActivityBuilder = {
     },
   ],
 };
+
+export const weightedResponseWeightsActivity: ActivityBuilder = {
+  _id: 'weighted-response-weights',
+  title: 'Weighted Response Weights',
+  activityType: 'builder',
+  description: '',
+  user: '123',
+  visibility: 'public',
+  displayIcon: DisplayIcons.DEFAULT,
+  flowsList: [
+    {
+      clientId: '2',
+      name: 'Flow 1',
+      steps: [
+        {
+          stepId: '1',
+          stepType: ActivityBuilderStepType.PROMPT,
+          promptText: 'Please generate 3 nicknames for Aaron',
+          responseFormat: '',
+          jsonResponseData: [
+            {
+              clientId: '1',
+              name: 'nickname1',
+              type: 'string',
+              isRequired: true,
+            },
+            {
+              clientId: '2',
+              name: 'nickname1rating',
+              type: 'string',
+              isRequired: true,
+            },
+
+            {
+              clientId: '3',
+              name: 'nickname2',
+              type: 'string',
+              isRequired: true,
+            },
+            {
+              clientId: '4',
+              name: 'nickname2rating',
+              type: 'string',
+              isRequired: true,
+            },
+          ],
+          includeChatLogContext: false,
+          includeEssay: false,
+          outputDataType: PromptOutputTypes.JSON,
+          customSystemRole: 'user',
+        } as PromptActivityStep,
+        {
+          stepId: '2',
+          stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+          saveAsIntention: false,
+          saveResponseVariableName: '',
+          disableFreeInput: false,
+          predefinedResponses: [
+            {
+              message: '{{nickname1}}',
+              responseWeight: '{{nickname1rating}}',
+            },
+            {
+              message: '{{nickname2}}',
+              responseWeight: '{{nickname2rating}}',
+            },
+          ],
+          message: 'Which nickname do you like best?',
+          jumpToStepId: '1',
+        } as RequestUserInputActivityStep,
+      ],
+    },
+  ],
+};

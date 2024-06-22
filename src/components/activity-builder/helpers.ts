@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { FlowItem, JsonResponseData } from './types';
+import { FlowItem, JsonResponseData, PredefinedResponse } from './types';
 import Validator, { Schema } from 'jsonschema';
 
 function convertExpectedDataIntoSchema(
@@ -70,4 +70,60 @@ export function getFlowForStepId(
       return step.stepId === stepId;
     });
   });
+}
+
+export function processPredefinedResponses(
+  processPredefinedResponses: PredefinedResponse[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  stateData: Record<string, any>
+): PredefinedResponse[] {
+  const processedPredefinedResponses = processPredefinedResponses.map(
+    (response) => {
+      return {
+        ...response,
+        message: replaceStoredDataInString(response.message, stateData),
+        responseWeight: replaceStoredDataInString(
+          response.responseWeight || '',
+          stateData
+        ),
+      };
+    }
+  );
+  return processedPredefinedResponses;
+}
+
+export function replaceStoredDataInString(
+  str: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  stateData: Record<string, any>
+): string {
+  // replace all instances of {{key}} in str with stored data[key]
+  const regex = /{{(.*?)}}/g;
+  return str.trim().replace(regex, (match, key) => {
+    return stateData[key] || match;
+  });
+}
+
+export function sortMessagesByResponseWeight(
+  messageList: string[],
+  predefinedResponses: PredefinedResponse[]
+): string[] {
+  const sortedMessages = messageList.sort((a, b) => {
+    const responseWeightA = predefinedResponses.find(
+      (response) => response.message === a
+    )?.responseWeight;
+    const responseWeightB = predefinedResponses.find(
+      (response) => response.message === b
+    )?.responseWeight;
+    try {
+      if (responseWeightA && responseWeightB) {
+        return parseInt(responseWeightB) - parseInt(responseWeightA);
+      }
+    } catch (e) {
+      console.error(e);
+      return 0;
+    }
+    return 0;
+  });
+  return sortedMessages;
 }

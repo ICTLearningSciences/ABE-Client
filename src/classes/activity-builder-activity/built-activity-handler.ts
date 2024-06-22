@@ -33,7 +33,10 @@ import {
 import { chatLogToString, isJsonString } from '../../helpers';
 import {
   convertExpectedDataToAiPromptString,
+  processPredefinedResponses,
   receivedExpectedData,
+  replaceStoredDataInString,
+  sortMessagesByResponseWeight,
 } from '../../components/activity-builder/helpers';
 import { ChatLogSubscriber } from '../../hooks/use-with-chat-log-subscribers';
 
@@ -163,7 +166,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.goToNextStep = this.goToNextStep.bind(this);
     this.handleNewUserMessage = this.handleNewUserMessage.bind(this);
     this.handlePromptStep = this.handlePromptStep.bind(this);
-    this.replaceStoredDataInString = this.replaceStoredDataInString.bind(this);
     this.getNextStep = this.getNextStep.bind(this);
     this.getStepById = this.getStepById.bind(this);
     this.addResponseNavigation = this.addResponseNavigation.bind(this);
@@ -240,7 +242,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   async handleSystemMessageStep(step: SystemMessageActivityStep) {
     this.sendMessage({
       id: uuidv4(),
-      message: this.replaceStoredDataInString(step.message),
+      message: replaceStoredDataInString(step.message, this.stateData),
       sender: Sender.SYSTEM,
       displayType: MessageDisplayType.TEXT,
     });
@@ -248,13 +250,17 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async handleRequestUserInputStep(step: RequestUserInputActivityStep) {
+    const processedPredefinedResponses = processPredefinedResponses(
+      step.predefinedResponses,
+      this.stateData
+    );
     this.sendMessage({
       id: uuidv4(),
-      message: this.replaceStoredDataInString(step.message),
+      message: replaceStoredDataInString(step.message, this.stateData),
       sender: Sender.SYSTEM,
       displayType: MessageDisplayType.TEXT,
       disableUserInput: step.disableFreeInput,
-      mcqChoices: this.handleExtractMcqChoices(step.predefinedResponses),
+      mcqChoices: this.handleExtractMcqChoices(processedPredefinedResponses),
     });
     this.setWaitingForUserAnswer(true);
     // Will now wait for user input before progressing to next step
@@ -265,7 +271,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     for (let i = 0; i < predefinedResponses.length; i++) {
       const res = predefinedResponses[i];
       if (res.isArray) {
-        const responsesArray = this.getStoredArray(res.message);
+        const responsesArray = res.message.split(',');
         if (res.jumpToStepId) {
           for (let j = 0; j < responsesArray.length; j++) {
             this.addResponseNavigation(responsesArray[j], res.jumpToStepId);
@@ -273,14 +279,17 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         }
         finalRes.push(...responsesArray);
       } else {
-        const resString = this.replaceStoredDataInString(res.message);
+        const resString = replaceStoredDataInString(
+          res.message,
+          this.stateData
+        );
         if (res.jumpToStepId) {
           this.addResponseNavigation(resString, res.jumpToStepId);
         }
         finalRes.push(resString);
       }
     }
-    return finalRes;
+    return sortMessagesByResponseWeight(finalRes, predefinedResponses);
   }
 
   addResponseNavigation(response: string, jumpToStepId: string) {
@@ -300,14 +309,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       }
     }
     return [str];
-  }
-
-  replaceStoredDataInString(str: string): string {
-    // replace all instances of {{key}} in str with stored data[key]
-    const regex = /{{(.*?)}}/g;
-    return str.trim().replace(regex, (match, key) => {
-      return this.stateData[key] || match;
-    });
   }
 
   async goToNextStep() {
@@ -393,12 +394,19 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   async handlePromptStep(step: PromptActivityStep) {
     this.setResponsePending(true);
     // handle replacing promptText with stored data
-    const promptText = this.replaceStoredDataInString(step.promptText);
+    const promptText = replaceStoredDataInString(
+      step.promptText,
+      this.stateData
+    );
     // handle replacing responseFormat with stored data
-    const responseFormat = this.replaceStoredDataInString(step.responseFormat);
+    const responseFormat = replaceStoredDataInString(
+      step.responseFormat,
+      this.stateData
+    );
     // handle replacing customSystemRole with stored data
-    const customSystemRole = this.replaceStoredDataInString(
-      step.customSystemRole
+    const customSystemRole = replaceStoredDataInString(
+      step.customSystemRole,
+      this.stateData
     );
 
     const aiPromptSteps: AiPromptStep[] = [];

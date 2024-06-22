@@ -22,6 +22,7 @@ import {
   utilizeListMcqActivity,
   accidentalLoopActivity,
   stepLoopsIntoSelfActivity,
+  weightedResponseWeightsActivity,
 } from './activity-builder-fixture';
 import { openAiTextResponse } from './fixtures/basic-text-response';
 
@@ -405,4 +406,58 @@ test('halts activity if loop is detected in activity steps', async () => {
   ).toBe(
     'Oops! A loop was detected in this activity, we are halting the activity to prevent an infinite loop. Please contact the activity creator to fix this issue.'
   );
+});
+
+test('can sort mcq responses by response weight', async () => {
+  const activityBuilderStepAccumulator = new ActivityBuilderDataAccumulator([
+    openAiTextResponse(
+      '{"nickname1":"aaron", "nickname2":"airbear","nickname1rating":"5","nickname2rating":"1"}'
+    ),
+    openAiTextResponse(
+      '{"nickname1":"aaron", "nickname2":"airbear","nickname1rating":"1","nickname2rating":"5"}'
+    ),
+  ]);
+
+  const activityBuilder = prepareActivityBuilder(
+    weightedResponseWeightsActivity,
+    activityBuilderStepAccumulator
+  );
+  activityBuilder.initializeActivity();
+
+  await new Promise((r) => setTimeout(r, 1000));
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(3);
+  expect(activityBuilderStepAccumulator.stepsExecuted[1].type).toBe(
+    ExecutedStepTypes.CHAT_MESSAGE
+  );
+  expect(
+    (activityBuilderStepAccumulator.stepsExecuted[1].value as ChatMessageTypes)
+      .message
+  ).toBe('Which nickname do you like best?');
+  expect(
+    (activityBuilderStepAccumulator.stepsExecuted[1].value as ChatMessageTypes)
+      .mcqChoices
+  ).toStrictEqual(['aaron', 'airbear']);
+
+  activityBuilder.newChatLogReceived([
+    {
+      id: '123',
+      sender: Sender.USER,
+      displayType: MessageDisplayType.TEXT,
+      message: 'aaron',
+    },
+  ]);
+
+  await new Promise((r) => setTimeout(r, 1000));
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(7);
+  expect(activityBuilderStepAccumulator.stepsExecuted[5].type).toBe(
+    ExecutedStepTypes.CHAT_MESSAGE
+  );
+  expect(
+    (activityBuilderStepAccumulator.stepsExecuted[5].value as ChatMessageTypes)
+      .message
+  ).toBe('Which nickname do you like best?');
+  expect(
+    (activityBuilderStepAccumulator.stepsExecuted[5].value as ChatMessageTypes)
+      .mcqChoices
+  ).toStrictEqual(['airbear', 'aaron']);
 });

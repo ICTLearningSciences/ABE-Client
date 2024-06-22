@@ -41,6 +41,7 @@ export const fullBuiltActivityQueryData = `
                                   message
                                   jumpToStepId
                                   isArray
+                                  responseWeight
                               }
                           }
 

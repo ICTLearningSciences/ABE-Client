@@ -65,6 +65,16 @@ function PredefinedResponseUpdater(props: {
             });
           }}
         />
+        <InputField
+          label="Response Weight (Optional)"
+          value={predefinedResponse.responseWeight || ''}
+          onChange={(e) => {
+            props.updateResponse({
+              ...predefinedResponse,
+              responseWeight: e,
+            });
+          }}
+        />
         <CheckBoxInput
           label="Is Array Data?"
           value={predefinedResponse.isArray || false}
@@ -150,6 +160,7 @@ function PredefinedResponsesUpdater(props: {
               ...step.predefinedResponses,
               {
                 message: '',
+                responseWeight: '0',
               },
             ],
           });
