@@ -433,37 +433,54 @@ function JsonResponseDataUpdater(props: {
               width: '95%',
             }}
           >
-            <InputField
-              label="Variable Name"
-              value={jsonResponseData.name}
-              onChange={(e) => {
-                addOrEdit({
-                  ...jsonResponseData,
-                  name: e,
-                });
+            <RowDiv
+              style={{
+                width: '100%',
+                justifyContent: 'space-between',
               }}
-            />
-            <SelectInputField
-              label="Type"
-              value={jsonResponseData.type}
-              options={[...Object.values(JsonResponseDataType)]}
-              onChange={(e) => {
-                addOrEdit({
-                  ...jsonResponseData,
-                  type: e as JsonResponseDataType,
-                });
-              }}
-            />
-            <CheckBoxInput
-              label="Is Required"
-              value={jsonResponseData.isRequired}
-              onChange={(e) => {
-                addOrEdit({
-                  ...jsonResponseData,
-                  isRequired: e,
-                });
-              }}
-            />
+            >
+              <RowDiv>
+                <InputField
+                  label="Variable Name"
+                  value={jsonResponseData.name}
+                  onChange={(e) => {
+                    addOrEdit({
+                      ...jsonResponseData,
+                      name: e,
+                    });
+                  }}
+                />
+                <SelectInputField
+                  label="Type"
+                  value={jsonResponseData.type}
+                  options={[...Object.values(JsonResponseDataType)]}
+                  onChange={(e) => {
+                    addOrEdit({
+                      ...jsonResponseData,
+                      type: e as JsonResponseDataType,
+                    });
+                  }}
+                />
+                <CheckBoxInput
+                  label="Is Required"
+                  value={jsonResponseData.isRequired}
+                  onChange={(e) => {
+                    addOrEdit({
+                      ...jsonResponseData,
+                      isRequired: e,
+                    });
+                  }}
+                />
+              </RowDiv>
+
+              <IconButton
+                onClick={() => {
+                  deleteJsonResponseData(jsonResponseData);
+                }}
+              >
+                <Delete />
+              </IconButton>
+            </RowDiv>
             <InputField
               label="Additional Info"
               maxRows={4}
@@ -475,18 +492,6 @@ function JsonResponseDataUpdater(props: {
                 });
               }}
             />
-            <IconButton
-              style={{
-                position: 'absolute',
-                top: 10,
-                right: 10,
-              }}
-              onClick={() => {
-                deleteJsonResponseData(jsonResponseData);
-              }}
-            >
-              <Delete />
-            </IconButton>
           </ColumnDiv>
         );
       })}
