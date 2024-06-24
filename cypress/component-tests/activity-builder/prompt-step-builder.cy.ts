@@ -14,13 +14,15 @@ describe("Prompt Step Builder", ()=>{
             step,
             updateLocalActivity: ()=>{
             },
-            updateStep: (step)=>{
-                step = step;
-            },
             deleteStep: ()=>{
             },
             stepIndex: 0,
-            flowsList: multipleFlowActivity.flowsList
+            flowsList: multipleFlowActivity.flowsList,
+            previewed: false,
+            startPreview: ()=>{
+            },
+            stopPreview: ()=>{
+            }
         });
         cy.mount(systemMessageStepBuilder);
     })

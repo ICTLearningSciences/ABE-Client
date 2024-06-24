@@ -63,6 +63,7 @@ export function SelectCreateActivity(props: {
         width: '100%',
         height: '100%',
         alignItems: 'center',
+        overflow: 'auto',
       }}
     >
       <h1>Activity Builder</h1>

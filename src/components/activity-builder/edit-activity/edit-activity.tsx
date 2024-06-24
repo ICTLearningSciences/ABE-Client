@@ -15,9 +15,6 @@ export function EditActivity(props: {
   const [localActivityCopy, setLocalActivityCopy] =
     React.useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
 
-  console.log(activity);
-  console.log(localActivityCopy);
-
   useEffect(() => {
     setLocalActivityCopy(JSON.parse(JSON.stringify(activity)));
   }, [activity]);
@@ -41,6 +38,7 @@ export function EditActivity(props: {
       style={{
         width: '100%',
         height: '100%',
+        overflowY: 'auto',
       }}
     >
       <ColumnDiv

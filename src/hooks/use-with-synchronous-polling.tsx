@@ -31,7 +31,7 @@ export async function asyncPromptExecute(
     pollFunction,
     (res: AiServicesJobStatusResponseTypes) => {
       if (res.jobStatus === JobStatus.FAILED) {
-        throw new Error('OpenAI job failed');
+        throw new Error(`OpenAI job failed: ${res.apiError}`);
       }
       return res.jobStatus === JobStatus.COMPLETE;
     },

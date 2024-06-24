@@ -17,6 +17,7 @@ import {
   ColumnCenterDiv,
   ColumnDiv,
   RoundedBorderDiv,
+  RowDiv,
   TopLeftText,
 } from '../../../../styled-components';
 import {
@@ -24,11 +25,22 @@ import {
   InputField,
   SelectInputField,
 } from '../../shared/input-components';
-import { PromptOutputTypes } from '../../../../types';
-import { Button, IconButton } from '@mui/material';
+import {
+  AiPromptStep,
+  PromptConfiguration,
+  PromptOutputTypes,
+  PromptRoles,
+} from '../../../../types';
+import { Button, CircularProgress, IconButton } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { v4 as uuid } from 'uuid';
 import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
+import { AiServicesResponseTypes } from '../../../../ai-services/ai-service-types';
+import ViewPreviousRunModal from '../../../admin-view/view-previous-run-modal';
+import { convertExpectedDataToAiPromptString } from '../../helpers';
+import { useWithExecutePrompt } from '../../../../hooks/use-with-execute-prompts';
+import { TextDialog } from '../../../dialog';
+import ViewPreviousRunsModal from '../../../admin-view/view-previous-runs-modal';
 
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
@@ -57,16 +69,40 @@ export function defaultPromptBuilder(): PromptActivityStep {
 
 export function PromptStepBuilder(props: {
   step: PromptActivityStep;
-  updateStep: (step: PromptActivityStep) => void;
   updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
-  deleteStep: () => void;
+  deleteStep: (stepId: string, flowClientId: string) => void;
   flowsList: FlowItem[];
   stepIndex: number;
+  previewed: boolean;
+  startPreview: () => void;
+  stopPreview: () => void;
   width?: string;
   height?: string;
 }): JSX.Element {
-  const { step, stepIndex, updateLocalActivity } = props;
-
+  const {
+    step,
+    stepIndex,
+    updateLocalActivity,
+    previewed,
+    stopPreview,
+    startPreview,
+    deleteStep,
+    flowsList,
+  } = props;
+  const currentFLow = flowsList.find((f) => {
+    return f.steps.find((s) => s.stepId === step.stepId);
+  });
+  const { executePromptSteps } = useWithExecutePrompt();
+  const [viewRunResults, setViewRunResults] =
+    React.useState<AiServicesResponseTypes>();
+  const [previousRunResults, setPreviousRunResults] = React.useState<
+    AiServicesResponseTypes[]
+  >([]);
+  const [viewingPreviousRuns, setViewingPreviousRuns] =
+    React.useState<boolean>(false);
+  const [executeError, setExecuteError] = React.useState<string>('');
+  const [executeInProgress, setExecuteInProgress] =
+    React.useState<boolean>(false);
   function updateField(
     field: string,
     value: string | boolean | JsonResponseData[]
@@ -162,6 +198,38 @@ export function PromptStepBuilder(props: {
     });
   }
 
+  async function executePromptTest() {
+    setExecuteInProgress(true);
+    const aiPromptSteps: AiPromptStep[] = [];
+    aiPromptSteps.push({
+      prompts: [],
+      outputDataType: step.outputDataType,
+      responseFormat: step.responseFormat,
+      systemRole: step.customSystemRole,
+    });
+    const promptConfig: PromptConfiguration = {
+      promptText: step.promptText,
+      includeEssay: step.includeEssay, // handled by server
+      promptRole: PromptRoles.USER,
+    };
+    aiPromptSteps[0].prompts.push(promptConfig);
+    if (step.jsonResponseData?.length) {
+      aiPromptSteps[0].responseFormat += convertExpectedDataToAiPromptString(
+        step.jsonResponseData
+      );
+    }
+    try {
+      const _response = await executePromptSteps(aiPromptSteps);
+      setViewRunResults(_response);
+      setPreviousRunResults([...previousRunResults, _response]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      setExecuteError(e.message);
+    } finally {
+      setExecuteInProgress(false);
+    }
+  }
+
   return (
     <RoundedBorderDiv
       style={{
@@ -171,16 +239,101 @@ export function PromptStepBuilder(props: {
         position: 'relative',
         flexDirection: 'column',
         padding: 10,
+        border: previewed ? '3px solid black' : '1px solid black',
       }}
     >
       <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>
+      <RowDiv
+        data-cy="run-prompt-buttons"
+        style={{
+          width: 'fit-content',
+          alignSelf: 'center',
+        }}
+      >
+        {previewed && (
+          <>
+            {!executeInProgress ? (
+              <Button
+                style={{
+                  marginRight: 10,
+                }}
+                onClick={() => {
+                  executePromptTest();
+                }}
+              >
+                Run
+              </Button>
+            ) : (
+              <CircularProgress
+                style={{
+                  marginRight: 10,
+                }}
+              />
+            )}
+            <Button
+              style={{
+                marginRight: 10,
+              }}
+              disabled={executeInProgress || !previousRunResults.length}
+              onClick={() => {
+                setViewingPreviousRuns(true);
+              }}
+            >
+              View Previous Runs
+            </Button>
+            <ViewPreviousRunModal
+              previousRunStepData={viewRunResults?.aiAllStepsData}
+              open={Boolean(viewRunResults)}
+              close={() => {
+                setViewRunResults(undefined);
+              }}
+            />
+            <ViewPreviousRunsModal
+              previousRuns={previousRunResults}
+              open={viewingPreviousRuns}
+              close={() => {
+                setViewingPreviousRuns(false);
+              }}
+              setRunToView={(run) => {
+                setViewRunResults(run);
+              }}
+            />
+            <TextDialog
+              title="Error"
+              body={executeError}
+              open={Boolean(executeError)}
+              close={() => {
+                setExecuteError('');
+              }}
+            />
+          </>
+        )}
+        <Button
+          variant={previewed ? 'contained' : 'outlined'}
+          style={{
+            width: 'fit-content',
+            alignSelf: 'center',
+          }}
+          onClick={() => {
+            if (previewed) {
+              stopPreview();
+            } else {
+              startPreview();
+            }
+          }}
+        >
+          {previewed ? 'Return' : 'Preview'}
+        </Button>
+      </RowDiv>
       <IconButton
         style={{
           position: 'absolute',
           right: 10,
           top: 10,
         }}
-        onClick={props.deleteStep}
+        onClick={() => {
+          deleteStep(step.stepId, currentFLow?.clientId || '');
+        }}
       >
         <Delete />
       </IconButton>

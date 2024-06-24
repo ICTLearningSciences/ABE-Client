@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 import { Button } from '@mui/material';
 import { ColumnDiv } from '../../styled-components';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   ActivityGQL,
   ActivityPrompt,
@@ -25,6 +24,7 @@ import {
 import { SavedActivityPromptsView } from './prompt-editing/saved-activity-prompts-view';
 import { isPromptInActivity } from '../../helpers';
 import { EditPrompt } from './prompt-editing/edit-prompt';
+import { ActivityBuilderPage } from '../activity-builder/activity-builder-page';
 
 export const emptyOpenAiPromptStep = (): AiPromptStep => {
   return {
@@ -47,9 +47,10 @@ export function MultiPromptTesting(props: {
 }): JSX.Element {
   const { activities, goToActivity, useWithPrompts } = props;
   const [targetPromptId, setTargetPromptId] = useState<string>();
-  const navigate = useNavigate();
   const { prompts, handleSavePrompt, editOrAddPrompt, isLoading } =
     useWithPrompts;
+  const [viewActivityBuilder, setViewActivityBuilder] =
+    useState<boolean>(false);
   const activitiesWithPrompts = activities.filter(
     (activity) => (activity.prompts?.length || 0) > 0
   );
@@ -128,6 +129,10 @@ export function MultiPromptTesting(props: {
     return activity;
   }
 
+  if (viewActivityBuilder) {
+    return <ActivityBuilderPage />;
+  }
+
   // Selecting prompt template
   if (!promptTemplate) {
     return (
@@ -138,7 +143,7 @@ export function MultiPromptTesting(props: {
           <h2 style={{ textAlign: 'center' }}>Activities</h2>
           <Button
             onClick={() => {
-              navigate('/build/activity');
+              setViewActivityBuilder(true);
             }}
           >
             Build Activities

@@ -127,3 +127,13 @@ export function sortMessagesByResponseWeight(
   });
   return sortedMessages;
 }
+
+export function getPromptStepById(stepId: string, flowsList: FlowItem[]) {
+  for (const flow of flowsList) {
+    const step = flow.steps.find((s) => s.stepId === stepId);
+    if (step) {
+      return step;
+    }
+  }
+  return undefined;
+}

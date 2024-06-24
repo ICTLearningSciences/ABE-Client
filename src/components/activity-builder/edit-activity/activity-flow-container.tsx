@@ -6,8 +6,15 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React, { useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
-import { ActivityBuilder as ActivityBuilderType } from '../types';
+import {
+  ActivityBuilderStep,
+  ActivityBuilder as ActivityBuilderType,
+  PromptActivityStep,
+} from '../types';
 import { FlowStepsBuilderTab } from './flow-steps-builder-tab';
+import { getPromptStepById } from '../helpers';
+import { ColumnDiv } from '../../../styled-components';
+import { PromptStepBuilder } from './step-builder/prompt-step-builder';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -51,6 +58,50 @@ export function ActivityFlowContainer(props: {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+  const [previewPromptId, setPreviewPromptId] = React.useState<string>('');
+  const previewPrompt: PromptActivityStep | undefined = getPromptStepById(
+    previewPromptId,
+    flowsList
+  ) as PromptActivityStep;
+
+  const updateStep = (step: ActivityBuilderStep, flowClientId: string) => {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          if (f.clientId === flowClientId) {
+            return {
+              ...f,
+              steps: f.steps.map((s) => {
+                if (s.stepId === step.stepId) {
+                  return step;
+                }
+                return s;
+              }),
+            };
+          }
+          return f;
+        }),
+      };
+    });
+  };
+
+  const deleteStep = (stepId: string, flowClientId: string) => {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          if (f.clientId === flowClientId) {
+            return {
+              ...f,
+              steps: f.steps.filter((s) => s.stepId !== stepId),
+            };
+          }
+          return f;
+        }),
+      };
+    });
+  };
 
   const tabs = flowsList.map((flow, index) => {
     return (
@@ -69,10 +120,35 @@ export function ActivityFlowContainer(props: {
           flow={flow}
           flowsList={flowsList}
           updateLocalActivity={updateLocalActivity}
+          updateStep={updateStep}
+          deleteStep={deleteStep}
+          setPreviewPromptId={(id: string) => setPreviewPromptId(id)}
         />
       </CustomTabPanel>
     );
   });
+
+  if (previewPrompt) {
+    return (
+      <ColumnDiv
+        style={{
+          alignItems: 'center',
+          position: 'relative',
+        }}
+      >
+        <PromptStepBuilder
+          stepIndex={0}
+          step={previewPrompt as PromptActivityStep}
+          deleteStep={deleteStep}
+          updateLocalActivity={updateLocalActivity}
+          flowsList={flowsList}
+          previewed={true}
+          startPreview={() => setPreviewPromptId(previewPrompt.stepId)}
+          stopPreview={() => setPreviewPromptId('')}
+        />
+      </ColumnDiv>
+    );
+  }
 
   return (
     <Box

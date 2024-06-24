@@ -437,7 +437,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
     aiPromptSteps[0].prompts.push(promptConfig);
     if (step.jsonResponseData) {
-      aiPromptSteps[0].responseFormat = convertExpectedDataToAiPromptString(
+      aiPromptSteps[0].responseFormat += convertExpectedDataToAiPromptString(
         step.jsonResponseData
       );
     }
