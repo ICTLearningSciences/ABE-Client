@@ -5,8 +5,12 @@ import {
   fetchBuiltActivities as _fetchBuiltActivities,
   addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
   LoadStatus,
+  addNewLocalBuiltActivity as _addNewLocalBuiltActivity,
 } from '.';
-import { ActivityBuilder } from '../../../components/activity-builder/types';
+import {
+  ActivityBuilder,
+  defaultActivityBuilder,
+} from '../../../components/activity-builder/types';
 import { ActivityGQL, ActivityTypes, DocGoal } from '../../../types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
@@ -24,6 +28,7 @@ export function useWithDocGoalsActivities() {
   const activitiesLoadingState = useAppSelector(
     (state) => state.docGoalsActivities.activitiesLoadStatus
   );
+  const userId = useAppSelector((state) => state.login.user?._id) || '';
   const docGoalsLoadingState = useAppSelector(
     (state) => state.docGoalsActivities.docGoalsLoadStatus
   );
@@ -94,6 +99,12 @@ export function useWithDocGoalsActivities() {
     return await dispatch(_fetchBuiltActivities());
   }
 
+  function addNewLocalBuiltActivity(): ActivityBuilder {
+    const newActivity = defaultActivityBuilder(userId);
+    _addNewLocalBuiltActivity(newActivity);
+    return newActivity;
+  }
+
   async function addOrUpdateBuiltActivity(
     activity: ActivityBuilder
   ): Promise<ActivityBuilder> {
@@ -108,6 +119,7 @@ export function useWithDocGoalsActivities() {
     loadBuiltActivities,
     addOrUpdateActivity,
     addOrUpdateBuiltActivity,
+    addNewLocalBuiltActivity,
     builtActivities,
     activities,
     docGoals: docGoalsActivities,

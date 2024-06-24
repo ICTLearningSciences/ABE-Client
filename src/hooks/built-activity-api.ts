@@ -10,6 +10,7 @@ import { execGql } from './api';
 
 export const fullBuiltActivityQueryData = `
                       _id
+                      clientId
                       title
                       user
                       visibility

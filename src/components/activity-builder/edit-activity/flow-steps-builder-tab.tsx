@@ -27,7 +27,7 @@ import { InputField } from '../shared/input-components';
 import { AddNewActivityButton } from '../shared/add-new-activity-button';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { IconButton } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
 import {
   SystemMessageStepBuilder,
   getDefaultSystemMessage,
@@ -135,6 +135,17 @@ export function FlowStepsBuilderTab(props: {
     }
   }
 
+  function deleteFlow() {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.filter(
+          (f) => f.clientId !== flow.clientId
+        ),
+      };
+    });
+  }
+
   function insertNewActivityStep(stepType: ActivityBuilderStepType, i: number) {
     const newStep: ActivityBuilderStep =
       stepType === ActivityBuilderStepType.SYSTEM_MESSAGE
@@ -219,8 +230,20 @@ export function FlowStepsBuilderTab(props: {
     <ColumnDiv
       style={{
         alignItems: 'center',
+        position: 'relative',
       }}
     >
+      <Button
+        style={{
+          position: 'absolute',
+          right: '0',
+          top: '0',
+        }}
+        variant="outlined"
+        onClick={deleteFlow}
+      >
+        Delete Flow
+      </Button>
       <div
         style={{
           alignSelf: 'center',

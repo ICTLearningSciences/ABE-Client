@@ -27,6 +27,7 @@ export interface FlowItem {
 export function defaultActivityBuilder(userId: string): ActivityBuilder {
   return {
     _id: uuidv4(),
+    clientId: uuidv4(),
     activityType: 'builder',
     title: 'New Activity',
     user: userId,
@@ -47,6 +48,7 @@ export function defaultActivityBuilder(userId: string): ActivityBuilder {
 
 export interface ActivityBuilder extends IActivity {
   _id: string;
+  clientId: string;
   activityType: 'builder';
   title: string;
   user: string;
@@ -96,7 +98,12 @@ export interface RequestUserInputActivityStep extends ActivityBuilderStep {
 //Prompt
 export enum JsonResponseDataType {
   STRING = 'string',
-  // OBJECT = 'object',
+  OBJECT = 'object',
+  ARRAY = 'array',
+}
+
+export enum SubJsonResponseDataType {
+  STRING = 'string',
   ARRAY = 'array',
 }
 
@@ -106,6 +113,11 @@ export interface JsonResponseData {
   type: JsonResponseDataType;
   isRequired: boolean;
   additionalInfo?: string;
+}
+
+export interface ObjectJsonResponseData extends JsonResponseData {
+  type: JsonResponseDataType.OBJECT;
+  subData: JsonResponseData[];
 }
 
 export interface PromptActivityStep extends ActivityBuilderStep {

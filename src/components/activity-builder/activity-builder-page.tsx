@@ -6,30 +6,31 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import {
-  ActivityBuilder as ActivityBuilderType,
-  defaultActivityBuilder,
-} from './types';
 import { SelectCreateActivity } from './select-create-activity';
 import { EditActivity } from './edit-activity/edit-activity';
-import { useAppSelector } from '../../store/hooks';
 
 export function ActivityBuilderPage(): JSX.Element {
-  const { builtActivities, addOrUpdateBuiltActivity } =
-    useWithDocGoalsActivities();
-  const [selectedActivity, setSelectedActivity] =
-    React.useState<ActivityBuilderType>();
-  const userId = useAppSelector((state) => state.login.user?._id) || '';
+  const {
+    builtActivities,
+    addOrUpdateBuiltActivity,
+    addNewLocalBuiltActivity,
+  } = useWithDocGoalsActivities();
+  const [selectedActivityClientId, setSelectedActivityClientId] =
+    React.useState<string>();
+  const selectedActivity = builtActivities.find(
+    (activity) => activity.clientId === selectedActivityClientId
+  );
 
   if (!selectedActivity) {
     return (
       <SelectCreateActivity
         builtActivities={builtActivities}
         onEditActivity={(activity) => {
-          setSelectedActivity(activity);
+          setSelectedActivityClientId(activity.clientId);
         }}
         onCreateActivity={() => {
-          setSelectedActivity(defaultActivityBuilder(userId));
+          const newActivity = addNewLocalBuiltActivity();
+          setSelectedActivityClientId(newActivity.clientId);
         }}
       />
     );

@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
-import { ActivityBuilder as ActivityBuilderType } from '../types';
+import { ActivityBuilder as ActivityBuilderType, FlowItem } from '../types';
 import { ActivityFlowContainer } from './activity-flow-container';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { Button } from '@mui/material';
 import { InputField } from '../shared/input-components';
+import { equals } from '../../../helpers';
+import { v4 as uuidv4 } from 'uuid';
 export function EditActivity(props: {
   activity: ActivityBuilderType;
   saveActivity: (activity: ActivityBuilderType) => Promise<ActivityBuilderType>;
@@ -13,9 +15,26 @@ export function EditActivity(props: {
   const [localActivityCopy, setLocalActivityCopy] =
     React.useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
 
+  console.log(activity);
+  console.log(localActivityCopy);
+
   useEffect(() => {
     setLocalActivityCopy(JSON.parse(JSON.stringify(activity)));
   }, [activity]);
+
+  function addNewFlow() {
+    const emptyFlow: FlowItem = {
+      clientId: uuidv4(),
+      name: '',
+      steps: [],
+    };
+    setLocalActivityCopy((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: [...prevValue.flowsList, emptyFlow],
+      };
+    });
+  }
 
   return (
     <ColumnDiv
@@ -44,11 +63,19 @@ export function EditActivity(props: {
         />
         <RowDiv>
           <Button
+            style={{
+              marginRight: '10px',
+            }}
+            variant="outlined"
+            disabled={equals(localActivityCopy, activity)}
             onClick={async () => {
               await saveActivity(localActivityCopy);
             }}
           >
             Save
+          </Button>
+          <Button onClick={addNewFlow} variant="outlined">
+            + Add Flow
           </Button>
         </RowDiv>
       </ColumnDiv>

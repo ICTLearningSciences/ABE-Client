@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { ActivityGQL, DocGoalGQl } from '../../../types';
 import {
   fetchDocGoals as _fetchDocGoals,
@@ -81,7 +81,14 @@ export const addOrUpdateBuiltActivity = createAsyncThunk(
 export const stateSlice = createSlice({
   name: 'state',
   initialState,
-  reducers: {},
+  reducers: {
+    addNewLocalBuiltActivity: (
+      state,
+      action: PayloadAction<ActivityBuilder>
+    ) => {
+      state.builtActivities.push(action.payload);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchDocGoals.pending, (state) => {
@@ -128,8 +135,9 @@ export const stateSlice = createSlice({
 
       .addCase(addOrUpdateBuiltActivity.fulfilled, (state, action) => {
         const activityIndex = state.builtActivities.findIndex(
-          (a) => a._id === action.payload._id
+          (a) => a.clientId === action.payload.clientId
         );
+        console.log(activityIndex);
         if (activityIndex >= 0) {
           state.builtActivities[activityIndex] = action.payload;
         } else {
@@ -138,5 +146,7 @@ export const stateSlice = createSlice({
       });
   },
 });
+
+export const { addNewLocalBuiltActivity } = stateSlice.actions;
 
 export default stateSlice.reducer;

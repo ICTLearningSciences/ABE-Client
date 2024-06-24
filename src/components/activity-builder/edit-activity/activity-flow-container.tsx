@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React, { useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
-import { ColumnDiv } from '../../../styled-components';
 import { ActivityBuilder as ActivityBuilderType } from '../types';
 import { FlowStepsBuilderTab } from './flow-steps-builder-tab';
 
@@ -76,24 +75,25 @@ export function ActivityFlowContainer(props: {
   });
 
   return (
-    <ColumnDiv
-      style={{
-        height: '100%',
+    <Box
+      sx={{
         width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      <Box sx={{ width: '100%' }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            aria-label="basic tabs example"
-          >
-            {tabs}
-          </Tabs>
-        </Box>
-        {customTabPanels}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          aria-label="basic tabs example"
+          centered
+        >
+          {tabs}
+        </Tabs>
       </Box>
-    </ColumnDiv>
+      {customTabPanels}
+    </Box>
   );
 }

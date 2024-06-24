@@ -58,6 +58,7 @@ export const examplePromptActivityStep: PromptActivityStep = {
 
 export const collectUserNameActivity: ActivityBuilder = {
   _id: 'collect-user-name',
+  clientId: '123',
   title: 'Collect User Name',
   activityType: 'builder',
   description: '',
@@ -104,6 +105,7 @@ export const collectUserNameActivity: ActivityBuilder = {
 
 export const collectIntentionActivity: ActivityBuilder = {
   _id: 'collect-user-intention',
+  clientId: '123',
   title: 'Collect User Intention',
   activityType: 'builder',
   user: '123',
@@ -137,6 +139,7 @@ export const collectIntentionActivity: ActivityBuilder = {
 
 export const collectAiDataAndDisplayActivity: ActivityBuilder = {
   _id: 'test-ai-response-data',
+  clientId: '123',
   title: 'Test AI Response Data',
   activityType: 'builder',
   user: '123',
@@ -190,6 +193,7 @@ export const collectAiDataAndDisplayActivity: ActivityBuilder = {
 
 export const sendDataToPromptsActivity: ActivityBuilder = {
   _id: 'test-ai-response-data',
+  clientId: '123',
   title: 'Test AI Response Data',
   activityType: 'builder',
   user: '123',
@@ -253,6 +257,7 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
 
 export const multipleFlowActivity: ActivityBuilder = {
   _id: 'multiple-flow-activity',
+  clientId: '123',
   title: 'Multiple Flow Activity',
   activityType: 'builder',
   user: '123',
@@ -328,6 +333,7 @@ export const multipleFlowActivity: ActivityBuilder = {
 
 export const utilizeListMcqActivity: ActivityBuilder = {
   _id: 'utilize-list-mcq',
+  clientId: '123',
   title: 'Utilize List MCQ',
   activityType: 'builder',
   description: '',
@@ -380,6 +386,7 @@ export const utilizeListMcqActivity: ActivityBuilder = {
 
 export const accidentalLoopActivity: ActivityBuilder = {
   _id: 'utilize-list-mcq',
+  clientId: '123',
   title: 'Utilize List MCQ',
   activityType: 'builder',
   description: '',
@@ -409,6 +416,7 @@ export const accidentalLoopActivity: ActivityBuilder = {
 
 export const stepLoopsIntoSelfActivity: ActivityBuilder = {
   _id: 'utilize-list-mcq',
+  clientId: '123',
   title: 'Utilize List MCQ',
   activityType: 'builder',
   description: '',
@@ -433,6 +441,7 @@ export const stepLoopsIntoSelfActivity: ActivityBuilder = {
 
 export const weightedResponseWeightsActivity: ActivityBuilder = {
   _id: 'weighted-response-weights',
+  clientId: '123',
   title: 'Weighted Response Weights',
   activityType: 'builder',
   description: '',
