@@ -101,7 +101,7 @@ export function useWithDocGoalsActivities() {
 
   function addNewLocalBuiltActivity(): ActivityBuilder {
     const newActivity = defaultActivityBuilder(userId);
-    _addNewLocalBuiltActivity(newActivity);
+    dispatch(_addNewLocalBuiltActivity(newActivity));
     return newActivity;
   }
 

@@ -18,7 +18,6 @@ import { useWithLogin } from './store/slices/login/use-with-login';
 import DocumentTimelinePage from './components/user-view/document-timeline';
 import { useReduxHydration } from './use-redux-hydration';
 import { useConfigLoader } from './components/config-loading/use-config-loader';
-import { ActivityBuilderPage } from './components/activity-builder/activity-builder-page';
 
 function MainApp() {
   const useLogin = useWithLogin();
@@ -57,25 +56,6 @@ function MainApp() {
             }}
           >
             <AdminView />
-          </div>
-        </>
-      ),
-    },
-    {
-      path: '/build/activity',
-      element: (
-        <>
-          <Header useLogin={useLogin} />
-          <div
-            style={{
-              width: '100%',
-              height: '94%', //header takes 6%
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <ActivityBuilderPage />
           </div>
         </>
       ),

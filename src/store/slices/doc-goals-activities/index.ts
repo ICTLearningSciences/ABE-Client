@@ -137,7 +137,6 @@ export const stateSlice = createSlice({
         const activityIndex = state.builtActivities.findIndex(
           (a) => a.clientId === action.payload.clientId
         );
-        console.log(activityIndex);
         if (activityIndex >= 0) {
           state.builtActivities[activityIndex] = action.payload;
         } else {

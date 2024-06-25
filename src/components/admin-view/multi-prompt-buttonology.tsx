@@ -14,6 +14,7 @@ import {
   AiPromptStep,
   PromptOutputTypes,
   PromptRoles,
+  ActivityTypes,
 } from '../../types';
 import { UseWithPrompts } from '../../hooks/use-with-prompts';
 import { v4 as uuidv4 } from 'uuid';
@@ -25,6 +26,7 @@ import { SavedActivityPromptsView } from './prompt-editing/saved-activity-prompt
 import { isPromptInActivity } from '../../helpers';
 import { EditPrompt } from './prompt-editing/edit-prompt';
 import { ActivityBuilderPage } from '../activity-builder/activity-builder-page';
+import { isActivityBuilder } from '../activity-builder/types';
 
 export const emptyOpenAiPromptStep = (): AiPromptStep => {
   return {
@@ -42,15 +44,15 @@ export const emptyOpenAiPromptStep = (): AiPromptStep => {
 export function MultiPromptTesting(props: {
   googleDocId: string;
   activities: ActivityGQL[];
-  goToActivity: (activityId: ActivityGQL) => void;
+  goToActivity: (activityId: ActivityTypes) => void;
   useWithPrompts: UseWithPrompts;
+  curActivity?: ActivityTypes;
 }): JSX.Element {
-  const { activities, goToActivity, useWithPrompts } = props;
+  const { activities, goToActivity, useWithPrompts, curActivity } = props;
   const [targetPromptId, setTargetPromptId] = useState<string>();
   const { prompts, handleSavePrompt, editOrAddPrompt, isLoading } =
     useWithPrompts;
-  const [viewActivityBuilder, setViewActivityBuilder] =
-    useState<boolean>(false);
+  const [viewActivityBuilder, setViewActivityBuilder] = useState<boolean>(true);
   const activitiesWithPrompts = activities.filter(
     (activity) => (activity.prompts?.length || 0) > 0
   );
@@ -130,24 +132,44 @@ export function MultiPromptTesting(props: {
   }
 
   if (viewActivityBuilder) {
-    return <ActivityBuilderPage />;
+    return (
+      <ColumnDiv
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
+        <ActivityBuilderPage
+          curActivity={
+            curActivity && isActivityBuilder(curActivity)
+              ? curActivity
+              : undefined
+          }
+          goToActivity={goToActivity}
+          goToOldActivityEditor={() => {
+            setViewActivityBuilder(false);
+          }}
+        />
+      </ColumnDiv>
+    );
   }
 
   // Selecting prompt template
   if (!promptTemplate) {
     return (
       <ColumnDiv
-        style={{ width: '100%', maxHeight: '90%', alignItems: 'center' }}
+        style={{
+          width: '100%',
+          maxHeight: '90%',
+          alignItems: 'center',
+          position: 'relative',
+        }}
       >
         <div style={{ overflow: 'auto', padding: '10px', width: '95%' }}>
           <h2 style={{ textAlign: 'center' }}>Activities</h2>
-          <Button
-            onClick={() => {
-              setViewActivityBuilder(true);
-            }}
-          >
-            Build Activities
-          </Button>
           <SavedActivityPromptsView
             activitiesWithPrompts={activityPrompts}
             promptsLoading={isLoading}
@@ -170,6 +192,24 @@ export function MultiPromptTesting(props: {
           />
         </div>
         <Button
+          variant="contained"
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 40,
+          }}
+          onClick={() => {
+            setViewActivityBuilder(true);
+          }}
+        >
+          New Activity Builder
+        </Button>
+        <Button
+          style={{
+            alignSelf: 'center',
+            justifySelf: 'center',
+          }}
+          variant="outlined"
           disabled={prompts?.length === 0}
           onClick={() => {
             const newId = uuidv4();
@@ -182,7 +222,7 @@ export function MultiPromptTesting(props: {
             setTargetPromptId(newId);
           }}
         >
-          New Prompt Template
+          + New Prompt Template
         </Button>
       </ColumnDiv>
     );

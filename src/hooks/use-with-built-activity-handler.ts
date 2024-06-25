@@ -13,6 +13,7 @@ import { useWithState } from '../store/slices/state/use-with-state';
 import { useWithChatLogSubscribers } from './use-with-chat-log-subscribers';
 import { useWithExecutePrompt } from './use-with-execute-prompts';
 import { ActivityBuilder } from '../components/activity-builder/types';
+import { equals } from '../helpers';
 
 export function useWithBuiltActivityHandler(
   resetActivityCounter: number,
@@ -27,6 +28,10 @@ export function useWithBuiltActivityHandler(
 
   const [builtActivityHandler, setBuiltActivityHandler] =
     useState<BuiltActivityHandler>();
+  const updatesFound = !equals(
+    selectedActivityBuilder,
+    builtActivityHandler?.builtActivityData
+  );
 
   useEffect(() => {
     if (!googleDocId) {
@@ -56,7 +61,8 @@ export function useWithBuiltActivityHandler(
       addNewSubscriber(newActivityHandler);
     } else if (
       builtActivityHandler.builtActivityData?._id !==
-      selectedActivityBuilder._id
+        selectedActivityBuilder._id ||
+      updatesFound
     ) {
       builtActivityHandler.setBuiltActivityData(selectedActivityBuilder);
       builtActivityHandler.resetActivity();
@@ -65,6 +71,7 @@ export function useWithBuiltActivityHandler(
     googleDocId,
     selectedActivityBuilder?._id,
     Boolean(builtActivityHandler),
+    updatesFound,
   ]);
 
   useEffect(() => {

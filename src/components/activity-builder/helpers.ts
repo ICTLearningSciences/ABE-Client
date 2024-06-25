@@ -4,7 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { FlowItem, JsonResponseData, PredefinedResponse } from './types';
+import {
+  ActivityBuilder,
+  FlowItem,
+  JsonResponseData,
+  PredefinedResponse,
+} from './types';
 import Validator, { Schema } from 'jsonschema';
 
 function convertExpectedDataIntoSchema(
@@ -136,4 +141,10 @@ export function getPromptStepById(stepId: string, flowsList: FlowItem[]) {
     }
   }
   return undefined;
+}
+
+export function isActivityRunnable(activity: ActivityBuilder) {
+  return (
+    activity.flowsList.length > 0 && activity.flowsList[0].steps.length > 0
+  );
 }

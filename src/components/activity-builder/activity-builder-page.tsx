@@ -8,15 +8,21 @@ import React from 'react';
 import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { SelectCreateActivity } from './select-create-activity';
 import { EditActivity } from './edit-activity/edit-activity';
+import { ActivityBuilder } from './types';
 
-export function ActivityBuilderPage(): JSX.Element {
+export function ActivityBuilderPage(props: {
+  goToActivity: (activity: ActivityBuilder) => void;
+  curActivity?: ActivityBuilder;
+  goToOldActivityEditor: () => void;
+}): JSX.Element {
+  const { goToActivity, curActivity, goToOldActivityEditor } = props;
   const {
     builtActivities,
     addOrUpdateBuiltActivity,
     addNewLocalBuiltActivity,
   } = useWithDocGoalsActivities();
   const [selectedActivityClientId, setSelectedActivityClientId] =
-    React.useState<string>();
+    React.useState<string>(curActivity?.clientId || '');
   const selectedActivity = builtActivities.find(
     (activity) => activity.clientId === selectedActivityClientId
   );
@@ -24,6 +30,8 @@ export function ActivityBuilderPage(): JSX.Element {
   if (!selectedActivity) {
     return (
       <SelectCreateActivity
+        goToOldActivityEditor={goToOldActivityEditor}
+        goToActivity={goToActivity}
         builtActivities={builtActivities}
         onEditActivity={(activity) => {
           setSelectedActivityClientId(activity.clientId);
@@ -37,6 +45,10 @@ export function ActivityBuilderPage(): JSX.Element {
   } else {
     return (
       <EditActivity
+        returnTo={() => {
+          setSelectedActivityClientId('');
+        }}
+        goToActivity={goToActivity}
         activity={selectedActivity}
         saveActivity={async (activity) => {
           return await addOrUpdateBuiltActivity(activity);

@@ -8,24 +8,39 @@ import React from 'react';
 import { ColumnDiv, RowDiv } from '../../styled-components';
 import { ActivityBuilder as ActivityBuilderType } from './types';
 import { Button } from '@mui/material';
+import { isActivityRunnable } from './helpers';
 
 export function ExistingActivityItem(props: {
   activity: ActivityBuilderType;
+  goToActivity: () => void;
   editActivity: () => void;
 }) {
-  const { activity, editActivity } = props;
+  const { activity, editActivity, goToActivity } = props;
   return (
-    <RowDiv>
-      <ColumnDiv>
-        <h2>{activity.title}</h2>
-        <p>{activity.description}</p>
-      </ColumnDiv>
-      <Button onClick={editActivity}>Edit</Button>
+    <RowDiv
+      style={{
+        width: '100%',
+        justifyContent: 'space-between',
+        borderBottom: '1px solid black',
+      }}
+    >
+      <h3>{activity.title}</h3>
+      <RowDiv>
+        <Button
+          style={{ marginRight: 10 }}
+          disabled={!isActivityRunnable(activity)}
+          onClick={goToActivity}
+        >
+          Preview
+        </Button>
+        <Button onClick={editActivity}>Edit</Button>
+      </RowDiv>
     </RowDiv>
   );
 }
 
 export function ExistingActivities(props: {
+  goToActivity: (activity: ActivityBuilderType) => void;
   activities: ActivityBuilderType[];
   editActivity: (activity: ActivityBuilderType) => void;
 }): JSX.Element {
@@ -35,7 +50,11 @@ export function ExistingActivities(props: {
   }
 
   return (
-    <ColumnDiv>
+    <ColumnDiv
+      style={{
+        width: '95%',
+      }}
+    >
       {activities.map((activity) => {
         return (
           <ExistingActivityItem
@@ -43,6 +62,9 @@ export function ExistingActivities(props: {
             activity={activity}
             editActivity={() => {
               editActivity(activity);
+            }}
+            goToActivity={() => {
+              props.goToActivity(activity);
             }}
           />
         );
@@ -52,11 +74,19 @@ export function ExistingActivities(props: {
 }
 
 export function SelectCreateActivity(props: {
+  goToOldActivityEditor: () => void;
+  goToActivity: (activity: ActivityBuilderType) => void;
   builtActivities: ActivityBuilderType[];
   onEditActivity: (activity: ActivityBuilderType) => void;
   onCreateActivity: () => void;
 }): JSX.Element {
-  const { builtActivities, onEditActivity, onCreateActivity } = props;
+  const {
+    builtActivities,
+    onEditActivity,
+    onCreateActivity,
+    goToActivity,
+    goToOldActivityEditor,
+  } = props;
   return (
     <ColumnDiv
       style={{
@@ -64,10 +94,22 @@ export function SelectCreateActivity(props: {
         height: '100%',
         alignItems: 'center',
         overflow: 'auto',
+        position: 'relative',
       }}
     >
+      <Button
+        onClick={goToOldActivityEditor}
+        style={{
+          position: 'absolute',
+          top: 10,
+          right: 10,
+        }}
+      >
+        Old Activity Editor
+      </Button>
       <h1>Activity Builder</h1>
       <ExistingActivities
+        goToActivity={goToActivity}
         activities={builtActivities}
         editActivity={onEditActivity}
       />
