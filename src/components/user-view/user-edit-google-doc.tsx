@@ -13,14 +13,15 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
-import Buttonology from '../admin-view/buttonology';
+import ActivityGqlButtonology from '../admin-view/buttonology';
 import { useWithState } from '../../store/slices/state/use-with-state';
-import { ActivityGQL, DocGoal } from '../../types';
+import { ActivityGQL, ActivityTypes, DocGoal } from '../../types';
 import { useWithPrompts as _useWithPrompts } from '../../hooks/use-with-prompts';
 import { DisplayIcons } from '../../helpers/display-icon-helper';
 import { v4 as uuidv4 } from 'uuid';
 import { removeDuplicatesByField } from '../../helpers';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
+import { ActivityBuilder } from '../activity-builder/types';
 
 export default function EditGoogleDoc(props: {
   googleDocId: string;
@@ -48,7 +49,7 @@ export default function EditGoogleDoc(props: {
   const activityFromParams = queryParams.get('activityId');
   const goalFromParams = queryParams.get('goalId');
   const allActivities = getAllActivites(docGoals || []);
-  const [previewingActivity, setPreviewingActivity] = useState<boolean>();
+  const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
   const [checkedUrlParams, setCheckedUrlParams] = useState<boolean>(false);
 
   function editDocGoal() {
@@ -56,9 +57,9 @@ export default function EditGoogleDoc(props: {
     setPreviewingActivity(false);
   }
 
-  function goToActivityPreview(activity: ActivityGQL) {
+  function goToActivityPreview(activity: ActivityTypes) {
     setPreviewingActivity(true);
-    setActivity(activity);
+    setGoalAndActivity(undefined, activity);
     updateViewingUserRole(UserRole.USER);
   }
 
@@ -83,6 +84,7 @@ export default function EditGoogleDoc(props: {
       (prompt) => {
         return {
           _id: uuidv4(),
+          activityType: 'gql',
           prompt,
           steps: [],
           title: prompt.title,
@@ -94,6 +96,13 @@ export default function EditGoogleDoc(props: {
       }
     );
     return [...activities, ...orphanPromptActivities];
+  }
+
+  function getAllBuiltActivities(docGoals: DocGoal[]): ActivityBuilder[] {
+    if (!docGoals.length) {
+      return [];
+    }
+    return docGoals.flatMap((goal) => goal.builtActivities || []);
   }
 
   useEffect(() => {
@@ -128,7 +137,6 @@ export default function EditGoogleDoc(props: {
   const smallWindowWidth = windowWidth < 1200;
   const googleDocWidth = smallWindowWidth ? '60%' : '55%';
   const chatButtonologyWidth = smallWindowWidth ? '40%' : '45%';
-
   return (
     <div style={{ height: '100%', display: 'flex', flexGrow: 1 }}>
       <div
@@ -163,11 +171,17 @@ export default function EditGoogleDoc(props: {
         }}
       >
         {viewingAdmin ? (
-          <Buttonology
+          <ActivityGqlButtonology
             googleDocId={googleDocId}
             activities={allActivities}
+            builtActivities={getAllBuiltActivities(docGoals || [])}
             goToActivity={goToActivityPreview}
             useWithPrompts={useWithPrompts}
+            curActivity={
+              previewingActivity && goalActivityState?.selectedActivity
+                ? goalActivityState?.selectedActivity
+                : undefined
+            }
           />
         ) : (
           <>

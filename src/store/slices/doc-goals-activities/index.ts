@@ -4,13 +4,18 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { ActivityGQL, DocGoalGQl } from '../../../types';
 import {
   fetchDocGoals as _fetchDocGoals,
   fetchActivities as _fetchActivities,
   addOrUpdateActivity as _addOrUpdateActivity,
 } from '../../../hooks/api';
+import {
+  fetchBuiltActivities as _fetchBuiltActivities,
+  addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
+} from '../../../hooks/built-activity-api';
+import { ActivityBuilder } from '../../../components/activity-builder/types';
 
 export enum LoadStatus {
   NONE,
@@ -24,6 +29,8 @@ export interface State {
   docGoalsLoadStatus: LoadStatus;
   activities: ActivityGQL[];
   activitiesLoadStatus: LoadStatus;
+  builtActivities: ActivityBuilder[];
+  builtActivitiesLoadStatus: LoadStatus;
 }
 
 const initialState: State = {
@@ -31,6 +38,8 @@ const initialState: State = {
   docGoalsLoadStatus: LoadStatus.NONE,
   activities: [],
   activitiesLoadStatus: LoadStatus.NONE,
+  builtActivities: [],
+  builtActivitiesLoadStatus: LoadStatus.NONE,
 };
 
 export const fetchDocGoals = createAsyncThunk(
@@ -54,11 +63,32 @@ export const addOrUpdateActivity = createAsyncThunk(
   }
 );
 
+export const fetchBuiltActivities = createAsyncThunk(
+  'state/fetchBuiltActivities',
+  async () => {
+    return await _fetchBuiltActivities();
+  }
+);
+
+export const addOrUpdateBuiltActivity = createAsyncThunk(
+  'state/addOrUpdateBuiltActivity',
+  async (activity: ActivityBuilder) => {
+    return await _addOrUpdateBuiltActivity(activity);
+  }
+);
+
 /** Reducer */
 export const stateSlice = createSlice({
   name: 'state',
   initialState,
-  reducers: {},
+  reducers: {
+    addNewLocalBuiltActivity: (
+      state,
+      action: PayloadAction<ActivityBuilder>
+    ) => {
+      state.builtActivities.push(action.payload);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchDocGoals.pending, (state) => {
@@ -83,6 +113,17 @@ export const stateSlice = createSlice({
         state.activitiesLoadStatus = LoadStatus.FAILED;
       })
 
+      .addCase(fetchBuiltActivities.pending, (state) => {
+        state.builtActivitiesLoadStatus = LoadStatus.LOADING;
+      })
+      .addCase(fetchBuiltActivities.fulfilled, (state, action) => {
+        state.builtActivities = action.payload;
+        state.builtActivitiesLoadStatus = LoadStatus.SUCCEEDED;
+      })
+      .addCase(fetchBuiltActivities.rejected, (state) => {
+        state.builtActivitiesLoadStatus = LoadStatus.FAILED;
+      })
+
       .addCase(addOrUpdateActivity.fulfilled, (state, action) => {
         state.activities = state.activities.map((a) => {
           if (a._id === action.payload._id) {
@@ -90,8 +131,21 @@ export const stateSlice = createSlice({
           }
           return a;
         });
+      })
+
+      .addCase(addOrUpdateBuiltActivity.fulfilled, (state, action) => {
+        const activityIndex = state.builtActivities.findIndex(
+          (a) => a.clientId === action.payload.clientId
+        );
+        if (activityIndex >= 0) {
+          state.builtActivities[activityIndex] = action.payload;
+        } else {
+          state.builtActivities.push(action.payload);
+        }
       });
   },
 });
+
+export const { addNewLocalBuiltActivity } = stateSlice.actions;
 
 export default stateSlice.reducer;

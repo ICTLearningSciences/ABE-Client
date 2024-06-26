@@ -1,38 +1,32 @@
 import React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Button,
   CircularProgress,
   FormControl,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
-  TextField,
 } from '@mui/material';
 import { useWithChat } from '../../../store/slices/chat/use-with-chat';
-import {
-  ChatMessageTypes,
-  MessageDisplayType,
-  Sender,
-  UserInputType,
-} from '../../../store/slices/chat';
 import { ChatHeader, RowDiv, SmallGreyText } from '../../../styled-components';
 import { useWithStoreDocVersions } from '../../../hooks/use-with-store-doc-versions';
 import { useAppSelector } from '../../../store/hooks';
-import { ActivityGQL, AiServiceModel, DocGoal } from '../../../types';
+import {
+  ActivityGQL,
+  ActivityTypes,
+  AiServiceModel,
+  DocGoal,
+  isActivityGql,
+} from '../../../types';
 import SystemPromptModal from './system-prompt-modal';
 import { useWithSystemPromptsConfig } from '../../../hooks/use-with-system-prompts-config';
 import { UserRole } from '../../../store/slices/login';
-import ChangeIcon from '@mui/icons-material/Construction';
 import useWithFreeInput from '../../../hooks/use-with-free-input';
 import { useWithActivityHandler } from '../../../hooks/use-with-activity-handler';
 import { useWithState } from '../../../store/slices/state/use-with-state';
 import './chat.css';
-import Message from './message';
-import ReplayIcon from '@mui/icons-material/Replay';
 import { UseWithPrompts } from '../../../hooks/use-with-prompts';
-import { v4 as uuidv4 } from 'uuid';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import {
   aiServiceModelStringParse,
@@ -40,232 +34,15 @@ import {
 } from '../../../helpers';
 import ViewPreviousRunModal from '../../admin-view/view-previous-run-modal';
 
-function ChatMessagesContainer(props: {
-  coachResponsePending: boolean;
-  googleDocId: string;
-  setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
-  sendMessage: (message: ChatMessageTypes) => void;
-}): JSX.Element {
-  const { coachResponsePending, googleDocId, setAiInfoToDisplay, sendMessage } =
-    props;
-  const messageContainerRef = useRef<HTMLDivElement>(null);
-  const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
-  const { state } = useWithChat();
-  const messages = state.chatLogs[googleDocId] || [];
-  const chatMessages: ChatMessageTypes[] = [
-    ...messages,
-    ...(coachResponsePending
-      ? [
-          {
-            id: 'pending-message',
-            message: '...',
-            sender: Sender.SYSTEM,
-            displayType: MessageDisplayType.PENDING_MESSAGE,
-          },
-        ]
-      : []),
-  ];
-  const mostRecentChatId =
-    chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].id : '';
-
-  function scrollToElementById(id: string) {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-
-  function scrollToMostRecentAiResponse() {
-    const mostRecentAiResponse = getMostRecentAiResponse(chatMessages);
-    if (mostRecentAiResponse) {
-      scrollToElementById(mostRecentAiResponse.id);
-    }
-  }
-
-  function getMostRecentAiResponse(
-    messages: ChatMessageTypes[]
-  ): ChatMessageTypes | undefined {
-    // first, find the most recent user message, then find the most recent system message after that
-    if (!messages || messages.length <= 1) return undefined;
-    let mostRecentUserMessageIndex = -1;
-    for (let i = messages.length - 1; i >= 0; i--) {
-      if (messages[i].sender === Sender.USER) {
-        mostRecentUserMessageIndex = i;
-        break;
-      }
-    }
-    if (mostRecentUserMessageIndex === -1) return undefined;
-    for (let i = mostRecentUserMessageIndex; i < messages.length; i++) {
-      if (messages[i].sender === Sender.SYSTEM) {
-        return messages[i];
-      }
-    }
-    return undefined;
-  }
-
-  useEffect(() => {
-    if (messageContainerRef.current) {
-      scrollToMostRecentAiResponse();
-    }
-  }, [messageElements]);
-
-  useEffect(() => {
-    const _newMessageElements = chatMessages.map(
-      (message: ChatMessageTypes, index: number) => {
-        return (
-          <>
-            <Message
-              key={index}
-              message={message}
-              setAiInfoToDisplay={setAiInfoToDisplay}
-              messageIndex={index}
-            />
-            {message.mcqChoices && index === chatMessages.length - 1 && (
-              <div
-                key={`mcq-choices-${index}`}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  width: '98%',
-                  justifyContent: 'flex-end',
-                  alignItems: 'flex-end',
-                  margin: '10px',
-                }}
-              >
-                {message.mcqChoices.map((choice: string, i: number) => {
-                  return (
-                    <Button
-                      key={i}
-                      variant="outlined"
-                      style={{
-                        marginBottom: '5px',
-                      }}
-                      data-cy={`mcq-choice-${choice.replaceAll(' ', '-')}`}
-                      onClick={() => {
-                        sendMessage({
-                          id: uuidv4(),
-                          message: choice,
-                          sender: Sender.USER,
-                          displayType: MessageDisplayType.TEXT,
-                          userInputType: UserInputType.MCQ,
-                        });
-                        if (message.retryFunction) {
-                          message.retryFunction();
-                        }
-                      }}
-                    >
-                      {choice}
-                    </Button>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        );
-      }
-    );
-    setMessageElements(_newMessageElements);
-  }, [chatMessages.length, mostRecentChatId]);
-
-  return (
-    <div
-      ref={messageContainerRef}
-      data-cy="messages-container"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        width: '100%',
-        maxWidth: '100%',
-        justifyContent: 'flex-start',
-        margin: '1rem',
-        borderRadius: '1rem',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-        border: '1px solid black',
-      }}
-    >
-      {messageElements}
-    </div>
-  );
-}
-
-function ChatInput(props: {
-  sendMessage: (message: ChatMessageTypes) => void;
-  googleDocId: string;
-  disableInput: boolean;
-}): JSX.Element {
-  const { sendMessage } = props;
-  const [message, setMessage] = useState<string>('');
-  function handleSendUserMessage(message: string) {
-    sendMessage({
-      id: uuidv4(),
-      message: message,
-      sender: Sender.USER,
-      displayType: MessageDisplayType.TEXT,
-      userInputType: UserInputType.FREE_INPUT,
-    });
-    setMessage('');
-  }
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        width: '90%',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        margin: '10px',
-      }}
-    >
-      <TextField
-        data-cy="chat-input"
-        disabled={props.disableInput}
-        fullWidth
-        multiline
-        placeholder={props.disableInput ? '' : 'Enter your response here...'}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: 'fit-content',
-          minHeight: '20px',
-          width: '100%',
-          justifyContent: 'space-around',
-          alignItems: 'center',
-          borderRadius: '2rem',
-          marginRight: '10px',
-          opacity: props.disableInput ? 0.3 : 1,
-        }}
-        value={message}
-        maxRows={5}
-        onChange={(e) => {
-          setMessage(e.target.value);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            handleSendUserMessage(message);
-          }
-        }}
-      />
-      <Button
-        variant="outlined"
-        data-cy="send-input-button"
-        disabled={props.disableInput}
-        onClick={() => {
-          handleSendUserMessage(message);
-        }}
-      >
-        Send
-      </Button>
-    </div>
-  );
-}
+import { ChatMessagesContainer } from './chat-message-container';
+import { ChatInput } from './chat-input';
+import { ChatHeaderGenerator } from './chat-header-generator';
+import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activity-handler';
+import { isActivityBuilder } from '../../activity-builder/types';
 
 export default function Chat(props: {
   selectedGoal?: DocGoal;
-  selectedActivity?: ActivityGQL;
+  selectedActivity?: ActivityTypes;
   editDocGoal: () => void;
   setSelectedActivity: (activity: ActivityGQL) => void;
   useWithPrompts: UseWithPrompts;
@@ -291,14 +68,22 @@ export default function Chat(props: {
   const userRole = useAppSelector((state) => state.login.userRole);
   const userIsAdmin = userRole === UserRole.ADMIN;
   const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
-  useWithFreeInput(selectedGoal);
+  useWithFreeInput(!selectedActivity ? selectedGoal : undefined);
   useWithStoreDocVersions(selectedActivity?._id || '');
   const { activityReady } = useWithActivityHandler(
     useWithPrompts,
     editDocGoal,
     resetActivityCounter,
     selectedGoal,
-    selectedActivity
+    selectedActivity && isActivityGql(selectedActivity)
+      ? selectedActivity
+      : undefined
+  );
+  const { activityReady: builtActivityReady } = useWithBuiltActivityHandler(
+    resetActivityCounter,
+    selectedActivity && isActivityBuilder(selectedActivity)
+      ? selectedActivity
+      : undefined
   );
   const messages = googleDocId ? chatState.chatLogs[googleDocId] : [];
   const goalHasActivities = Boolean(
@@ -322,46 +107,6 @@ export default function Chat(props: {
     setSystemRole(systemRole);
   }, [systemRole]);
 
-  function ChatHeaderGenerator(): JSX.Element {
-    // if (!selectedGoal && !selectedActivity)
-    //   return <ChatHeader>Coach</ChatHeader>;
-    let title = selectedGoal?.title || '';
-    title += selectedGoal && selectedActivity ? ' - ' : '';
-    title += selectedActivity?.title || '';
-    if (!title) title = 'Coach';
-    return (
-      <ChatHeader>
-        <span data-cy="chat-header">{title}</span>
-        <IconButton
-          data-cy="edit-goal-button"
-          onClick={() => {
-            editDocGoal();
-          }}
-          style={{
-            padding: 3,
-            marginBottom: 5,
-            marginLeft: 5,
-          }}
-        >
-          <ChangeIcon />
-        </IconButton>
-        <IconButton
-          data-cy="reset-activity-button"
-          onClick={() => {
-            setResetActivityCounter(resetActivityCounter + 1);
-          }}
-          style={{
-            padding: 3,
-            marginBottom: 5,
-            marginLeft: 5,
-          }}
-        >
-          <ReplayIcon />
-        </IconButton>
-      </ChatHeader>
-    );
-  }
-
   return (
     <div
       style={{
@@ -372,7 +117,7 @@ export default function Chat(props: {
         alignItems: 'center',
       }}
     >
-      {activityReady ? (
+      {activityReady || builtActivityReady || !goalHasActivities ? (
         <>
           <div
             data-cy="chat-box"
@@ -388,7 +133,16 @@ export default function Chat(props: {
               padding: '1rem',
             }}
           >
-            <ChatHeader>{ChatHeaderGenerator()}</ChatHeader>
+            <ChatHeader>
+              <ChatHeaderGenerator
+                incrementActivityCounter={() => {
+                  setResetActivityCounter(resetActivityCounter + 1);
+                }}
+                editDocGoal={editDocGoal}
+                selectedGoal={selectedGoal}
+                selectedActivity={selectedActivity}
+              />
+            </ChatHeader>
             <ChatMessagesContainer
               sendMessage={(message) => {
                 sendMessage(message, false, googleDocId);

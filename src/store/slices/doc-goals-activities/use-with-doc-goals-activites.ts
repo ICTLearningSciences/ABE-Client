@@ -2,17 +2,24 @@ import {
   fetchDocGoals as _fetchDocGoals,
   fetchActivities as _fetchActivities,
   addOrUpdateActivity as _addOrUpdateActivity,
+  fetchBuiltActivities as _fetchBuiltActivities,
+  addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
   LoadStatus,
+  addNewLocalBuiltActivity as _addNewLocalBuiltActivity,
 } from '.';
-import { ActivityGQL, DocGoal } from '../../../types';
+import {
+  ActivityBuilder,
+  defaultActivityBuilder,
+} from '../../../components/activity-builder/types';
+import { ActivityGQL, ActivityTypes, DocGoal } from '../../../types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
 export interface UseWithDocGoalsActivities {
-  getActivitById: (id: string) => ActivityGQL;
+  getActivitById: (id: string) => ActivityTypes;
   loadDocGoals: () => Promise<void>;
   loadActivities: () => Promise<void>;
-  addOrUpdateActivity: (activity: ActivityGQL) => Promise<void>;
-  activities: ActivityGQL[];
+  addOrUpdateActivity: (activity: ActivityTypes) => Promise<void>;
+  activities: ActivityTypes[];
   docGoals: DocGoal[];
 }
 
@@ -21,11 +28,15 @@ export function useWithDocGoalsActivities() {
   const activitiesLoadingState = useAppSelector(
     (state) => state.docGoalsActivities.activitiesLoadStatus
   );
+  const userId = useAppSelector((state) => state.login.user?._id) || '';
   const docGoalsLoadingState = useAppSelector(
     (state) => state.docGoalsActivities.docGoalsLoadStatus
   );
   const activities = useAppSelector(
     (state) => state.docGoalsActivities.activities
+  );
+  const builtActivities = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivities
   );
   const docGoalsGql = useAppSelector(
     (state) => state.docGoalsActivities.docGoals
@@ -33,16 +44,12 @@ export function useWithDocGoalsActivities() {
   const config = useAppSelector((state) => state.config);
   const displayedGoalActivities = config.config?.displayedGoalActivities || [];
 
-  /**
-   * The function `getActivityById` retrieves an activity object by its ID from an array of activities.
-   * @param {string} id - The `id` parameter is a string representing the unique identifier of an
-   * activity.
-   * @returns The function `getActivitById` is returning an object of type `ActivityGQL` that matches
-   * the provided `id` from the `activities` array. If no matching object is found, it returns an empty
-   * object of type `ActivityGQL`.
-   */
-  const getActivitById = (id: string): ActivityGQL => {
-    return activities.find((a) => a._id === id) || ({} as ActivityGQL);
+  const getActivitById = (id: string): ActivityGQL | undefined => {
+    return activities.find((a) => a._id === id);
+  };
+
+  const getBuiltActivityById = (id: string): ActivityBuilder | undefined => {
+    return builtActivities.find((a) => a._id === id);
   };
 
   const docGoalsActivities: DocGoal[] = displayedGoalActivities.reduce(
@@ -51,16 +58,27 @@ export function useWithDocGoalsActivities() {
       if (!goal) {
         return acc;
       }
-      const activities: ActivityGQL[] = goalActivity.activities
-        .map((activityId) => {
-          const activity = getActivitById(activityId.activity);
-          return {
-            ...activity,
-            disabled: activityId.disabled,
-          };
-        })
-        .filter((a) => !!a);
-      return [...acc, { ...goal, activities }];
+      const activities = goalActivity.activities.reduce((acc, activityId) => {
+        const activity = getActivitById(activityId.activity);
+        if (!activity) {
+          return acc;
+        }
+        return [...acc, { ...activity, disabled: activityId.disabled }];
+      }, [] as ActivityGQL[]);
+      const builtActivities = goalActivity.builtActivities?.reduce(
+        (acc, builtActivity) => {
+          const activity = getBuiltActivityById(builtActivity.activity);
+          if (!activity) {
+            return acc;
+          }
+          return [...acc, { ...activity, disabled: builtActivity.disabled }];
+        },
+        [] as ActivityBuilder[]
+      );
+      return [
+        ...acc,
+        { ...goal, activities, builtActivities: builtActivities || [] },
+      ];
     },
     [] as DocGoal[]
   );
@@ -77,11 +95,32 @@ export function useWithDocGoalsActivities() {
     return await dispatch(_addOrUpdateActivity(activity));
   }
 
+  async function loadBuiltActivities() {
+    return await dispatch(_fetchBuiltActivities());
+  }
+
+  function addNewLocalBuiltActivity(): ActivityBuilder {
+    const newActivity = defaultActivityBuilder(userId);
+    dispatch(_addNewLocalBuiltActivity(newActivity));
+    return newActivity;
+  }
+
+  async function addOrUpdateBuiltActivity(
+    activity: ActivityBuilder
+  ): Promise<ActivityBuilder> {
+    const res = await dispatch(_addOrUpdateBuiltActivity(activity));
+    return res.payload as ActivityBuilder;
+  }
+
   return {
     getActivitById,
     loadDocGoals,
     loadActivities,
+    loadBuiltActivities,
     addOrUpdateActivity,
+    addOrUpdateBuiltActivity,
+    addNewLocalBuiltActivity,
+    builtActivities,
     activities,
     docGoals: docGoalsActivities,
     isLoading:

@@ -53,6 +53,7 @@ export const emptyActivity: Activity = {
   _id: '',
   title: '',
   introduction: '',
+  activityType: 'gql',
   disabled: false,
   steps: [],
   description: '',
@@ -277,8 +278,7 @@ export function useWithActivityHandler(
     }
   }
 
-  function resetActivity() {
-    // cancel any pending requests
+  function abortCalls() {
     if (abortController) {
       try {
         abortController.controller.abort();
@@ -287,6 +287,11 @@ export function useWithActivityHandler(
         console.log(e);
       }
     }
+  }
+
+  function resetActivity() {
+    // cancel any pending requests
+    abortCalls();
     newSession();
     coachResponsePending(false);
     setWaitingForUserAnswer(false);
@@ -319,35 +324,33 @@ export function useWithActivityHandler(
         displayType: MessageDisplayType.TEXT,
       });
     }
-    sendMessages(messagesToSend, true, googleDocId);
+    if (messagesToSend.length) {
+      sendMessages(messagesToSend, true, googleDocId);
+    }
   }
 
   useEffect(() => {
+    abortCalls();
     if (resetActivityCounter === 0) return;
+    if (!selectedActivity) return;
     clearChatLog(googleDocId);
     sendIntroMessages();
     resetActivity();
-  }, [resetActivityCounter]);
-
-  useEffect(() => {
-    if (activity?._id && selectedGoal?._id) {
-      // newSession();
-    }
-  }, [activity?._id, selectedGoal?._id]);
+  }, [resetActivityCounter, Boolean(selectedActivity)]);
 
   // Handles initial load
   useEffect(() => {
-    if (!googleDocId) {
+    if (!googleDocId || !selectedActivity) {
       return;
     }
     clearChatLog(googleDocId);
     resetActivity();
     sendIntroMessages();
-  }, [selectedActivity, selectedGoal]);
+  }, [Boolean(selectedActivity), selectedGoal]);
 
   // Handles new step
   useEffect(() => {
-    if (!activity) return;
+    if (!activity || !selectedActivity) return;
     const currentStep = activity.getStep({
       executePrompt: executePromptWithMessage,
       openSelectActivityModal: editDocGoal,
@@ -370,10 +373,11 @@ export function useWithActivityHandler(
       googleDocId
     );
     setWaitingForUserAnswer(true);
-  }, [activity?.stepName]);
+  }, [activity?.stepName, Boolean(selectedActivity)]);
 
   // Handles user response to activity step via messages
   useEffect(() => {
+    if (!selectedActivity) return;
     if (!activity) return;
     const currentStep = activity.getStep({
       executePrompt: executePromptWithMessage,
@@ -398,9 +402,14 @@ export function useWithActivityHandler(
       }
       setWaitingForUserAnswer(false);
     }
-  }, [waitingForUserAnswer, messages, activity?.stepName]);
+  }, [
+    waitingForUserAnswer,
+    messages,
+    activity?.stepName,
+    Boolean(selectedActivity),
+  ]);
 
   return {
-    activityReady: activity?.isReady || !selectedActivity,
+    activityReady: Boolean(activity?.isReady) && Boolean(selectedActivity),
   };
 }

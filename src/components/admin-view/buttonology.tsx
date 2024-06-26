@@ -6,14 +6,17 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { ColumnCenterDiv } from '../../styled-components';
-import { Button, CircularProgress, IconButton, Input } from '@mui/material';
+import { Button, CircularProgress, Input } from '@mui/material';
 import { docTextAction } from '../../hooks/api';
-import { ActivityGQL, GoogleDocTextModifyActions } from '../../types';
+import {
+  ActivityGQL,
+  ActivityTypes,
+  GoogleDocTextModifyActions,
+} from '../../types';
 import { MultiPromptTesting } from './multi-prompt-buttonology';
-import ButtonologyIcon from '@mui/icons-material/DriveFileRenameOutline';
-import PromptIcon from '@mui/icons-material/EditNote';
 import { UseWithPrompts } from '../../hooks/use-with-prompts';
-function InputButtonAction(props: {
+import { ActivityBuilder } from '../activity-builder/types';
+export function InputButtonAction(props: {
   googleDocId: string;
   action: GoogleDocTextModifyActions;
   buttonText: string;
@@ -80,14 +83,16 @@ function InputButtonAction(props: {
   );
 }
 
-export default function Buttonology(props: {
+export default function ActivityGqlButtonology(props: {
   googleDocId: string;
   activities: ActivityGQL[];
-  goToActivity: (activity: ActivityGQL) => void;
+  builtActivities: ActivityBuilder[];
+  goToActivity: (activity: ActivityTypes) => void;
   useWithPrompts: UseWithPrompts;
+  curActivity?: ActivityTypes;
 }): JSX.Element {
-  const { googleDocId, activities, goToActivity, useWithPrompts } = props;
-  const [multiPrompt, setMultiPrompt] = React.useState<boolean>(true);
+  const { googleDocId, activities, goToActivity, useWithPrompts, curActivity } =
+    props;
   return (
     <ColumnCenterDiv
       style={{
@@ -95,43 +100,13 @@ export default function Buttonology(props: {
         height: '100%',
       }}
     >
-      {multiPrompt ? (
-        <MultiPromptTesting
-          googleDocId={googleDocId}
-          activities={activities}
-          goToActivity={goToActivity}
-          useWithPrompts={useWithPrompts}
-        />
-      ) : (
-        <>
-          <h4>Buttonology</h4>
-          <InputButtonAction
-            googleDocId={googleDocId}
-            action={GoogleDocTextModifyActions.HIGHLIGHT}
-            buttonText="Highlight"
-            insertAfterInput={false}
-          />
-          <InputButtonAction
-            googleDocId={googleDocId}
-            action={GoogleDocTextModifyActions.REMOVE}
-            buttonText="Remove"
-            insertAfterInput={false}
-          />
-          <InputButtonAction
-            googleDocId={googleDocId}
-            action={GoogleDocTextModifyActions.INSERT}
-            buttonText="Insert"
-            insertAfterInput={true}
-          />
-        </>
-      )}
-      <IconButton
-        onClick={() => {
-          setMultiPrompt((prevValue) => !prevValue);
-        }}
-      >
-        {multiPrompt ? <ButtonologyIcon /> : <PromptIcon />}
-      </IconButton>
+      <MultiPromptTesting
+        googleDocId={googleDocId}
+        activities={activities}
+        goToActivity={goToActivity}
+        useWithPrompts={useWithPrompts}
+        curActivity={curActivity}
+      />
     </ColumnCenterDiv>
   );
 }

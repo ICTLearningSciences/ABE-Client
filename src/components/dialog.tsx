@@ -54,6 +54,33 @@ interface Option {
   onClick: () => void;
 }
 
+export function TextDialog(props: {
+  title: string;
+  body: string;
+  open: boolean;
+  close: () => void;
+}): JSX.Element {
+  const { title, open, close, body } = props;
+  return (
+    <Dialog data-cy="text-dialog" maxWidth="sm" fullWidth={true} open={open}>
+      <DialogTitle style={{ textAlign: 'center' }}>{title}</DialogTitle>
+      <DialogContent
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <DialogContentText>{body}</DialogContentText>
+        <Button data-cy="close-text-dialog" onClick={close}>
+          Close
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function TwoOptionDialog(props: {
   title: string;
   open: boolean;

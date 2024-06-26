@@ -5,17 +5,16 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { useWithDocGoalsActivities } from '../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import { DocGoal, ActivityGQL } from '../types';
+import { DocGoal, ActivityTypes } from '../types';
 import { useState } from 'react';
 
 export interface CurrentGoalAndActivity {
   selectedGoal?: DocGoal;
-  selectedActivity?: ActivityGQL;
+  selectedActivity?: ActivityTypes;
 }
 
 export function useWithCurrentGoalActivity() {
-  const { docGoals, addOrUpdateActivity, isLoading } =
-    useWithDocGoalsActivities();
+  const { docGoals, isLoading } = useWithDocGoalsActivities();
 
   const [goalActivityState, setGoalActivityState] =
     useState<CurrentGoalAndActivity>();
@@ -29,7 +28,7 @@ export function useWithCurrentGoalActivity() {
     });
   }
 
-  function setActivity(activity?: ActivityGQL) {
+  function setActivity(activity?: ActivityTypes) {
     setGoalActivityState((prevState) => {
       return {
         ...prevState,
@@ -38,17 +37,13 @@ export function useWithCurrentGoalActivity() {
     });
   }
 
-  function setGoalAndActivity(goal?: DocGoal, activity?: ActivityGQL) {
+  function setGoalAndActivity(goal?: DocGoal, activity?: ActivityTypes) {
     setGoalActivityState(() => {
       return {
         selectedGoal: goal,
         selectedActivity: activity,
       };
     });
-  }
-
-  async function saveActivity(activity: ActivityGQL) {
-    await addOrUpdateActivity(activity);
   }
 
   return {
@@ -58,7 +53,6 @@ export function useWithCurrentGoalActivity() {
     setGoal,
     setActivity,
     setGoalAndActivity,
-    saveActivity,
     isLoading,
   };
 }

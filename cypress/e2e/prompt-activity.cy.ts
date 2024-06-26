@@ -186,6 +186,7 @@ describe('Prompt Activities', () => {
     cy.visit('/');
     cy.get('[data-cy=role-switch]').click();
     cy.get('[data-cy=doc-list-item-Aliens]').eq(0).click();
+    cy.get("[data-cy=go-to-old-activity-editor]").click();
     cy.get('[data-cy=preview-button-Army-Style-Review]').click();
     cyMockOpenAiCall(cy, { response: analyzeHookResponse(2, 2) });
     cy.get('[data-cy=chat-header]').should('have.text', 'Army Style Checklist');
@@ -204,6 +205,7 @@ describe('Prompt Activities', () => {
     cy.visit('/');
     cy.get('[data-cy=role-switch]').click();
     cy.get('[data-cy=doc-list-item-Aliens]').eq(0).click();
+    cy.get("[data-cy=go-to-old-activity-editor]").click();
     cy.get('[data-cy=preview-button-N-3-Compare-Story-to-Hook]').click();
     cy.get('[data-cy=chat-header]').should(
       'have.text',

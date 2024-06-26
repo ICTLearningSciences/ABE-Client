@@ -14,7 +14,11 @@ import {
   PromptRoles,
   GQLPrompt,
 } from '../types';
-import { MessageDisplayType, Sender } from '../store/slices/chat';
+import {
+  ChatMessageTypes,
+  MessageDisplayType,
+  Sender,
+} from '../store/slices/chat';
 import { v4 as uuidv4 } from 'uuid';
 import { FREE_INPUT_GOAL_ID } from '../constants';
 import { useWithExecutePrompt } from './use-with-execute-prompts';
@@ -30,7 +34,9 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
   );
   const messages = state.chatLogs[googleDocId] || [];
   const isFreeInput = selectedGoal?._id === FREE_INPUT_GOAL_ID;
+  const { sendMessages } = useWithChat();
   const { abortController, executePromptSteps } = useWithExecutePrompt();
+
   useEffect(() => {
     if (abortController) {
       try {
@@ -41,6 +47,30 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
       }
     }
   }, [selectedGoal?._id]);
+
+  function sendIntroMessages() {
+    const goalIntroduction = selectedGoal?.introduction;
+    const messagesToSend: ChatMessageTypes[] = [];
+    if (goalIntroduction) {
+      messagesToSend.push({
+        id: uuidv4(),
+        message: goalIntroduction,
+        sender: Sender.SYSTEM,
+        displayType: MessageDisplayType.TEXT,
+      });
+    }
+    if (messagesToSend.length) {
+      sendMessages(messagesToSend, true, googleDocId);
+    }
+  }
+
+  // Handles initial load
+  useEffect(() => {
+    if (!googleDocId || !isFreeInput) {
+      return;
+    }
+    sendIntroMessages();
+  }, [isFreeInput]);
 
   useEffect(() => {
     if (messages.length === 0 || !userId || !isFreeInput) {

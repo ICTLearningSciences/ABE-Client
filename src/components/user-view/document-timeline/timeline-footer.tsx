@@ -38,16 +38,11 @@ const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
 
   const activity = getActivitById(timelinePoint.version.activity || '');
   const googleDoc = getCurrentGoogleDoc(docId);
-  const title = activity?.title || googleDoc?.title;
+  const title = activity?.title || googleDoc?.title || '';
 
   return (
     <Box>
-      <Typography className="text-2">
-        {/* Conditional rendering that determines the text content to display
-        in the `Typography` component based on the `timelinePoint.type` and the availability of
-        `activity.title` and `googleDoc?.title`. */}
-        {activity.title ? activity.title : title}
-      </Typography>
+      <Typography className="text-2">{title}</Typography>
 
       <Typography className="text-3-no-indent" style={{ textAlign: 'right' }}>
         {convertDateTimelinePointTime(timelinePoint.versionTime) || ''}

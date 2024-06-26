@@ -14,7 +14,7 @@ import {
   SxProps,
   Theme,
 } from '@mui/material';
-import { ActivityGQL, DocGoal, GoogleDoc, Intention } from '../../../types';
+import { ActivityTypes, DocGoal, GoogleDoc, Intention } from '../../../types';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import './doc-goal-modal.css';
 import { useState } from 'react';
@@ -52,8 +52,8 @@ export default function DocGoalModal(props: {
   open: boolean;
   close: () => void;
   setSelectedGoal: (goal?: DocGoal) => void;
-  setSelectedActivity: (activity?: ActivityGQL) => void;
-  selectedActivity?: ActivityGQL;
+  setSelectedActivity: (activity?: ActivityTypes) => void;
+  selectedActivity?: ActivityTypes;
   selectedGoal?: DocGoal;
   docGoals?: DocGoal[];
 }): JSX.Element {
@@ -81,7 +81,7 @@ export default function DocGoalModal(props: {
   const [curStageIndex, setCurStageIndex] = useState(0);
   const [stages, setStages] = useState<SelectingStage[]>([]);
   const currentStage = stages[curStageIndex];
-  const [_selectedActivity, _setSelectedActivity] = useState<ActivityGQL>();
+  const [_selectedActivity, _setSelectedActivity] = useState<ActivityTypes>();
   const [_selectedGoal, _setSelectedGoal] = useState<DocGoal>();
   const [firstLoadComplete, setFirstLoadComplete] = useState(false);
   const [documentIntention, setDocumentIntention] = useState<string>(
@@ -259,7 +259,10 @@ export default function DocGoalModal(props: {
       return (
         _selectedGoal?.activities && (
           <ActivitiesDisplay
-            activities={_selectedGoal.activities}
+            activities={[
+              ..._selectedGoal.activities,
+              ..._selectedGoal.builtActivities,
+            ]}
             setSelectedActivity={_setSelectedActivity}
             selectedActivity={_selectedActivity}
           />

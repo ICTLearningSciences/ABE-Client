@@ -105,6 +105,10 @@ export default function Message(props: {
       ? colorTheme.chatUserTextColor
       : colorTheme.chatSystemTextColor;
 
+  if (message.message === '') {
+    return <></>;
+  }
+
   return (
     <div
       id={message.id}
