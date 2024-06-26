@@ -12,23 +12,44 @@ import {
   CheckBoxInput,
 } from '../../shared/input-components';
 import { JsonResponseData, JsonResponseDataType } from '../../types';
-import { getEmptyJsonResponseData } from './prompt-step-builder';
 
 export function JsonResponseDataUpdater(props: {
   jsonResponseData: JsonResponseData[];
-  addOrEdit: (jsonResponseData: JsonResponseData) => void;
-  deleteJsonResponseData: (jsonResponseData: JsonResponseData) => void;
+  addNewJsonResponseData: (parentJsonResponseDataIds: string[]) => void;
+  editDataField: (
+    clientId: string,
+    field: string,
+    value: string | boolean,
+    parentJsonResponseDataIds: string[]
+  ) => void;
+  deleteJsonResponseData: (
+    clientId: string,
+    parentJsonResponseDataIds: string[]
+  ) => void;
+  parentJsonResponseDataIds: string[];
 }): JSX.Element {
-  const { jsonResponseData, addOrEdit, deleteJsonResponseData } = props;
+  const {
+    jsonResponseData,
+    editDataField,
+    deleteJsonResponseData,
+    parentJsonResponseDataIds,
+    addNewJsonResponseData,
+  } = props;
+  const availableTypes =
+    parentJsonResponseDataIds.length !== 2
+      ? [...Object.values(JsonResponseDataType)]
+      : [JsonResponseDataType.STRING, JsonResponseDataType.ARRAY];
+
   return (
     <ColumnCenterDiv
       style={{
         border: '1px dotted grey',
         marginBottom: '10px',
         marginTop: '10px',
+        marginLeft: `${parentJsonResponseDataIds.length * 60}px`,
       }}
     >
-      <h3>Json Response Data</h3>
+      {!parentJsonResponseDataIds.length && <h3>Json Response Data</h3>}
       {jsonResponseData?.map((jsonResponseData, index) => {
         return (
           <ColumnDiv
@@ -50,38 +71,47 @@ export function JsonResponseDataUpdater(props: {
                   label="Variable Name"
                   value={jsonResponseData.name}
                   onChange={(e) => {
-                    addOrEdit({
-                      ...jsonResponseData,
-                      name: e,
-                    });
+                    editDataField(
+                      jsonResponseData.clientId,
+                      'name',
+                      e,
+                      parentJsonResponseDataIds
+                    );
                   }}
                 />
                 <SelectInputField
                   label="Type"
                   value={jsonResponseData.type}
-                  options={[...Object.values(JsonResponseDataType)]}
+                  options={availableTypes}
                   onChange={(e) => {
-                    addOrEdit({
-                      ...jsonResponseData,
-                      type: e as JsonResponseDataType,
-                    });
+                    editDataField(
+                      jsonResponseData.clientId,
+                      'type',
+                      e,
+                      parentJsonResponseDataIds
+                    );
                   }}
                 />
                 <CheckBoxInput
                   label="Is Required"
                   value={jsonResponseData.isRequired}
                   onChange={(e) => {
-                    addOrEdit({
-                      ...jsonResponseData,
-                      isRequired: e,
-                    });
+                    editDataField(
+                      jsonResponseData.clientId,
+                      'isRequired',
+                      e,
+                      parentJsonResponseDataIds
+                    );
                   }}
                 />
               </RowDiv>
 
               <IconButton
                 onClick={() => {
-                  deleteJsonResponseData(jsonResponseData);
+                  deleteJsonResponseData(
+                    jsonResponseData.clientId,
+                    parentJsonResponseDataIds
+                  );
                 }}
               >
                 <Delete />
@@ -92,24 +122,24 @@ export function JsonResponseDataUpdater(props: {
               maxRows={4}
               value={jsonResponseData.additionalInfo || ''}
               onChange={(e) => {
-                addOrEdit({
-                  ...jsonResponseData,
-                  additionalInfo: e,
-                });
+                editDataField(
+                  jsonResponseData.clientId,
+                  'additionalInfo',
+                  e,
+                  parentJsonResponseDataIds
+                );
               }}
             />
             {jsonResponseData.type === JsonResponseDataType.OBJECT && (
               <JsonResponseDataUpdater
                 jsonResponseData={jsonResponseData.subData || []}
-                addOrEdit={(jsonResponseData) => {
-                  addOrEdit({
-                    ...jsonResponseData,
-                    subData: jsonResponseData.subData || [],
-                  });
-                }}
-                deleteJsonResponseData={(jsonResponseData) => {
-                  deleteJsonResponseData(jsonResponseData);
-                }}
+                editDataField={editDataField}
+                deleteJsonResponseData={deleteJsonResponseData}
+                parentJsonResponseDataIds={[
+                  ...parentJsonResponseDataIds,
+                  jsonResponseData.clientId,
+                ]}
+                addNewJsonResponseData={addNewJsonResponseData}
               />
             )}
           </ColumnDiv>
@@ -117,7 +147,7 @@ export function JsonResponseDataUpdater(props: {
       })}
       <Button
         onClick={() => {
-          addOrEdit(getEmptyJsonResponseData());
+          addNewJsonResponseData(parentJsonResponseDataIds);
         }}
       >
         + Add Data Field

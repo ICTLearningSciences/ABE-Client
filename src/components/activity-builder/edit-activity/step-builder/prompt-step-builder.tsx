@@ -127,7 +127,95 @@ export function PromptStepBuilder(props: {
     });
   }
 
-  function addOrEditJsonResponseData(jsonResponseData: JsonResponseData) {
+  function recursiveUpdateNestedJsonResponseData(
+    clientId: string,
+    field: string,
+    value: string | boolean,
+    baseJsonResponseDatas: JsonResponseData[],
+    parentJsonResponseDataIds: string[]
+  ): JsonResponseData[] {
+    if (!parentJsonResponseDataIds?.length) {
+      return baseJsonResponseDatas.map((jrd) => {
+        if (jrd.clientId === clientId) {
+          return {
+            ...jrd,
+            [field]: value,
+          };
+        }
+        return jrd;
+      });
+    } else {
+      return baseJsonResponseDatas.map((jrd) => {
+        if (jrd.clientId === parentJsonResponseDataIds[0]) {
+          return {
+            ...jrd,
+            subData: recursiveUpdateNestedJsonResponseData(
+              clientId,
+              field,
+              value,
+              jrd.subData || [],
+              parentJsonResponseDataIds.slice(1)
+            ),
+          };
+        }
+        return jrd;
+      });
+    }
+  }
+
+  function recursiveAddNewJsonResponseData(
+    parentJsonResponseDataIds: string[],
+    baseJsonResponseDatas: JsonResponseData[]
+  ): JsonResponseData[] {
+    if (!parentJsonResponseDataIds?.length) {
+      return [...baseJsonResponseDatas, getEmptyJsonResponseData()];
+    } else {
+      return baseJsonResponseDatas.map((jrd) => {
+        if (jrd.clientId === parentJsonResponseDataIds[0]) {
+          return {
+            ...jrd,
+            subData: recursiveAddNewJsonResponseData(
+              parentJsonResponseDataIds.slice(1),
+              jrd.subData || []
+            ),
+          };
+        }
+        return jrd;
+      });
+    }
+  }
+
+  function recursiveDeleteJsonResponseData(
+    clientId: string,
+    baseJsonResponseDatas: JsonResponseData[],
+    parentJsonResponseDataIds: string[]
+  ): JsonResponseData[] {
+    // for all json response data, if the clientId matches, remove it
+    if (!parentJsonResponseDataIds?.length) {
+      return baseJsonResponseDatas.filter((jrd) => jrd.clientId !== clientId);
+    } else {
+      return baseJsonResponseDatas.map((jrd) => {
+        if (jrd.clientId === parentJsonResponseDataIds[0]) {
+          return {
+            ...jrd,
+            subData: recursiveDeleteJsonResponseData(
+              clientId,
+              jrd.subData || [],
+              parentJsonResponseDataIds.slice(1)
+            ),
+          };
+        }
+        return jrd;
+      });
+    }
+  }
+
+  function editJsonResponseData(
+    clientId: string,
+    field: string,
+    value: string | boolean,
+    parentJsonResponseDataIds: string[]
+  ) {
     updateLocalActivity((prevValue) => {
       return {
         ...prevValue,
@@ -138,23 +226,38 @@ export function PromptStepBuilder(props: {
               if (s.stepId === step.stepId) {
                 const responseData =
                   (s as PromptActivityStep).jsonResponseData || [];
-                const index = responseData.findIndex(
-                  (jrd) => jrd.clientId === jsonResponseData.clientId
-                );
-                if (index >= 0) {
-                  return {
-                    ...s,
-                    jsonResponseData: responseData.map((jrd) => {
-                      if (jrd.clientId === jsonResponseData.clientId) {
-                        return jsonResponseData;
-                      }
-                      return jrd;
-                    }),
-                  };
+                // if no parentJsonResponseData is provided, then just update the steps base json response data (look for or add to list)
+                if (!parentJsonResponseDataIds?.length) {
+                  const index = responseData.findIndex(
+                    (jrd) => jrd.clientId === clientId
+                  );
+                  if (index >= 0) {
+                    return {
+                      ...s,
+                      jsonResponseData: responseData.map((jrd) => {
+                        if (jrd.clientId === clientId) {
+                          return {
+                            ...jrd,
+                            [field]: value,
+                          };
+                        }
+                        return jrd;
+                      }),
+                    };
+                  } else {
+                    throw new Error('JsonResponseData not found');
+                  }
                 } else {
+                  // if there is a parentJsonResponseData, recursives update fields by looking for objects, and looking into their subData to update
                   return {
                     ...s,
-                    jsonResponseData: [...responseData, jsonResponseData],
+                    jsonResponseData: recursiveUpdateNestedJsonResponseData(
+                      clientId,
+                      field,
+                      value,
+                      responseData,
+                      parentJsonResponseDataIds
+                    ),
                   };
                 }
               }
@@ -166,7 +269,45 @@ export function PromptStepBuilder(props: {
     });
   }
 
-  function deleteJsonResponseData(jsonResponseData: JsonResponseData) {
+  function addNewJsonResponseData(parentJsonResponseDataIds: string[]) {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                if (!parentJsonResponseDataIds?.length) {
+                  return {
+                    ...s,
+                    jsonResponseData: [
+                      ...((s as PromptActivityStep).jsonResponseData || []),
+                      getEmptyJsonResponseData(),
+                    ],
+                  };
+                } else {
+                  return {
+                    ...s,
+                    jsonResponseData: recursiveAddNewJsonResponseData(
+                      parentJsonResponseDataIds,
+                      (s as PromptActivityStep).jsonResponseData || []
+                    ),
+                  };
+                }
+              }
+              return s;
+            }),
+          };
+        }),
+      };
+    });
+  }
+
+  function deleteJsonResponseData(
+    clientId: string,
+    parentJsonResponseDataIds: string[]
+  ) {
     updateLocalActivity((prevValue) => {
       return {
         ...prevValue,
@@ -177,14 +318,20 @@ export function PromptStepBuilder(props: {
               if (s.stepId === step.stepId) {
                 const responseData =
                   (s as PromptActivityStep).jsonResponseData || [];
-                const index = responseData.findIndex(
-                  (jrd) => jrd.clientId === jsonResponseData.clientId
-                );
-                if (index >= 0) {
+                if (!parentJsonResponseDataIds?.length) {
                   return {
                     ...s,
                     jsonResponseData: responseData.filter(
-                      (jrd) => jrd.clientId !== jsonResponseData.clientId
+                      (jrd) => jrd.clientId !== clientId
+                    ),
+                  };
+                } else {
+                  return {
+                    ...s,
+                    jsonResponseData: recursiveDeleteJsonResponseData(
+                      clientId,
+                      responseData,
+                      parentJsonResponseDataIds
                     ),
                   };
                 }
@@ -366,8 +513,10 @@ export function PromptStepBuilder(props: {
       {step.outputDataType === PromptOutputTypes.JSON && (
         <JsonResponseDataUpdater
           jsonResponseData={step.jsonResponseData || []}
-          addOrEdit={addOrEditJsonResponseData}
+          editDataField={editJsonResponseData}
+          addNewJsonResponseData={addNewJsonResponseData}
           deleteJsonResponseData={deleteJsonResponseData}
+          parentJsonResponseDataIds={[]}
         />
       )}
 
