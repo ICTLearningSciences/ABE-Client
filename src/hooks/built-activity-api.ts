@@ -43,6 +43,7 @@ export const fullBuiltActivityQueryData = `
                               saveResponseVariableName
                               disableFreeInput
                               predefinedResponses{
+                                  clientId
                                   message
                                   jumpToStepId
                                   isArray

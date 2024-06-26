@@ -31,6 +31,7 @@ export const exampleRequestUserInputActivityStep: RequestUserInputActivityStep =
     disableFreeInput: false,
     predefinedResponses: [
       {
+        clientId: '1',
         message: 'I like it!',
         jumpToStepId: '2',
       },

@@ -31,18 +31,59 @@ function convertExpectedDataIntoSchema(
   return schema;
 }
 
-export function convertExpectedDataToAiPromptString(
+// jsonResponseData:[
+//   {
+//     clientId: "1",
+//     name: "nickname",
+//     type: "string"
+//   },
+//   {
+//     clientId: "2",
+//     name: "people",
+//     type: "object",
+//     subData: [
+//       {
+//         clientId: "3",
+//         name: "person1",
+//         type: "string"
+//       }
+//     ]
+//   }
+// [
+// recursively convert expected data into a prompt string
+export function recursivelyConvertExpectedDataToAiPromptString(
   expectedData: JsonResponseData[]
-) {
-  let promptString = `
-  Respond in JSON. Validate that your response is valid JSON. Your JSON must follow this format:\n`;
+): string {
+  let promptString = `Respond in JSON. Validate that your response is valid JSON. Your JSON must follow this format:\n`;
   promptString += `{\n`;
-  for (const expectedField of expectedData) {
-    promptString += `"${expectedField.name}": ${expectedField.type}\t ${
-      expectedField.additionalInfo ? `// ${expectedField.additionalInfo}` : ''
-    } \n`;
+
+  function buildSchema(data: JsonResponseData[], indent: string): string {
+    let schema = '';
+    data.forEach((item, index) => {
+      schema += `${indent}"${item.name}": `;
+      if (item.type === 'object' && item.subData) {
+        schema += `{${
+          item.additionalInfo ? `\t// ${item.additionalInfo}` : ''
+        }\n`;
+        schema += buildSchema(item.subData, `${indent}  `);
+        schema += `${indent}}\n`;
+      } else {
+        schema += `"${item.type}"`;
+        if (item.additionalInfo) {
+          schema += `\t// ${item.additionalInfo}`;
+        }
+      }
+      if (index < data.length - 1) {
+        schema += ',';
+      }
+      schema += '\n';
+    });
+    return schema;
   }
+
+  promptString += buildSchema(expectedData, '  ');
   promptString += `}\n`;
+
   return promptString;
 }
 
@@ -102,6 +143,9 @@ export function replaceStoredDataInString(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stateData: Record<string, any>
 ): string {
+  console.log('in replaceStoredDataInString');
+  console.log(str);
+  console.log(stateData);
   // replace all instances of {{key.data...}} in str with stored data[key][data...]
   const regex = /{{(.*?)}}/g;
   return str.trim().replace(regex, (match, key) => {
@@ -152,4 +196,24 @@ export function isActivityRunnable(activity: ActivityBuilder) {
   return (
     activity.flowsList.length > 0 && activity.flowsList[0].steps.length > 0
   );
+}
+
+export function recursiveUpdateAdditionalInfo(
+  data: JsonResponseData[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  stateData: Record<string, any>
+) {
+  const copy: JsonResponseData[] = JSON.parse(JSON.stringify(data));
+  for (const item of copy) {
+    if (item.additionalInfo) {
+      item.additionalInfo = replaceStoredDataInString(
+        item.additionalInfo,
+        stateData
+      );
+    }
+    if (item.subData) {
+      item.subData = recursiveUpdateAdditionalInfo(item.subData, stateData);
+    }
+  }
+  return copy;
 }

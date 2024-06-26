@@ -32,11 +32,12 @@ import {
 } from '../../types';
 import { chatLogToString, isJsonString } from '../../helpers';
 import {
-  convertExpectedDataToAiPromptString,
+  recursivelyConvertExpectedDataToAiPromptString,
   processPredefinedResponses,
   receivedExpectedData,
   replaceStoredDataInString,
   sortMessagesByResponseWeight,
+  recursiveUpdateAdditionalInfo,
 } from '../../components/activity-builder/helpers';
 import { ChatLogSubscriber } from '../../hooks/use-with-chat-log-subscribers';
 
@@ -437,9 +438,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
     aiPromptSteps[0].prompts.push(promptConfig);
     if (step.jsonResponseData) {
-      aiPromptSteps[0].responseFormat += convertExpectedDataToAiPromptString(
-        step.jsonResponseData
-      );
+      aiPromptSteps[0].responseFormat +=
+        recursivelyConvertExpectedDataToAiPromptString(
+          recursiveUpdateAdditionalInfo(step.jsonResponseData, this.stateData)
+        );
     }
 
     // handle sending prompt

@@ -68,7 +68,7 @@ export default function Chat(props: {
   const userRole = useAppSelector((state) => state.login.userRole);
   const userIsAdmin = userRole === UserRole.ADMIN;
   const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
-  useWithFreeInput(selectedGoal);
+  useWithFreeInput(!selectedActivity ? selectedGoal : undefined);
   useWithStoreDocVersions(selectedActivity?._id || '');
   const { activityReady } = useWithActivityHandler(
     useWithPrompts,

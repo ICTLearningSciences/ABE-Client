@@ -35,7 +35,7 @@ import { v4 as uuid } from 'uuid';
 import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
 import { AiServicesResponseTypes } from '../../../../ai-services/ai-service-types';
 import ViewPreviousRunModal from '../../../admin-view/view-previous-run-modal';
-import { convertExpectedDataToAiPromptString } from '../../helpers';
+import { recursivelyConvertExpectedDataToAiPromptString } from '../../helpers';
 import { useWithExecutePrompt } from '../../../../hooks/use-with-execute-prompts';
 import { TextDialog } from '../../../dialog';
 import ViewPreviousRunsModal from '../../../admin-view/view-previous-runs-modal';
@@ -360,9 +360,8 @@ export function PromptStepBuilder(props: {
     };
     aiPromptSteps[0].prompts.push(promptConfig);
     if (step.jsonResponseData?.length) {
-      aiPromptSteps[0].responseFormat += convertExpectedDataToAiPromptString(
-        step.jsonResponseData
-      );
+      aiPromptSteps[0].responseFormat +=
+        recursivelyConvertExpectedDataToAiPromptString(step.jsonResponseData);
     }
     try {
       const _response = await executePromptSteps(aiPromptSteps);

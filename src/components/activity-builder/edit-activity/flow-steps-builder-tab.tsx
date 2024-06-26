@@ -25,9 +25,7 @@ import {
 } from './step-builder/prompt-step-builder';
 import { InputField } from '../shared/input-components';
 import { AddNewActivityButton } from '../shared/add-new-activity-button';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { Button, IconButton } from '@mui/material';
+import { Button } from '@mui/material';
 import {
   SystemMessageStepBuilder,
   getDefaultSystemMessage,
@@ -78,7 +76,6 @@ export function FlowStepsBuilderTab(props: {
             step={step as RequestUserInputActivityStep}
             updateLocalActivity={updateLocalActivity}
             deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
-            updateStep={(step) => props.updateStep(step, flow.clientId)}
             flowsList={flowsList}
           />
         );
@@ -127,69 +124,6 @@ export function FlowStepsBuilderTab(props: {
         ...flow.steps.slice(i + 1),
       ],
     });
-  }
-
-  function moveStepUp(i: number) {
-    if (i === 0) {
-      return;
-    }
-    const newSteps = [...flow.steps];
-    const temp = newSteps[i];
-    newSteps[i] = newSteps[i - 1];
-    newSteps[i - 1] = temp;
-    setLocalFlowCopy({
-      ...flow,
-      steps: newSteps,
-    });
-  }
-
-  function moveStepDown(i: number) {
-    if (i === flow.steps.length - 1) {
-      return;
-    }
-    const newSteps = [...flow.steps];
-    const temp = newSteps[i];
-    newSteps[i] = newSteps[i + 1];
-    newSteps[i + 1] = temp;
-    setLocalFlowCopy({
-      ...flow,
-      steps: newSteps,
-    });
-  }
-
-  function MoveStepArrows(props: {
-    i: number;
-    disableUp: boolean;
-    disableDown: boolean;
-  }): JSX.Element {
-    const { i, disableDown, disableUp } = props;
-    return (
-      <ColumnDiv
-        style={{
-          position: 'absolute',
-          right: '0',
-          top: '40%',
-          transform: 'translateY(-40%)',
-        }}
-      >
-        <IconButton
-          onClick={() => {
-            moveStepUp(i);
-          }}
-          disabled={disableUp}
-        >
-          <ArrowUpwardIcon />
-        </IconButton>
-        <IconButton
-          disabled={disableDown}
-          onClick={() => {
-            moveStepDown(i);
-          }}
-        >
-          <ArrowDownwardIcon />
-        </IconButton>
-      </ColumnDiv>
-    );
   }
 
   return (
@@ -250,11 +184,11 @@ export function FlowStepsBuilderTab(props: {
                 insertNewActivityStep(stepType, i)
               }
             />
-            <MoveStepArrows
+            {/* <MoveStepArrows
               i={i}
               disableUp={i === 0}
               disableDown={i === flow.steps.length - 1}
-            />
+            /> */}
           </ColumnDiv>
         );
       })}

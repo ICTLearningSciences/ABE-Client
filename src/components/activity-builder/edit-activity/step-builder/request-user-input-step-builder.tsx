@@ -50,13 +50,20 @@ function PredefinedResponseUpdater(props: {
   return (
     <RowDiv
       style={{
-        alignItems: 'center',
+        // alignItems: 'center',
         borderTop: '1px dotted black',
+        width: '100%',
+        justifyContent: 'space-between',
       }}
     >
-      <ColumnDiv>
+      <ColumnDiv
+        style={{
+          width: '60%',
+        }}
+      >
         <InputField
           label="Custom User Message"
+          width="100%"
           value={predefinedResponse.message}
           onChange={(e) => {
             props.updateResponse({
@@ -67,6 +74,7 @@ function PredefinedResponseUpdater(props: {
         />
         <InputField
           label="Response Weight (Optional)"
+          width="100%"
           value={predefinedResponse.responseWeight || ''}
           onChange={(e) => {
             props.updateResponse({
@@ -86,36 +94,46 @@ function PredefinedResponseUpdater(props: {
           }}
         />
       </ColumnDiv>
-      <FlowStepSelector
-        title="Jump to Step (OPTIONAL)"
-        flowsList={flowsList}
-        currentJumpToStepId={predefinedResponse.jumpToStepId}
-        rowOrColumn="column"
-        onStepSelected={(stepId) => {
-          updateResponse({
-            ...predefinedResponse,
-            jumpToStepId: stepId,
-          });
-        }}
-      />
-      <IconButton
-        data-cy="delete-predefined-response"
-        onClick={deleteResponse}
-        color="primary"
-      >
-        <DeleteIcon />
-      </IconButton>
+      <RowDiv>
+        <FlowStepSelector
+          title="Jump to Step (OPTIONAL)"
+          flowsList={flowsList}
+          width="150px"
+          currentJumpToStepId={predefinedResponse.jumpToStepId}
+          rowOrColumn="column"
+          onStepSelected={(stepId) => {
+            updateResponse({
+              ...predefinedResponse,
+              jumpToStepId: stepId,
+            });
+          }}
+        />
+        <IconButton
+          data-cy="delete-predefined-response"
+          onClick={deleteResponse}
+          color="primary"
+        >
+          <DeleteIcon />
+        </IconButton>
+      </RowDiv>
     </RowDiv>
   );
 }
 
 function PredefinedResponsesUpdater(props: {
   step: RequestUserInputActivityStep;
-  updateStep: (step: RequestUserInputActivityStep) => void;
+  updatePredefinedResponse: (updatedResponse: PredefinedResponse) => void;
+  addNewPredefinedResponse: () => void;
+  deletePredefinedResponse: (clientId: string) => void;
   flowsList: FlowItem[];
   width?: string;
 }): JSX.Element {
-  const { step, updateStep } = props;
+  const {
+    step,
+    updatePredefinedResponse,
+    addNewPredefinedResponse,
+    deletePredefinedResponse,
+  } = props;
   return (
     <ColumnCenterDiv
       style={{
@@ -134,47 +152,21 @@ function PredefinedResponsesUpdater(props: {
             key={index}
             predefinedResponse={response}
             updateResponse={(updatedResponse) => {
-              const updatedResponses = [...step.predefinedResponses];
-              updatedResponses[index] = updatedResponse;
-              updateStep({
-                ...step,
-                predefinedResponses: updatedResponses,
-              });
+              updatePredefinedResponse(updatedResponse);
             }}
             deleteResponse={() => {
-              const updatedResponses = [...step.predefinedResponses];
-              updatedResponses.splice(index, 1);
-              updateStep({
-                ...step,
-                predefinedResponses: updatedResponses,
-              });
+              deletePredefinedResponse(response.clientId);
             }}
             flowsList={props.flowsList}
           />
         ))}
-      <Button
-        onClick={() => {
-          updateStep({
-            ...step,
-            predefinedResponses: [
-              ...step.predefinedResponses,
-              {
-                message: '',
-                responseWeight: '0',
-              },
-            ],
-          });
-        }}
-      >
-        + Add Response
-      </Button>
+      <Button onClick={addNewPredefinedResponse}>+ Add Response</Button>
     </ColumnCenterDiv>
   );
 }
 
 export function RequestUserInputStepBuilder(props: {
   step: RequestUserInputActivityStep;
-  updateStep: (step: RequestUserInputActivityStep) => void;
   updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
   deleteStep: () => void;
   flowsList: FlowItem[];
@@ -182,9 +174,12 @@ export function RequestUserInputStepBuilder(props: {
   width?: string;
   height?: string;
 }): JSX.Element {
-  const { step, updateStep, stepIndex, updateLocalActivity } = props;
+  const { step, stepIndex, updateLocalActivity } = props;
 
-  function updateField(field: string, value: string | boolean) {
+  function updateField(
+    field: string,
+    value: string | boolean | PredefinedResponse[]
+  ) {
     updateLocalActivity((prevValue) => {
       return {
         ...prevValue,
@@ -204,6 +199,53 @@ export function RequestUserInputStepBuilder(props: {
         }),
       };
     });
+  }
+
+  function updatePredefinedResponse(updatedResponse: PredefinedResponse) {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                return {
+                  ...s,
+                  predefinedResponses: (
+                    s as RequestUserInputActivityStep
+                  ).predefinedResponses.map((r) => {
+                    if (r.clientId === updatedResponse.clientId) {
+                      return updatedResponse;
+                    }
+                    return r;
+                  }),
+                };
+              }
+              return s;
+            }),
+          };
+        }),
+      };
+    });
+  }
+
+  function addNewPredefinedResponse() {
+    updateField('predefinedResponses', [
+      ...step.predefinedResponses,
+      {
+        clientId: uuid(),
+        message: '',
+        responseWeight: '0',
+      },
+    ]);
+  }
+
+  function deletePredefinedResponse(clientId: string) {
+    updateField(
+      'predefinedResponses',
+      step.predefinedResponses.filter((r) => r.clientId !== clientId)
+    );
   }
 
   return (
@@ -258,9 +300,11 @@ export function RequestUserInputStepBuilder(props: {
         }}
       />
       <PredefinedResponsesUpdater
-        width="50%"
+        width="90%"
         step={step}
-        updateStep={updateStep}
+        updatePredefinedResponse={updatePredefinedResponse}
+        addNewPredefinedResponse={addNewPredefinedResponse}
+        deletePredefinedResponse={deletePredefinedResponse}
         flowsList={props.flowsList}
       />
 

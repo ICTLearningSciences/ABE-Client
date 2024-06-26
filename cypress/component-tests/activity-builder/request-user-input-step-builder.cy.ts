@@ -14,9 +14,6 @@ describe("Request User Input Step Builder", ()=>{
             step,
             updateLocalActivity: ()=>{
             },
-            updateStep: (step)=>{
-                step = step;
-            },
             deleteStep: ()=>{
             },
             stepIndex: 0,

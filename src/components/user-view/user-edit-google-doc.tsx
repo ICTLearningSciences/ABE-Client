@@ -59,7 +59,7 @@ export default function EditGoogleDoc(props: {
 
   function goToActivityPreview(activity: ActivityTypes) {
     setPreviewingActivity(true);
-    setActivity(activity);
+    setGoalAndActivity(undefined, activity);
     updateViewingUserRole(UserRole.USER);
   }
 

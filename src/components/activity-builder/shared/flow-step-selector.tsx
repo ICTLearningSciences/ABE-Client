@@ -1,4 +1,10 @@
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+} from '@mui/material';
 import React, { useEffect } from 'react';
 import { FlowItem } from '../types';
 import { getFlowForStepId } from '../helpers';
@@ -32,6 +38,7 @@ export function FlowStepSelector(props: {
         display: 'flex',
         flex: 1,
         width: props.width || '100%',
+        maxWidth: props.width || '100%',
         flexDirection: 'column',
       }}
     >
@@ -53,7 +60,7 @@ export function FlowStepSelector(props: {
           flexDirection: props.rowOrColumn || 'column',
         }}
       >
-        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+        <FormControl variant="standard" sx={{ minWidth: 120 }}>
           <InputLabel id="select-flow-label">Select flow</InputLabel>
           <Select
             labelId="select-flow-label"
@@ -76,7 +83,7 @@ export function FlowStepSelector(props: {
           </Select>
         </FormControl>
 
-        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+        <FormControl variant="standard" sx={{ minWidth: 120 }}>
           <InputLabel id="select-step-label">Select flow step</InputLabel>
           {/* when flow selected, select step */}
           <Select
@@ -104,6 +111,20 @@ export function FlowStepSelector(props: {
               })}
           </Select>
         </FormControl>
+        <Button
+          style={{
+            margin: 0,
+            padding: 0,
+          }}
+          disabled={!selectedFlowId && !selectedStepId}
+          onClick={() => {
+            setSelectedFlowId('');
+            setSelectedStepId('');
+            onStepSelected('');
+          }}
+        >
+          Clear
+        </Button>
       </div>
     </div>
   );
