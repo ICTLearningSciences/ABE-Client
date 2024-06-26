@@ -102,10 +102,15 @@ export function replaceStoredDataInString(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stateData: Record<string, any>
 ): string {
-  // replace all instances of {{key}} in str with stored data[key]
+  // replace all instances of {{key.data...}} in str with stored data[key][data...]
   const regex = /{{(.*?)}}/g;
   return str.trim().replace(regex, (match, key) => {
-    return stateData[key] || match;
+    const keys = key.split('.');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const value = keys.reduce((acc: Record<string, any>, k: string) => {
+      return acc[k];
+    }, stateData);
+    return value || '';
   });
 }
 

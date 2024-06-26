@@ -168,7 +168,14 @@ export function MultiPromptTesting(props: {
           position: 'relative',
         }}
       >
-        <div style={{ overflow: 'auto', padding: '10px', width: '95%' }}>
+        <div
+          style={{
+            overflow: 'auto',
+            padding: '10px',
+            width: '95%',
+            position: 'relative',
+          }}
+        >
           <h2 style={{ textAlign: 'center' }}>Activities</h2>
           <SavedActivityPromptsView
             activitiesWithPrompts={activityPrompts}
@@ -190,20 +197,20 @@ export function MultiPromptTesting(props: {
             goToActivity={goToActivity}
             activities={activities}
           />
+          <Button
+            variant="contained"
+            style={{
+              position: 'absolute',
+              top: 10,
+              right: 40,
+            }}
+            onClick={() => {
+              setViewActivityBuilder(true);
+            }}
+          >
+            New Activity Builder
+          </Button>
         </div>
-        <Button
-          variant="contained"
-          style={{
-            position: 'absolute',
-            top: 10,
-            right: 40,
-          }}
-          onClick={() => {
-            setViewActivityBuilder(true);
-          }}
-        >
-          New Activity Builder
-        </Button>
         <Button
           style={{
             alignSelf: 'center',

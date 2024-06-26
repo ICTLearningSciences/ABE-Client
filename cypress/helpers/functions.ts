@@ -513,6 +513,7 @@ export function toPromptEditing(cy: CypressGlobal) {
   cy.visit(`/docs/${testGoogleDocId}`);
   cy.get('[data-cy=doc-goal-cancel-button]').click();
   cy.get('[data-cy=role-switch]').click();
+  cy.get("[data-cy=go-to-old-activity-editor]").click();
   cy.get('[data-cy=prompt-item-Review-Sources]').click();
 }
 

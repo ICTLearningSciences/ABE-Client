@@ -98,6 +98,7 @@ export function SelectCreateActivity(props: {
       }}
     >
       <Button
+        data-cy="go-to-old-activity-editor"
         onClick={goToOldActivityEditor}
         style={{
           position: 'absolute',

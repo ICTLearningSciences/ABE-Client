@@ -531,3 +531,80 @@ export const weightedResponseWeightsActivity: ActivityBuilder = {
     },
   ],
 };
+
+export const nestedDataActivity: ActivityBuilder = {
+  _id: 'nested-data',
+  clientId: '123',
+  title: 'Nested Data',
+  activityType: 'builder',
+  description: '',
+  user: '123',
+  visibility: 'public',
+  displayIcon: DisplayIcons.DEFAULT,
+  flowsList: [
+    {
+      clientId: '2',
+      name: 'Flow 1',
+      steps: [
+        {
+          stepId: '1',
+          stepType: ActivityBuilderStepType.PROMPT,
+          promptText: 'Please generate 3 nicknames for Aaron',
+          responseFormat: '',
+          jsonResponseData: [
+            {
+              clientId: '1',
+              name: 'nicknames',
+              type: 'object',
+              isRequired: true,
+              subData: [
+                {
+                  clientId: '2',
+                  name: 'nickname1',
+                  type: 'string',
+                  isRequired: true,
+                },
+                {
+                  clientId: '3',
+                  name: 'nickname2',
+                  type: 'string',
+                  isRequired: true,
+                },
+                {
+                  clientId: '4',
+                  name: 'nickname3',
+                  type: 'string',
+                  isRequired: true,
+                },
+              ],
+            },
+          ],
+          includeChatLogContext: false,
+          includeEssay: false,
+          outputDataType: PromptOutputTypes.JSON,
+          customSystemRole: 'user',
+        } as PromptActivityStep,
+        {
+          stepId: '2',
+          stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+          saveAsIntention: false,
+          saveResponseVariableName: '',
+          disableFreeInput: false,
+          predefinedResponses: [
+            {
+              message: '{{nicknames.nickname1}}',
+            },
+            {
+              message: '{{nicknames.nickname2}}',
+            },
+            {
+              message: '{{nicknames.nickname3}}',
+            },
+          ],
+          message: 'Which nickname do you like best?',
+          jumpToStepId: '1',
+        } as RequestUserInputActivityStep,
+      ],
+    },
+  ],
+};

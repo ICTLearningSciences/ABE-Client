@@ -23,6 +23,7 @@ import {
   accidentalLoopActivity,
   stepLoopsIntoSelfActivity,
   weightedResponseWeightsActivity,
+  nestedDataActivity,
 } from './activity-builder-fixture';
 import { openAiTextResponse } from './fixtures/basic-text-response';
 
@@ -460,4 +461,32 @@ test('can sort mcq responses by response weight', async () => {
     (activityBuilderStepAccumulator.stepsExecuted[5].value as ChatMessageTypes)
       .mcqChoices
   ).toStrictEqual(['airbear', 'aaron']);
+});
+
+test('can use nested data responses', async () => {
+  const activityBuilderStepAccumulator = new ActivityBuilderDataAccumulator([
+    openAiTextResponse(
+      '{"nicknames":{"nickname1":"aaron","nickname2":"ryan","nickname3":"rebecca"}}'
+    ),
+  ]);
+
+  const activityBuilder = prepareActivityBuilder(
+    nestedDataActivity,
+    activityBuilderStepAccumulator
+  );
+  activityBuilder.initializeActivity();
+
+  await new Promise((r) => setTimeout(r, 1000));
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(3);
+  expect(activityBuilderStepAccumulator.stepsExecuted[1].type).toBe(
+    ExecutedStepTypes.CHAT_MESSAGE
+  );
+  expect(
+    (activityBuilderStepAccumulator.stepsExecuted[1].value as ChatMessageTypes)
+      .message
+  ).toBe('Which nickname do you like best?');
+  expect(
+    (activityBuilderStepAccumulator.stepsExecuted[1].value as ChatMessageTypes)
+      .mcqChoices
+  ).toStrictEqual(['aaron', 'ryan', 'rebecca']);
 });
