@@ -56,6 +56,24 @@ export const examplePromptActivityStep: PromptActivityStep = {
   customSystemRole: 'user',
 };
 
+export const examplePromptActivity: ActivityBuilder = {
+  _id: 'example-prompt-activity',
+  clientId: '123',
+  title: 'Example Prompt Activity',
+  activityType: 'builder',
+  description: '',
+  user: '123',
+  visibility: 'public',
+  displayIcon: DisplayIcons.DEFAULT,
+  flowsList: [
+    {
+      clientId: '1',
+      name: '',
+      steps: [examplePromptActivityStep],
+    },
+  ],
+};
+
 export const collectUserNameActivity: ActivityBuilder = {
   _id: 'collect-user-name',
   clientId: '123',

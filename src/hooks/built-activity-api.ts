@@ -4,7 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { ActivityBuilder } from '../components/activity-builder/types';
+import {
+  ActivityBuilder,
+  ActivityBuilderStepType,
+  PromptActivityStepGql,
+} from '../components/activity-builder/types';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
 import { execGql } from './api';
 
@@ -55,17 +59,46 @@ export const fullBuiltActivityQueryData = `
                               includeChatLogContext
                               includeEssay
                               outputDataType
-                              jsonResponseData{
-                                  name
-                                  type
-                                  isRequired
-                                  additionalInfo
-                              }
+                              jsonResponseData
                               customSystemRole
                           }
                       }
                       }
 `;
+
+export function convertGqlToBuiltActivity(
+  activity: ActivityBuilder
+): ActivityBuilder {
+  const copy: ActivityBuilder = JSON.parse(JSON.stringify(activity));
+  copy.flowsList.forEach((flow) => {
+    flow.steps.forEach((step) => {
+      if (step.stepType === ActivityBuilderStepType.PROMPT) {
+        const _step: PromptActivityStepGql = step as PromptActivityStepGql;
+        if (typeof _step.jsonResponseData === 'string') {
+          _step.jsonResponseData = JSON.parse(_step.jsonResponseData as string);
+        }
+      }
+    });
+  });
+  return copy;
+}
+
+export function convertBuiltActivityToGql(
+  activity: ActivityBuilder
+): ActivityBuilder {
+  const copy: ActivityBuilder = JSON.parse(JSON.stringify(activity));
+  copy.flowsList.forEach((flow) => {
+    flow.steps.forEach((step) => {
+      if (step.stepType === ActivityBuilderStepType.PROMPT) {
+        const _step: PromptActivityStepGql = step as PromptActivityStepGql;
+        if (_step.jsonResponseData) {
+          _step.jsonResponseData = JSON.stringify(_step.jsonResponseData);
+        }
+      }
+    });
+  });
+  return copy;
+}
 
 export async function addOrUpdateBuiltActivity(
   activity: ActivityBuilder
@@ -81,7 +114,7 @@ export async function addOrUpdateBuiltActivity(
         }
         `,
       variables: {
-        activity,
+        activity: convertBuiltActivityToGql(activity),
       },
     },
     {
@@ -89,7 +122,7 @@ export async function addOrUpdateBuiltActivity(
       accessToken,
     }
   );
-  return res;
+  return convertGqlToBuiltActivity(res);
 }
 
 export async function fetchBuiltActivities(): Promise<ActivityBuilder[]> {
@@ -109,5 +142,5 @@ export async function fetchBuiltActivities(): Promise<ActivityBuilder[]> {
       accessToken,
     }
   );
-  return res;
+  return res.map(convertGqlToBuiltActivity);
 }

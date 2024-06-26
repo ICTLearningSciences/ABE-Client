@@ -14,8 +14,6 @@ import {
   PromptActivityStep,
 } from '../../types';
 import {
-  ColumnCenterDiv,
-  ColumnDiv,
   RoundedBorderDiv,
   RowDiv,
   TopLeftText,
@@ -41,6 +39,7 @@ import { convertExpectedDataToAiPromptString } from '../../helpers';
 import { useWithExecutePrompt } from '../../../../hooks/use-with-execute-prompts';
 import { TextDialog } from '../../../dialog';
 import ViewPreviousRunsModal from '../../../admin-view/view-previous-runs-modal';
+import { JsonResponseDataUpdater } from './json-response-data-builder';
 
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
@@ -405,103 +404,5 @@ export function PromptStepBuilder(props: {
         }}
       />
     </RoundedBorderDiv>
-  );
-}
-
-function JsonResponseDataUpdater(props: {
-  jsonResponseData: JsonResponseData[];
-  addOrEdit: (jsonResponseData: JsonResponseData) => void;
-  deleteJsonResponseData: (jsonResponseData: JsonResponseData) => void;
-}): JSX.Element {
-  const { jsonResponseData, addOrEdit, deleteJsonResponseData } = props;
-  return (
-    <ColumnCenterDiv
-      style={{
-        border: '1px dotted grey',
-        marginBottom: '10px',
-        marginTop: '10px',
-      }}
-    >
-      <h3>Json Response Data</h3>
-      {jsonResponseData.map((jsonResponseData, index) => {
-        return (
-          <ColumnDiv
-            key={index}
-            style={{
-              border: '1px solid black',
-              position: 'relative',
-              width: '95%',
-            }}
-          >
-            <RowDiv
-              style={{
-                width: '100%',
-                justifyContent: 'space-between',
-              }}
-            >
-              <RowDiv>
-                <InputField
-                  label="Variable Name"
-                  value={jsonResponseData.name}
-                  onChange={(e) => {
-                    addOrEdit({
-                      ...jsonResponseData,
-                      name: e,
-                    });
-                  }}
-                />
-                <SelectInputField
-                  label="Type"
-                  value={jsonResponseData.type}
-                  options={[...Object.values(JsonResponseDataType)]}
-                  onChange={(e) => {
-                    addOrEdit({
-                      ...jsonResponseData,
-                      type: e as JsonResponseDataType,
-                    });
-                  }}
-                />
-                <CheckBoxInput
-                  label="Is Required"
-                  value={jsonResponseData.isRequired}
-                  onChange={(e) => {
-                    addOrEdit({
-                      ...jsonResponseData,
-                      isRequired: e,
-                    });
-                  }}
-                />
-              </RowDiv>
-
-              <IconButton
-                onClick={() => {
-                  deleteJsonResponseData(jsonResponseData);
-                }}
-              >
-                <Delete />
-              </IconButton>
-            </RowDiv>
-            <InputField
-              label="Additional Info"
-              maxRows={4}
-              value={jsonResponseData.additionalInfo || ''}
-              onChange={(e) => {
-                addOrEdit({
-                  ...jsonResponseData,
-                  additionalInfo: e,
-                });
-              }}
-            />
-          </ColumnDiv>
-        );
-      })}
-      <Button
-        onClick={() => {
-          addOrEdit(getEmptyJsonResponseData());
-        }}
-      >
-        + Add Data Field
-      </Button>
-    </ColumnCenterDiv>
   );
 }

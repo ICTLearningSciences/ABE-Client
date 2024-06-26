@@ -107,26 +107,32 @@ export enum SubJsonResponseDataType {
   ARRAY = 'array',
 }
 
+export interface JsonResponseDataGQL {
+  clientId: string;
+  stringifiedData: string;
+}
+
 export interface JsonResponseData {
   clientId: string;
   name: string;
   type: JsonResponseDataType;
   isRequired: boolean;
   additionalInfo?: string;
+  subData?: JsonResponseData[];
 }
 
-export interface ObjectJsonResponseData extends JsonResponseData {
-  type: JsonResponseDataType.OBJECT;
-  subData: JsonResponseData[];
-}
-
-export interface PromptActivityStep extends ActivityBuilderStep {
+export interface PromptActivityStepGql extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.PROMPT;
   promptText: string;
   responseFormat: string;
   includeChatLogContext: boolean;
   includeEssay: boolean;
   outputDataType: PromptOutputTypes;
-  jsonResponseData?: JsonResponseData[];
+  jsonResponseData?: string;
   customSystemRole: string;
+}
+
+export interface PromptActivityStep
+  extends Omit<PromptActivityStepGql, 'jsonResponseData'> {
+  jsonResponseData?: JsonResponseData[];
 }
