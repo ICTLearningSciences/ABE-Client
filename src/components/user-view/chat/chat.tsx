@@ -91,10 +91,9 @@ export default function Chat(props: {
   );
   const disableInput =
     coachResponsePending ||
-    (goalHasActivities &&
-      Boolean(
-        messages?.length > 0 && messages[messages.length - 1].disableUserInput
-      ));
+    Boolean(
+      messages?.length > 0 && messages[messages.length - 1].disableUserInput
+    );
   const [openAiInfoToDisplay, setAiInfoToDisplay] =
     useState<AiServiceStepDataTypes[]>();
   const [viewSystemPrompts, setViewSystemPrompts] = useState<boolean>(false);
