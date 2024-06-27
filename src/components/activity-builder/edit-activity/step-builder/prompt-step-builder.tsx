@@ -40,7 +40,9 @@ import { useWithExecutePrompt } from '../../../../hooks/use-with-execute-prompts
 import { TextDialog } from '../../../dialog';
 import ViewPreviousRunsModal from '../../../admin-view/view-previous-runs-modal';
 import { JsonResponseDataUpdater } from './json-response-data-builder';
-
+import Collapse from '@mui/material/Collapse';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
     clientId: uuid(),
@@ -64,6 +66,12 @@ export function defaultPromptBuilder(): PromptActivityStep {
     customSystemRole: '',
     jumpToStepId: '',
   };
+}
+
+export enum ViewingInputType {
+  PROMPT_TEXT = 'PROMPT_TEXT',
+  RESPONSE_FORMAT = 'RESPONSE_FORMAT',
+  NONE = 'NONE',
 }
 
 export function PromptStepBuilder(props: {
@@ -102,6 +110,9 @@ export function PromptStepBuilder(props: {
   const [executeError, setExecuteError] = React.useState<string>('');
   const [executeInProgress, setExecuteInProgress] =
     React.useState<boolean>(false);
+  const [collapsed, setCollapsed] = React.useState<boolean>(false);
+  const [viewingInputType, setViewingInputType] =
+    React.useState<ViewingInputType>(ViewingInputType.PROMPT_TEXT);
   function updateField(
     field: string,
     value: string | boolean | JsonResponseData[]
@@ -388,6 +399,17 @@ export function PromptStepBuilder(props: {
       }}
     >
       <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>
+      <IconButton
+        style={{
+          width: 'fit-content',
+          position: 'absolute',
+          left: 10,
+          top: 40,
+        }}
+        onClick={() => setCollapsed(!collapsed)}
+      >
+        {collapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+      </IconButton>
       <RowDiv
         data-cy="run-prompt-buttons"
         style={{
@@ -483,74 +505,86 @@ export function PromptStepBuilder(props: {
         <Delete />
       </IconButton>
       <h4 style={{ alignSelf: 'center' }}>Prompt</h4>
-      <InputField
-        label="Prompt Text"
-        value={step.promptText}
-        onChange={(e) => {
-          updateField('promptText', e);
-        }}
-        width="100%"
-      />
-      <InputField
-        label="Response Format"
-        value={step.responseFormat}
-        onChange={(e) => {
-          updateField('responseFormat', e);
-        }}
-        width="100%"
-      />
-
-      <SelectInputField
-        label="Output Data Type"
-        value={step.outputDataType}
-        options={[...Object.values(PromptOutputTypes)]}
-        onChange={(e) => {
-          updateField('outputDataType', e);
-        }}
-      />
-
-      {step.outputDataType === PromptOutputTypes.JSON && (
-        <JsonResponseDataUpdater
-          jsonResponseData={step.jsonResponseData || []}
-          editDataField={editJsonResponseData}
-          addNewJsonResponseData={addNewJsonResponseData}
-          deleteJsonResponseData={deleteJsonResponseData}
-          parentJsonResponseDataIds={[]}
+      <Collapse in={!collapsed}>
+        <InputField
+          label="Prompt Text"
+          value={step.promptText}
+          onFocus={() => {
+            setViewingInputType(ViewingInputType.PROMPT_TEXT);
+          }}
+          maxRows={viewingInputType === ViewingInputType.PROMPT_TEXT ? 20 : 3}
+          onChange={(e) => {
+            updateField('promptText', e);
+          }}
+          width="100%"
         />
-      )}
+        <InputField
+          label="Response Format"
+          value={step.responseFormat}
+          onFocus={() => {
+            setViewingInputType(ViewingInputType.RESPONSE_FORMAT);
+          }}
+          maxRows={
+            viewingInputType === ViewingInputType.RESPONSE_FORMAT ? 20 : 3
+          }
+          onChange={(e) => {
+            updateField('responseFormat', e);
+          }}
+          width="100%"
+        />
 
-      <CheckBoxInput
-        label="Include Chat History"
-        value={step.includeChatLogContext}
-        onChange={(e) => {
-          updateField('includeChatLogContext', e);
-        }}
-      />
+        <SelectInputField
+          label="Output Data Type"
+          value={step.outputDataType}
+          options={[...Object.values(PromptOutputTypes)]}
+          onChange={(e) => {
+            updateField('outputDataType', e);
+          }}
+        />
 
-      <CheckBoxInput
-        label="Include Essay"
-        value={step.includeEssay}
-        onChange={(e) => {
-          updateField('includeEssay', e);
-        }}
-      />
+        {step.outputDataType === PromptOutputTypes.JSON && (
+          <JsonResponseDataUpdater
+            jsonResponseData={step.jsonResponseData || []}
+            editDataField={editJsonResponseData}
+            addNewJsonResponseData={addNewJsonResponseData}
+            deleteJsonResponseData={deleteJsonResponseData}
+            parentJsonResponseDataIds={[]}
+          />
+        )}
 
-      <InputField
-        label="Custom System Role"
-        value={step.customSystemRole}
-        onChange={(e) => {
-          updateField('customSystemRole', e);
-        }}
-        width="100%"
-      />
+        <CheckBoxInput
+          label="Include Chat History"
+          value={step.includeChatLogContext}
+          onChange={(e) => {
+            updateField('includeChatLogContext', e);
+          }}
+        />
 
-      <JumpToAlternateStep
-        step={step}
-        flowsList={props.flowsList}
-        onNewStepSelected={(stepId) => {
-          updateField('jumpToStepId', stepId);
-        }}
-      />
+        <CheckBoxInput
+          label="Include Essay"
+          value={step.includeEssay}
+          onChange={(e) => {
+            updateField('includeEssay', e);
+          }}
+        />
+
+        <InputField
+          label="Custom System Role"
+          value={step.customSystemRole}
+          onChange={(e) => {
+            updateField('customSystemRole', e);
+          }}
+          width="100%"
+        />
+
+        <JumpToAlternateStep
+          step={step}
+          flowsList={props.flowsList}
+          onNewStepSelected={(stepId) => {
+            updateField('jumpToStepId', stepId);
+          }}
+        />
+      </Collapse>
     </RoundedBorderDiv>
   );
 }

@@ -17,7 +17,9 @@ import {
   FlowItem,
   ActivityBuilder,
 } from '../../types';
-
+import Collapse from '@mui/material/Collapse';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 export function getDefaultSystemMessage(): SystemMessageActivityStep {
   return {
     stepId: uuid(),
@@ -37,6 +39,7 @@ export function SystemMessageStepBuilder(props: {
   height?: string;
 }): JSX.Element {
   const { step, stepIndex, updateLocalActivity } = props;
+  const [collapsed, setCollapsed] = React.useState<boolean>(false);
 
   function updateField(field: string, value: string | boolean) {
     updateLocalActivity((prevValue) => {
@@ -82,22 +85,35 @@ export function SystemMessageStepBuilder(props: {
       >
         <Delete />
       </IconButton>
+      <IconButton
+        style={{
+          width: 'fit-content',
+          position: 'absolute',
+          left: 10,
+          top: 40,
+        }}
+        onClick={() => setCollapsed(!collapsed)}
+      >
+        {collapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+      </IconButton>
       <h4 style={{ alignSelf: 'center' }}>System Message</h4>
-      <InputField
-        label="Message"
-        value={step.message}
-        onChange={(e) => {
-          updateField('message', e);
-        }}
-      />
+      <Collapse in={!collapsed}>
+        <InputField
+          label="Message"
+          value={step.message}
+          onChange={(e) => {
+            updateField('message', e);
+          }}
+        />
 
-      <JumpToAlternateStep
-        step={step}
-        flowsList={props.flowsList}
-        onNewStepSelected={(stepId) => {
-          updateField('jumpToStepId', stepId);
-        }}
-      />
+        <JumpToAlternateStep
+          step={step}
+          flowsList={props.flowsList}
+          onNewStepSelected={(stepId) => {
+            updateField('jumpToStepId', stepId);
+          }}
+        />
+      </Collapse>
     </RoundedBorderDiv>
   );
 }

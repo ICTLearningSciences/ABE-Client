@@ -14,6 +14,7 @@ export function InputField(props: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  onFocus?: () => void;
   width?: string;
   maxRows?: number;
 }): JSX.Element {
@@ -35,6 +36,7 @@ export function InputField(props: {
       <Input
         value={localValue}
         multiline
+        onFocus={props.onFocus}
         maxRows={props.maxRows ?? undefined}
         onChange={(e) => {
           setLocalValue(e.target.value);

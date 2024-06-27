@@ -26,7 +26,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuid } from 'uuid';
 import { Delete } from '@mui/icons-material';
 import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
-
+import Collapse from '@mui/material/Collapse';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 export function getDefaultRequestUserInputBuilder(): RequestUserInputActivityStep {
   return {
     stepId: uuid(),
@@ -175,7 +177,7 @@ export function RequestUserInputStepBuilder(props: {
   height?: string;
 }): JSX.Element {
   const { step, stepIndex, updateLocalActivity } = props;
-
+  const [collapsed, setCollapsed] = React.useState<boolean>(false);
   function updateField(
     field: string,
     value: string | boolean | PredefinedResponse[]
@@ -270,51 +272,64 @@ export function RequestUserInputStepBuilder(props: {
       >
         <Delete />
       </IconButton>
+      <IconButton
+        style={{
+          width: 'fit-content',
+          position: 'absolute',
+          left: 10,
+          top: 40,
+        }}
+        onClick={() => setCollapsed(!collapsed)}
+      >
+        {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+      </IconButton>
       <h4 style={{ alignSelf: 'center' }}>Request User Input</h4>
-      <InputField
-        label="Request Message (Optional)"
-        value={step.message}
-        onChange={(e) => {
-          updateField('message', e);
-        }}
-      />
-      <InputField
-        label="Save Response As"
-        value={step.saveResponseVariableName}
-        onChange={(e) => {
-          updateField('saveResponseVariableName', e);
-        }}
-      />
-      <CheckBoxInput
-        label="Input is session intention."
-        value={step.saveAsIntention}
-        onChange={(e) => {
-          updateField('saveAsIntention', e);
-        }}
-      />
-      <CheckBoxInput
-        label="Disable Text Input? (requires predefined responses)"
-        value={step.disableFreeInput}
-        onChange={(e) => {
-          updateField('disableFreeInput', e);
-        }}
-      />
-      <PredefinedResponsesUpdater
-        width="90%"
-        step={step}
-        updatePredefinedResponse={updatePredefinedResponse}
-        addNewPredefinedResponse={addNewPredefinedResponse}
-        deletePredefinedResponse={deletePredefinedResponse}
-        flowsList={props.flowsList}
-      />
+      <Collapse in={collapsed}>
+        <InputField
+          label="Request Message (Optional)"
+          value={step.message}
+          onChange={(e) => {
+            updateField('message', e);
+          }}
+        />
+        <InputField
+          label="Save Response As"
+          value={step.saveResponseVariableName}
+          onChange={(e) => {
+            updateField('saveResponseVariableName', e);
+          }}
+        />
+        <CheckBoxInput
+          label="Input is session intention."
+          value={step.saveAsIntention}
+          onChange={(e) => {
+            updateField('saveAsIntention', e);
+          }}
+        />
+        <CheckBoxInput
+          label="Disable Text Input? (requires predefined responses)"
+          value={step.disableFreeInput}
+          onChange={(e) => {
+            updateField('disableFreeInput', e);
+          }}
+        />
+        <PredefinedResponsesUpdater
+          width="90%"
+          step={step}
+          updatePredefinedResponse={updatePredefinedResponse}
+          addNewPredefinedResponse={addNewPredefinedResponse}
+          deletePredefinedResponse={deletePredefinedResponse}
+          flowsList={props.flowsList}
+        />
 
-      <JumpToAlternateStep
-        step={step}
-        flowsList={props.flowsList}
-        onNewStepSelected={(stepId) => {
-          updateField('jumpToStepId', stepId);
-        }}
-      />
+        <JumpToAlternateStep
+          step={step}
+          flowsList={props.flowsList}
+          onNewStepSelected={(stepId) => {
+            updateField('jumpToStepId', stepId);
+          }}
+        />
+      </Collapse>
     </RoundedBorderDiv>
   );
 }
