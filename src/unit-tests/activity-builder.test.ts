@@ -42,10 +42,12 @@ interface ExecutedStep {
 class ActivityBuilderDataAccumulator {
   stepsExecuted: ExecutedStep[];
   aiResponses: AiServicesResponseTypes[];
+  numTimesPromptExecuted: number;
 
   constructor(aiResponses: AiServicesResponseTypes[]) {
     this.stepsExecuted = [];
     this.aiResponses = aiResponses;
+    this.numTimesPromptExecuted = 0;
   }
 
   sendMessage(msg: ChatMessageTypes) {
@@ -72,6 +74,7 @@ class ActivityBuilderDataAccumulator {
   executePrompt(
     aiPromptSteps: AiPromptStep[]
   ): Promise<AiServicesResponseTypes> {
+    this.numTimesPromptExecuted++;
     this.stepsExecuted.push({
       type: ExecutedStepTypes.PROMPT_EXECUTION,
       value: aiPromptSteps,
@@ -478,7 +481,6 @@ test('can use nested data responses', async () => {
     activityBuilderStepAccumulator
   );
   activityBuilder.initializeActivity();
-
   await new Promise((r) => setTimeout(r, 1000));
   expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(3);
   expect(activityBuilderStepAccumulator.stepsExecuted[1].type).toBe(
@@ -490,6 +492,71 @@ test('can use nested data responses', async () => {
   ).toBe('Which nickname do you like best?');
   expect(
     (activityBuilderStepAccumulator.stepsExecuted[1].value as ChatMessageTypes)
+      .mcqChoices
+  ).toStrictEqual(['aaron', 'ryan', 'rebecca']);
+});
+
+test('retries prompt 3 times', async () => {
+  const activityBuilderStepAccumulator = new ActivityBuilderDataAccumulator([
+    openAiTextResponse('{"wrong":"json"}'),
+    openAiTextResponse('{"wrong":"json"}'),
+    openAiTextResponse('{"wrong":"json"}'),
+  ]);
+
+  const activityBuilder = prepareActivityBuilder(
+    nestedDataActivity,
+    activityBuilderStepAccumulator
+  );
+  activityBuilder.initializeActivity();
+  await new Promise((r) => setTimeout(r, 1000));
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(4);
+  expect(activityBuilderStepAccumulator.numTimesPromptExecuted).toBe(3);
+  expect(activityBuilderStepAccumulator.stepsExecuted[0].type).toBe(
+    ExecutedStepTypes.PROMPT_EXECUTION
+  );
+  expect(activityBuilderStepAccumulator.stepsExecuted[1].type).toBe(
+    ExecutedStepTypes.PROMPT_EXECUTION
+  );
+  expect(activityBuilderStepAccumulator.stepsExecuted[2].type).toBe(
+    ExecutedStepTypes.PROMPT_EXECUTION
+  );
+  expect(activityBuilderStepAccumulator.stepsExecuted[3].type).toBe(
+    ExecutedStepTypes.CHAT_MESSAGE
+  );
+  expect(
+    (activityBuilderStepAccumulator.stepsExecuted[3].value as ChatMessageTypes)
+      .message
+  ).toBe('AI Service request failed');
+});
+
+test('properly continues after a failed exceute prompt', async () => {
+  const activityBuilderStepAccumulator = new ActivityBuilderDataAccumulator([
+    openAiTextResponse('{"wrong":"json"}'),
+    openAiTextResponse('{"wrong":"json"}'),
+    openAiTextResponse(
+      '{"nicknames":{"nickname1":"aaron","nickname2":"ryan","nickname3":"rebecca"}}'
+    ),
+  ]);
+
+  const activityBuilder = prepareActivityBuilder(
+    nestedDataActivity,
+    activityBuilderStepAccumulator
+  );
+  activityBuilder.initializeActivity();
+  await new Promise((r) => setTimeout(r, 1000));
+  console.log(
+    JSON.stringify(activityBuilderStepAccumulator.stepsExecuted, null, 2)
+  );
+  expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(5);
+  expect(activityBuilderStepAccumulator.stepsExecuted[3].type).toBe(
+    ExecutedStepTypes.CHAT_MESSAGE
+  );
+  expect(
+    (activityBuilderStepAccumulator.stepsExecuted[3].value as ChatMessageTypes)
+      .message
+  ).toBe('Which nickname do you like best?');
+  expect(
+    (activityBuilderStepAccumulator.stepsExecuted[3].value as ChatMessageTypes)
       .mcqChoices
   ).toStrictEqual(['aaron', 'ryan', 'rebecca']);
 });

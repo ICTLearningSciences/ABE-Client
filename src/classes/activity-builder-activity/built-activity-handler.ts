@@ -71,6 +71,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   ) => Promise<AiServicesResponseTypes>;
   userResponseHandleState: UserResponseHandleState;
   stepIdsSinceLastInput: string[];
+  lastFailedStepId: string | null = null;
 
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
@@ -316,8 +317,24 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     if (!this.curStep) {
       throw new Error('No current step found');
     }
-    this.curStep = this.getNextStep(this.curStep);
+    try {
+      this.curStep = this.getNextStep(this.curStep);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      this.sendErrorMessage(err.message);
+      return;
+    }
     await this.handleStep(this.curStep);
+  }
+
+  sendErrorMessage(message: string) {
+    this.sendMessage({
+      id: uuidv4(),
+      message,
+      sender: Sender.SYSTEM,
+      displayType: MessageDisplayType.TEXT,
+      disableUserInput: true,
+    });
   }
 
   async handleNewUserMessage(message: string) {
@@ -339,9 +356,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             predefinedResponseMatch.jumpToStepId
           );
           if (!jumpStep) {
-            throw new Error(
+            this.sendErrorMessage(
               `Unable to find target step ${predefinedResponseMatch.jumpToStepId} for predefined input ${predefinedResponseMatch.message}, maybe you deleted it and forgot to update this step?`
             );
+            return;
           }
           this.handleStep(jumpStep);
           return;
@@ -367,9 +385,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         if (responseNavigation.response === message) {
           const jumpStep = this.getStepById(responseNavigation.jumpToStepId);
           if (!jumpStep) {
-            throw new Error(
+            this.sendErrorMessage(
               `Unable to find target step ${responseNavigation.jumpToStepId} for predefined input ${responseNavigation.response}, maybe you deleted it and forgot to update this step?`
             );
+            return;
           }
           this.handleStep(jumpStep);
           return;
@@ -445,23 +464,46 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     }
 
     // handle sending prompt
-    const _response = await this.executePrompt(aiPromptSteps);
-    const response = extractServiceStepResponse(_response, 0);
 
-    if (step.outputDataType === PromptOutputTypes.JSON) {
-      if (!isJsonString(response)) {
-        this.errorMessage = 'Did not receive valid JSON data';
-        throw new Error('Did not receive valid JSON data');
-      }
-      if (step.jsonResponseData) {
-        if (!receivedExpectedData(step.jsonResponseData, response)) {
-          this.errorMessage = 'Did not receive expected JSON data';
-          throw new Error('Did not receive expected JSON data');
+    const requestFunction = async () => {
+      const _response = await this.executePrompt(aiPromptSteps);
+      const response = extractServiceStepResponse(_response, 0);
+
+      if (step.outputDataType === PromptOutputTypes.JSON) {
+        if (!isJsonString(response)) {
+          throw new Error('Did not receive valid JSON data');
+        }
+        if (step.jsonResponseData) {
+          if (!receivedExpectedData(step.jsonResponseData, response)) {
+            this.errorMessage = 'Did not receive expected JSON data';
+            throw new Error('Did not receive expected JSON data');
+          }
         }
       }
       const resData = JSON.parse(response);
       this.stateData = { ...this.stateData, ...resData };
+    };
+
+    // try request function 3 times
+    let counter = 0;
+    let success = false;
+    while (counter < 3) {
+      try {
+        await requestFunction();
+        success = true;
+        console.log('breaking');
+        break;
+      } catch (err) {
+        counter++;
+      }
     }
+    if (!success) {
+      this.sendErrorMessage('AI Service request failed');
+      this.lastFailedStepId = step.stepId;
+      this.setResponsePending(false);
+      return;
+    }
+
     this.setResponsePending(false);
     await this.goToNextStep();
   }
