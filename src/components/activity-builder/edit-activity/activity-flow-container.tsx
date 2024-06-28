@@ -165,6 +165,7 @@ export function ActivityFlowContainer(props: {
           onChange={handleChange}
           aria-label="basic tabs example"
           centered
+          variant="scrollable"
         >
           {tabs}
         </Tabs>
