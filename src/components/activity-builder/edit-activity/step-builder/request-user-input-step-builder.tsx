@@ -284,7 +284,7 @@ export function RequestUserInputStepBuilder(props: {
         {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
       </IconButton>
       <h4 style={{ alignSelf: 'center' }}>Request User Input</h4>
-      <Collapse in={collapsed}>
+      <Collapse in={!collapsed}>
         <InputField
           label="Request Message (Optional)"
           value={step.message}
