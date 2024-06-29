@@ -456,7 +456,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     };
 
     aiPromptSteps[0].prompts.push(promptConfig);
-    if (step.jsonResponseData) {
+    if (
+      step.jsonResponseData &&
+      step.outputDataType === PromptOutputTypes.JSON
+    ) {
       aiPromptSteps[0].responseFormat +=
         recursivelyConvertExpectedDataToAiPromptString(
           recursiveUpdateAdditionalInfo(step.jsonResponseData, this.stateData)
@@ -479,9 +482,17 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             throw new Error('Did not receive expected JSON data');
           }
         }
+        const resData = JSON.parse(response);
+        this.stateData = { ...this.stateData, ...resData };
+      } else {
+        // is a text response
+        this.sendMessage({
+          id: uuidv4(),
+          message: response,
+          sender: Sender.SYSTEM,
+          displayType: MessageDisplayType.TEXT,
+        });
       }
-      const resData = JSON.parse(response);
-      this.stateData = { ...this.stateData, ...resData };
     };
 
     // try request function 3 times
