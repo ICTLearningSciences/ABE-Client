@@ -87,9 +87,11 @@ export function EditActivity(props: {
           value={localActivityCopy.title}
           width="fit-content"
           onChange={(v) => {
-            setLocalActivityCopy({
-              ...localActivityCopy,
-              title: v,
+            setLocalActivityCopy((prevValue) => {
+              return {
+                ...prevValue,
+                title: v,
+              };
             });
           }}
         />

@@ -43,7 +43,10 @@ export function getDefaultRequestUserInputBuilder(): RequestUserInputActivitySte
 
 function PredefinedResponseUpdater(props: {
   predefinedResponse: PredefinedResponse;
-  updateResponse: (updatedResponse: PredefinedResponse) => void;
+  updateResponse: (
+    updatedResponse: Partial<PredefinedResponse>,
+    clientId: string
+  ) => void;
   deleteResponse: () => void;
   flowsList: FlowItem[];
 }): JSX.Element {
@@ -68,10 +71,12 @@ function PredefinedResponseUpdater(props: {
           width="100%"
           value={predefinedResponse.message}
           onChange={(e) => {
-            props.updateResponse({
-              ...predefinedResponse,
-              message: e,
-            });
+            props.updateResponse(
+              {
+                message: e,
+              },
+              predefinedResponse.clientId
+            );
           }}
         />
         <InputField
@@ -79,20 +84,24 @@ function PredefinedResponseUpdater(props: {
           width="100%"
           value={predefinedResponse.responseWeight || ''}
           onChange={(e) => {
-            props.updateResponse({
-              ...predefinedResponse,
-              responseWeight: e,
-            });
+            props.updateResponse(
+              {
+                responseWeight: e,
+              },
+              predefinedResponse.clientId
+            );
           }}
         />
         <CheckBoxInput
           label="Is Array Data?"
-          value={predefinedResponse.isArray || false}
+          value={predefinedResponse.isArray ?? false}
           onChange={(e) => {
-            props.updateResponse({
-              ...predefinedResponse,
-              isArray: e,
-            });
+            props.updateResponse(
+              {
+                isArray: e,
+              },
+              predefinedResponse.clientId
+            );
           }}
         />
       </ColumnDiv>
@@ -104,10 +113,13 @@ function PredefinedResponseUpdater(props: {
           currentJumpToStepId={predefinedResponse.jumpToStepId}
           rowOrColumn="column"
           onStepSelected={(stepId) => {
-            updateResponse({
-              ...predefinedResponse,
-              jumpToStepId: stepId,
-            });
+            updateResponse(
+              {
+                ...predefinedResponse,
+                jumpToStepId: stepId,
+              },
+              predefinedResponse.clientId
+            );
           }}
         />
         <IconButton
@@ -124,7 +136,10 @@ function PredefinedResponseUpdater(props: {
 
 function PredefinedResponsesUpdater(props: {
   step: RequestUserInputActivityStep;
-  updatePredefinedResponse: (updatedResponse: PredefinedResponse) => void;
+  updatePredefinedResponse: (
+    updatedResponse: Partial<PredefinedResponse>,
+    clientId: string
+  ) => void;
   addNewPredefinedResponse: () => void;
   deletePredefinedResponse: (clientId: string) => void;
   flowsList: FlowItem[];
@@ -153,8 +168,8 @@ function PredefinedResponsesUpdater(props: {
           <PredefinedResponseUpdater
             key={index}
             predefinedResponse={response}
-            updateResponse={(updatedResponse) => {
-              updatePredefinedResponse(updatedResponse);
+            updateResponse={(updatedResponse, clientId) => {
+              updatePredefinedResponse(updatedResponse, clientId);
             }}
             deleteResponse={() => {
               deletePredefinedResponse(response.clientId);
@@ -203,7 +218,10 @@ export function RequestUserInputStepBuilder(props: {
     });
   }
 
-  function updatePredefinedResponse(updatedResponse: PredefinedResponse) {
+  function updatePredefinedResponse(
+    updatedResponse: Partial<PredefinedResponse>,
+    clientId: string
+  ) {
     updateLocalActivity((prevValue) => {
       return {
         ...prevValue,
@@ -217,8 +235,11 @@ export function RequestUserInputStepBuilder(props: {
                   predefinedResponses: (
                     s as RequestUserInputActivityStep
                   ).predefinedResponses.map((r) => {
-                    if (r.clientId === updatedResponse.clientId) {
-                      return updatedResponse;
+                    if (r.clientId === clientId) {
+                      return {
+                        ...r,
+                        ...updatedResponse,
+                      };
                     }
                     return r;
                   }),

@@ -40,20 +40,6 @@ export function FlowStepsBuilderTab(props: {
 }) {
   const { flow, flowsList, updateLocalActivity, setPreviewPromptId } = props;
 
-  const setLocalFlowCopy = (flow: FlowItem) => {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          if (f.clientId === flow.clientId) {
-            return flow;
-          }
-          return f;
-        }),
-      };
-    });
-  };
-
   function renderActivityStep(step: ActivityBuilderStep, i: number) {
     switch (step.stepType) {
       case ActivityBuilderStepType.SYSTEM_MESSAGE:
@@ -116,13 +102,23 @@ export function FlowStepsBuilderTab(props: {
         : stepType === ActivityBuilderStepType.REQUEST_USER_INPUT
         ? getDefaultRequestUserInputBuilder()
         : defaultPromptBuilder();
-    setLocalFlowCopy({
-      ...flow,
-      steps: [
-        ...flow.steps.slice(0, i + 1),
-        newStep,
-        ...flow.steps.slice(i + 1),
-      ],
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          if (f.clientId === flow.clientId) {
+            return {
+              ...f,
+              steps: [
+                ...f.steps.slice(0, i + 1),
+                newStep,
+                ...f.steps.slice(i + 1),
+              ],
+            };
+          }
+          return f;
+        }),
+      };
     });
   }
 
@@ -153,9 +149,19 @@ export function FlowStepsBuilderTab(props: {
           label="Flow Title"
           value={flow.name}
           onChange={(e) => {
-            setLocalFlowCopy({
-              ...flow,
-              name: e,
+            updateLocalActivity((prevValue) => {
+              return {
+                ...prevValue,
+                flowsList: prevValue.flowsList.map((f) => {
+                  if (f.clientId === flow.clientId) {
+                    return {
+                      ...f,
+                      name: e,
+                    };
+                  }
+                  return f;
+                }),
+              };
             });
           }}
         />
@@ -170,7 +176,7 @@ export function FlowStepsBuilderTab(props: {
       {flow.steps.map((step, i) => {
         return (
           <ColumnDiv
-            key={i}
+            key={`${flow.clientId}-${step.stepId}`}
             style={{
               alignItems: 'center',
               width: '100%',
@@ -184,11 +190,6 @@ export function FlowStepsBuilderTab(props: {
                 insertNewActivityStep(stepType, i)
               }
             />
-            {/* <MoveStepArrows
-              i={i}
-              disableUp={i === 0}
-              disableDown={i === flow.steps.length - 1}
-            /> */}
           </ColumnDiv>
         );
       })}

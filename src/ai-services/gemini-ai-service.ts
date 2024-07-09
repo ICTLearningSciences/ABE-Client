@@ -45,7 +45,7 @@ export interface GeminiChatCompletionRequest {
   requestText: string;
 }
 
-export type OpenAiServiceJobStatusResponseType =
+export type GeminiAiServiceJobStatusResponseType =
   AiJobStatusType<OpenAiServiceResponse>;
 
 export function isGeminiData(
