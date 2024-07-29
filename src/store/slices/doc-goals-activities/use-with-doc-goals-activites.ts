@@ -6,6 +6,7 @@ import {
   addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
   LoadStatus,
   addNewLocalBuiltActivity as _addNewLocalBuiltActivity,
+  storeActivityVersionForActivity,
 } from '.';
 import {
   ActivityBuilder,
@@ -108,6 +109,7 @@ export function useWithDocGoalsActivities() {
   async function addOrUpdateBuiltActivity(
     activity: ActivityBuilder
   ): Promise<ActivityBuilder> {
+    dispatch(storeActivityVersionForActivity(activity));
     const res = await dispatch(_addOrUpdateBuiltActivity(activity));
     return res.payload as ActivityBuilder;
   }

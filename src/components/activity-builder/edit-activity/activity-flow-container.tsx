@@ -7,8 +7,9 @@ The full terms of this copyright and license should always be found in the root 
 import React, { useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
 import {
-  ActivityBuilderStep,
+  ActivityBuilderStepTypes,
   ActivityBuilder as ActivityBuilderType,
+  BuiltActivityVersion,
   PromptActivityStep,
 } from '../types';
 import { FlowStepsBuilderTab } from './flow-steps-builder-tab';
@@ -45,14 +46,32 @@ function a11yProps(index: number) {
   };
 }
 
+export interface StepVersion {
+  step: ActivityBuilderStepTypes;
+  versionTime: string;
+}
+
 export function ActivityFlowContainer(props: {
   localActivity: ActivityBuilderType;
   updateLocalActivity: React.Dispatch<
     React.SetStateAction<ActivityBuilderType>
   >;
+  versions: BuiltActivityVersion[];
 }): JSX.Element {
-  const { localActivity, updateLocalActivity } = props;
+  const { localActivity, updateLocalActivity, versions } = props;
   const flowsList = localActivity.flowsList;
+  const allStepVersions: StepVersion[] = versions
+    .flatMap((v) =>
+      v.activity.flowsList.map((s) => {
+        return {
+          steps: s.steps,
+          versionTime: v.versionTime,
+        };
+      })
+    )
+    .flatMap((f) =>
+      f.steps.map((s) => ({ step: s, versionTime: f.versionTime }))
+    );
 
   const [value, setValue] = useState(0);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -64,7 +83,11 @@ export function ActivityFlowContainer(props: {
     flowsList
   ) as PromptActivityStep;
 
-  const updateStep = (step: ActivityBuilderStep, flowClientId: string) => {
+  function getVersionsForStep(stepId: string): StepVersion[] {
+    return allStepVersions.filter((v) => v.step.stepId === stepId);
+  }
+
+  const updateStep = (step: ActivityBuilderStepTypes, flowClientId: string) => {
     updateLocalActivity((prevValue) => {
       return {
         ...prevValue,
@@ -123,6 +146,7 @@ export function ActivityFlowContainer(props: {
           updateStep={updateStep}
           deleteStep={deleteStep}
           setPreviewPromptId={(id: string) => setPreviewPromptId(id)}
+          getVersionsForStep={getVersionsForStep}
         />
       </CustomTabPanel>
     );
@@ -145,6 +169,7 @@ export function ActivityFlowContainer(props: {
           previewed={true}
           startPreview={() => setPreviewPromptId(previewPrompt.stepId)}
           stopPreview={() => setPreviewPromptId('')}
+          versions={getVersionsForStep(previewPrompt.stepId)}
         />
       </ColumnDiv>
     );

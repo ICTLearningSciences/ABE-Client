@@ -14,8 +14,13 @@ import {
 import {
   fetchBuiltActivities as _fetchBuiltActivities,
   addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
+  storeActivityVersion,
+  fetchActivityVersions as _fetchActivityVersions,
 } from '../../../hooks/built-activity-api';
-import { ActivityBuilder } from '../../../components/activity-builder/types';
+import {
+  ActivityBuilder,
+  BuiltActivityVersion,
+} from '../../../components/activity-builder/types';
 
 export enum LoadStatus {
   NONE,
@@ -31,6 +36,8 @@ export interface State {
   activitiesLoadStatus: LoadStatus;
   builtActivities: ActivityBuilder[];
   builtActivitiesLoadStatus: LoadStatus;
+  builtActivityVersions: Record<string, BuiltActivityVersion[]>;
+  builtActivityVersionsLoadStatus: LoadStatus;
 }
 
 const initialState: State = {
@@ -40,6 +47,8 @@ const initialState: State = {
   activitiesLoadStatus: LoadStatus.NONE,
   builtActivities: [],
   builtActivitiesLoadStatus: LoadStatus.NONE,
+  builtActivityVersions: {},
+  builtActivityVersionsLoadStatus: LoadStatus.NONE,
 };
 
 export const fetchDocGoals = createAsyncThunk(
@@ -74,6 +83,24 @@ export const addOrUpdateBuiltActivity = createAsyncThunk(
   'state/addOrUpdateBuiltActivity',
   async (activity: ActivityBuilder) => {
     return await _addOrUpdateBuiltActivity(activity);
+  }
+);
+
+export const storeActivityVersionForActivity = createAsyncThunk(
+  'state/storeActivityVersionForActivity',
+  async (activity: ActivityBuilder) => {
+    return await storeActivityVersion(activity);
+  }
+);
+
+export const fetchActivityVersions = createAsyncThunk(
+  'state/fetchActivityVersions',
+  async (activityClientId: string) => {
+    const versions = await _fetchActivityVersions(activityClientId);
+    return {
+      activityClientId,
+      versions,
+    };
   }
 );
 
@@ -142,6 +169,40 @@ export const stateSlice = createSlice({
         } else {
           state.builtActivities.push(action.payload);
         }
+      })
+
+      .addCase(fetchActivityVersions.pending, (state) => {
+        state.builtActivityVersionsLoadStatus = LoadStatus.LOADING;
+      })
+
+      .addCase(fetchActivityVersions.fulfilled, (state, action) => {
+        state.builtActivityVersionsLoadStatus = LoadStatus.SUCCEEDED;
+        state.builtActivityVersions[action.payload.activityClientId] =
+          action.payload.versions.sort((a, b) => {
+            return (
+              new Date(b.versionTime).getTime() -
+              new Date(a.versionTime).getTime()
+            );
+          });
+      })
+
+      .addCase(fetchActivityVersions.rejected, (state) => {
+        state.builtActivityVersionsLoadStatus = LoadStatus.FAILED;
+      })
+
+      .addCase(storeActivityVersionForActivity.fulfilled, (state, action) => {
+        const activityClientId = action.payload.activity.clientId;
+        const versions = [
+          ...(state.builtActivityVersions[activityClientId] || []),
+          action.payload,
+        ];
+        const sortedVersions = versions.sort((a, b) => {
+          return (
+            new Date(b.versionTime).getTime() -
+            new Date(a.versionTime).getTime()
+          );
+        });
+        state.builtActivityVersions[activityClientId] = sortedVersions;
       });
   },
 });

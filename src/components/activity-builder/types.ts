@@ -21,7 +21,7 @@ export interface IActivity {
 export interface FlowItem {
   clientId: string;
   name: string;
-  steps: ActivityBuilderStep[];
+  steps: ActivityBuilderStepTypes[];
 }
 
 export function defaultActivityBuilder(userId: string): ActivityBuilder {
@@ -71,6 +71,11 @@ export interface ActivityBuilderStep {
   stepType: ActivityBuilderStepType;
   jumpToStepId?: string;
 }
+
+export type ActivityBuilderStepTypes =
+  | SystemMessageActivityStep
+  | RequestUserInputActivityStep
+  | PromptActivityStep;
 
 // SystemMessage
 export interface SystemMessageActivityStep extends ActivityBuilderStep {
@@ -136,4 +141,9 @@ export interface PromptActivityStepGql extends ActivityBuilderStep {
 export interface PromptActivityStep
   extends Omit<PromptActivityStepGql, 'jsonResponseData'> {
   jsonResponseData?: JsonResponseData[];
+}
+
+export interface BuiltActivityVersion {
+  activity: ActivityBuilder;
+  versionTime: string;
 }

@@ -8,6 +8,7 @@ import { equals } from '../../../helpers';
 import { v4 as uuidv4 } from 'uuid';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { isActivityRunnable } from '../helpers';
+import { useWithActivityVersions } from '../../../hooks/use-with-activity-versions';
 export function EditActivity(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   activity: ActivityBuilderType;
@@ -24,10 +25,18 @@ export function EditActivity(props: {
   const [localActivityCopy, setLocalActivityCopy] =
     React.useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
+  const { activityVersions, loadActivityVersions } = useWithActivityVersions();
 
   useEffect(() => {
     setLocalActivityCopy(JSON.parse(JSON.stringify(activity)));
   }, [activity]);
+
+  useEffect(() => {
+    const alreadyLoaded = Boolean(activity.clientId in activityVersions);
+    if (activity.clientId && !alreadyLoaded) {
+      loadActivityVersions(activity.clientId);
+    }
+  }, [activity.clientId, activityVersions]);
 
   async function saveActivity() {
     setSaveInProgress(true);
@@ -136,6 +145,7 @@ export function EditActivity(props: {
       <ActivityFlowContainer
         localActivity={localActivityCopy}
         updateLocalActivity={setLocalActivityCopy}
+        versions={activityVersions[localActivityCopy.clientId] || []}
       />
     </ColumnDiv>
   );

@@ -4,27 +4,29 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { BuiltActivityVersion } from '../components/activity-builder/types';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchActivityVersions } from '../store/slices/doc-goals-activities';
 
-import { PromptStepBuilder } from "../../../src/components/activity-builder/edit-activity/step-builder/prompt-step-builder";
-import { examplePromptActivityStep, multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
-describe("Prompt Step Builder", ()=>{
-    it("should render", ()=>{
-        let step = examplePromptActivityStep;
-        const systemMessageStepBuilder = PromptStepBuilder({
-            step,
-            updateLocalActivity: ()=>{
-            },
-            deleteStep: ()=>{
-            },
-            stepIndex: 0,
-            flowsList: multipleFlowActivity.flowsList,
-            previewed: false,
-            startPreview: ()=>{
-            },
-            stopPreview: ()=>{
-            },
-            versions: [],
-        });
-        cy.mount(systemMessageStepBuilder);
-    })
-})
+export function useWithActivityVersions() {
+  const activityVersions = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivityVersions
+  );
+  const activityVersionsLoadStatus = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivityVersionsLoadStatus
+  );
+  const dispatch = useAppDispatch();
+
+  async function loadActivityVersions(
+    activityClientId: string
+  ): Promise<BuiltActivityVersion[]> {
+    const res = await dispatch(fetchActivityVersions(activityClientId));
+    return res.payload as BuiltActivityVersion[];
+  }
+
+  return {
+    activityVersions,
+    activityVersionsLoadStatus,
+    loadActivityVersions,
+  };
+}

@@ -43,6 +43,8 @@ import { JsonResponseDataUpdater } from './json-response-data-builder';
 import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { StepVersion } from '../activity-flow-container';
+import { VersionsDropdown } from './versions-dropdown';
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
     clientId: uuid(),
@@ -85,6 +87,7 @@ export function PromptStepBuilder(props: {
   stopPreview: () => void;
   width?: string;
   height?: string;
+  versions: StepVersion[];
 }): JSX.Element {
   const {
     step,
@@ -95,6 +98,7 @@ export function PromptStepBuilder(props: {
     startPreview,
     deleteStep,
     flowsList,
+    versions,
   } = props;
   const currentFLow = flowsList.find((f) => {
     return f.steps.find((s) => s.stepId === step.stepId);
@@ -113,6 +117,9 @@ export function PromptStepBuilder(props: {
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
   const [viewingInputType, setViewingInputType] =
     React.useState<ViewingInputType>(ViewingInputType.PROMPT_TEXT);
+
+  const [rerender, setRerender] = React.useState(0);
+
   function updateField(
     field: string,
     value: string | boolean | JsonResponseData[]
@@ -136,6 +143,26 @@ export function PromptStepBuilder(props: {
         }),
       };
     });
+  }
+
+  function replacePromptStepWithVersion(version: StepVersion) {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                return version.step;
+              }
+              return s;
+            }),
+          };
+        }),
+      };
+    });
+    setRerender(rerender + 1);
   }
 
   function recursiveUpdateNestedJsonResponseData(
@@ -388,6 +415,7 @@ export function PromptStepBuilder(props: {
 
   return (
     <RoundedBorderDiv
+      key={rerender}
       style={{
         width: props.width || '100%',
         height: props.height || '100%',
@@ -491,6 +519,10 @@ export function PromptStepBuilder(props: {
         >
           {previewed ? 'Return' : 'Preview'}
         </Button>
+        <VersionsDropdown
+          versions={versions}
+          onSelect={replacePromptStepWithVersion}
+        />
       </RowDiv>
       <IconButton
         style={{

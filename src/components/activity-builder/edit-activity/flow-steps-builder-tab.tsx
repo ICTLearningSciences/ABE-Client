@@ -7,8 +7,8 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import {
   ActivityBuilder,
-  ActivityBuilderStep,
   ActivityBuilderStepType,
+  ActivityBuilderStepTypes,
   FlowItem,
   PromptActivityStep,
   RequestUserInputActivityStep,
@@ -30,17 +30,19 @@ import {
   SystemMessageStepBuilder,
   getDefaultSystemMessage,
 } from './step-builder/system-message-step-builder';
+import { StepVersion } from './activity-flow-container';
 export function FlowStepsBuilderTab(props: {
   flow: FlowItem;
   flowsList: FlowItem[];
   updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
-  updateStep: (step: ActivityBuilderStep, flowClientId: string) => void;
+  updateStep: (step: ActivityBuilderStepTypes, flowClientId: string) => void;
   deleteStep: (stepId: string, flowClientId: string) => void;
   setPreviewPromptId: (id: string) => void;
+  getVersionsForStep: (stepId: string) => StepVersion[];
 }) {
   const { flow, flowsList, updateLocalActivity, setPreviewPromptId } = props;
 
-  function renderActivityStep(step: ActivityBuilderStep, i: number) {
+  function renderActivityStep(step: ActivityBuilderStepTypes, i: number) {
     switch (step.stepType) {
       case ActivityBuilderStepType.SYSTEM_MESSAGE:
         return (
@@ -77,10 +79,11 @@ export function FlowStepsBuilderTab(props: {
             previewed={false}
             startPreview={() => setPreviewPromptId(step.stepId)}
             stopPreview={() => setPreviewPromptId('')}
+            versions={props.getVersionsForStep(step.stepId)}
           />
         );
       default:
-        throw new Error(`Unknown step type: ${step.stepType}`);
+        throw new Error(`Unknown step type: ${step}`);
     }
   }
 
@@ -96,7 +99,7 @@ export function FlowStepsBuilderTab(props: {
   }
 
   function insertNewActivityStep(stepType: ActivityBuilderStepType, i: number) {
-    const newStep: ActivityBuilderStep =
+    const newStep: ActivityBuilderStepTypes =
       stepType === ActivityBuilderStepType.SYSTEM_MESSAGE
         ? getDefaultSystemMessage()
         : stepType === ActivityBuilderStepType.REQUEST_USER_INPUT
