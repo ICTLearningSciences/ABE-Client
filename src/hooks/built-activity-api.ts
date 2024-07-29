@@ -7,9 +7,11 @@ The full terms of this copyright and license should always be found in the root 
 import {
   ActivityBuilder,
   ActivityBuilderStepType,
+  BuiltActivityVersion,
   PromptActivityStepGql,
 } from '../components/activity-builder/types';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
+import { Connection } from '../types';
 import { execGql } from './api';
 
 export const fullBuiltActivityQueryData = `
@@ -65,6 +67,13 @@ export const fullBuiltActivityQueryData = `
                           }
                       }
                       }
+`;
+
+export const fetchActivityVersionsQueryData = `
+    activity{
+    ${fullBuiltActivityQueryData}
+    }
+    versionTime
 `;
 
 export function convertGqlToBuiltActivity(
@@ -144,4 +153,64 @@ export async function fetchBuiltActivities(): Promise<ActivityBuilder[]> {
     }
   );
   return res.map(convertGqlToBuiltActivity);
+}
+
+export async function fetchActivityVersions(
+  activityClientId: string
+): Promise<BuiltActivityVersion[]> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Connection<BuiltActivityVersion>>(
+    {
+      query: `
+        query FetchBuiltActivityVersions($limit: Int, $filter: String, $sortAscending: Boolean, $sortBy: String){
+            fetchBuiltActivityVersions(limit: $limit, filter: $filter, sortAscending: $sortAscending, sortBy: $sortBy) {
+                        edges{
+                            node{
+                                ${fetchActivityVersionsQueryData}
+                            }
+                        }
+                    }
+        }
+        `,
+      variables: {
+        filter: JSON.stringify({
+          'activity.clientId': activityClientId,
+        }),
+      },
+    },
+    {
+      dataPath: 'fetchBuiltActivityVersions',
+      accessToken,
+    }
+  );
+  const versions = res.edges.map((edge) => edge.node);
+  return versions.map((version) => {
+    version.activity = convertGqlToBuiltActivity(version.activity);
+    return version;
+  });
+}
+
+export async function storeActivityVersion(
+  activity: ActivityBuilder
+): Promise<BuiltActivityVersion> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<BuiltActivityVersion>(
+    {
+      query: `
+        mutation StoreBuiltActivityVersion($activity: BuiltActivityInputType!) {
+            storeBuiltActivityVersion(activity: $activity) {
+                        ${fetchActivityVersionsQueryData}
+                    }
+                }
+        `,
+      variables: {
+        activity: convertBuiltActivityToGql(activity),
+      },
+    },
+    {
+      dataPath: 'storeBuiltActivityVersion',
+      accessToken,
+    }
+  );
+  return res;
 }
