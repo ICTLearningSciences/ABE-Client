@@ -20,6 +20,8 @@ import {
 import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { StepVersion } from '../activity-flow-container';
+import { VersionsDropdown } from './versions-dropdown';
 export function getDefaultSystemMessage(): SystemMessageActivityStep {
   return {
     stepId: uuid(),
@@ -37,9 +39,31 @@ export function SystemMessageStepBuilder(props: {
   stepIndex: number;
   width?: string;
   height?: string;
+  versions: StepVersion[];
 }): JSX.Element {
-  const { step, stepIndex, updateLocalActivity } = props;
+  const { step, stepIndex, updateLocalActivity, versions } = props;
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
+
+  const [rerender, setRerender] = React.useState(0);
+  function replacePromptStepWithVersion(version: StepVersion) {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                return version.step;
+              }
+              return s;
+            }),
+          };
+        }),
+      };
+    });
+    setRerender(rerender + 1);
+  }
 
   function updateField(field: string, value: string | boolean) {
     updateLocalActivity((prevValue) => {
@@ -65,6 +89,7 @@ export function SystemMessageStepBuilder(props: {
 
   return (
     <RoundedBorderDiv
+      key={rerender}
       style={{
         width: props.width || '100%',
         height: props.height || '100%',
@@ -96,7 +121,20 @@ export function SystemMessageStepBuilder(props: {
       >
         {collapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
       </IconButton>
+
       <h4 style={{ alignSelf: 'center' }}>System Message</h4>
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 60,
+        }}
+      >
+        <VersionsDropdown
+          versions={versions}
+          onSelect={replacePromptStepWithVersion}
+        />
+      </div>
       <Collapse in={!collapsed}>
         <InputField
           label="Message"

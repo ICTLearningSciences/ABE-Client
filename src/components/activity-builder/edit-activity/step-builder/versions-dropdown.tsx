@@ -2,6 +2,7 @@ import React from 'react';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
 import { StepVersion } from '../activity-flow-container';
+import { formatISODate } from '../../../../helpers';
 export function VersionsDropdown(props: {
   versions: StepVersion[];
   onSelect: (version: StepVersion) => void;
@@ -36,7 +37,7 @@ export function VersionsDropdown(props: {
               handleClose();
             }}
           >
-            {version.versionTime}
+            {formatISODate(version.versionTime)}
           </MenuItem>
         ))}
       </Menu>

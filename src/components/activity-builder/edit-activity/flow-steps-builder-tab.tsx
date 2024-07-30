@@ -54,6 +54,7 @@ export function FlowStepsBuilderTab(props: {
             updateStep={(step) => props.updateStep(step, flow.clientId)}
             deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
             flowsList={flowsList}
+            versions={props.getVersionsForStep(step.stepId)}
           />
         );
       case ActivityBuilderStepType.REQUEST_USER_INPUT:
@@ -65,6 +66,7 @@ export function FlowStepsBuilderTab(props: {
             updateLocalActivity={updateLocalActivity}
             deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
             flowsList={flowsList}
+            versions={props.getVersionsForStep(step.stepId)}
           />
         );
       case ActivityBuilderStepType.PROMPT:

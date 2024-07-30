@@ -118,8 +118,6 @@ export function PromptStepBuilder(props: {
   const [viewingInputType, setViewingInputType] =
     React.useState<ViewingInputType>(ViewingInputType.PROMPT_TEXT);
 
-  const [rerender, setRerender] = React.useState(0);
-
   function updateField(
     field: string,
     value: string | boolean | JsonResponseData[]
@@ -145,6 +143,7 @@ export function PromptStepBuilder(props: {
     });
   }
 
+  const [rerender, setRerender] = React.useState(0);
   function replacePromptStepWithVersion(version: StepVersion) {
     updateLocalActivity((prevValue) => {
       return {
@@ -427,6 +426,18 @@ export function PromptStepBuilder(props: {
       }}
     >
       <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 60,
+        }}
+      >
+        <VersionsDropdown
+          versions={versions}
+          onSelect={replacePromptStepWithVersion}
+        />
+      </div>
       <IconButton
         style={{
           width: 'fit-content',
@@ -519,10 +530,6 @@ export function PromptStepBuilder(props: {
         >
           {previewed ? 'Return' : 'Preview'}
         </Button>
-        <VersionsDropdown
-          versions={versions}
-          onSelect={replacePromptStepWithVersion}
-        />
       </RowDiv>
       <IconButton
         style={{

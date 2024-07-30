@@ -29,6 +29,8 @@ import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
 import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { StepVersion } from '../activity-flow-container';
+import { VersionsDropdown } from './versions-dropdown';
 export function getDefaultRequestUserInputBuilder(): RequestUserInputActivityStep {
   return {
     stepId: uuid(),
@@ -190,9 +192,32 @@ export function RequestUserInputStepBuilder(props: {
   stepIndex: number;
   width?: string;
   height?: string;
+  versions: StepVersion[];
 }): JSX.Element {
-  const { step, stepIndex, updateLocalActivity } = props;
+  const { step, stepIndex, updateLocalActivity, versions } = props;
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
+
+  const [rerender, setRerender] = React.useState(0);
+  function replacePromptStepWithVersion(version: StepVersion) {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                return version.step;
+              }
+              return s;
+            }),
+          };
+        }),
+      };
+    });
+    setRerender(rerender + 1);
+  }
+
   function updateField(
     field: string,
     value: string | boolean | PredefinedResponse[]
@@ -273,6 +298,7 @@ export function RequestUserInputStepBuilder(props: {
 
   return (
     <RoundedBorderDiv
+      key={rerender}
       style={{
         width: props.width || '100%',
         height: props.height || '100%',
@@ -305,6 +331,18 @@ export function RequestUserInputStepBuilder(props: {
         {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
       </IconButton>
       <h4 style={{ alignSelf: 'center' }}>Request User Input</h4>
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 60,
+        }}
+      >
+        <VersionsDropdown
+          versions={versions}
+          onSelect={replacePromptStepWithVersion}
+        />
+      </div>
       <Collapse in={!collapsed}>
         <InputField
           label="Request Message (Optional)"

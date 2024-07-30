@@ -82,6 +82,34 @@ export function formatISODateToReadable(isoDate: string): string {
   }
 }
 
+export function formatISODate(isoDate: string): string {
+  const inputDate = new Date(isoDate);
+  const currentDate = new Date();
+
+  if (
+    inputDate.getDate() === currentDate.getDate() &&
+    inputDate.getMonth() === currentDate.getMonth() &&
+    inputDate.getFullYear() === currentDate.getFullYear()
+  ) {
+    // If the date is today, show the time of day with AM/PM
+    const hours = inputDate.getHours() % 12 || 12;
+    const minutes = inputDate.getMinutes().toString().padStart(2, '0');
+    const period = inputDate.getHours() < 12 ? 'AM' : 'PM';
+    return `${hours}:${minutes} ${period} (Today)`;
+  } else {
+    // If the date is not today, show the full date with time
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    };
+    return inputDate.toLocaleString('en-US', options);
+  }
+}
+
 export function isJsonString(str: string): boolean {
   try {
     JSON.parse(str);
