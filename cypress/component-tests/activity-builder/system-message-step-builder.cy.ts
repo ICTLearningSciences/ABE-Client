@@ -21,6 +21,7 @@ describe("System Message Step Builder", ()=>{
             },
             stepIndex: 0,
             flowsList: multipleFlowActivity.flowsList,
+            versions: []
         });
         cy.mount(systemMessageStepBuilder);
     })
