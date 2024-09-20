@@ -59,3 +59,9 @@ test-e2e-exec:
 .PHONY: test-e2e-build
 test-e2e-build:
 	$(TEST_E2E_DOCKER_COMPOSE) build
+
+.PHONY: publish
+publish:
+	echo "Make sure to update the package.json version number before publishing"
+	npm run build-tsc
+	npm publish
