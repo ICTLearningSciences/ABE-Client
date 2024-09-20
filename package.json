@@ -1,8 +1,8 @@
 {
   "name": "abe-client",
-  "version": "1.0.5",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "version": "1.0.7",
+  "main": "dist/exported-files.js",
+  "types": "dist/exported-files.d.ts",
   "private": false,
   "resolutions": {
     "styled-components": "^6.1.0"
