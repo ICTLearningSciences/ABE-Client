@@ -13,16 +13,18 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+      "declaration": true,                       // Generate .d.ts files
+      "module": "esnext",
+      "outDir": "./dist",                       // Redirect output structure to the 'dist' folder
+      "rootDir": "./src",                       // Specify the root directory of input files
+      "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    // "noEmit": true,
     "jsx": "react-jsx",
     "types": ["cypress", "node", "cypress-localstorage-commands"]
   },
   "include": [
     "src",
-    "**/*.ts"
   ]
 }
