@@ -1,0 +1,3 @@
+For deploying:
+
+Requires: jq
