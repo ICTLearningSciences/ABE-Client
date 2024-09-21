@@ -14,12 +14,18 @@ import {
   updateViewingAdvancedOptions,
   newSession as _newSession,
   setSessionIntention,
+  updateDocService,
 } from '.';
 import {
   fetchUserActivityStates,
   updateUserActivityState as _updateUserActivityState,
 } from '../../../hooks/api';
-import { AiServiceModel, Intention, UserActivityState } from '../../../types';
+import {
+  AiServiceModel,
+  DocService,
+  Intention,
+  UserActivityState,
+} from '../../../types';
 import { UserRole } from '../login';
 
 interface UseWithState {
@@ -37,6 +43,7 @@ interface UseWithState {
   updateViewingAdvancedOptions: (advancedOptions: boolean) => void;
   newSession: () => void;
   updateSessionIntention: (intention?: Intention) => void;
+  updateDocService: (docService: DocService) => void;
 }
 
 // Gives you a way to interface with the redux store (which has the user information)
@@ -50,6 +57,10 @@ export function useWithState(): UseWithState {
 
   function updateCurrentDocId(id: string) {
     dispatch(updateDocId(id));
+  }
+
+  function _updateDocService(docService: DocService) {
+    dispatch(updateDocService(docService));
   }
 
   async function loadUserActivityStates(userId: string): Promise<void> {
@@ -104,6 +115,7 @@ export function useWithState(): UseWithState {
   return {
     state,
     updateCurrentDocId,
+    updateDocService: _updateDocService,
     loadUserActivityStates,
     updateUserActivityState,
     overrideAiModel,

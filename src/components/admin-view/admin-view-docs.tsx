@@ -8,6 +8,9 @@ import React from 'react';
 import { UseWithGoogleDocs } from '../../hooks/use-with-google-docs';
 import { ColumnCenterDiv } from '../../styled-components';
 import SelectCreateDocs from '../user-view/select-create-docs';
+import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../store/hooks';
+import { UserRole } from '../../store/slices/login';
 
 export interface AdminViewUserGoogleDocsProps {
   useWithGoogleDocs: UseWithGoogleDocs;
@@ -24,6 +27,8 @@ export default function ViewUserGoogleDocs(
     handleCreateGoogleDoc,
     handleDeleteGoogleDoc,
   } = useWithGoogleDocs;
+  const navigate = useNavigate();
+  const userRole = useAppSelector((state) => state.login.userRole);
 
   return (
     <ColumnCenterDiv
@@ -39,6 +44,15 @@ export default function ViewUserGoogleDocs(
         copyGoogleDocs={copyGoogleDocs}
         creationInProgress={creationInProgress}
         handleCreateGoogleDoc={handleCreateGoogleDoc}
+        goToDoc={(docId: string) => navigate(`/docs/${docId}`)}
+        onHistoryClicked={(docId: string) => navigate(`/docs/history/${docId}`)}
+        previewUrlBuilder={(docId: string) =>
+          `https://docs.google.com/document/d/${docId}/view`
+        }
+        viewingAsAdmin={userRole === UserRole.ADMIN}
+        sx={{
+          width: '60%',
+        }}
       />
     </ColumnCenterDiv>
   );

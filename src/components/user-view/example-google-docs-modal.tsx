@@ -10,12 +10,9 @@ import { GoogleDoc } from '../../types';
 import { RowDiv, RowDivSB } from '../../styled-components';
 import React, { useEffect } from 'react';
 import './create-google-doc-modal.css';
-import { useAppSelector } from '../../store/hooks';
-import { UserRole } from '../../store/slices/login';
 import CreateNewAdminGoogleDoc from '../admin-view/author-new-google-doc-modal';
 import LockIcon from '@mui/icons-material/Lock';
 import { PreviewGoogleDocModal } from './preview-google-doc-modal';
-import { useNavigate } from 'react-router-dom';
 const useStyles = makeStyles({ name: { ExampleGoogleDocModal } })(
   (theme: Theme) => ({
     inputField: {
@@ -38,15 +35,22 @@ export default function ExampleGoogleDocModal(props: {
   onCreateDoc: (docId?: string, title?: string, isAdminDoc?: boolean) => void;
   open: boolean;
   close: () => void;
+  goToDoc: (docId: string) => void;
+  viewingAsAdmin: boolean;
+  previewUrlBuilder: (docId: string) => string;
 }): JSX.Element {
   const [selectedGoogleDoc, setSelectedGoogleDoc] = React.useState<string>('');
-  const viewingRole = useAppSelector((state) => state.state.viewingRole);
-  const viewingAsAdmin = viewingRole === UserRole.ADMIN;
-  const { open, close, adminDocs, onCreateDoc } = props;
+  const {
+    open,
+    close,
+    adminDocs,
+    onCreateDoc,
+    viewingAsAdmin,
+    previewUrlBuilder,
+  } = props;
   const [openNewDocModal, setOpenNewDocModal] = React.useState(false);
   const [previewDocId, setPreviewDocId] = React.useState<string>('');
   const { classes } = useStyles();
-  const navigate = useNavigate();
   const style = {
     position: 'absolute',
     top: '50%',
@@ -198,7 +202,8 @@ export default function ExampleGoogleDocModal(props: {
                 </Button>
                 <Button
                   onClick={() => {
-                    navigate(`/docs/${selectedGoogleDoc}`);
+                    // navigate(`/docs/${selectedGoogleDoc}`);
+                    props.goToDoc(selectedGoogleDoc);
                   }}
                   style={{
                     marginRight: '20px',
@@ -224,7 +229,7 @@ export default function ExampleGoogleDocModal(props: {
         }}
       />
       <PreviewGoogleDocModal
-        googleDocId={previewDocId}
+        docUrl={previewDocId ? previewUrlBuilder(previewDocId) : ''}
         close={() => {
           setPreviewDocId('');
         }}

@@ -31,7 +31,6 @@ export interface RevisionsItem {
 
 export interface UseWithGoogleDocs {
   docId: string;
-  docUrl: string;
   googleDocs: GoogleDoc[];
   copyGoogleDocs: GoogleDoc[];
   creationInProgress: boolean;
@@ -40,7 +39,6 @@ export interface UseWithGoogleDocs {
     title?: string,
     isAdminDoc?: boolean
   ) => Promise<void>;
-  handleOpenGoogleDoc: (docId: string) => void;
   handleSelectGoogleDocs: (docId: string) => void;
   docsLoading: boolean;
   updateGoogleDoc: (googleDoc: StoreGoogleDoc) => Promise<GoogleDoc>;
@@ -123,10 +121,6 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
       });
   }
 
-  function handleOpenGoogleDoc(docId: string) {
-    window.open(`https://docs.google.com/document/d/${docId}`, '_blank');
-  }
-
   function handleSelectGoogleDocs(docId: string) {
     updateCurrentDocId(docId);
   }
@@ -154,14 +148,10 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
 
   return {
     docId: googleDocId,
-    docUrl: googleDocId
-      ? `https://docs.google.com/document/d/${googleDocId}`
-      : '',
     googleDocs: userGoogleDocs || [],
     copyGoogleDocs: copyGoogleDocs || [],
     creationInProgress,
     handleCreateGoogleDoc,
-    handleOpenGoogleDoc,
     handleSelectGoogleDocs,
     docsLoading: isLoading,
     updateGoogleDoc,

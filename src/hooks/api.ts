@@ -289,6 +289,7 @@ export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
             assignmentDescription
             createdAt
             admin
+            service
           }
         }
       `,
@@ -433,6 +434,7 @@ export async function updateGoogleDocStorage(
                   description
               }
               createdAt
+              service
           }
         }
     `,
