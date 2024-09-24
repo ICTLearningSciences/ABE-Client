@@ -15,5 +15,6 @@ export { useWithLogin } from './store/slices/login/use-with-login';
 export { useWithState } from './store/slices/state/use-with-state';
 export { useWithGoogleDocs } from './hooks/use-with-google-docs';
 export { useReduxHydration } from './use-redux-hydration';
+export { EditGoogleDoc } from './components/user-view/user-edit-google-doc';
 
 export * from './hooks/api';

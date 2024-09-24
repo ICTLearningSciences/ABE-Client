@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { useEffect } from 'react';
 import withAuthorizationOnly from '../hooks/wrap-with-authorization-only';
-import UserEditGoogleDoc from './user-view/user-edit-google-doc';
+import { EditGoogleDoc } from './user-view/user-edit-google-doc';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useWithState } from '../store/slices/state/use-with-state';
 
@@ -32,13 +32,15 @@ function DocView(): JSX.Element {
     return <></>;
   }
 
-  return <UserEditGoogleDoc
-  docId={docId}
-  returnToDocs={() => navigate('/docs')}
-  docUrl={googleDocUrl}
-  activityFromParams={activityFromParams || ''}
-  goalFromParams={goalFromParams || ''}
-  />;
+  return (
+    <EditGoogleDoc
+      docId={docId}
+      returnToDocs={() => navigate('/docs')}
+      docUrl={googleDocUrl}
+      activityFromParams={activityFromParams || ''}
+      goalFromParams={goalFromParams || ''}
+    />
+  );
 }
 
 export default withAuthorizationOnly(DocView);

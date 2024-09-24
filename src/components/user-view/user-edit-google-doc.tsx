@@ -22,14 +22,15 @@ import { removeDuplicatesByField } from '../../helpers';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
 import { ActivityBuilder } from '../activity-builder/types';
 
-export default function EditGoogleDoc(props: {
+export function EditGoogleDoc(props: {
   docId: string;
   docUrl: string;
   activityFromParams: string;
   goalFromParams: string;
   returnToDocs: () => void;
 }): JSX.Element {
-  const { docId, docUrl, activityFromParams, goalFromParams, returnToDocs } = props;
+  const { docId, docUrl, activityFromParams, goalFromParams, returnToDocs } =
+    props;
   const {
     docGoals,
     setGoal,
@@ -44,10 +45,8 @@ export default function EditGoogleDoc(props: {
   const { width: windowWidth } = useWithWindowSize();
   const { updateViewingUserRole } = useWithState();
   const [docGoalModalOpen, setDocGoalModalOpen] = useState(false);
-
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const viewingAdmin = viewingRole === UserRole.ADMIN;
-
   const allActivities = getAllActivites(docGoals || []);
   const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
   const [checkedUrlParams, setCheckedUrlParams] = useState<boolean>(false);
@@ -155,10 +154,7 @@ export default function EditGoogleDoc(props: {
           src={docUrl}
           data-cy="google-doc-iframe"
         />
-        <Button
-          variant="text"
-          onClick={returnToDocs}
-        >
+        <Button variant="text" onClick={returnToDocs}>
           Return
         </Button>
       </div>
