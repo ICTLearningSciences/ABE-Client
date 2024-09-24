@@ -10,7 +10,6 @@ import Chat from './chat/chat';
 import { useWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-activity';
 import DocGoalModal from './doc-introduction/doc-goal-modal';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
 import ActivityGqlButtonology from '../admin-view/buttonology';
@@ -24,9 +23,13 @@ import { useWithWindowSize } from '../../hooks/use-with-window-size';
 import { ActivityBuilder } from '../activity-builder/types';
 
 export default function EditGoogleDoc(props: {
-  googleDocId: string;
+  docId: string;
+  docUrl: string;
+  activityFromParams: string;
+  goalFromParams: string;
+  returnToDocs: () => void;
 }): JSX.Element {
-  const { googleDocId } = props;
+  const { docId, docUrl, activityFromParams, goalFromParams, returnToDocs } = props;
   const {
     docGoals,
     setGoal,
@@ -35,19 +38,16 @@ export default function EditGoogleDoc(props: {
     goalActivityState,
     isLoading: goalsLoading,
   } = useWithCurrentGoalActivity();
+
   const useWithPrompts = _useWithPrompts();
   const { prompts } = useWithPrompts;
-  const navigate = useNavigate();
   const { width: windowWidth } = useWithWindowSize();
   const { updateViewingUserRole } = useWithState();
   const [docGoalModalOpen, setDocGoalModalOpen] = useState(false);
-  const googleDocUrl = `https://docs.google.com/document/d/${googleDocId}/edit`;
+
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const viewingAdmin = viewingRole === UserRole.ADMIN;
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const activityFromParams = queryParams.get('activityId');
-  const goalFromParams = queryParams.get('goalId');
+
   const allActivities = getAllActivites(docGoals || []);
   const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
   const [checkedUrlParams, setCheckedUrlParams] = useState<boolean>(false);
@@ -152,14 +152,12 @@ export default function EditGoogleDoc(props: {
         <iframe
           width={'98%'}
           height={'98%'}
-          src={googleDocUrl}
+          src={docUrl}
           data-cy="google-doc-iframe"
         />
         <Button
           variant="text"
-          onClick={() => {
-            navigate('/docs');
-          }}
+          onClick={returnToDocs}
         >
           Return
         </Button>
@@ -172,7 +170,7 @@ export default function EditGoogleDoc(props: {
       >
         {viewingAdmin ? (
           <ActivityGqlButtonology
-            googleDocId={googleDocId}
+            googleDocId={docId}
             activities={allActivities}
             builtActivities={getAllBuiltActivities(docGoals || [])}
             goToActivity={goToActivityPreview}

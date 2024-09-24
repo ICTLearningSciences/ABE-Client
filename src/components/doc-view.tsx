@@ -8,13 +8,18 @@ import React from 'react';
 import { useEffect } from 'react';
 import withAuthorizationOnly from '../hooks/wrap-with-authorization-only';
 import UserEditGoogleDoc from './user-view/user-edit-google-doc';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useWithState } from '../store/slices/state/use-with-state';
 
 function DocView(): JSX.Element {
   const { docId } = useParams<Record<string, string>>();
   const navigate = useNavigate();
   const { updateCurrentDocId } = useWithState();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const activityFromParams = queryParams.get('activityId');
+  const goalFromParams = queryParams.get('goalId');
+  const googleDocUrl = `https://docs.google.com/document/d/${docId}/edit`;
 
   useEffect(() => {
     if (docId) {
@@ -27,7 +32,13 @@ function DocView(): JSX.Element {
     return <></>;
   }
 
-  return <UserEditGoogleDoc googleDocId={docId} />;
+  return <UserEditGoogleDoc
+  docId={docId}
+  returnToDocs={() => navigate('/docs')}
+  docUrl={googleDocUrl}
+  activityFromParams={activityFromParams || ''}
+  goalFromParams={goalFromParams || ''}
+  />;
 }
 
 export default withAuthorizationOnly(DocView);
