@@ -101,6 +101,7 @@ export const loginSlice = createSlice({
     setUser: (state: LoginState, action: PayloadAction<UserAccessToken>) => {
       state.user = action.payload.user;
       state.accessToken = action.payload.accessToken;
+      localStorageStore(ACCESS_TOKEN_KEY, action.payload.accessToken);
       state.userRole = action.payload.user.userRole;
       state.loginStatus = LoginStatus.AUTHENTICATED;
     },
