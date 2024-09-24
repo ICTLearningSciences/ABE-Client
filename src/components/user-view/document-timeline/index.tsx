@@ -8,14 +8,14 @@ import TimepointDocumentText from './timepoint-document-text';
 import { TimepointOutline } from './timepoint-outline';
 import TimelineFooter from './timeline-footer';
 import withAuthorizationOnly from '../../../hooks/wrap-with-authorization-only';
-import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
+import { useWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 
 function DocumentTimelinePage(): JSX.Element {
   const footerTimelineRef = useRef<HTMLElement | null>(null);
   const userId = useAppSelector((state) => state.login.user?._id);
   const { docId } = useParams<Record<string, string>>();
   const [hasOverflowX, setHasOverflowX] = useState<boolean>(false);
-  const { googleDocs, updateGoogleDoc } = UseWithGoogleDocs();
+  const { googleDocs, updateGoogleDoc } = useWithGoogleDocs();
   const currentGoogleDoc = googleDocs.find((doc) => doc.googleDocId === docId);
   const {
     fetchDocumentTimeline,

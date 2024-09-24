@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { Button, CircularProgress, IconButton } from '@mui/material';
-import { GoogleDoc } from '../../types';
+import { GoogleDoc, NewDocData } from '../../types';
 import ExampleGoogleDocModal from './example-google-docs-modal';
 import { RowDiv } from '../../styled-components';
 import {
@@ -32,11 +32,12 @@ export default function SelectCreateDocs(props: {
   handleCreateGoogleDoc: (
     docIdToCopy?: string,
     title?: string,
-    isAdminDoc?: boolean
+    isAdminDoc?: boolean,
+    callback?: (newDocData: NewDocData) => void
   ) => void;
   handleDeleteGoogleDoc: (docId: string) => Promise<void>;
   onHistoryClicked: (docId: string) => void;
-  goToDoc: (docId: string) => void;
+  goToDoc: (docId: string, newDoc?: boolean) => void;
   previewUrlBuilder: (docId: string) => string;
   viewingAsAdmin: boolean;
   sx?: React.CSSProperties;
@@ -84,7 +85,14 @@ export default function SelectCreateDocs(props: {
           >
             <Button
               onClick={() => {
-                handleCreateGoogleDoc();
+                handleCreateGoogleDoc(
+                  undefined,
+                  undefined,
+                  undefined,
+                  (data) => {
+                    goToDoc(data.docId, true);
+                  }
+                );
               }}
               size="large"
               style={{
@@ -239,7 +247,15 @@ export default function SelectCreateDocs(props: {
           setCreateDocOpen(false);
         }}
         adminDocs={copyGoogleDocs}
-        onCreateDoc={handleCreateGoogleDoc}
+        onCreateDoc={(
+          docIdtoCopy?: string,
+          title?: string,
+          isAdminDoc?: boolean
+        ) => {
+          handleCreateGoogleDoc(docIdtoCopy, title, isAdminDoc, (data) => {
+            goToDoc(data.docId, true);
+          });
+        }}
         goToDoc={goToDoc}
         previewUrlBuilder={previewUrlBuilder}
       />

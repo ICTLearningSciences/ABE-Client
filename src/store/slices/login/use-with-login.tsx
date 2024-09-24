@@ -8,12 +8,14 @@ import { useAppSelector, useAppDispatch } from '../../hooks';
 import * as loginActions from '.';
 import { useEffect } from 'react';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
+import { UserAccessToken } from '../../../types';
 
 export interface UseWithLogin {
   state: loginActions.LoginState;
   logout: () => Promise<void>;
   loginWithGoogle: (googleAccessToken: string) => Promise<void>;
   refreshAccessToken: () => void;
+  setUser: (user: UserAccessToken) => void;
 }
 
 // Gives you a way to interface with the redux store (which has the user information)
@@ -64,10 +66,15 @@ export function useWithLogin(): UseWithLogin {
     await dispatch(loginActions.logout());
   }
 
+  async function setUser(user: UserAccessToken) {
+    dispatch(loginActions.setUser(user));
+  }
+
   return {
     state,
     logout,
     loginWithGoogle,
     refreshAccessToken,
+    setUser,
   };
 }

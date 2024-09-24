@@ -10,7 +10,7 @@ import {
   refreshAccessToken as _refreshAccessToken,
 } from '../../../hooks/api';
 import { extractErrorMessageFromError } from '../../../helpers';
-import { User } from '../../../types';
+import { User, UserAccessToken } from '../../../types';
 import {
   ACCESS_TOKEN_KEY,
   localStorageClear,
@@ -98,6 +98,12 @@ export const loginSlice = createSlice({
     setIsDisabled: (state: LoginState, action: PayloadAction<boolean>) => {
       state.isDisabled = action.payload;
     },
+    setUser: (state: LoginState, action: PayloadAction<UserAccessToken>) => {
+      state.user = action.payload.user;
+      state.accessToken = action.payload.accessToken;
+      state.userRole = action.payload.user.userRole;
+      state.loginStatus = LoginStatus.AUTHENTICATED;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -139,6 +145,6 @@ export const loginSlice = createSlice({
   },
 });
 
-export const { setIsDisabled } = loginSlice.actions;
+export const { setIsDisabled, setUser } = loginSlice.actions;
 
 export default loginSlice.reducer;

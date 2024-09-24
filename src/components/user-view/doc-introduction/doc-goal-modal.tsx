@@ -26,7 +26,7 @@ import { hasHoursPassed } from '../../../helpers';
 import { InputDocumentIntention } from './input-document-intention';
 import { InputDocumentAssignment } from './input-document-assignment';
 import { InputDayIntention } from './input-day-inention';
-import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
+import { useWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 import { useSearchParams } from 'react-router-dom';
 import { FREE_INPUT_GOAL_ID, URL_PARAM_NEW_DOC } from '../../../constants';
 
@@ -91,7 +91,7 @@ export default function DocGoalModal(props: {
     googleDoc?.assignmentDescription || ''
   );
   const [dayIntention, setDayIntention] = useState<string>('');
-  const { updateGoogleDoc } = UseWithGoogleDocs();
+  const { updateGoogleDoc } = useWithGoogleDocs();
 
   useEffect(() => {
     if (googleDoc?.googleDocId) {

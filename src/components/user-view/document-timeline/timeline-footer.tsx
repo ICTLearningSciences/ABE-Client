@@ -18,7 +18,7 @@ import {
   isTimelinePointFullyLoaded,
 } from '../../../helpers';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
+import { useWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 import '../../../styles/timeline.css';
 import {
   ColorlibConnector,
@@ -33,7 +33,7 @@ timeline point's version. */
 const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
   const { timelinePoint } = props;
   const { getActivitById } = useWithDocGoalsActivities();
-  const { getCurrentGoogleDoc } = UseWithGoogleDocs();
+  const { getCurrentGoogleDoc } = useWithGoogleDocs();
   const { docId } = useParams<Record<string, string>>();
 
   const activity = getActivitById(timelinePoint.version.activity || '');

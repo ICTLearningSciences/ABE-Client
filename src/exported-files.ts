@@ -4,9 +4,16 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-
-export { HelloWorld } from './HelloWorld';
 export { default as SelectCreateDocs } from './components/user-view/select-create-docs';
-export { useWithState } from './store/slices/state/use-with-state';
 export { store } from './store/store';
 export { Provider } from 'react-redux';
+
+export { useWithChat } from './store/slices/chat/use-with-chat';
+export { useWithConfig } from './store/slices/config/use-with-config';
+export { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
+export { useWithLogin } from './store/slices/login/use-with-login';
+export { useWithState } from './store/slices/state/use-with-state';
+export { useWithGoogleDocs } from './hooks/use-with-google-docs';
+export { useReduxHydration } from './use-redux-hydration';
+
+export * from './hooks/api';

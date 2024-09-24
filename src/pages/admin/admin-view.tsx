@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import ViewUserGoogleDocs from '../../components/admin-view/admin-view-docs';
-import { UseWithGoogleDocs } from '../../hooks/use-with-google-docs';
+import { useWithGoogleDocs } from '../../hooks/use-with-google-docs';
 import withAuthorizationOnly from '../../hooks/wrap-with-authorization-only';
 
 export enum AdminPages {
@@ -22,8 +22,8 @@ export enum AdminPages {
  * 3. Provide each page with a way to return to admin actions
  */
 function AdminView(): JSX.Element {
-  const useWithGoogleDocs = UseWithGoogleDocs();
-  return <ViewUserGoogleDocs useWithGoogleDocs={useWithGoogleDocs} />;
+  const _useWithGoogleDocs = useWithGoogleDocs();
+  return <ViewUserGoogleDocs useWithGoogleDocs={_useWithGoogleDocs} />;
 }
 
 export default withAuthorizationOnly(AdminView);
