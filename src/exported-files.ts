@@ -11,7 +11,7 @@ export { Provider } from 'react-redux';
 export { useWithChat } from './store/slices/chat/use-with-chat';
 export { useWithConfig } from './store/slices/config/use-with-config';
 export { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
-export { useWithLogin } from './store/slices/login/use-with-login';
+export { useWithSpfxLogin } from './store/slices/login/use-with-spfx-login';
 export { useWithState } from './store/slices/state/use-with-state';
 export { useWithGoogleDocs } from './hooks/use-with-google-docs';
 export { useReduxHydration } from './use-redux-hydration';
