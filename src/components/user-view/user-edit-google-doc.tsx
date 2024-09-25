@@ -15,12 +15,12 @@ import { UserRole } from '../../store/slices/login';
 import ActivityGqlButtonology from '../admin-view/buttonology';
 import { useWithState } from '../../store/slices/state/use-with-state';
 import { ActivityGQL, ActivityTypes, DocGoal } from '../../types';
-import { useWithPrompts as _useWithPrompts } from '../../hooks/use-with-prompts';
 import { DisplayIcons } from '../../helpers/display-icon-helper';
 import { v4 as uuidv4 } from 'uuid';
 import { removeDuplicatesByField } from '../../helpers';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
 import { ActivityBuilder } from '../activity-builder/types';
+import { UseWithPrompts } from '../../hooks/use-with-prompts';
 
 export function EditGoogleDoc(props: {
   docId: string;
@@ -28,9 +28,18 @@ export function EditGoogleDoc(props: {
   activityFromParams: string;
   goalFromParams: string;
   returnToDocs: () => void;
+  isNewDoc: boolean;
+  useWithPrompts: UseWithPrompts
 }): JSX.Element {
-  const { docId, docUrl, activityFromParams, goalFromParams, returnToDocs } =
-    props;
+  const {
+    docId,
+    docUrl,
+    activityFromParams,
+    goalFromParams,
+    returnToDocs,
+    isNewDoc,
+    useWithPrompts
+  } = props;
   const {
     docGoals,
     setGoal,
@@ -40,7 +49,6 @@ export function EditGoogleDoc(props: {
     isLoading: goalsLoading,
   } = useWithCurrentGoalActivity();
 
-  const useWithPrompts = _useWithPrompts();
   const { prompts } = useWithPrompts;
   const { width: windowWidth } = useWithWindowSize();
   const { updateViewingUserRole } = useWithState();
@@ -187,6 +195,7 @@ export function EditGoogleDoc(props: {
               useWithPrompts={useWithPrompts}
             />
             <DocGoalModal
+              isNewDoc={isNewDoc}
               docGoals={docGoals}
               setSelectedGoal={setGoal}
               setSelectedActivity={setActivity}

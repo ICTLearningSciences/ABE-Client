@@ -27,8 +27,7 @@ import { InputDocumentIntention } from './input-document-intention';
 import { InputDocumentAssignment } from './input-document-assignment';
 import { InputDayIntention } from './input-day-inention';
 import { useWithGoogleDocs } from '../../../hooks/use-with-google-docs';
-import { useSearchParams } from 'react-router-dom';
-import { FREE_INPUT_GOAL_ID, URL_PARAM_NEW_DOC } from '../../../constants';
+import { FREE_INPUT_GOAL_ID } from '../../../constants';
 
 const style: SxProps<Theme> = {
   position: 'absolute',
@@ -56,14 +55,15 @@ export default function DocGoalModal(props: {
   selectedActivity?: ActivityTypes;
   selectedGoal?: DocGoal;
   docGoals?: DocGoal[];
+  isNewDoc: boolean;
 }): JSX.Element {
-  const [urlSearchParams] = useSearchParams();
   const {
     open,
     close,
     docGoals,
     setSelectedGoal: beginGoal,
     setSelectedActivity: beginActivity,
+    isNewDoc,
   } = props;
 
   const enum SelectingStage {
@@ -77,7 +77,6 @@ export default function DocGoalModal(props: {
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
   const googleDocs = useAppSelector((state) => state.state.userGoogleDocs);
   const googleDoc = googleDocs.find((doc) => doc.googleDocId === googleDocId);
-  const isNewGoogleDoc = urlSearchParams.get(URL_PARAM_NEW_DOC) === 'true';
   const [curStageIndex, setCurStageIndex] = useState(0);
   const [stages, setStages] = useState<SelectingStage[]>([]);
   const currentStage = stages[curStageIndex];
@@ -252,7 +251,7 @@ export default function DocGoalModal(props: {
             }
           }}
           selectedGoal={_selectedGoal}
-          isNewGoogleDoc={isNewGoogleDoc}
+          isNewGoogleDoc={isNewDoc}
         />
       );
     } else {

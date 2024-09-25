@@ -8,8 +8,15 @@ import React from 'react';
 import { useEffect } from 'react';
 import withAuthorizationOnly from '../hooks/wrap-with-authorization-only';
 import { EditGoogleDoc } from './user-view/user-edit-google-doc';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { useWithState } from '../store/slices/state/use-with-state';
+import { URL_PARAM_NEW_DOC } from '../constants';
+import { useWithPrompts } from '../hooks/use-with-prompts';
 
 function DocView(): JSX.Element {
   const { docId } = useParams<Record<string, string>>();
@@ -20,6 +27,11 @@ function DocView(): JSX.Element {
   const activityFromParams = queryParams.get('activityId');
   const goalFromParams = queryParams.get('goalId');
   const googleDocUrl = `https://docs.google.com/document/d/${docId}/edit`;
+
+  const [urlSearchParams] = useSearchParams();
+  const isNewGoogleDoc = urlSearchParams.get(URL_PARAM_NEW_DOC) === 'true';
+
+  const prompts = useWithPrompts();
 
   useEffect(() => {
     if (docId) {
@@ -39,6 +51,8 @@ function DocView(): JSX.Element {
       docUrl={googleDocUrl}
       activityFromParams={activityFromParams || ''}
       goalFromParams={goalFromParams || ''}
+      isNewDoc={isNewGoogleDoc}
+      useWithPrompts={prompts}
     />
   );
 }
