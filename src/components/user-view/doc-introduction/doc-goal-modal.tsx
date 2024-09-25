@@ -47,7 +47,7 @@ const style: SxProps<Theme> = {
   border: '5px solid black',
 };
 
-export default function DocGoalModal(props: {
+export function DocGoalModal(props: {
   open: boolean;
   close: () => void;
   setSelectedGoal: (goal?: DocGoal) => void;
@@ -456,7 +456,30 @@ export default function DocGoalModal(props: {
               </ColumnDiv>
             </>
           ) : (
-            <CircularProgress />
+            <>
+              <CircularProgress />
+              <dialog
+                open
+                style={{
+                  position: 'fixed',
+                  top: '0',
+                  left: '0',
+                  right: '0',
+                  bottom: '0',
+                  width: '500px',
+                  height: '500px',
+                  backgroundColor: 'white',
+                  zIndex: 1000,
+                  padding: '20px',
+                  overflow: 'scroll',
+                }}
+              >
+                {googleDocId}
+                {JSON.stringify(googleDocs || '{}')}
+                {JSON.stringify(googleDoc || '{}')}
+                {firstLoadComplete}
+              </dialog>
+            </>
           )}
         </Box>
       </Modal>

@@ -17,5 +17,7 @@ export { useWithGoogleDocs } from './hooks/use-with-google-docs';
 export { useWithPrompts } from './hooks/use-with-prompts';
 export { useReduxHydration } from './use-redux-hydration';
 export { EditGoogleDoc } from './components/user-view/user-edit-google-doc';
-
+export { useWithCurrentGoalActivity } from './hooks/use-with-current-goal-activity';
+export { ChatActivity } from './components/user-view/chat-activity';
+export { useConfigLoader } from './components/config-loading/use-config-loader';
 export * from './hooks/api';

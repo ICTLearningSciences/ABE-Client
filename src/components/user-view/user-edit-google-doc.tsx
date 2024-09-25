@@ -6,10 +6,8 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { Button, CircularProgress } from '@mui/material';
-import Chat from './chat/chat';
 import { useWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-activity';
-import DocGoalModal from './doc-introduction/doc-goal-modal';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
 import ActivityGqlButtonology from '../admin-view/buttonology';
@@ -21,6 +19,7 @@ import { removeDuplicatesByField } from '../../helpers';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
 import { ActivityBuilder } from '../activity-builder/types';
 import { UseWithPrompts } from '../../hooks/use-with-prompts';
+import { ChatActivity } from './chat-activity';
 
 export function EditGoogleDoc(props: {
   docId: string;
@@ -29,7 +28,7 @@ export function EditGoogleDoc(props: {
   goalFromParams: string;
   returnToDocs: () => void;
   isNewDoc: boolean;
-  useWithPrompts: UseWithPrompts
+  useWithPrompts: UseWithPrompts;
 }): JSX.Element {
   const {
     docId,
@@ -38,31 +37,23 @@ export function EditGoogleDoc(props: {
     goalFromParams,
     returnToDocs,
     isNewDoc,
-    useWithPrompts
+    useWithPrompts,
   } = props;
+  const useCurrentGoalActivity = useWithCurrentGoalActivity();
   const {
     docGoals,
-    setGoal,
-    setActivity,
-    setGoalAndActivity,
     goalActivityState,
+    setGoalAndActivity,
     isLoading: goalsLoading,
-  } = useWithCurrentGoalActivity();
+  } = useCurrentGoalActivity;
 
   const { prompts } = useWithPrompts;
   const { width: windowWidth } = useWithWindowSize();
   const { updateViewingUserRole } = useWithState();
-  const [docGoalModalOpen, setDocGoalModalOpen] = useState(false);
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const viewingAdmin = viewingRole === UserRole.ADMIN;
   const allActivities = getAllActivites(docGoals || []);
   const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
-  const [checkedUrlParams, setCheckedUrlParams] = useState<boolean>(false);
-
-  function editDocGoal() {
-    setDocGoalModalOpen(true);
-    setPreviewingActivity(false);
-  }
 
   function goToActivityPreview(activity: ActivityTypes) {
     setPreviewingActivity(true);
@@ -111,27 +102,6 @@ export function EditGoogleDoc(props: {
     }
     return docGoals.flatMap((goal) => goal.builtActivities || []);
   }
-
-  useEffect(() => {
-    if (goalsLoading || !docGoals || checkedUrlParams) {
-      return;
-    }
-
-    if (!goalFromParams && !activityFromParams) {
-      setDocGoalModalOpen(true);
-      setCheckedUrlParams(true);
-      return;
-    }
-    const goal = docGoals.find((goal) => goal._id === goalFromParams);
-    const activity = allActivities?.find(
-      (activity) => activity?._id === activityFromParams
-    );
-    setGoalAndActivity(goal, activity);
-    const goalHasActivities = goal?.activities?.length;
-    if (!activity && goalHasActivities) {
-      setDocGoalModalOpen(true);
-    }
-  }, [goalFromParams, goalsLoading, activityFromParams, checkedUrlParams]);
 
   if (goalsLoading) {
     return (
@@ -186,31 +156,13 @@ export function EditGoogleDoc(props: {
             }
           />
         ) : (
-          <>
-            <Chat
-              selectedActivity={goalActivityState?.selectedActivity}
-              selectedGoal={goalActivityState?.selectedGoal}
-              editDocGoal={editDocGoal}
-              setSelectedActivity={setActivity}
-              useWithPrompts={useWithPrompts}
-            />
-            <DocGoalModal
-              isNewDoc={isNewDoc}
-              docGoals={docGoals}
-              setSelectedGoal={setGoal}
-              setSelectedActivity={setActivity}
-              selectedActivity={goalActivityState?.selectedActivity}
-              selectedGoal={goalActivityState?.selectedGoal}
-              open={
-                docGoalModalOpen &&
-                Boolean(docGoals?.length) &&
-                !previewingActivity
-              }
-              close={() => {
-                setDocGoalModalOpen(false);
-              }}
-            />
-          </>
+          <ChatActivity
+            activityFromParams={activityFromParams}
+            goalFromParams={goalFromParams}
+            isNewDoc={isNewDoc}
+            useWithPrompts={useWithPrompts}
+            useCurrentGoalActivity={useCurrentGoalActivity}
+          />
         )}
       </div>
     </div>

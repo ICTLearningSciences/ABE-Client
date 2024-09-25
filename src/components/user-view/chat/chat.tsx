@@ -40,7 +40,7 @@ import { ChatHeaderGenerator } from './chat-header-generator';
 import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activity-handler';
 import { isActivityBuilder } from '../../activity-builder/types';
 
-export default function Chat(props: {
+export function Chat(props: {
   selectedGoal?: DocGoal;
   selectedActivity?: ActivityTypes;
   editDocGoal: () => void;
@@ -108,6 +108,7 @@ export default function Chat(props: {
 
   return (
     <div
+      data-cy="chat-container-parent"
       style={{
         display: 'flex',
         flexDirection: 'column',
