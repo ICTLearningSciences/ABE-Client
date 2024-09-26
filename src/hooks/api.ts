@@ -210,7 +210,7 @@ export async function docTextAction(
 export async function getDocData(docId: string): Promise<DocData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY);
   const res = await axios.get<DocData>(
-    `${API_ENDPOINT}/get_doc_data/${docId}`,
+    `${API_ENDPOINT}/get_doc_data/${docId}/${DOCUMENT_SERVICE}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
