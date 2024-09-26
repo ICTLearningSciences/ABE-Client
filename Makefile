@@ -1,4 +1,4 @@
-TEST_E2E_DOCKER_COMPOSE=docker-compose
+TEST_E2E_DOCKER_COMPOSE=docker compose
 
 .PHONY: develop
 develop:
