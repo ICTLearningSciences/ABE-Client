@@ -21,9 +21,12 @@ import {
 import { formatISODateToReadable } from '../../helpers';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { Delete } from '@mui/icons-material';
-import './select-create-docs.css';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { TwoOptionDialog } from '../dialog';
+import {
+  GoogleDocItemName,
+  StyledGoogleDocItemRow,
+} from './select-create-docs-styles';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: GoogleDoc[];
@@ -129,9 +132,8 @@ export default function SelectCreateDocs(props: {
 
             <TableBody>
               {googleDocs?.map((doc, index) => (
-                <TableRow
+                <StyledGoogleDocItemRow
                   key={index}
-                  className="google-doc-item-row"
                   onDoubleClick={() => {
                     goToDoc(doc.googleDocId);
                   }}
@@ -139,8 +141,7 @@ export default function SelectCreateDocs(props: {
                   <TableCell>
                     <RowDiv>
                       <DescriptionIcon />
-                      <span
-                        className="google-doc-item-name"
+                      <GoogleDocItemName
                         data-cy={`doc-list-item-${doc.title.replaceAll(
                           ' ',
                           '-'
@@ -150,7 +151,7 @@ export default function SelectCreateDocs(props: {
                         }}
                       >
                         {doc.title || 'My Document'}
-                      </span>
+                      </GoogleDocItemName>
                     </RowDiv>
                   </TableCell>
                   <TableCell>
@@ -175,7 +176,7 @@ export default function SelectCreateDocs(props: {
                       <Delete />
                     </IconButton>
                   </TableCell>
-                </TableRow>
+                </StyledGoogleDocItemRow>
               ))}
             </TableBody>
           </Table>

@@ -16,7 +16,6 @@ import {
 } from '@mui/material';
 import { ActivityTypes, DocGoal, GoogleDoc, Intention } from '../../../types';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
-import './doc-goal-modal.css';
 import { useState } from 'react';
 import ChangeIcon from '@mui/icons-material/Construction';
 import { ActivitiesDisplay } from './activities-display';

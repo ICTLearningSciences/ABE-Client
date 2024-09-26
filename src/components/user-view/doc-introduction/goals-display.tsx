@@ -2,7 +2,7 @@ import React from 'react';
 import { DisplayIcon } from '../../../helpers/display-icon-helper';
 import { RowDiv, ColumnDiv } from '../../../styled-components';
 import { DocGoal } from '../../../types';
-import './doc-goal-modal.css';
+import { GoalDisplay as _GoalDisplay } from './doc-goal-modal-styles';
 
 export function GoalsDisplay(props: {
   docGoals: DocGoal[];
@@ -52,8 +52,8 @@ function GoalDisplay(props: {
 }): JSX.Element {
   const { docGoal, setSelectedGoal, isSelected, isNewGoogleDoc } = props;
   return (
-    <div
-      className={`goal-display ${
+    <_GoalDisplay
+      className={`${
         isNewGoogleDoc && docGoal.newDocRecommend ? 'goal-display-flash' : ''
       }`}
       data-cy={`goal-display-${docGoal._id}`}
@@ -81,6 +81,6 @@ function GoalDisplay(props: {
           {docGoal.description}
         </span>
       </ColumnDiv>
-    </div>
+    </_GoalDisplay>
   );
 }

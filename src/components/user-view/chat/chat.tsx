@@ -25,7 +25,6 @@ import { UserRole } from '../../../store/slices/login';
 import useWithFreeInput from '../../../hooks/use-with-free-input';
 import { useWithActivityHandler } from '../../../hooks/use-with-activity-handler';
 import { useWithState } from '../../../store/slices/state/use-with-state';
-import './chat.css';
 import { UseWithPrompts } from '../../../hooks/use-with-prompts';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import {
@@ -39,6 +38,14 @@ import { ChatInput } from './chat-input';
 import { ChatHeaderGenerator } from './chat-header-generator';
 import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activity-handler';
 import { isActivityBuilder } from '../../activity-builder/types';
+import { createGlobalStyle } from 'styled-components';
+
+export const GlobalChatStyles = createGlobalStyle`
+  .MuiOutlinedInput-notchedOutline {
+    border-color: rgb(0, 0, 0) !important;
+    border-width: 1px !important;
+  }
+`;
 
 export function Chat(props: {
   selectedGoal?: DocGoal;
@@ -117,6 +124,7 @@ export function Chat(props: {
         alignItems: 'center',
       }}
     >
+      <GlobalChatStyles />
       {activityReady || builtActivityReady || !goalHasActivities ? (
         <>
           <div

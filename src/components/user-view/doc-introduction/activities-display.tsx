@@ -4,7 +4,7 @@ import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { ActivityTypes } from '../../../types';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import './doc-goal-modal.css';
+import { GoalDisplay } from './doc-goal-modal-styles';
 
 function ActivityDisplay(props: {
   activity: ActivityTypes;
@@ -14,8 +14,8 @@ function ActivityDisplay(props: {
 }): JSX.Element {
   const { activity, setSelectedActivity, isSelected, isNewGoogleDoc } = props;
   return (
-    <div
-      className={`goal-display ${
+    <GoalDisplay
+      className={`${
         isNewGoogleDoc && activity.newDocRecommend ? 'goal-display-flash' : ''
       }`}
       data-cy={`activity-display-${activity._id}`}
@@ -72,7 +72,7 @@ function ActivityDisplay(props: {
           {activity.description}
         </span>
       </ColumnDiv>
-    </div>
+    </GoalDisplay>
   );
 }
 

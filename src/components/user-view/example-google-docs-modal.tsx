@@ -9,10 +9,10 @@ import { makeStyles } from 'tss-react/mui';
 import { GoogleDoc } from '../../types';
 import { RowDiv, RowDivSB } from '../../styled-components';
 import React, { useEffect } from 'react';
-import './create-google-doc-modal.css';
 import CreateNewAdminGoogleDoc from '../admin-view/author-new-google-doc-modal';
 import LockIcon from '@mui/icons-material/Lock';
 import { PreviewGoogleDocModal } from './preview-google-doc-modal';
+import styled from 'styled-components';
 const useStyles = makeStyles({ name: { ExampleGoogleDocModal } })(
   (theme: Theme) => ({
     inputField: {
@@ -29,6 +29,12 @@ const useStyles = makeStyles({ name: { ExampleGoogleDocModal } })(
     },
   })
 );
+
+export const StyledExampleGoogleDocItem = styled(RowDivSB)`
+  &:hover {
+    background-color: rgb(245, 245, 245);
+  }
+`;
 
 export default function ExampleGoogleDocModal(props: {
   adminDocs?: GoogleDoc[];
@@ -109,9 +115,8 @@ export default function ExampleGoogleDocModal(props: {
                 }}
               >
                 {adminDocs?.map((doc, i) => (
-                  <RowDivSB
+                  <StyledExampleGoogleDocItem
                     key={i}
-                    className="example-google-doc-item"
                     style={{
                       borderBottom: '1px solid black',
                       backgroundColor:
@@ -125,7 +130,7 @@ export default function ExampleGoogleDocModal(props: {
                     }}
                   >
                     <h4>{doc.title}</h4>
-                  </RowDivSB>
+                  </StyledExampleGoogleDocItem>
                 ))}
               </div>
             </div>
