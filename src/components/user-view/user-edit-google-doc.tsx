@@ -20,6 +20,7 @@ import { useWithWindowSize } from '../../hooks/use-with-window-size';
 import { ActivityBuilder } from '../activity-builder/types';
 import { UseWithPrompts } from '../../hooks/use-with-prompts';
 import { ChatActivity } from './chat-activity';
+import { getDocData } from '../../hooks/api';
 
 export function EditGoogleDoc(props: {
   docId: string;
@@ -157,6 +158,7 @@ export function EditGoogleDoc(props: {
           />
         ) : (
           <ChatActivity
+            getDocData={getDocData}
             activityFromParams={activityFromParams}
             goalFromParams={goalFromParams}
             isNewDoc={isNewDoc}

@@ -6,14 +6,18 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { useState } from 'react';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
-import { getDocData, submitDocVersion } from './api';
+import { submitDocVersion } from './api';
 import { useAppSelector } from '../store/hooks';
 import useInterval from './use-interval';
-import { DocVersion, Intention } from '../types';
+import { DocData, DocVersion, Intention } from '../types';
 import { hasHoursPassed } from '../helpers';
 import { useWithGoogleDocs } from './use-with-google-docs';
 
-export function useWithStoreDocVersions(selectedActivityId: string) {
+/**
+ * Interval to store doc versions
+ * @param selectedActivityId
+ */
+export function useWithStoreDocVersions(selectedActivityId: string, getDocData: (docId: string) => Promise<DocData>) {
   const { state } = useWithChat();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId

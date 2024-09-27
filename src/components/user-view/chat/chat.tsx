@@ -16,6 +16,7 @@ import {
   ActivityGQL,
   ActivityTypes,
   AiServiceModel,
+  DocData,
   DocGoal,
   isActivityGql,
 } from '../../../types';
@@ -53,8 +54,9 @@ export function Chat(props: {
   editDocGoal: () => void;
   setSelectedActivity: (activity: ActivityGQL) => void;
   useWithPrompts: UseWithPrompts;
+  getDocData: (docId: string) => Promise<DocData>;
 }) {
-  const { selectedGoal, selectedActivity, editDocGoal, useWithPrompts } = props;
+  const { selectedGoal, selectedActivity, editDocGoal, useWithPrompts, getDocData } = props;
   const { sendMessage, state: chatState, setSystemRole } = useWithChat();
   const {
     editedData: systemPromptData,
@@ -76,7 +78,7 @@ export function Chat(props: {
   const userIsAdmin = userRole === UserRole.ADMIN;
   const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
   useWithFreeInput(!selectedActivity ? selectedGoal : undefined);
-  useWithStoreDocVersions(selectedActivity?._id || '');
+  useWithStoreDocVersions(selectedActivity?._id || '', getDocData);
   const { activityReady } = useWithActivityHandler(
     useWithPrompts,
     editDocGoal,
