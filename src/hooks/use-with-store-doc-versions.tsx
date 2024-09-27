@@ -43,6 +43,7 @@ export function useWithStoreDocVersions(selectedActivityId: string, getDocData: 
   const [lastNumMessages, setLastNumMessages] = useState<number>(
     messages.length
   );
+  const [lastUpdatedPlainText, setLastUpdatedPlainText] = useState<string>('');
   const [lastSavedSessionId, setLastSavedSessionId] =
     useState<string>(sessionId);
 
@@ -58,6 +59,7 @@ export function useWithStoreDocVersions(selectedActivityId: string, getDocData: 
         }
         if (
           docData.lastChangedId === lastUpdatedId &&
+          docData.plainText === lastUpdatedPlainText &&
           docData.title === lastUpdatedTitle &&
           messages.length === lastNumMessages &&
           sessionId === lastSavedSessionId
@@ -66,6 +68,7 @@ export function useWithStoreDocVersions(selectedActivityId: string, getDocData: 
         setLastSavedSessionId(sessionId);
         setLastUpdatedId(docData.lastChangedId);
         setLastUpdatedTitle(docData.title);
+        setLastUpdatedPlainText(docData.plainText);
         setLastNumMessages(messages.length);
         const newDocData: DocVersion = {
           docId: googleDocId,
