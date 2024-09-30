@@ -17,7 +17,10 @@ import { useWithGoogleDocs } from './use-with-google-docs';
  * Interval to store doc versions
  * @param selectedActivityId
  */
-export function useWithStoreDocVersions(selectedActivityId: string, getDocData: (docId: string) => Promise<DocData>) {
+export function useWithStoreDocVersions(
+  selectedActivityId: string,
+  getDocData: (docId: string) => Promise<DocData>
+) {
   const { state } = useWithChat();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId

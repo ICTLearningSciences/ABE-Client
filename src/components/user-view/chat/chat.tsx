@@ -56,7 +56,13 @@ export function Chat(props: {
   useWithPrompts: UseWithPrompts;
   getDocData: (docId: string) => Promise<DocData>;
 }) {
-  const { selectedGoal, selectedActivity, editDocGoal, useWithPrompts, getDocData } = props;
+  const {
+    selectedGoal,
+    selectedActivity,
+    editDocGoal,
+    useWithPrompts,
+    getDocData,
+  } = props;
   const { sendMessage, state: chatState, setSystemRole } = useWithChat();
   const {
     editedData: systemPromptData,

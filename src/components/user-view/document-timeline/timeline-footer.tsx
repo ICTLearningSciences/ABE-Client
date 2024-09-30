@@ -1,5 +1,5 @@
 import React, { RefObject, useEffect, useState } from 'react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import { useParams } from 'react-router-dom';
 
 import Stepper from '@mui/material/Stepper';
@@ -25,6 +25,11 @@ import {
   QontoStepIcon,
   StepperSx,
 } from './ColorlibConnector';
+import {
+  Text2Typography,
+  Text3,
+  Text3NoIndent,
+} from '../../../styles/content-revision-styles';
 
 /* The `TimeLineCard` component is a functional component that takes in a prop `timelinePoint` of type
 `GQLTimelinePoint`. Inside the component, it retrieves the `getActivitById` function from the
@@ -42,11 +47,11 @@ const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
 
   return (
     <Box>
-      <Typography className="text-2">{title}</Typography>
+      <Text2Typography>{title}</Text2Typography>
 
-      <Typography className="text-3-no-indent" style={{ textAlign: 'right' }}>
+      <Text3NoIndent style={{ textAlign: 'right' }}>
         {convertDateTimelinePointTime(timelinePoint.versionTime) || ''}
-      </Typography>
+      </Text3NoIndent>
     </Box>
   );
 };
@@ -155,8 +160,7 @@ export default function TimelineFooter(props: {
                   >
                     {hoverIndex !== i ? (
                       <div className="timeline-footer-item-card-inner">
-                        <Typography
-                          className="text-2"
+                        <Text2Typography
                           style={{
                             textAlign: 'center',
                             display: 'flex',
@@ -173,12 +177,12 @@ export default function TimelineFooter(props: {
                               style={{ marginLeft: 5, fontSize: 18 }}
                             />
                           ) : null}
-                        </Typography>
-                        <Typography className="text-3">
+                        </Text2Typography>
+                        <Text3>
                           {convertDateTimelinePointTime(
                             timelinePoint.versionTime
                           )}
-                        </Typography>
+                        </Text3>
                       </div>
                     ) : (
                       <TimeLineCard timelinePoint={timelinePoints[i]} />
