@@ -11,6 +11,7 @@ import {
   StyledCloseIcon,
   StyledPopover,
   Text3,
+  Text3NoIndent,
 } from '../../../styles/content-revision-styles';
 
 interface ActivityTranscriptProps {
@@ -46,6 +47,7 @@ const ChatMessage = (props: ChatMessageProps) => {
       <Text3
         style={{
           color: isSystemMessage ? ContentRevisionTextColor3 : ContentBg,
+          marginLeft: isSystemMessage ? '10px' : '0px',
         }}
       >
         {message}
@@ -85,14 +87,14 @@ function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
   return (
     <Text3>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Text3
+        <Text3NoIndent
           style={{
             cursor: 'pointer',
           }}
           onClick={handleClick}
         >
           {activityTitle ? `${activityTitle}` : ''}
-        </Text3>
+        </Text3NoIndent>
         <IconButton aria-label="chat" onClick={handleClick}>
           <ChatIcon style={{ fontSize: 18 }} />
         </IconButton>
