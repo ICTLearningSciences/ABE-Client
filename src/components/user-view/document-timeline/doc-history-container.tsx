@@ -2,7 +2,7 @@ import React from 'react';
 import withAuthorizationOnly from '../../../hooks/wrap-with-authorization-only';
 import { UseWithLogin } from '../../../store/slices/login/use-with-login';
 import Header from '../../header';
-import DocumentTimelinePage from './index';
+import { DocumentTimelinePage } from './index';
 import { useParams, useNavigate } from 'react-router-dom';
 
 function DocHistoryContainer(props: { useLogin: UseWithLogin }): JSX.Element {

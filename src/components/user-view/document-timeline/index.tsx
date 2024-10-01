@@ -8,7 +8,7 @@ import { TimepointOutline } from './timepoint-outline';
 import TimelineFooter from './timeline-footer';
 import { useWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 
-function DocumentTimelinePage(props: {
+export function DocumentTimelinePage(props: {
   returnToDocs: () => void;
   docIdFromParams: string;
 }): JSX.Element {
@@ -156,5 +156,3 @@ function DocumentTimelinePage(props: {
     </div>
   );
 }
-
-export default DocumentTimelinePage;

@@ -8,6 +8,7 @@ export { default as SelectCreateDocs } from './components/user-view/select-creat
 export { store } from './store/store';
 export { Provider } from 'react-redux';
 
+export { useWithLogin } from './store/slices/login/use-with-login';
 export { useWithChat } from './store/slices/chat/use-with-chat';
 export { useWithConfig } from './store/slices/config/use-with-config';
 export { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
@@ -20,4 +21,5 @@ export { EditGoogleDoc } from './components/user-view/user-edit-google-doc';
 export { useWithCurrentGoalActivity } from './hooks/use-with-current-goal-activity';
 export { ChatActivity } from './components/user-view/chat-activity';
 export { useConfigLoader } from './components/config-loading/use-config-loader';
+export { DocumentTimelinePage } from './components/user-view/document-timeline';
 export * from './hooks/api';
