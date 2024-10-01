@@ -15,9 +15,9 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import DocView from './components/doc-view';
 import { useWithLogin } from './store/slices/login/use-with-login';
-import DocumentTimelinePage from './components/user-view/document-timeline';
 import { useReduxHydration } from './use-redux-hydration';
 import { useConfigLoader } from './components/config-loading/use-config-loader';
+import DocHistoryContainer from './components/user-view/document-timeline/doc-history-container';
 
 function MainApp() {
   const useLogin = useWithLogin();
@@ -81,22 +81,7 @@ function MainApp() {
     },
     {
       path: '/docs/history/:docId',
-      element: (
-        <>
-          <Header useLogin={useLogin} />
-          <div
-            style={{
-              width: '100%',
-              height: '94%', //header takes 6%
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <DocumentTimelinePage />
-          </div>
-        </>
-      ),
+      element: <DocHistoryContainer useLogin={useLogin} />,
     },
   ]);
   const { ConfigLoader, configLoaded } = useConfigLoader();

@@ -1,9 +1,14 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
 import { GQLTimelinePoint } from '../../../types';
 
-import '../../../styles/content-revision.css';
 import { AnimatePresence, motion } from 'framer-motion';
+import {
+  ContentContainer,
+  ContentRevisionContainerLeft,
+  RevisionTimeHeaderTypography,
+  Text2Styles,
+  Text3NoIndent,
+} from '../../../styles/content-revision-styles';
 
 export default function TimepointDocumentText(props: {
   timelinePoint: GQLTimelinePoint;
@@ -11,13 +16,7 @@ export default function TimepointDocumentText(props: {
 }): JSX.Element {
   const { timelinePoint, hasOverflowX } = props;
   return (
-    <Box
-      className={
-        hasOverflowX
-          ? 'content-revision-container-left-scroll'
-          : 'content-revision-container-left'
-      }
-    >
+    <ContentRevisionContainerLeft hasOverflowX={hasOverflowX}>
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, x: 50 }}
@@ -25,9 +24,13 @@ export default function TimepointDocumentText(props: {
           exit={{ opacity: 0, x: 100 }}
           transition={{ duration: 0.5, ease: 'easeInOut' }}
         >
-          <Typography className="revision-time-header text-2">
+          <RevisionTimeHeaderTypography
+            style={{
+              ...Text2Styles,
+            }}
+          >
             {timelinePoint.version.title}
-          </Typography>
+          </RevisionTimeHeaderTypography>
         </motion.div>
       </AnimatePresence>
 
@@ -38,16 +41,14 @@ export default function TimepointDocumentText(props: {
           exit={{ opacity: 0, x: 100 }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
         >
-          <Box
+          <ContentContainer
             data-cy="left-content-container"
-            className={
-              hasOverflowX
-                ? 'left-content-container-scroll'
-                : 'left-content-container'
-            }
+            hasOverflowX={hasOverflowX}
+            sx={{
+              marginRight: 10,
+            }}
           >
-            <Typography
-              className="text-3-no-indent"
+            <Text3NoIndent
               style={{
                 marginRight: 10,
               }}
@@ -61,10 +62,10 @@ export default function TimepointDocumentText(props: {
               >
                 {timelinePoint.version.plainText}
               </pre>
-            </Typography>
-          </Box>
+            </Text3NoIndent>
+          </ContentContainer>
         </motion.div>
       </AnimatePresence>
-    </Box>
+    </ContentRevisionContainerLeft>
   );
 }

@@ -13,7 +13,19 @@ export interface CurrentGoalAndActivity {
   selectedActivity?: ActivityTypes;
 }
 
-export function useWithCurrentGoalActivity() {
+export interface UseWithCurrentGoalActivity {
+  docGoals: DocGoal[] | undefined;
+  goalActivityState: CurrentGoalAndActivity | undefined;
+  setGoalActivityState: React.Dispatch<
+    React.SetStateAction<CurrentGoalAndActivity | undefined>
+  >;
+  setGoal: (goal?: DocGoal) => void;
+  setActivity: (activity?: ActivityTypes) => void;
+  setGoalAndActivity: (goal?: DocGoal, activity?: ActivityTypes) => void;
+  isLoading: boolean;
+}
+
+export function useWithCurrentGoalActivity(): UseWithCurrentGoalActivity {
   const { docGoals, isLoading } = useWithDocGoalsActivities();
 
   const [goalActivityState, setGoalActivityState] =

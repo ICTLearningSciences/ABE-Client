@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import {
   Button,
-  Card,
   CardActions,
   CardHeader,
   CircularProgress,
@@ -17,13 +16,12 @@ import {
   Paper,
 } from '@mui/material';
 import { ActivityGQL, ActivityPrompt, GQLPrompt } from '../../../types';
-import './saved-prompts-view.css';
 import { ArrowDropDown } from '@mui/icons-material';
 import { RowDivSB } from '../../../styled-components';
 import SavePromptListItem from '../saved-prompt-list-item';
 import { useState } from 'react';
-import './saved-activity-prompts-view.css';
 import EditActivityMessages from './edit-activity-messages';
+import { StyledActivityCard } from './saved-activity-prompts-view-styles';
 
 export interface ActivityPrompts {
   activity: ActivityGQL;
@@ -53,11 +51,10 @@ function SavedActivityPromptDisplay(props: {
         marginBottom: '10px',
       }}
     >
-      <Card
+      <StyledActivityCard
         onClick={() => {
           setExpand(!expand);
         }}
-        className="activity-card"
         style={{
           textAlign: 'left',
           cursor: 'pointer',
@@ -100,7 +97,7 @@ function SavedActivityPromptDisplay(props: {
             </>
           ))}
         </Collapse>
-      </Card>
+      </StyledActivityCard>
     </Paper>
   );
 }

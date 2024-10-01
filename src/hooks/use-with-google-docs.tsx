@@ -9,7 +9,7 @@ import { createNewGoogleDoc } from './api';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { GoogleDoc, NewDocData, StoreGoogleDoc } from '../types';
-import { useNavigate } from 'react-router-dom';
+
 import {
   GoogleDocsLoadStatus,
   loadUserGoogleDocs,
@@ -17,7 +17,6 @@ import {
   deleteUserGoogleDoc,
   updateGoogleDocTitleLocally as _updateGoogleDocTitle,
 } from '../store/slices/state';
-import { URL_PARAM_NEW_DOC } from '../constants';
 
 export interface DocRevisionResponse {
   revisions: RevisionsItem[];
@@ -31,16 +30,15 @@ export interface RevisionsItem {
 
 export interface UseWithGoogleDocs {
   docId: string;
-  docUrl: string;
   googleDocs: GoogleDoc[];
   copyGoogleDocs: GoogleDoc[];
   creationInProgress: boolean;
   handleCreateGoogleDoc: (
     docIdToCopyFrom?: string,
     title?: string,
-    isAdminDoc?: boolean
+    isAdminDoc?: boolean,
+    callback?: (newDocData: NewDocData) => void
   ) => Promise<void>;
-  handleOpenGoogleDoc: (docId: string) => void;
   handleSelectGoogleDocs: (docId: string) => void;
   docsLoading: boolean;
   updateGoogleDoc: (googleDoc: StoreGoogleDoc) => Promise<GoogleDoc>;
@@ -50,7 +48,7 @@ export interface UseWithGoogleDocs {
   updateGoogleDocTitleLocally: (googleDocId: string, title: string) => void;
 }
 
-export function UseWithGoogleDocs(): UseWithGoogleDocs {
+export function useWithGoogleDocs(): UseWithGoogleDocs {
   const { updateCurrentDocId } = useWithState();
 
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
@@ -69,14 +67,10 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
   const copyGoogleDocs = googleDocs?.filter((doc) => {
     return exampleGoogleDocs.includes(doc.googleDocId);
   });
-  const navigate = useNavigate();
+
   const [creationInProgress, setCreationInProgress] =
     React.useState<boolean>(false);
 
-  function handleNewGoogleDoc(newGoogleDoc: NewDocData) {
-    updateCurrentDocId(newGoogleDoc.docId);
-    navigate(`/docs/${newGoogleDoc.docId}?${URL_PARAM_NEW_DOC}=true`);
-  }
   useEffect(() => {
     const queryParameters = new URLSearchParams(window.location.search);
     const targetDocId = queryParameters.get('docId');
@@ -100,7 +94,8 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
   async function handleCreateGoogleDoc(
     docIdToCopyFrom?: string,
     title?: string,
-    isAdminDoc?: boolean
+    isAdminDoc?: boolean,
+    callback?: (newDocData: NewDocData) => void
   ) {
     setCreationInProgress(true);
     await createNewGoogleDoc(
@@ -111,7 +106,12 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
       isAdminDoc
     )
       .then((newDocData) => {
-        handleNewGoogleDoc(newDocData);
+        // if(navToNewDoc){
+        //   handleNewGoogleDoc(newDocData);
+        // }
+        if (callback) {
+          callback(newDocData);
+        }
         loadUsersGoogleDocs(); //reload the user's google docs since have new onces
       })
       .catch((err) => {
@@ -121,10 +121,6 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
       .finally(() => {
         setCreationInProgress(false);
       });
-  }
-
-  function handleOpenGoogleDoc(docId: string) {
-    window.open(`https://docs.google.com/document/d/${docId}`, '_blank');
   }
 
   function handleSelectGoogleDocs(docId: string) {
@@ -154,14 +150,10 @@ export function UseWithGoogleDocs(): UseWithGoogleDocs {
 
   return {
     docId: googleDocId,
-    docUrl: googleDocId
-      ? `https://docs.google.com/document/d/${googleDocId}`
-      : '',
     googleDocs: userGoogleDocs || [],
     copyGoogleDocs: copyGoogleDocs || [],
     creationInProgress,
     handleCreateGoogleDoc,
-    handleOpenGoogleDoc,
     handleSelectGoogleDocs,
     docsLoading: isLoading,
     updateGoogleDoc,

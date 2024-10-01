@@ -1,9 +1,18 @@
 import React from 'react';
 import ChatIcon from '@mui/icons-material/Chat';
-import { IconButton, Popover, Typography } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { IconButton } from '@mui/material';
 import { ChatItem } from '../../../types';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
+import {
+  ContentBg,
+  ContentRevisionTextColor3,
+  MessageContainer,
+  SenderTag,
+  StyledCloseIcon,
+  StyledPopover,
+  Text3,
+  Text3NoIndent,
+} from '../../../styles/content-revision-styles';
 
 interface ActivityTranscriptProps {
   chatLog: ChatItem[];
@@ -28,20 +37,29 @@ const ChatMessage = (props: ChatMessageProps) => {
   const { message, sender } = props;
   const isSystemMessage = sender === 'SYSTEM';
   return (
-    <div
-      className={`message ${
-        isSystemMessage ? 'system-message' : 'user-message'
-      }`}
+    <MessageContainer
+      style={{
+        backgroundColor: isSystemMessage ? '#f0f0f0' : '#1b6a9c',
+        color: isSystemMessage ? undefined : ContentBg,
+        alignSelf: isSystemMessage ? 'flex-start' : 'flex-end',
+      }}
     >
-      <Typography className={isSystemMessage ? 'text-3' : 'text-3-user-chat'}>
+      <Text3
+        style={{
+          color: isSystemMessage ? ContentRevisionTextColor3 : ContentBg,
+          marginLeft: isSystemMessage ? '10px' : '0px',
+        }}
+      >
         {message}
-        <span
-          className={isSystemMessage ? 'sender-tag-system' : 'sender-tag-user'}
+        <SenderTag
+          style={{
+            borderRadius: isSystemMessage ? '10px' : '5px',
+          }}
         >
           {sender}
-        </span>
-      </Typography>
-    </div>
+        </SenderTag>
+      </Text3>
+    </MessageContainer>
   );
 };
 
@@ -67,17 +85,22 @@ function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
   const activity = getActivitById(activityId);
   const activityTitle = activity?.title || '';
   return (
-    <div className="text-3">
+    <Text3>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Typography className="text-3-clickable" onClick={handleClick}>
+        <Text3NoIndent
+          style={{
+            cursor: 'pointer',
+          }}
+          onClick={handleClick}
+        >
           {activityTitle ? `${activityTitle}` : ''}
-        </Typography>
+        </Text3NoIndent>
         <IconButton aria-label="chat" onClick={handleClick}>
           <ChatIcon style={{ fontSize: 18 }} />
         </IconButton>
       </div>
 
-      <Popover
+      <StyledPopover
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
@@ -85,12 +108,8 @@ function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
           vertical: 'bottom',
           horizontal: 'right',
         }}
-        className="chat-container"
       >
-        <CloseIcon
-          className="close-activity-transcript-icon"
-          onClick={handleClose}
-        />
+        <StyledCloseIcon onClick={handleClose} />
         {chatLog.map((chatItem, index) => (
           <ChatMessage
             key={index}
@@ -98,8 +117,8 @@ function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
             sender={chatItem.sender}
           />
         ))}
-      </Popover>
-    </div>
+      </StyledPopover>
+    </Text3>
   );
 }
 

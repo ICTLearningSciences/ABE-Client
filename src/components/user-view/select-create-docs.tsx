@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { Button, CircularProgress, IconButton } from '@mui/material';
-import { GoogleDoc } from '../../types';
+import { GoogleDoc, NewDocData } from '../../types';
 import ExampleGoogleDocModal from './example-google-docs-modal';
 import { RowDiv } from '../../styled-components';
 import {
@@ -21,10 +21,12 @@ import {
 import { formatISODateToReadable } from '../../helpers';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { Delete } from '@mui/icons-material';
-import './select-create-docs.css';
-import { useNavigate } from 'react-router-dom';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { TwoOptionDialog } from '../dialog';
+import {
+  GoogleDocItemName,
+  StyledGoogleDocItemRow,
+} from './select-create-docs-styles';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: GoogleDoc[];
@@ -33,9 +35,15 @@ export default function SelectCreateDocs(props: {
   handleCreateGoogleDoc: (
     docIdToCopy?: string,
     title?: string,
-    isAdminDoc?: boolean
+    isAdminDoc?: boolean,
+    callback?: (newDocData: NewDocData) => void
   ) => void;
   handleDeleteGoogleDoc: (docId: string) => Promise<void>;
+  onHistoryClicked: (docId: string) => void;
+  goToDoc: (docId: string, newDoc?: boolean) => void;
+  previewUrlBuilder: (docId: string) => string;
+  viewingAsAdmin: boolean;
+  sx?: React.CSSProperties;
 }): JSX.Element {
   const {
     googleDocs,
@@ -43,15 +51,15 @@ export default function SelectCreateDocs(props: {
     creationInProgress,
     handleCreateGoogleDoc,
     handleDeleteGoogleDoc,
+    onHistoryClicked,
+    goToDoc,
+    viewingAsAdmin,
+    previewUrlBuilder,
+    sx,
   } = props;
   const [createDocOpen, setCreateDocOpen] = React.useState(false);
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
   const [docToDelete, setDocToDelete] = React.useState<GoogleDoc>();
-  const navigate = useNavigate();
-
-  function onHistoryClicked(docId: string) {
-    navigate(`/docs/history/${docId}`);
-  }
 
   function googleDocsDisplay() {
     return (
@@ -80,7 +88,14 @@ export default function SelectCreateDocs(props: {
           >
             <Button
               onClick={() => {
-                handleCreateGoogleDoc();
+                handleCreateGoogleDoc(
+                  undefined,
+                  undefined,
+                  undefined,
+                  (data) => {
+                    goToDoc(data.docId, true);
+                  }
+                );
               }}
               size="large"
               style={{
@@ -117,28 +132,26 @@ export default function SelectCreateDocs(props: {
 
             <TableBody>
               {googleDocs?.map((doc, index) => (
-                <TableRow
+                <StyledGoogleDocItemRow
                   key={index}
-                  className="google-doc-item-row"
                   onDoubleClick={() => {
-                    navigate(`/docs/${doc.googleDocId}`);
+                    goToDoc(doc.googleDocId);
                   }}
                 >
                   <TableCell>
                     <RowDiv>
                       <DescriptionIcon />
-                      <span
-                        className="google-doc-item-name"
+                      <GoogleDocItemName
                         data-cy={`doc-list-item-${doc.title.replaceAll(
                           ' ',
                           '-'
                         )}`}
                         onClick={() => {
-                          navigate(`/docs/${doc.googleDocId}`);
+                          goToDoc(doc.googleDocId);
                         }}
                       >
                         {doc.title || 'My Document'}
-                      </span>
+                      </GoogleDocItemName>
                     </RowDiv>
                   </TableCell>
                   <TableCell>
@@ -163,7 +176,7 @@ export default function SelectCreateDocs(props: {
                       <Delete />
                     </IconButton>
                   </TableCell>
-                </TableRow>
+                </StyledGoogleDocItemRow>
               ))}
             </TableBody>
           </Table>
@@ -218,22 +231,34 @@ export default function SelectCreateDocs(props: {
   return (
     <div
       style={{
-        width: '60%',
+        // width: '60%',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         position: 'relative',
+        ...sx,
       }}
     >
       {googleDocsDisplay()}
       <ExampleGoogleDocModal
+        viewingAsAdmin={viewingAsAdmin}
         open={createDocOpen}
         close={() => {
           setCreateDocOpen(false);
         }}
         adminDocs={copyGoogleDocs}
-        onCreateDoc={handleCreateGoogleDoc}
+        onCreateDoc={(
+          docIdtoCopy?: string,
+          title?: string,
+          isAdminDoc?: boolean
+        ) => {
+          handleCreateGoogleDoc(docIdtoCopy, title, isAdminDoc, (data) => {
+            goToDoc(data.docId, true);
+          });
+        }}
+        goToDoc={goToDoc}
+        previewUrlBuilder={previewUrlBuilder}
       />
     </div>
   );

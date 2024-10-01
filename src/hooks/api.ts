@@ -31,6 +31,7 @@ import {
   ActivityGQL,
   AiServiceModel,
   DocGoalGQl,
+  DocService,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -43,6 +44,9 @@ import { OpenAiServiceJobStatusResponseType } from '../ai-services/open-ai-servi
 const API_ENDPOINT = process.env.REACT_APP_GOOGLE_API_ENDPOINT || '/docs';
 const GRAPHQL_ENDPOINT =
   process.env.REACT_APP_GRAPHQL_ENDPOINT || '/graphql/graphql';
+
+const DOCUMENT_SERVICE =
+  process.env.REACT_APP_DOCUMENT_SERVICE || DocService.GOOGLE_DOCS;
 
 const REQUEST_TIMEOUT_GRAPHQL_DEFAULT = 30000;
 
@@ -206,7 +210,7 @@ export async function docTextAction(
 export async function getDocData(docId: string): Promise<DocData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY);
   const res = await axios.get<DocData>(
-    `${API_ENDPOINT}/get_doc_data/${docId}`,
+    `${API_ENDPOINT}/get_doc_data/${docId}/${DOCUMENT_SERVICE}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -289,6 +293,7 @@ export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
             assignmentDescription
             createdAt
             admin
+            service
           }
         }
       `,
@@ -433,6 +438,7 @@ export async function updateGoogleDocStorage(
                   description
               }
               createdAt
+              service
           }
         }
     `,
@@ -755,7 +761,7 @@ export async function asyncOpenAiRequest(
   if (!accessToken) throw new Error('No access token');
   const res = await execHttp<OpenAiJobId>(
     'POST',
-    `${API_ENDPOINT}/async_open_ai_doc_question/?docId=${docsId}&userAction=${UserActions.MULTISTEP_PROMPTS}&userId=${userId}`,
+    `${API_ENDPOINT}/async_open_ai_doc_question/?docId=${docsId}&userAction=${UserActions.MULTISTEP_PROMPTS}&userId=${userId}&docService=${DOCUMENT_SERVICE}`,
     {
       accessToken: accessToken,
       dataPath: ['response', 'jobId'],
@@ -802,7 +808,7 @@ export async function asyncRequestDocTimeline(
   if (!accessToken) throw new Error('No access token');
   const res = await execHttp<DocumentTimelineJobId>(
     'POST',
-    `${API_ENDPOINT}/async_get_document_timeline/?docId=${docId}&userId=${userId}`,
+    `${API_ENDPOINT}/async_get_document_timeline/?docId=${docId}&userId=${userId}&docService=${DOCUMENT_SERVICE}`,
     {
       accessToken: accessToken,
       dataPath: ['response', 'jobId'],

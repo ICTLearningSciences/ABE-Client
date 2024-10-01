@@ -6,14 +6,21 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { useState } from 'react';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
-import { getDocData, submitDocVersion } from './api';
+import { submitDocVersion } from './api';
 import { useAppSelector } from '../store/hooks';
 import useInterval from './use-interval';
-import { DocVersion, Intention } from '../types';
+import { DocData, DocVersion, Intention } from '../types';
 import { hasHoursPassed } from '../helpers';
-import { UseWithGoogleDocs } from './use-with-google-docs';
+import { useWithGoogleDocs } from './use-with-google-docs';
 
-export function useWithStoreDocVersions(selectedActivityId: string) {
+/**
+ * Interval to store doc versions
+ * @param selectedActivityId
+ */
+export function useWithStoreDocVersions(
+  selectedActivityId: string,
+  getDocData: (docId: string) => Promise<DocData>
+) {
   const { state } = useWithChat();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
@@ -25,7 +32,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
   const curGoogleDoc = useAppSelector((state) =>
     state.state.userGoogleDocs.find((doc) => doc.googleDocId === googleDocId)
   );
-  const { updateGoogleDocTitleLocally } = UseWithGoogleDocs();
+  const { updateGoogleDocTitleLocally } = useWithGoogleDocs();
   const useDayIntention = curGoogleDoc?.currentDayIntention?.createdAt
     ? !hasHoursPassed(
         curGoogleDoc.currentDayIntention.createdAt,
@@ -39,6 +46,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
   const [lastNumMessages, setLastNumMessages] = useState<number>(
     messages.length
   );
+  const [lastUpdatedPlainText, setLastUpdatedPlainText] = useState<string>('');
   const [lastSavedSessionId, setLastSavedSessionId] =
     useState<string>(sessionId);
 
@@ -54,6 +62,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         }
         if (
           docData.lastChangedId === lastUpdatedId &&
+          docData.plainText === lastUpdatedPlainText &&
           docData.title === lastUpdatedTitle &&
           messages.length === lastNumMessages &&
           sessionId === lastSavedSessionId
@@ -62,6 +71,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         setLastSavedSessionId(sessionId);
         setLastUpdatedId(docData.lastChangedId);
         setLastUpdatedTitle(docData.title);
+        setLastUpdatedPlainText(docData.plainText);
         setLastNumMessages(messages.length);
         const newDocData: DocVersion = {
           docId: googleDocId,
