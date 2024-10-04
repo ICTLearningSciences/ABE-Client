@@ -86,6 +86,7 @@ export function useWithExecutePrompt() {
       userId || '',
       source.token
     );
+
     if (callback && !abortController.signal.aborted) callback(res);
     return res;
   }

@@ -9,10 +9,28 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { convertMarkdownToJsonString, isJsonMarkdown } from './helpers';
+
+const preprocess = (input: string) => {
+  const returnValue = input.trim();
+  if (isJsonMarkdown(returnValue)) {
+    return convertMarkdownToJsonString(returnValue);
+  }
+  return returnValue;
+};
+
+(function () {
+  const originalJsonParse = JSON.parse;
+  JSON.parse = function (input: string) {
+    const preprocessedInput = preprocess(input);
+    return originalJsonParse(preprocessedInput);
+  };
+})();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
     <App />

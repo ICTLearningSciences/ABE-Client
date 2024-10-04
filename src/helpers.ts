@@ -14,10 +14,8 @@ import {
   AiServiceModel,
   AiServiceNames,
 } from './types';
-import { ChatCompletion, ChatCompletionCreateParams } from 'openai/resources';
 import Validator, { Schema } from 'jsonschema';
 import { ChatLog, Sender, UserInputType } from './store/slices/chat';
-import { OpenAiStepDataType } from './ai-services/open-ai-service';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function extractErrorMessageFromError(err: any | unknown): string {
   if (err?.response?.data) {
@@ -118,44 +116,6 @@ export function isJsonString(str: string): boolean {
     return false;
   }
   return true;
-}
-
-export function parseOpenAIResContent(
-  openAiRes: OpenAiStepDataType
-): OpenAiStepDataType {
-  const promptData = openAiRes.aiServiceRequestParams;
-  const processedPromptData: ChatCompletionCreateParams = {
-    ...promptData,
-    messages: promptData.messages.map((m) => {
-      if (!m.content) return m;
-      if (!isJsonString(m.content)) {
-        return {
-          ...m,
-          content: m.content.replace(/\\t/g, '\t').replace(/\\n/g, '\n'),
-        };
-      }
-      return {
-        ...m,
-        content: JSON.parse(m.content),
-      };
-    }),
-  };
-  const resData = openAiRes.aiServiceResponse;
-  const processedResData: ChatCompletion.Choice[] = resData.map((r) => {
-    if (!r.message.content || !isJsonString(r.message.content)) return r;
-    return {
-      ...r,
-      message: {
-        ...r.message,
-        content: JSON.parse(r.message.content),
-      },
-    };
-  });
-  return {
-    ...openAiRes,
-    aiServiceResponse: processedResData,
-    aiServiceRequestParams: processedPromptData,
-  };
 }
 
 export function validateJsonResponse<T>(response: string, schema: Schema): T {
@@ -358,4 +318,19 @@ export function chatLogToString(chatLog: ChatLog) {
     chatLogString += `${chatLog[i].sender}: ${chatLog[i].message}\n`;
   }
   return chatLogString;
+}
+
+export function isJsonMarkdown(jsonMarkdown: string): boolean {
+  return jsonMarkdown.startsWith('```json\n');
+}
+
+export function convertMarkdownToJsonString(jsonMarkdown: string): string {
+  const trimmedMarkdown = jsonMarkdown.trim();
+  const withoutStart = trimmedMarkdown.startsWith('```json\n')
+    ? trimmedMarkdown.slice(7) // Length of "```json\n"
+    : trimmedMarkdown;
+  const withoutEnd = withoutStart.endsWith('```')
+    ? withoutStart.slice(0, -3) // Length of "```"
+    : withoutStart;
+  return withoutEnd.trim();
 }
