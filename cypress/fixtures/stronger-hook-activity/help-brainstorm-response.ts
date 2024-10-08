@@ -36,7 +36,12 @@ export const helpBrainstormResponse = (jobStatus?: JobStatus): AiJobStatusApiRes
                                 },
                                 "finish_reason": "stop"
                             }
-                        ]
+                        ],
+                        tokenUsage:{
+                            promptUsage: 1,
+                            completionUsage: 1,
+                            totalUsage: 2
+                        }
                     }
                 ],
                 "answer": "Example help brainstorm response."

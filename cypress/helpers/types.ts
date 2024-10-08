@@ -188,6 +188,11 @@ export interface DocVersion {
 export interface AiStepData {
   aiServiceRequestParams: OpenAI.Chat.Completions.ChatCompletionCreateParams;
   aiServiceResponse: OpenAI.Chat.Completions.ChatCompletion.Choice[];
+  tokenUsage: {
+    promptUsage: number;
+    completionUsage: number;
+    totalUsage: number;
+  }
   originalRequestPrompt?: AiPromptStep;
 }
 

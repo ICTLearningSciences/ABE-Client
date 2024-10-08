@@ -45,7 +45,12 @@ export const audienceEmotionsResponse = (audienceEmotions: AudienceEmtionsMember
                                 },
                                 "finish_reason": "stop"
                             }
-                        ]
+                        ],
+                        tokenUsage:{
+                            promptUsage: 1,
+                            completionUsage: 1,
+                            totalUsage: 2
+                        }
                     }
                 ],
                 "answer": JSON.stringify({audience: audienceEmotions})
