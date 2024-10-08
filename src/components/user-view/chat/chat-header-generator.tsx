@@ -4,7 +4,9 @@ import { ChatHeader } from '../../../styled-components';
 import { DocGoal, ActivityTypes } from '../../../types';
 import ChangeIcon from '@mui/icons-material/Construction';
 import ReplayIcon from '@mui/icons-material/Replay';
-
+import { useAppSelector } from '../../../store/hooks';
+import { useWithChat } from '../../../store/slices/chat/use-with-chat';
+import DownloadIcon from '@mui/icons-material/Download';
 export function ChatHeaderGenerator(props: {
   incrementActivityCounter: () => void;
   editDocGoal: () => void;
@@ -17,6 +19,10 @@ export function ChatHeaderGenerator(props: {
     selectedGoal,
     selectedActivity,
   } = props;
+  const viewingAdvancedOptions = useAppSelector(
+    (state) => state.state.viewingAdvancedOptions
+  );
+  const { downloadChatLog } = useWithChat();
   let title = selectedGoal?.title || '';
   title += selectedGoal && selectedActivity ? ' - ' : '';
   title += selectedActivity?.title || '';
@@ -46,6 +52,19 @@ export function ChatHeaderGenerator(props: {
       >
         <ReplayIcon />
       </IconButton>
+      {viewingAdvancedOptions && (
+        <IconButton
+          data-cy="download-chat-log-button"
+          onClick={() => downloadChatLog('')}
+          style={{
+            padding: 3,
+            marginBottom: 5,
+            marginLeft: 5,
+          }}
+        >
+          <DownloadIcon />
+        </IconButton>
+      )}
     </ChatHeader>
   );
 }
