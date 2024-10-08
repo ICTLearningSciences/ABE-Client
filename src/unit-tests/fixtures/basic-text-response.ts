@@ -38,6 +38,11 @@ export const openAiTextResponse = (
             finish_reason: 'stop',
           },
         ],
+        tokenUsage: {
+          promptUsage: 0,
+          completionUsage: 0,
+          totalUsage: 0,
+        },
       },
     ],
     answer: resText,

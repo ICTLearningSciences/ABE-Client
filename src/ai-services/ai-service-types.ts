@@ -10,8 +10,13 @@ import { GeminiStepDataType, isGeminiData } from './gemini-ai-service';
 import { OpenAiStepDataType } from './open-ai-service';
 
 export interface AiStepData<ReqType, ResType> {
-  aiServiceRequestParams: ReqType; // OpenAI.Chat.Completions.ChatCompletionCreateParams for OpenAi
-  aiServiceResponse: ResType; // OpenAI.Chat.Completions.ChatCompletion.Choice[] for OpenAi
+  aiServiceRequestParams: ReqType;
+  aiServiceResponse: ResType;
+  tokenUsage: {
+    promptUsage: number;
+    completionUsage: number;
+    totalUsage: number;
+  };
 }
 
 export interface AiResponseType<AiStepDataType> {

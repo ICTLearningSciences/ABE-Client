@@ -67,6 +67,19 @@ export default function ViewPreviousRunModal(props: {
               return (
                 <ColumnDiv key={index}>
                   <h2 style={{ alignSelf: 'center' }}>{`Step ${index + 1}`}</h2>
+                  <ColumnDiv
+                    style={{
+                      width: '100%',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <b>Total Tokens Used: </b>
+                      {promptStep.tokenUsage.totalUsage}
+                    </div>
+                    <div>{`Prompt Tokens Used: ${promptStep.tokenUsage.promptUsage}`}</div>
+                    <div>{`Completion Tokens Used: ${promptStep.tokenUsage.completionUsage}`}</div>
+                  </ColumnDiv>
                   <div>Prompt</div>
                   <div style={{ border: '1px solid black' }}>
                     <JsonView
