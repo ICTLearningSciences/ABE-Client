@@ -173,6 +173,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.addResponseNavigation = this.addResponseNavigation.bind(this);
     this.handleExtractMcqChoices = this.handleExtractMcqChoices.bind(this);
   }
+
   setBuiltActivityData(builtActivityData?: ActivityBuilder) {
     this.builtActivityData = builtActivityData;
   }
@@ -236,9 +237,24 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       case ActivityBuilderStepType.PROMPT:
         await this.handlePromptStep(step as PromptActivityStep);
         break;
+      case ActivityBuilderStepType.LOGIC_OPERATION:
+        await this.handleLogicOperationStep(step as ActivityBuilderStep);
+        break;
       default:
         throw new Error(`Unknown step type: ${step.stepType}`);
     }
+  }
+
+  async handleLogicOperationStep(step: ActivityBuilderStep) {
+    // handle logic operation step
+    // currently, logic operation steps are not supported
+    this.sendMessage({
+      id: uuidv4(),
+      message: 'Logic operation steps are not currently supported',
+      sender: Sender.SYSTEM,
+      displayType: MessageDisplayType.TEXT,
+    });
+    await this.goToNextStep();
   }
 
   async handleSystemMessageStep(step: SystemMessageActivityStep) {
