@@ -54,6 +54,7 @@ export function useWithBuiltActivityHandler(
         coachResponsePending,
         updateSessionIntentionHelper,
         executePromptSteps,
+        googleDocId,
         selectedActivityBuilder
       );
       newActivityHandler.initializeActivity();

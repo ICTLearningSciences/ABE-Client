@@ -14,12 +14,18 @@ import {
   updateViewingAdvancedOptions,
   newSession as _newSession,
   setSessionIntention,
+  storeMostRecentDocVersion,
 } from '.';
 import {
   fetchUserActivityStates,
   updateUserActivityState as _updateUserActivityState,
 } from '../../../hooks/api';
-import { AiServiceModel, Intention, UserActivityState } from '../../../types';
+import {
+  AiServiceModel,
+  DocData,
+  Intention,
+  UserActivityState,
+} from '../../../types';
 import { UserRole } from '../login';
 
 interface UseWithState {
@@ -37,9 +43,9 @@ interface UseWithState {
   updateViewingAdvancedOptions: (advancedOptions: boolean) => void;
   newSession: () => void;
   updateSessionIntention: (intention?: Intention) => void;
+  updateMostRecentDocVersion: (docData: DocData) => void;
 }
 
-// Gives you a way to interface with the redux store (which has the user information)
 export function useWithState(): UseWithState {
   const dispatch = useAppDispatch();
   const state: State = useAppSelector((state) => state.state);
@@ -101,6 +107,11 @@ export function useWithState(): UseWithState {
   function updateSessionIntention(intention?: Intention) {
     dispatch(setSessionIntention(intention));
   }
+
+  function updateMostRecentDocVersion(docData: DocData) {
+    dispatch(storeMostRecentDocVersion(docData));
+  }
+
   return {
     state,
     updateCurrentDocId,
@@ -111,5 +122,6 @@ export function useWithState(): UseWithState {
     updateViewingAdvancedOptions: _updateViewingAdvancedOptions,
     newSession,
     updateSessionIntention,
+    updateMostRecentDocVersion,
   };
 }

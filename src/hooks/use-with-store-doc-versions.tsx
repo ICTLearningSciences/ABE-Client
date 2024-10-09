@@ -12,9 +12,11 @@ import useInterval from './use-interval';
 import { DocVersion, Intention } from '../types';
 import { hasHoursPassed } from '../helpers';
 import { UseWithGoogleDocs } from './use-with-google-docs';
+import { useWithState } from '../store/slices/state/use-with-state';
 
 export function useWithStoreDocVersions(selectedActivityId: string) {
   const { state } = useWithChat();
+  const { updateMostRecentDocVersion } = useWithState();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
   );
@@ -49,6 +51,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
           return;
         }
         const docData = await getDocData(googleDocId);
+        updateMostRecentDocVersion(docData);
         if (docData.title !== lastUpdatedTitle) {
           updateGoogleDocTitleLocally(googleDocId, docData.title);
         }

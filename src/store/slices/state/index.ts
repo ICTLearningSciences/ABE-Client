@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   AiServiceModel,
+  DocData,
   GoogleDoc,
   Intention,
   StoreGoogleDoc,
@@ -29,6 +30,7 @@ export enum GoogleDocsLoadStatus {
 
 export interface State {
   googleDocId: string;
+  mostRecentDocVersion?: DocData;
   userGoogleDocs: GoogleDoc[];
   userGoogleDocsLoadStatus: GoogleDocsLoadStatus;
   sessionId: string;
@@ -87,6 +89,9 @@ export const stateSlice = createSlice({
   initialState,
   reducers: {
     updateDocId: (state: State, action: PayloadAction<string>) => {
+      if (!action.payload) {
+        state.mostRecentDocVersion = undefined;
+      }
       state.googleDocId = action.payload;
     },
     newSession: (state: State) => {
@@ -131,6 +136,12 @@ export const stateSlice = createSlice({
         return doc;
       });
     },
+    storeMostRecentDocVersion: (
+      state: State,
+      action: PayloadAction<DocData>
+    ) => {
+      state.mostRecentDocVersion = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(loadUserGoogleDocs.fulfilled, (state, action) => {
@@ -172,6 +183,7 @@ export const {
   newSession,
   setSessionIntention,
   updateGoogleDocTitleLocally,
+  storeMostRecentDocVersion,
 } = stateSlice.actions;
 
 export default stateSlice.reducer;

@@ -1,14 +1,22 @@
-import React, { useEffect } from 'react';
-import { ActivityBuilder as ActivityBuilderType, FlowItem } from '../types';
+import React, { useEffect, useMemo } from 'react';
+import {
+  ActivityBuilderStepType,
+  ActivityBuilder as ActivityBuilderType,
+  FlowItem,
+} from '../types';
 import { ActivityFlowContainer } from './activity-flow-container';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
-import { Button, CircularProgress, IconButton } from '@mui/material';
+import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
 import { InputField } from '../shared/input-components';
 import { equals } from '../../../helpers';
 import { v4 as uuidv4 } from 'uuid';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { isActivityRunnable } from '../helpers';
 import { useWithActivityVersions } from '../../../hooks/use-with-activity-versions';
+import {
+  DOC_NUM_WORDS_KEY,
+  DOC_TEXT_KEY,
+} from '../../../classes/activity-builder-activity/built-activity-handler';
 export function EditActivity(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   activity: ActivityBuilderType;
@@ -26,6 +34,27 @@ export function EditActivity(props: {
     React.useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
   const { activityVersions, loadActivityVersions } = useWithActivityVersions();
+  const globalStateKeys: string[] = useMemo(() => {
+    return localActivityCopy.flowsList.reduce(
+      (acc, flow) => {
+        const stateKeysForFlow = flow.steps.reduce((acc, step) => {
+          if (step.stepType === ActivityBuilderStepType.REQUEST_USER_INPUT) {
+            if (step.saveResponseVariableName) {
+              acc.push(step.saveResponseVariableName);
+            }
+          }
+          if (step.stepType === ActivityBuilderStepType.PROMPT) {
+            const jsonKeys = step.jsonResponseData?.map((d) => d.name) || [];
+            acc.push(...jsonKeys);
+          }
+          return acc;
+        }, [] as string[]);
+        acc.push(...stateKeysForFlow);
+        return acc;
+      },
+      [DOC_TEXT_KEY, DOC_NUM_WORDS_KEY] as string[]
+    );
+  }, [localActivityCopy.flowsList]);
 
   useEffect(() => {
     setLocalActivityCopy(JSON.parse(JSON.stringify(activity)));
@@ -140,9 +169,32 @@ export function EditActivity(props: {
           <Button onClick={addNewFlow} variant="outlined">
             + Add Flow
           </Button>
+
+          <Tooltip
+            title={
+              <div>
+                {globalStateKeys.map((key) => (
+                  <div key={key}>{key}</div>
+                ))}
+              </div>
+            }
+          >
+            <div
+              style={{
+                position: 'absolute',
+                right: 20,
+                top: 20,
+                color: 'gray',
+                cursor: 'pointer',
+              }}
+            >
+              Activity Variables
+            </div>
+          </Tooltip>
         </RowDiv>
       </ColumnDiv>
       <ActivityFlowContainer
+        globalStateKeys={globalStateKeys}
         localActivity={localActivityCopy}
         updateLocalActivity={setLocalActivityCopy}
         versions={activityVersions[localActivityCopy.clientId] || []}

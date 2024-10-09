@@ -130,6 +130,7 @@ function prepareActivityBuilder(
       activityBuilderStepAccumulator.updateSessionIntention(intention),
     async (aiPromptSteps: AiPromptStep[]) =>
       activityBuilderStepAccumulator.executePrompt(aiPromptSteps),
+    '',
     activityBuilderData
   );
 }
