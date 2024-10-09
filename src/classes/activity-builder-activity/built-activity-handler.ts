@@ -588,6 +588,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         this.sendMessage({
           id: uuidv4(),
           message: response,
+          aiServiceStepData: _response.aiAllStepsData,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
         });
