@@ -31,22 +31,25 @@ export function EditActivity(props: {
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
   const { activityVersions, loadActivityVersions } = useWithActivityVersions();
   const globalStateKeys = useMemo(() => {
-    return localActivityCopy.flowsList.reduce((acc, flow) => {
-      const stateKeysForFlow = flow.steps.reduce((acc, step) => {
-        if (step.stepType === ActivityBuilderStepType.REQUEST_USER_INPUT) {
-          if (step.saveResponseVariableName) {
-            acc.push(step.saveResponseVariableName);
+    return localActivityCopy.flowsList.reduce(
+      (acc, flow) => {
+        const stateKeysForFlow = flow.steps.reduce((acc, step) => {
+          if (step.stepType === ActivityBuilderStepType.REQUEST_USER_INPUT) {
+            if (step.saveResponseVariableName) {
+              acc.push(step.saveResponseVariableName);
+            }
           }
-        }
-        if (step.stepType === ActivityBuilderStepType.PROMPT) {
-          const jsonKeys = step.jsonResponseData?.map((d) => d.name) || [];
-          acc.push(...jsonKeys);
-        }
+          if (step.stepType === ActivityBuilderStepType.PROMPT) {
+            const jsonKeys = step.jsonResponseData?.map((d) => d.name) || [];
+            acc.push(...jsonKeys);
+          }
+          return acc;
+        }, [] as string[]);
+        acc.push(...stateKeysForFlow);
         return acc;
-      }, [] as string[]);
-      acc.push(...stateKeysForFlow);
-      return acc;
-    }, [] as string[]);
+      },
+      ['doc_text', 'doc_num_keys'] as string[]
+    );
   }, [localActivityCopy.flowsList]);
 
   useEffect(() => {

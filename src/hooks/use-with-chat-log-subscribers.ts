@@ -8,15 +8,20 @@ import { useEffect, useState } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
 import { ChatLog } from '../store/slices/chat';
+import { DocData } from '../types';
 
 export abstract class ChatLogSubscriber {
   abstract newChatLogReceived(chatLog: ChatLog): void;
+  abstract newDocDataReceived(docData?: DocData): void;
 }
 
 export function useWithChatLogSubscribers() {
   const [subscribers, setSubscribers] = useState<ChatLogSubscriber[]>([]);
 
   const { state } = useWithChat();
+  const mostRecentDocVersion = useAppSelector(
+    (state) => state.state.mostRecentDocVersion
+  );
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
   );
@@ -30,6 +35,15 @@ export function useWithChatLogSubscribers() {
       newChatLogFunction(messages);
     }
   }, [messages]);
+
+  useEffect(() => {
+    for (let i = 0; i < subscribers.length; i++) {
+      const newDocDataFunction = subscribers[i].newDocDataReceived.bind(
+        subscribers[i]
+      );
+      newDocDataFunction(mostRecentDocVersion);
+    }
+  }, [mostRecentDocVersion]);
 
   function addNewSubscriber(subscriber: ChatLogSubscriber) {
     setSubscribers([...subscribers, subscriber]);

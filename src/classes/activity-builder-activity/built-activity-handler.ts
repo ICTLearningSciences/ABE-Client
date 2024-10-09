@@ -26,6 +26,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import {
   AiPromptStep,
+  DocData,
   PromptConfiguration,
   PromptOutputTypes,
   PromptRoles,
@@ -53,6 +54,9 @@ function getDefaultUserResponseHandleState(): UserResponseHandleState {
     responseNavigations: [],
   };
 }
+
+export const DOC_TEXT_KEY = 'doc_text';
+export const DOC_NUM_WORDS_KEY = 'doc_num_words';
 
 export class BuiltActivityHandler implements ChatLogSubscriber {
   builtActivityData: ActivityBuilder | undefined;
@@ -416,7 +420,23 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     await this.goToNextStep();
   }
 
+  newDocDataReceived(docData?: DocData) {
+    console.log('newDocData received');
+    if (!docData) {
+      delete this.stateData[DOC_TEXT_KEY];
+      delete this.stateData[DOC_NUM_WORDS_KEY];
+      return;
+    }
+    this.stateData = {
+      ...this.stateData,
+      [DOC_TEXT_KEY]: docData.plainText,
+      [DOC_NUM_WORDS_KEY]: docData.plainText.split(' ').length,
+    };
+    console.log(this.stateData);
+  }
+
   newChatLogReceived(chatLog: ChatLog) {
+    console.log('new chat log received');
     this.chatLog = chatLog;
     if (chatLog.length === 0) {
       return;
