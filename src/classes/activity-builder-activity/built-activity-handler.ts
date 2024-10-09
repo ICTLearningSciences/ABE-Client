@@ -43,6 +43,7 @@ import {
   recursiveUpdateAdditionalInfo,
 } from '../../components/activity-builder/helpers';
 import { ChatLogSubscriber } from '../../hooks/use-with-chat-log-subscribers';
+import { getDocData } from '../../hooks/api';
 
 interface UserResponseHandleState {
   responseNavigations: {
@@ -255,7 +256,15 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async handleLogicOperationStep(step: ConditionalActivityStep) {
+    this.setResponsePending(true);
+    const docData = await getDocData(this.docId);
+    this.stateData = {
+      ...this.stateData,
+      [DOC_TEXT_KEY]: docData.plainText,
+      [DOC_NUM_WORDS_KEY]: docData.plainText.split(' ').length,
+    };
     const conditionals = step.conditionals;
+    this.setResponsePending(false);
     for (let i = 0; i < conditionals.length; i++) {
       const condition = conditionals[i];
       const stateValue = this.stateData[condition.stateDataKey];

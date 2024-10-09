@@ -175,7 +175,7 @@ export function ConditionalStepBuilder(props: {
         {collapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
       </IconButton>
 
-      <h4 style={{ alignSelf: 'center' }}>System Message</h4>
+      <h4 style={{ alignSelf: 'center' }}>Conditionals</h4>
       <div
         style={{
           position: 'absolute',
@@ -190,7 +190,6 @@ export function ConditionalStepBuilder(props: {
       </div>
       <Collapse in={!collapsed}>
         <ColumnCenterDiv>
-          <h5>Conditionals</h5>
           {step.conditionals.map((conditional, index) => {
             return (
               <ColumnCenterDiv
