@@ -16,6 +16,8 @@ import {
   SystemMessageActivityStep,
   RequestUserInputActivityStep,
   PredefinedResponse,
+  ConditionalActivityStep,
+  Checking,
 } from '../../components/activity-builder/types';
 import {
   ChatLog,
@@ -241,23 +243,75 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       case ActivityBuilderStepType.PROMPT:
         await this.handlePromptStep(step as PromptActivityStep);
         break;
-      case ActivityBuilderStepType.LOGIC_OPERATION:
-        await this.handleLogicOperationStep(step as ActivityBuilderStep);
+      case ActivityBuilderStepType.CONDITIONAL:
+        await this.handleLogicOperationStep(step as ConditionalActivityStep);
         break;
       default:
         throw new Error(`Unknown step type: ${step.stepType}`);
     }
   }
 
-  async handleLogicOperationStep(step: ActivityBuilderStep) {
-    // handle logic operation step
-    // currently, logic operation steps are not supported
-    this.sendMessage({
-      id: uuidv4(),
-      message: 'Logic operation steps are not currently supported',
-      sender: Sender.SYSTEM,
-      displayType: MessageDisplayType.TEXT,
-    });
+  async handleLogicOperationStep(step: ConditionalActivityStep) {
+    const conditionals = step.conditionals;
+    for (let i = 0; i < conditionals.length; i++) {
+      const condition = conditionals[i];
+      const stateValue = this.stateData[condition.stateDataKey];
+      if (!stateValue) {
+        this.sendErrorMessage(
+          `An error occured during this activity. Could not find state value ${condition.stateDataKey}.`
+        );
+        return;
+      }
+
+      if (condition.checking === Checking.VALUE) {
+        const expression = `${String(stateValue)} ${condition.operation} ${
+          condition.expectedValue
+        }`;
+        const conditionTrue = new Function(`return ${expression};`)();
+        if (conditionTrue) {
+          const step = this.getStepById(condition.targetStepId);
+          if (!step) {
+            this.sendErrorMessage(
+              `An error occured during this activity. Could not find step: ${condition.targetStepId}`
+            );
+            return;
+          }
+          this.handleStep(step);
+          return;
+        }
+      } else if (condition.checking === Checking.LENGTH) {
+        const expression = `${stateValue.length} ${condition.operation} ${condition.expectedValue}`;
+        const conditionTrue = new Function(`return ${expression};`)();
+        if (conditionTrue) {
+          const step = this.getStepById(condition.targetStepId);
+          if (!step) {
+            this.sendErrorMessage(
+              `An error occured during this activity. Could not find step: ${condition.targetStepId}`
+            );
+            return;
+          }
+          this.handleStep(step);
+          return;
+        }
+      } else {
+        // Checking if array or string contains value
+        const conditionTrue = Array.isArray(stateValue)
+          ? stateValue.find((a) => String(a) === condition.expectedValue)
+          : (stateValue as string).includes(String(condition.expectedValue));
+        if (conditionTrue) {
+          const step = this.getStepById(condition.targetStepId);
+          if (!step) {
+            this.sendErrorMessage(
+              `An error occured during this activity. Could not find step: ${condition.targetStepId}`
+            );
+            return;
+          }
+          this.handleStep(step);
+          return;
+        }
+      }
+    }
+
     await this.goToNextStep();
   }
 
@@ -421,7 +475,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   newDocDataReceived(docData?: DocData) {
-    console.log('newDocData received');
     if (!docData) {
       delete this.stateData[DOC_TEXT_KEY];
       delete this.stateData[DOC_NUM_WORDS_KEY];
@@ -432,11 +485,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       [DOC_TEXT_KEY]: docData.plainText,
       [DOC_NUM_WORDS_KEY]: docData.plainText.split(' ').length,
     };
-    console.log(this.stateData);
   }
 
   newChatLogReceived(chatLog: ChatLog) {
-    console.log('new chat log received');
     this.chatLog = chatLog;
     if (chatLog.length === 0) {
       return;

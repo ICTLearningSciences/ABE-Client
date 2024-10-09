@@ -9,6 +9,7 @@ import {
   ActivityBuilder,
   ActivityBuilderStepType,
   ActivityBuilderStepTypes,
+  ConditionalActivityStep,
   FlowItem,
   PromptActivityStep,
   RequestUserInputActivityStep,
@@ -31,7 +32,12 @@ import {
   getDefaultSystemMessage,
 } from './step-builder/system-message-step-builder';
 import { StepVersion } from './activity-flow-container';
+import {
+  ConditionalStepBuilder,
+  getDefaultConditionalStep,
+} from './step-builder/conditional-step-builder';
 export function FlowStepsBuilderTab(props: {
+  globalStateKeys: string[];
   flow: FlowItem;
   flowsList: FlowItem[];
   updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
@@ -40,7 +46,13 @@ export function FlowStepsBuilderTab(props: {
   setPreviewPromptId: (id: string) => void;
   getVersionsForStep: (stepId: string) => StepVersion[];
 }) {
-  const { flow, flowsList, updateLocalActivity, setPreviewPromptId } = props;
+  const {
+    flow,
+    flowsList,
+    updateLocalActivity,
+    setPreviewPromptId,
+    globalStateKeys,
+  } = props;
 
   function renderActivityStep(step: ActivityBuilderStepTypes, i: number) {
     switch (step.stepType) {
@@ -84,6 +96,20 @@ export function FlowStepsBuilderTab(props: {
             versions={props.getVersionsForStep(step.stepId)}
           />
         );
+      case ActivityBuilderStepType.CONDITIONAL:
+        return (
+          <ConditionalStepBuilder
+            globalStateKeys={globalStateKeys}
+            key={i}
+            step={step as ConditionalActivityStep}
+            updateLocalActivity={updateLocalActivity}
+            updateStep={(step) => props.updateStep(step, flow.clientId)}
+            deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
+            flowsList={flowsList}
+            stepIndex={i}
+            versions={props.getVersionsForStep(step.stepId)}
+          />
+        );
       default:
         throw new Error(`Unknown step type: ${step}`);
     }
@@ -106,6 +132,8 @@ export function FlowStepsBuilderTab(props: {
         ? getDefaultSystemMessage()
         : stepType === ActivityBuilderStepType.REQUEST_USER_INPUT
         ? getDefaultRequestUserInputBuilder()
+        : stepType === ActivityBuilderStepType.CONDITIONAL
+        ? getDefaultConditionalStep()
         : defaultPromptBuilder();
     updateLocalActivity((prevValue) => {
       return {
@@ -140,6 +168,7 @@ export function FlowStepsBuilderTab(props: {
           right: '0',
           top: '0',
         }}
+        color="error"
         variant="outlined"
         onClick={deleteFlow}
       >

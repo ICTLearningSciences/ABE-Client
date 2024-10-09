@@ -65,6 +65,19 @@ export const fullBuiltActivityQueryData = `
                               jsonResponseData
                               customSystemRole
                           }
+
+                                                    ... on ConditionalActivityStepType {
+                              stepId
+                              stepType
+                              jumpToStepId
+                              conditionals{
+                                  stateDataKey
+                                  checking
+                                  operation
+                                  expectedValue
+                                  targetStepId
+                              }
+                          }
                       }
                       }
 `;

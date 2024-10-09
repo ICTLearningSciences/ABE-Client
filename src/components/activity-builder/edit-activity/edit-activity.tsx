@@ -13,6 +13,10 @@ import { v4 as uuidv4 } from 'uuid';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { isActivityRunnable } from '../helpers';
 import { useWithActivityVersions } from '../../../hooks/use-with-activity-versions';
+import {
+  DOC_NUM_WORDS_KEY,
+  DOC_TEXT_KEY,
+} from '../../../classes/activity-builder-activity/built-activity-handler';
 export function EditActivity(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   activity: ActivityBuilderType;
@@ -30,7 +34,7 @@ export function EditActivity(props: {
     React.useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
   const { activityVersions, loadActivityVersions } = useWithActivityVersions();
-  const globalStateKeys = useMemo(() => {
+  const globalStateKeys: string[] = useMemo(() => {
     return localActivityCopy.flowsList.reduce(
       (acc, flow) => {
         const stateKeysForFlow = flow.steps.reduce((acc, step) => {
@@ -48,7 +52,7 @@ export function EditActivity(props: {
         acc.push(...stateKeysForFlow);
         return acc;
       },
-      ['doc_text', 'doc_num_keys'] as string[]
+      [DOC_TEXT_KEY, DOC_NUM_WORDS_KEY] as string[]
     );
   }, [localActivityCopy.flowsList]);
 
@@ -190,6 +194,7 @@ export function EditActivity(props: {
         </RowDiv>
       </ColumnDiv>
       <ActivityFlowContainer
+        globalStateKeys={globalStateKeys}
         localActivity={localActivityCopy}
         updateLocalActivity={setLocalActivityCopy}
         versions={activityVersions[localActivityCopy.clientId] || []}

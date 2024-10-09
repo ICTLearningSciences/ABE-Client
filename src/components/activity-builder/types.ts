@@ -64,7 +64,7 @@ export enum ActivityBuilderStepType {
   SYSTEM_MESSAGE = 'SYSTEM_MESSAGE',
   REQUEST_USER_INPUT = 'REQUEST_USER_INPUT',
   PROMPT = 'PROMPT',
-  LOGIC_OPERATION = 'LOGIC_OPERATION',
+  CONDITIONAL = 'CONDITIONAL',
 }
 
 export interface ActivityBuilderStep {
@@ -76,7 +76,8 @@ export interface ActivityBuilderStep {
 export type ActivityBuilderStepTypes =
   | SystemMessageActivityStep
   | RequestUserInputActivityStep
-  | PromptActivityStep;
+  | PromptActivityStep
+  | ConditionalActivityStep;
 
 // SystemMessage
 export interface SystemMessageActivityStep extends ActivityBuilderStep {
@@ -103,21 +104,16 @@ export enum Checking {
   CONTAINS = 'CONTAINS',
 }
 
-export interface LogicNumericalOperation {
-  operation: NumericOperations;
-  value: number;
-}
-
 export interface LogicStepConditional {
   stateDataKey: string;
   checking: Checking;
-  numericalOperation?: LogicNumericalOperation;
-  expectedValue: string | boolean | number;
+  operation: NumericOperations;
+  expectedValue: string;
+  targetStepId: string;
 }
 
-export interface LogicOperationActivityStep extends ActivityBuilderStep {
-  stepType: ActivityBuilderStepType.LOGIC_OPERATION;
-  // TODO: operands
+export interface ConditionalActivityStep extends ActivityBuilderStep {
+  stepType: ActivityBuilderStepType.CONDITIONAL;
   conditionals: LogicStepConditional[];
 }
 
