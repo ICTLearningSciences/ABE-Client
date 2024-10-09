@@ -105,6 +105,41 @@ export function ConditionalStepBuilder(props: {
     });
   }
 
+  function updateConditionalField(
+    index: number,
+    field: string,
+    value: string | boolean
+  ) {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                const step = s as ConditionalActivityStep;
+                return {
+                  ...step,
+                  conditionals: step.conditionals.map((c, i) => {
+                    if (i === index) {
+                      return {
+                        ...c,
+                        [field]: value,
+                      };
+                    }
+                    return c;
+                  }),
+                };
+              }
+              return s;
+            }),
+          };
+        }),
+      };
+    });
+  }
+
   return (
     <RoundedBorderDiv
       key={rerender}
@@ -154,17 +189,17 @@ export function ConditionalStepBuilder(props: {
         />
       </div>
       <Collapse in={!collapsed}>
-        {/* TODO: add ability to add conditionals, then need inputs for each field in each */}
         <ColumnCenterDiv>
           <h5>Conditionals</h5>
-
           {step.conditionals.map((conditional, index) => {
             return (
               <ColumnCenterDiv
-                key={index}
+                key={`${conditional.stateDataKey}-${index}-${conditional.checking}-${conditional.expectedValue}-${conditional.targetStepId}`}
                 style={{
                   border: '1px solid black',
                   position: 'relative',
+                  borderRadius: '10px',
+                  width: '700px',
                 }}
               >
                 <RowDiv>
@@ -175,7 +210,7 @@ export function ConditionalStepBuilder(props: {
                     onChange={(v) => {
                       const newConditionals = [...step.conditionals];
                       newConditionals[index].stateDataKey = v;
-                      updateField('conditionals', newConditionals);
+                      updateConditionalField(index, 'stateDataKey', v);
                     }}
                   />
                   <SelectInputField
@@ -185,7 +220,7 @@ export function ConditionalStepBuilder(props: {
                     onChange={(v) => {
                       const newConditionals = [...step.conditionals];
                       newConditionals[index].checking = v as Checking;
-                      updateField('conditionals', newConditionals);
+                      updateConditionalField(index, 'checking', v);
                     }}
                   />
                   {conditional.checking !== Checking.CONTAINS && (
@@ -197,7 +232,7 @@ export function ConditionalStepBuilder(props: {
                         const newConditionals = [...step.conditionals];
                         newConditionals[index].operation =
                           v as NumericOperations;
-                        updateField('conditionals', newConditionals);
+                        updateConditionalField(index, 'operation', v);
                       }}
                     />
                   )}
@@ -207,14 +242,33 @@ export function ConditionalStepBuilder(props: {
                     onChange={(v) => {
                       const newConditionals = [...step.conditionals];
                       newConditionals[index].expectedValue = v;
-                      updateField('conditionals', newConditionals);
+                      updateConditionalField(index, 'expectedValue', v);
                     }}
                   />
                   <IconButton
                     onClick={() => {
-                      const newConditionals = [...step.conditionals];
-                      newConditionals.splice(index, 1);
-                      updateField('conditionals', newConditionals);
+                      updateLocalActivity((prevValue) => {
+                        return {
+                          ...prevValue,
+                          flowsList: prevValue.flowsList.map((f) => {
+                            return {
+                              ...f,
+                              steps: f.steps.map((s) => {
+                                if (s.stepId === step.stepId) {
+                                  const step = s as ConditionalActivityStep;
+                                  return {
+                                    ...step,
+                                    conditionals: step.conditionals.filter(
+                                      (c, i) => i !== index
+                                    ),
+                                  };
+                                }
+                                return s;
+                              }),
+                            };
+                          }),
+                        };
+                      });
                     }}
                   >
                     <Delete />

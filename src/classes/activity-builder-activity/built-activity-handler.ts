@@ -78,6 +78,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   userResponseHandleState: UserResponseHandleState;
   stepIdsSinceLastInput: string[];
   lastFailedStepId: string | null = null;
+  docId: string;
 
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
@@ -151,8 +152,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     executePrompt: (
       aiPromptSteps: AiPromptStep[]
     ) => Promise<AiServicesResponseTypes>,
+    docId: string,
     builtActivityData?: ActivityBuilder
   ) {
+    this.docId = docId;
     this.builtActivityData = builtActivityData;
     this.stateData = {};
     this.stepIdsSinceLastInput = [];
