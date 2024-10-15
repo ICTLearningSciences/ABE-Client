@@ -17,6 +17,7 @@ import { equals } from '../helpers';
 
 export function useWithBuiltActivityHandler(
   resetActivityCounter: number,
+  editDocGoal: () => void,
   selectedActivityBuilder?: ActivityBuilder
 ) {
   const { sendMessage, clearChatLog, coachResponsePending } = useWithChat();
@@ -25,7 +26,6 @@ export function useWithBuiltActivityHandler(
   const { executePromptSteps } = useWithExecutePrompt();
   const { addNewSubscriber, removeAllSubscribers } =
     useWithChatLogSubscribers();
-
   const [builtActivityHandler, setBuiltActivityHandler] =
     useState<BuiltActivityHandler>();
   const updatesFound = !equals(
@@ -55,6 +55,7 @@ export function useWithBuiltActivityHandler(
         updateSessionIntentionHelper,
         executePromptSteps,
         googleDocId,
+        editDocGoal,
         selectedActivityBuilder
       );
       newActivityHandler.initializeActivity();
