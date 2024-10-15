@@ -131,6 +131,9 @@ function prepareActivityBuilder(
     async (aiPromptSteps: AiPromptStep[]) =>
       activityBuilderStepAccumulator.executePrompt(aiPromptSteps),
     '',
+    () => {
+      console.log('edit doc goal');
+    },
     activityBuilderData
   );
 }

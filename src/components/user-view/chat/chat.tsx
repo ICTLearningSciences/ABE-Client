@@ -81,6 +81,7 @@ export default function Chat(props: {
   );
   const { activityReady: builtActivityReady } = useWithBuiltActivityHandler(
     resetActivityCounter,
+    editDocGoal,
     selectedActivity && isActivityBuilder(selectedActivity)
       ? selectedActivity
       : undefined

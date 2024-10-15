@@ -30,6 +30,7 @@ function convertExpectedDataIntoSchema(
   }
   return schema;
 }
+export const STRING_ARRAY_SPLITTER = ',,,';
 
 // jsonResponseData:[
 //   {
@@ -152,6 +153,9 @@ export function replaceStoredDataInString(
       const value = keys.reduce((acc: Record<string, any>, k: string) => {
         return acc[k];
       }, stateData);
+      if (Array.isArray(value)) {
+        return value.map((v: string) => v || '').join(STRING_ARRAY_SPLITTER);
+      }
       return value || '';
     });
   } catch (e) {

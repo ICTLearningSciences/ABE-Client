@@ -41,6 +41,7 @@ import {
   replaceStoredDataInString,
   sortMessagesByResponseWeight,
   recursiveUpdateAdditionalInfo,
+  STRING_ARRAY_SPLITTER,
 } from '../../components/activity-builder/helpers';
 import { ChatLogSubscriber } from '../../hooks/use-with-chat-log-subscribers';
 import { getDocData } from '../../hooks/api';
@@ -57,7 +58,7 @@ function getDefaultUserResponseHandleState(): UserResponseHandleState {
     responseNavigations: [],
   };
 }
-
+export const EDIT_DOC_GOAL_MESSAGE = 'New Activity';
 export const DOC_TEXT_KEY = 'doc_text';
 export const DOC_NUM_WORDS_KEY = 'doc_num_words';
 
@@ -76,6 +77,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   executePrompt: (
     aiPromptSteps: AiPromptStep[]
   ) => Promise<AiServicesResponseTypes>;
+  editDocGoal: () => void;
   userResponseHandleState: UserResponseHandleState;
   stepIdsSinceLastInput: string[];
   lastFailedStepId: string | null = null;
@@ -154,6 +156,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       aiPromptSteps: AiPromptStep[]
     ) => Promise<AiServicesResponseTypes>,
     docId: string,
+    editDocGoal: () => void,
     builtActivityData?: ActivityBuilder
   ) {
     this.docId = docId;
@@ -167,6 +170,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.updateSessionIntention = updateSessionIntention;
     this.executePrompt = executePrompt;
     this.setResponsePending = setResponsePending;
+    this.editDocGoal = editDocGoal;
 
     this.setBuiltActivityData = this.setBuiltActivityData.bind(this);
     this.initializeActivity = this.initializeActivity.bind(this);
@@ -263,7 +267,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       [DOC_TEXT_KEY]: docData.plainText,
       [DOC_NUM_WORDS_KEY]: docData.plainText.split(' ').length,
     };
-    const conditionals = step.conditionals;
+    const conditionals = step.conditionals.map((c) => ({
+      ...c,
+      expectedValue: replaceStoredDataInString(c.expectedValue, this.stateData),
+    }));
     this.setResponsePending(false);
     for (let i = 0; i < conditionals.length; i++) {
       const condition = conditionals[i];
@@ -359,7 +366,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     for (let i = 0; i < predefinedResponses.length; i++) {
       const res = predefinedResponses[i];
       if (res.isArray) {
-        const responsesArray = res.message.split(',');
+        const responsesArray = res.message.split(STRING_ARRAY_SPLITTER);
         if (res.jumpToStepId) {
           for (let j = 0; j < responsesArray.length; j++) {
             this.addResponseNavigation(responsesArray[j], res.jumpToStepId);
@@ -429,6 +436,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     }
     if (this.curStep.stepType !== ActivityBuilderStepType.REQUEST_USER_INPUT) {
       return;
+    }
+    if (message === EDIT_DOC_GOAL_MESSAGE) {
+      this.editDocGoal();
     }
     const requestUserInputStep = this.curStep as RequestUserInputActivityStep;
     if (requestUserInputStep.predefinedResponses.length > 0) {
