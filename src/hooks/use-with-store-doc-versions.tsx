@@ -13,16 +13,20 @@ import { DocVersion, Intention } from '../types';
 import { hasHoursPassed } from '../helpers';
 import { UseWithGoogleDocs } from './use-with-google-docs';
 import { useWithState } from '../store/slices/state/use-with-state';
+import { isAxiosError } from 'axios';
 
 export function useWithStoreDocVersions(selectedActivityId: string) {
   const { state } = useWithChat();
-  const { updateMostRecentDocVersion } = useWithState();
+  const { updateMostRecentDocVersion, warnExpiredAccessToken } = useWithState();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
   );
   const sessionId: string = useAppSelector((state) => state.state.sessionId);
   const sessionIntention: Intention | undefined = useAppSelector(
     (state) => state.state.sessionIntention
+  );
+  const accessTokenExpired: boolean = useAppSelector(
+    (state) => state.state.warnExpiredAccessToken
   );
   const curGoogleDoc = useAppSelector((state) =>
     state.state.userGoogleDocs.find((doc) => doc.googleDocId === googleDocId)
@@ -50,7 +54,12 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         if (!messages.length || !sessionId) {
           return;
         }
-        const docData = await getDocData(googleDocId);
+        const docData = await getDocData(googleDocId).catch((e) => {
+          if (isAxiosError(e) && e.response?.status === 403) {
+            warnExpiredAccessToken(true);
+          }
+          throw e;
+        });
         updateMostRecentDocVersion(docData);
         if (docData.title !== lastUpdatedTitle) {
           updateGoogleDocTitleLocally(googleDocId, docData.title);
@@ -88,6 +97,12 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         console.log(e);
       }
     },
-    googleDocId ? (process.env.NODE_ENV === 'development' ? 5000 : 5000) : null
+    accessTokenExpired
+      ? null
+      : googleDocId
+      ? process.env.NODE_ENV === 'development'
+        ? 5000
+        : 5000
+      : null
   );
 }

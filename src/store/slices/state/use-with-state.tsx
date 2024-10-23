@@ -15,6 +15,7 @@ import {
   newSession as _newSession,
   setSessionIntention,
   storeMostRecentDocVersion,
+  setWarnExpiredAccessToken,
 } from '.';
 import {
   fetchUserActivityStates,
@@ -44,6 +45,7 @@ interface UseWithState {
   newSession: () => void;
   updateSessionIntention: (intention?: Intention) => void;
   updateMostRecentDocVersion: (docData: DocData) => void;
+  warnExpiredAccessToken: (warn: boolean) => void;
 }
 
 export function useWithState(): UseWithState {
@@ -112,6 +114,10 @@ export function useWithState(): UseWithState {
     dispatch(storeMostRecentDocVersion(docData));
   }
 
+  function warnExpiredAccessToken(warn: boolean) {
+    dispatch(setWarnExpiredAccessToken(warn));
+  }
+
   return {
     state,
     updateCurrentDocId,
@@ -123,5 +129,6 @@ export function useWithState(): UseWithState {
     newSession,
     updateSessionIntention,
     updateMostRecentDocVersion,
+    warnExpiredAccessToken,
   };
 }
