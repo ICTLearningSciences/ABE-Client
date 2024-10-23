@@ -217,7 +217,7 @@ export async function getDocData(docId: string): Promise<DocData> {
 }
 
 export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
-  await axios.post(GRAPHQL_ENDPOINT, {
+  return await axios.post(GRAPHQL_ENDPOINT, {
     query: `
         mutation SubmitGoogleDocVersion($googleDocData: GDocVersionInputType!) {
           submitGoogleDocVersion(googleDocData: $googleDocData) {
@@ -267,7 +267,6 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
       },
     },
   });
-  return;
 }
 
 export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {

@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -12,6 +12,7 @@ import {
   DialogContentText,
   Button,
   CircularProgress,
+  DialogActions,
 } from '@mui/material';
 import { RowDiv } from '../styled-components';
 
@@ -127,6 +128,39 @@ export function TwoOptionDialog(props: {
           </Button>
         </RowDiv>
       </DialogContent>
+    </Dialog>
+  );
+}
+
+export function SingleNotificationDialog(props: {
+  open: boolean;
+  title: string;
+  notification: string;
+}): JSX.Element {
+  const { open, title, notification } = props;
+  const [alreadyShown, setAlreadyShown] = useState<boolean>(false);
+
+  function onClose() {
+    close();
+    setAlreadyShown(true);
+  }
+
+  return (
+    <Dialog
+      data-cy="single-notification-dialog"
+      maxWidth="sm"
+      fullWidth={true}
+      open={open && !alreadyShown}
+    >
+      <DialogTitle style={{ textAlign: 'center' }}>{title}</DialogTitle>
+      <DialogContent>
+        <DialogContentText style={{ textAlign: 'center' }}>
+          {notification}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Close</Button>
+      </DialogActions>
     </Dialog>
   );
 }

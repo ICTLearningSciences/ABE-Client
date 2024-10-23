@@ -39,6 +39,7 @@ export interface State {
   overrideAiServiceModel?: AiServiceModel;
   viewingRole: UserRole;
   viewingAdvancedOptions: boolean;
+  warnExpiredAccessToken: boolean;
 }
 
 const initialState: State = {
@@ -50,6 +51,7 @@ const initialState: State = {
   overrideAiServiceModel: undefined,
   viewingRole: UserRole.USER,
   viewingAdvancedOptions: false,
+  warnExpiredAccessToken: false,
 };
 
 export const loadUserGoogleDocs = createAsyncThunk(
@@ -88,6 +90,12 @@ export const stateSlice = createSlice({
   name: 'state',
   initialState,
   reducers: {
+    setWarnExpiredAccessToken: (
+      state: State,
+      action: PayloadAction<boolean>
+    ) => {
+      state.warnExpiredAccessToken = action.payload;
+    },
     updateDocId: (state: State, action: PayloadAction<string>) => {
       if (!action.payload) {
         state.mostRecentDocVersion = undefined;
@@ -184,6 +192,7 @@ export const {
   setSessionIntention,
   updateGoogleDocTitleLocally,
   storeMostRecentDocVersion,
+  setWarnExpiredAccessToken,
 } = stateSlice.actions;
 
 export default stateSlice.reducer;

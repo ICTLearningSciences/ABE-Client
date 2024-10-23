@@ -22,6 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { removeDuplicatesByField } from '../../helpers';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
 import { ActivityBuilder } from '../activity-builder/types';
+import { SingleNotificationDialog } from '../dialog';
 
 export default function EditGoogleDoc(props: {
   googleDocId: string;
@@ -39,7 +40,7 @@ export default function EditGoogleDoc(props: {
   const { prompts } = useWithPrompts;
   const navigate = useNavigate();
   const { width: windowWidth } = useWithWindowSize();
-  const { updateViewingUserRole } = useWithState();
+  const { updateViewingUserRole, state } = useWithState();
   const [docGoalModalOpen, setDocGoalModalOpen] = useState(false);
   const googleDocUrl = `https://docs.google.com/document/d/${googleDocId}/edit`;
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
@@ -210,6 +211,11 @@ export default function EditGoogleDoc(props: {
           </>
         )}
       </div>
+      <SingleNotificationDialog
+        open={state.warnExpiredAccessToken}
+        title="Access Token Expired"
+        notification="Your access token has expired. Please refresh the page or log in again."
+      />
     </div>
   );
 }
