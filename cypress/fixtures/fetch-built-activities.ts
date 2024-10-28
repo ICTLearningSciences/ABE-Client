@@ -4,8 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { ActivityBuilder, ActivityBuilderVisibility, ActivityBuilderStepType, RequestUserInputActivityStep, SystemMessageActivityStep, PromptActivityStep, NumericOperations, Checking } from "../../src/components/activity-builder/types";
-import { DisplayIcons, PromptOutputTypes } from "../helpers/types";
+import { ActivityBuilder, ActivityBuilderStepType, RequestUserInputActivityStep, SystemMessageActivityStep, PromptActivityStep, Checking, NumericOperations } from "../helpers/activity-builder-types";
+import { ActivityBuilderVisibility, DisplayIcons, PromptOutputTypes } from "../helpers/types";
 import { testUser } from "./user-data";
 
 export function createActivityBuilder(userId: string, title: string, activityId: string, visibility: ActivityBuilderVisibility): ActivityBuilder{

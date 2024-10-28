@@ -4,7 +4,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { ActivityBuilderVisibility } from '../../src/components/activity-builder/types';
 import { asyncStartRequestRes } from '../fixtures/async-start-request';
 import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
 import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
@@ -33,6 +32,7 @@ import {
   JobStatus,
   UserRole,
   MockDefaultType,
+  ActivityBuilderVisibility,
 } from './types';
 
 export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';

@@ -284,6 +284,12 @@ export interface IGoalActivites {
   builtActivities: IActivityConfig[];
 }
 
+export enum ActivityBuilderVisibility {
+  EDITABLE = 'editable',
+  READ_ONLY = 'read-only',
+  PRIVATE = 'private',
+}
+
 export interface ColorThemeConfig {
   headerColor: string;
   headerButtonsColor: string;
