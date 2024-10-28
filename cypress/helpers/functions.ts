@@ -228,6 +228,11 @@ export function cyMockDefault(
     mockGQL('StoreGoogleDoc', storeGoogleDocResponse(gDocWithAllIntentions)),
     mockGQL('FetchActivities', fetchActivitiesResponse),
     mockGQL('FetchBuiltActivities', fetchBuiltActivitiesResponse),
+    mockGQL('FetchBuiltActivityVersions', {fetchBuiltActivityVersions: {
+      edges: []
+    }}),
+    mockGQL('AddOrUpdateBuiltActivity', {}),
+    mockGQL('StoreBuiltActivityVersion', {storeBuiltActivityVersion:{activity:{}}}),
     mockGQL('SubmitGoogleDocVersion', {}),
   ]);
 }

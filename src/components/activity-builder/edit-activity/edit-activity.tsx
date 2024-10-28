@@ -156,6 +156,7 @@ export function EditActivity(props: {
           </Button>
           {!saveInProgress ? (
             <Button
+              data-cy="save-activity"
               style={{
                 marginRight: '10px',
               }}
@@ -172,7 +173,7 @@ export function EditActivity(props: {
               }}
             />
           )}
-          <Button onClick={addNewFlow} variant="outlined" disabled={!canEditActivity}>
+          <Button data-cy="add-flow" onClick={addNewFlow} variant="outlined" disabled={!canEditActivity}>
             + Add Flow
           </Button>
 

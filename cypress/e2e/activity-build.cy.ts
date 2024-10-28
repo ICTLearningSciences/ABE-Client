@@ -18,9 +18,15 @@ export function flowTitleIsEditable(cy: CypressGlobal){
     cy.get("[data-cy=input-field-Flow-Title]").should("contain.text", "New Flow Title")
 }
 
-export function flowTitleIsNotEditable(cy: CypressGlobal){
+export function flowIsNotEditable(cy: CypressGlobal){
     cy.get("[data-cy=input-field-Flow-Title]").should("exist")
     cy.get("[data-cy=input-field-Flow-Title]").should("contain.text", "")
+    cy.get("[data-cy=input-field-Flow-Title]").should("have.css", "pointer-events", "none")
+    cy.get('[data-cy=input-field-Activity-Name]').within(()=>{
+        cy.get("textarea").should("be.disabled")
+    })
+    cy.get('[data-cy=save-activity]').should("be.disabled")
+    cy.get('[data-cy=add-flow]').should("be.disabled")
 
 }
 
@@ -60,7 +66,7 @@ describe('activity builder', () => {
     describe("content managers", ()=>{
         it("can see all activities", ()=>{
             cyMockDefault(cy, {
-                userRole: UserRole.ADMIN
+                userRole: UserRole.CONTENT_MANAGER
               });
               cy.visit("/")
               cy.get("[data-cy=role-switch]").should("contain.text", "User")
@@ -76,7 +82,7 @@ describe('activity builder', () => {
 
         })
 
-        it.only("cannot edit other users read-only activities", ()=>{
+        it("cannot edit other users read-only activities", ()=>{
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
               });
@@ -87,6 +93,12 @@ describe('activity builder', () => {
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
+              flowTitleIsEditable(cy)
+              cy.get("[data-cy=return-to-activity-list]").click()
+              cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("exist")
+              cy.get("[data-cy=activity-item-edit-other-user-read-only-activity]").should("exist").click()
+              flowIsNotEditable(cy)
+              cy.get("[data-cy=return-to-activity-list]").click()
         })
     })
 

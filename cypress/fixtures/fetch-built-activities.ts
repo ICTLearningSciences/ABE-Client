@@ -6,6 +6,7 @@ export function createActivityBuilder(userId: string, title: string, activityId:
     return {
         ...myEditableActivity,
         _id: activityId,
+        clientId: activityId,
         user: userId,
         visibility: visibility,
         title: title
