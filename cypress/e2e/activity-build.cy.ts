@@ -75,11 +75,33 @@ describe('activity builder', () => {
         })
         
         it("can edit their own activities", ()=>{
-
+            cyMockDefault(cy, {
+                userRole: UserRole.CONTENT_MANAGER
+              });
+              cy.visit("/")
+              cy.get("[data-cy=role-switch]").should("contain.text", "User")
+              cy.get("[data-cy=role-switch]").click();
+              cy.get("[data-cy=role-switch]").should("contain.text", "Content Manager")
+              cy.get("[data-cy=doc-list-item-Aliens").click()
+              cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
+              cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
+              flowTitleIsEditable(cy)
+              cy.get("[data-cy=return-to-activity-list]").click()
         })
 
         it("can edit other users 'editable' set activities", ()=>{
-
+            cyMockDefault(cy, {
+                userRole: UserRole.CONTENT_MANAGER
+              });
+              cy.visit("/")
+              cy.get("[data-cy=role-switch]").should("contain.text", "User")
+              cy.get("[data-cy=role-switch]").click();
+              cy.get("[data-cy=role-switch]").should("contain.text", "Content Manager")
+              cy.get("[data-cy=doc-list-item-Aliens").click()
+              cy.get("[data-cy=activity-item-other-user-editable-activity]").should("exist")
+              cy.get("[data-cy=activity-item-edit-other-user-editable-activity]").should("exist").click()
+              flowTitleIsEditable(cy)
+              cy.get("[data-cy=return-to-activity-list]").click()
         })
 
         it("cannot edit other users read-only activities", ()=>{

@@ -60,8 +60,13 @@ export function ActivityFlowContainer(props: {
   versions: BuiltActivityVersion[];
   disabled?: boolean;
 }): JSX.Element {
-  const { localActivity, updateLocalActivity, versions, globalStateKeys, disabled } =
-    props;
+  const {
+    localActivity,
+    updateLocalActivity,
+    versions,
+    globalStateKeys,
+    disabled,
+  } = props;
   const flowsList = localActivity.flowsList;
   const allStepVersions: StepVersion[] = versions
     .flatMap((v) =>

@@ -34,7 +34,7 @@ export function EditActivity(props: {
   const [localActivityCopy, setLocalActivityCopy] =
     React.useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
-  const user = useAppSelector(state => state.login.user);
+  const user = useAppSelector((state) => state.login.user);
   const canEditActivity = user ? userCanEditActivity(activity, user) : false;
   const { activityVersions, loadActivityVersions } = useWithActivityVersions();
   const globalStateKeys: string[] = useMemo(() => {
@@ -173,7 +173,12 @@ export function EditActivity(props: {
               }}
             />
           )}
-          <Button data-cy="add-flow" onClick={addNewFlow} variant="outlined" disabled={!canEditActivity}>
+          <Button
+            data-cy="add-flow"
+            onClick={addNewFlow}
+            variant="outlined"
+            disabled={!canEditActivity}
+          >
             + Add Flow
           </Button>
 

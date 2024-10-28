@@ -47,7 +47,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
   });
 
   function roleDisplayText(userRole: UserRole) {
-    switch(userRole) {
+    switch (userRole) {
       case UserRole.ADMIN:
         return 'Admin';
       case UserRole.CONTENT_MANAGER:
@@ -131,9 +131,11 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
             }}
           >
             {isAdminOrContentManager ? (
-              <ColumnDiv style={{
-                marginRight: 20,
-              }}>
+              <ColumnDiv
+                style={{
+                  marginRight: 20,
+                }}
+              >
                 <ThemeProvider theme={() => switchTheme(roleSwitchChecked)}>
                   <FormControlLabel
                     data-cy="role-switch"

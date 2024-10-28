@@ -141,7 +141,6 @@ export function ConditionalStepBuilder(props: {
   }
 
   return (
-
     <RoundedBorderDiv
       key={rerender}
       style={{

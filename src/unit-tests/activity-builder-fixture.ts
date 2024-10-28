@@ -15,7 +15,6 @@ import {
   ActivityBuilderVisibility,
 } from '../components/activity-builder/types';
 import { DisplayIcons } from '../helpers/display-icon-helper';
-import { UserRole } from '../store/slices/login';
 
 export const exampleSystemMessageActivityStep: SystemMessageActivityStep = {
   stepId: '1',
