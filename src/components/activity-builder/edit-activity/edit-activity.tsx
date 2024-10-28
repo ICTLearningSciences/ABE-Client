@@ -8,7 +8,7 @@ import { ActivityFlowContainer } from './activity-flow-container';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
 import { InputField } from '../shared/input-components';
-import { equals } from '../../../helpers';
+import { equals, userCanEditActivity } from '../../../helpers';
 import { v4 as uuidv4 } from 'uuid';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { isActivityRunnable } from '../helpers';
@@ -17,6 +17,7 @@ import {
   DOC_NUM_WORDS_KEY,
   DOC_TEXT_KEY,
 } from '../../../classes/activity-builder-activity/built-activity-handler';
+import { useAppSelector } from '../../../store/hooks';
 export function EditActivity(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   activity: ActivityBuilderType;
@@ -33,6 +34,8 @@ export function EditActivity(props: {
   const [localActivityCopy, setLocalActivityCopy] =
     React.useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
+  const user = useAppSelector(state => state.login.user);
+  const canEditActivity = user ? userCanEditActivity(activity, user) : false;
   const { activityVersions, loadActivityVersions } = useWithActivityVersions();
   const globalStateKeys: string[] = useMemo(() => {
     return localActivityCopy.flowsList.reduce(
@@ -102,6 +105,7 @@ export function EditActivity(props: {
       }}
     >
       <IconButton
+        data-cy="return-to-activity-list"
         onClick={returnTo}
         style={{
           position: 'absolute',
@@ -124,6 +128,8 @@ export function EditActivity(props: {
           label="Activity Name"
           value={localActivityCopy.title}
           width="fit-content"
+          disabled={!canEditActivity}
+          key={localActivityCopy.clientId}
           onChange={(v) => {
             setLocalActivityCopy((prevValue) => {
               return {
@@ -154,7 +160,7 @@ export function EditActivity(props: {
                 marginRight: '10px',
               }}
               variant="outlined"
-              disabled={equals(localActivityCopy, activity)}
+              disabled={!canEditActivity || equals(localActivityCopy, activity)}
               onClick={saveActivity}
             >
               Save
@@ -166,7 +172,7 @@ export function EditActivity(props: {
               }}
             />
           )}
-          <Button onClick={addNewFlow} variant="outlined">
+          <Button onClick={addNewFlow} variant="outlined" disabled={!canEditActivity}>
             + Add Flow
           </Button>
 
@@ -198,6 +204,7 @@ export function EditActivity(props: {
         localActivity={localActivityCopy}
         updateLocalActivity={setLocalActivityCopy}
         versions={activityVersions[localActivityCopy.clientId] || []}
+        disabled={!canEditActivity}
       />
     </ColumnDiv>
   );

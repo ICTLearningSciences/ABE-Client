@@ -172,6 +172,7 @@ export function cyMockDefault(
   cyMockGetDocTimeline(cy, {
     response: eightHoursBetweenSessions,
   });
+  cyMockGoogleDoc(cy);
   switch (args.mockType) {
     case MockDefaultType.VERSION:
       cyMockGetDocTimeline(cy, {
@@ -299,6 +300,24 @@ export function cyMockGetDocData(
       staticResponse({
         statusCode: 200,
         body: docData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        delayMs: 0,
+      })
+    );
+  });
+}
+
+export function cyMockGoogleDoc(
+  cy: CypressGlobal,
+) {
+
+  cy.intercept('**/docs.google.com/**', (req) => {
+    req.reply(
+      staticResponse({
+        statusCode: 200,
+        body: {},
         headers: {
           'Content-Type': 'application/json',
         },

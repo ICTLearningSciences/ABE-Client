@@ -17,6 +17,7 @@ export function InputField(props: {
   onFocus?: () => void;
   width?: string;
   maxRows?: number;
+  disabled?: boolean;
 }): JSX.Element {
   const [localValue, setLocalValue] = React.useState(props.value);
   const debounceOnChange = useDebouncedCallback((v: string) => {
@@ -31,6 +32,7 @@ export function InputField(props: {
     <FormControl
       variant="standard"
       sx={{ m: 1, minWidth: 120, width: props.width || '80%' }}
+      data-cy={`input-field-${props.label.replace(/\s+/g, '-')}`}
     >
       <InputLabel>{props.label}</InputLabel>
       <Input
@@ -41,6 +43,7 @@ export function InputField(props: {
         onChange={(e) => {
           setLocalValue(e.target.value);
         }}
+        disabled={props.disabled}
       />
     </FormControl>
   );
@@ -50,6 +53,7 @@ export function CheckBoxInput(props: {
   label: string;
   value: boolean;
   onChange: (value: boolean) => void;
+  disabled?: boolean;
 }): JSX.Element {
   return (
     <FormControlLabel
@@ -64,6 +68,7 @@ export function CheckBoxInput(props: {
           onChange={(e) => {
             props.onChange(e.target.checked);
           }}
+          disabled={props.disabled}
         />
       }
     />
@@ -75,8 +80,9 @@ export function SelectInputField(props: {
   value: string;
   options: string[];
   onChange: (value: string) => void;
+  disabled?: boolean;
 }): JSX.Element {
-  const { label, options, onChange, value } = props;
+  const { label, options, onChange, value, disabled } = props;
   return (
     <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
       <InputLabel id={'select-field-label'}>{label}</InputLabel>
@@ -87,7 +93,8 @@ export function SelectInputField(props: {
         onChange={(e) => {
           onChange(e.target.value as string);
         }}
-        label="Output Data Type"
+        label={label}
+        disabled={disabled}
       >
         {options.map((option, i) => (
           <MenuItem key={i} value={option}>

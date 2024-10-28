@@ -44,7 +44,7 @@ export default function EditGoogleDoc(props: {
   const [docGoalModalOpen, setDocGoalModalOpen] = useState(false);
   const googleDocUrl = `https://docs.google.com/document/d/${googleDocId}/edit`;
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
-  const viewingAdmin = viewingRole === UserRole.ADMIN;
+  const viewingAdmin = viewingRole === UserRole.ADMIN || viewingRole === UserRole.CONTENT_MANAGER;
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const activityFromParams = queryParams.get('activityId');
