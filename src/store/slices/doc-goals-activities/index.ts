@@ -16,6 +16,7 @@ import {
   addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
   storeActivityVersion,
   fetchActivityVersions as _fetchActivityVersions,
+  copyBuiltActivity as _copyBuiltActivity,
 } from '../../../hooks/built-activity-api';
 import {
   ActivityBuilder,
@@ -76,6 +77,13 @@ export const fetchBuiltActivities = createAsyncThunk(
   'state/fetchBuiltActivities',
   async () => {
     return await _fetchBuiltActivities();
+  }
+);
+
+export const copyBuiltActivity = createAsyncThunk(
+  'state/copyBuiltActivity',
+  async (activityId: string) => {
+    return await _copyBuiltActivity(activityId);
   }
 );
 
@@ -203,6 +211,10 @@ export const stateSlice = createSlice({
           );
         });
         state.builtActivityVersions[activityClientId] = sortedVersions;
+      })
+
+      .addCase(copyBuiltActivity.fulfilled, (state, action) => {
+        state.builtActivities.push(action.payload);
       });
   },
 });

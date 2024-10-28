@@ -4,10 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { ActivityBuilderVisibility } from '../../src/components/activity-builder/types';
 import { asyncStartRequestRes } from '../fixtures/async-start-request';
 import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
 import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
-import { fetchBuiltActivitiesResponse } from '../fixtures/fetch-built-activities';
+import { createActivityBuilder, fetchBuiltActivitiesResponse } from '../fixtures/fetch-built-activities';
 import { fetchConfigResponse } from '../fixtures/fetch-config';
 import { fetchDocGoalsResponse } from '../fixtures/fetch-doc-goals';
 import { fetchGoogleDocsResponse } from '../fixtures/fetch-google-docs';
@@ -23,6 +24,7 @@ import { audienceEmotionsResponse } from '../fixtures/stronger-hook-activity/aud
 import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
 import { entityFoundResponse } from '../fixtures/stronger-hook-activity/entity-found-response';
 import { updateUserActivityStatesResponse } from '../fixtures/update-user-activity-states';
+import { testUser } from '../fixtures/user-data';
 import { ACCESS_TOKEN_KEY } from './local-storage';
 import {
   DocData,
@@ -234,6 +236,7 @@ export function cyMockDefault(
     mockGQL('AddOrUpdateBuiltActivity', {}),
     mockGQL('StoreBuiltActivityVersion', {storeBuiltActivityVersion:{activity:{}}}),
     mockGQL('SubmitGoogleDocVersion', {}),
+    mockGQL('CopyBuiltActivity', {copyBuiltActivity:createActivityBuilder(testUser._id, 'Copied Activity', 'copied-activity', ActivityBuilderVisibility.EDITABLE)}, {delayMs:1000}),
   ]);
 }
 

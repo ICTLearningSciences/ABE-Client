@@ -11,7 +11,7 @@ export function stepsAreEditable(cy: CypressGlobal){
     cy.get("[data-cy=activity-builder-step-type]").should("exist")
 }
 
-export function flowTitleIsEditable(cy: CypressGlobal){
+export function flowIsEditable(cy: CypressGlobal){
     cy.get("[data-cy=input-field-Flow-Title]").should("exist")
     cy.get("[data-cy=input-field-Flow-Title]").should("contain.text", "")
     cy.get("[data-cy=input-field-Flow-Title]").type("New Flow Title")
@@ -27,7 +27,9 @@ export function flowIsNotEditable(cy: CypressGlobal){
     })
     cy.get('[data-cy=save-activity]').should("be.disabled")
     cy.get('[data-cy=add-flow]').should("be.disabled")
-
+    cy.get('[data-cy=select-field-Visibility]').within(()=>{
+        cy.get("input").should("be.disabled")
+    })
 }
 
 describe('activity builder', () => {
@@ -43,23 +45,23 @@ describe('activity builder', () => {
             cy.get("[data-cy=doc-list-item-Aliens").click()
             cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
             cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
-            flowTitleIsEditable(cy)
+            flowIsEditable(cy)
             cy.get("[data-cy=return-to-activity-list]").click()
             cy.get("[data-cy=activity-item-my-private-activity]").should("exist")
             cy.get("[data-cy=activity-item-edit-my-private-activity]").click()
-            flowTitleIsEditable(cy)
+            flowIsEditable(cy)
             cy.get("[data-cy=return-to-activity-list]").click()
             cy.get("[data-cy=activity-item-my-read-only-activity]").should("exist")
             cy.get("[data-cy=activity-item-edit-my-read-only-activity]").click()
-            flowTitleIsEditable(cy)
+            flowIsEditable(cy)
             cy.get("[data-cy=return-to-activity-list]").click()
             cy.get("[data-cy=activity-item-other-user-editable-activity]").should("exist")
             cy.get("[data-cy=activity-item-edit-other-user-editable-activity]").click()
-            flowTitleIsEditable(cy)
+            flowIsEditable(cy)
             cy.get("[data-cy=return-to-activity-list]").click()
             cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("exist")
             cy.get("[data-cy=activity-item-edit-other-user-read-only-activity]").click()
-            flowTitleIsEditable(cy)
+            flowIsEditable(cy)
           })
     })
 
@@ -85,7 +87,15 @@ describe('activity builder', () => {
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
-              flowTitleIsEditable(cy)
+              flowIsEditable(cy)
+              cy.get("[data-cy=return-to-activity-list]").click()
+              cy.get("[data-cy=activity-item-my-read-only-activity]").should("exist")
+              cy.get("[data-cy=activity-item-edit-my-read-only-activity]").should("exist").click()
+              flowIsEditable(cy)
+              cy.get("[data-cy=return-to-activity-list]").click()
+              cy.get("[data-cy=activity-item-my-private-activity]").should("exist")
+              cy.get("[data-cy=activity-item-edit-my-private-activity]").should("exist").click()
+              flowIsEditable(cy)
               cy.get("[data-cy=return-to-activity-list]").click()
         })
 
@@ -100,7 +110,7 @@ describe('activity builder', () => {
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-other-user-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-edit-other-user-editable-activity]").should("exist").click()
-              flowTitleIsEditable(cy)
+              flowIsEditable(cy)
               cy.get("[data-cy=return-to-activity-list]").click()
         })
 
@@ -115,7 +125,7 @@ describe('activity builder', () => {
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
-              flowTitleIsEditable(cy)
+              flowIsEditable(cy)
               cy.get("[data-cy=return-to-activity-list]").click()
               cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("exist")
               cy.get("[data-cy=activity-item-edit-other-user-read-only-activity]").should("exist").click()
@@ -124,4 +134,21 @@ describe('activity builder', () => {
         })
     })
 
+
+    describe("admins and content managers", ()=>{
+        it("can copy activities", ()=>{
+            cyMockDefault(cy, {
+                userRole: UserRole.CONTENT_MANAGER
+            });
+            cy.visit("/");
+            cy.get("[data-cy=role-switch]").should("contain.text", "User");
+            cy.get("[data-cy=role-switch]").click();
+            cy.get("[data-cy=role-switch]").should("contain.text", "Content Manager");
+            cy.get("[data-cy=doc-list-item-Aliens").click();
+            cy.get("[data-cy=activity-item-copied-activity]").should("not.exist");
+            cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("exist");
+            cy.get("[data-cy=activity-item-copy-other-user-read-only-activity]").click();
+            cy.get("[data-cy=activity-item-copied-activity]").should("exist");
+        })
+    })
   });

@@ -4,19 +4,23 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+import React, { useState } from 'react';
 import { ColumnDiv, RowDiv } from '../../styled-components';
 import { ActivityBuilder as ActivityBuilderType } from './types';
-import { Button } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import { isActivityRunnable } from './helpers';
 import PreviewIcon from '@mui/icons-material/Preview';
 import EditIcon from '@mui/icons-material/Edit';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useAppSelector } from '../../store/hooks';
 export function ExistingActivityItem(props: {
   activity: ActivityBuilderType;
   goToActivity: () => void;
   editActivity: () => void;
+  copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
 }) {
-  const { activity, editActivity, goToActivity } = props;
+  const { activity, editActivity, goToActivity, copyActivity } = props;
+  const [copying, setCopying] = useState(false);
   return (
     <RowDiv
       data-cy={`activity-item-${activity._id}`}
@@ -38,6 +42,23 @@ export function ExistingActivityItem(props: {
           Preview
         </Button>
         <Button
+          style={{ marginRight: 10 }}
+          disabled={copying}
+          onClick={() => {
+            setCopying(true);
+            copyActivity(activity._id).finally(() => {
+              setCopying(false);
+            });
+          }}
+          variant="outlined"
+          startIcon={
+            copying ? <CircularProgress size={20} /> : <ContentCopyIcon />
+          }
+          data-cy={`activity-item-copy-${activity._id}`}
+        >
+          {copying ? 'Copying...' : 'Copy'}
+        </Button>
+        <Button
           onClick={editActivity}
           variant="contained"
           startIcon={<EditIcon />}
@@ -54,11 +75,18 @@ export function ExistingActivities(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   activities: ActivityBuilderType[];
   editActivity: (activity: ActivityBuilderType) => void;
+  copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
+  onCreateActivity: () => void;
 }): JSX.Element {
-  const { activities, editActivity } = props;
+  const { activities, editActivity, copyActivity, onCreateActivity } = props;
+  const user = useAppSelector((state) => state.login.user?._id) || '';
   if (!activities.length) {
     return <></>;
   }
+  const myActivities = activities.filter((activity) => activity.user === user);
+  const otherActivities = activities.filter(
+    (activity) => activity.user !== user
+  );
 
   return (
     <ColumnDiv
@@ -66,11 +94,55 @@ export function ExistingActivities(props: {
         width: '95%',
       }}
     >
-      {activities.map((activity) => {
+      <h2
+        style={{
+          fontStyle: 'italic',
+        }}
+      >
+        My Activities
+      </h2>
+      {myActivities.length === 0 && <p>No activities found</p>}
+      {myActivities.map((activity) => {
         return (
           <ExistingActivityItem
             key={activity._id}
             activity={activity}
+            copyActivity={copyActivity}
+            editActivity={() => {
+              editActivity(activity);
+            }}
+            goToActivity={() => {
+              props.goToActivity(activity);
+            }}
+          />
+        );
+      })}
+      <Button
+        variant="outlined"
+        style={{
+          marginTop: 10,
+          width: 'fit-content',
+          alignSelf: 'center',
+        }}
+        onClick={onCreateActivity}
+      >
+        + Create New Activity
+      </Button>
+
+      <h2
+        style={{
+          fontStyle: 'italic',
+        }}
+      >
+        Other Activities
+      </h2>
+      {otherActivities.length === 0 && <p>No activities found</p>}
+      {otherActivities.map((activity) => {
+        return (
+          <ExistingActivityItem
+            key={activity._id}
+            activity={activity}
+            copyActivity={copyActivity}
             editActivity={() => {
               editActivity(activity);
             }}
@@ -90,6 +162,7 @@ export function SelectCreateActivity(props: {
   builtActivities: ActivityBuilderType[];
   onEditActivity: (activity: ActivityBuilderType) => void;
   onCreateActivity: () => void;
+  copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
 }): JSX.Element {
   const {
     builtActivities,
@@ -97,6 +170,7 @@ export function SelectCreateActivity(props: {
     onCreateActivity,
     goToActivity,
     goToOldActivityEditor,
+    copyActivity,
   } = props;
   return (
     <ColumnDiv
@@ -124,8 +198,9 @@ export function SelectCreateActivity(props: {
         goToActivity={goToActivity}
         activities={builtActivities}
         editActivity={onEditActivity}
+        copyActivity={copyActivity}
+        onCreateActivity={onCreateActivity}
       />
-      <Button onClick={onCreateActivity}>+ Create New Activity</Button>
     </ColumnDiv>
   );
 }

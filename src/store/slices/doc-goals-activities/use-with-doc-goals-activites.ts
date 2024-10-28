@@ -7,6 +7,7 @@ import {
   LoadStatus,
   addNewLocalBuiltActivity as _addNewLocalBuiltActivity,
   storeActivityVersionForActivity,
+  copyBuiltActivity as _copyBuiltActivity,
 } from '.';
 import {
   ActivityBuilder,
@@ -114,6 +115,11 @@ export function useWithDocGoalsActivities() {
     return res.payload as ActivityBuilder;
   }
 
+  async function copyBuiltActivity(activityId: string) {
+    const res = await dispatch(_copyBuiltActivity(activityId));
+    return res.payload as ActivityBuilder;
+  }
+
   return {
     getActivitById,
     loadDocGoals,
@@ -122,6 +128,7 @@ export function useWithDocGoalsActivities() {
     addOrUpdateActivity,
     addOrUpdateBuiltActivity,
     addNewLocalBuiltActivity,
+    copyBuiltActivity,
     builtActivities,
     activities,
     docGoals: docGoalsActivities,

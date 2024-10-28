@@ -2,12 +2,13 @@ import React, { useEffect, useMemo } from 'react';
 import {
   ActivityBuilderStepType,
   ActivityBuilder as ActivityBuilderType,
+  ActivityBuilderVisibility,
   FlowItem,
 } from '../types';
 import { ActivityFlowContainer } from './activity-flow-container';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
-import { InputField } from '../shared/input-components';
+import { InputField, SelectInputField } from '../shared/input-components';
 import { equals, userCanEditActivity } from '../../../helpers';
 import { v4 as uuidv4 } from 'uuid';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -124,21 +125,37 @@ export function EditActivity(props: {
           alignItems: 'center',
         }}
       >
-        <InputField
-          label="Activity Name"
-          value={localActivityCopy.title}
-          width="fit-content"
-          disabled={!canEditActivity}
-          key={localActivityCopy.clientId}
-          onChange={(v) => {
-            setLocalActivityCopy((prevValue) => {
-              return {
-                ...prevValue,
-                title: v,
-              };
-            });
-          }}
-        />
+        <RowDiv>
+          <InputField
+            label="Activity Name"
+            value={localActivityCopy.title}
+            width="fit-content"
+            disabled={!canEditActivity}
+            key={localActivityCopy.clientId}
+            onChange={(v) => {
+              setLocalActivityCopy((prevValue) => {
+                return {
+                  ...prevValue,
+                  title: v,
+                };
+              });
+            }}
+          />
+          <SelectInputField
+            label="Visibility"
+            value={localActivityCopy.visibility}
+            options={Object.values(ActivityBuilderVisibility)}
+            disabled={!canEditActivity}
+            onChange={(v) => {
+              setLocalActivityCopy((prevValue) => {
+                return {
+                  ...prevValue,
+                  visibility: v as ActivityBuilderVisibility,
+                };
+              });
+            }}
+          />
+        </RowDiv>
         <RowDiv>
           <Button
             style={{
@@ -181,7 +198,6 @@ export function EditActivity(props: {
           >
             + Add Flow
           </Button>
-
           <Tooltip
             title={
               <div>
@@ -200,7 +216,7 @@ export function EditActivity(props: {
                 cursor: 'pointer',
               }}
             >
-              Activity Variables
+              Variables
             </div>
           </Tooltip>
         </RowDiv>

@@ -20,6 +20,7 @@ export function ActivityBuilderPage(props: {
     builtActivities,
     addOrUpdateBuiltActivity,
     addNewLocalBuiltActivity,
+    copyBuiltActivity,
   } = useWithDocGoalsActivities();
   const [selectedActivityClientId, setSelectedActivityClientId] =
     React.useState<string>(curActivity?.clientId || '');
@@ -30,6 +31,7 @@ export function ActivityBuilderPage(props: {
   if (!selectedActivity) {
     return (
       <SelectCreateActivity
+        copyActivity={copyBuiltActivity}
         goToOldActivityEditor={goToOldActivityEditor}
         goToActivity={goToActivity}
         builtActivities={builtActivities}

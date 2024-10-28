@@ -87,6 +87,7 @@ export function SelectInputField(props: {
     <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
       <InputLabel id={'select-field-label'}>{label}</InputLabel>
       <Select
+        data-cy={`select-field-${label.replace(/\s+/g, '-')}`}
         labelId="demo-simple-select-standard-label"
         id="demo-simple-select-standard"
         value={value}

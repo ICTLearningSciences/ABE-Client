@@ -227,3 +227,28 @@ export async function storeActivityVersion(
   );
   return res;
 }
+
+export async function copyBuiltActivity(
+  activityId: string
+): Promise<ActivityBuilder> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<ActivityBuilder>(
+    {
+      query: `
+mutation CopyBuiltActivity($activityIdToCopy: String!) {
+          copyBuiltActivity(activityIdToCopy: $activityIdToCopy) {
+                ${fullBuiltActivityQueryData}
+              }
+         }
+        `,
+      variables: {
+        activityIdToCopy: activityId,
+      },
+    },
+    {
+      dataPath: 'copyBuiltActivity',
+      accessToken,
+    }
+  );
+  return res;
+}
