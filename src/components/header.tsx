@@ -32,7 +32,8 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
   const userRole = useAppSelector((state) => state.login.userRole);
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const loggedIn = loginStatus === LoginStatus.AUTHENTICATED;
-  const isAdmin = userRole === UserRole.ADMIN;
+  const isAdminOrContentManager =
+    userRole === UserRole.ADMIN || userRole === UserRole.CONTENT_MANAGER;
   const navigate = useNavigate();
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
@@ -45,7 +46,18 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
     },
   });
 
-  const roleSwitchChecked = viewingRole === UserRole.ADMIN;
+  function roleDisplayText(userRole: UserRole) {
+    switch(userRole) {
+      case UserRole.ADMIN:
+        return 'Admin';
+      case UserRole.CONTENT_MANAGER:
+        return 'Content Manager';
+      default:
+        return 'User';
+    }
+  }
+
+  const roleSwitchChecked = viewingRole !== UserRole.USER;
   const switchTheme = (checked: boolean) =>
     createTheme({
       components: {
@@ -118,33 +130,35 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
               alignItems: 'center',
             }}
           >
-            {isAdmin ? (
-              <ColumnDiv>
+            {isAdminOrContentManager ? (
+              <ColumnDiv style={{
+                marginRight: 20,
+              }}>
                 <ThemeProvider theme={() => switchTheme(roleSwitchChecked)}>
                   <FormControlLabel
                     data-cy="role-switch"
-                    labelPlacement="end"
+                    labelPlacement="start"
                     control={
                       <Switch
                         size="small"
                         checked={roleSwitchChecked}
                         onChange={() => {
                           updateViewingUserRole(
-                            viewingRole === UserRole.ADMIN
+                            viewingRole !== UserRole.USER
                               ? UserRole.USER
-                              : UserRole.ADMIN
+                              : userRole
                           );
                         }}
                       />
                     }
-                    label={viewingRole === UserRole.ADMIN ? 'Admin' : 'User'}
+                    label={roleDisplayText(viewingRole)}
                   />
                 </ThemeProvider>
                 <ThemeProvider
                   theme={() => switchTheme(state.viewingAdvancedOptions)}
                 >
                   <FormControlLabel
-                    labelPlacement="end"
+                    labelPlacement="start"
                     control={
                       <Switch
                         size="small"

@@ -31,7 +31,7 @@ export function defaultActivityBuilder(userId: string): ActivityBuilder {
     activityType: 'builder',
     title: 'New Activity',
     user: userId,
-    visibility: 'public',
+    visibility: ActivityBuilderVisibility.READ_ONLY,
     description: '',
     displayIcon: DisplayIcons.DEFAULT,
     newDocRecommend: false,
@@ -46,13 +46,19 @@ export function defaultActivityBuilder(userId: string): ActivityBuilder {
   };
 }
 
+export enum ActivityBuilderVisibility {
+  EDITABLE = 'editable',
+  READ_ONLY = 'read-only',
+  PRIVATE = 'private',
+}
+
 export interface ActivityBuilder extends IActivity {
   _id: string;
   clientId: string;
   activityType: 'builder';
   title: string;
   user: string;
-  visibility: string;
+  visibility: ActivityBuilderVisibility;
   description: string;
   displayIcon: DisplayIcons;
   newDocRecommend?: boolean;

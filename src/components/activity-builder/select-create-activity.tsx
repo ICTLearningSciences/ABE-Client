@@ -9,7 +9,8 @@ import { ColumnDiv, RowDiv } from '../../styled-components';
 import { ActivityBuilder as ActivityBuilderType } from './types';
 import { Button } from '@mui/material';
 import { isActivityRunnable } from './helpers';
-
+import PreviewIcon from '@mui/icons-material/Preview';
+import EditIcon from '@mui/icons-material/Edit';
 export function ExistingActivityItem(props: {
   activity: ActivityBuilderType;
   goToActivity: () => void;
@@ -18,6 +19,7 @@ export function ExistingActivityItem(props: {
   const { activity, editActivity, goToActivity } = props;
   return (
     <RowDiv
+      data-cy={`activity-item-${activity._id}`}
       style={{
         width: '100%',
         justifyContent: 'space-between',
@@ -30,10 +32,19 @@ export function ExistingActivityItem(props: {
           style={{ marginRight: 10 }}
           disabled={!isActivityRunnable(activity)}
           onClick={goToActivity}
+          startIcon={<PreviewIcon />}
+          variant="outlined"
         >
           Preview
         </Button>
-        <Button onClick={editActivity}>Edit</Button>
+        <Button
+          onClick={editActivity}
+          variant="contained"
+          startIcon={<EditIcon />}
+          data-cy={`activity-item-edit-${activity._id}`}
+        >
+          Edit
+        </Button>
       </RowDiv>
     </RowDiv>
   );

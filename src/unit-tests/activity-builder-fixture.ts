@@ -12,8 +12,10 @@ import {
   RequestUserInputActivityStep,
   PromptActivityStep,
   JsonResponseDataType,
+  ActivityBuilderVisibility,
 } from '../components/activity-builder/types';
 import { DisplayIcons } from '../helpers/display-icon-helper';
+import { UserRole } from '../store/slices/login';
 
 export const exampleSystemMessageActivityStep: SystemMessageActivityStep = {
   stepId: '1',
@@ -64,7 +66,7 @@ export const examplePromptActivity: ActivityBuilder = {
   activityType: 'builder',
   description: '',
   user: '123',
-  visibility: 'public',
+  visibility: ActivityBuilderVisibility.EDITABLE,
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {
@@ -82,7 +84,7 @@ export const collectUserNameActivity: ActivityBuilder = {
   activityType: 'builder',
   description: '',
   user: '123',
-  visibility: 'public',
+  visibility: ActivityBuilderVisibility.EDITABLE,
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {
@@ -128,7 +130,7 @@ export const collectIntentionActivity: ActivityBuilder = {
   title: 'Collect User Intention',
   activityType: 'builder',
   user: '123',
-  visibility: 'public',
+  visibility: ActivityBuilderVisibility.EDITABLE,
   description: '',
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
@@ -162,7 +164,7 @@ export const collectAiDataAndDisplayActivity: ActivityBuilder = {
   title: 'Test AI Response Data',
   activityType: 'builder',
   user: '123',
-  visibility: 'public',
+  visibility: ActivityBuilderVisibility.EDITABLE,
   description: '',
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
@@ -216,7 +218,7 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
   title: 'Test AI Response Data',
   activityType: 'builder',
   user: '123',
-  visibility: 'public',
+  visibility: ActivityBuilderVisibility.EDITABLE,
   description: '',
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
@@ -280,7 +282,7 @@ export const multipleFlowActivity: ActivityBuilder = {
   title: 'Multiple Flow Activity',
   activityType: 'builder',
   user: '123',
-  visibility: 'public',
+  visibility: ActivityBuilderVisibility.EDITABLE,
   description: '',
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
@@ -357,7 +359,7 @@ export const utilizeListMcqActivity: ActivityBuilder = {
   activityType: 'builder',
   description: '',
   user: '123',
-  visibility: 'public',
+  visibility: ActivityBuilderVisibility.EDITABLE,
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {
@@ -410,7 +412,7 @@ export const accidentalLoopActivity: ActivityBuilder = {
   activityType: 'builder',
   description: '',
   user: '123',
-  visibility: 'public',
+  visibility: ActivityBuilderVisibility.EDITABLE,
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {
@@ -440,7 +442,7 @@ export const stepLoopsIntoSelfActivity: ActivityBuilder = {
   activityType: 'builder',
   description: '',
   user: '123',
-  visibility: 'public',
+  visibility: ActivityBuilderVisibility.EDITABLE,
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {
@@ -465,7 +467,7 @@ export const weightedResponseWeightsActivity: ActivityBuilder = {
   activityType: 'builder',
   description: '',
   user: '123',
-  visibility: 'public',
+  visibility: ActivityBuilderVisibility.EDITABLE,
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {
@@ -540,7 +542,7 @@ export const nestedDataActivity: ActivityBuilder = {
   activityType: 'builder',
   description: '',
   user: '123',
-  visibility: 'public',
+  visibility: ActivityBuilderVisibility.EDITABLE,
   displayIcon: DisplayIcons.DEFAULT,
   flowsList: [
     {

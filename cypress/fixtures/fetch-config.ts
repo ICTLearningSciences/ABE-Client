@@ -20,7 +20,8 @@ export const fetchConfigResponse: FetchConfigResponse = {
         "displayedGoalActivities":[
             {
                 "goal": "65823a8799045156193339b2",
-                "activities": []
+                "activities": [],
+                "builtActivities": []
               },
             {
                 "goal": "6580e5640ac7bcb42fc8d27f",
@@ -30,6 +31,12 @@ export const fetchConfigResponse: FetchConfigResponse = {
                 { activity: '65a8592b26523c7ce5acac9e', disabled: false },
                 { activity: '65a8592b26523c7ce5acacsa', disabled: false },
                 ],
+                builtActivities: [
+                    {
+                        activity: 'example-activity',
+                        disabled: false
+                    }
+                ]
               },
         ],
         "colorTheme": {
