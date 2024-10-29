@@ -45,6 +45,7 @@ export function FlowStepsBuilderTab(props: {
   deleteStep: (stepId: string, flowClientId: string) => void;
   setPreviewPromptId: (id: string) => void;
   getVersionsForStep: (stepId: string) => StepVersion[];
+  disabled?: boolean;
 }) {
   const {
     flow,
@@ -52,6 +53,7 @@ export function FlowStepsBuilderTab(props: {
     updateLocalActivity,
     setPreviewPromptId,
     globalStateKeys,
+    disabled,
   } = props;
 
   function renderActivityStep(step: ActivityBuilderStepTypes, i: number) {
@@ -160,6 +162,8 @@ export function FlowStepsBuilderTab(props: {
       style={{
         alignItems: 'center',
         position: 'relative',
+        pointerEvents: disabled ? 'none' : 'auto',
+        opacity: disabled ? 0.5 : 1,
       }}
     >
       <Button

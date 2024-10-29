@@ -58,9 +58,15 @@ export function ActivityFlowContainer(props: {
     React.SetStateAction<ActivityBuilderType>
   >;
   versions: BuiltActivityVersion[];
+  disabled?: boolean;
 }): JSX.Element {
-  const { localActivity, updateLocalActivity, versions, globalStateKeys } =
-    props;
+  const {
+    localActivity,
+    updateLocalActivity,
+    versions,
+    globalStateKeys,
+    disabled,
+  } = props;
   const flowsList = localActivity.flowsList;
   const allStepVersions: StepVersion[] = versions
     .flatMap((v) =>
@@ -150,6 +156,7 @@ export function ActivityFlowContainer(props: {
           deleteStep={deleteStep}
           setPreviewPromptId={(id: string) => setPreviewPromptId(id)}
           getVersionsForStep={getVersionsForStep}
+          disabled={disabled}
         />
       </CustomTabPanel>
     );

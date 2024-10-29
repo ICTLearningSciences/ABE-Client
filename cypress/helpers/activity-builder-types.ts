@@ -4,10 +4,15 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { DisplayIcons } from '../../helpers/display-icon-helper';
-import { ActivityGQL, PromptOutputTypes } from '../../types';
 import { v4 as uuidv4 } from 'uuid';
+import { ActivityGQL, PromptOutputTypes } from './types';
 
+export enum DisplayIcons {
+    LIGHT_BULB = 'LIGHT_BULB',
+    PENCIL = 'PENCIL',
+    PENCIL_OUTLINE = 'PENCIL_OUTLINE',
+    DEFAULT = 'DEFAULT',
+  }
 export function isActivityBuilder(
   activity: ActivityGQL | ActivityBuilder
 ): activity is ActivityBuilder {

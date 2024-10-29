@@ -460,7 +460,7 @@ describe('collectin user intentions', () => {
       goToStrongerHookActivity(cy);
       checkNumberSessionIds(cy, 1);
       cy.get('[data-cy=home-button]').click();
-      cy.get('[data-cy=doc-list-item-Aliens]').click();
+      cy.get('[data-cy=doc-list-item-Aliens-2]').click();
       goToStrongerHookActivity(cy);
       checkNumberSessionIds(cy, 2);
     });

@@ -13,9 +13,15 @@ import {
   PromptConfiguration,
   AiServiceModel,
   AiServiceNames,
+  User,
 } from './types';
 import Validator, { Schema } from 'jsonschema';
 import { ChatLog, Sender, UserInputType } from './store/slices/chat';
+import {
+  ActivityBuilder,
+  ActivityBuilderVisibility,
+} from './components/activity-builder/types';
+import { UserRole } from './store/slices/login';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function extractErrorMessageFromError(err: any | unknown): string {
   if (err?.response?.data) {
@@ -333,4 +339,15 @@ export function convertMarkdownToJsonString(jsonMarkdown: string): string {
     ? withoutStart.slice(0, -3) // Length of "```"
     : withoutStart;
   return withoutEnd.trim();
+}
+
+export function userCanEditActivity(
+  activity: ActivityBuilder,
+  user: User
+): boolean {
+  return (
+    user.userRole === UserRole.ADMIN ||
+    activity.user === user._id ||
+    activity.visibility === ActivityBuilderVisibility.EDITABLE
+  );
 }
