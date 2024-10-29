@@ -16,6 +16,8 @@ import {
   addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
   storeActivityVersion,
   fetchActivityVersions as _fetchActivityVersions,
+  copyBuiltActivity as _copyBuiltActivity,
+  deleteBuiltActivity as _deleteBuiltActivity,
 } from '../../../hooks/built-activity-api';
 import {
   ActivityBuilder,
@@ -79,6 +81,13 @@ export const fetchBuiltActivities = createAsyncThunk(
   }
 );
 
+export const copyBuiltActivity = createAsyncThunk(
+  'state/copyBuiltActivity',
+  async (activityId: string) => {
+    return await _copyBuiltActivity(activityId);
+  }
+);
+
 export const addOrUpdateBuiltActivity = createAsyncThunk(
   'state/addOrUpdateBuiltActivity',
   async (activity: ActivityBuilder) => {
@@ -101,6 +110,13 @@ export const fetchActivityVersions = createAsyncThunk(
       activityClientId,
       versions,
     };
+  }
+);
+
+export const deleteBuiltActivity = createAsyncThunk(
+  'state/deleteBuiltActivity',
+  async (activityId: string) => {
+    return await _deleteBuiltActivity(activityId);
   }
 );
 
@@ -203,6 +219,16 @@ export const stateSlice = createSlice({
           );
         });
         state.builtActivityVersions[activityClientId] = sortedVersions;
+      })
+
+      .addCase(copyBuiltActivity.fulfilled, (state, action) => {
+        state.builtActivities.push(action.payload);
+      })
+
+      .addCase(deleteBuiltActivity.fulfilled, (state, action) => {
+        state.builtActivities = state.builtActivities.filter(
+          (a) => a._id !== action.payload
+        );
       });
   },
 });

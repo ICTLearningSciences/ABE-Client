@@ -15,6 +15,8 @@ import {
   newSession as _newSession,
   setSessionIntention,
   updateDocService,
+  storeMostRecentDocVersion,
+  setWarnExpiredAccessToken,
 } from '.';
 import {
   fetchUserActivityStates,
@@ -23,6 +25,7 @@ import {
 import {
   AiServiceModel,
   DocService,
+  DocData,
   Intention,
   UserActivityState,
 } from '../../../types';
@@ -44,9 +47,10 @@ interface UseWithState {
   newSession: () => void;
   updateSessionIntention: (intention?: Intention) => void;
   updateDocService: (docService: DocService) => void;
+  updateMostRecentDocVersion: (docData: DocData) => void;
+  warnExpiredAccessToken: (warn: boolean) => void;
 }
 
-// Gives you a way to interface with the redux store (which has the user information)
 export function useWithState(): UseWithState {
   const dispatch = useAppDispatch();
   const state: State = useAppSelector((state) => state.state);
@@ -112,6 +116,15 @@ export function useWithState(): UseWithState {
   function updateSessionIntention(intention?: Intention) {
     dispatch(setSessionIntention(intention));
   }
+
+  function updateMostRecentDocVersion(docData: DocData) {
+    dispatch(storeMostRecentDocVersion(docData));
+  }
+
+  function warnExpiredAccessToken(warn: boolean) {
+    dispatch(setWarnExpiredAccessToken(warn));
+  }
+
   return {
     state,
     updateCurrentDocId,
@@ -123,5 +136,7 @@ export function useWithState(): UseWithState {
     updateViewingAdvancedOptions: _updateViewingAdvancedOptions,
     newSession,
     updateSessionIntention,
+    updateMostRecentDocVersion,
+    warnExpiredAccessToken,
   };
 }

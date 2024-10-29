@@ -52,13 +52,21 @@ export interface StepVersion {
 }
 
 export function ActivityFlowContainer(props: {
+  globalStateKeys: string[];
   localActivity: ActivityBuilderType;
   updateLocalActivity: React.Dispatch<
     React.SetStateAction<ActivityBuilderType>
   >;
   versions: BuiltActivityVersion[];
+  disabled?: boolean;
 }): JSX.Element {
-  const { localActivity, updateLocalActivity, versions } = props;
+  const {
+    localActivity,
+    updateLocalActivity,
+    versions,
+    globalStateKeys,
+    disabled,
+  } = props;
   const flowsList = localActivity.flowsList;
   const allStepVersions: StepVersion[] = versions
     .flatMap((v) =>
@@ -140,6 +148,7 @@ export function ActivityFlowContainer(props: {
     return (
       <CustomTabPanel key={flow.clientId} value={value} index={index}>
         <FlowStepsBuilderTab
+          globalStateKeys={globalStateKeys}
           flow={flow}
           flowsList={flowsList}
           updateLocalActivity={updateLocalActivity}
@@ -147,6 +156,7 @@ export function ActivityFlowContainer(props: {
           deleteStep={deleteStep}
           setPreviewPromptId={(id: string) => setPreviewPromptId(id)}
           getVersionsForStep={getVersionsForStep}
+          disabled={disabled}
         />
       </CustomTabPanel>
     );

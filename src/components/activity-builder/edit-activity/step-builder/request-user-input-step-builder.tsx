@@ -166,9 +166,9 @@ function PredefinedResponsesUpdater(props: {
       <span style={{ fontWeight: 'bold' }}>Custom Response Buttons</span>
 
       {step.predefinedResponses?.length &&
-        step.predefinedResponses.map((response, index) => (
+        step.predefinedResponses.map((response) => (
           <PredefinedResponseUpdater
-            key={index}
+            key={response.clientId}
             predefinedResponse={response}
             updateResponse={(updatedResponse, clientId) => {
               updatePredefinedResponse(updatedResponse, clientId);

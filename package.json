@@ -53,7 +53,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "PORT=80 react-scripts start",
+    "start": "PORT=8000 react-scripts start",
     "build-react-scripts": "react-scripts build",
     "test": "react-scripts test",
     "test:unit": "npx jest --config=./src/unit-tests/jest.config.js",

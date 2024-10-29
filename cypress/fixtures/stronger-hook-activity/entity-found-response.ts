@@ -54,7 +54,12 @@ export const entityFoundResponse = (entities: Experience[], jobStatus?: JobStatu
                                 },
                                 "finish_reason": "stop"
                             }
-                        ]
+                        ],
+                        tokenUsage:{
+                            promptUsage: 1,
+                            completionUsage: 1,
+                            totalUsage: 2
+                        }
                     }
                 ],
                 "answer": response

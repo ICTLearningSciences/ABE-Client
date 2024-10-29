@@ -16,6 +16,8 @@ import {
   SystemMessageActivityStep,
   RequestUserInputActivityStep,
   PredefinedResponse,
+  ConditionalActivityStep,
+  Checking,
 } from '../../components/activity-builder/types';
 import {
   ChatLog,
@@ -26,6 +28,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import {
   AiPromptStep,
+  DocData,
   PromptConfiguration,
   PromptOutputTypes,
   PromptRoles,
@@ -38,8 +41,10 @@ import {
   replaceStoredDataInString,
   sortMessagesByResponseWeight,
   recursiveUpdateAdditionalInfo,
+  STRING_ARRAY_SPLITTER,
 } from '../../components/activity-builder/helpers';
 import { ChatLogSubscriber } from '../../hooks/use-with-chat-log-subscribers';
+import { getDocData } from '../../hooks/api';
 
 interface UserResponseHandleState {
   responseNavigations: {
@@ -53,6 +58,9 @@ function getDefaultUserResponseHandleState(): UserResponseHandleState {
     responseNavigations: [],
   };
 }
+export const EDIT_DOC_GOAL_MESSAGE = 'New Activity';
+export const DOC_TEXT_KEY = 'doc_text';
+export const DOC_NUM_WORDS_KEY = 'doc_num_words';
 
 export class BuiltActivityHandler implements ChatLogSubscriber {
   builtActivityData: ActivityBuilder | undefined;
@@ -69,9 +77,11 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   executePrompt: (
     aiPromptSteps: AiPromptStep[]
   ) => Promise<AiServicesResponseTypes>;
+  editDocGoal: () => void;
   userResponseHandleState: UserResponseHandleState;
   stepIdsSinceLastInput: string[];
   lastFailedStepId: string | null = null;
+  docId: string;
 
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
@@ -145,8 +155,11 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     executePrompt: (
       aiPromptSteps: AiPromptStep[]
     ) => Promise<AiServicesResponseTypes>,
+    docId: string,
+    editDocGoal: () => void,
     builtActivityData?: ActivityBuilder
   ) {
+    this.docId = docId;
     this.builtActivityData = builtActivityData;
     this.stateData = {};
     this.stepIdsSinceLastInput = [];
@@ -157,6 +170,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.updateSessionIntention = updateSessionIntention;
     this.executePrompt = executePrompt;
     this.setResponsePending = setResponsePending;
+    this.editDocGoal = editDocGoal;
 
     this.setBuiltActivityData = this.setBuiltActivityData.bind(this);
     this.initializeActivity = this.initializeActivity.bind(this);
@@ -173,6 +187,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.addResponseNavigation = this.addResponseNavigation.bind(this);
     this.handleExtractMcqChoices = this.handleExtractMcqChoices.bind(this);
   }
+
   setBuiltActivityData(builtActivityData?: ActivityBuilder) {
     this.builtActivityData = builtActivityData;
   }
@@ -236,9 +251,87 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       case ActivityBuilderStepType.PROMPT:
         await this.handlePromptStep(step as PromptActivityStep);
         break;
+      case ActivityBuilderStepType.CONDITIONAL:
+        await this.handleLogicOperationStep(step as ConditionalActivityStep);
+        break;
       default:
         throw new Error(`Unknown step type: ${step.stepType}`);
     }
+  }
+
+  async handleLogicOperationStep(step: ConditionalActivityStep) {
+    this.setResponsePending(true);
+    const docData = await getDocData(this.docId);
+    this.stateData = {
+      ...this.stateData,
+      [DOC_TEXT_KEY]: docData.plainText,
+      [DOC_NUM_WORDS_KEY]: docData.plainText.split(' ').length,
+    };
+    const conditionals = step.conditionals.map((c) => ({
+      ...c,
+      expectedValue: replaceStoredDataInString(c.expectedValue, this.stateData),
+    }));
+    this.setResponsePending(false);
+    for (let i = 0; i < conditionals.length; i++) {
+      const condition = conditionals[i];
+      const stateValue = this.stateData[condition.stateDataKey];
+      if (!stateValue) {
+        this.sendErrorMessage(
+          `An error occured during this activity. Could not find state value ${condition.stateDataKey}.`
+        );
+        return;
+      }
+
+      if (condition.checking === Checking.VALUE) {
+        const expression = `${String(stateValue)} ${condition.operation} ${
+          condition.expectedValue
+        }`;
+        const conditionTrue = new Function(`return ${expression};`)();
+        if (conditionTrue) {
+          const step = this.getStepById(condition.targetStepId);
+          if (!step) {
+            this.sendErrorMessage(
+              `An error occured during this activity. Could not find step: ${condition.targetStepId}`
+            );
+            return;
+          }
+          this.handleStep(step);
+          return;
+        }
+      } else if (condition.checking === Checking.LENGTH) {
+        const expression = `${stateValue.length} ${condition.operation} ${condition.expectedValue}`;
+        const conditionTrue = new Function(`return ${expression};`)();
+        if (conditionTrue) {
+          const step = this.getStepById(condition.targetStepId);
+          if (!step) {
+            this.sendErrorMessage(
+              `An error occured during this activity. Could not find step: ${condition.targetStepId}`
+            );
+            return;
+          }
+          this.handleStep(step);
+          return;
+        }
+      } else {
+        // Checking if array or string contains value
+        const conditionTrue = Array.isArray(stateValue)
+          ? stateValue.find((a) => String(a) === condition.expectedValue)
+          : (stateValue as string).includes(String(condition.expectedValue));
+        if (conditionTrue) {
+          const step = this.getStepById(condition.targetStepId);
+          if (!step) {
+            this.sendErrorMessage(
+              `An error occured during this activity. Could not find step: ${condition.targetStepId}`
+            );
+            return;
+          }
+          this.handleStep(step);
+          return;
+        }
+      }
+    }
+
+    await this.goToNextStep();
   }
 
   async handleSystemMessageStep(step: SystemMessageActivityStep) {
@@ -273,7 +366,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     for (let i = 0; i < predefinedResponses.length; i++) {
       const res = predefinedResponses[i];
       if (res.isArray) {
-        const responsesArray = res.message.split(',');
+        const responsesArray = res.message.split(STRING_ARRAY_SPLITTER);
         if (res.jumpToStepId) {
           for (let j = 0; j < responsesArray.length; j++) {
             this.addResponseNavigation(responsesArray[j], res.jumpToStepId);
@@ -344,6 +437,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     if (this.curStep.stepType !== ActivityBuilderStepType.REQUEST_USER_INPUT) {
       return;
     }
+    if (message === EDIT_DOC_GOAL_MESSAGE) {
+      this.editDocGoal();
+    }
     const requestUserInputStep = this.curStep as RequestUserInputActivityStep;
     if (requestUserInputStep.predefinedResponses.length > 0) {
       const predefinedResponseMatch =
@@ -398,6 +494,19 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // reset user response handle state since we handled the user response
     this.userResponseHandleState = getDefaultUserResponseHandleState();
     await this.goToNextStep();
+  }
+
+  newDocDataReceived(docData?: DocData) {
+    if (!docData) {
+      delete this.stateData[DOC_TEXT_KEY];
+      delete this.stateData[DOC_NUM_WORDS_KEY];
+      return;
+    }
+    this.stateData = {
+      ...this.stateData,
+      [DOC_TEXT_KEY]: docData.plainText,
+      [DOC_NUM_WORDS_KEY]: docData.plainText.split(' ').length,
+    };
   }
 
   newChatLogReceived(chatLog: ChatLog) {
@@ -489,6 +598,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         this.sendMessage({
           id: uuidv4(),
           message: response,
+          aiServiceStepData: _response.aiAllStepsData,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
         });

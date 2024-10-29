@@ -31,11 +31,13 @@ interface UseWithChat {
   clearChatLog: (docId: string) => void;
   chatLogToString: (docId: string) => string;
   setSystemRole: (prompt: string) => void;
+  downloadChatLog: (docId: string) => void;
 }
 
 export function useWithChat(): UseWithChat {
   const dispatch = useAppDispatch();
   const chatState: ChatState = useAppSelector((state) => state.chat);
+  const currentDoc = useAppSelector((state) => state.state.googleDocId);
 
   function sendMessage(
     msg: ChatMessageTypes,
@@ -69,9 +71,32 @@ export function useWithChat(): UseWithChat {
     const chatLog = chatState.chatLogs[docId];
     let chatLogString = '';
     for (let i = 0; i < chatLog.length; i++) {
-      chatLogString += `${chatLog[i].sender}: ${chatLog[i].message}\n`;
+      const tokenUsage =
+        chatLog[i].aiServiceStepData?.[0].tokenUsage.totalUsage;
+      chatLogString += `${chatLog[i].sender}${
+        tokenUsage ? ` (Token Usage: ${tokenUsage})` : ''
+      }: ${chatLog[i].message}\n`;
     }
     return chatLogString;
+  }
+
+  function downloadChatLog(docId?: string) {
+    let chatLog = chatLogToString(docId || currentDoc);
+    const totalTokenUsage = chatState.chatLogs[docId || currentDoc].reduce(
+      (acc, chatLogItem) => {
+        return (
+          acc + (chatLogItem.aiServiceStepData?.[0].tokenUsage.totalUsage || 0)
+        );
+      },
+      0
+    );
+    chatLog += `\nTotal Token Usage: ${totalTokenUsage}`;
+    const element = document.createElement('a');
+    const file = new Blob([chatLog], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'chat-log.txt';
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
   }
 
   return {
@@ -82,5 +107,6 @@ export function useWithChat(): UseWithChat {
     clearChatLog,
     chatLogToString,
     setSystemRole,
+    downloadChatLog,
   };
 }

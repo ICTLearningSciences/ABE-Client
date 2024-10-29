@@ -4,20 +4,40 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+import React, { useState } from 'react';
 import { ColumnDiv, RowDiv } from '../../styled-components';
 import { ActivityBuilder as ActivityBuilderType } from './types';
-import { Button } from '@mui/material';
+import { Button, CircularProgress, IconButton } from '@mui/material';
 import { isActivityRunnable } from './helpers';
-
+import PreviewIcon from '@mui/icons-material/Preview';
+import EditIcon from '@mui/icons-material/Edit';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useAppSelector } from '../../store/hooks';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { UserRole } from '../../store/slices/login';
+import { TwoOptionDialog } from '../dialog';
 export function ExistingActivityItem(props: {
   activity: ActivityBuilderType;
   goToActivity: () => void;
   editActivity: () => void;
+  copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
+  deleteBuiltActivity: (activityId: string) => Promise<void>;
+  canDeleteActivity: boolean;
 }) {
-  const { activity, editActivity, goToActivity } = props;
+  const {
+    activity,
+    editActivity,
+    goToActivity,
+    copyActivity,
+    deleteBuiltActivity,
+    canDeleteActivity,
+  } = props;
+  const [copying, setCopying] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   return (
     <RowDiv
+      data-cy={`activity-item-${activity._id}`}
       style={{
         width: '100%',
         justifyContent: 'space-between',
@@ -30,11 +50,66 @@ export function ExistingActivityItem(props: {
           style={{ marginRight: 10 }}
           disabled={!isActivityRunnable(activity)}
           onClick={goToActivity}
+          startIcon={<PreviewIcon />}
+          variant="outlined"
         >
           Preview
         </Button>
-        <Button onClick={editActivity}>Edit</Button>
+        <Button
+          style={{ marginRight: 10 }}
+          disabled={copying}
+          onClick={() => {
+            setCopying(true);
+            copyActivity(activity._id).finally(() => {
+              setCopying(false);
+            });
+          }}
+          variant="outlined"
+          startIcon={
+            copying ? <CircularProgress size={20} /> : <ContentCopyIcon />
+          }
+          data-cy={`activity-item-copy-${activity._id}`}
+        >
+          {copying ? 'Copying...' : 'Copy'}
+        </Button>
+        <Button
+          onClick={editActivity}
+          variant="contained"
+          startIcon={<EditIcon />}
+          data-cy={`activity-item-edit-${activity._id}`}
+        >
+          Edit
+        </Button>
+        <IconButton
+          disabled={deleting || !canDeleteActivity}
+          onClick={() => {
+            setShowDeleteDialog(true);
+          }}
+          data-cy={`activity-item-delete-${activity._id}`}
+          color="error"
+        >
+          {deleting ? <CircularProgress size={20} /> : <DeleteIcon />}
+        </IconButton>
       </RowDiv>
+      <TwoOptionDialog
+        open={showDeleteDialog}
+        actionInProgress={deleting}
+        option1={{
+          display: 'Cancel',
+          onClick: () => setShowDeleteDialog(false),
+        }}
+        option2={{
+          display: 'Delete',
+          onClick: () => {
+            setDeleting(true);
+            deleteBuiltActivity(activity._id).finally(() => {
+              setDeleting(false);
+              setShowDeleteDialog(false);
+            });
+          },
+        }}
+        title={`Delete ${activity.title}?`}
+      />
     </RowDiv>
   );
 }
@@ -43,11 +118,27 @@ export function ExistingActivities(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   activities: ActivityBuilderType[];
   editActivity: (activity: ActivityBuilderType) => void;
+  copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
+  deleteBuiltActivity: (activityId: string) => Promise<void>;
+  onCreateActivity: () => void;
 }): JSX.Element {
-  const { activities, editActivity } = props;
+  const {
+    activities,
+    editActivity,
+    copyActivity,
+    onCreateActivity,
+    deleteBuiltActivity,
+  } = props;
+  const user = useAppSelector((state) => state.login.user);
   if (!activities.length) {
     return <></>;
   }
+  const myActivities = activities.filter(
+    (activity) => activity.user === user?._id
+  );
+  const otherActivities = activities.filter(
+    (activity) => activity.user !== user?._id
+  );
 
   return (
     <ColumnDiv
@@ -55,17 +146,65 @@ export function ExistingActivities(props: {
         width: '95%',
       }}
     >
-      {activities.map((activity) => {
+      <h2
+        style={{
+          fontStyle: 'italic',
+        }}
+      >
+        My Activities
+      </h2>
+      {myActivities.length === 0 && <p>No activities found</p>}
+      {myActivities.map((activity) => {
         return (
           <ExistingActivityItem
             key={activity._id}
             activity={activity}
+            copyActivity={copyActivity}
             editActivity={() => {
               editActivity(activity);
             }}
             goToActivity={() => {
               props.goToActivity(activity);
             }}
+            deleteBuiltActivity={deleteBuiltActivity}
+            canDeleteActivity={true}
+          />
+        );
+      })}
+      <Button
+        variant="outlined"
+        style={{
+          marginTop: 10,
+          width: 'fit-content',
+          alignSelf: 'center',
+        }}
+        onClick={onCreateActivity}
+      >
+        + Create New Activity
+      </Button>
+
+      <h2
+        style={{
+          fontStyle: 'italic',
+        }}
+      >
+        Other Activities
+      </h2>
+      {otherActivities.length === 0 && <p>No activities found</p>}
+      {otherActivities.map((activity) => {
+        return (
+          <ExistingActivityItem
+            key={activity._id}
+            activity={activity}
+            copyActivity={copyActivity}
+            editActivity={() => {
+              editActivity(activity);
+            }}
+            goToActivity={() => {
+              props.goToActivity(activity);
+            }}
+            deleteBuiltActivity={deleteBuiltActivity}
+            canDeleteActivity={user?.userRole === UserRole.ADMIN}
           />
         );
       })}
@@ -79,6 +218,8 @@ export function SelectCreateActivity(props: {
   builtActivities: ActivityBuilderType[];
   onEditActivity: (activity: ActivityBuilderType) => void;
   onCreateActivity: () => void;
+  copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
+  deleteBuiltActivity: (activityId: string) => Promise<void>;
 }): JSX.Element {
   const {
     builtActivities,
@@ -86,6 +227,8 @@ export function SelectCreateActivity(props: {
     onCreateActivity,
     goToActivity,
     goToOldActivityEditor,
+    copyActivity,
+    deleteBuiltActivity,
   } = props;
   return (
     <ColumnDiv
@@ -113,8 +256,10 @@ export function SelectCreateActivity(props: {
         goToActivity={goToActivity}
         activities={builtActivities}
         editActivity={onEditActivity}
+        copyActivity={copyActivity}
+        deleteBuiltActivity={deleteBuiltActivity}
+        onCreateActivity={onCreateActivity}
       />
-      <Button onClick={onCreateActivity}>+ Create New Activity</Button>
     </ColumnDiv>
   );
 }

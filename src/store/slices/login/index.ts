@@ -35,6 +35,7 @@ export enum LoginRejectedReason {
 export enum UserRole {
   NONE = 'NONE',
   ADMIN = 'ADMIN',
+  CONTENT_MANAGER = 'CONTENT_MANAGER',
   USER = 'USER',
 }
 

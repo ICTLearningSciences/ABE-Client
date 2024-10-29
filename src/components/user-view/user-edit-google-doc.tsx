@@ -21,6 +21,7 @@ import { ActivityBuilder } from '../activity-builder/types';
 import { UseWithPrompts } from '../../hooks/use-with-prompts';
 import { ChatActivity } from './chat-activity';
 import { getDocData } from '../../hooks/api';
+import { SingleNotificationDialog } from '../dialog';
 
 export function EditGoogleDoc(props: {
   docId: string;
@@ -50,9 +51,10 @@ export function EditGoogleDoc(props: {
 
   const { prompts } = useWithPrompts;
   const { width: windowWidth } = useWithWindowSize();
-  const { updateViewingUserRole } = useWithState();
+  const { updateViewingUserRole, state } = useWithState();
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
-  const viewingAdmin = viewingRole === UserRole.ADMIN;
+  const viewingAdmin =
+    viewingRole === UserRole.ADMIN || viewingRole === UserRole.CONTENT_MANAGER;
   const allActivities = getAllActivites(docGoals || []);
   const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
 
@@ -167,6 +169,11 @@ export function EditGoogleDoc(props: {
           />
         )}
       </div>
+      <SingleNotificationDialog
+        open={state.warnExpiredAccessToken}
+        title="Access Token Expired"
+        notification="Your access token has expired. Please refresh the page or log in again."
+      />
     </div>
   );
 }

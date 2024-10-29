@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { asyncStartRequestRes } from '../fixtures/async-start-request';
 import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
 import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
+import { createActivityBuilder, fetchBuiltActivitiesResponse } from '../fixtures/fetch-built-activities';
 import { fetchConfigResponse } from '../fixtures/fetch-config';
 import { fetchDocGoalsResponse } from '../fixtures/fetch-doc-goals';
 import { fetchGoogleDocsResponse } from '../fixtures/fetch-google-docs';
@@ -22,6 +23,7 @@ import { audienceEmotionsResponse } from '../fixtures/stronger-hook-activity/aud
 import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
 import { entityFoundResponse } from '../fixtures/stronger-hook-activity/entity-found-response';
 import { updateUserActivityStatesResponse } from '../fixtures/update-user-activity-states';
+import { testUser } from '../fixtures/user-data';
 import { ACCESS_TOKEN_KEY } from './local-storage';
 import {
   DocData,
@@ -30,6 +32,7 @@ import {
   JobStatus,
   UserRole,
   MockDefaultType,
+  ActivityBuilderVisibility,
 } from './types';
 
 export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';
@@ -171,6 +174,7 @@ export function cyMockDefault(
   cyMockGetDocTimeline(cy, {
     response: eightHoursBetweenSessions,
   });
+  cyMockGoogleDoc(cy);
   switch (args.mockType) {
     case MockDefaultType.VERSION:
       cyMockGetDocTimeline(cy, {
@@ -225,7 +229,16 @@ export function cyMockDefault(
     mockGQL('UpdateUserActivityState', updateUserActivityStatesResponse),
     mockGQL('StoreGoogleDoc', storeGoogleDocResponse(gDocWithAllIntentions)),
     mockGQL('FetchActivities', fetchActivitiesResponse),
+    mockGQL('FetchBuiltActivities', fetchBuiltActivitiesResponse),
+    mockGQL('FetchBuiltActivityVersions', {fetchBuiltActivityVersions: {
+      edges: []
+    }}),
+    mockGQL('AddOrUpdateBuiltActivity', {}),
+    mockGQL('StoreBuiltActivityVersion', {storeBuiltActivityVersion:{activity:{}}}),
     mockGQL('SubmitGoogleDocVersion', {}),
+    mockGQL('CopyBuiltActivity', {copyBuiltActivity:createActivityBuilder(testUser._id, 'Copied Activity', 'copied-activity', ActivityBuilderVisibility.EDITABLE)}, {delayMs:1000}),
+    mockGQL('DeleteBuiltActivity', {deleteBuiltActivity: ""}),
+  
   ]);
 }
 
@@ -297,6 +310,24 @@ export function cyMockGetDocData(
       staticResponse({
         statusCode: 200,
         body: docData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        delayMs: 0,
+      })
+    );
+  });
+}
+
+export function cyMockGoogleDoc(
+  cy: CypressGlobal,
+) {
+
+  cy.intercept('**/docs.google.com/**', (req) => {
+    req.reply(
+      staticResponse({
+        statusCode: 200,
+        body: {},
         headers: {
           'Content-Type': 'application/json',
         },

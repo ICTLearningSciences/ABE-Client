@@ -95,6 +95,7 @@ export interface BulletPointMessage extends ChatMessage {
 export enum UserRole {
   NONE = 'NONE',
   ADMIN = 'ADMIN',
+  CONTENT_MANAGER = 'CONTENT_MANAGER',
   USER = 'USER',
 }
 
@@ -188,6 +189,11 @@ export interface DocVersion {
 export interface AiStepData {
   aiServiceRequestParams: OpenAI.Chat.Completions.ChatCompletionCreateParams;
   aiServiceResponse: OpenAI.Chat.Completions.ChatCompletion.Choice[];
+  tokenUsage: {
+    promptUsage: number;
+    completionUsage: number;
+    totalUsage: number;
+  }
   originalRequestPrompt?: AiPromptStep;
 }
 
@@ -272,9 +278,16 @@ export interface IActivityConfig{
   disabled: boolean;
 }
 
-export interface IGoalActivites{
-  goal:string;
+export interface IGoalActivites {
+  goal: string;
   activities: IActivityConfig[];
+  builtActivities: IActivityConfig[];
+}
+
+export enum ActivityBuilderVisibility {
+  EDITABLE = 'editable',
+  READ_ONLY = 'read-only',
+  PRIVATE = 'private',
 }
 
 export interface ColorThemeConfig {
@@ -295,9 +308,11 @@ export interface Config {
   defaultAiModel?: AiServiceModel;
   availableAiServiceModels?: AvailableAiServiceModels[];
 
-  headerTitle?: string;
+  headerTitle?: string; // first word will be golden
   orgName?: string;
+  loginScreenTitle?: string;
 }
+
 export enum ActivityStepTypes {
   FREE_RESPONSE_QUESTION = 'FREE_RESPONSE_QUESTION',
   MULTIPLE_CHOICE_QUESTIONS = 'MULTIPLE_CHOICE_QUESTIONS',

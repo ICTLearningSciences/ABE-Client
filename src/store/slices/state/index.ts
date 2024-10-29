@@ -8,6 +8,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   AiServiceModel,
   DocService,
+  DocData,
   GoogleDoc,
   Intention,
   StoreGoogleDoc,
@@ -31,6 +32,7 @@ export enum GoogleDocsLoadStatus {
 export interface State {
   googleDocId: string;
   docService: DocService;
+  mostRecentDocVersion?: DocData;
   userGoogleDocs: GoogleDoc[];
   userGoogleDocsLoadStatus: GoogleDocsLoadStatus;
   sessionId: string;
@@ -39,6 +41,7 @@ export interface State {
   overrideAiServiceModel?: AiServiceModel;
   viewingRole: UserRole;
   viewingAdvancedOptions: boolean;
+  warnExpiredAccessToken: boolean;
 }
 
 const initialState: State = {
@@ -51,6 +54,7 @@ const initialState: State = {
   overrideAiServiceModel: undefined,
   viewingRole: UserRole.USER,
   viewingAdvancedOptions: false,
+  warnExpiredAccessToken: false,
 };
 
 export const loadUserGoogleDocs = createAsyncThunk(
@@ -92,7 +96,16 @@ export const stateSlice = createSlice({
     updateDocService: (state: State, action: PayloadAction<DocService>) => {
       state.docService = action.payload;
     },
+    setWarnExpiredAccessToken: (
+      state: State,
+      action: PayloadAction<boolean>
+    ) => {
+      state.warnExpiredAccessToken = action.payload;
+    },
     updateDocId: (state: State, action: PayloadAction<string>) => {
+      if (!action.payload) {
+        state.mostRecentDocVersion = undefined;
+      }
       state.googleDocId = action.payload;
     },
     newSession: (state: State) => {
@@ -137,6 +150,12 @@ export const stateSlice = createSlice({
         return doc;
       });
     },
+    storeMostRecentDocVersion: (
+      state: State,
+      action: PayloadAction<DocData>
+    ) => {
+      state.mostRecentDocVersion = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(loadUserGoogleDocs.fulfilled, (state, action) => {
@@ -179,6 +198,8 @@ export const {
   setSessionIntention,
   updateGoogleDocTitleLocally,
   updateDocService,
+  storeMostRecentDocVersion,
+  setWarnExpiredAccessToken,
 } = stateSlice.actions;
 
 export default stateSlice.reducer;

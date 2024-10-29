@@ -130,6 +130,10 @@ function prepareActivityBuilder(
       activityBuilderStepAccumulator.updateSessionIntention(intention),
     async (aiPromptSteps: AiPromptStep[]) =>
       activityBuilderStepAccumulator.executePrompt(aiPromptSteps),
+    '',
+    () => {
+      console.log('edit doc goal');
+    },
     activityBuilderData
   );
 }

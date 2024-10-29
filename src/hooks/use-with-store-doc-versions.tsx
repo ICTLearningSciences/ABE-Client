@@ -12,6 +12,8 @@ import useInterval from './use-interval';
 import { DocData, DocVersion, Intention } from '../types';
 import { hasHoursPassed } from '../helpers';
 import { useWithGoogleDocs } from './use-with-google-docs';
+import { useWithState } from '../store/slices/state/use-with-state';
+import { isAxiosError } from 'axios';
 
 /**
  * Interval to store doc versions
@@ -22,12 +24,16 @@ export function useWithStoreDocVersions(
   getDocData: (docId: string) => Promise<DocData>
 ) {
   const { state } = useWithChat();
+  const { updateMostRecentDocVersion, warnExpiredAccessToken } = useWithState();
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
   );
   const sessionId: string = useAppSelector((state) => state.state.sessionId);
   const sessionIntention: Intention | undefined = useAppSelector(
     (state) => state.state.sessionIntention
+  );
+  const accessTokenExpired: boolean = useAppSelector(
+    (state) => state.state.warnExpiredAccessToken
   );
   const curGoogleDoc = useAppSelector((state) =>
     state.state.userGoogleDocs.find((doc) => doc.googleDocId === googleDocId)
@@ -56,7 +62,13 @@ export function useWithStoreDocVersions(
         if (!messages.length || !sessionId) {
           return;
         }
-        const docData = await getDocData(googleDocId);
+        const docData = await getDocData(googleDocId).catch((e) => {
+          if (isAxiosError(e) && e.response?.status === 403) {
+            warnExpiredAccessToken(true);
+          }
+          throw e;
+        });
+        updateMostRecentDocVersion(docData);
         if (docData.title !== lastUpdatedTitle) {
           updateGoogleDocTitleLocally(googleDocId, docData.title);
         }
@@ -95,6 +107,12 @@ export function useWithStoreDocVersions(
         console.log(e);
       }
     },
-    googleDocId ? (process.env.NODE_ENV === 'development' ? 5000 : 5000) : null
+    accessTokenExpired
+      ? null
+      : googleDocId
+      ? process.env.NODE_ENV === 'development'
+        ? 5000
+        : 5000
+      : null
   );
 }
