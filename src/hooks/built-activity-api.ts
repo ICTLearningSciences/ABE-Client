@@ -252,3 +252,17 @@ mutation CopyBuiltActivity($activityIdToCopy: String!) {
   );
   return res;
 }
+
+export async function deleteBuiltActivity(activityId: string): Promise<string> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<string>(
+    {
+      query: `mutation DeleteBuiltActivity($activityIdToDelete: String!) {
+            deleteBuiltActivity(activityIdToDelete: $activityIdToDelete)
+           }`,
+      variables: { activityIdToDelete: activityId },
+    },
+    { accessToken, dataPath: 'deleteBuiltActivity' }
+  );
+  return res;
+}

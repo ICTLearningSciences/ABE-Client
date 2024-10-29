@@ -21,6 +21,7 @@ export function ActivityBuilderPage(props: {
     addOrUpdateBuiltActivity,
     addNewLocalBuiltActivity,
     copyBuiltActivity,
+    deleteBuiltActivity,
   } = useWithDocGoalsActivities();
   const [selectedActivityClientId, setSelectedActivityClientId] =
     React.useState<string>(curActivity?.clientId || '');
@@ -42,6 +43,7 @@ export function ActivityBuilderPage(props: {
           const newActivity = addNewLocalBuiltActivity();
           setSelectedActivityClientId(newActivity.clientId);
         }}
+        deleteBuiltActivity={deleteBuiltActivity}
       />
     );
   } else {

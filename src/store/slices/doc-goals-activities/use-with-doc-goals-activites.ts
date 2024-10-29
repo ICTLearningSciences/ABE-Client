@@ -8,6 +8,7 @@ import {
   addNewLocalBuiltActivity as _addNewLocalBuiltActivity,
   storeActivityVersionForActivity,
   copyBuiltActivity as _copyBuiltActivity,
+  deleteBuiltActivity as _deleteBuiltActivity,
 } from '.';
 import {
   ActivityBuilder,
@@ -120,6 +121,10 @@ export function useWithDocGoalsActivities() {
     return res.payload as ActivityBuilder;
   }
 
+  async function deleteBuiltActivity(activityId: string) {
+    await dispatch(_deleteBuiltActivity(activityId));
+  }
+
   return {
     getActivitById,
     loadDocGoals,
@@ -129,6 +134,7 @@ export function useWithDocGoalsActivities() {
     addOrUpdateBuiltActivity,
     addNewLocalBuiltActivity,
     copyBuiltActivity,
+    deleteBuiltActivity,
     builtActivities,
     activities,
     docGoals: docGoalsActivities,

@@ -17,6 +17,7 @@ import {
   storeActivityVersion,
   fetchActivityVersions as _fetchActivityVersions,
   copyBuiltActivity as _copyBuiltActivity,
+  deleteBuiltActivity as _deleteBuiltActivity,
 } from '../../../hooks/built-activity-api';
 import {
   ActivityBuilder,
@@ -109,6 +110,13 @@ export const fetchActivityVersions = createAsyncThunk(
       activityClientId,
       versions,
     };
+  }
+);
+
+export const deleteBuiltActivity = createAsyncThunk(
+  'state/deleteBuiltActivity',
+  async (activityId: string) => {
+    return await _deleteBuiltActivity(activityId);
   }
 );
 
@@ -215,6 +223,12 @@ export const stateSlice = createSlice({
 
       .addCase(copyBuiltActivity.fulfilled, (state, action) => {
         state.builtActivities.push(action.payload);
+      })
+
+      .addCase(deleteBuiltActivity.fulfilled, (state, action) => {
+        state.builtActivities = state.builtActivities.filter(
+          (a) => a._id !== action.payload
+        );
       });
   },
 });

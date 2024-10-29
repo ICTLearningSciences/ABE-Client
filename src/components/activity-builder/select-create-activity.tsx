@@ -7,20 +7,32 @@ The full terms of this copyright and license should always be found in the root 
 import React, { useState } from 'react';
 import { ColumnDiv, RowDiv } from '../../styled-components';
 import { ActivityBuilder as ActivityBuilderType } from './types';
-import { Button, CircularProgress } from '@mui/material';
+import { Button, CircularProgress, IconButton } from '@mui/material';
 import { isActivityRunnable } from './helpers';
 import PreviewIcon from '@mui/icons-material/Preview';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useAppSelector } from '../../store/hooks';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { UserRole } from '../../store/slices/login';
 export function ExistingActivityItem(props: {
   activity: ActivityBuilderType;
   goToActivity: () => void;
   editActivity: () => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
+  deleteBuiltActivity: (activityId: string) => Promise<void>;
+  canDeleteActivity: boolean;
 }) {
-  const { activity, editActivity, goToActivity, copyActivity } = props;
+  const {
+    activity,
+    editActivity,
+    goToActivity,
+    copyActivity,
+    deleteBuiltActivity,
+    canDeleteActivity,
+  } = props;
   const [copying, setCopying] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   return (
     <RowDiv
       data-cy={`activity-item-${activity._id}`}
@@ -66,6 +78,18 @@ export function ExistingActivityItem(props: {
         >
           Edit
         </Button>
+        <IconButton
+          disabled={deleting || !canDeleteActivity}
+          onClick={() => {
+            setDeleting(true);
+            deleteBuiltActivity(activity._id).finally(() => {
+              setDeleting(false);
+            });
+          }}
+          data-cy={`activity-item-delete-${activity._id}`}
+        >
+          {deleting ? <CircularProgress size={20} /> : <DeleteIcon />}
+        </IconButton>
       </RowDiv>
     </RowDiv>
   );
@@ -76,16 +100,25 @@ export function ExistingActivities(props: {
   activities: ActivityBuilderType[];
   editActivity: (activity: ActivityBuilderType) => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
+  deleteBuiltActivity: (activityId: string) => Promise<void>;
   onCreateActivity: () => void;
 }): JSX.Element {
-  const { activities, editActivity, copyActivity, onCreateActivity } = props;
-  const user = useAppSelector((state) => state.login.user?._id) || '';
+  const {
+    activities,
+    editActivity,
+    copyActivity,
+    onCreateActivity,
+    deleteBuiltActivity,
+  } = props;
+  const user = useAppSelector((state) => state.login.user);
   if (!activities.length) {
     return <></>;
   }
-  const myActivities = activities.filter((activity) => activity.user === user);
+  const myActivities = activities.filter(
+    (activity) => activity.user === user?._id
+  );
   const otherActivities = activities.filter(
-    (activity) => activity.user !== user
+    (activity) => activity.user !== user?._id
   );
 
   return (
@@ -114,6 +147,8 @@ export function ExistingActivities(props: {
             goToActivity={() => {
               props.goToActivity(activity);
             }}
+            deleteBuiltActivity={deleteBuiltActivity}
+            canDeleteActivity={true}
           />
         );
       })}
@@ -149,6 +184,8 @@ export function ExistingActivities(props: {
             goToActivity={() => {
               props.goToActivity(activity);
             }}
+            deleteBuiltActivity={deleteBuiltActivity}
+            canDeleteActivity={user?.userRole === UserRole.ADMIN}
           />
         );
       })}
@@ -163,6 +200,7 @@ export function SelectCreateActivity(props: {
   onEditActivity: (activity: ActivityBuilderType) => void;
   onCreateActivity: () => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
+  deleteBuiltActivity: (activityId: string) => Promise<void>;
 }): JSX.Element {
   const {
     builtActivities,
@@ -171,6 +209,7 @@ export function SelectCreateActivity(props: {
     goToActivity,
     goToOldActivityEditor,
     copyActivity,
+    deleteBuiltActivity,
   } = props;
   return (
     <ColumnDiv
@@ -199,6 +238,7 @@ export function SelectCreateActivity(props: {
         activities={builtActivities}
         editActivity={onEditActivity}
         copyActivity={copyActivity}
+        deleteBuiltActivity={deleteBuiltActivity}
         onCreateActivity={onCreateActivity}
       />
     </ColumnDiv>

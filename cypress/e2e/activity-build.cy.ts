@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { cyMockDefault, cyMockOpenAiCall, CypressGlobal, toPromptEditing } from "../helpers/functions";
+import { cyMockDefault, cyMockOpenAiCall, CypressGlobal, mockGQL, toPromptEditing } from "../helpers/functions";
 import { UserRole } from "../helpers/types";
 
 export function stepsAreEditable(cy: CypressGlobal){
@@ -62,6 +62,35 @@ describe('activity builder', () => {
             cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("exist")
             cy.get("[data-cy=activity-item-edit-other-user-read-only-activity]").click()
             flowIsEditable(cy)
+          })
+
+          it("can delete any activity", ()=>{
+            cyMockDefault(cy, {
+                userRole: UserRole.ADMIN,
+                gqlQueries: [
+                    mockGQL('DeleteBuiltActivity', [
+                        {deleteBuiltActivity: "my-editable-activity"},
+                        {deleteBuiltActivity: "other-user-editable-activity"},
+                        {deleteBuiltActivity: "other-user-read-only-activity"},
+                    ]),
+                ]
+              });
+              cy.visit("/")
+              cy.get("[data-cy=role-switch]").should("contain.text", "User")
+              cy.get("[data-cy=role-switch]").click();
+              cy.get("[data-cy=role-switch]").should("contain.text", "Admin")
+              cy.get("[data-cy=doc-list-item-Aliens").click()
+              cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
+              cy.get("[data-cy=activity-item-delete-my-editable-activity]").click()
+              cy.get("[data-cy=activity-item-my-editable-activity]").should("not.exist")
+
+              cy.get("[data-cy=activity-item-other-user-editable-activity]").should("exist")
+              cy.get("[data-cy=activity-item-delete-other-user-editable-activity]").click()
+              cy.get("[data-cy=activity-item-other-user-editable-activity]").should("not.exist")
+
+              cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("exist")
+              cy.get("[data-cy=activity-item-delete-other-user-read-only-activity]").click()
+              cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("not.exist")
           })
     })
 
@@ -131,6 +160,31 @@ describe('activity builder', () => {
               cy.get("[data-cy=activity-item-edit-other-user-read-only-activity]").should("exist").click()
               flowIsNotEditable(cy)
               cy.get("[data-cy=return-to-activity-list]").click()
+        })
+
+        it("can only delete their own activities", ()=>{
+            cyMockDefault(cy, {
+                userRole: UserRole.CONTENT_MANAGER,
+                gqlQueries: [
+                    mockGQL('DeleteBuiltActivity', [
+                        {deleteBuiltActivity: "my-editable-activity"},
+                    ]),
+                ]
+              });
+              cy.visit("/")
+              cy.get("[data-cy=role-switch]").should("contain.text", "User")
+              cy.get("[data-cy=role-switch]").click();
+              cy.get("[data-cy=role-switch]").should("contain.text", "Content Manager")
+              cy.get("[data-cy=doc-list-item-Aliens").click()
+              cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
+              cy.get("[data-cy=activity-item-delete-my-editable-activity]").click()
+              cy.get("[data-cy=activity-item-my-editable-activity]").should("not.exist")
+
+              cy.get("[data-cy=activity-item-other-user-editable-activity]").should("exist")
+              cy.get("[data-cy=activity-item-delete-other-user-editable-activity]").should("be.disabled")
+
+              cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("exist")
+              cy.get("[data-cy=activity-item-delete-other-user-read-only-activity]").should("be.disabled")
         })
     })
 

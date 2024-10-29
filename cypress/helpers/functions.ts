@@ -237,6 +237,8 @@ export function cyMockDefault(
     mockGQL('StoreBuiltActivityVersion', {storeBuiltActivityVersion:{activity:{}}}),
     mockGQL('SubmitGoogleDocVersion', {}),
     mockGQL('CopyBuiltActivity', {copyBuiltActivity:createActivityBuilder(testUser._id, 'Copied Activity', 'copied-activity', ActivityBuilderVisibility.EDITABLE)}, {delayMs:1000}),
+    mockGQL('DeleteBuiltActivity', {deleteBuiltActivity: ""}),
+  
   ]);
 }
 
