@@ -250,7 +250,7 @@ mutation CopyBuiltActivity($activityIdToCopy: String!) {
       accessToken,
     }
   );
-  return res;
+  return convertGqlToBuiltActivity(res);
 }
 
 export async function deleteBuiltActivity(activityId: string): Promise<string> {
