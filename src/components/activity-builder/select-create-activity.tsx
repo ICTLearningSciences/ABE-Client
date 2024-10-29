@@ -15,6 +15,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useAppSelector } from '../../store/hooks';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { UserRole } from '../../store/slices/login';
+import { TwoOptionDialog } from '../dialog';
 export function ExistingActivityItem(props: {
   activity: ActivityBuilderType;
   goToActivity: () => void;
@@ -32,6 +33,7 @@ export function ExistingActivityItem(props: {
     canDeleteActivity,
   } = props;
   const [copying, setCopying] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
   return (
     <RowDiv
@@ -81,16 +83,33 @@ export function ExistingActivityItem(props: {
         <IconButton
           disabled={deleting || !canDeleteActivity}
           onClick={() => {
-            setDeleting(true);
-            deleteBuiltActivity(activity._id).finally(() => {
-              setDeleting(false);
-            });
+            setShowDeleteDialog(true);
           }}
           data-cy={`activity-item-delete-${activity._id}`}
+          color="error"
         >
           {deleting ? <CircularProgress size={20} /> : <DeleteIcon />}
         </IconButton>
       </RowDiv>
+      <TwoOptionDialog
+        open={showDeleteDialog}
+        actionInProgress={deleting}
+        option1={{
+          display: 'Cancel',
+          onClick: () => setShowDeleteDialog(false),
+        }}
+        option2={{
+          display: 'Delete',
+          onClick: () => {
+            setDeleting(true);
+            deleteBuiltActivity(activity._id).finally(() => {
+              setDeleting(false);
+              setShowDeleteDialog(false);
+            });
+          },
+        }}
+        title={`Delete ${activity.title}?`}
+      />
     </RowDiv>
   );
 }

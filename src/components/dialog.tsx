@@ -111,6 +111,10 @@ export function TwoOptionDialog(props: {
           <Button
             disabled={actionInProgress}
             data-cy="option-1"
+            variant="contained"
+            style={{
+              marginRight: '10px',
+            }}
             onClick={() => {
               option1.onClick();
             }}
@@ -120,6 +124,7 @@ export function TwoOptionDialog(props: {
           <Button
             disabled={actionInProgress}
             data-cy="option-2"
+            variant="contained"
             onClick={() => {
               option2.onClick();
             }}

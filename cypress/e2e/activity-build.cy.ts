@@ -82,14 +82,20 @@ describe('activity builder', () => {
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-delete-my-editable-activity]").click()
+              cy.get("[data-cy=two-option-dialog]").should("exist")
+              cy.get("[data-cy=option-2]").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("not.exist")
 
               cy.get("[data-cy=activity-item-other-user-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-delete-other-user-editable-activity]").click()
+              cy.get("[data-cy=two-option-dialog]").should("exist")
+              cy.get("[data-cy=option-2]").click()
               cy.get("[data-cy=activity-item-other-user-editable-activity]").should("not.exist")
 
               cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("exist")
               cy.get("[data-cy=activity-item-delete-other-user-read-only-activity]").click()
+              cy.get("[data-cy=two-option-dialog]").should("exist")
+              cy.get("[data-cy=option-2]").click()
               cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("not.exist")
           })
     })
@@ -178,6 +184,7 @@ describe('activity builder', () => {
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-delete-my-editable-activity]").click()
+              cy.get("[data-cy=option-2]").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("not.exist")
 
               cy.get("[data-cy=activity-item-other-user-editable-activity]").should("exist")
