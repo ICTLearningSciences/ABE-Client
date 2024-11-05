@@ -20,8 +20,24 @@ export function useWithSpfxLogin(): UseWithLogin {
       state.loginStatus === loginActions.LoginStatus.FAILED
     ) {
       await dispatch(
-        loginActions.googleLogin({
+        loginActions.login({
           accessToken: googleAccessToken,
+          service: loginActions.LoginService.GOOGLE,
+        })
+      );
+    }
+  }
+
+  async function loginWithMicrosoft(microsoftAccessToken: string) {
+    if (
+      state.loginStatus === loginActions.LoginStatus.NONE ||
+      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
+      state.loginStatus === loginActions.LoginStatus.FAILED
+    ) {
+      await dispatch(
+        loginActions.login({
+          accessToken: microsoftAccessToken,
+          service: loginActions.LoginService.MICROSOFT,
         })
       );
     }
@@ -49,6 +65,7 @@ export function useWithSpfxLogin(): UseWithLogin {
     state,
     logout,
     loginWithGoogle,
+    loginWithMicrosoft,
     refreshAccessToken,
     setUser,
   };

@@ -114,6 +114,7 @@ export enum UserActions {
 
 export interface StoreGoogleDoc {
   googleDocId: string;
+  wordDocId?: string;
   user: string;
   admin?: boolean;
   currentDayIntention?: Intention;

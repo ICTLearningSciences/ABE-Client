@@ -14,6 +14,7 @@ export interface UseWithLogin {
   state: loginActions.LoginState;
   logout: () => Promise<void>;
   loginWithGoogle: (googleAccessToken: string) => Promise<void>;
+  loginWithMicrosoft: (microsoftAccessToken: string) => Promise<void>;
   refreshAccessToken: () => void;
   setUser: (user: UserAccessToken) => void;
 }
@@ -45,8 +46,24 @@ export function useWithLogin(): UseWithLogin {
       state.loginStatus === loginActions.LoginStatus.FAILED
     ) {
       await dispatch(
-        loginActions.googleLogin({
+        loginActions.login({
           accessToken: googleAccessToken,
+          service: loginActions.LoginService.GOOGLE,
+        })
+      );
+    }
+  }
+
+  async function loginWithMicrosoft(microsoftAccessToken: string) {
+    if (
+      state.loginStatus === loginActions.LoginStatus.NONE ||
+      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
+      state.loginStatus === loginActions.LoginStatus.FAILED
+    ) {
+      await dispatch(
+        loginActions.login({
+          accessToken: microsoftAccessToken,
+          service: loginActions.LoginService.MICROSOFT,
         })
       );
     }
@@ -74,6 +91,7 @@ export function useWithLogin(): UseWithLogin {
     state,
     logout,
     loginWithGoogle,
+    loginWithMicrosoft,
     refreshAccessToken,
     setUser,
   };
