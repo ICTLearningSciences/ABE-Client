@@ -279,6 +279,7 @@ export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
         query FetchGoogleDocs($userId: ID!) {
           fetchGoogleDocs(userId: $userId) {
             googleDocId
+            wordDocId
             user
             title
             documentIntention {

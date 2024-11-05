@@ -75,6 +75,7 @@ export enum DocService {
 
 export interface GoogleDoc {
   googleDocId: string;
+  wordDocId?: string;
   title: string;
   user: string;
   documentIntention?: Intention;
