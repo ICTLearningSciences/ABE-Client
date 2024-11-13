@@ -32,8 +32,22 @@ export function flowIsNotEditable(cy: CypressGlobal){
     })
 }
 
+
 describe('activity builder', () => {
     describe("admins", ()=>{
+        it.only("test", ()=>{
+            cyMockDefault(cy, {
+                userRole: UserRole.ADMIN
+              });
+              cy.visit("/")
+              cy.get("[data-cy=role-switch]").should("contain.text", "User")
+              cy.get("[data-cy=role-switch]").click();
+              cy.get("[data-cy=role-switch]").should("contain.text", "Admin")
+              cy.get("[data-cy=doc-list-item-Aliens").click()
+              cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
+              cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
+        })
+
         it("can edit all activities, despite ownership", ()=>{
             cyMockDefault(cy, {
               userRole: UserRole.ADMIN

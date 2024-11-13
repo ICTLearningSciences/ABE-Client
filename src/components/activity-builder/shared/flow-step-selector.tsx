@@ -73,10 +73,10 @@ export function FlowStepSelector(props: {
             }}
             label="Output Data Type"
           >
-            {flowsList.map((flow) => {
+            {flowsList.map((flow, i) => {
               return (
                 <MenuItem key={flow.clientId} value={flow.clientId}>
-                  {flow.name}
+                  {flow.name || `Flow ${i + 1}`}
                 </MenuItem>
               );
             })}

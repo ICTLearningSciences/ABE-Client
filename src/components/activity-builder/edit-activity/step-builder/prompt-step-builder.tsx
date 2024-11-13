@@ -557,21 +557,6 @@ export function PromptStepBuilder(props: {
           }}
           width="100%"
         />
-        <InputField
-          label="Response Format"
-          value={step.responseFormat}
-          onFocus={() => {
-            setViewingInputType(ViewingInputType.RESPONSE_FORMAT);
-          }}
-          maxRows={
-            viewingInputType === ViewingInputType.RESPONSE_FORMAT ? 20 : 3
-          }
-          onChange={(e) => {
-            updateField('responseFormat', e);
-          }}
-          width="100%"
-        />
-
         <SelectInputField
           label="Output Data Type"
           value={step.outputDataType}
@@ -580,6 +565,22 @@ export function PromptStepBuilder(props: {
             updateField('outputDataType', e);
           }}
         />
+        {step.outputDataType === PromptOutputTypes.TEXT ? (
+          <InputField
+            label="Response Format"
+            value={step.responseFormat}
+            onFocus={() => {
+              setViewingInputType(ViewingInputType.RESPONSE_FORMAT);
+            }}
+            maxRows={
+              viewingInputType === ViewingInputType.RESPONSE_FORMAT ? 20 : 3
+            }
+            onChange={(e) => {
+              updateField('responseFormat', e);
+            }}
+            width="100%"
+          />
+        ) : undefined}
 
         {step.outputDataType === PromptOutputTypes.JSON && (
           <JsonResponseDataUpdater

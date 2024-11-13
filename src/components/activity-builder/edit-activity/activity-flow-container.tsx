@@ -194,12 +194,24 @@ export function ActivityFlowContainer(props: {
         flexDirection: 'column',
       }}
     >
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
+      <Box
+        sx={{
+          borderBottom: 1,
+          borderColor: 'divider',
+          width: '100%',
+          maxWidth: '100%',
+        }}
+      >
         <Tabs
+          sx={{
+            maxWidth: '100%',
+            overflow: 'hidden',
+          }}
+          centered
           value={value}
           onChange={handleChange}
           aria-label="basic tabs example"
-          variant="scrollable"
+          variant={tabs.length > 10 ? 'scrollable' : 'standard'}
         >
           {tabs}
         </Tabs>

@@ -31,6 +31,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
+import { isContextDataString } from '../../helpers';
 export function getDefaultRequestUserInputBuilder(): RequestUserInputActivityStep {
   return {
     stepId: uuid(),
@@ -69,7 +70,7 @@ function PredefinedResponseUpdater(props: {
         }}
       >
         <InputField
-          label="Custom User Message"
+          label="Message"
           width="100%"
           value={predefinedResponse.message}
           onChange={(e) => {
@@ -81,6 +82,21 @@ function PredefinedResponseUpdater(props: {
             );
           }}
         />
+        {/* TODO: add a dropdown to select context data */}
+        {isContextDataString(predefinedResponse.message) ? (
+          <CheckBoxInput
+            label="Is Array Data?"
+            value={predefinedResponse.isArray ?? false}
+            onChange={(e) => {
+              props.updateResponse(
+                {
+                  isArray: e,
+                },
+                predefinedResponse.clientId
+              );
+            }}
+          />
+        ) : undefined}
         <InputField
           label="Response Weight (Optional)"
           width="100%"
@@ -89,18 +105,6 @@ function PredefinedResponseUpdater(props: {
             props.updateResponse(
               {
                 responseWeight: e,
-              },
-              predefinedResponse.clientId
-            );
-          }}
-        />
-        <CheckBoxInput
-          label="Is Array Data?"
-          value={predefinedResponse.isArray ?? false}
-          onChange={(e) => {
-            props.updateResponse(
-              {
-                isArray: e,
               },
               predefinedResponse.clientId
             );
@@ -163,9 +167,9 @@ function PredefinedResponsesUpdater(props: {
         padding: 10,
       }}
     >
-      <span style={{ fontWeight: 'bold' }}>Custom Response Buttons</span>
+      <span style={{ fontWeight: 'bold' }}>Predefined Responses</span>
 
-      {step.predefinedResponses?.length &&
+      {Boolean(step.predefinedResponses?.length) &&
         step.predefinedResponses.map((response) => (
           <PredefinedResponseUpdater
             key={response.clientId}
