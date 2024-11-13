@@ -26,7 +26,8 @@ import {
 } from './step-builder/prompt-step-builder';
 import { InputField } from '../shared/input-components';
 import { AddNewActivityButton } from '../shared/add-new-activity-button';
-import { Button } from '@mui/material';
+import { Button, Tooltip } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
 import {
   SystemMessageStepBuilder,
   getDefaultSystemMessage,
@@ -166,6 +167,37 @@ export function FlowStepsBuilderTab(props: {
         opacity: disabled ? 0.5 : 1,
       }}
     >
+      <Tooltip
+        title={
+          <div>
+            {globalStateKeys.map((key) => (
+              <div key={key}>{key}</div>
+            ))}
+          </div>
+        }
+      >
+        <div
+          style={{
+            position: 'sticky',
+            left: 10,
+            top: 10,
+            alignSelf: 'flex-start',
+            color: 'gray',
+            cursor: 'pointer',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 0,
+            overflow: 'visible',
+            paddingTop: 20,
+          }}
+        >
+          <InfoIcon />
+          Variables
+        </div>
+      </Tooltip>
       <Button
         style={{
           position: 'absolute',

@@ -40,6 +40,7 @@ export function FlowStepSelector(props: {
         width: props.width || '100%',
         maxWidth: props.width || '100%',
         flexDirection: 'column',
+        alignItems: 'center',
       }}
     >
       {props.title && (
@@ -58,6 +59,8 @@ export function FlowStepSelector(props: {
           width: '100%',
           display: 'flex',
           flexDirection: props.rowOrColumn || 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <FormControl variant="standard" sx={{ minWidth: 120 }}>
@@ -83,34 +86,35 @@ export function FlowStepSelector(props: {
           </Select>
         </FormControl>
 
-        <FormControl variant="standard" sx={{ minWidth: 120 }}>
-          <InputLabel id="select-step-label">Select flow step</InputLabel>
-          {/* when flow selected, select step */}
-          <Select
-            disabled={!selectedFlowId}
-            labelId="select-step-label"
-            value={selectedStepId}
-            onChange={(e) => {
-              setSelectedStepId(e.target.value);
-              onStepSelected(e.target.value);
-            }}
-            label="Output Data Type"
-          >
-            {flowsList
-              .find((flow) => flow.clientId === selectedFlowId)
-              ?.steps.map((step, i) => {
-                return (
-                  <MenuItem
-                    key={step.stepId}
-                    value={step.stepId}
-                    disabled={props.disableStepsList?.includes(step.stepId)}
-                  >
-                    {`Step ${i + 1}`}
-                  </MenuItem>
-                );
-              })}
-          </Select>
-        </FormControl>
+        {selectedFlowId && (
+          <FormControl variant="standard" sx={{ minWidth: 120 }}>
+            <InputLabel id="select-step-label">Select flow step</InputLabel>
+            <Select
+              disabled={!selectedFlowId}
+              labelId="select-step-label"
+              value={selectedStepId}
+              onChange={(e) => {
+                setSelectedStepId(e.target.value);
+                onStepSelected(e.target.value);
+              }}
+              label="Output Data Type"
+            >
+              {flowsList
+                .find((flow) => flow.clientId === selectedFlowId)
+                ?.steps.map((step, i) => {
+                  return (
+                    <MenuItem
+                      key={step.stepId}
+                      value={step.stepId}
+                      disabled={props.disableStepsList?.includes(step.stepId)}
+                    >
+                      {`Step ${i + 1}`}
+                    </MenuItem>
+                  );
+                })}
+            </Select>
+          </FormControl>
+        )}
         <Button
           style={{
             margin: 0,

@@ -422,7 +422,6 @@ export function PromptStepBuilder(props: {
         position: 'relative',
         flexDirection: 'column',
         padding: 10,
-        border: previewed ? '3px solid black' : '1px solid black',
       }}
     >
       <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>

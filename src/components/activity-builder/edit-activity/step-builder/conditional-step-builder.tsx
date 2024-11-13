@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { v4 as uuid } from 'uuid';
-import { IconButton } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import {
   ColumnCenterDiv,
@@ -33,6 +33,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
 import { FlowStepSelector } from '../../shared/flow-step-selector';
+import { InfoTooltip } from '../../../info-tooltip';
 
 export function getDefaultConditionalStep(): ConditionalActivityStep {
   return {
@@ -175,7 +176,12 @@ export function ConditionalStepBuilder(props: {
         {collapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
       </IconButton>
 
-      <h4 style={{ alignSelf: 'center' }}>Conditionals</h4>
+      <h4
+        style={{ alignSelf: 'center', display: 'flex', alignItems: 'center' }}
+      >
+        Conditionals{' '}
+        <InfoTooltip title="Define conditions that will trigger the flow to jump to a specific step." />
+      </h4>
       <div
         style={{
           position: 'absolute',
@@ -198,7 +204,9 @@ export function ConditionalStepBuilder(props: {
                   border: '1px solid black',
                   position: 'relative',
                   borderRadius: '10px',
-                  width: '700px',
+                  width: '90%',
+                  marginTop: 5,
+                  marginBottom: 5,
                 }}
               >
                 <RowDiv>
@@ -276,9 +284,9 @@ export function ConditionalStepBuilder(props: {
                 <FlowStepSelector
                   title="Target Step"
                   flowsList={props.flowsList}
-                  width="150px"
+                  width="100%"
                   currentJumpToStepId={conditional.targetStepId}
-                  rowOrColumn="row"
+                  rowOrColumn="column"
                   onStepSelected={(stepId) => {
                     const newConditionals = [...step.conditionals];
                     newConditionals[index].targetStepId = stepId;
@@ -289,7 +297,8 @@ export function ConditionalStepBuilder(props: {
             );
           })}
 
-          <IconButton
+          <Button
+            variant="outlined"
             onClick={() => {
               updateField('conditionals', [
                 ...step.conditionals,
@@ -302,9 +311,10 @@ export function ConditionalStepBuilder(props: {
                 } as LogicStepConditional,
               ]);
             }}
+            startIcon={<AddCircleIcon />}
           >
-            <AddCircleIcon />
-          </IconButton>
+            New Conditional
+          </Button>
         </ColumnCenterDiv>
 
         <JumpToAlternateStep

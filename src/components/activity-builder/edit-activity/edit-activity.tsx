@@ -7,7 +7,7 @@ import {
 } from '../types';
 import { ActivityFlowContainer } from './activity-flow-container';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
-import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
+import { Button, CircularProgress, IconButton } from '@mui/material';
 import { InputField, SelectInputField } from '../shared/input-components';
 import { equals, userCanEditActivity } from '../../../helpers';
 import { v4 as uuidv4 } from 'uuid';
@@ -198,27 +198,6 @@ export function EditActivity(props: {
           >
             + Add Flow
           </Button>
-          <Tooltip
-            title={
-              <div>
-                {globalStateKeys.map((key) => (
-                  <div key={key}>{key}</div>
-                ))}
-              </div>
-            }
-          >
-            <div
-              style={{
-                position: 'absolute',
-                right: 20,
-                top: 20,
-                color: 'gray',
-                cursor: 'pointer',
-              }}
-            >
-              Variables
-            </div>
-          </Tooltip>
         </RowDiv>
       </ColumnDiv>
       <ActivityFlowContainer

@@ -21,7 +21,7 @@ import {
 } from '../../../../styled-components';
 import { CheckBoxInput, InputField } from '../../shared/input-components';
 import { FlowStepSelector } from '../../shared/flow-step-selector';
-import { Button, IconButton } from '@mui/material';
+import { Box, Button, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuid } from 'uuid';
 import { Delete } from '@mui/icons-material';
@@ -32,6 +32,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
 import { isContextDataString } from '../../helpers';
+import DropdownDisplay from '../../../dropdown-display';
+import { InfoTooltip } from '../../../info-tooltip';
 export function getDefaultRequestUserInputBuilder(): RequestUserInputActivityStep {
   return {
     stepId: uuid(),
@@ -56,87 +58,117 @@ function PredefinedResponseUpdater(props: {
   const { predefinedResponse, updateResponse, flowsList, deleteResponse } =
     props;
   return (
-    <RowDiv
-      style={{
-        // alignItems: 'center',
-        borderTop: '1px dotted black',
+    <Box
+      sx={{
+        mt: 2,
+        borderRadius: 2,
+        boxShadow: 1,
+        backgroundColor: 'white',
+        border: '1px solid #e0e0e0',
+        display: 'flex',
+        flexDirection: 'column',
         width: '100%',
-        justifyContent: 'space-between',
       }}
     >
       <ColumnDiv
         style={{
-          width: '60%',
+          // alignItems: 'center',
+          width: '100%',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          position: 'relative',
         }}
       >
-        <InputField
-          label="Message"
-          width="100%"
-          value={predefinedResponse.message}
-          onChange={(e) => {
-            props.updateResponse(
-              {
-                message: e,
-              },
-              predefinedResponse.clientId
-            );
+        <IconButton
+          data-cy="delete-predefined-response"
+          onClick={deleteResponse}
+          color="primary"
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
           }}
-        />
-        {/* TODO: add a dropdown to select context data */}
-        {isContextDataString(predefinedResponse.message) ? (
-          <CheckBoxInput
-            label="Is Array Data?"
-            value={predefinedResponse.isArray ?? false}
+        >
+          <DeleteIcon />
+        </IconButton>
+
+        <RowDiv
+          style={{
+            width: '60%',
+          }}
+        >
+          <InputField
+            label="Message"
+            width="100%"
+            value={predefinedResponse.message}
             onChange={(e) => {
               props.updateResponse(
                 {
-                  isArray: e,
+                  message: e,
                 },
                 predefinedResponse.clientId
               );
             }}
           />
-        ) : undefined}
-        <InputField
-          label="Response Weight (Optional)"
-          width="100%"
-          value={predefinedResponse.responseWeight || ''}
-          onChange={(e) => {
-            props.updateResponse(
-              {
-                responseWeight: e,
-              },
-              predefinedResponse.clientId
-            );
-          }}
+        </RowDiv>
+        <DropdownDisplay
+          buttonLabelOpen="Settings"
+          buttonLabelClose="Close Settings"
+          content={
+            <ColumnDiv
+              style={{
+                width: '100%',
+                alignItems: 'center',
+              }}
+            >
+              {isContextDataString(predefinedResponse.message) ? (
+                <CheckBoxInput
+                  label="Is Array Data?"
+                  value={predefinedResponse.isArray ?? false}
+                  onChange={(e) => {
+                    props.updateResponse(
+                      {
+                        isArray: e,
+                      },
+                      predefinedResponse.clientId
+                    );
+                  }}
+                />
+              ) : undefined}
+              <FlowStepSelector
+                title="Jump to Step"
+                flowsList={flowsList}
+                width="150px"
+                currentJumpToStepId={predefinedResponse.jumpToStepId}
+                rowOrColumn="column"
+                onStepSelected={(stepId) => {
+                  updateResponse(
+                    {
+                      ...predefinedResponse,
+                      jumpToStepId: stepId,
+                    },
+                    predefinedResponse.clientId
+                  );
+                }}
+              />
+              <InputField
+                label="Response Weight"
+                width="60%"
+                value={predefinedResponse.responseWeight || ''}
+                onChange={(e) => {
+                  props.updateResponse(
+                    {
+                      responseWeight: e,
+                    },
+                    predefinedResponse.clientId
+                  );
+                }}
+              />
+            </ColumnDiv>
+          }
         />
       </ColumnDiv>
-      <RowDiv>
-        <FlowStepSelector
-          title="Jump to Step (OPTIONAL)"
-          flowsList={flowsList}
-          width="150px"
-          currentJumpToStepId={predefinedResponse.jumpToStepId}
-          rowOrColumn="column"
-          onStepSelected={(stepId) => {
-            updateResponse(
-              {
-                ...predefinedResponse,
-                jumpToStepId: stepId,
-              },
-              predefinedResponse.clientId
-            );
-          }}
-        />
-        <IconButton
-          data-cy="delete-predefined-response"
-          onClick={deleteResponse}
-          color="primary"
-        >
-          <DeleteIcon />
-        </IconButton>
-      </RowDiv>
-    </RowDiv>
+    </Box>
   );
 }
 
@@ -161,29 +193,44 @@ function PredefinedResponsesUpdater(props: {
     <ColumnCenterDiv
       style={{
         width: props.width || '100%',
-        border: '1px solid black',
         alignSelf: 'center',
         justifyContent: 'center',
-        padding: 10,
       }}
     >
-      <span style={{ fontWeight: 'bold' }}>Predefined Responses</span>
+      <RowDiv>
+        <span style={{ fontWeight: 'bold' }}>Predefined Responses</span>
+        <InfoTooltip title="Predefined responses are a list of responses the user can choose from." />
+      </RowDiv>
 
-      {Boolean(step.predefinedResponses?.length) &&
-        step.predefinedResponses.map((response) => (
-          <PredefinedResponseUpdater
-            key={response.clientId}
-            predefinedResponse={response}
-            updateResponse={(updatedResponse, clientId) => {
-              updatePredefinedResponse(updatedResponse, clientId);
-            }}
-            deleteResponse={() => {
-              deletePredefinedResponse(response.clientId);
-            }}
-            flowsList={props.flowsList}
-          />
-        ))}
-      <Button onClick={addNewPredefinedResponse}>+ Add Response</Button>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            lg: 'repeat(3, 1fr)',
+          },
+          width: '100%',
+          gap: 1,
+        }}
+      >
+        {Boolean(step.predefinedResponses?.length) &&
+          step.predefinedResponses.map((response) => (
+            <PredefinedResponseUpdater
+              key={response.clientId}
+              predefinedResponse={response}
+              updateResponse={(updatedResponse, clientId) => {
+                updatePredefinedResponse(updatedResponse, clientId);
+              }}
+              deleteResponse={() => {
+                deletePredefinedResponse(response.clientId);
+              }}
+              flowsList={props.flowsList}
+            />
+          ))}
+      </Box>
+      <Button variant="outlined" onClick={addNewPredefinedResponse}>
+        + Add Response
+      </Button>
     </ColumnCenterDiv>
   );
 }
@@ -310,6 +357,7 @@ export function RequestUserInputStepBuilder(props: {
         position: 'relative',
         flexDirection: 'column',
         padding: 10,
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
       }}
     >
       <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>
@@ -356,19 +404,22 @@ export function RequestUserInputStepBuilder(props: {
           }}
         />
         <InputField
-          label="Save Response As"
+          label="Save Response As (Optional)"
           value={step.saveResponseVariableName}
           onChange={(e) => {
             updateField('saveResponseVariableName', e);
           }}
         />
-        <CheckBoxInput
-          label="Input is session intention."
-          value={step.saveAsIntention}
-          onChange={(e) => {
-            updateField('saveAsIntention', e);
-          }}
-        />
+        <RowDiv>
+          <CheckBoxInput
+            label="Input is session intention."
+            value={step.saveAsIntention}
+            onChange={(e) => {
+              updateField('saveAsIntention', e);
+            }}
+          />
+          <InfoTooltip title="If checked, the user's input will be saved as a session intention." />
+        </RowDiv>
         <CheckBoxInput
           label="Disable Text Input? (requires predefined responses)"
           value={step.disableFreeInput}
@@ -377,7 +428,7 @@ export function RequestUserInputStepBuilder(props: {
           }}
         />
         <PredefinedResponsesUpdater
-          width="90%"
+          width="100%"
           step={step}
           updatePredefinedResponse={updatePredefinedResponse}
           addNewPredefinedResponse={addNewPredefinedResponse}
