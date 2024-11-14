@@ -19,6 +19,7 @@ import {
   DOC_TEXT_KEY,
 } from '../../../classes/activity-builder-activity/built-activity-handler';
 import { useAppSelector } from '../../../store/hooks';
+import { useWithCheckActivityErrors } from '../../../hooks/use-with-check-activity-errors';
 export function EditActivity(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   activity: ActivityBuilderType;
@@ -59,6 +60,11 @@ export function EditActivity(props: {
       [DOC_TEXT_KEY, DOC_NUM_WORDS_KEY] as string[]
     );
   }, [localActivityCopy.flowsList]);
+
+  const { errors } = useWithCheckActivityErrors(
+    globalStateKeys,
+    localActivityCopy
+  );
 
   useEffect(() => {
     setLocalActivityCopy(JSON.parse(JSON.stringify(activity)));
@@ -206,6 +212,7 @@ export function EditActivity(props: {
         updateLocalActivity={setLocalActivityCopy}
         versions={activityVersions[localActivityCopy.clientId] || []}
         disabled={!canEditActivity}
+        stepErrors={errors}
       />
     </ColumnDiv>
   );

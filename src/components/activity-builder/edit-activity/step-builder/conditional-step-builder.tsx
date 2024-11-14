@@ -55,9 +55,16 @@ export function ConditionalStepBuilder(props: {
   width?: string;
   height?: string;
   versions: StepVersion[];
+  errors?: string[];
 }): JSX.Element {
-  const { step, stepIndex, updateLocalActivity, versions, globalStateKeys } =
-    props;
+  const {
+    step,
+    stepIndex,
+    updateLocalActivity,
+    versions,
+    globalStateKeys,
+    errors,
+  } = props;
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
 
   const [rerender, setRerender] = React.useState(0);
@@ -182,6 +189,11 @@ export function ConditionalStepBuilder(props: {
         Conditionals{' '}
         <InfoTooltip title="Define conditions that will trigger the flow to jump to a specific step." />
       </h4>
+      {errors && errors.length > 0 && (
+        <span style={{ color: 'red', textAlign: 'center' }}>
+          {errors.join(', ')}
+        </span>
+      )}
       <div
         style={{
           position: 'absolute',

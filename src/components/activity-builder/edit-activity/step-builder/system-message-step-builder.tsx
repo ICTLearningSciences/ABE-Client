@@ -40,8 +40,9 @@ export function SystemMessageStepBuilder(props: {
   width?: string;
   height?: string;
   versions: StepVersion[];
+  errors?: string[];
 }): JSX.Element {
-  const { step, stepIndex, updateLocalActivity, versions } = props;
+  const { step, stepIndex, updateLocalActivity, versions, errors } = props;
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
 
   const [rerender, setRerender] = React.useState(0);
@@ -123,6 +124,11 @@ export function SystemMessageStepBuilder(props: {
       </IconButton>
 
       <h4 style={{ alignSelf: 'center' }}>System Message</h4>
+      {errors && errors.length > 0 && (
+        <span style={{ color: 'red', textAlign: 'center' }}>
+          {errors.join(', ')}
+        </span>
+      )}
       <div
         style={{
           position: 'absolute',

@@ -85,6 +85,7 @@ export function PromptStepBuilder(props: {
   previewed: boolean;
   startPreview: () => void;
   stopPreview: () => void;
+  errors?: string[];
   width?: string;
   height?: string;
   versions: StepVersion[];
@@ -99,6 +100,7 @@ export function PromptStepBuilder(props: {
     deleteStep,
     flowsList,
     versions,
+    errors,
   } = props;
   const currentFLow = flowsList.find((f) => {
     return f.steps.find((s) => s.stepId === step.stepId);
@@ -543,6 +545,11 @@ export function PromptStepBuilder(props: {
         <Delete />
       </IconButton>
       <h4 style={{ alignSelf: 'center' }}>Prompt</h4>
+      {errors && errors.length > 0 && (
+        <span style={{ color: 'red', textAlign: 'center' }}>
+          {errors.join(', ')}
+        </span>
+      )}
       <Collapse in={!collapsed}>
         <InputField
           label="Prompt Text"

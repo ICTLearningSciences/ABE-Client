@@ -16,6 +16,7 @@ import { FlowStepsBuilderTab } from './flow-steps-builder-tab';
 import { getPromptStepById } from '../helpers';
 import { ColumnDiv } from '../../../styled-components';
 import { PromptStepBuilder } from './step-builder/prompt-step-builder';
+import { StepErrors } from '../../../classes/activity-builder-activity/activity-step-error-checker';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -59,11 +60,13 @@ export function ActivityFlowContainer(props: {
   >;
   versions: BuiltActivityVersion[];
   disabled?: boolean;
+  stepErrors: StepErrors;
 }): JSX.Element {
   const {
     localActivity,
     updateLocalActivity,
     versions,
+    stepErrors,
     globalStateKeys,
     disabled,
   } = props;
@@ -148,6 +151,7 @@ export function ActivityFlowContainer(props: {
     return (
       <CustomTabPanel key={flow.clientId} value={value} index={index}>
         <FlowStepsBuilderTab
+          stepErrors={stepErrors}
           globalStateKeys={globalStateKeys}
           flow={flow}
           flowsList={flowsList}
@@ -180,6 +184,7 @@ export function ActivityFlowContainer(props: {
           startPreview={() => setPreviewPromptId(previewPrompt.stepId)}
           stopPreview={() => setPreviewPromptId('')}
           versions={getVersionsForStep(previewPrompt.stepId)}
+          errors={[]}
         />
       </ColumnDiv>
     );
