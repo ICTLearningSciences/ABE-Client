@@ -61,9 +61,11 @@ export const FullScreenCenterDiv = styled.div`
 
 export const RoundedBorderDiv = styled.div`
   postion: relative;
-  border: 1px solid black;
+  border: 1px solid grey;
   border-radius: 10px;
   box-sizing: border-box;
+  margin-top: 20px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 `;
 
 export const TopLeftText = styled.span`
