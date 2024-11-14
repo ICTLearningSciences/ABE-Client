@@ -211,7 +211,7 @@ export function ConditionalStepBuilder(props: {
               >
                 <RowDiv>
                   <SelectInputField
-                    label="State Data Key"
+                    label="Data Key"
                     value={conditional.stateDataKey}
                     options={globalStateKeys}
                     onChange={(v) => {

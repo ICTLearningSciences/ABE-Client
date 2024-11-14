@@ -64,7 +64,7 @@ export function FlowStepSelector(props: {
         }}
       >
         <FormControl variant="standard" sx={{ minWidth: 120 }}>
-          <InputLabel id="select-flow-label">Select flow</InputLabel>
+          <InputLabel id="select-flow-label">Select Flow</InputLabel>
           <Select
             labelId="select-flow-label"
             value={selectedFlowId}
@@ -88,7 +88,7 @@ export function FlowStepSelector(props: {
 
         {selectedFlowId && (
           <FormControl variant="standard" sx={{ minWidth: 120 }}>
-            <InputLabel id="select-step-label">Select flow step</InputLabel>
+            <InputLabel id="select-step-label">Flow step</InputLabel>
             <Select
               disabled={!selectedFlowId}
               labelId="select-step-label"

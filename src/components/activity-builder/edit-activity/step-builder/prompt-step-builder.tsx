@@ -50,7 +50,7 @@ export function getEmptyJsonResponseData(): JsonResponseData {
     clientId: uuid(),
     name: '',
     type: JsonResponseDataType.STRING,
-    isRequired: false,
+    isRequired: true,
     additionalInfo: '',
   };
 }
@@ -566,7 +566,7 @@ export function PromptStepBuilder(props: {
         />
         {step.outputDataType === PromptOutputTypes.TEXT ? (
           <InputField
-            label="Response Format"
+            label="Text Response Format"
             value={step.responseFormat}
             onFocus={() => {
               setViewingInputType(ViewingInputType.RESPONSE_FORMAT);

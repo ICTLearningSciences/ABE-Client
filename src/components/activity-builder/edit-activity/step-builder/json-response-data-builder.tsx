@@ -32,10 +32,10 @@ export function JsonResponseDataUpdater(props: {
     parentJsonResponseDataIds,
     addNewJsonResponseData,
   } = props;
-  const availableTypes =
-    parentJsonResponseDataIds.length !== 2
-      ? [...Object.values(JsonResponseDataType)]
-      : [JsonResponseDataType.STRING, JsonResponseDataType.ARRAY];
+  const isSubData = parentJsonResponseDataIds.length >= 1;
+  const availableTypes = !isSubData
+    ? [...Object.values(JsonResponseDataType)]
+    : [JsonResponseDataType.STRING, JsonResponseDataType.ARRAY];
 
   return (
     <Box
@@ -166,7 +166,7 @@ export function JsonResponseDataUpdater(props: {
           addNewJsonResponseData(parentJsonResponseDataIds);
         }}
       >
-        + Add Data Field
+        {isSubData ? 'Add Subfield' : '+ Add JSON Field'}
       </Button>
     </Box>
   );
