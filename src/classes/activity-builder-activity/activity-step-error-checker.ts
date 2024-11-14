@@ -40,8 +40,9 @@ export class ActivityStepErrorChecker {
     });
     activity.flowsList.forEach((flow) => {
       this.errors[flow.clientId] = {};
-      flow.steps.forEach((step) => {
-        this.checkStepErrors(step, flow.clientId, existingSteps);
+      flow.steps.forEach((step, i) => {
+        const isLastStep = flow.steps.length > 1 && i === flow.steps.length - 1;
+        this.checkStepErrors(step, flow.clientId, existingSteps, isLastStep);
       });
     });
   }
@@ -49,31 +50,36 @@ export class ActivityStepErrorChecker {
   checkStepErrors(
     step: ActivityBuilderStep,
     flowId: string,
-    existingSteps: Set<string>
+    existingSteps: Set<string>,
+    isLastStep: boolean
   ) {
     if (step.stepType === ActivityBuilderStepType.SYSTEM_MESSAGE) {
       this.checkMessageStepErrors(
         step as SystemMessageActivityStep,
         flowId,
-        existingSteps
+        existingSteps,
+        isLastStep
       );
     } else if (step.stepType === ActivityBuilderStepType.CONDITIONAL) {
       this.checkConditionalStepErrors(
         step as ConditionalActivityStep,
         flowId,
-        existingSteps
+        existingSteps,
+        isLastStep
       );
     } else if (step.stepType === ActivityBuilderStepType.REQUEST_USER_INPUT) {
       this.checkRequestUserInputStepErrors(
         step as RequestUserInputActivityStep,
         flowId,
-        existingSteps
+        existingSteps,
+        isLastStep
       );
     } else if (step.stepType === ActivityBuilderStepType.PROMPT) {
       this.checkPromptStepErrors(
         step as PromptActivityStep,
         flowId,
-        existingSteps
+        existingSteps,
+        isLastStep
       );
     }
   }
@@ -93,26 +99,13 @@ export class ActivityStepErrorChecker {
   checkMessageStepErrors(
     step: SystemMessageActivityStep,
     flowId: string,
-    existingSteps: Set<string>
+    existingSteps: Set<string>,
+    isLastStep: boolean
   ) {
     this.initializeStepErrors(flowId, step.stepId);
     const keys = getAllContextDataKeys(step.message);
-    const invalidKeys = keys.filter(
-      (key) => !this.globalStateKeys.includes(key)
-    );
-    if (invalidKeys.length > 0) {
-      this.errors[flowId][step.stepId].push(
-        `Did not find the following keys in the global state: ${invalidKeys.join(
-          ', '
-        )}`
-      );
-    }
 
-    if (step.jumpToStepId && !existingSteps.has(step.jumpToStepId)) {
-      this.errors[flowId][step.stepId].push(
-        'This step is set to jump to a step that does not exist'
-      );
-    }
+    this.sharedStepErrors(step, flowId, existingSteps, isLastStep, keys);
 
     this.clearEmptyStepErrors(flowId, step.stepId);
   }
@@ -120,7 +113,8 @@ export class ActivityStepErrorChecker {
   checkConditionalStepErrors(
     step: ConditionalActivityStep,
     flowId: string,
-    existingSteps: Set<string>
+    existingSteps: Set<string>,
+    isLastStep: boolean
   ) {
     this.initializeStepErrors(flowId, step.stepId);
     const conditions = step.conditionals;
@@ -144,11 +138,7 @@ export class ActivityStepErrorChecker {
       }
     });
 
-    if (step.jumpToStepId && !existingSteps.has(step.jumpToStepId)) {
-      this.errors[flowId][step.stepId].push(
-        'This step is set to jump to a step that does not exist'
-      );
-    }
+    this.sharedStepErrors(step, flowId, existingSteps, isLastStep, []);
 
     this.clearEmptyStepErrors(flowId, step.stepId);
   }
@@ -156,20 +146,11 @@ export class ActivityStepErrorChecker {
   checkRequestUserInputStepErrors(
     step: RequestUserInputActivityStep,
     flowId: string,
-    existingSteps: Set<string>
+    existingSteps: Set<string>,
+    isLastStep: boolean
   ) {
     this.initializeStepErrors(flowId, step.stepId);
     const keys = getAllContextDataKeys(step.message);
-    const invalidKeys = keys.filter(
-      (key) => !this.globalStateKeys.includes(key)
-    );
-    if (invalidKeys.length > 0) {
-      this.errors[flowId][step.stepId].push(
-        `Did not find the following keys in the global state: ${invalidKeys.join(
-          ', '
-        )}`
-      );
-    }
 
     if (step.disableFreeInput && step.predefinedResponses.length === 0) {
       this.errors[flowId][step.stepId].push(
@@ -177,11 +158,7 @@ export class ActivityStepErrorChecker {
       );
     }
 
-    if (step.jumpToStepId && !existingSteps.has(step.jumpToStepId)) {
-      this.errors[flowId][step.stepId].push(
-        'This step is set to jump to a step that does not exist'
-      );
-    }
+    this.sharedStepErrors(step, flowId, existingSteps, isLastStep, keys);
 
     this.clearEmptyStepErrors(flowId, step.stepId);
   }
@@ -189,22 +166,15 @@ export class ActivityStepErrorChecker {
   checkPromptStepErrors(
     step: PromptActivityStep,
     flowId: string,
-    existingSteps: Set<string>
+    existingSteps: Set<string>,
+    isLastStep: boolean
   ) {
     this.initializeStepErrors(flowId, step.stepId);
     const keys = getAllContextDataKeys(step.promptText).concat(
       getAllContextDataKeys(step.customSystemRole)
     );
-    const invalidKeys = keys.filter(
-      (key) => !this.globalStateKeys.includes(key)
-    );
-    if (invalidKeys.length > 0) {
-      this.errors[flowId][step.stepId].push(
-        `Did not find the following keys in the global state: ${invalidKeys.join(
-          ', '
-        )}`
-      );
-    }
+
+    this.sharedStepErrors(step, flowId, existingSteps, isLastStep, keys);
 
     if (
       step.outputDataType === PromptOutputTypes.JSON &&
@@ -213,12 +183,39 @@ export class ActivityStepErrorChecker {
       this.errors[flowId][step.stepId].push('No JSON response data is set');
     }
 
+    this.clearEmptyStepErrors(flowId, step.stepId);
+  }
+
+  sharedStepErrors(
+    step: ActivityBuilderStep,
+    flowId: string,
+    existingSteps: Set<string>,
+    isLastStep: boolean,
+    dataKeys: string[]
+  ) {
     if (step.jumpToStepId && !existingSteps.has(step.jumpToStepId)) {
       this.errors[flowId][step.stepId].push(
         'This step is set to jump to a step that does not exist'
       );
     }
 
-    this.clearEmptyStepErrors(flowId, step.stepId);
+    if (isLastStep && !step.jumpToStepId) {
+      this.errors[flowId][step.stepId].push(
+        'This step is the last step in the flow but is not set to jump to any other step'
+      );
+    }
+
+    if (dataKeys.length > 0) {
+      const invalidKeys = dataKeys.filter(
+        (key) => !this.globalStateKeys.includes(key)
+      );
+      if (invalidKeys.length > 0) {
+        this.errors[flowId][step.stepId].push(
+          `Did not find the following keys in the global state: ${invalidKeys.join(
+            ', '
+          )}`
+        );
+      }
+    }
   }
 }
