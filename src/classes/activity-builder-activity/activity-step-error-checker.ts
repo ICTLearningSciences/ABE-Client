@@ -201,7 +201,7 @@ export class ActivityStepErrorChecker {
 
     if (isLastStep && !step.jumpToStepId) {
       this.errors[flowId][step.stepId].push(
-        'This step is the last step in the flow but is not set to jump to any other step'
+        'The last step in a flow must have a jump target'
       );
     }
 
