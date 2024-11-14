@@ -40,7 +40,7 @@ import {
 import { StepErrors } from '../../../classes/activity-builder-activity/activity-step-error-checker';
 
 export function FlowStepsBuilderTab(props: {
-  stepErrors: StepErrors;
+  stepsErrors?: StepErrors;
   globalStateKeys: string[];
   flow: FlowItem;
   flowsList: FlowItem[];
@@ -58,11 +58,11 @@ export function FlowStepsBuilderTab(props: {
     setPreviewPromptId,
     globalStateKeys,
     disabled,
-    stepErrors,
+    stepsErrors,
   } = props;
 
   function renderActivityStep(step: ActivityBuilderStepTypes, i: number) {
-    const errors = stepErrors[step.stepId];
+    const errors = stepsErrors?.[step.stepId];
     switch (step.stepType) {
       case ActivityBuilderStepType.SYSTEM_MESSAGE:
         return (
