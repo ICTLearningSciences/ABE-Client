@@ -209,12 +209,14 @@ export function ActivityFlowContainer(props: {
           borderColor: 'divider',
           width: '100%',
           maxWidth: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         <Tabs
           sx={{
-            maxWidth: '100%',
-            overflow: 'hidden',
+            maxWidth: '98vw',
           }}
           centered
           value={value}

@@ -199,12 +199,6 @@ export class ActivityStepErrorChecker {
       );
     }
 
-    if (isLastStep && !step.jumpToStepId) {
-      this.errors[flowId][step.stepId].push(
-        'The last step in a flow must have a jump target'
-      );
-    }
-
     if (dataKeys.length > 0) {
       const invalidKeys = dataKeys.filter(
         (key) => !this.globalStateKeys.includes(key)
