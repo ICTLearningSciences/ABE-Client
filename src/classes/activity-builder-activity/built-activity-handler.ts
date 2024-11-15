@@ -569,7 +569,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       step.jsonResponseData &&
       step.outputDataType === PromptOutputTypes.JSON
     ) {
-      aiPromptSteps[0].responseFormat +=
+      aiPromptSteps[0].responseFormat =
         recursivelyConvertExpectedDataToAiPromptString(
           recursiveUpdateAdditionalInfo(step.jsonResponseData, this.stateData)
         );
