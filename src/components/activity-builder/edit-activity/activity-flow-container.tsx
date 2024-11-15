@@ -137,6 +137,10 @@ export function ActivityFlowContainer(props: {
     });
   };
 
+  function filterFlowName(name: string): string {
+    return name.length > 20 ? name.substring(0, 20) + '...' : name;
+  }
+
   const tabs = flowsList.map((flow, index) => {
     const flowContainsErrors =
       stepErrors[flow.clientId] &&
@@ -145,7 +149,7 @@ export function ActivityFlowContainer(props: {
       <Tab
         key={flow.clientId}
         icon={flowContainsErrors ? <ErrorIcon color="error" /> : undefined}
-        label={`${flow.name || `Flow ${index + 1}`}`}
+        label={filterFlowName(flow.name || `Flow ${index + 1}`)}
         {...a11yProps(index)}
       />
     );
@@ -222,7 +226,7 @@ export function ActivityFlowContainer(props: {
           value={value}
           onChange={handleChange}
           aria-label="basic tabs example"
-          variant={tabs.length > 10 ? 'scrollable' : 'standard'}
+          variant={'scrollable'}
         >
           {tabs}
         </Tabs>

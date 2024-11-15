@@ -26,6 +26,7 @@ export function ExistingActivityItem(props: {
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
   deleteBuiltActivity: (activityId: string) => Promise<void>;
   canEditActivity: boolean;
+  canDeleteActivity: boolean;
 }) {
   const {
     activity,
@@ -34,6 +35,7 @@ export function ExistingActivityItem(props: {
     copyActivity,
     deleteBuiltActivity,
     canEditActivity,
+    canDeleteActivity,
   } = props;
   const [copying, setCopying] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -84,7 +86,7 @@ export function ExistingActivityItem(props: {
           {canEditActivity ? 'Edit' : 'View'}
         </Button>
         <IconButton
-          disabled={deleting || !canEditActivity}
+          disabled={deleting || !canDeleteActivity}
           onClick={() => {
             setShowDeleteDialog(true);
           }}
@@ -171,6 +173,7 @@ export function ExistingActivities(props: {
             }}
             deleteBuiltActivity={deleteBuiltActivity}
             canEditActivity={true}
+            canDeleteActivity={true}
           />
         );
       })}
@@ -211,6 +214,7 @@ export function ExistingActivities(props: {
               user?.userRole === UserRole.ADMIN ||
               activity.visibility === ActivityBuilderVisibility.EDITABLE
             }
+            canDeleteActivity={user?.userRole === UserRole.ADMIN}
           />
         );
       })}
