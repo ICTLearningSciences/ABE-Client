@@ -205,7 +205,7 @@ export class ActivityStepErrorChecker {
       );
       if (invalidKeys.length > 0) {
         this.errors[flowId][step.stepId].push(
-          `Did not find the following keys in the global state: ${invalidKeys.join(
+          `Did not find the following variables in the state: ${invalidKeys.join(
             ', '
           )}`
         );
