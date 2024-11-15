@@ -6,7 +6,10 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React, { useState } from 'react';
 import { ColumnDiv, RowDiv } from '../../styled-components';
-import { ActivityBuilder as ActivityBuilderType } from './types';
+import {
+  ActivityBuilder as ActivityBuilderType,
+  ActivityBuilderVisibility,
+} from './types';
 import { Button, CircularProgress, IconButton } from '@mui/material';
 import { isActivityRunnable } from './helpers';
 import PreviewIcon from '@mui/icons-material/Preview';
@@ -22,7 +25,7 @@ export function ExistingActivityItem(props: {
   editActivity: () => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
   deleteBuiltActivity: (activityId: string) => Promise<void>;
-  canDeleteActivity: boolean;
+  canEditActivity: boolean;
 }) {
   const {
     activity,
@@ -30,7 +33,7 @@ export function ExistingActivityItem(props: {
     goToActivity,
     copyActivity,
     deleteBuiltActivity,
-    canDeleteActivity,
+    canEditActivity,
   } = props;
   const [copying, setCopying] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -78,10 +81,10 @@ export function ExistingActivityItem(props: {
           startIcon={<EditIcon />}
           data-cy={`activity-item-edit-${activity._id}`}
         >
-          Edit
+          {canEditActivity ? 'Edit' : 'View'}
         </Button>
         <IconButton
-          disabled={deleting || !canDeleteActivity}
+          disabled={deleting || !canEditActivity}
           onClick={() => {
             setShowDeleteDialog(true);
           }}
@@ -167,7 +170,7 @@ export function ExistingActivities(props: {
               props.goToActivity(activity);
             }}
             deleteBuiltActivity={deleteBuiltActivity}
-            canDeleteActivity={true}
+            canEditActivity={true}
           />
         );
       })}
@@ -204,7 +207,10 @@ export function ExistingActivities(props: {
               props.goToActivity(activity);
             }}
             deleteBuiltActivity={deleteBuiltActivity}
-            canDeleteActivity={user?.userRole === UserRole.ADMIN}
+            canEditActivity={
+              user?.userRole === UserRole.ADMIN ||
+              activity.visibility === ActivityBuilderVisibility.EDITABLE
+            }
           />
         );
       })}
