@@ -1,17 +1,14 @@
 import React from 'react';
 import { Delete } from '@mui/icons-material';
-import { IconButton, Button } from '@mui/material';
-import {
-  ColumnCenterDiv,
-  ColumnDiv,
-  RowDiv,
-} from '../../../../styled-components';
+import { IconButton, Button, Box } from '@mui/material';
+import { RowDiv } from '../../../../styled-components';
 import {
   InputField,
   SelectInputField,
   CheckBoxInput,
 } from '../../shared/input-components';
 import { JsonResponseData, JsonResponseDataType } from '../../types';
+import { InfoTooltip } from '../../../info-tooltip';
 
 export function JsonResponseDataUpdater(props: {
   jsonResponseData: JsonResponseData[];
@@ -35,29 +32,48 @@ export function JsonResponseDataUpdater(props: {
     parentJsonResponseDataIds,
     addNewJsonResponseData,
   } = props;
-  const availableTypes =
-    parentJsonResponseDataIds.length !== 2
-      ? [...Object.values(JsonResponseDataType)]
-      : [JsonResponseDataType.STRING, JsonResponseDataType.ARRAY];
+  const isSubData = parentJsonResponseDataIds.length >= 1;
+  const availableTypes = !isSubData
+    ? [...Object.values(JsonResponseDataType)]
+    : [JsonResponseDataType.STRING, JsonResponseDataType.ARRAY];
 
   return (
-    <ColumnCenterDiv
-      style={{
-        border: '1px dotted grey',
+    <Box
+      sx={{
         marginBottom: '10px',
         marginTop: '10px',
         marginLeft: `${parentJsonResponseDataIds.length * 60}px`,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
       }}
     >
-      {!parentJsonResponseDataIds.length && <h3>Json Response Data</h3>}
+      {!parentJsonResponseDataIds.length && (
+        <h3
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          Json Response Data
+          <InfoTooltip title="Define the fields for that AI's JSON response." />
+        </h3>
+      )}
       {jsonResponseData?.map((jsonResponseData, index) => {
         return (
-          <ColumnDiv
+          <Box
             key={index}
-            style={{
-              border: '1px solid black',
+            sx={{
               position: 'relative',
               width: '95%',
+              mt: 2,
+              borderRadius: 2,
+              boxShadow: 1,
+              backgroundColor: 'white',
+              border: '1px solid #e0e0e0',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             <RowDiv
@@ -142,7 +158,7 @@ export function JsonResponseDataUpdater(props: {
                 addNewJsonResponseData={addNewJsonResponseData}
               />
             )}
-          </ColumnDiv>
+          </Box>
         );
       })}
       <Button
@@ -150,8 +166,8 @@ export function JsonResponseDataUpdater(props: {
           addNewJsonResponseData(parentJsonResponseDataIds);
         }}
       >
-        + Add Data Field
+        {isSubData ? 'Add Subfield' : '+ Add JSON Field'}
       </Button>
-    </ColumnCenterDiv>
+    </Box>
   );
 }

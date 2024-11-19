@@ -1,10 +1,11 @@
 import React from 'react';
-import { Button, IconButton } from '@mui/material';
-import { ColumnCenterDiv, ColumnDiv, RowDiv } from '../../../styled-components';
+import { Box, Button, IconButton } from '@mui/material';
+import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { ActivityBuilderStep, FlowItem } from '../types';
 import { FlowStepSelector } from './flow-step-selector';
 import { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
+import { InfoTooltip } from '../../info-tooltip';
 export function JumpToAlternateStep(props: {
   step: ActivityBuilderStep;
   flowsList: FlowItem[];
@@ -19,6 +20,7 @@ export function JumpToAlternateStep(props: {
       {!displayStepSelector && (
         <RowDiv>
           <span style={{ color: 'grey' }}>Jump to alternate step?</span>
+          <InfoTooltip title="Configure this step to jump to a step out of order." />
           <Button
             onClick={() => {
               setDisplayStepSelector(true);
@@ -30,12 +32,18 @@ export function JumpToAlternateStep(props: {
       )}
 
       {displayStepSelector && (
-        <ColumnCenterDiv
-          style={{
-            width: '80%',
-            border: '1px solid black',
-            padding: 10,
+        <Box
+          sx={{
+            mt: 2,
+            borderRadius: 2,
+            boxShadow: 1,
+            backgroundColor: 'white',
+            border: '1px solid #e0e0e0',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             alignSelf: 'center',
+            width: '50%',
             position: 'relative',
           }}
         >
@@ -63,7 +71,7 @@ export function JumpToAlternateStep(props: {
               onNewStepSelected(stepId);
             }}
           />
-        </ColumnCenterDiv>
+        </Box>
       )}
     </ColumnDiv>
   );

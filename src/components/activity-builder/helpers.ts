@@ -139,6 +139,17 @@ export function processPredefinedResponses(
   return processedPredefinedResponses;
 }
 
+export function isContextDataString(input: string): boolean {
+  const regex = /{{(.*?)}}/g;
+  return regex.test(input);
+}
+
+export function getAllContextDataKeys(input: string): string[] {
+  const regex = /{{(.*?)}}/g;
+  const keys = input.match(regex);
+  return keys ? keys.map((key) => key.slice(2, -2)) : [];
+}
+
 export function replaceStoredDataInString(
   str: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

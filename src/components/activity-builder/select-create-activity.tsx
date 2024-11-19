@@ -6,7 +6,10 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React, { useState } from 'react';
 import { ColumnDiv, RowDiv } from '../../styled-components';
-import { ActivityBuilder as ActivityBuilderType } from './types';
+import {
+  ActivityBuilder as ActivityBuilderType,
+  ActivityBuilderVisibility,
+} from './types';
 import { Button, CircularProgress, IconButton } from '@mui/material';
 import { isActivityRunnable } from './helpers';
 import PreviewIcon from '@mui/icons-material/Preview';
@@ -22,6 +25,7 @@ export function ExistingActivityItem(props: {
   editActivity: () => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
   deleteBuiltActivity: (activityId: string) => Promise<void>;
+  canEditActivity: boolean;
   canDeleteActivity: boolean;
 }) {
   const {
@@ -30,6 +34,7 @@ export function ExistingActivityItem(props: {
     goToActivity,
     copyActivity,
     deleteBuiltActivity,
+    canEditActivity,
     canDeleteActivity,
   } = props;
   const [copying, setCopying] = useState(false);
@@ -78,7 +83,7 @@ export function ExistingActivityItem(props: {
           startIcon={<EditIcon />}
           data-cy={`activity-item-edit-${activity._id}`}
         >
-          Edit
+          {canEditActivity ? 'Edit' : 'View'}
         </Button>
         <IconButton
           disabled={deleting || !canDeleteActivity}
@@ -167,6 +172,7 @@ export function ExistingActivities(props: {
               props.goToActivity(activity);
             }}
             deleteBuiltActivity={deleteBuiltActivity}
+            canEditActivity={true}
             canDeleteActivity={true}
           />
         );
@@ -204,6 +210,10 @@ export function ExistingActivities(props: {
               props.goToActivity(activity);
             }}
             deleteBuiltActivity={deleteBuiltActivity}
+            canEditActivity={
+              user?.userRole === UserRole.ADMIN ||
+              activity.visibility === ActivityBuilderVisibility.EDITABLE
+            }
             canDeleteActivity={user?.userRole === UserRole.ADMIN}
           />
         );

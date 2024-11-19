@@ -116,12 +116,16 @@ export function EditGoogleDoc(props: {
 
   const smallWindowWidth = windowWidth < 1200;
   const googleDocWidth = smallWindowWidth ? '60%' : '55%';
-  const chatButtonologyWidth = smallWindowWidth ? '40%' : '45%';
+  const chatButtonologyWidth = viewingAdmin
+    ? '100%'
+    : smallWindowWidth
+    ? '40%'
+    : '45%';
   return (
     <div style={{ height: '100%', display: 'flex', flexGrow: 1 }}>
       <div
         style={{
-          display: 'flex',
+          display: viewingAdmin ? 'none' : 'flex',
           flexDirection: 'column',
           height: '100%',
           justifyContent: 'space-around',
@@ -143,6 +147,7 @@ export function EditGoogleDoc(props: {
       <div
         style={{
           width: chatButtonologyWidth,
+          maxWidth: chatButtonologyWidth,
         }}
       >
         {viewingAdmin ? (

@@ -32,8 +32,10 @@ export function flowIsNotEditable(cy: CypressGlobal){
     })
 }
 
+
 describe('activity builder', () => {
     describe("admins", ()=>{
+
         it("can edit all activities, despite ownership", ()=>{
             cyMockDefault(cy, {
               userRole: UserRole.ADMIN

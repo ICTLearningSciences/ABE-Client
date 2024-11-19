@@ -26,7 +26,8 @@ import {
 } from './step-builder/prompt-step-builder';
 import { InputField } from '../shared/input-components';
 import { AddNewActivityButton } from '../shared/add-new-activity-button';
-import { Button } from '@mui/material';
+import { Button, Tooltip } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
 import {
   SystemMessageStepBuilder,
   getDefaultSystemMessage,
@@ -36,7 +37,10 @@ import {
   ConditionalStepBuilder,
   getDefaultConditionalStep,
 } from './step-builder/conditional-step-builder';
+import { StepErrors } from '../../../classes/activity-builder-activity/activity-step-error-checker';
+
 export function FlowStepsBuilderTab(props: {
+  stepsErrors?: StepErrors;
   globalStateKeys: string[];
   flow: FlowItem;
   flowsList: FlowItem[];
@@ -54,9 +58,11 @@ export function FlowStepsBuilderTab(props: {
     setPreviewPromptId,
     globalStateKeys,
     disabled,
+    stepsErrors,
   } = props;
 
   function renderActivityStep(step: ActivityBuilderStepTypes, i: number) {
+    const errors = stepsErrors?.[step.stepId];
     switch (step.stepType) {
       case ActivityBuilderStepType.SYSTEM_MESSAGE:
         return (
@@ -69,6 +75,7 @@ export function FlowStepsBuilderTab(props: {
             deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
             flowsList={flowsList}
             versions={props.getVersionsForStep(step.stepId)}
+            errors={errors}
           />
         );
       case ActivityBuilderStepType.REQUEST_USER_INPUT:
@@ -81,6 +88,7 @@ export function FlowStepsBuilderTab(props: {
             deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
             flowsList={flowsList}
             versions={props.getVersionsForStep(step.stepId)}
+            errors={errors}
           />
         );
       case ActivityBuilderStepType.PROMPT:
@@ -96,6 +104,7 @@ export function FlowStepsBuilderTab(props: {
             startPreview={() => setPreviewPromptId(step.stepId)}
             stopPreview={() => setPreviewPromptId('')}
             versions={props.getVersionsForStep(step.stepId)}
+            errors={errors}
           />
         );
       case ActivityBuilderStepType.CONDITIONAL:
@@ -110,6 +119,7 @@ export function FlowStepsBuilderTab(props: {
             flowsList={flowsList}
             stepIndex={i}
             versions={props.getVersionsForStep(step.stepId)}
+            errors={errors}
           />
         );
       default:
@@ -166,6 +176,37 @@ export function FlowStepsBuilderTab(props: {
         opacity: disabled ? 0.5 : 1,
       }}
     >
+      <Tooltip
+        title={
+          <div>
+            {globalStateKeys.map((key) => (
+              <div key={key}>{key}</div>
+            ))}
+          </div>
+        }
+      >
+        <div
+          style={{
+            position: 'sticky',
+            left: 10,
+            top: 10,
+            alignSelf: 'flex-start',
+            color: 'gray',
+            cursor: 'pointer',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 0,
+            overflow: 'visible',
+            paddingTop: 20,
+          }}
+        >
+          <InfoIcon />
+          Variables
+        </div>
+      </Tooltip>
       <Button
         style={{
           position: 'absolute',

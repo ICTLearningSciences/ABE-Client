@@ -16,7 +16,8 @@ import { FlowStepsBuilderTab } from './flow-steps-builder-tab';
 import { getPromptStepById } from '../helpers';
 import { ColumnDiv } from '../../../styled-components';
 import { PromptStepBuilder } from './step-builder/prompt-step-builder';
-
+import { FlowErrors } from '../../../classes/activity-builder-activity/activity-step-error-checker';
+import ErrorIcon from '@mui/icons-material/Error';
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -59,11 +60,13 @@ export function ActivityFlowContainer(props: {
   >;
   versions: BuiltActivityVersion[];
   disabled?: boolean;
+  stepErrors: FlowErrors;
 }): JSX.Element {
   const {
     localActivity,
     updateLocalActivity,
     versions,
+    stepErrors,
     globalStateKeys,
     disabled,
   } = props;
@@ -134,11 +137,19 @@ export function ActivityFlowContainer(props: {
     });
   };
 
+  function filterFlowName(name: string): string {
+    return name.length > 20 ? name.substring(0, 20) + '...' : name;
+  }
+
   const tabs = flowsList.map((flow, index) => {
+    const flowContainsErrors =
+      stepErrors[flow.clientId] &&
+      Object.keys(stepErrors[flow.clientId]).length > 0;
     return (
       <Tab
         key={flow.clientId}
-        label={`${flow.name || `Flow ${index + 1}`}`}
+        icon={flowContainsErrors ? <ErrorIcon color="error" /> : undefined}
+        label={filterFlowName(flow.name || `Flow ${index + 1}`)}
         {...a11yProps(index)}
       />
     );
@@ -148,6 +159,7 @@ export function ActivityFlowContainer(props: {
     return (
       <CustomTabPanel key={flow.clientId} value={value} index={index}>
         <FlowStepsBuilderTab
+          stepsErrors={stepErrors[flow.clientId]}
           globalStateKeys={globalStateKeys}
           flow={flow}
           flowsList={flowsList}
@@ -180,6 +192,7 @@ export function ActivityFlowContainer(props: {
           startPreview={() => setPreviewPromptId(previewPrompt.stepId)}
           stopPreview={() => setPreviewPromptId('')}
           versions={getVersionsForStep(previewPrompt.stepId)}
+          errors={[]}
         />
       </ColumnDiv>
     );
@@ -194,12 +207,26 @@ export function ActivityFlowContainer(props: {
         flexDirection: 'column',
       }}
     >
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
+      <Box
+        sx={{
+          borderBottom: 1,
+          borderColor: 'divider',
+          width: '100%',
+          maxWidth: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <Tabs
+          sx={{
+            maxWidth: '98vw',
+          }}
+          centered
           value={value}
           onChange={handleChange}
           aria-label="basic tabs example"
-          variant="scrollable"
+          variant={'scrollable'}
         >
           {tabs}
         </Tabs>

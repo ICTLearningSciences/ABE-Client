@@ -7,7 +7,7 @@ import {
 } from '../types';
 import { ActivityFlowContainer } from './activity-flow-container';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
-import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
+import { Button, CircularProgress, IconButton } from '@mui/material';
 import { InputField, SelectInputField } from '../shared/input-components';
 import { equals, userCanEditActivity } from '../../../helpers';
 import { v4 as uuidv4 } from 'uuid';
@@ -19,6 +19,7 @@ import {
   DOC_TEXT_KEY,
 } from '../../../classes/activity-builder-activity/built-activity-handler';
 import { useAppSelector } from '../../../store/hooks';
+import { useWithCheckActivityErrors } from '../../../hooks/use-with-check-activity-errors';
 export function EditActivity(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   activity: ActivityBuilderType;
@@ -59,6 +60,11 @@ export function EditActivity(props: {
       [DOC_TEXT_KEY, DOC_NUM_WORDS_KEY] as string[]
     );
   }, [localActivityCopy.flowsList]);
+
+  const { errors } = useWithCheckActivityErrors(
+    globalStateKeys,
+    localActivityCopy
+  );
 
   useEffect(() => {
     setLocalActivityCopy(JSON.parse(JSON.stringify(activity)));
@@ -198,27 +204,6 @@ export function EditActivity(props: {
           >
             + Add Flow
           </Button>
-          <Tooltip
-            title={
-              <div>
-                {globalStateKeys.map((key) => (
-                  <div key={key}>{key}</div>
-                ))}
-              </div>
-            }
-          >
-            <div
-              style={{
-                position: 'absolute',
-                right: 20,
-                top: 20,
-                color: 'gray',
-                cursor: 'pointer',
-              }}
-            >
-              Variables
-            </div>
-          </Tooltip>
         </RowDiv>
       </ColumnDiv>
       <ActivityFlowContainer
@@ -227,6 +212,7 @@ export function EditActivity(props: {
         updateLocalActivity={setLocalActivityCopy}
         versions={activityVersions[localActivityCopy.clientId] || []}
         disabled={!canEditActivity}
+        stepErrors={errors}
       />
     </ColumnDiv>
   );
