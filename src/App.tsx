@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import './App.css';
 import AdminView from './pages/admin/admin-view';
-import Login from './pages/login';
+import Login from './pages/login/login';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import Header from './components/header';
