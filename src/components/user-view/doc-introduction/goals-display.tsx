@@ -1,8 +1,12 @@
 import React from 'react';
 import { DisplayIcon } from '../../../helpers/display-icon-helper';
-import { RowDiv, ColumnDiv } from '../../../styled-components';
+import { ColumnDiv } from '../../../styled-components';
 import { DocGoal } from '../../../types';
-import { GoalDisplay as _GoalDisplay } from './doc-goal-modal-styles';
+import {
+  GoalDisplay as _GoalDisplay,
+  ActivitiesContainer,
+  ActivitiesGrid,
+} from './doc-goal-modal-styles';
 
 export function GoalsDisplay(props: {
   docGoals: DocGoal[];
@@ -12,35 +16,28 @@ export function GoalsDisplay(props: {
 }): JSX.Element {
   const { docGoals, setSelectedGoal, selectedGoal, isNewGoogleDoc } = props;
   return (
-    <>
+    <ActivitiesContainer>
       <h1
         style={{
           borderRadius: '10px',
           padding: 10,
+          margin: '10px 0',
         }}
       >
         What is your current goal?
       </h1>
-      <RowDiv
-        style={{
-          width: '100%',
-          height: '100%',
-          justifyContent: 'space-around',
-        }}
-      >
-        {docGoals.map((docGoal, i) => {
-          return (
-            <GoalDisplay
-              key={i}
-              docGoal={docGoal}
-              setSelectedGoal={setSelectedGoal}
-              isSelected={selectedGoal?._id === docGoal._id}
-              isNewGoogleDoc={isNewGoogleDoc}
-            />
-          );
-        })}
-      </RowDiv>
-    </>
+      <ActivitiesGrid>
+        {docGoals.map((docGoal, i) => (
+          <GoalDisplay
+            key={i}
+            docGoal={docGoal}
+            setSelectedGoal={setSelectedGoal}
+            isSelected={selectedGoal?._id === docGoal._id}
+            isNewGoogleDoc={isNewGoogleDoc}
+          />
+        ))}
+      </ActivitiesGrid>
+    </ActivitiesContainer>
   );
 }
 

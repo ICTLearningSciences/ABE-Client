@@ -44,3 +44,41 @@ export const GoalDisplay = styled.div`
     height: 150px;
   }
 `;
+
+export const ActivitiesContainer = styled.div`
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  position: relative;
+`;
+
+export const ActivitiesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  @media only screen and (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;

@@ -343,8 +343,8 @@ export function DocGoalModal(props: {
                 data-cy="selected-goal-display"
                 style={{
                   position: 'absolute',
-                  top: 30,
-                  left: 30,
+                  top: 20,
+                  left: 20,
                 }}
               >
                 {_selectedGoal && (
