@@ -4,6 +4,7 @@ env:
   variables:
     REACT_APP_GOOGLE_API_ENDPOINT: "https://api-qa.abewriting.org/docs"
     REACT_APP_GRAPHQL_ENDPOINT: "https://api-qa.abewriting.org/graphql/graphql"
+    REACT_APP_DOCUMENT_SERVICE: "GOOGLE_DOCS"
     STAGE: 'qa'
   parameter-store:
     REACT_APP_GOOGLE_CLIENT_ID: "/ABE/google_client_id"

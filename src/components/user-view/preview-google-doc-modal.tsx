@@ -29,7 +29,7 @@ const useStyles = makeStyles({ name: { PreviewGoogleDocModal } })(
 );
 
 export function PreviewGoogleDocModal(props: {
-  googleDocId: string;
+  docUrl: string;
   close: () => void;
 }): JSX.Element {
   const { classes } = useStyles();
@@ -46,20 +46,19 @@ export function PreviewGoogleDocModal(props: {
     p: 4,
   };
   const modalUseRef = useRef<HTMLDivElement>(null);
-  const { googleDocId, close } = props;
-  const googleDocUrl = `https://docs.google.com/document/d/${googleDocId}/view`;
+  const { docUrl, close } = props;
   useOutsideClick({ onOutsideClick: close, ref: modalUseRef });
 
   return (
     <div ref={modalUseRef}>
-      <Modal open={Boolean(googleDocId)} className={classes.modal}>
+      <Modal open={Boolean(docUrl)} className={classes.modal}>
         <Box sx={style}>
           <ColumnCenterDiv
             style={{
               height: '100%',
             }}
           >
-            <iframe width={'98%'} height={'98%'} src={googleDocUrl} />
+            <iframe width={'98%'} height={'98%'} src={docUrl} />
             <Button>Close</Button>
           </ColumnCenterDiv>
         </Box>

@@ -14,6 +14,7 @@ import {
   updateViewingAdvancedOptions,
   newSession as _newSession,
   setSessionIntention,
+  updateDocService,
   storeMostRecentDocVersion,
   setWarnExpiredAccessToken,
 } from '.';
@@ -23,6 +24,7 @@ import {
 } from '../../../hooks/api';
 import {
   AiServiceModel,
+  DocService,
   DocData,
   Intention,
   UserActivityState,
@@ -44,6 +46,7 @@ interface UseWithState {
   updateViewingAdvancedOptions: (advancedOptions: boolean) => void;
   newSession: () => void;
   updateSessionIntention: (intention?: Intention) => void;
+  updateDocService: (docService: DocService) => void;
   updateMostRecentDocVersion: (docData: DocData) => void;
   warnExpiredAccessToken: (warn: boolean) => void;
 }
@@ -58,6 +61,10 @@ export function useWithState(): UseWithState {
 
   function updateCurrentDocId(id: string) {
     dispatch(updateDocId(id));
+  }
+
+  function _updateDocService(docService: DocService) {
+    dispatch(updateDocService(docService));
   }
 
   async function loadUserActivityStates(userId: string): Promise<void> {
@@ -121,6 +128,7 @@ export function useWithState(): UseWithState {
   return {
     state,
     updateCurrentDocId,
+    updateDocService: _updateDocService,
     loadUserActivityStates,
     updateUserActivityState,
     overrideAiModel,

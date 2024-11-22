@@ -1,10 +1,14 @@
 import React from 'react';
 import { DisplayIcon } from '../../../helpers/display-icon-helper';
-import { ColumnDiv, RowDiv } from '../../../styled-components';
+import { ColumnDiv } from '../../../styled-components';
 import { ActivityTypes } from '../../../types';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import './doc-goal-modal.css';
+import {
+  GoalDisplay,
+  ActivitiesGrid,
+  ActivitiesContainer,
+} from './doc-goal-modal-styles';
 
 function ActivityDisplay(props: {
   activity: ActivityTypes;
@@ -14,8 +18,8 @@ function ActivityDisplay(props: {
 }): JSX.Element {
   const { activity, setSelectedActivity, isSelected, isNewGoogleDoc } = props;
   return (
-    <div
-      className={`goal-display ${
+    <GoalDisplay
+      className={`${
         isNewGoogleDoc && activity.newDocRecommend ? 'goal-display-flash' : ''
       }`}
       data-cy={`activity-display-${activity._id}`}
@@ -72,7 +76,7 @@ function ActivityDisplay(props: {
           {activity.description}
         </span>
       </ColumnDiv>
-    </div>
+    </GoalDisplay>
   );
 }
 
@@ -84,59 +88,30 @@ export function ActivitiesDisplay(props: {
 }): JSX.Element {
   const { activities, setSelectedActivity, selectedActivity, isNewGoogleDoc } =
     props;
-  const activitiesCopy: ActivityTypes[] = [...activities];
-  const activitiesSplitByThree = activitiesCopy.reduce(
-    (acc: ActivityTypes[][], activity, i) => {
-      if (i % 3 === 0) {
-        acc.push([activity]);
-      } else {
-        acc[acc.length - 1].push(activity);
-      }
-      return acc;
-    },
-    []
-  );
+
   return (
-    <>
+    <ActivitiesContainer>
       <h1
         style={{
           borderRadius: '10px',
           padding: 10,
+          margin: '10px 0',
+          textAlign: 'center',
         }}
       >
         Please select an activity.
       </h1>
-      <ColumnDiv
-        style={{
-          width: '100%',
-          height: '100%',
-        }}
-      >
-        {activitiesSplitByThree.map((activities, i) => {
-          return (
-            <RowDiv
-              key={i}
-              style={{
-                width: '100%',
-                height: '100%',
-                justifyContent: 'space-around',
-              }}
-            >
-              {activities.map((activity, i) => {
-                return (
-                  <ActivityDisplay
-                    key={i}
-                    activity={activity}
-                    setSelectedActivity={setSelectedActivity}
-                    isSelected={selectedActivity?._id === activity._id}
-                    isNewGoogleDoc={isNewGoogleDoc}
-                  />
-                );
-              })}
-            </RowDiv>
-          );
-        })}
-      </ColumnDiv>
-    </>
+      <ActivitiesGrid>
+        {activities.map((activity, i) => (
+          <ActivityDisplay
+            key={i}
+            activity={activity}
+            setSelectedActivity={setSelectedActivity}
+            isSelected={selectedActivity?._id === activity._id}
+            isNewGoogleDoc={isNewGoogleDoc}
+          />
+        ))}
+      </ActivitiesGrid>
+    </ActivitiesContainer>
   );
 }

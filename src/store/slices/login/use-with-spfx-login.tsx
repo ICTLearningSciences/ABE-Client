@@ -6,38 +6,12 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import * as loginActions from '.';
-import { useEffect } from 'react';
-import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
 import { UserAccessToken } from '../../../types';
+import { UseWithLogin } from './use-with-login';
 
-export interface UseWithLogin {
-  state: loginActions.LoginState;
-  logout: () => Promise<void>;
-  loginWithGoogle: (googleAccessToken: string) => Promise<void>;
-  loginWithMicrosoft: (microsoftAccessToken: string) => Promise<void>;
-  refreshAccessToken: () => void;
-  setUser: (user: UserAccessToken) => void;
-}
-
-// Gives you a way to interface with the redux store (which has the user information)
-export function useWithLogin(): UseWithLogin {
+export function useWithSpfxLogin(): UseWithLogin {
   const dispatch = useAppDispatch();
   const state: loginActions.LoginState = useAppSelector((state) => state.login);
-
-  useEffect(() => {
-    if (
-      state.loginStatus === loginActions.LoginStatus.AUTHENTICATED ||
-      state.loginStatus === loginActions.LoginStatus.IN_PROGRESS
-    ) {
-      return;
-    }
-    const token = localStorageGet(ACCESS_TOKEN_KEY);
-    if (token) {
-      refreshAccessToken();
-    } else {
-      dispatch(loginActions.logout());
-    }
-  }, [state.loginStatus]);
 
   async function loginWithGoogle(googleAccessToken: string) {
     if (

@@ -9,8 +9,8 @@ import {
 import { useAppSelector } from '../../../store/hooks';
 import { UserRole } from '../../../store/slices/login';
 import { useEffect, useState } from 'react';
-import './message.css';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
+import { StyledFadingText } from './message-styles';
 
 const baseMessageStyle: React.CSSProperties = {
   borderRadius: '1rem',
@@ -77,13 +77,12 @@ const FadingText: React.FC<{ strings: string[] }> = ({ strings }) => {
   }, [fadeState, strings.length]);
 
   return (
-    <div
-      className={`fading-text ${
-        fadeState === 'fading-out' ? 'fade-out' : 'fade-in'
-      }`}
+    <StyledFadingText
+      isFadingIn={fadeState === 'fading-in'}
+      isFadingOut={fadeState === 'fading-out'}
     >
       {strings[currentStringIndex]}
-    </div>
+    </StyledFadingText>
   );
 };
 

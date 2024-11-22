@@ -16,6 +16,7 @@ import {
   ActivityGQL,
   ActivityTypes,
   AiServiceModel,
+  DocData,
   DocGoal,
   isActivityGql,
 } from '../../../types';
@@ -25,7 +26,6 @@ import { UserRole } from '../../../store/slices/login';
 import useWithFreeInput from '../../../hooks/use-with-free-input';
 import { useWithActivityHandler } from '../../../hooks/use-with-activity-handler';
 import { useWithState } from '../../../store/slices/state/use-with-state';
-import './chat.css';
 import { UseWithPrompts } from '../../../hooks/use-with-prompts';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import {
@@ -39,15 +39,30 @@ import { ChatInput } from './chat-input';
 import { ChatHeaderGenerator } from './chat-header-generator';
 import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activity-handler';
 import { isActivityBuilder } from '../../activity-builder/types';
+import { createGlobalStyle } from 'styled-components';
 
-export default function Chat(props: {
+export const GlobalChatStyles = createGlobalStyle`
+  .MuiOutlinedInput-notchedOutline {
+    border-color: rgb(0, 0, 0) !important;
+    border-width: 1px !important;
+  }
+`;
+
+export function Chat(props: {
   selectedGoal?: DocGoal;
   selectedActivity?: ActivityTypes;
   editDocGoal: () => void;
   setSelectedActivity: (activity: ActivityGQL) => void;
   useWithPrompts: UseWithPrompts;
+  getDocData: (docId: string) => Promise<DocData>;
 }) {
-  const { selectedGoal, selectedActivity, editDocGoal, useWithPrompts } = props;
+  const {
+    selectedGoal,
+    selectedActivity,
+    editDocGoal,
+    useWithPrompts,
+    getDocData,
+  } = props;
   const { sendMessage, state: chatState, setSystemRole } = useWithChat();
   const {
     editedData: systemPromptData,
@@ -69,7 +84,7 @@ export default function Chat(props: {
   const userIsAdmin = userRole === UserRole.ADMIN;
   const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
   useWithFreeInput(!selectedActivity ? selectedGoal : undefined);
-  useWithStoreDocVersions(selectedActivity?._id || '');
+  useWithStoreDocVersions(selectedActivity?._id || '', getDocData);
   const { activityReady } = useWithActivityHandler(
     useWithPrompts,
     editDocGoal,
@@ -109,6 +124,7 @@ export default function Chat(props: {
 
   return (
     <div
+      data-cy="chat-container-parent"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -117,6 +133,7 @@ export default function Chat(props: {
         alignItems: 'center',
       }}
     >
+      <GlobalChatStyles />
       {activityReady || builtActivityReady || !goalHasActivities ? (
         <>
           <div
