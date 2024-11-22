@@ -358,7 +358,12 @@ export function DocGoalModal(props: {
                     >
                       {_selectedGoal.title}
                     </span>
-                    <IconButton onClick={goBackToGoalStage}>
+                    <IconButton
+                      style={{
+                        zIndex: 2,
+                      }}
+                      onClick={goBackToGoalStage}
+                    >
                       <ChangeIcon />
                     </IconButton>
                   </>
