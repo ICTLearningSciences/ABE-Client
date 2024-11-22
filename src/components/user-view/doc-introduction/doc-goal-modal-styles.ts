@@ -49,6 +49,7 @@ export const ActivitiesContainer = styled.div`
   max-height: 75vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
   overflow: auto;
   position: relative;
 `;
@@ -56,7 +57,7 @@ export const ActivitiesContainer = styled.div`
 export const ActivitiesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  width: 100%;
+  width: fit-content;
   overflow-y: auto;
   overflow-x: hidden;
 
