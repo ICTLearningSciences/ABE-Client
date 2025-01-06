@@ -305,8 +305,6 @@ export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
 }
 
 export async function fetchPrompts(): Promise<GQLResPrompts> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
   const data = await execGql<GQLPrompt[]>(
     {
       query: `
