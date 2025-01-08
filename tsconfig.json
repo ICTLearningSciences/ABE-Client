@@ -13,11 +13,11 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-      "declaration": true,                       // Generate .d.ts files
-      "module": "esnext",
-      "outDir": "./build",                       // Redirect output structure to the 'dist' folder
-      "rootDir": "./src",                       // Specify the root directory of input files
-      "moduleResolution": "node",
+    "declaration": true,                       // Generate .d.ts files
+    "module": "esnext",
+    "outDir": "./build",                       // Redirect output structure to the 'dist' folder
+    // "rootDir": "./",                       // Specify the root directory of input files
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     // "noEmit": true,
@@ -26,5 +26,6 @@
   },
   "include": [
     "src",
+    "**/*.ts"
   ]
 }
