@@ -23,6 +23,8 @@ export function ChatActivity(props: {
   useWithPrompts: UseWithPrompts;
   getDocData: (docId: string) => Promise<DocData>;
   useCurrentGoalActivity: UseWithCurrentGoalActivity;
+  previewingActivity: boolean;
+  setPreviewingActivity: (previewingActivity: boolean) => void;
 }): JSX.Element {
   const {
     activityFromParams,
@@ -31,6 +33,8 @@ export function ChatActivity(props: {
     useWithPrompts,
     getDocData,
     useCurrentGoalActivity,
+    previewingActivity,
+    setPreviewingActivity,
   } = props;
   const {
     docGoals,
@@ -44,9 +48,7 @@ export function ChatActivity(props: {
   const { prompts } = useWithPrompts;
   const [docGoalModalOpen, setDocGoalModalOpen] = useState(false);
   const allActivities = getAllActivites(docGoals || []);
-  const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
   const [checkedUrlParams, setCheckedUrlParams] = useState<boolean>(false);
-
   function editDocGoal() {
     setDocGoalModalOpen(true);
     setPreviewingActivity(false);

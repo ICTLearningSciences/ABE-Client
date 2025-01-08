@@ -171,6 +171,8 @@ export function EditGoogleDoc(props: {
             isNewDoc={isNewDoc}
             useWithPrompts={useWithPrompts}
             useCurrentGoalActivity={useCurrentGoalActivity}
+            previewingActivity={previewingActivity}
+            setPreviewingActivity={setPreviewingActivity}
           />
         )}
       </div>

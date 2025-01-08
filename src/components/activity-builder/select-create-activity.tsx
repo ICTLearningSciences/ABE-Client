@@ -52,6 +52,7 @@ export function ExistingActivityItem(props: {
       <h3>{activity.title}</h3>
       <RowDiv>
         <Button
+          data-cy={`preview-button-${activity._id}`}
           style={{ marginRight: 10 }}
           disabled={!isActivityRunnable(activity)}
           onClick={goToActivity}
