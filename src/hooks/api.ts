@@ -485,12 +485,12 @@ export async function loginGoogle(
   );
 }
 
-export async function fetchConfig(): Promise<Config> {
+export async function fetchConfig(subdomain?: string): Promise<Config> {
   return await execGql<Config>(
     {
       query: `
-        query FetchConfig{
-          fetchConfig {
+        query FetchConfig($subdomain: String){
+          fetchConfig(subdomain: $subdomain) {
             aiSystemPrompt
             displayedGoalActivities{
               goal
@@ -530,6 +530,9 @@ export async function fetchConfig(): Promise<Config> {
           }
         }
       `,
+      variables: {
+        subdomain: subdomain,
+      },
     },
     {
       dataPath: 'fetchConfig',

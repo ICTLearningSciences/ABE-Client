@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 
 export interface UseWithConfig {
   state: config.ConfigState;
-  loadConfig: () => void;
+  loadConfig: (subdomain?: string) => void;
   isConfigLoaded: () => boolean;
   updateConfig: (accessToken: string, key: string, value: string) => void;
   loadFailed: () => boolean;
@@ -27,13 +27,13 @@ export function useWithConfig(): UseWithConfig {
     return state.status === config.ConfigStatus.FAILED;
   }
 
-  function loadConfig() {
+  function loadConfig(subdomain?: string) {
     if (
       state.status === config.ConfigStatus.NONE ||
       state.status === config.ConfigStatus.FAILED ||
       state.status === config.ConfigStatus.SUCCEEDED
     ) {
-      dispatch(config.getConfig());
+      dispatch(config.getConfig(subdomain));
     }
   }
 

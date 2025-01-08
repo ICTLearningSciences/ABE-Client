@@ -17,8 +17,9 @@ export function LoginUI(props: {
   login: () => void;
   loginText: string;
   orgName: string;
+  titleText?: string;
 }) {
-  const { loginState, login, loginText, orgName } = props;
+  const { loginState, login, loginText, orgName, titleText } = props;
   const config = useAppSelector((state) => state.config);
   return (
     <ColumnCenterDiv
@@ -48,7 +49,8 @@ export function LoginUI(props: {
           alt={orgName}
         />
         <span data-cy="login-title" style={{ fontSize: '22px' }}>
-          {config.config?.loginScreenTitle ||
+          {titleText ||
+            config.config?.loginScreenTitle ||
             'AI for Brainstorming and Editing'}
         </span>
       </ColumnDiv>
