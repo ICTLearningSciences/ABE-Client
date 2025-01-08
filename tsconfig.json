@@ -15,7 +15,7 @@
     "noFallthroughCasesInSwitch": true,
       "declaration": true,                       // Generate .d.ts files
       "module": "esnext",
-      "outDir": "./dist",                       // Redirect output structure to the 'dist' folder
+      "outDir": "./build",                       // Redirect output structure to the 'dist' folder
       "rootDir": "./src",                       // Specify the root directory of input files
       "moduleResolution": "node",
     "resolveJsonModule": true,

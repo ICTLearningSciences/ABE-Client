@@ -1,8 +1,8 @@
 {
   "name": "abe-client",
-  "version": "1.0.61",
-  "main": "dist/exported-files.js",
-  "types": "dist/exported-files.d.ts",
+  "version": "1.0.64",
+  "main": "build/exported-files.js",
+  "types": "build/exported-files.d.ts",
   "private": false,
   "resolutions": {
     "styled-components": "^6.1.0"
@@ -66,8 +66,8 @@
     "test:format": "prettier --check \"src/**/*.{js,ts,tsx}\"",
     "license:fix": "license-check-and-add remove -f license-config.json && license-check-and-add add -f license-config.json",
     "test:license": "license-check-and-add check -f license-config.json",
-    "build-clean": "rimraf dist/",
-    "build-copy-files": "copyfiles -u 1 \"src/**.html\" \"src/**/*.html\" \"src/**.css\" \"src/**/*.css\" \"src/**.png\" \"src/**/*.png\" dist/",
+    "build-clean": "rimraf build/",
+    "build-copy-files": "copyfiles -u 1 \"src/**.html\" \"src/**/*.html\" \"src/**.css\" \"src/**/*.css\" \"src/**.png\" \"src/**/*.png\" build/",
     "build-tsc": "npm run build-clean && tsc && npm run build-copy-files",
     "build-webpack": "webpack --mode production",
     "prepublishOnly": "npm run build-webpack"
@@ -109,6 +109,6 @@
     "webpack-cli": "^5.1.4"
   },
   "files": [
-    "dist"
+    "build"
   ]
 }

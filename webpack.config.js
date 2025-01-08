@@ -5,7 +5,7 @@ module.exports = {
   entry: './src/exported-files.ts',
   output: {
     filename: 'exported-files.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'build'),
     libraryTarget: 'umd',
     clean: true
   },
