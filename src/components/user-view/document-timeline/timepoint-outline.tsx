@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import {
-  Box,
-  CircularProgress,
-  Divider,
-  IconButton,
-  Input,
-  Typography,
-} from '@mui/material';
+import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { motion } from 'framer-motion';
 
@@ -26,8 +19,26 @@ import {
   getIntentionText,
 } from '../../../helpers/functions';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
-import '../../../styles/content-revision.css';
-import '../../../styles/activity-transcript.css';
+import {
+  AIOutlineContainer,
+  ContentBg,
+  ContentContainer,
+  ContentRevisionContainer,
+  ContentRevisionTextColor2,
+  ContentRevisionTextColor3,
+  InputContainer,
+  InputWrapper,
+  RevisionTimeHeaderBox,
+  StyledDivider,
+  SummaryInput,
+  SummaryTitleContainer,
+  SupportingClaimsContainer,
+  Text2Styles,
+  Text2Typography,
+  Text3,
+  Text3Bold,
+  Text3List,
+} from '../../../styles/content-revision-styles';
 
 interface EvidenceObject {
   [key: string]: string[];
@@ -108,41 +119,56 @@ export const TimepointOutline = React.memo(
           transition={{ duration: 0.3, ease: 'easeInOut' }}
         >
           <Box data-cy={`${dataCy}-container`}>
-            <div className="claims-title" onClick={toggleExpand}>
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                cursor: 'pointer',
+              }}
+              onClick={toggleExpand}
+            >
               {fontType === 'bold' ? (
-                <Typography
-                  className="text-3-bold"
+                <Text3Bold
                   style={{ marginTop: 10, maxWidth: '90%' }}
                   data-cy={`${dataCy}-title`}
                 >
                   {!claimNumber ? title : `${claimNumber}. ${title}`}
-                </Typography>
+                </Text3Bold>
               ) : (
-                <Typography className="text-3" data-cy={`${dataCy}-title`}>
-                  {title}
-                </Typography>
+                <Text3 data-cy={`${dataCy}-title`}>{title}</Text3>
               )}
 
               {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </div>
 
-            <div
-              className={`collapsable-claims supporting-claims-container ${
-                expanded ? 'expanded' : 'collapsed'
-              }`}
+            <SupportingClaimsContainer
+              collapsed={!expanded}
+              className={expanded ? 'expanded' : 'collapsed'}
               data-cy={`${dataCy}-accordion`}
             >
               {outline.map((claim: string, i: number) => {
                 return (
-                  <Box key={i} className="list-container">
-                    <FiberManualRecordIcon className="bulletpoint-icon" />
-                    <Typography key={i} className="text-3-list">
-                      {claim}
-                    </Typography>
+                  <Box
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      marginLeft: '10px',
+                    }}
+                  >
+                    <FiberManualRecordIcon
+                      sx={{
+                        fontSize: '0.5rem !important',
+                        color: ContentRevisionTextColor3,
+                      }}
+                    />
+                    <Text3List key={i}>{claim}</Text3List>
                   </Box>
                 );
               })}
-            </div>
+            </SupportingClaimsContainer>
           </Box>
         </motion.div>
       );
@@ -164,14 +190,12 @@ export const TimepointOutline = React.memo(
       const formatTime = formatTimeDifferenceToReadable(revisionTime);
 
       return (
-        <Box className="revision-time-header" data-cy="revision-time-header">
-          <Typography className={`text-2`} data-cy="revision-title">
-            Revision:
-          </Typography>
-          <Typography className={`text-3`} data-cy="revision-date">
+        <RevisionTimeHeaderBox data-cy="revision-time-header">
+          <Text2Typography data-cy="revision-title">Revision:</Text2Typography>
+          <Text3 data-cy="revision-date">
             {formatISODateToReadable(revisionTime)} ({formatTime})
-          </Typography>
-        </Box>
+          </Text3>
+        </RevisionTimeHeaderBox>
       );
     }
 
@@ -195,15 +219,15 @@ export const TimepointOutline = React.memo(
       }, [timelinePoint]);
 
       return (
-        <Box className="input-container" data-cy="intention-container">
-          <span className="input-wrapper">
-            <div className="summary-title-container">
-              <Typography className="text-2" data-cy="intention-title">
+        <InputContainer data-cy="intention-container">
+          <InputWrapper>
+            <SummaryTitleContainer>
+              <Text2Typography data-cy="intention-title">
                 Intention
-              </Typography>
-            </div>
+              </Text2Typography>
+            </SummaryTitleContainer>
 
-            <Input
+            <SummaryInput
               value={editedInentionText}
               disableUnderline
               disabled={
@@ -240,13 +264,12 @@ export const TimepointOutline = React.memo(
               }
               multiline
               maxRows={4}
-              className="summary-input"
               placeholder="Enter your text here..."
               data-cy="intention-textarea"
               onChange={(e) => setEditedIntentionText(e.target.value)}
             />
-          </span>
-        </Box>
+          </InputWrapper>
+        </InputContainer>
       );
     }
 
@@ -264,15 +287,15 @@ export const TimepointOutline = React.memo(
       }, [assignmentDescription]);
 
       return (
-        <Box className="input-container" data-cy="assignment-container">
-          <span className="input-wrapper">
+        <InputContainer data-cy="assignment-container">
+          <InputWrapper>
             <div className="assignment-description-container">
-              <Typography className="text-2" data-cy="assignment-description">
+              <Text2Typography data-cy="assignment-description">
                 Assignment Description
-              </Typography>
+              </Text2Typography>
             </div>
 
-            <Input
+            <SummaryInput
               value={editedAssignmentDescription}
               disableUnderline
               disabled={
@@ -301,13 +324,12 @@ export const TimepointOutline = React.memo(
               }
               multiline
               maxRows={4}
-              className="summary-input"
               placeholder="Enter your assignment description here..."
               data-cy="assignment-textarea"
               onChange={(e) => setEditedAssignmentDescription(e.target.value)}
             />
-          </span>
-        </Box>
+          </InputWrapper>
+        </InputContainer>
       );
     }
 
@@ -334,43 +356,42 @@ and dynamically adjust the height of the input field. */
         timelinePoint.changeSummaryStatus === AiGenerationStatus.IN_PROGRESS
       ) {
         return (
-          <Box
-            className="ai-outline-container"
+          <AIOutlineContainer
             style={{
               display: 'flex',
               flexDirection: 'column',
             }}
           >
-            <Typography className="text-2" data-cy="ai-summary-in-progress">
+            <Text2Typography data-cy="ai-summary-in-progress">
               Generating AI Summary...
-            </Typography>
+            </Text2Typography>
             <CircularProgress
               style={{
                 alignSelf: 'center',
                 justifySelf: 'center',
               }}
             />
-          </Box>
+          </AIOutlineContainer>
         );
       }
 
       return (
-        <Box className="input-container" data-cy="summary-container">
+        <InputContainer data-cy="summary-container">
           {timelinePoint.type !== TimelinePointType.INTRO ? (
-            <span className="input-wrapper">
-              <Divider className="divider" />
+            <InputWrapper>
+              <StyledDivider />
 
-              <div className="summary-title-container">
-                <Typography className="text-2" data-cy="summary-title">
+              <SummaryTitleContainer>
+                <Text2Typography data-cy="summary-title">
                   Summary
-                </Typography>
+                </Text2Typography>
                 <ActivityTranscript
                   chatLog={timelinePoint.version.chatLog}
                   activityId={timelinePoint.version.activity}
                 />
-              </div>
+              </SummaryTitleContainer>
 
-              <Input
+              <SummaryInput
                 value={editedChangeSummary}
                 disableUnderline
                 multiline
@@ -398,14 +419,13 @@ and dynamically adjust the height of the input field. */
                   ) : undefined
                 }
                 maxRows={4}
-                className="summary-input"
                 placeholder="Enter your text here..."
                 onChange={(e) => setEditedChangeSummary(e.target.value)}
                 data-cy="summary-textarea"
               />
-            </span>
+            </InputWrapper>
           ) : undefined}
-        </Box>
+        </InputContainer>
       );
     }
 
@@ -417,38 +437,40 @@ and dynamically adjust the height of the input field. */
 
       if (reverseOutline === 'No outline available')
         return (
-          <Typography className="text-2" data-cy="no-ai-outline">
+          <Text2Typography data-cy="no-ai-outline">
             No AI outline available
-          </Typography>
+          </Text2Typography>
         );
 
       const outline = JSON.parse(reverseOutline);
 
       return (
-        <Box className="ai-outline-container" data-cy="ai-outline-container">
+        <AIOutlineContainer data-cy="ai-outline-container">
           {/* This code snippet is conditionally rendering a section for the Thesis Statement based on the
         value of the `thesis` state. If `thesis` is true, it will display a `div` element containing the
         following elements: */}
           {thesis ? (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography
-                  className="text-2"
-                  data-cy="ai-outline-statement-title"
-                >
+                <Text2Typography data-cy="ai-outline-statement-title">
                   Thesis
-                </Typography>
+                </Text2Typography>
 
-                <Typography className={`text-2-bubble ai-outline-bubble`}>
+                <Typography
+                  style={{
+                    ...Text2Styles,
+                    color: ContentBg,
+                    borderRadius: 5,
+                    padding: '0px 10px',
+                    backgroundColor: ContentRevisionTextColor2,
+                  }}
+                >
                   AI Outline
                 </Typography>
               </div>
-              <Typography
-                className="text-3"
-                data-cy="ai-outline-statement-content"
-              >
+              <Text3 data-cy="ai-outline-statement-content">
                 {outline['Thesis Statement']}
-              </Typography>
+              </Text3>
             </div>
           ) : null}
 
@@ -468,13 +490,12 @@ and dynamically adjust the height of the input field. */
        based on the value of the `claimEvidence` state. */}
           {claimEvidence ? (
             <div>
-              <Typography
-                className="text-2"
+              <Text2Typography
                 style={{ margin: '10px 5px 0px 0px' }}
                 data-cy="claim-evidence-title"
               >
                 Evidence Given for Each Claim
-              </Typography>
+              </Text2Typography>
               {outline['Evidence Given for Each Claim'].map(
                 (evidence: EvidenceObject, i: number) => {
                   const keys = Object.keys(evidence);
@@ -498,30 +519,22 @@ and dynamically adjust the height of the input field. */
               )}
             </div>
           ) : null}
-        </Box>
+        </AIOutlineContainer>
       );
     }
 
     return (
-      <Box
-        className={
-          hasOverflowX
-            ? 'content-revision-container-scroll'
-            : 'content-revision-container'
-        }
+      <ContentRevisionContainer
+        hasOverflowX={hasOverflowX}
         data-cy="content-revision-container"
       >
         <RevisionTimeHeader revisionTime={timelinePoint.versionTime} />
-        <Box
-          className={
-            hasOverflowX
-              ? 'right-content-container-scroll'
-              : 'right-content-container'
-          }
+        <ContentContainer
+          hasOverflowX={hasOverflowX}
           data-cy="right-content-container"
         >
           <div style={{ marginRight: 10 }}>
-            <Divider className="divider" />
+            <StyledDivider />
             <AssignmentDescriptionDisplay
               assignmentDescription={googleDoc?.assignmentDescription || ''}
               saveTimelineDescription={async (description: string) => {
@@ -535,7 +548,7 @@ and dynamically adjust the height of the input field. */
               }}
             />
           </div>
-          <Divider className="divider" />
+          <StyledDivider />
           <div style={{ marginRight: 10 }}>
             <IntentionDisplay
               timelinePoint={timelinePoint}
@@ -548,7 +561,7 @@ and dynamically adjust the height of the input field. */
               saveTimelinePoint={props.saveTimelinePoint}
             />
           </div>
-          <Divider className="divider" />
+          <StyledDivider />
           {/* The above code is conditionally rendering an AIOutlineDisplay component based on the
         presence of values in the variables thesis, supportingClaims, and claimEvidence. If all
         three variables have values, the AIOutlineDisplay component is rendered with a specific
@@ -571,32 +584,31 @@ and dynamically adjust the height of the input field. */
               </div>
             ) : timelinePoint.reverseOutlineStatus ===
               AiGenerationStatus.COMPLETED ? (
-              <Typography className="text-2" data-cy="no-ai-outline">
+              <Text2Typography data-cy="no-ai-outline">
                 No AI outline available
-              </Typography>
+              </Text2Typography>
             ) : (
-              <Box
-                className="ai-outline-container"
+              <AIOutlineContainer
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   marginRight: 10,
                 }}
               >
-                <Typography className="text-2" data-cy="ai-outline-in-progress">
+                <Text2Typography data-cy="ai-outline-in-progress">
                   Generating AI Outline...
-                </Typography>
+                </Text2Typography>
                 <CircularProgress
                   style={{
                     alignSelf: 'center',
                     justifySelf: 'center',
                   }}
                 />
-              </Box>
+              </AIOutlineContainer>
             )
           }
-        </Box>
-      </Box>
+        </ContentContainer>
+      </ContentRevisionContainer>
     );
   },
   (prevProps, nextProps) => {

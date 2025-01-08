@@ -16,7 +16,6 @@ import {
 } from '@mui/material';
 import { ActivityTypes, DocGoal, GoogleDoc, Intention } from '../../../types';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
-import './doc-goal-modal.css';
 import { useState } from 'react';
 import ChangeIcon from '@mui/icons-material/Construction';
 import { ActivitiesDisplay } from './activities-display';
@@ -26,9 +25,8 @@ import { hasHoursPassed } from '../../../helpers';
 import { InputDocumentIntention } from './input-document-intention';
 import { InputDocumentAssignment } from './input-document-assignment';
 import { InputDayIntention } from './input-day-inention';
-import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
-import { useSearchParams } from 'react-router-dom';
-import { FREE_INPUT_GOAL_ID, URL_PARAM_NEW_DOC } from '../../../constants';
+import { useWithGoogleDocs } from '../../../hooks/use-with-google-docs';
+import { FREE_INPUT_GOAL_ID } from '../../../constants';
 
 const style: SxProps<Theme> = {
   position: 'absolute',
@@ -48,7 +46,7 @@ const style: SxProps<Theme> = {
   border: '5px solid black',
 };
 
-export default function DocGoalModal(props: {
+export function DocGoalModal(props: {
   open: boolean;
   close: () => void;
   setSelectedGoal: (goal?: DocGoal) => void;
@@ -56,14 +54,15 @@ export default function DocGoalModal(props: {
   selectedActivity?: ActivityTypes;
   selectedGoal?: DocGoal;
   docGoals?: DocGoal[];
+  isNewDoc: boolean;
 }): JSX.Element {
-  const [urlSearchParams] = useSearchParams();
   const {
     open,
     close,
     docGoals,
     setSelectedGoal: beginGoal,
     setSelectedActivity: beginActivity,
+    isNewDoc,
   } = props;
 
   const enum SelectingStage {
@@ -77,7 +76,6 @@ export default function DocGoalModal(props: {
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
   const googleDocs = useAppSelector((state) => state.state.userGoogleDocs);
   const googleDoc = googleDocs.find((doc) => doc.googleDocId === googleDocId);
-  const isNewGoogleDoc = urlSearchParams.get(URL_PARAM_NEW_DOC) === 'true';
   const [curStageIndex, setCurStageIndex] = useState(0);
   const [stages, setStages] = useState<SelectingStage[]>([]);
   const currentStage = stages[curStageIndex];
@@ -91,7 +89,7 @@ export default function DocGoalModal(props: {
     googleDoc?.assignmentDescription || ''
   );
   const [dayIntention, setDayIntention] = useState<string>('');
-  const { updateGoogleDoc } = UseWithGoogleDocs();
+  const { updateGoogleDoc } = useWithGoogleDocs();
 
   useEffect(() => {
     if (googleDoc?.googleDocId) {
@@ -252,7 +250,7 @@ export default function DocGoalModal(props: {
             }
           }}
           selectedGoal={_selectedGoal}
-          isNewGoogleDoc={isNewGoogleDoc}
+          isNewGoogleDoc={isNewDoc}
         />
       );
     } else {
@@ -345,8 +343,8 @@ export default function DocGoalModal(props: {
                 data-cy="selected-goal-display"
                 style={{
                   position: 'absolute',
-                  top: 30,
-                  left: 30,
+                  top: 20,
+                  left: 20,
                 }}
               >
                 {_selectedGoal && (
@@ -360,7 +358,12 @@ export default function DocGoalModal(props: {
                     >
                       {_selectedGoal.title}
                     </span>
-                    <IconButton onClick={goBackToGoalStage}>
+                    <IconButton
+                      style={{
+                        zIndex: 2,
+                      }}
+                      onClick={goBackToGoalStage}
+                    >
                       <ChangeIcon />
                     </IconButton>
                   </>
@@ -457,7 +460,30 @@ export default function DocGoalModal(props: {
               </ColumnDiv>
             </>
           ) : (
-            <CircularProgress />
+            <>
+              <CircularProgress />
+              <dialog
+                open
+                style={{
+                  position: 'fixed',
+                  top: '0',
+                  left: '0',
+                  right: '0',
+                  bottom: '0',
+                  width: '500px',
+                  height: '500px',
+                  backgroundColor: 'white',
+                  zIndex: 1000,
+                  padding: '20px',
+                  overflow: 'scroll',
+                }}
+              >
+                {googleDocId}
+                {JSON.stringify(googleDocs || '{}')}
+                {JSON.stringify(googleDoc || '{}')}
+                {firstLoadComplete}
+              </dialog>
+            </>
           )}
         </Box>
       </Modal>

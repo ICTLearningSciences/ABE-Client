@@ -2,20 +2,21 @@ import React, { RefObject, useEffect, useRef, useState } from 'react';
 import { useWithDocumentTimeline } from '../../../hooks/use-with-document-timeline';
 import { useAppSelector } from '../../../store/hooks';
 import { Button, CircularProgress } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import TimepointDocumentText from './timepoint-document-text';
 import { TimepointOutline } from './timepoint-outline';
 import TimelineFooter from './timeline-footer';
-import withAuthorizationOnly from '../../../hooks/wrap-with-authorization-only';
-import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
+import { useWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 
-function DocumentTimelinePage(): JSX.Element {
+export function DocumentTimelinePage(props: {
+  returnToDocs: () => void;
+  docIdFromParams: string;
+}): JSX.Element {
+  const { returnToDocs, docIdFromParams: docId } = props;
   const footerTimelineRef = useRef<HTMLElement | null>(null);
   const userId = useAppSelector((state) => state.login.user?._id);
-  const { docId } = useParams<Record<string, string>>();
   const [hasOverflowX, setHasOverflowX] = useState<boolean>(false);
-  const { googleDocs, updateGoogleDoc } = UseWithGoogleDocs();
+  const { googleDocs, updateGoogleDoc } = useWithGoogleDocs();
   const currentGoogleDoc = googleDocs.find((doc) => doc.googleDocId === docId);
   const {
     fetchDocumentTimeline,
@@ -26,7 +27,6 @@ function DocumentTimelinePage(): JSX.Element {
     selectTimelinePoint,
     saveTimelinePoint,
   } = useWithDocumentTimeline();
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (userId && docId && !loadInProgress && !documentTimeline) {
@@ -47,7 +47,7 @@ function DocumentTimelinePage(): JSX.Element {
         }}
       >
         <div>Error occured: {errorMessage.message}</div>
-        <Button onClick={() => navigate('/docs')}>Return</Button>
+        <Button onClick={returnToDocs}>Return</Button>
       </div>
     );
   }
@@ -65,7 +65,7 @@ function DocumentTimelinePage(): JSX.Element {
         }}
       >
         <div>No History found.</div>
-        <Button onClick={() => navigate('/docs')}>Return</Button>
+        <Button onClick={returnToDocs}>Return</Button>
       </div>
     );
   }
@@ -156,5 +156,3 @@ function DocumentTimelinePage(): JSX.Element {
     </div>
   );
 }
-
-export default withAuthorizationOnly(DocumentTimelinePage);

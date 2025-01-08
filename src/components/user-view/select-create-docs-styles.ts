@@ -4,13 +4,22 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-.prompt-item{
-    text-align: left;
-    border: 1px solid lightgrey;
-    margin: 10px;
-    width: 90%;
-}
+import styled from 'styled-components';
+import { TableRow } from '@mui/material';
 
-.prompt-item:hover{
-    background-color: lightgrey;
-}
+export const StyledGoogleDocItemRow = styled(TableRow)`
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
+export const GoogleDocItemName = styled.span`
+  font-weight: bold;
+  word-break: break-word;
+
+  &:hover {
+    cursor: pointer;
+    color: #1a73e8;
+    text-decoration: underline;
+  }
+`;

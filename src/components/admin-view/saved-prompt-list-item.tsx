@@ -9,6 +9,7 @@ import { Button, CardHeader, IconButton } from '@mui/material';
 import { RowDiv } from '../../styled-components';
 import { Delete } from '@mui/icons-material';
 import { ActivityGQL, GQLPrompt } from '../../types';
+import { PromptItem } from './prompt-editing/saved-activity-prompts-view-styles';
 
 export default function SavePromptListItem(props: {
   prompt: GQLPrompt;
@@ -22,10 +23,7 @@ export default function SavePromptListItem(props: {
     props;
   return (
     <RowDiv style={{ width: '100%' }}>
-      <div
-        className="prompt-item"
-        data-cy={`prompt-item-${prompt.title.replaceAll(' ', '-')}`}
-      >
+      <PromptItem data-cy={`prompt-item-${prompt.title.replaceAll(' ', '-')}`}>
         <CardHeader
           onClick={() => {
             startEditPrompt(prompt);
@@ -33,7 +31,7 @@ export default function SavePromptListItem(props: {
           title={prompt.title}
           style={{ cursor: 'pointer' }}
         />
-      </div>
+      </PromptItem>
       <Button
         data-cy={`preview-button-${prompt.title.replaceAll(' ', '-')}`}
         disabled={!getActivity(prompt)}

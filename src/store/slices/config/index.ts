@@ -25,9 +25,12 @@ const initialState: ConfigState = {
   status: ConfigStatus.NONE,
 };
 
-export const getConfig = createAsyncThunk('config/config', async () => {
-  return await api.fetchConfig();
-});
+export const getConfig = createAsyncThunk(
+  'config/config',
+  async (subdomain?: string) => {
+    return await api.fetchConfig(subdomain);
+  }
+);
 
 export interface UpdateConfigParams {
   key: string;

@@ -9,14 +9,14 @@ import { useWithConfig } from '../../store/slices/config/use-with-config';
 import { Button, CircularProgress } from '@mui/material';
 import { FullScreenCenterDiv } from '../../styled-components';
 
-export function useConfigLoader() {
+export function useConfigLoader(subdomain?: string) {
   const { isConfigLoaded, loadConfig, loadFailed } = useWithConfig();
   const [initialConfigLoadComplete, setInitialConfigLoadComplete] =
     useState(false);
   const configLoading = !isConfigLoaded();
   const configLoadFailed = loadFailed();
   useEffect(() => {
-    loadConfig();
+    loadConfig(subdomain);
   }, []);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export function useConfigLoader() {
           <Button
             data-cy="config-load-retry-button"
             onClick={() => {
-              loadConfig();
+              loadConfig(subdomain);
             }}
           >
             Retry

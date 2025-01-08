@@ -68,8 +68,14 @@ export interface DocData {
   modifiedTime: string;
 }
 
+export enum DocService {
+  GOOGLE_DOCS = 'GOOGLE_DOCS',
+  MICROSOFT_WORD = 'MICROSOFT_WORD',
+}
+
 export interface GoogleDoc {
   googleDocId: string;
+  wordDocId?: string;
   title: string;
   user: string;
   documentIntention?: Intention;
@@ -77,6 +83,7 @@ export interface GoogleDoc {
   assignmentDescription?: string;
   createdAt: string;
   admin: boolean;
+  service: DocService;
 }
 
 export interface Intention {
@@ -108,6 +115,7 @@ export enum UserActions {
 
 export interface StoreGoogleDoc {
   googleDocId: string;
+  wordDocId?: string;
   user: string;
   admin?: boolean;
   currentDayIntention?: Intention;

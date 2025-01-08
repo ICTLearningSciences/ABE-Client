@@ -1,8 +1,7 @@
 import React, { RefObject, useEffect, useState } from 'react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { useParams } from 'react-router-dom';
 
-import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import AssistantPhotoIcon from '@mui/icons-material/AssistantPhoto';
@@ -11,20 +10,30 @@ import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import { motion } from 'framer-motion';
 
 import { GQLTimelinePoint } from '../../../types';
-import { ColumnDiv } from '../../../styled-components';
 import {
   formatISODateToReadable,
   convertDateTimelinePointTime,
   isTimelinePointFullyLoaded,
 } from '../../../helpers';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import { UseWithGoogleDocs } from '../../../hooks/use-with-google-docs';
-import '../../../styles/timeline.css';
+import { useWithGoogleDocs } from '../../../hooks/use-with-google-docs';
 import {
   ColorlibConnector,
   QontoStepIcon,
   StepperSx,
 } from './ColorlibConnector';
+import {
+  Text2Typography,
+  Text3,
+  Text3NoIndent,
+} from '../../../styles/content-revision-styles';
+import {
+  GlobalStyles,
+  TimelineBar,
+  TimelineFooterItemCard,
+  TimelineItemTest,
+  TimelineTestContainer,
+} from '../../../styles/timeline-styles';
 
 /* The `TimeLineCard` component is a functional component that takes in a prop `timelinePoint` of type
 `GQLTimelinePoint`. Inside the component, it retrieves the `getActivitById` function from the
@@ -33,7 +42,7 @@ timeline point's version. */
 const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
   const { timelinePoint } = props;
   const { getActivitById } = useWithDocGoalsActivities();
-  const { getCurrentGoogleDoc } = UseWithGoogleDocs();
+  const { getCurrentGoogleDoc } = useWithGoogleDocs();
   const { docId } = useParams<Record<string, string>>();
 
   const activity = getActivitById(timelinePoint.version.activity || '');
@@ -42,11 +51,11 @@ const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
 
   return (
     <Box>
-      <Typography className="text-2">{title}</Typography>
+      <Text2Typography>{title}</Text2Typography>
 
-      <Typography className="text-3-no-indent" style={{ textAlign: 'right' }}>
+      <Text3NoIndent style={{ textAlign: 'right' }}>
         {convertDateTimelinePointTime(timelinePoint.versionTime) || ''}
-      </Typography>
+      </Text3NoIndent>
     </Box>
   );
 };
@@ -98,19 +107,18 @@ export default function TimelineFooter(props: {
   const currentVersionIndex = timelinePoints.length - 1;
 
   return (
-    <Box
-      className="timeline-test-container"
+    <TimelineTestContainer
       data-cy="timeline-footer-wrapper"
       ref={footerTimelineRef}
       style={{
         width: footerTimelineRef.current?.scrollWidth || window.innerWidth,
       }}
     >
-      <Stepper
+      <GlobalStyles />
+      <TimelineBar
         alternativeLabel
         connector={<ColorlibConnector />}
         sx={StepperSx}
-        className="timeline-bar"
         style={{
           width:
             footerTimelineRef.current?.scrollWidth ||
@@ -130,33 +138,35 @@ export default function TimelineFooter(props: {
               data-cy={`timeline-footer-item-${i}`}
               // style={i === 0 || i === currentVersionIndex ? { bottom: 25 } : {}}
             >
-              <ColumnDiv key={i} className="timeline-item-test">
+              <TimelineItemTest key={i}>
                 <motion.div
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5 }}
                   key={i}
                 >
-                  <Paper
+                  <TimelineFooterItemCard
                     onClick={() => props.onSelectTimepoint(timelinePoint)}
                     elevation={1}
                     style={{
                       padding: '1rem',
                       opacity: isFullyLoaded ? 1 : 0.5,
                     }}
-                    className={
-                      hoverIndex !== i
-                        ? 'timeline-footer-item-card'
-                        : 'timeline-footer-item-card-hover'
-                    }
+                    hovered={hoverIndex === i}
                     data-cy={`timeline-footer-item-card-${i}`}
                     onMouseEnter={() => handleMouseEnter(i)}
                     onMouseLeave={handleMouseLeave}
                   >
                     {hoverIndex !== i ? (
-                      <div className="timeline-footer-item-card-inner">
-                        <Typography
-                          className="text-2"
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Text2Typography
                           style={{
                             textAlign: 'center',
                             display: 'flex',
@@ -173,24 +183,24 @@ export default function TimelineFooter(props: {
                               style={{ marginLeft: 5, fontSize: 18 }}
                             />
                           ) : null}
-                        </Typography>
-                        <Typography className="text-3">
+                        </Text2Typography>
+                        <Text3>
                           {convertDateTimelinePointTime(
                             timelinePoint.versionTime
                           )}
-                        </Typography>
+                        </Text3>
                       </div>
                     ) : (
                       <TimeLineCard timelinePoint={timelinePoints[i]} />
                     )}
-                  </Paper>
+                  </TimelineFooterItemCard>
                 </motion.div>
-              </ColumnDiv>
+              </TimelineItemTest>
               <StepLabel StepIconComponent={QontoStepIcon} />
             </Step>
           );
         })}
-      </Stepper>
-    </Box>
+      </TimelineBar>
+    </TimelineTestContainer>
   );
 }

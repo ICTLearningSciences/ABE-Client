@@ -9,13 +9,10 @@ import { makeStyles } from 'tss-react/mui';
 import { GoogleDoc } from '../../types';
 import { RowDiv, RowDivSB } from '../../styled-components';
 import React, { useEffect } from 'react';
-import './create-google-doc-modal.css';
-import { useAppSelector } from '../../store/hooks';
-import { UserRole } from '../../store/slices/login';
 import CreateNewAdminGoogleDoc from '../admin-view/author-new-google-doc-modal';
 import LockIcon from '@mui/icons-material/Lock';
 import { PreviewGoogleDocModal } from './preview-google-doc-modal';
-import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 const useStyles = makeStyles({ name: { ExampleGoogleDocModal } })(
   (theme: Theme) => ({
     inputField: {
@@ -33,20 +30,33 @@ const useStyles = makeStyles({ name: { ExampleGoogleDocModal } })(
   })
 );
 
+export const StyledExampleGoogleDocItem = styled(RowDivSB)`
+  &:hover {
+    background-color: rgb(245, 245, 245);
+  }
+`;
+
 export default function ExampleGoogleDocModal(props: {
   adminDocs?: GoogleDoc[];
   onCreateDoc: (docId?: string, title?: string, isAdminDoc?: boolean) => void;
   open: boolean;
   close: () => void;
+  goToDoc: (docId: string) => void;
+  viewingAsAdmin: boolean;
+  previewUrlBuilder: (docId: string) => string;
 }): JSX.Element {
   const [selectedGoogleDoc, setSelectedGoogleDoc] = React.useState<string>('');
-  const viewingRole = useAppSelector((state) => state.state.viewingRole);
-  const viewingAsAdmin = viewingRole === UserRole.ADMIN;
-  const { open, close, adminDocs, onCreateDoc } = props;
+  const {
+    open,
+    close,
+    adminDocs,
+    onCreateDoc,
+    viewingAsAdmin,
+    previewUrlBuilder,
+  } = props;
   const [openNewDocModal, setOpenNewDocModal] = React.useState(false);
   const [previewDocId, setPreviewDocId] = React.useState<string>('');
   const { classes } = useStyles();
-  const navigate = useNavigate();
   const style = {
     position: 'absolute',
     top: '50%',
@@ -105,9 +115,8 @@ export default function ExampleGoogleDocModal(props: {
                 }}
               >
                 {adminDocs?.map((doc, i) => (
-                  <RowDivSB
+                  <StyledExampleGoogleDocItem
                     key={i}
-                    className="example-google-doc-item"
                     style={{
                       borderBottom: '1px solid black',
                       backgroundColor:
@@ -121,7 +130,7 @@ export default function ExampleGoogleDocModal(props: {
                     }}
                   >
                     <h4>{doc.title}</h4>
-                  </RowDivSB>
+                  </StyledExampleGoogleDocItem>
                 ))}
               </div>
             </div>
@@ -198,7 +207,8 @@ export default function ExampleGoogleDocModal(props: {
                 </Button>
                 <Button
                   onClick={() => {
-                    navigate(`/docs/${selectedGoogleDoc}`);
+                    // navigate(`/docs/${selectedGoogleDoc}`);
+                    props.goToDoc(selectedGoogleDoc);
                   }}
                   style={{
                     marginRight: '20px',
@@ -224,7 +234,7 @@ export default function ExampleGoogleDocModal(props: {
         }}
       />
       <PreviewGoogleDocModal
-        googleDocId={previewDocId}
+        docUrl={previewDocId ? previewUrlBuilder(previewDocId) : ''}
         close={() => {
           setPreviewDocId('');
         }}

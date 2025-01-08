@@ -6,58 +6,57 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { Button, CircularProgress } from '@mui/material';
-import Chat from './chat/chat';
 import { useWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-activity';
-import DocGoalModal from './doc-introduction/doc-goal-modal';
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
 import ActivityGqlButtonology from '../admin-view/buttonology';
 import { useWithState } from '../../store/slices/state/use-with-state';
 import { ActivityGQL, ActivityTypes, DocGoal } from '../../types';
-import { useWithPrompts as _useWithPrompts } from '../../hooks/use-with-prompts';
 import { DisplayIcons } from '../../helpers/display-icon-helper';
 import { v4 as uuidv4 } from 'uuid';
 import { removeDuplicatesByField } from '../../helpers';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
 import { ActivityBuilder } from '../activity-builder/types';
+import { UseWithPrompts } from '../../hooks/use-with-prompts';
+import { ChatActivity } from './chat-activity';
+import { getDocData } from '../../hooks/api';
 import { SingleNotificationDialog } from '../dialog';
 
-export default function EditGoogleDoc(props: {
-  googleDocId: string;
+export function EditGoogleDoc(props: {
+  docId: string;
+  docUrl: string;
+  activityFromParams: string;
+  goalFromParams: string;
+  returnToDocs: () => void;
+  isNewDoc: boolean;
+  useWithPrompts: UseWithPrompts;
 }): JSX.Element {
-  const { googleDocId } = props;
+  const {
+    docId,
+    docUrl,
+    activityFromParams,
+    goalFromParams,
+    returnToDocs,
+    isNewDoc,
+    useWithPrompts,
+  } = props;
+  const useCurrentGoalActivity = useWithCurrentGoalActivity();
   const {
     docGoals,
-    setGoal,
-    setActivity,
-    setGoalAndActivity,
     goalActivityState,
+    setGoalAndActivity,
     isLoading: goalsLoading,
-  } = useWithCurrentGoalActivity();
-  const useWithPrompts = _useWithPrompts();
+  } = useCurrentGoalActivity;
+
   const { prompts } = useWithPrompts;
-  const navigate = useNavigate();
   const { width: windowWidth } = useWithWindowSize();
   const { updateViewingUserRole, state } = useWithState();
-  const [docGoalModalOpen, setDocGoalModalOpen] = useState(false);
-  const googleDocUrl = `https://docs.google.com/document/d/${googleDocId}/edit`;
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const viewingAdmin =
     viewingRole === UserRole.ADMIN || viewingRole === UserRole.CONTENT_MANAGER;
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const activityFromParams = queryParams.get('activityId');
-  const goalFromParams = queryParams.get('goalId');
   const allActivities = getAllActivites(docGoals || []);
   const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
-  const [checkedUrlParams, setCheckedUrlParams] = useState<boolean>(false);
-
-  function editDocGoal() {
-    setDocGoalModalOpen(true);
-    setPreviewingActivity(false);
-  }
 
   function goToActivityPreview(activity: ActivityTypes) {
     setPreviewingActivity(true);
@@ -107,27 +106,6 @@ export default function EditGoogleDoc(props: {
     return docGoals.flatMap((goal) => goal.builtActivities || []);
   }
 
-  useEffect(() => {
-    if (goalsLoading || !docGoals || checkedUrlParams) {
-      return;
-    }
-
-    if (!goalFromParams && !activityFromParams) {
-      setDocGoalModalOpen(true);
-      setCheckedUrlParams(true);
-      return;
-    }
-    const goal = docGoals.find((goal) => goal._id === goalFromParams);
-    const activity = allActivities?.find(
-      (activity) => activity?._id === activityFromParams
-    );
-    setGoalAndActivity(goal, activity);
-    const goalHasActivities = goal?.activities?.length;
-    if (!activity && goalHasActivities) {
-      setDocGoalModalOpen(true);
-    }
-  }, [goalFromParams, goalsLoading, activityFromParams, checkedUrlParams]);
-
   if (goalsLoading) {
     return (
       <>
@@ -158,15 +136,10 @@ export default function EditGoogleDoc(props: {
         <iframe
           width={'98%'}
           height={'98%'}
-          src={googleDocUrl}
+          src={docUrl}
           data-cy="google-doc-iframe"
         />
-        <Button
-          variant="text"
-          onClick={() => {
-            navigate('/docs');
-          }}
-        >
+        <Button variant="text" onClick={returnToDocs}>
           Return
         </Button>
       </div>
@@ -179,7 +152,7 @@ export default function EditGoogleDoc(props: {
       >
         {viewingAdmin ? (
           <ActivityGqlButtonology
-            googleDocId={googleDocId}
+            googleDocId={docId}
             activities={allActivities}
             builtActivities={getAllBuiltActivities(docGoals || [])}
             goToActivity={goToActivityPreview}
@@ -191,30 +164,16 @@ export default function EditGoogleDoc(props: {
             }
           />
         ) : (
-          <>
-            <Chat
-              selectedActivity={goalActivityState?.selectedActivity}
-              selectedGoal={goalActivityState?.selectedGoal}
-              editDocGoal={editDocGoal}
-              setSelectedActivity={setActivity}
-              useWithPrompts={useWithPrompts}
-            />
-            <DocGoalModal
-              docGoals={docGoals}
-              setSelectedGoal={setGoal}
-              setSelectedActivity={setActivity}
-              selectedActivity={goalActivityState?.selectedActivity}
-              selectedGoal={goalActivityState?.selectedGoal}
-              open={
-                docGoalModalOpen &&
-                Boolean(docGoals?.length) &&
-                !previewingActivity
-              }
-              close={() => {
-                setDocGoalModalOpen(false);
-              }}
-            />
-          </>
+          <ChatActivity
+            getDocData={getDocData}
+            activityFromParams={activityFromParams}
+            goalFromParams={goalFromParams}
+            isNewDoc={isNewDoc}
+            useWithPrompts={useWithPrompts}
+            useCurrentGoalActivity={useCurrentGoalActivity}
+            previewingActivity={previewingActivity}
+            setPreviewingActivity={setPreviewingActivity}
+          />
         )}
       </div>
       <SingleNotificationDialog

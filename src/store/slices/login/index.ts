@@ -10,12 +10,13 @@ import {
   refreshAccessToken as _refreshAccessToken,
 } from '../../../hooks/api';
 import { extractErrorMessageFromError } from '../../../helpers';
-import { User } from '../../../types';
+import { User, UserAccessToken } from '../../../types';
 import {
   ACCESS_TOKEN_KEY,
   localStorageClear,
   localStorageStore,
 } from '../../local-storage';
+import { loginMicrosoft } from '../../../hooks/microsoft-api';
 
 export enum LoginStatus {
   NONE = 0,
@@ -64,19 +65,28 @@ export const logout = createAsyncThunk('login/logout', async () => {
   return Promise.resolve();
 });
 
-export const googleLogin = createAsyncThunk(
-  'login/googleLogin',
+export enum LoginService {
+  GOOGLE = 'GOOGLE',
+  MICROSOFT = 'MICROSOFT',
+}
+
+export const login = createAsyncThunk(
+  'login/login',
   async (
     args: {
       accessToken: string;
+      service: LoginService;
     },
     thunkAPI
   ) => {
     try {
-      const googleLogin = await loginGoogle(args.accessToken);
+      const login =
+        args.service === LoginService.GOOGLE
+          ? await loginGoogle(args.accessToken)
+          : await loginMicrosoft(args.accessToken);
       // Note: This was previously done to convert from 15 min access token to 90 day access token, wrong way to go
       // return await login(googleLogin.accessToken);
-      return googleLogin;
+      return login;
     } catch (err: unknown) {
       if (
         err instanceof Error &&
@@ -99,6 +109,13 @@ export const loginSlice = createSlice({
     setIsDisabled: (state: LoginState, action: PayloadAction<boolean>) => {
       state.isDisabled = action.payload;
     },
+    setUser: (state: LoginState, action: PayloadAction<UserAccessToken>) => {
+      state.user = action.payload.user;
+      state.accessToken = action.payload.accessToken;
+      localStorageStore(ACCESS_TOKEN_KEY, action.payload.accessToken);
+      state.userRole = action.payload.user.userRole;
+      state.loginStatus = LoginStatus.AUTHENTICATED;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -108,17 +125,17 @@ export const loginSlice = createSlice({
         state.accessToken = undefined;
         state.loginStatus = LoginStatus.NOT_LOGGED_IN;
       })
-      .addCase(googleLogin.pending, (state) => {
+      .addCase(login.pending, (state) => {
         state.loginStatus = LoginStatus.IN_PROGRESS;
       })
-      .addCase(googleLogin.fulfilled, (state, action) => {
+      .addCase(login.fulfilled, (state, action) => {
         localStorageStore(ACCESS_TOKEN_KEY, action.payload.accessToken);
         state.userRole = action.payload.user.userRole;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
         state.loginStatus = LoginStatus.AUTHENTICATED;
       })
-      .addCase(googleLogin.rejected, (state) => {
+      .addCase(login.rejected, (state) => {
         state.loginStatus = LoginStatus.FAILED;
         localStorageClear(ACCESS_TOKEN_KEY);
       })
@@ -140,6 +157,6 @@ export const loginSlice = createSlice({
   },
 });
 
-export const { setIsDisabled } = loginSlice.actions;
+export const { setIsDisabled, setUser } = loginSlice.actions;
 
 export default loginSlice.reducer;
