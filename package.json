@@ -54,7 +54,7 @@
   },
   "scripts": {
     "start": "PORT=8000 react-scripts start",
-    "build-react-scripts": "react-scripts build",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "test:unit": "npx jest --config=./src/unit-tests/jest.config.js",
     "eject": "react-scripts eject",
@@ -69,8 +69,8 @@
     "build-clean": "rimraf dist/",
     "build-copy-files": "copyfiles -u 1 \"src/**.html\" \"src/**/*.html\" \"src/**.css\" \"src/**/*.css\" \"src/**.png\" \"src/**/*.png\" dist/",
     "build-tsc": "npm run build-clean && tsc && npm run build-copy-files",
-    "build": "webpack --mode production",
-    "prepublishOnly": "npm run build"
+    "build-webpack": "webpack --mode production",
+    "prepublishOnly": "npm run build-webpack"
   },
   "eslintConfig": {
     "extends": [
