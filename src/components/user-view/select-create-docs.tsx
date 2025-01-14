@@ -106,15 +106,17 @@ export default function SelectCreateDocs(props: {
             >
               + New
             </Button>
-            <Button
-              onClick={() => {
-                setCreateDocOpen(true);
-              }}
-              size="large"
-              variant="text"
-            >
-              Examples
-            </Button>
+            {copyGoogleDocs && copyGoogleDocs.length > 0 && (
+              <Button
+                onClick={() => {
+                  setCreateDocOpen(true);
+                }}
+                size="large"
+                variant="text"
+              >
+                Examples
+              </Button>
+            )}
           </RowDiv>
           <h2>Your Docs</h2>
         </RowDiv>
