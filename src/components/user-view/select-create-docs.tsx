@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { Button, CircularProgress, IconButton } from '@mui/material';
 import { GoogleDoc, NewDocData } from '../../types';
-import ExampleGoogleDocModal from './example-google-docs-modal';
 import { RowDiv } from '../../styled-components';
 import {
   Table,
@@ -41,9 +40,8 @@ export default function SelectCreateDocs(props: {
   handleDeleteGoogleDoc: (docId: string) => Promise<void>;
   onHistoryClicked: (docId: string) => void;
   goToDoc: (docId: string, newDoc?: boolean) => void;
-  previewUrlBuilder: (docId: string) => string;
-  viewingAsAdmin: boolean;
   sx?: React.CSSProperties;
+  setExampleDocsOpen: (open: boolean) => void;
 }): JSX.Element {
   const {
     googleDocs,
@@ -53,11 +51,9 @@ export default function SelectCreateDocs(props: {
     handleDeleteGoogleDoc,
     onHistoryClicked,
     goToDoc,
-    viewingAsAdmin,
-    previewUrlBuilder,
     sx,
+    setExampleDocsOpen,
   } = props;
-  const [createDocOpen, setCreateDocOpen] = React.useState(false);
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
   const [docToDelete, setDocToDelete] = React.useState<GoogleDoc>();
 
@@ -109,7 +105,7 @@ export default function SelectCreateDocs(props: {
             {copyGoogleDocs && copyGoogleDocs.length > 0 && (
               <Button
                 onClick={() => {
-                  setCreateDocOpen(true);
+                  setExampleDocsOpen(true);
                 }}
                 size="large"
                 variant="text"
@@ -243,25 +239,6 @@ export default function SelectCreateDocs(props: {
       }}
     >
       {googleDocsDisplay()}
-      <ExampleGoogleDocModal
-        viewingAsAdmin={viewingAsAdmin}
-        open={createDocOpen}
-        close={() => {
-          setCreateDocOpen(false);
-        }}
-        adminDocs={copyGoogleDocs}
-        onCreateDoc={(
-          docIdtoCopy?: string,
-          title?: string,
-          isAdminDoc?: boolean
-        ) => {
-          handleCreateGoogleDoc(docIdtoCopy, title, isAdminDoc, (data) => {
-            goToDoc(data.docId, true);
-          });
-        }}
-        goToDoc={goToDoc}
-        previewUrlBuilder={previewUrlBuilder}
-      />
     </div>
   );
 }

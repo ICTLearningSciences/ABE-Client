@@ -13,6 +13,7 @@ import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
 import { URL_PARAM_NEW_DOC } from '../../constants';
 import { useWithState } from '../../exported-files';
+import ExampleGoogleDocModal from '../user-view/example-google-docs-modal';
 
 export interface AdminViewUserGoogleDocsProps {
   useWithGoogleDocs: UseWithGoogleDocs;
@@ -32,6 +33,16 @@ export default function ViewUserGoogleDocs(
   const { updateCurrentDocId } = useWithState();
   const navigate = useNavigate();
   const userRole = useAppSelector((state) => state.login.userRole);
+  const [exampleDocsOpen, setExampleDocsOpen] = React.useState(false);
+
+  function goToDoc(docId: string, newDoc?: boolean) {
+    updateCurrentDocId(docId);
+    navigate(`/docs/${docId}?${newDoc ? `${URL_PARAM_NEW_DOC}=true` : ''}`);
+  }
+
+  function previewUrlBuilder(docId: string) {
+    return `https://docs.google.com/document/d/${docId}/view`;
+  }
 
   return (
     <ColumnCenterDiv
@@ -47,20 +58,31 @@ export default function ViewUserGoogleDocs(
         copyGoogleDocs={copyGoogleDocs}
         creationInProgress={creationInProgress}
         handleCreateGoogleDoc={handleCreateGoogleDoc}
-        goToDoc={(docId: string, newDoc?: boolean) => {
-          updateCurrentDocId(docId);
-          navigate(
-            `/docs/${docId}?${newDoc ? `${URL_PARAM_NEW_DOC}=true` : ''}`
-          );
-        }}
+        goToDoc={goToDoc}
         onHistoryClicked={(docId: string) => navigate(`/docs/history/${docId}`)}
-        previewUrlBuilder={(docId: string) =>
-          `https://docs.google.com/document/d/${docId}/view`
-        }
-        viewingAsAdmin={userRole === UserRole.ADMIN}
+        setExampleDocsOpen={setExampleDocsOpen}
         sx={{
           width: '60%',
         }}
+      />
+      <ExampleGoogleDocModal
+        viewingAsAdmin={userRole === UserRole.ADMIN}
+        open={exampleDocsOpen}
+        close={() => {
+          setExampleDocsOpen(false);
+        }}
+        adminDocs={copyGoogleDocs}
+        onCreateDoc={(
+          docIdtoCopy?: string,
+          title?: string,
+          isAdminDoc?: boolean
+        ) => {
+          handleCreateGoogleDoc(docIdtoCopy, title, isAdminDoc, (data) => {
+            goToDoc(data.docId, true);
+          });
+        }}
+        goToDoc={goToDoc}
+        previewUrlBuilder={previewUrlBuilder}
       />
     </ColumnCenterDiv>
   );
