@@ -8,13 +8,12 @@ import React from 'react';
 import { UseWithGoogleDocs } from '../../hooks/use-with-google-docs';
 import { ColumnCenterDiv } from '../../styled-components';
 import SelectCreateDocs from '../user-view/select-create-docs';
-import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
 import { URL_PARAM_NEW_DOC } from '../../constants';
 import { useWithState } from '../../exported-files';
 import ExampleGoogleDocModal from '../user-view/example-google-docs-modal';
-
+import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 export interface AdminViewUserGoogleDocsProps {
   useWithGoogleDocs: UseWithGoogleDocs;
 }
@@ -31,7 +30,7 @@ export default function ViewUserGoogleDocs(
     handleDeleteGoogleDoc,
   } = useWithGoogleDocs;
   const { updateCurrentDocId } = useWithState();
-  const navigate = useNavigate();
+  const navigate = useNavigateWithParams();
   const userRole = useAppSelector((state) => state.login.userRole);
   const [exampleDocsOpen, setExampleDocsOpen] = React.useState(false);
 

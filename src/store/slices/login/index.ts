@@ -8,9 +8,10 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   loginGoogle,
   refreshAccessToken as _refreshAccessToken,
+  updateUserInfo,
 } from '../../../hooks/api';
 import { extractErrorMessageFromError } from '../../../helpers';
-import { User, UserAccessToken } from '../../../types';
+import { UpdateUserInfo, User, UserAccessToken } from '../../../types';
 import {
   ACCESS_TOKEN_KEY,
   localStorageClear,
@@ -100,6 +101,13 @@ export const login = createAsyncThunk(
   }
 );
 
+export const _updateUserInfo = createAsyncThunk(
+  'login/updateUserInfo',
+  async (userInfo: UpdateUserInfo) => {
+    return await updateUserInfo(userInfo);
+  }
+);
+
 /** Reducer */
 
 export const loginSlice = createSlice({
@@ -154,6 +162,13 @@ export const loginSlice = createSlice({
         state.loginStatus = LoginStatus.FAILED;
         localStorageClear(ACCESS_TOKEN_KEY);
       });
+
+    builder.addCase(_updateUserInfo.fulfilled, (state, action) => {
+      state.user = {
+        ...state.user,
+        ...action.payload,
+      };
+    });
   },
 });
 

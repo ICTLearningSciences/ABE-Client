@@ -32,6 +32,8 @@ import {
   AiServiceModel,
   DocGoalGQl,
   DocService,
+  User,
+  UpdateUserInfo,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -221,8 +223,10 @@ export async function getDocData(docId: string): Promise<DocData> {
 }
 
 export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
-  return await axios.post(GRAPHQL_ENDPOINT, {
-    query: `
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  return await execGql<void>(
+    {
+      query: `
         mutation SubmitGoogleDocVersion($googleDocData: GDocVersionInputType!) {
           submitGoogleDocVersion(googleDocData: $googleDocData) {
             docId
@@ -242,35 +246,39 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
           }
         }
       `,
-    variables: {
-      googleDocData: {
-        ...docVersion,
-        dayIntention: docVersion.dayIntention
-          ? {
-              description: docVersion.dayIntention.description,
-            }
-          : undefined,
-        sessionIntention: docVersion.sessionIntention
-          ? {
-              description: docVersion.sessionIntention.description,
-            }
-          : undefined,
-        documentIntention: docVersion.documentIntention
-          ? {
-              description: docVersion.documentIntention.description,
-            }
-          : undefined,
-        chatLog: docVersion.chatLog.map((chatItem) => ({
-          message: chatItem.message,
-          sender: chatItem.sender,
-          displayType: chatItem.displayType,
-          bulletPoints: isBulletPointMessage(chatItem)
-            ? chatItem.bulletPoints
-            : [],
-        })),
+      variables: {
+        googleDocData: {
+          ...docVersion,
+          dayIntention: docVersion.dayIntention
+            ? {
+                description: docVersion.dayIntention.description,
+              }
+            : undefined,
+          sessionIntention: docVersion.sessionIntention
+            ? {
+                description: docVersion.sessionIntention.description,
+              }
+            : undefined,
+          documentIntention: docVersion.documentIntention
+            ? {
+                description: docVersion.documentIntention.description,
+              }
+            : undefined,
+          chatLog: docVersion.chatLog.map((chatItem) => ({
+            message: chatItem.message,
+            sender: chatItem.sender,
+            displayType: chatItem.displayType,
+            bulletPoints: isBulletPointMessage(chatItem)
+              ? chatItem.bulletPoints
+              : [],
+          })),
+        },
       },
     },
-  });
+    {
+      accessToken,
+    }
+  );
 }
 
 export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
@@ -460,12 +468,7 @@ export async function loginGoogle(
       mutation LoginGoogle($accessToken: String!) {
         loginGoogle(accessToken: $accessToken) {
           user {
-            _id
-            googleId
-            name
-            email
-            userRole
-            lastLoginAt
+            ${userDataQuery}
           }
           accessToken
         }
@@ -527,6 +530,10 @@ export async function fetchConfig(subdomain?: string): Promise<Config> {
             headerTitle
             orgName
             loginScreenTitle
+            surveyConfig{
+              surveyLink
+              surveyQueryParam
+            }
           }
         }
       `,
@@ -588,6 +595,16 @@ export async function updateConfigByKey(key: string, value: any): Promise<any> {
   );
 }
 
+export const userDataQuery = `
+  _id
+  googleId
+  name
+  email
+  userRole
+  lastLoginAt
+  classroomCode
+  previousClassroomCodes
+`;
 export async function refreshAccessToken(): Promise<UserAccessToken> {
   return execGql<UserAccessToken>(
     {
@@ -595,12 +612,7 @@ export async function refreshAccessToken(): Promise<UserAccessToken> {
       mutation RefreshAccessToken{
         refreshAccessToken{
           user {
-            _id
-            googleId
-            name
-            email
-            userRole
-            lastLoginAt
+            ${userDataQuery}
           }
           accessToken
         }
@@ -613,6 +625,29 @@ export async function refreshAccessToken(): Promise<UserAccessToken> {
       axiosConfig: {
         withCredentials: true,
       },
+    }
+  );
+}
+
+export async function updateUserInfo(userInfo: UpdateUserInfo): Promise<User> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  if (!accessToken) throw new Error('No access token');
+  return execGql<User>(
+    {
+      query: `
+mutation UpdateUserInfo($userInfo: UserInputType!) {
+          updateUserInfo(userInfo: $userInfo) {
+                ${userDataQuery}
+              }
+         }
+    `,
+      variables: {
+        userInfo: userInfo,
+      },
+    },
+    {
+      dataPath: 'updateUserInfo',
+      accessToken: accessToken,
     }
   );
 }

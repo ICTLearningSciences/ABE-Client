@@ -3,12 +3,13 @@ import withAuthorizationOnly from '../../../hooks/wrap-with-authorization-only';
 import { UseWithLogin } from '../../../store/slices/login/use-with-login';
 import Header from '../../header';
 import { DocumentTimelinePage } from './index';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useNavigateWithParams } from '../../../hooks/use-navigate-with-params';
 
 function DocHistoryContainer(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
   const { docId } = useParams<Record<string, string>>();
-  const navigate = useNavigate();
+  const navigate = useNavigateWithParams();
   return (
     <>
       <Header useLogin={useLogin} />

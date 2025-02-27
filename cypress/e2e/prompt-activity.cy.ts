@@ -8,6 +8,7 @@ import { analyzeHookResponse } from '../fixtures/stronger-hook-activity/analyze-
 import {
   cyMockDefault,
   cyMockOpenAiCall,
+  roleSwitch,
   toPromptActivity,
 } from '../helpers/functions';
 import { ACCESS_TOKEN_KEY } from '../helpers/local-storage';
@@ -184,7 +185,7 @@ describe('Prompt Activities', () => {
   it('can preview prompt activities', () => {
     cyMockDefault(cy, { userRole: UserRole.ADMIN });
     cy.visit('/');
-    cy.get('[data-cy=role-switch]').click();
+    roleSwitch(cy, UserRole.ADMIN)
     cy.get('[data-cy=doc-list-item-Aliens]').eq(0).click();
     cy.get("[data-cy=go-to-old-activity-editor]").click();
     cy.get('[data-cy=preview-button-Army-Style-Review]').click();
@@ -203,7 +204,7 @@ describe('Prompt Activities', () => {
     cyMockDefault(cy, { userRole: UserRole.ADMIN });
     cyMockOpenAiCall(cy, { response: analyzeHookResponse(2, 2) });
     cy.visit('/');
-    cy.get('[data-cy=role-switch]').click();
+    roleSwitch(cy, UserRole.ADMIN)
     cy.get('[data-cy=doc-list-item-Aliens]').eq(0).click();
     cy.get("[data-cy=go-to-old-activity-editor]").click();
     cy.get('[data-cy=preview-button-N-3-Compare-Story-to-Hook]').click();

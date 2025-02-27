@@ -4,34 +4,38 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { UserAccessToken } from '../types';
-import { execGql, userDataQuery } from './api';
+import React from 'react';
+import { Box, Modal, SxProps, Theme } from '@mui/material';
 
-export async function loginMicrosoft(
-  accessToken: string
-): Promise<UserAccessToken> {
-  return await execGql<UserAccessToken>(
-    {
-      query: `
-        mutation LoginMicrosoft($accessToken: String) {
-        loginMicrosoft(accessToken: $accessToken) {
-            user {
-              ${userDataQuery}
-            }
-            accessToken
-          }
-        }
-      `,
-      variables: {
-        accessToken: accessToken,
-      },
-    },
-    // login responds with set-cookie, w/o withCredentials it doesnt get stored
-    {
-      dataPath: 'loginMicrosoft',
-      axiosConfig: {
-        withCredentials: true,
-      },
-    }
+const style: SxProps<Theme> = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  WebkitTransform: 'translate(-50%, -50%)',
+  transform: 'translate(-50%, -50%)',
+  width: 'fit-content',
+  height: 'fit-content',
+  p: 4,
+  display: 'flex',
+  boxSizing: 'border-box',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  backgroundColor: 'white',
+  borderRadius: '20px',
+  border: '5px solid black',
+};
+
+export function CenteredBoxModal(props: {
+  open: boolean;
+  children: React.ReactNode;
+}): JSX.Element {
+  return (
+    <div>
+      <Modal open={Boolean(props.open)}>
+        <Box sx={style} data-cy="centered-box-modal">
+          {props.children}
+        </Box>
+      </Modal>
+    </div>
   );
 }

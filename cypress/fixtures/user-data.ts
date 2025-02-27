@@ -12,5 +12,7 @@ export const testUser: User = {
     "name": "John Doe",
     "email": "johndoe@gmail.com",
     "userRole": UserRole.USER,
-    "lastLoginAt": new Date()
+    "lastLoginAt": new Date(),
+    "classroomCode": "123456",
+    "previousClassroomCodes": ["123456", "123457"]
 }

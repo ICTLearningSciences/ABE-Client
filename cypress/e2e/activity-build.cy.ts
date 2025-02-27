@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { cyMockDefault, cyMockOpenAiCall, CypressGlobal, mockGQL, toPromptEditing } from "../helpers/functions";
+import { cyMockDefault, CypressGlobal, mockGQL, roleSwitch } from "../helpers/functions";
 import { UserRole } from "../helpers/types";
 
 export function stepsAreEditable(cy: CypressGlobal){
@@ -32,7 +32,6 @@ export function flowIsNotEditable(cy: CypressGlobal){
     })
 }
 
-
 describe('activity builder', () => {
     describe("admins", ()=>{
 
@@ -41,9 +40,7 @@ describe('activity builder', () => {
               userRole: UserRole.ADMIN
             });
             cy.visit("/")
-            cy.get("[data-cy=role-switch]").should("contain.text", "User")
-            cy.get("[data-cy=role-switch]").click();
-            cy.get("[data-cy=role-switch]").should("contain.text", "Admin")
+            roleSwitch(cy, UserRole.ADMIN)
             cy.get("[data-cy=doc-list-item-Aliens").click()
             cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
             cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
@@ -78,9 +75,7 @@ describe('activity builder', () => {
                 ]
               });
               cy.visit("/")
-              cy.get("[data-cy=role-switch]").should("contain.text", "User")
-              cy.get("[data-cy=role-switch]").click();
-              cy.get("[data-cy=role-switch]").should("contain.text", "Admin")
+              roleSwitch(cy, UserRole.ADMIN)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-delete-my-editable-activity]").click()
@@ -108,9 +103,7 @@ describe('activity builder', () => {
                 userRole: UserRole.CONTENT_MANAGER
               });
               cy.visit("/")
-              cy.get("[data-cy=role-switch]").should("contain.text", "User")
-              cy.get("[data-cy=role-switch]").click();
-              cy.get("[data-cy=role-switch]").should("contain.text", "Content Manager")
+              roleSwitch(cy, UserRole.CONTENT_MANAGER)
         })
         
         it("can edit their own activities", ()=>{
@@ -118,9 +111,7 @@ describe('activity builder', () => {
                 userRole: UserRole.CONTENT_MANAGER
               });
               cy.visit("/")
-              cy.get("[data-cy=role-switch]").should("contain.text", "User")
-              cy.get("[data-cy=role-switch]").click();
-              cy.get("[data-cy=role-switch]").should("contain.text", "Content Manager")
+              roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
@@ -141,9 +132,7 @@ describe('activity builder', () => {
                 userRole: UserRole.CONTENT_MANAGER
               });
               cy.visit("/")
-              cy.get("[data-cy=role-switch]").should("contain.text", "User")
-              cy.get("[data-cy=role-switch]").click();
-              cy.get("[data-cy=role-switch]").should("contain.text", "Content Manager")
+              roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-other-user-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-edit-other-user-editable-activity]").should("exist").click()
@@ -156,9 +145,7 @@ describe('activity builder', () => {
                 userRole: UserRole.CONTENT_MANAGER
               });
               cy.visit("/")
-              cy.get("[data-cy=role-switch]").should("contain.text", "User")
-              cy.get("[data-cy=role-switch]").click();
-              cy.get("[data-cy=role-switch]").should("contain.text", "Content Manager")
+              roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
@@ -180,9 +167,7 @@ describe('activity builder', () => {
                 ]
               });
               cy.visit("/")
-              cy.get("[data-cy=role-switch]").should("contain.text", "User")
-              cy.get("[data-cy=role-switch]").click();
-              cy.get("[data-cy=role-switch]").should("contain.text", "Content Manager")
+              roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-delete-my-editable-activity]").click()
@@ -204,9 +189,7 @@ describe('activity builder', () => {
                 userRole: UserRole.CONTENT_MANAGER
             });
             cy.visit("/");
-            cy.get("[data-cy=role-switch]").should("contain.text", "User");
-            cy.get("[data-cy=role-switch]").click();
-            cy.get("[data-cy=role-switch]").should("contain.text", "Content Manager");
+            roleSwitch(cy, UserRole.CONTENT_MANAGER)
             cy.get("[data-cy=doc-list-item-Aliens").click();
             cy.get("[data-cy=activity-item-copied-activity]").should("not.exist");
             cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("exist");

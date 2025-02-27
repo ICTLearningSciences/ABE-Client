@@ -4,34 +4,21 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { UserAccessToken } from '../types';
-import { execGql, userDataQuery } from './api';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-export async function loginMicrosoft(
-  accessToken: string
-): Promise<UserAccessToken> {
-  return await execGql<UserAccessToken>(
-    {
-      query: `
-        mutation LoginMicrosoft($accessToken: String) {
-        loginMicrosoft(accessToken: $accessToken) {
-            user {
-              ${userDataQuery}
-            }
-            accessToken
-          }
-        }
-      `,
-      variables: {
-        accessToken: accessToken,
-      },
-    },
-    // login responds with set-cookie, w/o withCredentials it doesnt get stored
-    {
-      dataPath: 'loginMicrosoft',
-      axiosConfig: {
-        withCredentials: true,
-      },
-    }
-  );
-}
+export const useNavigateWithParams = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const navigateWithParams = (path: string, options = {}) => {
+    // Build the new URL with all existing parameters
+    const url = new URL(path, window.location.origin);
+    searchParams.forEach((value, key) => {
+      url.searchParams.set(key, value);
+    });
+
+    // Navigate to the new URL
+    navigate(`${url.pathname}${url.search}`, options);
+  };
+  return navigateWithParams;
+};

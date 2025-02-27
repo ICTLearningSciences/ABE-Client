@@ -73,6 +73,10 @@ export const fetchConfigResponse: FetchConfigResponse = {
             }
         ],
         headerTitle: "AWE Army Writing Enhancement",
-        orgName: ""
+        orgName: "",
+        surveyConfig: {
+            surveyLink: "https://test-survey-link.com",
+            surveyQueryParam: "userId"
+        }
     }   
 }

@@ -351,3 +351,20 @@ export function userCanEditActivity(
     activity.visibility === ActivityBuilderVisibility.EDITABLE
   );
 }
+
+export function removeQueryParamFromUrl(paramName: string): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  if (!urlParams.has(paramName)) {
+    return;
+  }
+
+  urlParams.delete(paramName);
+  const newUrl =
+    window.location.pathname +
+    (urlParams.toString() ? `?${urlParams.toString()}` : '');
+  window.history.replaceState({}, '', newUrl);
+}

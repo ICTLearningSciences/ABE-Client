@@ -4,25 +4,31 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { cyMockDefault, roleSwitch } from "../helpers/functions";
 import { UserRole } from "../helpers/types";
+import { cyGetQueryVariables, cyMockDefault } from "../helpers/functions";
 
 
-
-describe('role viewing', () => {
-    it("Can switch roles as admin", ()=>{
+describe("classroom code", ()=>{
+  it("classroom code is submitted from the url on login", ()=>{
       cyMockDefault(cy, {
         userRole: UserRole.ADMIN
       });
-      cy.visit("/")
-      roleSwitch(cy, UserRole.ADMIN)
+      cy.visit("/?classroomCode=123456&test=true");
+      cy.url().should('include', 'classroomCode=123456');
+      cy.wait("@UpdateUserInfo").then((query)=>{
+        const variables = cyGetQueryVariables(query);
+        assert.equal(variables.userInfo.classroomCode, "123456");
+      })
+      cy.url().should('not.include', 'classroomCode=123456');
+      cy.url().should('include', 'test=true');
     })
 
-    it("Can switch roles as content manager", ()=>{
+    it("classroom code is viewable in settings UI", ()=>{
       cyMockDefault(cy, {
-        userRole: UserRole.CONTENT_MANAGER
+        userRole: UserRole.ADMIN
       });
-      cy.visit("/")
-      roleSwitch(cy, UserRole.CONTENT_MANAGER)
+      cy.visit("/?classroomCode=123");
+      cy.get("[data-cy=profile-button]").click();
+      cy.get("[data-cy=current-classroom-code]").should('contain', "123");
     })
-  });
+})

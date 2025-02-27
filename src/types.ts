@@ -30,6 +30,12 @@ export interface PageInfo {
   endCursor: string;
 }
 
+export interface UpdateUserInfo {
+  name?: string;
+  email?: string;
+  classroomCode?: string;
+}
+
 export interface User {
   _id: string;
   googleId: string;
@@ -37,6 +43,8 @@ export interface User {
   email: string;
   userRole: UserRole;
   lastLoginAt: Date;
+  classroomCode?: string;
+  previousClassroomCodes?: string[];
 }
 
 export interface UserAccessToken {
@@ -200,6 +208,11 @@ export interface ColorThemeConfig {
   chatUserTextColor: string;
 }
 
+export interface SurveyConfig {
+  surveyLink: string;
+  surveyQueryParam: string;
+}
+
 export interface Config {
   aiSystemPrompt: string[];
   colorTheme?: ColorThemeConfig;
@@ -212,6 +225,7 @@ export interface Config {
   headerTitle?: string; // first word will be golden
   orgName?: string;
   loginScreenTitle?: string;
+  surveyConfig?: SurveyConfig;
 }
 
 export enum ActivityStepTypes {

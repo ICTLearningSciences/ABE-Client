@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import * as loginActions from '.';
-import { UserAccessToken } from '../../../types';
+import { UpdateUserInfo, User, UserAccessToken } from '../../../types';
 import { UseWithLogin } from './use-with-login';
 
 export function useWithSpfxLogin(): UseWithLogin {
@@ -61,6 +61,11 @@ export function useWithSpfxLogin(): UseWithLogin {
     dispatch(loginActions.setUser(user));
   }
 
+  async function updateUserInfo(userInfo: UpdateUserInfo): Promise<User> {
+    const user = await dispatch(loginActions._updateUserInfo(userInfo));
+    return user.payload as User;
+  }
+
   return {
     state,
     logout,
@@ -68,5 +73,6 @@ export function useWithSpfxLogin(): UseWithLogin {
     loginWithMicrosoft,
     refreshAccessToken,
     setUser,
+    updateUserInfo,
   };
 }
