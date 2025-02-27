@@ -9,7 +9,7 @@ export const updateUserInfoResponse = (classroomCode: string) => {
     return {
         "updateUserInfo": {
             "classroomCode": classroomCode,
-            "previousClassroomCodes": [ "321" ]
+            "previousClassroomCodes": [ "1234432112344321", "5467765445677654", "8765567887655678" ]
         }
     }
 }

@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { ColumnDiv } from '../../styled-components';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
-import { Button } from '@mui/material';
+import { Button, Tooltip } from '@mui/material';
 import { useWithConfig } from '../../exported-files';
 import { AdminControls } from './admin-controls';
 import AssignmentIcon from '@mui/icons-material/Assignment';
@@ -16,6 +16,7 @@ export function UserInfoSettings(): JSX.Element {
   const { state: configState } = useWithConfig();
   const userName = state.user?.name;
   const classroomCode = state.user?.classroomCode;
+  const previousClassroomCodes = state.user?.previousClassroomCodes;
   const surveyUrl = configState.config?.surveyConfig?.surveyLink;
   const surveyUrlParam = configState.config?.surveyConfig?.surveyQueryParam;
   function takeSurvey() {
@@ -39,6 +40,24 @@ export function UserInfoSettings(): JSX.Element {
         <p data-cy="current-classroom-code">
           <b>Classroom Code:</b> {classroomCode}
         </p>
+      )}
+      {previousClassroomCodes && previousClassroomCodes.length > 0 && (
+        <Tooltip
+          data-cy="previous-classroom-codes-tooltip"
+          title={previousClassroomCodes.map((code) => (
+            <p key={code}>{code}</p>
+          ))}
+        >
+          <p
+            data-cy="previous-classroom-codes"
+            style={{
+              opacity: 0.5,
+              cursor: 'pointer',
+            }}
+          >
+            Previous Classroom Codes
+          </p>
+        </Tooltip>
       )}
       <AdminControls />
       {surveyUrl && surveyUrlParam && (

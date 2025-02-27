@@ -36,4 +36,20 @@ describe("classroom code", ()=>{
       cy.get("[data-cy=current-classroom-code]").should('contain', "1234123412341234123");
     })
 
+    it("previous classroom codes are viewable in settings UI", ()=>{
+      cyMockDefault(cy, {
+        userRole: UserRole.ADMIN,
+        gqlQueries: [
+          mockGQL("UpdateUserInfo", updateUserInfoResponse("1234123412341234123")),
+        ]
+      });
+      cy.visit("/?classroomCode=123");
+      cy.get("[data-cy=profile-button]").click();
+      cy.get("[data-cy=current-classroom-code]").should('contain', "1234123412341234123");
+      cy.get("[data-cy=previous-classroom-codes]").click()
+      cy.get("[role=tooltip]").should('contain.text', "1234432112344321")
+      cy.get("[role=tooltip]").should('contain.text', "5467765445677654")
+      cy.get("[role=tooltip]").should('contain.text', "8765567887655678")
+    })
+
 })
