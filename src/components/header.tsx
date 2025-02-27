@@ -20,8 +20,8 @@ import { Home } from '@mui/icons-material';
 import { HeaderTitle } from './header-title';
 import { useNavigateWithParams } from '../hooks/use-navigate-with-params';
 import PersonIcon from '@mui/icons-material/Person';
-import { AdminControls } from './settings/admin-controls';
 import { UserInfoSettings } from './settings/user-info-settings';
+import LogoutIcon from '@mui/icons-material/Logout';
 export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
   const { logout } = useLogin;
@@ -67,21 +67,17 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
               justifyContent: 'space-around',
             }}
           >
-            <h3>Profile</h3>
             <UserInfoSettings />
           </div>
-          <div>
-            <AdminControls />
-          </div>
           <Button
-            style={{ height: 'fit-content', color: 'blue' }}
-            variant="outlined"
+            style={{ color: 'blue' }}
+            variant="contained"
             onClick={async () => {
               await logout();
               navigate('/');
             }}
           >
-            Logout
+            Logout <LogoutIcon style={{ marginLeft: 10 }} />
           </Button>
         </div>
       </Drawer>

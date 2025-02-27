@@ -9,27 +9,50 @@ import { ColumnDiv } from '../../styled-components';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
 import { Button } from '@mui/material';
 import { useWithConfig } from '../../exported-files';
-
+import { AdminControls } from './admin-controls';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 export function UserInfoSettings(): JSX.Element {
   const { state } = useWithLogin();
   const { state: configState } = useWithConfig();
+  const userName = state.user?.name;
+  const classroomCode = state.user?.classroomCode;
+  const surveyUrl = configState.config?.surveyConfig?.surveyLink;
+  const surveyUrlParam = configState.config?.surveyConfig?.surveyQueryParam;
   function takeSurvey() {
-    const url = configState.config?.surveyConfig?.surveyLink;
-    const urlParam = configState.config?.surveyConfig?.surveyQueryParam;
-    if (url) {
-      window.open(`${url}?${urlParam}=${state.user?._id}`, '_blank');
+    if (surveyUrl && surveyUrlParam) {
+      window.open(
+        `${surveyUrl}?${surveyUrlParam}=${state.user?._id}`,
+        '_blank'
+      );
     }
   }
 
   return (
-    <ColumnDiv data-cy="user-info-settings">
-      <p>Name: {state.user?.name}</p>
-      <p data-cy="current-classroom-code">
-        Classroom Code: {state.user?.classroomCode}
-      </p>
-      <Button variant="contained" color="primary" onClick={takeSurvey}>
-        Take Survey
-      </Button>
+    <ColumnDiv
+      data-cy="user-info-settings"
+      style={{
+        alignItems: 'center',
+      }}
+    >
+      {userName && <p>{userName}</p>}
+      {classroomCode && (
+        <p data-cy="current-classroom-code">
+          <b>Classroom Code:</b> {classroomCode}
+        </p>
+      )}
+      <AdminControls />
+      {surveyUrl && surveyUrlParam && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={takeSurvey}
+          style={{
+            marginTop: 10,
+          }}
+        >
+          Take Survey <AssignmentIcon style={{ marginLeft: 10 }} />
+        </Button>
+      )}
     </ColumnDiv>
   );
 }
