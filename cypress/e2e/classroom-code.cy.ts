@@ -70,4 +70,14 @@ describe("classroom code", ()=>{
       cy.get("[data-cy=editable-text-save-button]").click();
       cy.get("[data-cy=current-classroom-code]").should('contain', "def");
     })
+
+    it("classroom code is removed from url when user navigates to docs", ()=>{
+      cyMockDefault(cy, {
+        userRole: UserRole.ADMIN,
+      });
+      cy.visit("/?classroomCode=abc");
+      cy.url().should('not.include', 'classroomCode=abc');
+      cy.get("[data-cy=doc-list-item-Aliens]").click();
+      cy.url().should('not.include', 'classroomCode=abc');
+    })
 })
