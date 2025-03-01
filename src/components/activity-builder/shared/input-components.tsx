@@ -7,8 +7,12 @@ import {
   Checkbox,
   Select,
   MenuItem,
+  IconButton,
+  Typography,
+  Box,
 } from '@mui/material';
 import { useDebouncedCallback } from '../../../hooks/use-debounced-callback';
+import { Edit as EditIcon, Save as SaveIcon } from '@mui/icons-material';
 
 export function InputField(props: {
   label: string;
@@ -104,5 +108,61 @@ export function SelectInputField(props: {
         ))}
       </Select>
     </FormControl>
+  );
+}
+
+export function EditableText(props: {
+  text: string;
+  onSave: (newText: string) => Promise<void>;
+  disabled?: boolean;
+}): JSX.Element {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [localText, setLocalText] = React.useState(props.text);
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await props.onSave(localText);
+      setIsEditing(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Input
+          value={localText}
+          onChange={(e) => setLocalText(e.target.value)}
+          disabled={isSaving}
+          autoFocus
+          data-cy="editable-text-input"
+        />
+        <IconButton
+          data-cy="editable-text-save-button"
+          onClick={handleSave}
+          disabled={isSaving || props.disabled}
+          size="small"
+        >
+          <SaveIcon />
+        </IconButton>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Typography>{props.text}</Typography>
+      <IconButton
+        onClick={() => setIsEditing(true)}
+        disabled={props.disabled}
+        size="small"
+        data-cy="editable-text-edit-button"
+      >
+        <EditIcon />
+      </IconButton>
+    </Box>
   );
 }

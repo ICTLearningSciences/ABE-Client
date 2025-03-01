@@ -52,4 +52,22 @@ describe("classroom code", ()=>{
       cy.get("[role=tooltip]").should('contain.text', "8765567887655678")
     })
 
+    it("classroom code is editable in settings UI", ()=>{
+      cyMockDefault(cy, {
+        userRole: UserRole.ADMIN,
+        gqlQueries: [
+          mockGQL("UpdateUserInfo", [
+            updateUserInfoResponse("abc"),
+            updateUserInfoResponse("def")
+          ]),
+        ]
+      });
+      cy.visit("/?classroomCode=abc");
+      cy.get("[data-cy=profile-button]").click();
+      cy.get("[data-cy=current-classroom-code]").should('contain', "abc");
+      cy.get("[data-cy=editable-text-edit-button]").click();
+      cy.get("[data-cy=editable-text-input]").clear().type("def");
+      cy.get("[data-cy=editable-text-save-button]").click();
+      cy.get("[data-cy=current-classroom-code]").should('contain', "def");
+    })
 })

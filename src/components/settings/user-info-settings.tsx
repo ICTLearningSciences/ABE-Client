@@ -11,8 +11,10 @@ import { Button, Tooltip } from '@mui/material';
 import { useWithConfig } from '../../exported-files';
 import { AdminControls } from './admin-controls';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import { formatISODateToReadable } from '../../helpers';
+import { EditableText } from '../activity-builder/shared/input-components';
 export function UserInfoSettings(): JSX.Element {
-  const { state } = useWithLogin();
+  const { state, updateUserInfo } = useWithLogin();
   const { state: configState } = useWithConfig();
   const userName = state.user?.name;
   const classroomCode = state.user?.classroomCode;
@@ -37,15 +39,29 @@ export function UserInfoSettings(): JSX.Element {
     >
       {userName && <p>{userName}</p>}
       {classroomCode && (
-        <p data-cy="current-classroom-code">
-          <b>Classroom Code:</b> {classroomCode}
-        </p>
+        <div data-cy="current-classroom-code">
+          <b>Classroom Code:</b>{' '}
+          <EditableText
+            text={classroomCode.code}
+            onSave={async (newText) => {
+              await updateUserInfo({
+                classroomCode: newText,
+              });
+            }}
+          />
+          <br />
+          <b>Created At:</b> {formatISODateToReadable(classroomCode.createdAt)}
+        </div>
       )}
       {previousClassroomCodes && previousClassroomCodes.length > 0 && (
         <Tooltip
           data-cy="previous-classroom-codes-tooltip"
           title={previousClassroomCodes.map((code) => (
-            <p key={code}>{code}</p>
+            <p key={code.code}>
+              <b>Classroom Code:</b> {code.code}
+              <br />
+              <b>Created At:</b> {formatISODateToReadable(code.createdAt)}
+            </p>
           ))}
         >
           <p

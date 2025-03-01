@@ -8,8 +8,24 @@ The full terms of this copyright and license should always be found in the root 
 export const updateUserInfoResponse = (classroomCode: string) => {
     return {
         "updateUserInfo": {
-            "classroomCode": classroomCode,
-            "previousClassroomCodes": [ "1234432112344321", "5467765445677654", "8765567887655678" ]
+            "classroomCode": {
+                "code":classroomCode,
+                "createdAt": "2025-03-02T00:00:00.000Z",
+            },
+            "previousClassroomCodes": [
+                {
+                    "code": "1234432112344321",
+                    "createdAt": "2025-03-02T00:00:00.000Z",
+                },
+                {
+                    "code": "5467765445677654",
+                    "createdAt": "2025-03-02T00:00:00.000Z",
+                },
+                {
+                    "code": "8765567887655678",
+                    "createdAt": "2025-03-02T00:00:00.000Z",
+                }
+            ]
         }
     }
 }

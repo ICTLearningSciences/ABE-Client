@@ -115,6 +115,10 @@ export interface PageInfo {
   startCursor: string;
   endCursor: string;
 }
+export interface ClassroomCode {
+  code: string;
+  createdAt: string;
+}
 
 export interface User {
   _id: string;
@@ -123,8 +127,8 @@ export interface User {
   email: string;
   userRole: UserRole;
   lastLoginAt: Date;
-  classroomCode?: string;
-  previousClassroomCodes?: string[];
+  classroomCode?: ClassroomCode;
+  previousClassroomCodes?: ClassroomCode[];
 }
 
 export interface UserAccessToken {

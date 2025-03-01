@@ -602,8 +602,14 @@ export const userDataQuery = `
   email
   userRole
   lastLoginAt
-  classroomCode
-  previousClassroomCodes
+  classroomCode{
+    code
+    createdAt
+  }
+  previousClassroomCodes{
+    code
+    createdAt
+  }
 `;
 export async function refreshAccessToken(): Promise<UserAccessToken> {
   return execGql<UserAccessToken>(
