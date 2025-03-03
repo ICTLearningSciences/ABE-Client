@@ -9,7 +9,7 @@ import { ActivityFlowContainer } from './activity-flow-container';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { Button, CircularProgress, IconButton } from '@mui/material';
 import { InputField, SelectInputField } from '../shared/input-components';
-import { equals, userCanEditActivity } from '../../../helpers';
+import { equals } from '../../../helpers';
 import { v4 as uuidv4 } from 'uuid';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { isActivityRunnable } from '../helpers';
@@ -18,26 +18,26 @@ import {
   DOC_NUM_WORDS_KEY,
   DOC_TEXT_KEY,
 } from '../../../classes/activity-builder-activity/built-activity-handler';
-import { useAppSelector } from '../../../store/hooks';
 import { useWithCheckActivityErrors } from '../../../hooks/use-with-check-activity-errors';
 export function EditActivity(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   activity: ActivityBuilderType;
   saveActivity: (activity: ActivityBuilderType) => Promise<ActivityBuilderType>;
   returnTo: () => void;
+  userCanEditActivity: (activity: ActivityBuilderType) => boolean;
 }): JSX.Element {
   const {
     activity,
     saveActivity: _saveActivity,
     goToActivity,
     returnTo,
+    userCanEditActivity,
   } = props;
 
   const [localActivityCopy, setLocalActivityCopy] =
     React.useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
-  const user = useAppSelector((state) => state.login.user);
-  const canEditActivity = user ? userCanEditActivity(activity, user) : false;
+  const canEditActivity = userCanEditActivity(activity);
   const { activityVersions, loadActivityVersions } = useWithActivityVersions();
   const globalStateKeys: string[] = useMemo(() => {
     return localActivityCopy.flowsList.reduce(

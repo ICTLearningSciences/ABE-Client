@@ -23,12 +23,13 @@ import {
   SavedPromptsView,
 } from './prompt-editing/saved-prompts-view';
 import { SavedActivityPromptsView } from './prompt-editing/saved-activity-prompts-view';
-import { isPromptInActivity } from '../../helpers';
+import { isPromptInActivity, userCanEditActivity } from '../../helpers';
 import { EditPrompt } from './prompt-editing/edit-prompt';
 import { ActivityBuilderPage } from '../activity-builder/activity-builder-page';
 import { isActivityBuilder } from '../activity-builder/types';
 import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-
+import { useAppSelector } from '../../store/hooks';
+import { UserRole } from '../../store/slices/login';
 export const emptyOpenAiPromptStep = (): AiPromptStep => {
   return {
     prompts: [
@@ -61,6 +62,7 @@ export function MultiPromptTesting(props: {
     deleteBuiltActivity,
   } = useWithDocGoalsActivities();
   const [viewActivityBuilder, setViewActivityBuilder] = useState<boolean>(true);
+  const user = useAppSelector((state) => state.login.user);
   const activitiesWithPrompts = activities.filter(
     (activity) => (activity.prompts?.length || 0) > 0
   );
@@ -151,6 +153,10 @@ export function MultiPromptTesting(props: {
         }}
       >
         <ActivityBuilderPage
+          userId={user?._id || ''}
+          userCanEditActivity={(activity) =>
+            user ? userCanEditActivity(activity, user) : false
+          }
           onCreateNewActivity={async () => {
             const newActivity = addNewLocalBuiltActivity();
             return newActivity;
@@ -168,6 +174,7 @@ export function MultiPromptTesting(props: {
           goToOldActivityEditor={() => {
             setViewActivityBuilder(false);
           }}
+          userCanDeleteActivity={() => user?.userRole === UserRole.ADMIN}
         />
       </ColumnDiv>
     );

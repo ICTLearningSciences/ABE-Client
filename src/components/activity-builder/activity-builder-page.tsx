@@ -30,6 +30,9 @@ export function ActivityBuilderPage(props: {
   onSaveActivity: (activity: ActivityBuilder) => Promise<ActivityBuilder>;
   onCreateNewActivity: () => Promise<ActivityBuilder>;
   onCopyActivity: (activityId: string) => Promise<ActivityBuilder>;
+  userCanEditActivity: (activity: ActivityBuilder) => boolean;
+  userCanDeleteActivity: () => boolean;
+  userId: string;
 }): JSX.Element {
   const {
     previewActivity,
@@ -40,6 +43,9 @@ export function ActivityBuilderPage(props: {
     onSaveActivity,
     onCreateNewActivity,
     onCopyActivity,
+    userCanEditActivity,
+    userCanDeleteActivity,
+    userId,
   } = props;
   const [selectedActivityClientId, setSelectedActivityClientId] =
     React.useState<string>(overrideCurActivity?.clientId || '');
@@ -50,6 +56,7 @@ export function ActivityBuilderPage(props: {
   if (!selectedActivity) {
     return (
       <SelectCreateActivity
+        userId={userId}
         copyActivity={onCopyActivity}
         goToOldActivityEditor={goToOldActivityEditor}
         goToActivity={previewActivity}
@@ -62,6 +69,8 @@ export function ActivityBuilderPage(props: {
           setSelectedActivityClientId(newActivity.clientId);
         }}
         deleteBuiltActivity={deleteBuiltActivity}
+        userCanDeleteActivity={userCanDeleteActivity}
+        userCanEditActivity={userCanEditActivity}
       />
     );
   } else {
@@ -75,6 +84,7 @@ export function ActivityBuilderPage(props: {
         saveActivity={async (activity) => {
           return await onSaveActivity(activity);
         }}
+        userCanEditActivity={userCanEditActivity}
       />
     );
   }

@@ -23,4 +23,5 @@ export { ChatActivity } from './components/user-view/chat-activity';
 export { useConfigLoader } from './components/config-loading/use-config-loader';
 export { DocumentTimelinePage } from './components/user-view/document-timeline';
 export { LoginUI } from './pages/login/login-ui';
+export { ActivityBuilderPage } from './components/activity-builder/activity-builder-page';
 export * from './hooks/api';

@@ -6,18 +6,13 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React, { useState } from 'react';
 import { ColumnDiv, RowDiv } from '../../styled-components';
-import {
-  ActivityBuilder as ActivityBuilderType,
-  ActivityBuilderVisibility,
-} from './types';
+import { ActivityBuilder as ActivityBuilderType } from './types';
 import { Button, CircularProgress, IconButton } from '@mui/material';
 import { isActivityRunnable } from './helpers';
 import PreviewIcon from '@mui/icons-material/Preview';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { useAppSelector } from '../../store/hooks';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { UserRole } from '../../store/slices/login';
 import { TwoOptionDialog } from '../dialog';
 export function ExistingActivityItem(props: {
   activity: ActivityBuilderType;
@@ -126,7 +121,10 @@ export function ExistingActivities(props: {
   editActivity: (activity: ActivityBuilderType) => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
   deleteBuiltActivity: (activityId: string) => Promise<void>;
+  userCanDeleteActivity: () => boolean;
+  userCanEditActivity: (activity: ActivityBuilderType) => boolean;
   onCreateActivity: () => void;
+  userId: string;
 }): JSX.Element {
   const {
     activities,
@@ -134,16 +132,18 @@ export function ExistingActivities(props: {
     copyActivity,
     onCreateActivity,
     deleteBuiltActivity,
+    userCanDeleteActivity,
+    userCanEditActivity,
+    userId,
   } = props;
-  const user = useAppSelector((state) => state.login.user);
   if (!activities.length) {
     return <></>;
   }
   const myActivities = activities.filter(
-    (activity) => activity.user === user?._id
+    (activity) => activity.user === userId
   );
   const otherActivities = activities.filter(
-    (activity) => activity.user !== user?._id
+    (activity) => activity.user !== userId
   );
 
   return (
@@ -211,11 +211,8 @@ export function ExistingActivities(props: {
               props.goToActivity(activity);
             }}
             deleteBuiltActivity={deleteBuiltActivity}
-            canEditActivity={
-              user?.userRole === UserRole.ADMIN ||
-              activity.visibility === ActivityBuilderVisibility.EDITABLE
-            }
-            canDeleteActivity={user?.userRole === UserRole.ADMIN}
+            canEditActivity={userCanEditActivity(activity)}
+            canDeleteActivity={userCanDeleteActivity()}
           />
         );
       })}
@@ -231,6 +228,9 @@ export function SelectCreateActivity(props: {
   onCreateActivity: () => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
   deleteBuiltActivity: (activityId: string) => Promise<void>;
+  userCanDeleteActivity: () => boolean;
+  userCanEditActivity: (activity: ActivityBuilderType) => boolean;
+  userId: string;
 }): JSX.Element {
   const {
     builtActivities,
@@ -240,6 +240,9 @@ export function SelectCreateActivity(props: {
     goToOldActivityEditor,
     copyActivity,
     deleteBuiltActivity,
+    userCanDeleteActivity,
+    userCanEditActivity,
+    userId,
   } = props;
   return (
     <ColumnDiv
@@ -271,6 +274,9 @@ export function SelectCreateActivity(props: {
         editActivity={onEditActivity}
         copyActivity={copyActivity}
         deleteBuiltActivity={deleteBuiltActivity}
+        userCanDeleteActivity={userCanDeleteActivity}
+        userCanEditActivity={userCanEditActivity}
+        userId={userId}
         onCreateActivity={onCreateActivity}
       />
     </ColumnDiv>
