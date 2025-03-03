@@ -4,34 +4,28 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { UserAccessToken } from '../types';
-import { execGql, userDataQuery } from './api';
 
-export async function loginMicrosoft(
-  accessToken: string
-): Promise<UserAccessToken> {
-  return await execGql<UserAccessToken>(
-    {
-      query: `
-        mutation LoginMicrosoft($accessToken: String) {
-        loginMicrosoft(accessToken: $accessToken) {
-            user {
-              ${userDataQuery}
-            }
-            accessToken
-          }
+export const updateUserInfoResponse = (classroomCode: string) => {
+    return {
+        "updateUserInfo": {
+            "classroomCode": {
+                "code":classroomCode,
+                "createdAt": "2025-03-02T00:00:00.000Z",
+            },
+            "previousClassroomCodes": [
+                {
+                    "code": "1234432112344321",
+                    "createdAt": "2025-03-02T00:00:00.000Z",
+                },
+                {
+                    "code": "5467765445677654",
+                    "createdAt": "2025-03-02T00:00:00.000Z",
+                },
+                {
+                    "code": "8765567887655678",
+                    "createdAt": "2025-03-02T00:00:00.000Z",
+                }
+            ]
         }
-      `,
-      variables: {
-        accessToken: accessToken,
-      },
-    },
-    // login responds with set-cookie, w/o withCredentials it doesnt get stored
-    {
-      dataPath: 'loginMicrosoft',
-      axiosConfig: {
-        withCredentials: true,
-      },
     }
-  );
 }

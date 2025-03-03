@@ -8,19 +8,15 @@ import React from 'react';
 import { useEffect } from 'react';
 import withAuthorizationOnly from '../hooks/wrap-with-authorization-only';
 import { EditGoogleDoc } from './user-view/user-edit-google-doc';
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom';
+import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { URL_PARAM_NEW_DOC } from '../constants';
 import { useWithPrompts } from '../hooks/use-with-prompts';
+import { useNavigateWithParams } from '../hooks/use-navigate-with-params';
 
 function DocView(): JSX.Element {
   const { docId } = useParams<Record<string, string>>();
-  const navigate = useNavigate();
+  const navigate = useNavigateWithParams();
   const { updateCurrentDocId } = useWithState();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);

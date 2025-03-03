@@ -8,14 +8,13 @@ import React, { useEffect } from 'react';
 import { UseWithLogin } from '../../store/slices/login/use-with-login';
 import { LoginStatus } from '../../store/slices/login';
 import { useGoogleLogin } from '@react-oauth/google';
-import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import { LoginUI } from './login-ui';
-
+import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
   const { loginWithGoogle, state: loginState } = useLogin;
-  const navigate = useNavigate();
+  const navigate = useNavigateWithParams();
   const config = useAppSelector((state) => state.config);
   const orgName = config.config?.orgName || 'ABE';
   const loginGoogle = useGoogleLogin({

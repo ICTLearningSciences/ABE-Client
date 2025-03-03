@@ -4,88 +4,83 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Button,
-  FormControlLabel,
+  Drawer,
   IconButton,
-  Switch,
   ThemeProvider,
   createTheme,
 } from '@mui/material';
 import { UseWithLogin } from '../store/slices/login/use-with-login';
 import { useAppSelector } from '../store/hooks';
-import { LoginStatus, UserRole } from '../store/slices/login';
+import { LoginStatus } from '../store/slices/login';
 import { DEFAULT_COLOR_THEME } from '../constants';
 import { Home } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { useWithState } from '../store/slices/state/use-with-state';
 import { HeaderTitle } from './header-title';
-import { ColumnDiv } from '../styled-components';
-
+import { useNavigateWithParams } from '../hooks/use-navigate-with-params';
+import PersonIcon from '@mui/icons-material/Person';
+import { UserInfoSettings } from './settings/user-info-settings';
+import LogoutIcon from '@mui/icons-material/Logout';
 export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
   const { logout } = useLogin;
-  const { updateViewingUserRole, state, updateViewingAdvancedOptions } =
-    useWithState();
   const loginStatus = useAppSelector((state) => state.login.loginStatus);
-  const userRole = useAppSelector((state) => state.login.userRole);
-  const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const loggedIn = loginStatus === LoginStatus.AUTHENTICATED;
-  const isAdminOrContentManager =
-    userRole === UserRole.ADMIN || userRole === UserRole.CONTENT_MANAGER;
-  const navigate = useNavigate();
+  const navigate = useNavigateWithParams();
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
   const theme = createTheme({
     palette: {
       primary: {
-        // gold
         main: colorTheme.headerButtonsColor,
       },
     },
   });
-
-  function roleDisplayText(userRole: UserRole) {
-    switch (userRole) {
-      case UserRole.ADMIN:
-        return 'Admin';
-      case UserRole.CONTENT_MANAGER:
-        return 'Content Manager';
-      default:
-        return 'User';
-    }
-  }
-
-  const roleSwitchChecked = viewingRole !== UserRole.USER;
-  const switchTheme = (checked: boolean) =>
-    createTheme({
-      components: {
-        MuiSwitch: {
-          styleOverrides: {
-            switchBase: {
-              color: checked ? colorTheme.headerButtonsColor : 'white',
-              '&.Mui-checked': {
-                color: checked ? colorTheme.headerButtonsColor : 'white',
-              },
-              '&.Mui-checked + .MuiSwitch-track': {
-                backgroundColor: checked
-                  ? colorTheme.headerButtonsColor
-                  : 'white',
-              },
-            },
-            track: {
-              backgroundColor: checked
-                ? colorTheme.headerButtonsColor
-                : 'lightgrey',
-            },
-          },
-        },
-      },
-    });
+  const [profileOpen, setProfileOpen] = useState(false);
 
   return (
     <ThemeProvider theme={theme}>
+      <Drawer
+        anchor="right"
+        open={profileOpen && loggedIn}
+        onClose={() => {
+          setProfileOpen(false);
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'space-around',
+            height: '100%',
+            padding: 20,
+          }}
+          data-cy="profile-drawer"
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'space-around',
+            }}
+          >
+            <UserInfoSettings />
+          </div>
+          <Button
+            style={{ color: 'blue' }}
+            variant="contained"
+            onClick={async () => {
+              await logout();
+              navigate('/');
+            }}
+          >
+            Logout <LogoutIcon style={{ marginLeft: 10 }} />
+          </Button>
+        </div>
+      </Drawer>
       <header
         data-cy="header"
         style={{
@@ -130,62 +125,17 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
               alignItems: 'center',
             }}
           >
-            {isAdminOrContentManager ? (
-              <ColumnDiv
-                style={{
-                  marginRight: 20,
-                }}
-              >
-                <ThemeProvider theme={() => switchTheme(roleSwitchChecked)}>
-                  <FormControlLabel
-                    data-cy="role-switch"
-                    labelPlacement="start"
-                    control={
-                      <Switch
-                        size="small"
-                        checked={roleSwitchChecked}
-                        onChange={() => {
-                          updateViewingUserRole(
-                            viewingRole !== UserRole.USER
-                              ? UserRole.USER
-                              : userRole
-                          );
-                        }}
-                      />
-                    }
-                    label={roleDisplayText(viewingRole)}
-                  />
-                </ThemeProvider>
-                <ThemeProvider
-                  theme={() => switchTheme(state.viewingAdvancedOptions)}
-                >
-                  <FormControlLabel
-                    labelPlacement="start"
-                    control={
-                      <Switch
-                        size="small"
-                        color="primary"
-                        checked={state.viewingAdvancedOptions}
-                        onChange={(value) => {
-                          updateViewingAdvancedOptions(value.target.checked);
-                        }}
-                      />
-                    }
-                    label="Advanced"
-                  />
-                </ThemeProvider>
-              </ColumnDiv>
-            ) : undefined}
-            <Button
-              style={{ height: 'fit-content', color: 'white' }}
-              variant="outlined"
-              onClick={async () => {
-                await logout();
-                navigate('/');
+            <IconButton
+              onClick={() => {
+                setProfileOpen(true);
               }}
+              style={{
+                color: 'white',
+              }}
+              data-cy="profile-button"
             >
-              Logout
-            </Button>
+              <PersonIcon />
+            </IconButton>
           </div>
         )}
       </header>

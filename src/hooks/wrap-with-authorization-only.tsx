@@ -7,14 +7,14 @@ The full terms of this copyright and license should always be found in the root 
 import React, { useEffect } from 'react';
 import { CircularProgress } from '@mui/material';
 import { LoginStatus } from '../store/slices/login';
-import { useNavigate } from 'react-router-dom';
+import { useNavigateWithParams } from './use-navigate-with-params';
 import { useAppSelector } from '../store/hooks';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const withAuthorizationOnly = (Component: any) => (props: any) => {
   const loginState = useAppSelector((state) => state.login);
-  const navigate = useNavigate();
+  const navigate = useNavigateWithParams();
 
   useEffect(() => {
     if (

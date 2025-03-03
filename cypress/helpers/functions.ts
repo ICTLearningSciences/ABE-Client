@@ -4,6 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { Interception } from 'cypress/types/net-stubbing';
 import { asyncStartRequestRes } from '../fixtures/async-start-request';
 import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
 import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
@@ -23,6 +24,7 @@ import { audienceEmotionsResponse } from '../fixtures/stronger-hook-activity/aud
 import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
 import { entityFoundResponse } from '../fixtures/stronger-hook-activity/entity-found-response';
 import { updateUserActivityStatesResponse } from '../fixtures/update-user-activity-states';
+import { updateUserInfoResponse } from '../fixtures/update-user-info';
 import { testUser } from '../fixtures/user-data';
 import { ACCESS_TOKEN_KEY } from './local-storage';
 import {
@@ -238,7 +240,7 @@ export function cyMockDefault(
     mockGQL('SubmitGoogleDocVersion', {}),
     mockGQL('CopyBuiltActivity', {copyBuiltActivity:createActivityBuilder(testUser._id, 'Copied Activity', 'copied-activity', ActivityBuilderVisibility.EDITABLE)}, {delayMs:1000}),
     mockGQL('DeleteBuiltActivity', {deleteBuiltActivity: ""}),
-  
+    mockGQL('UpdateUserInfo', updateUserInfoResponse("123")),
   ]);
 }
 
@@ -543,7 +545,7 @@ export function toStrongerHookActivity(cy: CypressGlobal, step?: StepNames) {
 export function toPromptEditing(cy: CypressGlobal) {
   cy.visit(`/docs/${testGoogleDocId}`);
   cy.get('[data-cy=doc-goal-cancel-button]').click();
-  cy.get('[data-cy=role-switch]').click();
+  roleSwitch(cy, UserRole.ADMIN)
   cy.get("[data-cy=go-to-old-activity-editor]").click();
   cy.get('[data-cy=prompt-item-Review-Sources]').click();
 }
@@ -561,4 +563,29 @@ export function toPromptActivity(cy: CypressGlobal) {
   cy.get('[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]').click();
   cy.get('[data-cy=activity-display-65a8592b26523c7ce5acac9e]').click();
   cy.get('[data-cy=doc-goal-modal-next-button]').click();
+}
+
+export function cyGetQueryVariables(query: Interception) {
+  const variables = query.request.body.variables;
+  return variables;
+}
+
+function roleDisplayText(userRole: UserRole) {
+  switch (userRole) {
+    case UserRole.ADMIN:
+      return 'Admin';
+    case UserRole.CONTENT_MANAGER:
+      return 'Content Manager';
+    default:
+      return 'User';
+  }
+}
+
+export function roleSwitch(cy: CypressGlobal, targetNewRole: UserRole){
+  cy.get("[data-cy=profile-button]").click();
+  cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText(UserRole.USER))
+  cy.get("[data-cy=role-switch]").click();
+  cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText(targetNewRole))
+  // click center of screen to close drawer
+  cy.get("body").click(0, 0);
 }

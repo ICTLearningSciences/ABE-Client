@@ -7,8 +7,14 @@ The full terms of this copyright and license should always be found in the root 
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import * as loginActions from '.';
 import { useEffect } from 'react';
-import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
-import { UserAccessToken } from '../../../types';
+import {
+  ACCESS_TOKEN_KEY,
+  CLASSROOM_CODE_KEY,
+  localStorageClear,
+  localStorageGet,
+} from '../../local-storage';
+import { UpdateUserInfo, User, UserAccessToken } from '../../../types';
+import { removeQueryParamFromUrl } from '../../../helpers';
 
 export interface UseWithLogin {
   state: loginActions.LoginState;
@@ -17,6 +23,7 @@ export interface UseWithLogin {
   loginWithMicrosoft: (microsoftAccessToken: string) => Promise<void>;
   refreshAccessToken: () => void;
   setUser: (user: UserAccessToken) => void;
+  updateUserInfo: (userInfo: UpdateUserInfo) => Promise<User>;
 }
 
 // Gives you a way to interface with the redux store (which has the user information)
@@ -25,6 +32,7 @@ export function useWithLogin(): UseWithLogin {
   const state: loginActions.LoginState = useAppSelector((state) => state.login);
 
   useEffect(() => {
+    checkForClassroomCode(state.loginStatus);
     if (
       state.loginStatus === loginActions.LoginStatus.AUTHENTICATED ||
       state.loginStatus === loginActions.LoginStatus.IN_PROGRESS
@@ -38,6 +46,22 @@ export function useWithLogin(): UseWithLogin {
       dispatch(loginActions.logout());
     }
   }, [state.loginStatus]);
+
+  async function checkForClassroomCode(loginStatus: loginActions.LoginStatus) {
+    if (loginStatus !== loginActions.LoginStatus.AUTHENTICATED) {
+      return;
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const classroomCodeUrlParam = urlParams.get('classroomCode');
+    const classroomCodeLocalStorage = localStorageGet(CLASSROOM_CODE_KEY);
+    if (classroomCodeUrlParam) {
+      await updateUserInfo({ classroomCode: classroomCodeUrlParam });
+    } else if (classroomCodeLocalStorage) {
+      await updateUserInfo({ classroomCode: classroomCodeLocalStorage });
+    }
+    removeQueryParamFromUrl('classroomCode');
+    localStorageClear(CLASSROOM_CODE_KEY);
+  }
 
   async function loginWithGoogle(googleAccessToken: string) {
     if (
@@ -87,6 +111,11 @@ export function useWithLogin(): UseWithLogin {
     dispatch(loginActions.setUser(user));
   }
 
+  async function updateUserInfo(userInfo: UpdateUserInfo): Promise<User> {
+    const user = await dispatch(loginActions._updateUserInfo(userInfo));
+    return user.payload as User;
+  }
+
   return {
     state,
     logout,
@@ -94,5 +123,6 @@ export function useWithLogin(): UseWithLogin {
     loginWithMicrosoft,
     refreshAccessToken,
     setUser,
+    updateUserInfo,
   };
 }
