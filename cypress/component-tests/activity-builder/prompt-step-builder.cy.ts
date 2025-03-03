@@ -6,9 +6,11 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import { PromptStepBuilder } from "../../../src/components/activity-builder/edit-activity/step-builder/prompt-step-builder";
+import { useWithExecutePrompt } from "../../../src/hooks/use-with-execute-prompts";
 import { examplePromptActivityStep, multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
 describe("Prompt Step Builder", ()=>{
     it("should render", ()=>{
+        const {executePromptSteps} = useWithExecutePrompt();
         let step = examplePromptActivityStep;
         const systemMessageStepBuilder = PromptStepBuilder({
             step,
@@ -24,6 +26,7 @@ describe("Prompt Step Builder", ()=>{
             stopPreview: ()=>{
             },
             versions: [],
+            executePromptSteps: executePromptSteps
         });
         cy.mount(systemMessageStepBuilder);
     })

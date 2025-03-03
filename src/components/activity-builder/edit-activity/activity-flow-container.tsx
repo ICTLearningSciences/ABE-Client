@@ -18,6 +18,8 @@ import { ColumnDiv } from '../../../styled-components';
 import { PromptStepBuilder } from './step-builder/prompt-step-builder';
 import { FlowErrors } from '../../../classes/activity-builder-activity/activity-step-error-checker';
 import ErrorIcon from '@mui/icons-material/Error';
+import { AiServicesResponseTypes } from '../../../ai-services/ai-service-types';
+import { AiPromptStep } from '../../../types';
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -61,6 +63,10 @@ export function ActivityFlowContainer(props: {
   versions: BuiltActivityVersion[];
   disabled?: boolean;
   stepErrors: FlowErrors;
+  executePromptSteps: (
+    aiPromptSteps: AiPromptStep[],
+    callback?: (response: AiServicesResponseTypes) => void
+  ) => Promise<AiServicesResponseTypes>;
 }): JSX.Element {
   const {
     localActivity,
@@ -69,6 +75,7 @@ export function ActivityFlowContainer(props: {
     stepErrors,
     globalStateKeys,
     disabled,
+    executePromptSteps,
   } = props;
   const flowsList = localActivity.flowsList;
   const allStepVersions: StepVersion[] = versions
@@ -169,6 +176,7 @@ export function ActivityFlowContainer(props: {
           setPreviewPromptId={(id: string) => setPreviewPromptId(id)}
           getVersionsForStep={getVersionsForStep}
           disabled={disabled}
+          executePromptSteps={executePromptSteps}
         />
       </CustomTabPanel>
     );
@@ -193,6 +201,7 @@ export function ActivityFlowContainer(props: {
           stopPreview={() => setPreviewPromptId('')}
           versions={getVersionsForStep(previewPrompt.stepId)}
           errors={[]}
+          executePromptSteps={executePromptSteps}
         />
       </ColumnDiv>
     );

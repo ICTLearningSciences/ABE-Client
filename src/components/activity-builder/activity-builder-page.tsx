@@ -7,7 +7,9 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { SelectCreateActivity } from './select-create-activity';
 import { EditActivity } from './edit-activity/edit-activity';
-import { ActivityBuilder } from './types';
+import { ActivityBuilder, BuiltActivityVersion } from './types';
+import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
+import { AiPromptStep } from '../../types';
 
 /**
  * This component is the main component for the activity builder page.
@@ -32,7 +34,15 @@ export function ActivityBuilderPage(props: {
   onCopyActivity: (activityId: string) => Promise<ActivityBuilder>;
   userCanEditActivity: (activity: ActivityBuilder) => boolean;
   userCanDeleteActivity: () => boolean;
+  activityVersions: Record<string, BuiltActivityVersion[]>;
+  loadActivityVersions: (
+    activityClientId: string
+  ) => Promise<BuiltActivityVersion[]>;
   userId: string;
+  executePromptSteps: (
+    aiPromptSteps: AiPromptStep[],
+    callback?: (response: AiServicesResponseTypes) => void
+  ) => Promise<AiServicesResponseTypes>;
 }): JSX.Element {
   const {
     previewActivity,
@@ -45,7 +55,10 @@ export function ActivityBuilderPage(props: {
     onCopyActivity,
     userCanEditActivity,
     userCanDeleteActivity,
+    activityVersions,
+    loadActivityVersions,
     userId,
+    executePromptSteps,
   } = props;
   const [selectedActivityClientId, setSelectedActivityClientId] =
     React.useState<string>(overrideCurActivity?.clientId || '');
@@ -85,6 +98,9 @@ export function ActivityBuilderPage(props: {
           return await onSaveActivity(activity);
         }}
         userCanEditActivity={userCanEditActivity}
+        activityVersions={activityVersions}
+        loadActivityVersions={loadActivityVersions}
+        executePromptSteps={executePromptSteps}
       />
     );
   }

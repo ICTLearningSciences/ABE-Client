@@ -3,6 +3,7 @@ import {
   ActivityBuilderStepType,
   ActivityBuilder as ActivityBuilderType,
   ActivityBuilderVisibility,
+  BuiltActivityVersion,
   FlowItem,
 } from '../types';
 import { ActivityFlowContainer } from './activity-flow-container';
@@ -13,18 +14,27 @@ import { equals } from '../../../helpers';
 import { v4 as uuidv4 } from 'uuid';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { isActivityRunnable } from '../helpers';
-import { useWithActivityVersions } from '../../../hooks/use-with-activity-versions';
 import {
   DOC_NUM_WORDS_KEY,
   DOC_TEXT_KEY,
 } from '../../../classes/activity-builder-activity/built-activity-handler';
 import { useWithCheckActivityErrors } from '../../../hooks/use-with-check-activity-errors';
+import { AiServicesResponseTypes } from '../../../ai-services/ai-service-types';
+import { AiPromptStep } from '../../../types';
 export function EditActivity(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   activity: ActivityBuilderType;
   saveActivity: (activity: ActivityBuilderType) => Promise<ActivityBuilderType>;
   returnTo: () => void;
   userCanEditActivity: (activity: ActivityBuilderType) => boolean;
+  activityVersions: Record<string, BuiltActivityVersion[]>;
+  loadActivityVersions: (
+    activityClientId: string
+  ) => Promise<BuiltActivityVersion[]>;
+  executePromptSteps: (
+    aiPromptSteps: AiPromptStep[],
+    callback?: (response: AiServicesResponseTypes) => void
+  ) => Promise<AiServicesResponseTypes>;
 }): JSX.Element {
   const {
     activity,
@@ -32,13 +42,15 @@ export function EditActivity(props: {
     goToActivity,
     returnTo,
     userCanEditActivity,
+    activityVersions,
+    loadActivityVersions,
+    executePromptSteps,
   } = props;
 
   const [localActivityCopy, setLocalActivityCopy] =
     React.useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
   const canEditActivity = userCanEditActivity(activity);
-  const { activityVersions, loadActivityVersions } = useWithActivityVersions();
   const globalStateKeys: string[] = useMemo(() => {
     return localActivityCopy.flowsList.reduce(
       (acc, flow) => {
@@ -213,6 +225,7 @@ export function EditActivity(props: {
         versions={activityVersions[localActivityCopy.clientId] || []}
         disabled={!canEditActivity}
         stepErrors={errors}
+        executePromptSteps={executePromptSteps}
       />
     </ColumnDiv>
   );

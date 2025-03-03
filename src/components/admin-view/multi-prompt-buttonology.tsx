@@ -30,6 +30,8 @@ import { isActivityBuilder } from '../activity-builder/types';
 import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
+import { useWithActivityVersions } from '../../hooks/use-with-activity-versions';
+import { useWithExecutePrompt } from '../../hooks/use-with-execute-prompts';
 export const emptyOpenAiPromptStep = (): AiPromptStep => {
   return {
     prompts: [
@@ -61,6 +63,8 @@ export function MultiPromptTesting(props: {
     copyBuiltActivity,
     deleteBuiltActivity,
   } = useWithDocGoalsActivities();
+  const { activityVersions, loadActivityVersions } = useWithActivityVersions();
+  const { executePromptSteps } = useWithExecutePrompt();
   const [viewActivityBuilder, setViewActivityBuilder] = useState<boolean>(true);
   const user = useAppSelector((state) => state.login.user);
   const activitiesWithPrompts = activities.filter(
@@ -175,6 +179,9 @@ export function MultiPromptTesting(props: {
             setViewActivityBuilder(false);
           }}
           userCanDeleteActivity={() => user?.userRole === UserRole.ADMIN}
+          activityVersions={activityVersions}
+          loadActivityVersions={loadActivityVersions}
+          executePromptSteps={executePromptSteps}
         />
       </ColumnDiv>
     );

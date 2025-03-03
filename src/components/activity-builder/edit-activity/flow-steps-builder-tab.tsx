@@ -38,7 +38,8 @@ import {
   getDefaultConditionalStep,
 } from './step-builder/conditional-step-builder';
 import { StepErrors } from '../../../classes/activity-builder-activity/activity-step-error-checker';
-
+import { AiServicesResponseTypes } from '../../../ai-services/ai-service-types';
+import { AiPromptStep } from '../../../types';
 export function FlowStepsBuilderTab(props: {
   stepsErrors?: StepErrors;
   globalStateKeys: string[];
@@ -50,6 +51,10 @@ export function FlowStepsBuilderTab(props: {
   setPreviewPromptId: (id: string) => void;
   getVersionsForStep: (stepId: string) => StepVersion[];
   disabled?: boolean;
+  executePromptSteps: (
+    aiPromptSteps: AiPromptStep[],
+    callback?: (response: AiServicesResponseTypes) => void
+  ) => Promise<AiServicesResponseTypes>;
 }) {
   const {
     flow,
@@ -59,6 +64,7 @@ export function FlowStepsBuilderTab(props: {
     globalStateKeys,
     disabled,
     stepsErrors,
+    executePromptSteps,
   } = props;
 
   function renderActivityStep(step: ActivityBuilderStepTypes, i: number) {
@@ -105,6 +111,7 @@ export function FlowStepsBuilderTab(props: {
             stopPreview={() => setPreviewPromptId('')}
             versions={props.getVersionsForStep(step.stepId)}
             errors={errors}
+            executePromptSteps={executePromptSteps}
           />
         );
       case ActivityBuilderStepType.CONDITIONAL:
