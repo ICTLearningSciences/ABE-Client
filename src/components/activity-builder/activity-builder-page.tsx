@@ -5,26 +5,44 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { SelectCreateActivity } from './select-create-activity';
 import { EditActivity } from './edit-activity/edit-activity';
 import { ActivityBuilder } from './types';
 
+/**
+ * This component is the main component for the activity builder page.
+ * It is used to create and edit activities.
+ * It is also used to select an existing activity to edit.
+ * @param previewActivity: called when an activitied "Preview" button is clicked
+ * @param overrideCurActivity: allows you to override the current activity to edit
+ * @param goToOldActivityEditor: an optional function, if provided, will show the old activity editor button
+ * @param deleteBuiltActivity: function called when the delete activity button is clicked
+ * @param onSaveActivity: function called when the save activity button is clicked
+ * @param onCreateNewActivity: function called when the + CREATE NEW ACTIVITY button is clicked. MUST return the clientId of the new activity
+ * @returns
+ */
 export function ActivityBuilderPage(props: {
-  goToActivity: (activity: ActivityBuilder) => void;
-  curActivity?: ActivityBuilder;
-  goToOldActivityEditor: () => void;
+  previewActivity: (activity: ActivityBuilder) => void;
+  overrideCurActivity?: ActivityBuilder;
+  goToOldActivityEditor?: () => void;
+  builtActivities: ActivityBuilder[];
+  deleteBuiltActivity: (activityId: string) => Promise<void>;
+  onSaveActivity: (activity: ActivityBuilder) => Promise<ActivityBuilder>;
+  onCreateNewActivity: () => Promise<ActivityBuilder>;
+  onCopyActivity: (activityId: string) => Promise<ActivityBuilder>;
 }): JSX.Element {
-  const { goToActivity, curActivity, goToOldActivityEditor } = props;
   const {
-    builtActivities,
-    addOrUpdateBuiltActivity,
-    addNewLocalBuiltActivity,
-    copyBuiltActivity,
+    previewActivity,
+    overrideCurActivity,
+    goToOldActivityEditor,
     deleteBuiltActivity,
-  } = useWithDocGoalsActivities();
+    builtActivities,
+    onSaveActivity,
+    onCreateNewActivity,
+    onCopyActivity,
+  } = props;
   const [selectedActivityClientId, setSelectedActivityClientId] =
-    React.useState<string>(curActivity?.clientId || '');
+    React.useState<string>(overrideCurActivity?.clientId || '');
   const selectedActivity = builtActivities.find(
     (activity) => activity.clientId === selectedActivityClientId
   );
@@ -32,15 +50,15 @@ export function ActivityBuilderPage(props: {
   if (!selectedActivity) {
     return (
       <SelectCreateActivity
-        copyActivity={copyBuiltActivity}
+        copyActivity={onCopyActivity}
         goToOldActivityEditor={goToOldActivityEditor}
-        goToActivity={goToActivity}
+        goToActivity={previewActivity}
         builtActivities={builtActivities}
         onEditActivity={(activity) => {
           setSelectedActivityClientId(activity.clientId);
         }}
-        onCreateActivity={() => {
-          const newActivity = addNewLocalBuiltActivity();
+        onCreateActivity={async () => {
+          const newActivity = await onCreateNewActivity();
           setSelectedActivityClientId(newActivity.clientId);
         }}
         deleteBuiltActivity={deleteBuiltActivity}
@@ -52,10 +70,10 @@ export function ActivityBuilderPage(props: {
         returnTo={() => {
           setSelectedActivityClientId('');
         }}
-        goToActivity={goToActivity}
+        goToActivity={previewActivity}
         activity={selectedActivity}
         saveActivity={async (activity) => {
-          return await addOrUpdateBuiltActivity(activity);
+          return await onSaveActivity(activity);
         }}
       />
     );

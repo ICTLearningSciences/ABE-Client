@@ -224,7 +224,7 @@ export function ExistingActivities(props: {
 }
 
 export function SelectCreateActivity(props: {
-  goToOldActivityEditor: () => void;
+  goToOldActivityEditor?: () => void;
   goToActivity: (activity: ActivityBuilderType) => void;
   builtActivities: ActivityBuilderType[];
   onEditActivity: (activity: ActivityBuilderType) => void;
@@ -251,17 +251,19 @@ export function SelectCreateActivity(props: {
         position: 'relative',
       }}
     >
-      <Button
-        data-cy="go-to-old-activity-editor"
-        onClick={goToOldActivityEditor}
-        style={{
-          position: 'absolute',
-          top: 10,
-          right: 10,
-        }}
-      >
-        Old Activity Editor
-      </Button>
+      {goToOldActivityEditor && (
+        <Button
+          data-cy="go-to-old-activity-editor"
+          onClick={goToOldActivityEditor}
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+          }}
+        >
+          Old Activity Editor
+        </Button>
+      )}
       <h1>Activity Builder</h1>
       <ExistingActivities
         goToActivity={goToActivity}

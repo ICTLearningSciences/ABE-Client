@@ -27,6 +27,7 @@ import { isPromptInActivity } from '../../helpers';
 import { EditPrompt } from './prompt-editing/edit-prompt';
 import { ActivityBuilderPage } from '../activity-builder/activity-builder-page';
 import { isActivityBuilder } from '../activity-builder/types';
+import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 
 export const emptyOpenAiPromptStep = (): AiPromptStep => {
   return {
@@ -52,6 +53,13 @@ export function MultiPromptTesting(props: {
   const [targetPromptId, setTargetPromptId] = useState<string>();
   const { prompts, handleSavePrompt, editOrAddPrompt, isLoading } =
     useWithPrompts;
+  const {
+    builtActivities,
+    addOrUpdateBuiltActivity,
+    addNewLocalBuiltActivity,
+    copyBuiltActivity,
+    deleteBuiltActivity,
+  } = useWithDocGoalsActivities();
   const [viewActivityBuilder, setViewActivityBuilder] = useState<boolean>(true);
   const activitiesWithPrompts = activities.filter(
     (activity) => (activity.prompts?.length || 0) > 0
@@ -143,12 +151,20 @@ export function MultiPromptTesting(props: {
         }}
       >
         <ActivityBuilderPage
-          curActivity={
+          onCreateNewActivity={async () => {
+            const newActivity = addNewLocalBuiltActivity();
+            return newActivity;
+          }}
+          onCopyActivity={copyBuiltActivity}
+          onSaveActivity={addOrUpdateBuiltActivity}
+          builtActivities={builtActivities}
+          deleteBuiltActivity={deleteBuiltActivity}
+          overrideCurActivity={
             curActivity && isActivityBuilder(curActivity)
               ? curActivity
               : undefined
           }
-          goToActivity={goToActivity}
+          previewActivity={goToActivity}
           goToOldActivityEditor={() => {
             setViewActivityBuilder(false);
           }}
