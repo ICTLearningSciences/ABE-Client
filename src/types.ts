@@ -216,6 +216,7 @@ export interface ColorThemeConfig {
 export interface SurveyConfig {
   surveyLink: string;
   surveyQueryParam: string;
+  surveyClassroomParam: string;
 }
 
 export interface Config {

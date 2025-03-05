@@ -533,6 +533,7 @@ export async function fetchConfig(subdomain?: string): Promise<Config> {
             surveyConfig{
               surveyLink
               surveyQueryParam
+              surveyClassroomParam
             }
           }
         }

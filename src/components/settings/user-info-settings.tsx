@@ -21,10 +21,12 @@ export function UserInfoSettings(): JSX.Element {
   const previousClassroomCodes = state.user?.previousClassroomCodes;
   const surveyUrl = configState.config?.surveyConfig?.surveyLink;
   const surveyUrlParam = configState.config?.surveyConfig?.surveyQueryParam;
+  const surveyClassroomParam =
+    configState.config?.surveyConfig?.surveyClassroomParam;
   function takeSurvey() {
-    if (surveyUrl && surveyUrlParam) {
+    if (surveyUrl && surveyUrlParam && surveyClassroomParam) {
       window.open(
-        `${surveyUrl}?${surveyUrlParam}=${state.user?._id}`,
+        `${surveyUrl}?${surveyUrlParam}=${state.user?._id}&${surveyClassroomParam}=${classroomCode?.code}`,
         '_blank'
       );
     }
