@@ -462,27 +462,6 @@ export function DocGoalModal(props: {
           ) : (
             <>
               <CircularProgress />
-              <dialog
-                open
-                style={{
-                  position: 'fixed',
-                  top: '0',
-                  left: '0',
-                  right: '0',
-                  bottom: '0',
-                  width: '500px',
-                  height: '500px',
-                  backgroundColor: 'white',
-                  zIndex: 1000,
-                  padding: '20px',
-                  overflow: 'scroll',
-                }}
-              >
-                {googleDocId}
-                {JSON.stringify(googleDocs || '{}')}
-                {JSON.stringify(googleDoc || '{}')}
-                {firstLoadComplete}
-              </dialog>
             </>
           )}
         </Box>

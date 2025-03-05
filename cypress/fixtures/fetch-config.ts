@@ -76,7 +76,8 @@ export const fetchConfigResponse: FetchConfigResponse = {
         orgName: "",
         surveyConfig: {
             surveyLink: "https://test-survey-link.com",
-            surveyQueryParam: "userId"
+            surveyQueryParam: "userId",
+            surveyClassroomParam: "classroomId"
         }
     }   
 }
