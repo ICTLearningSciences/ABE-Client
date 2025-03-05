@@ -24,11 +24,15 @@ export function UserInfoSettings(): JSX.Element {
   const surveyClassroomParam =
     configState.config?.surveyConfig?.surveyClassroomParam;
   function takeSurvey() {
-    if (surveyUrl && surveyUrlParam && surveyClassroomParam) {
-      window.open(
-        `${surveyUrl}?${surveyUrlParam}=${state.user?._id}&${surveyClassroomParam}=${classroomCode?.code}`,
-        '_blank'
-      );
+    if (surveyUrl) {
+      const url = new URL(surveyUrl);
+      if (state.user?._id && surveyUrlParam) {
+        url.searchParams.set(surveyUrlParam, state.user?._id);
+      }
+      if (classroomCode?.code && surveyClassroomParam) {
+        url.searchParams.set(surveyClassroomParam, classroomCode?.code);
+      }
+      window.open(url.toString(), '_blank');
     }
   }
 
