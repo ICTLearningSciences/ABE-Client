@@ -104,7 +104,8 @@ export function ChatActivity(props: {
       (activity) => activity?._id === activityFromParams
     );
     setGoalAndActivity(goal, activity);
-    const goalHasActivities = goal?.activities?.length;
+    const goalHasActivities =
+      goal?.activities?.length || goal?.builtActivities?.length;
     if (!activity && goalHasActivities) {
       setDocGoalModalOpen(true);
     }

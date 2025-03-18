@@ -102,9 +102,9 @@ export function Chat(props: {
       : undefined
   );
   const messages = googleDocId ? chatState.chatLogs[googleDocId] : [];
-  const goalHasActivities = Boolean(
-    selectedGoal?.activities && selectedGoal.activities.length > 0
-  );
+  const goalHasActivities =
+    (selectedGoal?.activities && selectedGoal.activities.length > 0) ||
+    (selectedGoal?.builtActivities && selectedGoal.builtActivities.length > 0);
   const disableInput =
     coachResponsePending ||
     Boolean(

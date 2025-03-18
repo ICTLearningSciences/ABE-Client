@@ -164,7 +164,10 @@ export function DocGoalModal(props: {
   }
 
   function goalHasActivities(goal: DocGoal) {
-    return goal.activities && goal.activities.length;
+    return (
+      (goal.activities && goal.activities.length) ||
+      goal.builtActivities?.length
+    );
   }
 
   function completeModal(goal: DocGoal) {
