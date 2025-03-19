@@ -11,7 +11,6 @@ export function useWithFavicon() {
   const config = useWithConfig();
   const orgName = config.state.config?.orgName || 'abe';
   const configLoaded = config.isConfigLoaded();
-  const timestamp = new Date().getTime();
 
   useEffect(() => {
     if (!configLoaded) {
@@ -30,7 +29,7 @@ export function useWithFavicon() {
     const link = document.createElement('link');
     link.id = 'favicon';
     link.rel = 'icon';
-    link.href = `/${orgName}-favicon.ico?v=${timestamp}`;
+    link.href = `/${orgName}-favicon.ico`;
     document.head.appendChild(link);
 
     return () => {
