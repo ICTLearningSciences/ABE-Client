@@ -18,6 +18,7 @@ import { useWithLogin } from './store/slices/login/use-with-login';
 import { useReduxHydration } from './use-redux-hydration';
 import { useConfigLoader } from './components/config-loading/use-config-loader';
 import DocHistoryContainer from './components/user-view/document-timeline/doc-history-container';
+import { useWithFavicon } from './hooks/use-with-favicon';
 
 function MainApp() {
   const useLogin = useWithLogin();
@@ -86,6 +87,7 @@ function MainApp() {
   ]);
   const { ConfigLoader, configLoaded } = useConfigLoader();
   useReduxHydration();
+  useWithFavicon();
   if (!configLoaded) {
     return <ConfigLoader />;
   }
