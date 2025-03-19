@@ -1,5 +1,8 @@
  # ABE-PROTOTYPE
 
+Favicon is selected based on the orgName in the config, allowing for subdomains to have different favicons.
+This requires there to be a favicon.ico file in the public folder with the naming convention of `{orgName}-favicon.ico`.
+
 To deploy:
 ```
 npm run build
