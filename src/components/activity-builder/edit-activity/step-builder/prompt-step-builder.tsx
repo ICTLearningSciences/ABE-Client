@@ -614,6 +614,14 @@ export function PromptStepBuilder(props: {
           }}
         />
 
+        <CheckBoxInput
+          label="Enable Web Search"
+          value={step.webSearch || false}
+          onChange={(e) => {
+            updateField('webSearch', e);
+          }}
+        />
+
         <InputField
           label="Custom System Role"
           value={step.customSystemRole}
