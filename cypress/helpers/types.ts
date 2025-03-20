@@ -13,8 +13,6 @@ export enum GptModels {
   NONE = '',
 }
 
-
-
 export enum DisplayIcons {
   LIGHT_BULB = 'LIGHT_BULB',
   PENCIL = 'PENCIL',

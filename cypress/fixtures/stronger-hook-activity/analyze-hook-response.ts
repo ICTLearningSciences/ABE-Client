@@ -45,10 +45,12 @@ export const analyzeHookResponse = (emotionRating: number, narrativityRating: nu
                             {
                                 "index": 0,
                                 "message": {
+                                    "refusal": null,
                                     "role": "assistant",
                                     "content": `{\n\t\"content\": {\n\t\t\"thesis_statement\": \"The ethical considerations surrounding the design and use of AI are crucial for shaping a future where AI benefits humanity while minimizing harm.\",\n\t\t\"paragraph\": \"AI ethics is a critical field of study and practice that aims to ensure that artificial intelligence systems are developed, deployed, and used in a responsible and morally sound manner. It encompasses a range of principles and guidelines to address concerns related to fairness, accountability, transparency, privacy, and bias in AI systems. Central to AI ethics is the need to balance the potential benefits of AI with the potential risks and consequences, while also considering the social, cultural, and legal implications of AI technologies. As AI continues to advance and integrate into various aspects of society, the ethical considerations surrounding its design and use become increasingly important in shaping a future where AI benefits humanity while minimizing harm.\"\n\t},\n\t\"emotion\": {\n\t\t\"emotions\": [\"concern\", \"responsibility\", \"moral\", \"fairness\", \"accountability\", \"transparency\", \"privacy\", \"bias\", \"risks\", \"consequences\"],\n\t\t\"rating\": ${emotionRating},\n\t\t\"justification\": \"The paragraph discusses various ethical concerns, such as fairness, accountability, privacy, and bias, which evoke emotions like concern and responsibility. These emotions are central to the field of AI ethics, making the paragraph emotionally engaging.\"\n\t},\n\t\"narrativity\": {\n\t\t\"rating\": ${narrativityRating},\n\t\t\"justification\": \"The paragraph provides an overview of AI ethics, principles, and guidelines related to the design and use of AI systems. It does not extensively discuss specific incidents or stories, making it less narrative.\"\n\t},\n\t\"overall\": {\n\t\t\"rating\": 3,\n\t\t\"justification\": \"${finalJustification}\"\n\t}\n}`
                                 },
-                                "finish_reason": "stop"
+                                "finish_reason": "stop",
+                                "logprobs": null
                             }
                         ],
                         tokenUsage:{
