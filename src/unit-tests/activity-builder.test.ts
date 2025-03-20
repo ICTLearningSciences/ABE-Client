@@ -237,6 +237,7 @@ test('can collect data from ai response and display', async () => {
       responseFormat:
         'Respond in JSON. Validate that your response is valid JSON. Your JSON must follow this format:\n{\n  "nickname": "string"\n}\n',
       systemRole: 'user',
+      webSearch: false,
     },
   ]);
   confirmStepMessage(
@@ -302,6 +303,7 @@ test('can send data to prompt requests', async () => {
       responseFormat:
         'Respond in JSON. Validate that your response is valid JSON. Your JSON must follow this format:\n{\n  "nickname": "string"\t// a nickname generated for the supplied name\n}\n',
       systemRole: 'user',
+      webSearch: false,
     },
   ]);
   confirmStepMessage(

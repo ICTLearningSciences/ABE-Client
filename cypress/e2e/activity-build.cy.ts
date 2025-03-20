@@ -98,7 +98,7 @@ describe('activity builder', () => {
     })
 
     describe("content managers", ()=>{
-        it.only("can see all activities", ()=>{
+        it("can see all activities", ()=>{
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
               });

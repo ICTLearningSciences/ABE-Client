@@ -391,6 +391,7 @@ export function PromptStepBuilder(props: {
       outputDataType: step.outputDataType,
       responseFormat: step.responseFormat,
       systemRole: step.customSystemRole,
+      webSearch: step.webSearch || false,
     });
     const promptConfig: PromptConfiguration = {
       promptText: step.promptText,
