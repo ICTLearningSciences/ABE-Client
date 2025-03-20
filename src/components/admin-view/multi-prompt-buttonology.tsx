@@ -23,11 +23,15 @@ import {
   SavedPromptsView,
 } from './prompt-editing/saved-prompts-view';
 import { SavedActivityPromptsView } from './prompt-editing/saved-activity-prompts-view';
-import { isPromptInActivity } from '../../helpers';
+import { isPromptInActivity, userCanEditActivity } from '../../helpers';
 import { EditPrompt } from './prompt-editing/edit-prompt';
 import { ActivityBuilderPage } from '../activity-builder/activity-builder-page';
 import { isActivityBuilder } from '../activity-builder/types';
-
+import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
+import { useAppSelector } from '../../store/hooks';
+import { UserRole } from '../../store/slices/login';
+import { useWithActivityVersions } from '../../hooks/use-with-activity-versions';
+import { useWithExecutePrompt } from '../../hooks/use-with-execute-prompts';
 export const emptyOpenAiPromptStep = (): AiPromptStep => {
   return {
     prompts: [
@@ -52,7 +56,17 @@ export function MultiPromptTesting(props: {
   const [targetPromptId, setTargetPromptId] = useState<string>();
   const { prompts, handleSavePrompt, editOrAddPrompt, isLoading } =
     useWithPrompts;
+  const {
+    builtActivities,
+    addOrUpdateBuiltActivity,
+    addNewLocalBuiltActivity,
+    copyBuiltActivity,
+    deleteBuiltActivity,
+  } = useWithDocGoalsActivities();
+  const { activityVersions, loadActivityVersions } = useWithActivityVersions();
+  const { executePromptSteps } = useWithExecutePrompt();
   const [viewActivityBuilder, setViewActivityBuilder] = useState<boolean>(true);
+  const user = useAppSelector((state) => state.login.user);
   const activitiesWithPrompts = activities.filter(
     (activity) => (activity.prompts?.length || 0) > 0
   );
@@ -143,15 +157,31 @@ export function MultiPromptTesting(props: {
         }}
       >
         <ActivityBuilderPage
-          curActivity={
+          userId={user?._id || ''}
+          userCanEditActivity={(activity) =>
+            user ? userCanEditActivity(activity, user) : false
+          }
+          onCreateNewActivity={async () => {
+            const newActivity = addNewLocalBuiltActivity();
+            return newActivity;
+          }}
+          onCopyActivity={copyBuiltActivity}
+          onSaveActivity={addOrUpdateBuiltActivity}
+          builtActivities={builtActivities}
+          deleteBuiltActivity={deleteBuiltActivity}
+          overrideCurActivity={
             curActivity && isActivityBuilder(curActivity)
               ? curActivity
               : undefined
           }
-          goToActivity={goToActivity}
+          previewActivity={goToActivity}
           goToOldActivityEditor={() => {
             setViewActivityBuilder(false);
           }}
+          userCanDeleteActivity={() => user?.userRole === UserRole.ADMIN}
+          activityVersions={activityVersions}
+          loadActivityVersions={loadActivityVersions}
+          executePromptSteps={executePromptSteps}
         />
       </ColumnDiv>
     );

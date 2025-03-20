@@ -36,7 +36,6 @@ import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
 import { AiServicesResponseTypes } from '../../../../ai-services/ai-service-types';
 import ViewPreviousRunModal from '../../../admin-view/view-previous-run-modal';
 import { recursivelyConvertExpectedDataToAiPromptString } from '../../helpers';
-import { useWithExecutePrompt } from '../../../../hooks/use-with-execute-prompts';
 import { TextDialog } from '../../../dialog';
 import ViewPreviousRunsModal from '../../../admin-view/view-previous-runs-modal';
 import { JsonResponseDataUpdater } from './json-response-data-builder';
@@ -89,6 +88,10 @@ export function PromptStepBuilder(props: {
   width?: string;
   height?: string;
   versions: StepVersion[];
+  executePromptSteps: (
+    aiPromptSteps: AiPromptStep[],
+    callback?: (response: AiServicesResponseTypes) => void
+  ) => Promise<AiServicesResponseTypes>;
 }): JSX.Element {
   const {
     step,
@@ -101,11 +104,11 @@ export function PromptStepBuilder(props: {
     flowsList,
     versions,
     errors,
+    executePromptSteps,
   } = props;
   const currentFLow = flowsList.find((f) => {
     return f.steps.find((s) => s.stepId === step.stepId);
   });
-  const { executePromptSteps } = useWithExecutePrompt();
   const [viewRunResults, setViewRunResults] =
     React.useState<AiServicesResponseTypes>();
   const [previousRunResults, setPreviousRunResults] = React.useState<
