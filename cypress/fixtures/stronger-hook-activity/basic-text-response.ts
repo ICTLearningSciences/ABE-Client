@@ -31,10 +31,12 @@ export const openAiTextResponse = (resText: string, jobStatus?: JobStatus): AiJo
                             {
                                 "index": 0,
                                 "message": {
+                                    "refusal": null,
                                     "role": "assistant",
                                     "content": resText
                                 },
-                                "finish_reason": "stop"
+                                "finish_reason": "stop",
+                                "logprobs": null
                             }
                         ],
                         tokenUsage:{

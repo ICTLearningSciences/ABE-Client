@@ -40,10 +40,12 @@ export const audienceEmotionsResponse = (audienceEmotions: AudienceEmtionsMember
                             {
                                 "index": 0,
                                 "message": {
+                                    "refusal": null,
                                     "role": "assistant",
                                     "content": JSON.stringify({audience: audienceEmotions})
                                 },
-                                "finish_reason": "stop"
+                                "finish_reason": "stop",
+                                "logprobs": null
                             }
                         ],
                         tokenUsage:{

@@ -49,10 +49,12 @@ export const entityFoundResponse = (entities: Experience[], jobStatus?: JobStatu
                             {
                                 "index": 0,
                                 "message": {
+                                    "refusal": null,
                                     "role": "assistant",
                                     "content": response
                                 },
-                                "finish_reason": "stop"
+                                "finish_reason": "stop",
+                                "logprobs": null
                             }
                         ],
                         tokenUsage:{

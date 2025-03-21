@@ -64,6 +64,7 @@ export const fullBuiltActivityQueryData = `
                               outputDataType
                               jsonResponseData
                               customSystemRole
+                              webSearch
                           }
 
                                                     ... on ConditionalActivityStepType {

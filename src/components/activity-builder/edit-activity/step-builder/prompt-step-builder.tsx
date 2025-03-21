@@ -391,6 +391,7 @@ export function PromptStepBuilder(props: {
       outputDataType: step.outputDataType,
       responseFormat: step.responseFormat,
       systemRole: step.customSystemRole,
+      webSearch: step.webSearch || false,
     });
     const promptConfig: PromptConfiguration = {
       promptText: step.promptText,
@@ -611,6 +612,14 @@ export function PromptStepBuilder(props: {
           value={step.includeEssay}
           onChange={(e) => {
             updateField('includeEssay', e);
+          }}
+        />
+
+        <CheckBoxInput
+          label="Enable Web Search"
+          value={step.webSearch || false}
+          onChange={(e) => {
+            updateField('webSearch', e);
           }}
         />
 
