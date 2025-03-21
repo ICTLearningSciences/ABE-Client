@@ -48,7 +48,7 @@ export function extractServiceStepResponse(
 ): string {
   const currentStep = aiServiceResponse.aiAllStepsData[stepNumber];
   if (isAzureOpenAiData(currentStep)) {
-    return currentStep.aiServiceResponse.choices[0].message?.content || '';
+    return currentStep.aiServiceResponse.output_text || '';
   } else if (isOpenAiData(currentStep)) {
     return currentStep.aiServiceResponse.output_text || '';
   } else if (isGeminiData(currentStep)) {
