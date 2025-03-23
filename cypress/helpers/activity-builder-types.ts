@@ -181,6 +181,7 @@ export interface PromptActivityStepGql extends ActivityBuilderStep {
   outputDataType: PromptOutputTypes;
   jsonResponseData?: string;
   customSystemRole: string;
+  webSearch?: boolean;
 }
 
 export interface PromptActivityStep

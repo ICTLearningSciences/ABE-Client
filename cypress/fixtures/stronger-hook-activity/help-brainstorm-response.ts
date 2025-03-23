@@ -31,10 +31,12 @@ export const helpBrainstormResponse = (jobStatus?: JobStatus): AiJobStatusApiRes
                             {
                                 "index": 0,
                                 "message": {
+                                    "refusal": null,
                                     "role": "assistant",
                                     "content": "Example help brainstorm response."
                                 },
-                                "finish_reason": "stop"
+                                "finish_reason": "stop",
+                                "logprobs": null
                             }
                         ],
                         tokenUsage:{
