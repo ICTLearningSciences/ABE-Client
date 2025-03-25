@@ -440,6 +440,13 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     if (message === EDIT_DOC_GOAL_MESSAGE) {
       this.editDocGoal();
     }
+    const userInputStep = this.curStep as RequestUserInputActivityStep;
+    if (userInputStep.saveAsIntention) {
+      this.updateSessionIntention(message);
+    }
+    if (userInputStep.saveResponseVariableName) {
+      this.stateData[userInputStep.saveResponseVariableName] = message;
+    }
     const requestUserInputStep = this.curStep as RequestUserInputActivityStep;
     if (requestUserInputStep.predefinedResponses.length > 0) {
       const predefinedResponseMatch =
@@ -461,13 +468,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           return;
         }
       }
-    }
-    const userInputStep = this.curStep as RequestUserInputActivityStep;
-    if (userInputStep.saveAsIntention) {
-      this.updateSessionIntention(message);
-    }
-    if (userInputStep.saveResponseVariableName) {
-      this.stateData[userInputStep.saveResponseVariableName] = message;
     }
     this.setWaitingForUserAnswer(false);
     if (this.userResponseHandleState.responseNavigations.length > 0) {
