@@ -34,6 +34,7 @@ import { useAppSelector } from '../../../store/hooks';
 import { AiServicesResponseTypes } from '../../../ai-services/ai-service-types';
 import { useWithExecutePrompt } from '../../../hooks/use-with-execute-prompts';
 import { MyTooltip } from '../../tooltip';
+import { useWithConfig } from '../../../store/slices/config/use-with-config';
 
 enum PromptFields {
   PROMPT_TEXT = 'promptText',
@@ -54,11 +55,9 @@ export function EditPrompt(props: {
   handleSavePrompt: (prompt: GQLPrompt) => void;
   promptsLoading: boolean;
 }): JSX.Element {
+  const { availableAiServiceModels } = useWithConfig();
   const user = useAppSelector((state) => state.login.user);
   const userId = user?._id;
-  const availableAiServiceModels = useAppSelector(
-    (state) => state.config.config?.availableAiServiceModels
-  );
   const defaultAiModel = useAppSelector(
     (state) => state.config.config?.defaultAiModel
   );
