@@ -8,7 +8,7 @@ The full terms of this copyright and license should always be found in the root 
 import { AzureOpenAiStepDataType, isAzureOpenAiData } from './azure-ai-service';
 import { GeminiStepDataType, isGeminiData } from './gemini-ai-service';
 import { isOpenAiData, OpenAiStepDataType } from './open-ai-service';
-
+import { SageStepDataType, isSageData } from './ask-sage-service';
 export interface AiStepData<ReqType, ResType> {
   aiServiceRequestParams: ReqType;
   aiServiceResponse: ResType;
@@ -37,7 +37,8 @@ export interface AiJobStatusType<ServiceResponseType> {
 export type AiServiceStepDataTypes =
   | OpenAiStepDataType
   | GeminiStepDataType
-  | AzureOpenAiStepDataType;
+  | AzureOpenAiStepDataType
+  | SageStepDataType;
 export type AiServicesResponseTypes = AiResponseType<AiServiceStepDataTypes>;
 export type AiServicesJobStatusResponseTypes =
   AiJobStatusType<AiServicesResponseTypes>;
@@ -53,6 +54,8 @@ export function extractServiceStepResponse(
     return currentStep.aiServiceResponse.output_text || '';
   } else if (isGeminiData(currentStep)) {
     return currentStep.aiServiceResponse.text || '';
+  } else if (isSageData(currentStep)) {
+    return currentStep.aiServiceResponse.message || '';
   } else {
     throw new Error('Invalid step data');
   }
