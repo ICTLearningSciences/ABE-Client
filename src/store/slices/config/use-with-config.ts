@@ -5,10 +5,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import * as config from '.';
+import { AvailableAiServiceModels } from '../../../types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
 export interface UseWithConfig {
   state: config.ConfigState;
+  availableAiServiceModels: AvailableAiServiceModels[];
   loadConfig: (subdomain?: string) => void;
   isConfigLoaded: () => boolean;
   updateConfig: (accessToken: string, key: string, value: string) => void;
@@ -18,6 +20,17 @@ export interface UseWithConfig {
 export function useWithConfig(): UseWithConfig {
   const dispatch = useAppDispatch();
   const state = useAppSelector((state) => state.config);
+  const userEmail = useAppSelector((state) => state.login.user?.email);
+  const _availableAiServiceModels = state.config?.availableAiServiceModels;
+  const approvedEmailsForAiModels = state.config?.approvedEmailsForAiModels;
+  const isApprovedEmail =
+    userEmail && approvedEmailsForAiModels?.includes(userEmail);
+  const availableAiServiceModels = !isApprovedEmail
+    ? _availableAiServiceModels || []
+    : [
+        ...(_availableAiServiceModels || []),
+        ...(state.config?.emailAiServiceModels || []),
+      ];
 
   function isConfigLoaded(): boolean {
     return state.status === config.ConfigStatus.SUCCEEDED;
@@ -43,6 +56,7 @@ export function useWithConfig(): UseWithConfig {
 
   return {
     state,
+    availableAiServiceModels,
     loadConfig,
     isConfigLoaded,
     updateConfig,

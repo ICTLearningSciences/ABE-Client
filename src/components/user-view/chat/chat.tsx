@@ -40,6 +40,7 @@ import { ChatHeaderGenerator } from './chat-header-generator';
 import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activity-handler';
 import { isActivityBuilder } from '../../activity-builder/types';
 import { createGlobalStyle } from 'styled-components';
+import { useWithConfig } from '../../../store/slices/config/use-with-config';
 
 export const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
@@ -72,9 +73,7 @@ export function Chat(props: {
     deleteSystemPrompt,
     isSaving,
   } = useWithSystemPromptsConfig();
-  const availableAiServiceModels = useAppSelector(
-    (state) => state.config.config?.availableAiServiceModels
-  );
+  const { availableAiServiceModels } = useWithConfig();
   const { overrideAiModel, state } = useWithState();
   const { googleDocId } = state;
   const coachResponsePending = useAppSelector(

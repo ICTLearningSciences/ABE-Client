@@ -10,7 +10,7 @@ import { AiPromptStep } from '../types';
 import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { useState } from 'react';
 import { useAppSelector } from '../store/hooks';
-
+import { useWithConfig } from '../store/slices/config/use-with-config';
 export function useWithExecutePrompt() {
   const userId: string | undefined = useAppSelector(
     (state) => state.login.user?._id
@@ -22,9 +22,7 @@ export function useWithExecutePrompt() {
   const googleDocId: string = useAppSelector(
     (state) => state.state.googleDocId
   );
-  const availableAiServiceModels =
-    useAppSelector((state) => state.config.config?.availableAiServiceModels) ||
-    [];
+  const { availableAiServiceModels } = useWithConfig();
   const defaultAiServiceModel = useAppSelector(
     (state) => state.config.config?.defaultAiModel
   );
