@@ -14,6 +14,7 @@ export const switchActivities: GQLDocumentTimeline = {
     {
       type: TimelinePointType.START,
       versionTime: '2024-03-27T04:53:41.735Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'CDC vaccines are great!\n',
@@ -60,6 +61,7 @@ export const switchActivities: GQLDocumentTimeline = {
     {
       type: TimelinePointType.NEW_ACTIVITY,
       versionTime: '2024-03-27T04:54:26.932Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'CDC vaccines are great!\n',

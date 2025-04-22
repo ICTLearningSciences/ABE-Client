@@ -426,7 +426,8 @@ export enum AiGenerationStatus {
 export interface GQLTimelinePoint {
   type: TimelinePointType;
   versionTime: string;
-  version: IGDocVersion;
+  version?: IGDocVersion;
+  versionId: string;
   intent: string;
   changeSummary: string;
   changeSummaryStatus: AiGenerationStatus;

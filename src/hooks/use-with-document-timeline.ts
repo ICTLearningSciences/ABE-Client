@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useReducer } from 'react';
+import { useMemo, useReducer } from 'react';
 import {
   DocumentTimelineJobStatus,
   GQLDocumentTimeline,
@@ -12,10 +12,13 @@ import {
   JobStatus,
   AiGenerationStatus,
   TimelinePointType,
+  DehydratedGQLDocumentTimeline,
+  IGDocVersion,
 } from '../types';
 import {
   asyncRequestDocTimeline,
   asyncRequestDocTimelineStatus,
+  fetchDocVersions,
   storeDocTimeline,
 } from './api';
 import {
@@ -37,7 +40,9 @@ const initialState: TimelineState = {
 const startPoint: GQLTimelinePoint = {
   type: TimelinePointType.NEW_ACTIVITY,
   versionTime: '',
+  versionId: '',
   version: {
+    _id: '',
     sessionIntention: {
       description: '',
       createdAt: '',
@@ -99,9 +104,40 @@ export function addStartPointToTimeline(timeline: GQLDocumentTimeline) {
   return timelineCopy;
 }
 
+export async function getDocVersions(
+  timeline?: DehydratedGQLDocumentTimeline
+): Promise<IGDocVersion[]> {
+  if (!timeline) {
+    return [];
+  }
+  const versionIds = timeline.timelinePoints.map((point) => point.versionId);
+  const versions = await fetchDocVersions(versionIds);
+  return versions;
+}
+
 export function useWithDocumentTimeline() {
   const [state, dispatch] = useReducer(TimelineReducer, initialState);
   const { state: config } = useWithConfig();
+  const hydratedGqlTimeline: GQLDocumentTimeline | undefined = useMemo(() => {
+    if (!state.data) {
+      return undefined;
+    }
+    return {
+      ...state.data,
+      timelinePoints: state.data.timelinePoints.reduce((acc, point) => {
+        const version = state.docVersions?.find(
+          (v) => v._id === point.versionId
+        );
+        if (version) {
+          acc.push({
+            ...point,
+            version: version,
+          });
+        }
+        return acc;
+      }, [] as GQLTimelinePoint[]),
+    };
+  }, [state.data, state.docVersions]);
 
   async function asyncFetchDocTimeline(
     userId: string,
@@ -133,7 +169,8 @@ export function useWithDocumentTimeline() {
           }
           if (
             res.jobStatus === JobStatus.IN_PROGRESS &&
-            Boolean(res.documentTimeline)
+            Boolean(res.documentTimeline) &&
+            res.documentTimeline
           ) {
             dispatch({
               type: TimelineActionType.PARTIAL_DATA_LOADED,
@@ -146,9 +183,12 @@ export function useWithDocumentTimeline() {
         300 * 1000
       );
       const timeline = res.documentTimeline;
+
+      const docVersions = await getDocVersions(timeline);
       dispatch({
         type: TimelineActionType.LOADING_SUCCEEDED,
         dataPayload: timeline,
+        docVersionsPayload: docVersions,
       });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
@@ -164,13 +204,13 @@ export function useWithDocumentTimeline() {
   }
 
   async function saveTimelinePoint(updatedTimelinePoint: GQLTimelinePoint) {
-    if (!state.data) {
+    if (!hydratedGqlTimeline) {
       return;
     }
     try {
       await storeDocTimeline({
-        ...state.data,
-        timelinePoints: state.data.timelinePoints.map((point) => {
+        ...hydratedGqlTimeline,
+        timelinePoints: hydratedGqlTimeline.timelinePoints.map((point) => {
           if (point.versionTime === updatedTimelinePoint.versionTime) {
             return updatedTimelinePoint;
           }
@@ -196,10 +236,10 @@ export function useWithDocumentTimeline() {
   }
 
   return {
-    documentTimeline: state.data,
+    documentTimeline: hydratedGqlTimeline,
     // ? addStartPointToTimeline(state.data)
     // : undefined,
-    curTimelinePoint: state.data?.timelinePoints.find(
+    curTimelinePoint: hydratedGqlTimeline?.timelinePoints.find(
       (tp) => tp.versionTime === state.selectedTimepointVersionTime
     ),
     loadInProgress: state.status === LoadingStatusType.LOADING,

@@ -14,6 +14,7 @@ export const tenTimelinePoints: GQLDocumentTimeline = {
     {
       type: TimelinePointType.START,
       versionTime: '2024-03-27T05:00:02.587Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ?\n',
@@ -86,6 +87,7 @@ export const tenTimelinePoints: GQLDocumentTimeline = {
     {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
@@ -141,6 +143,7 @@ export const tenTimelinePoints: GQLDocumentTimeline = {
     {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
@@ -196,6 +199,7 @@ export const tenTimelinePoints: GQLDocumentTimeline = {
     {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
@@ -251,6 +255,7 @@ export const tenTimelinePoints: GQLDocumentTimeline = {
     {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
@@ -306,6 +311,7 @@ export const tenTimelinePoints: GQLDocumentTimeline = {
     {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
@@ -361,6 +367,7 @@ export const tenTimelinePoints: GQLDocumentTimeline = {
     {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
@@ -416,6 +423,7 @@ export const tenTimelinePoints: GQLDocumentTimeline = {
     {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
@@ -471,6 +479,7 @@ export const tenTimelinePoints: GQLDocumentTimeline = {
     {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
@@ -526,6 +535,7 @@ export const tenTimelinePoints: GQLDocumentTimeline = {
     {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
@@ -581,6 +591,7 @@ export const tenTimelinePoints: GQLDocumentTimeline = {
     {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       version: {
         docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         plainText:

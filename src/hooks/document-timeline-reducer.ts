@@ -5,19 +5,25 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { GQLDocumentTimeline, GQLTimelinePoint } from '../types';
+import {
+  DehydratedGQLDocumentTimeline,
+  GQLTimelinePoint,
+  IGDocVersion,
+} from '../types';
 import { LoadingError, LoadingStatusType } from './generic-loading-reducer';
 
 export interface TimelineState {
   status: LoadingStatusType;
-  data?: GQLDocumentTimeline;
+  data?: DehydratedGQLDocumentTimeline;
+  docVersions?: IGDocVersion[];
   selectedTimepointVersionTime?: string;
   error?: LoadingError;
 }
 
 export interface TimelineAction {
   type: TimelineActionType;
-  dataPayload?: GQLDocumentTimeline;
+  dataPayload?: DehydratedGQLDocumentTimeline;
+  docVersionsPayload?: IGDocVersion[];
   selectTimepointPayload?: GQLTimelinePoint;
   errorPayload?: LoadingError;
   savedTimelinePoint?: GQLTimelinePoint;
@@ -36,12 +42,19 @@ export function TimelineReducer(
   state: TimelineState,
   action: TimelineAction
 ): TimelineState {
-  const { type, dataPayload, errorPayload, selectTimepointPayload } = action;
+  const {
+    type,
+    dataPayload,
+    docVersionsPayload,
+    errorPayload,
+    selectTimepointPayload,
+  } = action;
   switch (type) {
     case TimelineActionType.LOADING_STARTED:
       return {
         status: LoadingStatusType.LOADING,
         data: undefined,
+        docVersions: undefined,
         selectedTimepointVersionTime: undefined,
         error: undefined,
       };
@@ -62,6 +75,7 @@ export function TimelineReducer(
       return {
         status: LoadingStatusType.SUCCESS,
         data: dataPayload,
+        docVersions: docVersionsPayload,
         selectedTimepointVersionTime:
           dataPayload &&
           dataPayload.timelinePoints.length > 0 &&
