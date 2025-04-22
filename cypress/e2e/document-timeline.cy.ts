@@ -217,14 +217,9 @@ describe('document timeline', () => {
 
   describe('UI Content Revision', () => {
     beforeEach(() => {
-      cyMockDefault(cy, {
-        mockType: MockDefaultType.CUSTOM_FILE_DATA,
-        customDocumentTimeline: tenTimelinePoints,
-      });
+      cyMockDefault(cy);
     });
 
-    /* This test case is checking for the display of a statement if it exists in the document timeline
-   feature. Here's a breakdown of what the test is doing: */
     it('Shows scroll bar if needed in left side (Document)', () => {
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       // left-content-container should have scroll bar

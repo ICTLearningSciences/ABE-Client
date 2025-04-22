@@ -405,7 +405,7 @@ export interface OpenAiJobStatus {
 
 export interface DocumentTimelineJobStatus {
   jobStatus: JobStatus;
-  documentTimeline: GQLDocumentTimeline;
+  documentTimeline: DehydratedGQLDocumentTimeline;
 }
 
 export enum TimelinePointType {
@@ -441,24 +441,6 @@ export interface ChatItem {
   message: string;
 }
 
-export interface IGDocVersion {
-  docId: string;
-  plainText: string;
-  lastChangedId: string;
-  sessionId: string;
-  sessionIntention?: Intention;
-  documentIntention?: Intention;
-  dayIntention?: Intention;
-  chatLog: ChatItem[];
-  activity: string;
-  intent: string;
-  title: string;
-  lastModifyingUser: string;
-  modifiedTime: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface GQLDocumentTimeline {
   docId: string;
   user: string;
@@ -466,13 +448,12 @@ export interface GQLDocumentTimeline {
 }
 
 export enum MockDefaultType {
-  VERSION = 'VERSION',
   REVERSE_OUTLINE = 'REVERSE_OUTLINE',
-  CUSTOM_FILE_DATA = 'CUSTOM_FILE_DATA',
   ALL = 'ALL',
 }
 
 export interface IGDocVersion {
+  _id: string;
   docId: string;
   plainText: string;
   lastChangedId: string;
@@ -498,4 +479,14 @@ export interface Intention {
 export interface ChatItem {
   sender: string;
   message: string;
+}
+
+export interface DehydratedGQLTimelinePoint
+  extends Omit<GQLTimelinePoint, 'version'> {
+  version?: IGDocVersion;
+}
+
+export interface DehydratedGQLDocumentTimeline
+  extends Omit<GQLDocumentTimeline, 'timelinePoints'> {
+  timelinePoints: DehydratedGQLTimelinePoint[];
 }

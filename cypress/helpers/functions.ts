@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { Interception } from 'cypress/types/net-stubbing';
 import { asyncStartRequestRes } from '../fixtures/async-start-request';
-import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
+import { eightHoursBetweenSessions, eightHoursBetweenSessionsDocVersions } from '../fixtures/document-timeline/eight-hours-difference';
 import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
 import { createActivityBuilder, fetchBuiltActivitiesResponse } from '../fixtures/fetch-built-activities';
 import { fetchConfigResponse } from '../fixtures/fetch-config';
@@ -36,6 +36,7 @@ import {
   MockDefaultType,
   ActivityBuilderVisibility,
 } from './types';
+import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 
 export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';
 
@@ -173,24 +174,13 @@ export function cyMockDefault(
   cySetup(cy);
   cyMockLogin(cy);
   cyMockGetDocData(cy);
+  let docTimelineVersions: IGDocVersion[] = [];
   cyMockGetDocTimeline(cy, {
     response: eightHoursBetweenSessions,
   });
+  docTimelineVersions = eightHoursBetweenSessionsDocVersions;
   cyMockGoogleDoc(cy);
   switch (args.mockType) {
-    case MockDefaultType.VERSION:
-      cyMockGetDocTimeline(cy, {
-        response: {
-          ...eightHoursBetweenSessions,
-          timelinePoints: eightHoursBetweenSessions.timelinePoints.map(
-            (point) => ({
-              ...point,
-              version: args.version || ({} as IGDocVersion),
-            })
-          ),
-        },
-      });
-      break;
     case MockDefaultType.REVERSE_OUTLINE:
       cyMockGetDocTimeline(cy, {
         response: {
@@ -203,16 +193,13 @@ export function cyMockDefault(
           ),
         },
       });
-      break;
-    case MockDefaultType.CUSTOM_FILE_DATA:
-      cyMockGetDocTimeline(cy, {
-        response: args.customDocumentTimeline,
-      });
+      docTimelineVersions = eightHoursBetweenSessionsDocVersions
       break;
     default:
       cyMockGetDocTimeline(cy, {
         response: eightHoursBetweenSessions,
       });
+      docTimelineVersions = eightHoursBetweenSessionsDocVersions
   }
 
   cyInterceptGraphQL(cy, [
@@ -222,6 +209,7 @@ export function cyMockDefault(
       'RefreshAccessToken',
       refreshAccessTokenResponse(args.userRole || UserRole.USER)
     ),
+    mockGQL('DocVersions', fetchDocVersionsBuilder(docTimelineVersions)),
     mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse),
     mockGQL('FetchPrompts', fetchPromptTemplates),
     mockGQL('FetchUserActivityStates', fetchUserActivityStatesResponse),
@@ -288,6 +276,7 @@ export function cyMockGetDocTimeline(
       })
     );
   });
+
 }
 
 export function cyMockGetDocData(

@@ -62,6 +62,9 @@ export function TimelineReducer(
       return {
         status: LoadingStatusType.LOADING,
         data: dataPayload,
+        docVersions: docVersionsPayload
+          ? [...(state.docVersions || []), ...docVersionsPayload]
+          : state.docVersions,
         selectedTimepointVersionTime:
           dataPayload &&
           dataPayload.timelinePoints.length > 0 &&
@@ -75,7 +78,9 @@ export function TimelineReducer(
       return {
         status: LoadingStatusType.SUCCESS,
         data: dataPayload,
-        docVersions: docVersionsPayload,
+        docVersions: docVersionsPayload
+          ? [...(state.docVersions || []), ...docVersionsPayload]
+          : state.docVersions,
         selectedTimepointVersionTime:
           dataPayload &&
           dataPayload.timelinePoints.length > 0 &&

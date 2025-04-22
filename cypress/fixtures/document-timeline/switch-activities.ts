@@ -5,9 +5,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { GQLDocumentTimeline, AiGenerationStatus, TimelinePointType } from '../../helpers/types';
+import { DehydratedGQLDocumentTimeline, AiGenerationStatus, TimelinePointType, IGDocVersion } from '../../helpers/types';
 
-export const switchActivities: GQLDocumentTimeline = {
+export const switchActivities: DehydratedGQLDocumentTimeline = {
   docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
   user: '653972706e601e65dbc3acea',
   timelinePoints: [
@@ -15,41 +15,6 @@ export const switchActivities: GQLDocumentTimeline = {
       type: TimelinePointType.START,
       versionTime: '2024-03-27T04:53:41.735Z',
       versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
-      version: {
-        docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
-        plainText: 'CDC vaccines are great!\n',
-        lastChangedId:
-          'ALBJ4LuqOjQVnAA3GapMNWBmG4F6vdvlfyZ-1VzMT3QtO1R3ZNros6a03RQWlZb16ebVWYnsMKjHOkJjNeEahs8',
-        chatLog: [
-          {
-            sender: 'SYSTEM',
-            message:
-              "Feel free to edit your paper. Let me know when you're ready for me to analyze it.",
-          },
-          {
-            sender: 'USER',
-            message: 'Ready',
-          },
-          {
-            sender: 'SYSTEM',
-            message:
-              'I apologize for the confusion, but the essay content for evaluation was not provided. Could you please provide the essay so I can proceed with the evaluation?',
-          },
-          {
-            sender: 'SYSTEM',
-            message:
-              'Feel free to ask me anything else about your essay, or I can analyze it again for you.',
-          },
-        ],
-        sessionId: '123',
-        modifiedTime: '2024-03-27T04:53:41.735Z',
-        createdAt: '2024-03-27T04:53:41.735Z',
-        updatedAt: '2024-03-27T04:53:41.735Z',
-        activity: '65a8838126523c7ce5acacac',
-        intent: '',
-        title: 'Copy of CDC Vaccines',
-        lastModifyingUser: 'ashiel408@gmail.com',
-      },
       intent: '',
       changeSummary: '',
       changeSummaryStatus: AiGenerationStatus.COMPLETED,
@@ -62,45 +27,6 @@ export const switchActivities: GQLDocumentTimeline = {
       type: TimelinePointType.NEW_ACTIVITY,
       versionTime: '2024-03-27T04:54:26.932Z',
       versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
-      version: {
-        docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
-        plainText: 'CDC vaccines are great!\n',
-        lastChangedId:
-          'ALBJ4LuqOjQVnAA3GapMNWBmG4F6vdvlfyZ-1VzMT3QtO1R3ZNros6a03RQWlZb16ebVWYnsMKjHOkJjNeEahs8',
-        chatLog: [
-          {
-            sender: 'SYSTEM',
-            message:
-              'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
-          },
-          {
-            sender: 'SYSTEM',
-            message:
-              "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
-          },
-          {
-            sender: 'USER',
-            message: 'Ready',
-          },
-          {
-            sender: 'SYSTEM',
-            message:
-              'The thesis statement lacks both emotional engagement and narrative elements. It is a simple and straightforward statement, without any hooks to captivate the reader. To improve, consider adding supporting evidence, persuasive arguments, or a personal anecdote to create a stronger hook. (Emotion: 1; Narrativity: 1)',
-          },
-          {
-            sender: 'SYSTEM',
-            message: 'What would you like to work on?',
-          },
-        ],
-        activity: '658230f699045156193339ac',
-        intent: '',
-        title: 'Swap activities',
-        lastModifyingUser: 'ashiel408@gmail.com',
-        sessionId: '123',
-        modifiedTime: '2024-03-27T04:53:41.735Z',
-        createdAt: '2024-03-27T04:53:41.735Z',
-        updatedAt: '2024-03-27T04:53:41.735Z',
-      },
       intent: '',
       changeSummary: 'No changes from previous version',
       changeSummaryStatus: AiGenerationStatus.COMPLETED,
@@ -112,3 +38,41 @@ export const switchActivities: GQLDocumentTimeline = {
     },
   ],
 };
+export const switchActivitiesDocVersions: IGDocVersion[] = [
+  {
+    _id: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+    docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+    plainText: 'CDC vaccines are great!\n',
+    lastChangedId:
+      'ALBJ4LuqOjQVnAA3GapMNWBmG4F6vdvlfyZ-1VzMT3QtO1R3ZNros6a03RQWlZb16ebVWYnsMKjHOkJjNeEahs8',
+    chatLog: [
+      {
+        sender: 'SYSTEM',
+        message:
+          "Feel free to edit your paper. Let me know when you're ready for me to analyze it.",
+      },
+      {
+        sender: 'USER',
+        message: 'Ready',
+      },
+      {
+        sender: 'SYSTEM',
+        message:
+          'I apologize for the confusion, but the essay content for evaluation was not provided. Could you please provide the essay so I can proceed with the evaluation?',
+      },
+      {
+        sender: 'SYSTEM',
+        message:
+          'Feel free to ask me anything else about your essay, or I can analyze it again for you.',
+      },
+    ],
+    sessionId: '123',
+    modifiedTime: '2024-03-27T04:53:41.735Z',
+    createdAt: '2024-03-27T04:53:41.735Z',
+    updatedAt: '2024-03-27T04:53:41.735Z',
+    activity: '65a8838126523c7ce5acacac',
+    intent: '',
+    title: 'Copy of CDC Vaccines',
+    lastModifyingUser: 'ashiel408@gmail.com',
+  }
+];

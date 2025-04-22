@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useMemo, useReducer } from 'react';
+import { useMemo, useReducer, useRef } from 'react';
 import {
   DocumentTimelineJobStatus,
   GQLDocumentTimeline,
@@ -13,7 +13,6 @@ import {
   AiGenerationStatus,
   TimelinePointType,
   DehydratedGQLDocumentTimeline,
-  IGDocVersion,
 } from '../types';
 import {
   asyncRequestDocTimeline,
@@ -104,20 +103,11 @@ export function addStartPointToTimeline(timeline: GQLDocumentTimeline) {
   return timelineCopy;
 }
 
-export async function getDocVersions(
-  timeline?: DehydratedGQLDocumentTimeline
-): Promise<IGDocVersion[]> {
-  if (!timeline) {
-    return [];
-  }
-  const versionIds = timeline.timelinePoints.map((point) => point.versionId);
-  const versions = await fetchDocVersions(versionIds);
-  return versions;
-}
-
 export function useWithDocumentTimeline() {
   const [state, dispatch] = useReducer(TimelineReducer, initialState);
   const { state: config } = useWithConfig();
+  const requestedVersionIds = useRef<Set<string>>(new Set());
+
   const hydratedGqlTimeline: GQLDocumentTimeline | undefined = useMemo(() => {
     if (!state.data) {
       return undefined;
@@ -138,6 +128,35 @@ export function useWithDocumentTimeline() {
       }, [] as GQLTimelinePoint[]),
     };
   }, [state.data, state.docVersions]);
+
+  async function fetchDocVersionsForPartialData(
+    timeline?: DehydratedGQLDocumentTimeline
+  ) {
+    if (!timeline) {
+      return;
+    }
+    const newVersionIds = timeline.timelinePoints
+      .map((point) => point.versionId)
+      .filter((id) => !requestedVersionIds.current.has(id));
+
+    if (newVersionIds.length > 0) {
+      const versions = await fetchDocVersions(newVersionIds);
+      requestedVersionIds.current = new Set([
+        ...Array.from(requestedVersionIds.current),
+        ...newVersionIds,
+      ]);
+      dispatch({
+        type: TimelineActionType.PARTIAL_DATA_LOADED,
+        dataPayload: timeline,
+        docVersionsPayload: versions,
+      });
+    } else {
+      dispatch({
+        type: TimelineActionType.PARTIAL_DATA_LOADED,
+        dataPayload: timeline,
+      });
+    }
+  }
 
   async function asyncFetchDocTimeline(
     userId: string,
@@ -172,10 +191,7 @@ export function useWithDocumentTimeline() {
             Boolean(res.documentTimeline) &&
             res.documentTimeline
           ) {
-            dispatch({
-              type: TimelineActionType.PARTIAL_DATA_LOADED,
-              dataPayload: res.documentTimeline,
-            });
+            fetchDocVersionsForPartialData(res.documentTimeline);
           }
           return res.jobStatus === JobStatus.COMPLETE;
         },
@@ -183,18 +199,15 @@ export function useWithDocumentTimeline() {
         300 * 1000
       );
       const timeline = res.documentTimeline;
-
-      const docVersions = await getDocVersions(timeline);
+      await fetchDocVersionsForPartialData(timeline);
       dispatch({
         type: TimelineActionType.LOADING_SUCCEEDED,
         dataPayload: timeline,
-        docVersionsPayload: docVersions,
       });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       dispatch({
         type: TimelineActionType.LOADING_FAILED,
-
         errorPayload: {
           error: e,
           message: JSON.stringify(e.message),

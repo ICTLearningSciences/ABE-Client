@@ -4,35 +4,15 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-export enum MockDefaultType {
-  REVERSE_OUTLINE = 'REVERSE_OUTLINE',
-  ALL = 'ALL',
-}
 
-export interface IGDocVersion {
-  docId: string;
-  plainText: string;
-  lastChangedId: string;
-  sessionId: string;
-  sessionIntention?: Intention;
-  documentIntention?: Intention;
-  dayIntention?: Intention;
-  chatLog: ChatItem[];
-  activity: string;
-  intent: string;
-  title: string;
-  lastModifyingUser: string;
-  modifiedTime: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { IGDocVersion } from "../helpers/types";
 
-export interface Intention {
-  description: string;
-  createdAt?: string;
-}
-
-export interface ChatItem {
-  sender: string;
-  message: string;
+export function fetchDocVersionsBuilder(versions: IGDocVersion[]) {
+    return {
+        "docVersions": {
+            "edges": versions.map((version) => ({
+                "node": version,
+            })),
+        },
+    };
 }
