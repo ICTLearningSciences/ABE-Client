@@ -5,75 +5,16 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { GQLDocumentTimeline, AiGenerationStatus, TimelinePointType } from '../../helpers/types';
+import { DehydratedGQLDocumentTimeline, AiGenerationStatus, TimelinePointType, IGDocVersion } from '../../helpers/types';
 
-export const generationInProgress: GQLDocumentTimeline = {
+export const generationInProgress: DehydratedGQLDocumentTimeline = {
   docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
   user: '653972706e601e65dbc3acea',
   timelinePoints: [
     {
       type: TimelinePointType.START,
       versionTime: '2024-03-27T05:00:02.587Z',
-      version: {
-        docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
-        plainText: 'Hello, world! What’s going on ?\n',
-        lastChangedId:
-          'ALBJ4LvGtDw60PlOb4l1tFcX4PLEKKguGqtBIRo_qqoSB4_bFjOkQDcvy7-FcRRMaoFZ6y2Q_3m77cwrMmm3WjA',
-        sessionIntention: {
-          description:
-            'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
-          createdAt: '2024-03-27T05:00:02.587Z',
-        },
-        chatLog: [
-          {
-            sender: 'SYSTEM',
-            message:
-              'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
-          },
-          {
-            sender: 'SYSTEM',
-            message:
-              "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
-          },
-          {
-            sender: 'USER',
-            message: 'Ready',
-          },
-          {
-            sender: 'SYSTEM',
-            message: 'Request failed, please try again later.',
-          },
-          {
-            sender: 'USER',
-            message: 'Retry',
-          },
-          {
-            sender: 'SYSTEM',
-            message: 'Request failed, please try again later.',
-          },
-          {
-            sender: 'USER',
-            message: 'Retry',
-          },
-          {
-            sender: 'SYSTEM',
-            message:
-              "The hook of the essay has a weak engagement factor. It lacks both emotional evocativeness and narrative elements. The thesis statement is a simple greeting without any depth or compelling elements. To improve the hook, consider introducing a thought-provoking question, a surprising fact, or a captivating anecdote to capture the reader's attention. (Emotion: 1; Narrativity: 1)",
-          },
-          {
-            sender: 'SYSTEM',
-            message: 'What would you like to work on?',
-          },
-        ],
-        activity: '65a8592b26523c7ce5acac9e',
-        intent: '',
-        title: 'Same activity, 8 hour',
-        lastModifyingUser: 'ashiel408@gmail.com',
-        sessionId: '123',
-        modifiedTime: '2024-03-27T04:53:41.735Z',
-        createdAt: '2024-03-27T04:53:41.735Z',
-        updatedAt: '2024-03-27T04:53:41.735Z',
-      },
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       intent: '',
       changeSummary: '',
       changeSummaryStatus: AiGenerationStatus.IN_PROGRESS,
@@ -85,49 +26,7 @@ export const generationInProgress: GQLDocumentTimeline = {
     {
       type: TimelinePointType.TIME_DIFFERENCE,
       versionTime: '2024-03-27T20:00:57.804Z',
-      version: {
-        docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
-        plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
-        lastChangedId:
-          'ALBJ4LvpUjPG6iVXa8vibKE0FafnztNmt9B3Qmmn8h0Z5SfAgNZSjfH1Dk33Ygrte_B_WuN1EIxZ4uBJoekEju8',
-        sessionIntention: {
-          description: 'This activity is to work on the hook of the essay.',
-          createdAt: '2024-03-27T05:00:02.587Z',
-        },
-        chatLog: [
-          {
-            sender: 'SYSTEM',
-            message:
-              'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
-          },
-          {
-            sender: 'SYSTEM',
-            message:
-              "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
-          },
-          {
-            sender: 'USER',
-            message: 'Ready',
-          },
-          {
-            sender: 'SYSTEM',
-            message:
-              'Based on the absence of emotional evocativeness and narrativity, the hook in this essay is weak. It does not engage the reader or provide any narrative context. To improve the hook, it could benefit from incorporating emotions and narrative elements to create a more engaging and captivating introduction. The current rating for emotions is 1 and for narrativity is 1.',
-          },
-          {
-            sender: 'SYSTEM',
-            message: 'What would you like to work on?',
-          },
-        ],
-        activity: '658230f699045156193339ac',
-        intent: '',
-        title: 'Same activity, 8 hour',
-        lastModifyingUser: 'ashiel408@gmail.com',
-        sessionId: '123',
-        modifiedTime: '2024-03-27T04:53:41.735Z',
-        createdAt: '2024-03-27T04:53:41.735Z',
-        updatedAt: '2024-03-27T04:53:41.735Z',
-      },
+      versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       intent: '',
       changeSummary:
         "",
@@ -140,73 +39,61 @@ export const generationInProgress: GQLDocumentTimeline = {
   ],
 };
 
-export const generationCompleted: GQLDocumentTimeline = {
+export const generationsInProgressDocVersions: IGDocVersion[] = [
+  {
+    _id: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+    docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+    plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
+    lastChangedId:
+      'ALBJ4LvpUjPG6iVXa8vibKE0FafnztNmt9B3Qmmn8h0Z5SfAgNZSjfH1Dk33Ygrte_B_WuN1EIxZ4uBJoekEju8',
+    sessionIntention: {
+      description: 'This activity is to work on the hook of the essay.',
+      createdAt: '2024-03-27T05:00:02.587Z',
+    },
+    chatLog: [
+      {
+        sender: 'SYSTEM',
+        message:
+          'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
+      },
+      {
+        sender: 'SYSTEM',
+        message:
+          "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
+      },
+      {
+        sender: 'USER',
+        message: 'Ready',
+      },
+      {
+        sender: 'SYSTEM',
+        message:
+          'Based on the absence of emotional evocativeness and narrativity, the hook in this essay is weak. It does not engage the reader or provide any narrative context. To improve the hook, it could benefit from incorporating emotions and narrative elements to create a more engaging and captivating introduction. The current rating for emotions is 1 and for narrativity is 1.',
+      },
+      {
+        sender: 'SYSTEM',
+        message: 'What would you like to work on?',
+      },
+    ],
+    activity: '658230f699045156193339ac',
+    intent: '',
+    title: 'Same activity, 8 hour',
+    lastModifyingUser: 'ashiel408@gmail.com',
+    sessionId: '123',
+    modifiedTime: '2024-03-27T04:53:41.735Z',
+    createdAt: '2024-03-27T04:53:41.735Z',
+    updatedAt: '2024-03-27T04:53:41.735Z',
+  },
+];
+
+export const generationCompleted: DehydratedGQLDocumentTimeline = {
     docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
     user: '653972706e601e65dbc3acea',
     timelinePoints: [
       {
         type: TimelinePointType.START,
         versionTime: '2024-03-27T05:00:02.587Z',
-        version: {
-          docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
-          plainText: 'Hello, world! What’s going on ?\n',
-          lastChangedId:
-            'ALBJ4LvGtDw60PlOb4l1tFcX4PLEKKguGqtBIRo_qqoSB4_bFjOkQDcvy7-FcRRMaoFZ6y2Q_3m77cwrMmm3WjA',
-          sessionIntention: {
-            description:
-              'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
-            createdAt: '2024-03-27T05:00:02.587Z',
-          },
-          chatLog: [
-            {
-              sender: 'SYSTEM',
-              message:
-                'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
-            },
-            {
-              sender: 'SYSTEM',
-              message:
-                "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
-            },
-            {
-              sender: 'USER',
-              message: 'Ready',
-            },
-            {
-              sender: 'SYSTEM',
-              message: 'Request failed, please try again later.',
-            },
-            {
-              sender: 'USER',
-              message: 'Retry',
-            },
-            {
-              sender: 'SYSTEM',
-              message: 'Request failed, please try again later.',
-            },
-            {
-              sender: 'USER',
-              message: 'Retry',
-            },
-            {
-              sender: 'SYSTEM',
-              message:
-                "The hook of the essay has a weak engagement factor. It lacks both emotional evocativeness and narrative elements. The thesis statement is a simple greeting without any depth or compelling elements. To improve the hook, consider introducing a thought-provoking question, a surprising fact, or a captivating anecdote to capture the reader's attention. (Emotion: 1; Narrativity: 1)",
-            },
-            {
-              sender: 'SYSTEM',
-              message: 'What would you like to work on?',
-            },
-          ],
-          activity: '65a8592b26523c7ce5acac9e',
-          intent: '',
-          title: 'Same activity, 8 hour',
-          lastModifyingUser: 'ashiel408@gmail.com',
-          sessionId: '123',
-          modifiedTime: '2024-03-27T04:53:41.735Z',
-          createdAt: '2024-03-27T04:53:41.735Z',
-          updatedAt: '2024-03-27T04:53:41.735Z',
-        },
+        versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         intent: '',
         changeSummary: '',
         changeSummaryStatus: AiGenerationStatus.COMPLETED,
@@ -218,49 +105,7 @@ export const generationCompleted: GQLDocumentTimeline = {
       {
         type: TimelinePointType.TIME_DIFFERENCE,
         versionTime: '2024-03-27T20:00:57.804Z',
-        version: {
-          docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
-          plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
-          lastChangedId:
-            'ALBJ4LvpUjPG6iVXa8vibKE0FafnztNmt9B3Qmmn8h0Z5SfAgNZSjfH1Dk33Ygrte_B_WuN1EIxZ4uBJoekEju8',
-          sessionIntention: {
-            description: 'This activity is to work on the hook of the essay.',
-            createdAt: '2024-03-27T05:00:02.587Z',
-          },
-          chatLog: [
-            {
-              sender: 'SYSTEM',
-              message:
-                'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
-            },
-            {
-              sender: 'SYSTEM',
-              message:
-                "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
-            },
-            {
-              sender: 'USER',
-              message: 'Ready',
-            },
-            {
-              sender: 'SYSTEM',
-              message:
-                'Based on the absence of emotional evocativeness and narrativity, the hook in this essay is weak. It does not engage the reader or provide any narrative context. To improve the hook, it could benefit from incorporating emotions and narrative elements to create a more engaging and captivating introduction. The current rating for emotions is 1 and for narrativity is 1.',
-            },
-            {
-              sender: 'SYSTEM',
-              message: 'What would you like to work on?',
-            },
-          ],
-          activity: '658230f699045156193339ac',
-          intent: '',
-          title: 'Same activity, 8 hour',
-          lastModifyingUser: 'ashiel408@gmail.com',
-          sessionId: '123',
-          modifiedTime: '2024-03-27T04:53:41.735Z',
-          createdAt: '2024-03-27T04:53:41.735Z',
-          updatedAt: '2024-03-27T04:53:41.735Z',
-        },
+        versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         intent: '',
         changeSummary:
           "Complete Summary",
@@ -272,3 +117,50 @@ export const generationCompleted: GQLDocumentTimeline = {
       },
     ],
   };
+
+export const generationsCompletedDocVersions: IGDocVersion[] = [
+  {
+    _id: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+    docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+    plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
+    lastChangedId:
+      'ALBJ4LvpUjPG6iVXa8vibKE0FafnztNmt9B3Qmmn8h0Z5SfAgNZSjfH1Dk33Ygrte_B_WuN1EIxZ4uBJoekEju8',
+    sessionIntention: {
+      description: 'This activity is to work on the hook of the essay.',
+      createdAt: '2024-03-27T05:00:02.587Z',
+    },
+    chatLog: [
+      {
+        sender: 'SYSTEM',
+        message:
+          'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
+      },
+      {
+        sender: 'SYSTEM',
+        message:
+          "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
+      },
+      {
+        sender: 'USER',
+        message: 'Ready',
+      },
+      {
+        sender: 'SYSTEM',
+        message:
+          'Based on the absence of emotional evocativeness and narrativity, the hook in this essay is weak. It does not engage the reader or provide any narrative context. To improve the hook, it could benefit from incorporating emotions and narrative elements to create a more engaging and captivating introduction. The current rating for emotions is 1 and for narrativity is 1.',
+      },
+      {
+        sender: 'SYSTEM',
+        message: 'What would you like to work on?',
+      },
+    ],
+    activity: '658230f699045156193339ac',
+    intent: '',
+    title: 'Same activity, 8 hour',
+    lastModifyingUser: 'ashiel408@gmail.com',
+    sessionId: '123',
+    modifiedTime: '2024-03-27T04:53:41.735Z',
+    createdAt: '2024-03-27T04:53:41.735Z',
+    updatedAt: '2024-03-27T04:53:41.735Z',
+  }
+];

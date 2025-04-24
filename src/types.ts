@@ -338,7 +338,7 @@ export enum JobStatus {
 
 export interface DocumentTimelineJobStatus {
   jobStatus: JobStatus;
-  documentTimeline?: GQLDocumentTimeline;
+  documentTimeline?: DehydratedGQLDocumentTimeline;
 }
 
 export enum TimelinePointType {
@@ -350,22 +350,17 @@ export enum TimelinePointType {
   NONE = '',
 }
 
-export enum MockDefaultType {
-  VERSION = 'VERSION',
-  REVERSE_OUTLINE = 'REVERSE_OUTLINE',
-  CUSTOM_FILE_DATA = 'CUSTOM_FILE_DATA',
-  ALL = 'ALL',
-}
-
 export enum AiGenerationStatus {
   NONE = 'NONE',
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
 }
+
 export interface GQLTimelinePoint {
   type: TimelinePointType;
   versionTime: string;
+  versionId: string;
   version: IGDocVersion;
   intent: string;
   changeSummary: string;
@@ -376,12 +371,18 @@ export interface GQLTimelinePoint {
   relatedFeedback: string;
 }
 
+export interface DehydratedGQLTimelinePoint
+  extends Omit<GQLTimelinePoint, 'version'> {
+  version?: IGDocVersion;
+}
+
 export interface ChatItem {
   sender: string;
   message: string;
 }
 
 export interface IGDocVersion {
+  _id: string;
   docId: string;
   plainText: string;
   lastChangedId: string;
@@ -403,4 +404,9 @@ export interface GQLDocumentTimeline {
   docId: string;
   user: string;
   timelinePoints: GQLTimelinePoint[];
+}
+
+export interface DehydratedGQLDocumentTimeline
+  extends Omit<GQLDocumentTimeline, 'timelinePoints'> {
+  timelinePoints: DehydratedGQLTimelinePoint[];
 }

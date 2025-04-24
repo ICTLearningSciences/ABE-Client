@@ -34,6 +34,7 @@ import {
   DocService,
   User,
   UpdateUserInfo,
+  IGDocVersion,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -970,4 +971,64 @@ export async function storeDocTimeline(
     }
   );
   return res;
+}
+
+export const versionQueryData = `
+ query DocVersions($limit: Int, $filterObject: Object, $sortAscending: Boolean, $sortBy: String) {
+                docVersions(limit: $limit, filterObject: $filterObject, sortAscending: $sortAscending, sortBy: $sortBy) {
+                      edges {
+                        node{
+          _id
+          docId
+          plainText
+          lastChangedId
+          sessionId
+          sessionIntention{
+            description
+            createdAt
+          }
+          dayIntention{
+            description
+            createdAt
+          }
+          documentIntention{
+            description
+            createdAt
+          }
+          chatLog {
+            sender
+            message
+          }
+          activity
+          intent
+          title
+          lastModifyingUser
+          modifiedTime
+          createdAt
+          updatedAt
+                        }
+                    }
+                    }
+                }`;
+
+export async function fetchDocVersions(
+  versionIds: string[]
+): Promise<IGDocVersion[]> {
+  const res = await execGql<Connection<IGDocVersion>>(
+    {
+      query: versionQueryData,
+      variables: {
+        limit: 9999,
+        filterObject: {
+          _id: {
+            $in: versionIds,
+          },
+        },
+      },
+    },
+    {
+      dataPath: 'docVersions',
+    }
+  );
+  return res.edges.map((edge) => edge.node);
 }
