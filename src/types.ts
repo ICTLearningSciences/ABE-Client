@@ -228,7 +228,8 @@ export interface Config {
   overrideAiModel?: AiServiceModel;
   defaultAiModel?: AiServiceModel;
   availableAiServiceModels?: AvailableAiServiceModels[];
-
+  emailAiServiceModels?: AvailableAiServiceModels[];
+  approvedEmailsForAiModels?: string[];
   headerTitle?: string; // first word will be golden
   orgName?: string;
   loginScreenTitle?: string;

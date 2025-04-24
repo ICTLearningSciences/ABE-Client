@@ -528,6 +528,11 @@ export async function fetchConfig(subdomain?: string): Promise<Config> {
               serviceName
               models
             }
+            emailAiServiceModels{
+              serviceName
+              models
+            }
+            approvedEmailsForAiModels
             headerTitle
             orgName
             loginScreenTitle
