@@ -12,7 +12,7 @@ import { UserRole } from "../helpers/types";
 
 describe('Doc Viewing', () => {
 
-    it("Can visit prompt editing", ()=>{
+    it("Can sort by updated at", ()=>{
       cyMockDefault(cy, {
         userRole: UserRole.ADMIN,
         gqlQueries: [

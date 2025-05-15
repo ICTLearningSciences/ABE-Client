@@ -71,7 +71,7 @@ export default function ViewUserGoogleDocs(
         onHistoryClicked={(docId: string) => navigate(`/docs/history/${docId}`)}
         setExampleDocsOpen={setExampleDocsOpen}
         sx={{
-          width: '60%',
+          width: '75%',
         }}
       />
       <ExampleGoogleDocModal
