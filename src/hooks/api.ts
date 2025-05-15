@@ -301,6 +301,7 @@ export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
             }
             assignmentDescription
             createdAt
+            updatedAt
             admin
             service
           }

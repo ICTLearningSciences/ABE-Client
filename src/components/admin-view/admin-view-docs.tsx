@@ -28,6 +28,8 @@ export default function ViewUserGoogleDocs(
     creationInProgress,
     handleCreateGoogleDoc,
     handleDeleteGoogleDoc,
+    sortBy,
+    setSortBy,
   } = useWithGoogleDocs;
   const { updateCurrentDocId } = useWithState();
   const navigate = useNavigateWithParams();
@@ -57,6 +59,8 @@ export default function ViewUserGoogleDocs(
         copyGoogleDocs={copyGoogleDocs}
         creationInProgress={creationInProgress}
         handleCreateGoogleDoc={handleCreateGoogleDoc}
+        setSortBy={setSortBy}
+        sortBy={sortBy}
         goToDoc={goToDoc}
         onHistoryClicked={(docId: string) => navigate(`/docs/history/${docId}`)}
         setExampleDocsOpen={setExampleDocsOpen}

@@ -16,7 +16,8 @@ export const gDocWithNoIntentions: GoogleDoc = {
     currentDayIntention: undefined,
     assignmentDescription: undefined,
     "createdAt": new Date().toISOString(),
-    "admin": false
+    "admin": false,
+    "updatedAt": new Date().toISOString()
 }
 
 export const gDocWithoutDocumentIntention: GoogleDoc = {
@@ -30,7 +31,8 @@ export const gDocWithoutDocumentIntention: GoogleDoc = {
     },
     assignmentDescription: "Aliens assignment description",
     "createdAt": new Date().toISOString(),
-    "admin": false
+    "admin": false,
+    "updatedAt": new Date().toISOString()
 }
 
 export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: GoogleDoc = {
@@ -44,7 +46,8 @@ export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: GoogleDo
     currentDayIntention: undefined,
     assignmentDescription: "Aliens assignment description",
     "createdAt": "2021-06-01T00:00:00.000Z",
-    "admin": false
+    "admin": false,
+    "updatedAt": new Date().toISOString()
 }
 
 export const gDocWithoutAssignmentDescription: GoogleDoc = {
@@ -61,7 +64,8 @@ export const gDocWithoutAssignmentDescription: GoogleDoc = {
     },
     assignmentDescription: undefined,
     "createdAt": new Date().toISOString(),
-    "admin": false
+    "admin": false,
+    "updatedAt": new Date().toISOString()
 }
 
 export const gDocWithAllIntentions: GoogleDoc = {
@@ -78,7 +82,8 @@ export const gDocWithAllIntentions: GoogleDoc = {
     },
     assignmentDescription: "Aliens assignment description",
     "createdAt": new Date().toISOString(),
-    "admin": false
+    "admin": false,
+    "updatedAt": new Date().toISOString()
 }
 
 export const gDocWithExpiredDayIntention: GoogleDoc = {
@@ -95,7 +100,8 @@ export const gDocWithExpiredDayIntention: GoogleDoc = {
     },
     assignmentDescription: "Aliens assignment description",
     "createdAt": new Date().toISOString(),
-    "admin": false
+    "admin": false,
+    "updatedAt": new Date().toISOString()
 }
 
 export function storeGoogleDocResponse(gDoc: GoogleDoc): {storeGoogleDoc: GoogleDoc} {

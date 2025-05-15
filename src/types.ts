@@ -95,6 +95,7 @@ export interface GoogleDoc {
   currentDayIntention?: Intention;
   assignmentDescription?: string;
   createdAt: string;
+  updatedAt: string;
   admin: boolean;
   service: DocService;
 }
@@ -410,4 +411,9 @@ export interface GQLDocumentTimeline {
 export interface DehydratedGQLDocumentTimeline
   extends Omit<GQLDocumentTimeline, 'timelinePoints'> {
   timelinePoints: DehydratedGQLTimelinePoint[];
+}
+
+export interface SortConfig {
+  field: string;
+  ascend: boolean;
 }

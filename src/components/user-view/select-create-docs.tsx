@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { Button, CircularProgress, IconButton } from '@mui/material';
-import { GoogleDoc, NewDocData } from '../../types';
+import { GoogleDoc, NewDocData, SortConfig } from '../../types';
 import { RowDiv } from '../../styled-components';
 import {
   Table,
@@ -26,6 +26,8 @@ import {
   GoogleDocItemName,
   StyledGoogleDocItemRow,
 } from './select-create-docs-styles';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: GoogleDoc[];
@@ -42,6 +44,8 @@ export default function SelectCreateDocs(props: {
   goToDoc: (docId: string, newDoc?: boolean) => void;
   sx?: React.CSSProperties;
   setExampleDocsOpen: (open: boolean) => void;
+  setSortBy: (config: SortConfig) => void;
+  sortBy: SortConfig;
 }): JSX.Element {
   const {
     googleDocs,
@@ -53,9 +57,37 @@ export default function SelectCreateDocs(props: {
     goToDoc,
     sx,
     setExampleDocsOpen,
+    setSortBy,
+    sortBy,
   } = props;
+
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
   const [docToDelete, setDocToDelete] = React.useState<GoogleDoc>();
+
+  function SortIndicator(props: { field: string }) {
+    const { field } = props;
+    const isActive = sortBy.field === field;
+    return sortBy.ascend ? (
+      <KeyboardArrowUpIcon
+        style={{
+          opacity: isActive ? 1 : 0,
+        }}
+      />
+    ) : (
+      <KeyboardArrowDownIcon
+        style={{
+          opacity: isActive ? 1 : 0,
+        }}
+      />
+    );
+  }
+
+  const handleSortClick = (field: string): void => {
+    setSortBy({
+      field,
+      ascend: sortBy.field === field ? !sortBy.ascend : false,
+    });
+  };
 
   function googleDocsDisplay() {
     return (
@@ -65,7 +97,6 @@ export default function SelectCreateDocs(props: {
           flexDirection: 'column',
           alignItems: 'center',
           width: '100%',
-          // overflowY: 'auto',
         }}
       >
         <RowDiv
@@ -118,13 +149,41 @@ export default function SelectCreateDocs(props: {
         </RowDiv>
         <TableContainer component={Paper}>
           <Table>
-            <TableHead sx={{ height: '0px', padding: 0, margin: 0 }}>
+            <TableHead>
               <TableRow>
-                <TableCell style={{ width: '66%', padding: 0 }}></TableCell>
-                <TableCell style={{ padding: 0 }}></TableCell>
-                <TableCell style={{ padding: 0 }}></TableCell>
-                <TableCell style={{ padding: 0 }}></TableCell>
-                {/* Empty cells for delete/history buttons */}
+                <TableCell style={{ width: '40%' }}>Title</TableCell>
+                <TableCell
+                  style={{ cursor: 'pointer', textAlign: 'center' }}
+                  onClick={() => handleSortClick('createdAt')}
+                >
+                  <RowDiv
+                    data-cy="created-at-header"
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    Created At <SortIndicator field="createdAt" />
+                  </RowDiv>
+                </TableCell>
+                <TableCell
+                  style={{ cursor: 'pointer', textAlign: 'center' }}
+                  onClick={() => handleSortClick('updatedAt')}
+                >
+                  <RowDiv
+                    data-cy="updated-at-header"
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    Updated At <SortIndicator field="updatedAt" />
+                  </RowDiv>
+                </TableCell>
+                <TableCell style={{ width: '50px' }}></TableCell>
+                <TableCell style={{ width: '50px' }}></TableCell>
               </TableRow>
             </TableHead>
 
@@ -137,7 +196,7 @@ export default function SelectCreateDocs(props: {
                   }}
                 >
                   <TableCell>
-                    <RowDiv>
+                    <RowDiv data-cy={`doc-list-item-${index}`}>
                       <DescriptionIcon />
                       <GoogleDocItemName
                         data-cy={`doc-list-item-${doc.title.replaceAll(
@@ -154,6 +213,9 @@ export default function SelectCreateDocs(props: {
                   </TableCell>
                   <TableCell>
                     {formatISODateToReadable(doc.createdAt)}
+                  </TableCell>
+                  <TableCell>
+                    {formatISODateToReadable(doc.updatedAt)}
                   </TableCell>
                   <TableCell>
                     <IconButton

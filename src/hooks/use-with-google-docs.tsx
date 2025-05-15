@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createNewGoogleDoc } from './api';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { useWithState } from '../store/slices/state/use-with-state';
@@ -28,6 +28,11 @@ export interface RevisionsItem {
   rawText: string;
 }
 
+export interface SortConfig {
+  field: string;
+  ascend: boolean;
+}
+
 export interface UseWithGoogleDocs {
   docId: string;
   googleDocs: GoogleDoc[];
@@ -46,10 +51,23 @@ export interface UseWithGoogleDocs {
   handleDeleteGoogleDoc: (docId: string) => Promise<void>;
   getCurrentGoogleDoc: (docId: string | undefined) => GoogleDoc | undefined;
   updateGoogleDocTitleLocally: (googleDocId: string, title: string) => void;
+  sortBy: SortConfig;
+  setSortBy: (config: SortConfig) => void;
 }
 
 export function useWithGoogleDocs(): UseWithGoogleDocs {
   const { updateCurrentDocId } = useWithState();
+  const [sortBy, setSortByState] = useState<SortConfig>({
+    field: 'updatedAt',
+    ascend: false,
+  });
+
+  const setSortBy = (config: SortConfig) => {
+    setSortByState((prev) => ({
+      field: config.field,
+      ascend: config.field === prev.field ? !prev.ascend : config.ascend,
+    }));
+  };
 
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
   const userEmail = useAppSelector((state) => state.login.user?.email);
@@ -62,7 +80,28 @@ export function useWithGoogleDocs(): UseWithGoogleDocs {
   const dispatch = useAppDispatch();
   const config = useAppSelector((state) => state.config);
   const isLoading = googleDocsLoadStatus === GoogleDocsLoadStatus.LOADING;
-  const userGoogleDocs = googleDocs?.filter((doc) => !doc.admin);
+
+  const userGoogleDocs = useMemo(() => {
+    const filteredDocs = googleDocs?.filter((doc) => !doc.admin) || [];
+    return [...filteredDocs].sort((a, b) => {
+      let comparison = 0;
+
+      if (sortBy.field === 'title') {
+        comparison = (a.title || '').localeCompare(b.title || '');
+      } else if (sortBy.field === 'createdAt') {
+        comparison =
+          new Date(b.createdAt || 0).getTime() -
+          new Date(a.createdAt || 0).getTime();
+      } else if (sortBy.field === 'updatedAt') {
+        comparison =
+          new Date(b.updatedAt || 0).getTime() -
+          new Date(a.updatedAt || 0).getTime();
+      }
+
+      return sortBy.ascend ? -comparison : comparison;
+    });
+  }, [googleDocs, sortBy]);
+
   const exampleGoogleDocs = config.config?.exampleGoogleDocs || [];
   const copyGoogleDocs = googleDocs?.filter((doc) => {
     return exampleGoogleDocs.includes(doc.googleDocId);
@@ -161,5 +200,7 @@ export function useWithGoogleDocs(): UseWithGoogleDocs {
     handleDeleteGoogleDoc,
     getCurrentGoogleDoc,
     updateGoogleDocTitleLocally,
+    sortBy,
+    setSortBy,
   };
 }
