@@ -89,7 +89,7 @@ export const fetchGoogleDocsDated: { fetchGoogleDocs: GoogleDoc[] } = {
       createdAt: getNDaysAgo(5),
       updatedAt: getNDaysAgo(1),
       admin: false,
-      archived: true,
+      archived: false,
     },
   ],
 };

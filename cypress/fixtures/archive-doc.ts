@@ -13,7 +13,7 @@ interface ArchiveDocResponse {
 
 export function archiveDocResponse(docId: string, userId: string, archived: boolean) {
     return {
-        "archiveDoc": {
+        "addOrUpdateDoc": {
             "googleDocId": docId,
             "title": "docTitle",
             "user": userId,

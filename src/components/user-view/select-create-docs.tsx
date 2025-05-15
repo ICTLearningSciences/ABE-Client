@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import { GoogleDoc, NewDocData, SortConfig } from '../../types';
 import { RowDiv } from '../../styled-components';
 import {
@@ -17,19 +17,11 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import { formatISODateToReadable } from '../../helpers';
-import DescriptionIcon from '@mui/icons-material/Description';
-import { Delete } from '@mui/icons-material';
-import RestoreIcon from '@mui/icons-material/Restore';
 import { TwoOptionDialog } from '../dialog';
-import {
-  GoogleDocItemName,
-  StyledGoogleDocItemRow,
-} from './select-create-docs-styles';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import UnarchiveIcon from '@mui/icons-material/Unarchive';
+import { GoogleDocItemRow } from './google-doc-item-row';
+
 export default function SelectCreateDocs(props: {
   googleDocs?: GoogleDoc[];
   copyGoogleDocs?: GoogleDoc[];
@@ -49,6 +41,7 @@ export default function SelectCreateDocs(props: {
   sortBy: SortConfig;
   archiveGoogleDoc: (googleDocId: string) => Promise<void>;
   unarchiveGoogleDoc: (googleDocId: string) => Promise<void>;
+  docsLoading: boolean;
 }): JSX.Element {
   const {
     googleDocs: _googleDocs,
@@ -64,6 +57,7 @@ export default function SelectCreateDocs(props: {
     setExampleDocsOpen,
     setSortBy,
     sortBy,
+    docsLoading,
   } = props;
   const archivedDocs = _googleDocs?.filter((doc) => doc.archived);
   const unarchivedDocs = _googleDocs?.filter((doc) => !doc.archived);
@@ -218,105 +212,31 @@ export default function SelectCreateDocs(props: {
             </TableHead>
 
             <TableBody>
+              {docsLoading && (
+                <TableRow>
+                  <TableCell colSpan={4} style={{ textAlign: 'center' }}>
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              )}
               {googleDocs?.map((doc, index) => (
-                <StyledGoogleDocItemRow
+                <GoogleDocItemRow
                   key={index}
+                  doc={doc}
+                  index={index}
+                  viewingArchived={viewingArchived}
                   onDoubleClick={() => {
                     goToDoc(doc.googleDocId);
                   }}
-                >
-                  <TableCell>
-                    <RowDiv
-                      data-cy={`doc-list-item-${index}`}
-                      style={{
-                        opacity: doc.archived ? 0.5 : 1,
-                      }}
-                    >
-                      <DescriptionIcon />
-                      <GoogleDocItemName
-                        data-cy={`doc-list-item-${doc.title.replaceAll(
-                          ' ',
-                          '-'
-                        )}`}
-                        onClick={() => {
-                          goToDoc(doc.googleDocId);
-                        }}
-                      >
-                        {doc.title || 'My Document'}
-                      </GoogleDocItemName>
-                    </RowDiv>
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {formatISODateToReadable(doc.createdAt)}
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {formatISODateToReadable(doc.updatedAt)}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      display: 'flex',
-                      gap: '8px',
-                    }}
-                  >
-                    {!viewingArchived && (
-                      <Tooltip title="View History">
-                        <IconButton
-                          onClick={() => {
-                            onHistoryClicked(doc.googleDocId);
-                          }}
-                        >
-                          <RestoreIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {!viewingArchived && (
-                      <Tooltip title="Archive">
-                        <IconButton
-                          data-cy={`archive-doc-${doc.title.replaceAll(
-                            ' ',
-                            '-'
-                          )}`}
-                          onClick={() => {
-                            archiveGoogleDoc(doc.googleDocId);
-                          }}
-                        >
-                          <ArchiveIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {viewingArchived && (
-                      <RowDiv>
-                        <Tooltip title="Unarchive">
-                          <IconButton
-                            data-cy={`unarchive-doc-${doc.title.replaceAll(
-                              ' ',
-                              '-'
-                            )}`}
-                            onClick={() => {
-                              unarchiveGoogleDoc(doc.googleDocId);
-                            }}
-                          >
-                            <UnarchiveIcon />
-                          </IconButton>
-                        </Tooltip>
-
-                        <Tooltip title="Delete">
-                          <IconButton
-                            data-cy={`delete-doc-${doc.title.replaceAll(
-                              ' ',
-                              '-'
-                            )}`}
-                            onClick={() => {
-                              setDocToDelete(doc);
-                            }}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </Tooltip>
-                      </RowDiv>
-                    )}
-                  </TableCell>
-                </StyledGoogleDocItemRow>
+                  onHistoryClick={() => {
+                    onHistoryClicked(doc.googleDocId);
+                  }}
+                  onArchiveClick={() => archiveGoogleDoc(doc.googleDocId)}
+                  onUnarchiveClick={() => unarchiveGoogleDoc(doc.googleDocId)}
+                  onDeleteClick={() => {
+                    setDocToDelete(doc);
+                  }}
+                />
               ))}
             </TableBody>
           </Table>

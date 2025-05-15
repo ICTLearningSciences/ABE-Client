@@ -32,6 +32,7 @@ export default function ViewUserGoogleDocs(
     unarchiveGoogleDoc,
     sortBy,
     setSortBy,
+    docsLoading,
   } = useWithGoogleDocs;
   const { updateCurrentDocId } = useWithState();
   const navigate = useNavigateWithParams();
@@ -58,6 +59,7 @@ export default function ViewUserGoogleDocs(
       <SelectCreateDocs
         handleDeleteGoogleDoc={handleDeleteGoogleDoc}
         googleDocs={googleDocs}
+        docsLoading={docsLoading}
         copyGoogleDocs={copyGoogleDocs}
         creationInProgress={creationInProgress}
         handleCreateGoogleDoc={handleCreateGoogleDoc}

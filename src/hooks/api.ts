@@ -304,6 +304,7 @@ export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
             updatedAt
             admin
             service
+            archived
           }
         }
       `,
@@ -1058,13 +1059,15 @@ export async function archiveDoc(
      }
     `,
       variables: {
-        googleDocId: googleDocId,
-        userId: userId,
-        archive: archive,
+        googleDoc: {
+          googleDocId: googleDocId,
+          user: userId,
+          archived: archive,
+        },
       },
     },
     {
-      dataPath: 'archiveDoc',
+      dataPath: 'addOrUpdateDoc',
     }
   );
   return data;
