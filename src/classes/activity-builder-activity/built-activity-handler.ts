@@ -521,7 +521,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async handlePromptStep(step: PromptActivityStep) {
-    console.log('handlePromptStep', step);
     this.setResponsePending(true);
     // handle replacing promptText with stored data
     const promptText = replaceStoredDataInString(
@@ -579,19 +578,14 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
     // handle sending prompt
     const requestFunction = async () => {
-      console.log('requestFunction call');
       const _response = await this.executePrompt(aiPromptSteps);
       const response = extractServiceStepResponse(_response, 0);
-      console.log('response', response);
-      console.log('response string', JSON.stringify(response));
       if (step.outputDataType === PromptOutputTypes.JSON) {
         if (!isJsonString(response)) {
-          console.log('Did not receive valid JSON data');
           throw new Error('Did not receive valid JSON data');
         }
         if (step.jsonResponseData) {
           if (!receivedExpectedData(step.jsonResponseData, response)) {
-            console.log('Did not receive expected JSON data');
             this.errorMessage = 'Did not receive expected JSON data';
             throw new Error('Did not receive expected JSON data');
           }

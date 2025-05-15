@@ -98,6 +98,7 @@ export interface GoogleDoc {
   updatedAt: string;
   admin: boolean;
   service: DocService;
+  archived: boolean;
 }
 
 export interface Intention {

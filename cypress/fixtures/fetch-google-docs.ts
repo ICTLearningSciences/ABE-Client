@@ -30,6 +30,7 @@ export const fetchGoogleDocsResponse: { fetchGoogleDocs: GoogleDoc[] } = {
       updatedAt: new Date().toISOString(),
       admin: false,
       googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+      archived: false,
     },
     {
       googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Z',
@@ -47,6 +48,7 @@ export const fetchGoogleDocsResponse: { fetchGoogleDocs: GoogleDoc[] } = {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       admin: false,
+      archived: false,
     },
   ],
 };
@@ -69,6 +71,7 @@ export const fetchGoogleDocsDated: { fetchGoogleDocs: GoogleDoc[] } = {
       updatedAt: getNDaysAgo(5),
       admin: false,
       googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+      archived: false,
     },
     {
       googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Z',
@@ -86,6 +89,7 @@ export const fetchGoogleDocsDated: { fetchGoogleDocs: GoogleDoc[] } = {
       createdAt: getNDaysAgo(5),
       updatedAt: getNDaysAgo(1),
       admin: false,
+      archived: true,
     },
   ],
 };

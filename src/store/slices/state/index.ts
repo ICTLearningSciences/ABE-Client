@@ -17,6 +17,7 @@ import {
 import { UserRole } from '../login';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  archiveDoc,
   deleteGoogleDoc,
   fetchGoogleDocs,
   updateGoogleDocStorage,
@@ -80,6 +81,13 @@ export const updateGoogleDoc = createAsyncThunk(
   'state/updateGoogleDoc',
   async (args: { googleDoc: StoreGoogleDoc }) => {
     return await updateGoogleDocStorage(args.googleDoc);
+  }
+);
+
+export const setArchiveGoogleDoc = createAsyncThunk(
+  'state/setArchiveGoogleDoc',
+  async (args: { googleDocId: string; userId: string; archive: boolean }) => {
+    return await archiveDoc(args.googleDocId, args.userId, args.archive);
   }
 );
 
@@ -179,11 +187,22 @@ export const stateSlice = createSlice({
         return doc;
       });
     });
-
     builder.addCase(deleteUserGoogleDoc.fulfilled, (state, action) => {
       state.userGoogleDocs = state.userGoogleDocs.filter(
         (doc) => doc.googleDocId !== action.payload.googleDocId
       );
+    });
+
+    builder.addCase(setArchiveGoogleDoc.fulfilled, (state, action) => {
+      state.userGoogleDocs = state.userGoogleDocs.map((doc) => {
+        if (
+          doc.googleDocId === action.payload.googleDocId &&
+          doc.user === action.payload.user
+        ) {
+          return { ...doc, archived: action.payload.archived };
+        }
+        return doc;
+      });
     });
   },
 });

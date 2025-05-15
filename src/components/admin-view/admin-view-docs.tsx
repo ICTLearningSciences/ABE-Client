@@ -28,6 +28,8 @@ export default function ViewUserGoogleDocs(
     creationInProgress,
     handleCreateGoogleDoc,
     handleDeleteGoogleDoc,
+    archiveGoogleDoc,
+    unarchiveGoogleDoc,
     sortBy,
     setSortBy,
   } = useWithGoogleDocs;
@@ -59,6 +61,8 @@ export default function ViewUserGoogleDocs(
         copyGoogleDocs={copyGoogleDocs}
         creationInProgress={creationInProgress}
         handleCreateGoogleDoc={handleCreateGoogleDoc}
+        archiveGoogleDoc={archiveGoogleDoc}
+        unarchiveGoogleDoc={unarchiveGoogleDoc}
         setSortBy={setSortBy}
         sortBy={sortBy}
         goToDoc={goToDoc}

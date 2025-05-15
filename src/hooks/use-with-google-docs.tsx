@@ -16,6 +16,7 @@ import {
   updateGoogleDoc as _updateGoogleDoc,
   deleteUserGoogleDoc,
   updateGoogleDocTitleLocally as _updateGoogleDocTitle,
+  setArchiveGoogleDoc,
 } from '../store/slices/state';
 
 export interface DocRevisionResponse {
@@ -53,6 +54,8 @@ export interface UseWithGoogleDocs {
   updateGoogleDocTitleLocally: (googleDocId: string, title: string) => void;
   sortBy: SortConfig;
   setSortBy: (config: SortConfig) => void;
+  archiveGoogleDoc: (googleDocId: string) => Promise<void>;
+  unarchiveGoogleDoc: (googleDocId: string) => Promise<void>;
 }
 
 export function useWithGoogleDocs(): UseWithGoogleDocs {
@@ -187,6 +190,16 @@ export function useWithGoogleDocs(): UseWithGoogleDocs {
     dispatch(_updateGoogleDocTitle({ googleDocId, title }));
   }
 
+  async function archiveGoogleDoc(googleDocId: string) {
+    await dispatch(setArchiveGoogleDoc({ googleDocId, userId, archive: true }));
+  }
+
+  async function unarchiveGoogleDoc(googleDocId: string) {
+    await dispatch(
+      setArchiveGoogleDoc({ googleDocId, userId, archive: false })
+    );
+  }
+
   return {
     docId: googleDocId,
     googleDocs: userGoogleDocs || [],
@@ -202,5 +215,7 @@ export function useWithGoogleDocs(): UseWithGoogleDocs {
     updateGoogleDocTitleLocally,
     sortBy,
     setSortBy,
+    archiveGoogleDoc,
+    unarchiveGoogleDoc,
   };
 }

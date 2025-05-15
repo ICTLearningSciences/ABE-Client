@@ -17,7 +17,8 @@ export const gDocWithNoIntentions: GoogleDoc = {
     assignmentDescription: undefined,
     "createdAt": new Date().toISOString(),
     "admin": false,
-    "updatedAt": new Date().toISOString()
+    "updatedAt": new Date().toISOString(),
+    "archived": false
 }
 
 export const gDocWithoutDocumentIntention: GoogleDoc = {
@@ -32,7 +33,8 @@ export const gDocWithoutDocumentIntention: GoogleDoc = {
     assignmentDescription: "Aliens assignment description",
     "createdAt": new Date().toISOString(),
     "admin": false,
-    "updatedAt": new Date().toISOString()
+    "updatedAt": new Date().toISOString(),
+    "archived": false
 }
 
 export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: GoogleDoc = {
@@ -47,7 +49,8 @@ export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: GoogleDo
     assignmentDescription: "Aliens assignment description",
     "createdAt": "2021-06-01T00:00:00.000Z",
     "admin": false,
-    "updatedAt": new Date().toISOString()
+    "updatedAt": new Date().toISOString(),
+    "archived": false
 }
 
 export const gDocWithoutAssignmentDescription: GoogleDoc = {
@@ -65,7 +68,8 @@ export const gDocWithoutAssignmentDescription: GoogleDoc = {
     assignmentDescription: undefined,
     "createdAt": new Date().toISOString(),
     "admin": false,
-    "updatedAt": new Date().toISOString()
+    "updatedAt": new Date().toISOString(),
+    "archived": false
 }
 
 export const gDocWithAllIntentions: GoogleDoc = {
@@ -83,7 +87,8 @@ export const gDocWithAllIntentions: GoogleDoc = {
     assignmentDescription: "Aliens assignment description",
     "createdAt": new Date().toISOString(),
     "admin": false,
-    "updatedAt": new Date().toISOString()
+    "updatedAt": new Date().toISOString(),
+    "archived": false
 }
 
 export const gDocWithExpiredDayIntention: GoogleDoc = {
@@ -101,7 +106,8 @@ export const gDocWithExpiredDayIntention: GoogleDoc = {
     assignmentDescription: "Aliens assignment description",
     "createdAt": new Date().toISOString(),
     "admin": false,
-    "updatedAt": new Date().toISOString()
+    "updatedAt": new Date().toISOString(),
+    "archived": false
 }
 
 export function storeGoogleDocResponse(gDoc: GoogleDoc): {storeGoogleDoc: GoogleDoc} {
