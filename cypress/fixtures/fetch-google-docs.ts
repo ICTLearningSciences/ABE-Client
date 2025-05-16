@@ -8,6 +8,10 @@ import { testGoogleDocId } from '../helpers/functions';
 import { GoogleDoc } from '../helpers/types';
 import { testUser } from './user-data';
 
+const getNDaysAgo = (days: number) => {
+  return new Date(new Date().getTime() - days * 24 * 60 * 60 * 1000).toISOString();
+};
+
 export const fetchGoogleDocsResponse: { fetchGoogleDocs: GoogleDoc[] } = {
   fetchGoogleDocs: [
     {
@@ -23,9 +27,10 @@ export const fetchGoogleDocsResponse: { fetchGoogleDocs: GoogleDoc[] } = {
       },
       assignmentDescription: 'Aliens assignment description',
       createdAt: new Date().toISOString(),
-
+      updatedAt: new Date().toISOString(),
       admin: false,
       googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+      archived: false,
     },
     {
       googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Z',
@@ -41,8 +46,50 @@ export const fetchGoogleDocsResponse: { fetchGoogleDocs: GoogleDoc[] } = {
       },
       assignmentDescription: '',
       createdAt: new Date().toISOString(),
-
+      updatedAt: new Date().toISOString(),
       admin: false,
+      archived: false,
+    },
+  ],
+};
+
+export const fetchGoogleDocsDated: { fetchGoogleDocs: GoogleDoc[] } = {
+  fetchGoogleDocs: [
+    {
+      user: testUser._id,
+      title: 'Aliens',
+      documentIntention: {
+        description: 'Aliens document intention',
+        createdAt: new Date().toISOString(),
+      },
+      currentDayIntention: {
+        description: 'Aliens day intention',
+        createdAt: new Date().toISOString(),
+      },
+      assignmentDescription: 'Aliens assignment description',
+      createdAt: getNDaysAgo(5),
+      updatedAt: getNDaysAgo(5),
+      admin: false,
+      googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+      archived: false,
+    },
+    {
+      googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Z',
+      user: testUser._id,
+      title: 'Aliens 2',
+      documentIntention: {
+        description: 'Aliens document intention',
+        createdAt: new Date().toISOString(),
+      },
+      currentDayIntention: {
+        description: 'Aliens day intention',
+        createdAt: new Date().toISOString(),
+      },
+      assignmentDescription: '',
+      createdAt: getNDaysAgo(5),
+      updatedAt: getNDaysAgo(1),
+      admin: false,
+      archived: false,
     },
   ],
 };

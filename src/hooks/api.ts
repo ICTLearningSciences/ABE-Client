@@ -301,8 +301,10 @@ export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
             }
             assignmentDescription
             createdAt
+            updatedAt
             admin
             service
+            archived
           }
         }
       `,
@@ -1036,4 +1038,37 @@ export async function fetchDocVersions(
     }
   );
   return res.edges.map((edge) => edge.node);
+}
+
+export async function archiveDoc(
+  googleDocId: string,
+  userId: string,
+  archive: boolean
+): Promise<GoogleDoc> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  if (!accessToken) throw new Error('No access token');
+  const data = await execGql<GoogleDoc>(
+    {
+      query: `
+      mutation AddOrUpdateDoc($googleDoc: GoogleDocInputType!) {
+          addOrUpdateDoc(googleDoc: $googleDoc) {
+            googleDocId
+            user
+            archived
+          }
+     }
+    `,
+      variables: {
+        googleDoc: {
+          googleDocId: googleDocId,
+          user: userId,
+          archived: archive,
+        },
+      },
+    },
+    {
+      dataPath: 'addOrUpdateDoc',
+    }
+  );
+  return data;
 }

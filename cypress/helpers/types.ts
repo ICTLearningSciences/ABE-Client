@@ -167,6 +167,8 @@ export interface GoogleDoc {
   assignmentDescription?: string;
   createdAt: string;
   admin: boolean;
+  updatedAt: string;
+  archived: boolean;
 }
 
 export interface Intention {

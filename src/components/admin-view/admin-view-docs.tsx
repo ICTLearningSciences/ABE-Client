@@ -28,6 +28,11 @@ export default function ViewUserGoogleDocs(
     creationInProgress,
     handleCreateGoogleDoc,
     handleDeleteGoogleDoc,
+    archiveGoogleDoc,
+    unarchiveGoogleDoc,
+    sortBy,
+    setSortBy,
+    docsLoading,
   } = useWithGoogleDocs;
   const { updateCurrentDocId } = useWithState();
   const navigate = useNavigateWithParams();
@@ -54,14 +59,19 @@ export default function ViewUserGoogleDocs(
       <SelectCreateDocs
         handleDeleteGoogleDoc={handleDeleteGoogleDoc}
         googleDocs={googleDocs}
+        docsLoading={docsLoading}
         copyGoogleDocs={copyGoogleDocs}
         creationInProgress={creationInProgress}
         handleCreateGoogleDoc={handleCreateGoogleDoc}
+        archiveGoogleDoc={archiveGoogleDoc}
+        unarchiveGoogleDoc={unarchiveGoogleDoc}
+        setSortBy={setSortBy}
+        sortBy={sortBy}
         goToDoc={goToDoc}
         onHistoryClicked={(docId: string) => navigate(`/docs/history/${docId}`)}
         setExampleDocsOpen={setExampleDocsOpen}
         sx={{
-          width: '60%',
+          width: '75%',
         }}
       />
       <ExampleGoogleDocModal

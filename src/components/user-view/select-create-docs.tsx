@@ -5,8 +5,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { Button, CircularProgress, IconButton } from '@mui/material';
-import { GoogleDoc, NewDocData } from '../../types';
+import { Button, CircularProgress } from '@mui/material';
+import { GoogleDoc, NewDocData, SortConfig } from '../../types';
 import { RowDiv } from '../../styled-components';
 import {
   Table,
@@ -17,15 +17,10 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import { formatISODateToReadable } from '../../helpers';
-import DescriptionIcon from '@mui/icons-material/Description';
-import { Delete } from '@mui/icons-material';
-import RestoreIcon from '@mui/icons-material/Restore';
 import { TwoOptionDialog } from '../dialog';
-import {
-  GoogleDocItemName,
-  StyledGoogleDocItemRow,
-} from './select-create-docs-styles';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { GoogleDocItemRow } from './google-doc-item-row';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: GoogleDoc[];
@@ -42,20 +37,63 @@ export default function SelectCreateDocs(props: {
   goToDoc: (docId: string, newDoc?: boolean) => void;
   sx?: React.CSSProperties;
   setExampleDocsOpen: (open: boolean) => void;
+  setSortBy: (config: SortConfig) => void;
+  sortBy: SortConfig;
+  archiveGoogleDoc: (googleDocId: string) => Promise<void>;
+  unarchiveGoogleDoc: (googleDocId: string) => Promise<void>;
+  docsLoading: boolean;
 }): JSX.Element {
   const {
-    googleDocs,
+    googleDocs: _googleDocs,
     copyGoogleDocs,
     creationInProgress,
     handleCreateGoogleDoc,
     handleDeleteGoogleDoc,
     onHistoryClicked,
     goToDoc,
+    archiveGoogleDoc,
+    unarchiveGoogleDoc,
     sx,
     setExampleDocsOpen,
+    setSortBy,
+    sortBy,
+    docsLoading,
   } = props;
-  const [deleteInProgress, setDeleteInProgress] = React.useState(false);
+  const archivedDocs = _googleDocs?.filter((doc) => doc.archived);
+  const unarchivedDocs = _googleDocs?.filter((doc) => !doc.archived);
+  const [viewingArchived, setViewingArchived] = React.useState(false);
+  const googleDocs = viewingArchived ? archivedDocs : unarchivedDocs;
   const [docToDelete, setDocToDelete] = React.useState<GoogleDoc>();
+  const [deleteInProgress, setDeleteInProgress] = React.useState(false);
+
+  function SortIndicator(props: { field: string }) {
+    const { field } = props;
+    const isActive = sortBy.field === field;
+    return sortBy.ascend ? (
+      <KeyboardArrowUpIcon
+        style={{
+          opacity: isActive ? 1 : 0,
+          position: 'absolute',
+          right: 0,
+        }}
+      />
+    ) : (
+      <KeyboardArrowDownIcon
+        style={{
+          opacity: isActive ? 1 : 0,
+          position: 'absolute',
+          right: 0,
+        }}
+      />
+    );
+  }
+
+  const handleSortClick = (field: string): void => {
+    setSortBy({
+      field,
+      ascend: sortBy.field === field ? !sortBy.ascend : false,
+    });
+  };
 
   function googleDocsDisplay() {
     return (
@@ -65,7 +103,6 @@ export default function SelectCreateDocs(props: {
           flexDirection: 'column',
           alignItems: 'center',
           width: '100%',
-          // overflowY: 'auto',
         }}
       >
         <RowDiv
@@ -76,105 +113,130 @@ export default function SelectCreateDocs(props: {
             justifyContent: 'center',
           }}
         >
-          <RowDiv
-            style={{
-              position: 'absolute',
-              left: 0,
-            }}
-          >
-            <Button
-              onClick={() => {
-                handleCreateGoogleDoc(
-                  undefined,
-                  undefined,
-                  undefined,
-                  (data) => {
-                    goToDoc(data.docId, true);
-                  }
-                );
-              }}
-              size="large"
+          {!viewingArchived && (
+            <RowDiv
               style={{
-                fontWeight: 'bold',
-                marginRight: '10px',
+                position: 'absolute',
+                left: 0,
               }}
-              variant="outlined"
             >
-              + New
-            </Button>
-            {copyGoogleDocs && copyGoogleDocs.length > 0 && (
               <Button
                 onClick={() => {
-                  setExampleDocsOpen(true);
+                  handleCreateGoogleDoc(
+                    undefined,
+                    undefined,
+                    undefined,
+                    (data) => {
+                      goToDoc(data.docId, true);
+                    }
+                  );
                 }}
                 size="large"
-                variant="text"
+                style={{
+                  fontWeight: 'bold',
+                  marginRight: '10px',
+                }}
+                variant="outlined"
               >
-                Examples
+                + New
               </Button>
-            )}
-          </RowDiv>
-          <h2>Your Docs</h2>
+              {copyGoogleDocs && copyGoogleDocs.length > 0 && (
+                <Button
+                  onClick={() => {
+                    setExampleDocsOpen(true);
+                  }}
+                  size="large"
+                  variant="text"
+                >
+                  Examples
+                </Button>
+              )}
+            </RowDiv>
+          )}
+          <h2>{viewingArchived ? 'Archived' : 'Your'} Docs</h2>
+          <Button
+            data-cy={`toggle-view-archived`}
+            style={{
+              position: 'absolute',
+              right: 0,
+            }}
+            onClick={() => {
+              setViewingArchived(!viewingArchived);
+            }}
+          >
+            {viewingArchived ? 'View Active' : 'View Archived'}
+          </Button>
         </RowDiv>
         <TableContainer component={Paper}>
           <Table>
-            <TableHead sx={{ height: '0px', padding: 0, margin: 0 }}>
+            <TableHead>
               <TableRow>
-                <TableCell style={{ width: '66%', padding: 0 }}></TableCell>
-                <TableCell style={{ padding: 0 }}></TableCell>
-                <TableCell style={{ padding: 0 }}></TableCell>
-                <TableCell style={{ padding: 0 }}></TableCell>
-                {/* Empty cells for delete/history buttons */}
+                <TableCell style={{ width: '40%' }}>Title</TableCell>
+                <TableCell
+                  style={{ cursor: 'pointer', textAlign: 'center' }}
+                  onClick={() => handleSortClick('createdAt')}
+                >
+                  <RowDiv
+                    data-cy="created-at-header"
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: '4px',
+                      textAlign: 'center',
+                      position: 'relative',
+                    }}
+                  >
+                    <span style={{ textAlign: 'center' }}>Created At</span>
+                    <SortIndicator field="createdAt" />
+                  </RowDiv>
+                </TableCell>
+                <TableCell
+                  style={{ cursor: 'pointer', textAlign: 'center' }}
+                  onClick={() => handleSortClick('updatedAt')}
+                >
+                  <RowDiv
+                    data-cy="updated-at-header"
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: '4px',
+                      position: 'relative',
+                    }}
+                  >
+                    <span style={{ textAlign: 'center' }}>Updated At</span>
+                    <SortIndicator field="updatedAt" />
+                  </RowDiv>
+                </TableCell>
+                <TableCell style={{ width: '50px' }}></TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
+              {docsLoading && (
+                <TableRow>
+                  <TableCell colSpan={4} style={{ textAlign: 'center' }}>
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              )}
               {googleDocs?.map((doc, index) => (
-                <StyledGoogleDocItemRow
+                <GoogleDocItemRow
                   key={index}
+                  doc={doc}
+                  index={index}
+                  viewingArchived={viewingArchived}
                   onDoubleClick={() => {
                     goToDoc(doc.googleDocId);
                   }}
-                >
-                  <TableCell>
-                    <RowDiv>
-                      <DescriptionIcon />
-                      <GoogleDocItemName
-                        data-cy={`doc-list-item-${doc.title.replaceAll(
-                          ' ',
-                          '-'
-                        )}`}
-                        onClick={() => {
-                          goToDoc(doc.googleDocId);
-                        }}
-                      >
-                        {doc.title || 'My Document'}
-                      </GoogleDocItemName>
-                    </RowDiv>
-                  </TableCell>
-                  <TableCell>
-                    {formatISODateToReadable(doc.createdAt)}
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      onClick={() => {
-                        onHistoryClicked(doc.googleDocId);
-                      }}
-                    >
-                      <RestoreIcon />
-                    </IconButton>
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      data-cy={`delete-doc-${doc.title.replaceAll(' ', '-')}`}
-                      onClick={() => {
-                        setDocToDelete(doc);
-                      }}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </StyledGoogleDocItemRow>
+                  onHistoryClick={() => {
+                    onHistoryClicked(doc.googleDocId);
+                  }}
+                  onArchiveClick={() => archiveGoogleDoc(doc.googleDocId)}
+                  onUnarchiveClick={() => unarchiveGoogleDoc(doc.googleDocId)}
+                  onDeleteClick={() => {
+                    setDocToDelete(doc);
+                  }}
+                />
               ))}
             </TableBody>
           </Table>
