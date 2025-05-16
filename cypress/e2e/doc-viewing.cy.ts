@@ -40,8 +40,15 @@ describe('Doc Viewing', () => {
         userRole: UserRole.ADMIN,
         gqlQueries: [
             mockGQL('AddOrUpdateDoc', [
-              archiveDocResponse('1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y', testUser._id, true),
-              archiveDocResponse('1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y', testUser._id, false)
+              archiveDocResponse({
+                googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+                user: testUser._id,
+                archived: true
+              }),
+              archiveDocResponse({
+                googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
+                user: testUser._id,
+                archived: false})
             ]),
         ]
       });

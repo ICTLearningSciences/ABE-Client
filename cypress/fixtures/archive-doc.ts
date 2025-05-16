@@ -5,21 +5,18 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { AiServiceNames, Config, GoogleDoc } from "../helpers/types"
+import { GoogleDoc } from "../helpers/types"
 
-interface ArchiveDocResponse {
-    archiveDoc: GoogleDoc;
-}
 
-export function archiveDocResponse(docId: string, userId: string, archived: boolean) {
+export function archiveDocResponse(googleDoc: Partial<GoogleDoc>) {
     return {
         "addOrUpdateDoc": {
-            "googleDocId": docId,
-            "title": "docTitle",
-            "user": userId,
-            "createdAt": "2021-01-01",
-            "updatedAt": "2021-01-01",
-            "archived": archived
+            "googleDocId": googleDoc.googleDocId || "docId",
+            "title": googleDoc.title || "docTitle",
+            "user": googleDoc.user || "userId",
+            "createdAt": googleDoc.createdAt || new Date().toISOString(),
+            "updatedAt": googleDoc.updatedAt || new Date().toISOString(),
+            "archived": googleDoc.archived || false
         }
     }
 
