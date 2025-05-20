@@ -158,7 +158,7 @@ export interface DocData {
   modifiedTime: string;
 }
 
-export interface GoogleDoc {
+export interface UserDoc {
   googleDocId: string;
   title: string;
   user: string;
@@ -209,7 +209,7 @@ export enum UserActions {
   SINGLE_PROMPT = 'SINGLE_PROMPT',
 }
 
-export interface StoreGoogleDoc {
+export interface StoreUserDoc {
   googleDocId: string;
   user: string;
   admin?: boolean;
@@ -380,13 +380,6 @@ export interface DocGoal {
   displayIcon: DisplayIcons;
   introduction: string;
   newDocRecommend?: boolean;
-}
-
-export interface UserActivityState {
-  userId: string;
-  activityId: string;
-  googleDocId: string;
-  metadata: string;
 }
 
 export enum JobStatus {

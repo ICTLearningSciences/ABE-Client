@@ -54,7 +54,7 @@ export function useWithLimitsToArgumentActivity(
   prompts: GQLPrompt[],
   goal?: DocGoal
 ): Activity {
-  const googleDocId = useAppSelector((state) => state.state.googleDocId);
+  const curDocId = useAppSelector((state) => state.state.curDocId);
   const allActivityMessages: StepMessage[] = (activityGql.steps || [])?.reduce(
     (acc, step) => {
       return [...acc, ...step.messages];
@@ -190,7 +190,7 @@ export function useWithLimitsToArgumentActivity(
                 aiServiceStepData: res.aiAllStepsData,
               },
               false,
-              googleDocId
+              curDocId
             );
 
             setState((prevValue) => {
@@ -276,7 +276,7 @@ export function useWithLimitsToArgumentActivity(
                   aiServiceStepData: res.aiAllStepsData,
                 },
                 false,
-                googleDocId
+                curDocId
               );
             },
             state.targetAudienceSystemPrompt

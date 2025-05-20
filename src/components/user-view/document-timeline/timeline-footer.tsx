@@ -16,7 +16,7 @@ import {
   isTimelinePointFullyLoaded,
 } from '../../../helpers';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import { useWithGoogleDocs } from '../../../hooks/use-with-google-docs';
+import { useWithUsersDocs } from '../../../hooks/use-with-users-docs';
 import {
   ColorlibConnector,
   QontoStepIcon,
@@ -42,11 +42,11 @@ timeline point's version. */
 const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
   const { timelinePoint } = props;
   const { getActivitById } = useWithDocGoalsActivities();
-  const { getCurrentGoogleDoc } = useWithGoogleDocs();
+  const { getCurrentDoc } = useWithUsersDocs();
   const { docId } = useParams<Record<string, string>>();
 
   const activity = getActivitById(timelinePoint.version.activity || '');
-  const googleDoc = getCurrentGoogleDoc(docId);
+  const googleDoc = getCurrentDoc(docId);
   const title = activity?.title || googleDoc?.title || '';
 
   return (

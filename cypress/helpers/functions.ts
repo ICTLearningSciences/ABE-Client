@@ -13,17 +13,15 @@ import { fetchConfigResponse } from '../fixtures/fetch-config';
 import { fetchDocGoalsResponse } from '../fixtures/fetch-doc-goals';
 import { fetchGoogleDocsResponse } from '../fixtures/fetch-google-docs';
 import { fetchPromptTemplates } from '../fixtures/fetch-prompt-templates';
-import { fetchUserActivityStatesResponse } from '../fixtures/fetch-user-activity-states';
 import {
   gDocWithAllIntentions,
-  storeGoogleDocResponse,
+  storeUserDocResponse,
 } from '../fixtures/intentions/google-docs-intentions';
 import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
 import { analyzeHookResponse } from '../fixtures/stronger-hook-activity/analyze-hook-response';
 import { audienceEmotionsResponse } from '../fixtures/stronger-hook-activity/audience-emotion-response';
 import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
 import { entityFoundResponse } from '../fixtures/stronger-hook-activity/entity-found-response';
-import { updateUserActivityStatesResponse } from '../fixtures/update-user-activity-states';
 import { updateUserInfoResponse } from '../fixtures/update-user-info';
 import { testUser } from '../fixtures/user-data';
 import { ACCESS_TOKEN_KEY } from './local-storage';
@@ -212,12 +210,10 @@ export function cyMockDefault(
     mockGQL('DocVersions', fetchDocVersionsBuilder(docTimelineVersions)),
     mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse),
     mockGQL('FetchPrompts', fetchPromptTemplates),
-    mockGQL('FetchUserActivityStates', fetchUserActivityStatesResponse),
     mockGQL('FetchConfig', fetchConfigResponse),
     mockGQL('FetchDocGoals', fetchDocGoalsResponse),
     mockGQL('FetchSystemPrompts', fetchConfigResponse),
-    mockGQL('UpdateUserActivityState', updateUserActivityStatesResponse),
-    mockGQL('StoreGoogleDoc', storeGoogleDocResponse(gDocWithAllIntentions)),
+    mockGQL('StoreUserDoc', storeUserDocResponse(gDocWithAllIntentions)),
     mockGQL('FetchActivities', fetchActivitiesResponse),
     mockGQL('FetchBuiltActivities', fetchBuiltActivitiesResponse),
     mockGQL('FetchBuiltActivityVersions', {fetchBuiltActivityVersions: {
@@ -225,7 +221,7 @@ export function cyMockDefault(
     }}),
     mockGQL('AddOrUpdateBuiltActivity', {}),
     mockGQL('StoreBuiltActivityVersion', {storeBuiltActivityVersion:{activity:{}}}),
-    mockGQL('SubmitGoogleDocVersion', {}),
+    mockGQL('SubmitDocVersion', {}),
     mockGQL('CopyBuiltActivity', {copyBuiltActivity:createActivityBuilder(testUser._id, 'Copied Activity', 'copied-activity', ActivityBuilderVisibility.EDITABLE)}, {delayMs:1000}),
     mockGQL('DeleteBuiltActivity', {deleteBuiltActivity: ""}),
     mockGQL('UpdateUserInfo', updateUserInfoResponse("123")),

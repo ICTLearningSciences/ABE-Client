@@ -26,13 +26,11 @@ import { useWithExecutePrompt } from './use-with-execute-prompts';
 export default function useWithFreeInput(selectedGoal?: DocGoal) {
   const { state, sendMessage, chatLogToString, coachResponsePending } =
     useWithChat();
-  const googleDocId: string = useAppSelector(
-    (state) => state.state.googleDocId
-  );
+  const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const userId: string | undefined = useAppSelector(
     (state) => state.login.user?._id
   );
-  const messages = state.chatLogs[googleDocId] || [];
+  const messages = state.chatLogs[curDocId] || [];
   const isFreeInput = selectedGoal?._id === FREE_INPUT_GOAL_ID;
   const { sendMessages } = useWithChat();
   const { abortController, executePromptSteps } = useWithExecutePrompt();
@@ -60,13 +58,13 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
       });
     }
     if (messagesToSend.length) {
-      sendMessages(messagesToSend, true, googleDocId);
+      sendMessages(messagesToSend, true, curDocId);
     }
   }
 
   // Handles initial load
   useEffect(() => {
-    if (!googleDocId || !isFreeInput) {
+    if (!curDocId || !isFreeInput) {
       return;
     }
     sendIntroMessages();
@@ -88,7 +86,7 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
             },
             {
               promptText: `Here is the chat log with the user: ${chatLogToString(
-                googleDocId
+                curDocId
               )}`,
               includeEssay: false,
               promptRole: PromptRoles.ASSISSANT,
@@ -119,7 +117,7 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
             aiServiceStepData: response.aiAllStepsData,
           },
           false,
-          googleDocId
+          curDocId
         );
       })
         .catch((err) => {

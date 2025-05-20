@@ -5,10 +5,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { testGoogleDocId } from "../../helpers/functions"
-import { GoogleDoc } from "../../helpers/types"
+import { UserDoc } from "../../helpers/types"
 import { testUser } from "../user-data"
 
-export const gDocWithNoIntentions: GoogleDoc = {
+export const gDocWithNoIntentions: UserDoc = {
     "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
@@ -21,7 +21,7 @@ export const gDocWithNoIntentions: GoogleDoc = {
     "archived": false
 }
 
-export const gDocWithoutDocumentIntention: GoogleDoc = {
+export const gDocWithoutDocumentIntention: UserDoc = {
     "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
@@ -37,7 +37,7 @@ export const gDocWithoutDocumentIntention: GoogleDoc = {
     "archived": false
 }
 
-export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: GoogleDoc = {
+export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: UserDoc = {
     "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
@@ -53,7 +53,7 @@ export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: GoogleDo
     "archived": false
 }
 
-export const gDocWithoutAssignmentDescription: GoogleDoc = {
+export const gDocWithoutAssignmentDescription: UserDoc = {
     "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
@@ -72,7 +72,7 @@ export const gDocWithoutAssignmentDescription: GoogleDoc = {
     "archived": false
 }
 
-export const gDocWithAllIntentions: GoogleDoc = {
+export const gDocWithAllIntentions: UserDoc = {
     "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
@@ -91,7 +91,7 @@ export const gDocWithAllIntentions: GoogleDoc = {
     "archived": false
 }
 
-export const gDocWithExpiredDayIntention: GoogleDoc = {
+export const gDocWithExpiredDayIntention: UserDoc = {
     "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
@@ -110,7 +110,7 @@ export const gDocWithExpiredDayIntention: GoogleDoc = {
     "archived": false
 }
 
-export function storeGoogleDocResponse(gDoc: GoogleDoc): {storeGoogleDoc: GoogleDoc} {
+export function storeUserDocResponse(gDoc: UserDoc): {storeGoogleDoc: UserDoc} {
     return {
         storeGoogleDoc: gDoc
     }

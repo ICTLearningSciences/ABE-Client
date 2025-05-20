@@ -11,7 +11,7 @@ import {
   TableCell,
   CircularProgress,
 } from '@mui/material';
-import { GoogleDoc } from '../../types';
+import { UserDoc } from '../../types';
 import { RowDiv } from '../../styled-components';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { Delete } from '@mui/icons-material';
@@ -25,7 +25,7 @@ import {
 } from './select-create-docs-styles';
 
 interface GoogleDocItemRowProps {
-  doc: GoogleDoc;
+  doc: UserDoc;
   index: number;
   viewingArchived: boolean;
   onDoubleClick: () => void;

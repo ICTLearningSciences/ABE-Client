@@ -88,11 +88,9 @@ export function useWithActivityHandler(
   const { executePromptSteps: executePrompt, abortController } =
     useWithExecutePrompt();
   const { newSession, updateSessionIntention } = useWithState();
-  const googleDocId: string = useAppSelector(
-    (state) => state.state.googleDocId
-  );
+  const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const systemRole: string = useAppSelector((state) => state.chat.systemRole);
-  const messages = state.chatLogs[googleDocId] || [];
+  const messages = state.chatLogs[curDocId] || [];
   const [waitingForUserAnswer, setWaitingForUserAnswer] =
     useState<boolean>(false);
   const { prompts, isLoading: promptsLoading } = useWithPrompts;
@@ -154,7 +152,7 @@ export function useWithActivityHandler(
   ) {
     if (!messages.length) return;
     const lastUserMessage = getLastUserMessage(messages);
-    const chatLogString = chatLogToString(googleDocId);
+    const chatLogString = chatLogToString(curDocId);
     const prompt = _prompt(messages);
     const aiPromptSteps: AiPromptStep[] = preparePromptSteps(
       prompt,
@@ -187,7 +185,7 @@ export function useWithActivityHandler(
             },
           },
           false,
-          googleDocId
+          curDocId
         );
       }
       coachResponsePending(false);
@@ -248,7 +246,7 @@ export function useWithActivityHandler(
           aiServiceStepData: response.aiAllStepsData,
         },
         false,
-        googleDocId
+        curDocId
       );
     }
   }
@@ -276,7 +274,7 @@ export function useWithActivityHandler(
   }
 
   function sendMessageHelper(message: ChatMessageTypes) {
-    sendMessage(message, false, googleDocId);
+    sendMessage(message, false, curDocId);
   }
 
   function sendIntroMessages() {
@@ -300,7 +298,7 @@ export function useWithActivityHandler(
       });
     }
     if (messagesToSend.length) {
-      sendMessages(messagesToSend, true, googleDocId);
+      sendMessages(messagesToSend, true, curDocId);
     }
   }
 
@@ -308,17 +306,17 @@ export function useWithActivityHandler(
     abortCalls();
     if (resetActivityCounter === 0) return;
     if (!selectedActivity) return;
-    clearChatLog(googleDocId);
+    clearChatLog(curDocId);
     sendIntroMessages();
     resetActivity();
   }, [resetActivityCounter, Boolean(selectedActivity)]);
 
   // Handles initial load
   useEffect(() => {
-    if (!googleDocId || !selectedActivity) {
+    if (!curDocId || !selectedActivity) {
       return;
     }
-    clearChatLog(googleDocId);
+    clearChatLog(curDocId);
     resetActivity();
     sendIntroMessages();
   }, [Boolean(selectedActivity), selectedGoal]);
@@ -345,7 +343,7 @@ export function useWithActivityHandler(
         selectedGoal: selectedGoal,
       },
       false,
-      googleDocId
+      curDocId
     );
     setWaitingForUserAnswer(true);
   }, [activity?.stepName, Boolean(selectedActivity)]);

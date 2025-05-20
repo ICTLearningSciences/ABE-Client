@@ -8,7 +8,6 @@ import { useAppSelector, useAppDispatch } from '../../hooks';
 import {
   State,
   updateDocId,
-  updateUserActivityStates,
   overrideAiModel as _overrideOpenAiModel,
   updateViewingUserRole,
   updateViewingAdvancedOptions,
@@ -18,29 +17,12 @@ import {
   storeMostRecentDocVersion,
   setWarnExpiredAccessToken,
 } from '.';
-import {
-  fetchUserActivityStates,
-  updateUserActivityState as _updateUserActivityState,
-} from '../../../hooks/api';
-import {
-  AiServiceModel,
-  DocService,
-  DocData,
-  Intention,
-  UserActivityState,
-} from '../../../types';
+import { AiServiceModel, DocService, DocData, Intention } from '../../../types';
 import { UserRole } from '../login';
 
 interface UseWithState {
   state: State;
   updateCurrentDocId: (docId: string) => void;
-  loadUserActivityStates: (userId: string) => Promise<void>;
-  updateUserActivityState: (
-    userId: string,
-    googleDocId: string,
-    activityId: string,
-    metadata: string
-  ) => Promise<void>;
   overrideAiModel: (aiServiceModel?: AiServiceModel) => void;
   updateViewingUserRole: (role: UserRole) => void;
   updateViewingAdvancedOptions: (advancedOptions: boolean) => void;
@@ -65,40 +47,6 @@ export function useWithState(): UseWithState {
 
   function _updateDocService(docService: DocService) {
     dispatch(updateDocService(docService));
-  }
-
-  async function loadUserActivityStates(userId: string): Promise<void> {
-    const userActivityStates = await fetchUserActivityStates(userId);
-    dispatch(updateUserActivityStates(userActivityStates));
-  }
-
-  async function updateUserActivityState(
-    userId: string,
-    googleDocId: string,
-    activityId: string,
-    metadata: string
-  ): Promise<void> {
-    const userActivityStatesHold: UserActivityState[] = JSON.parse(
-      JSON.stringify(state.userActivityStates)
-    );
-    const updatedUserActivityState = await _updateUserActivityState(
-      userId,
-      activityId,
-      googleDocId,
-      metadata
-    );
-    const index = userActivityStatesHold.findIndex(
-      (userActivityState) =>
-        userActivityState.activityId === activityId &&
-        userActivityState.googleDocId === googleDocId
-    );
-    if (index !== -1) {
-      userActivityStatesHold[index] = updatedUserActivityState;
-    } else {
-      userActivityStatesHold.push(updatedUserActivityState);
-    }
-    dispatch(updateUserActivityStates(userActivityStatesHold));
-    return;
   }
 
   function _updateViewingUserRole(role: UserRole) {
@@ -129,8 +77,6 @@ export function useWithState(): UseWithState {
     state,
     updateCurrentDocId,
     updateDocService: _updateDocService,
-    loadUserActivityStates,
-    updateUserActivityState,
     overrideAiModel,
     updateViewingUserRole: _updateViewingUserRole,
     updateViewingAdvancedOptions: _updateViewingAdvancedOptions,

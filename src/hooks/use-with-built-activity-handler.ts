@@ -22,7 +22,7 @@ export function useWithBuiltActivityHandler(
 ) {
   const { sendMessage, clearChatLog, coachResponsePending } = useWithChat();
   const { state, updateSessionIntention, newSession } = useWithState();
-  const googleDocId = state.googleDocId;
+  const curDocId = state.curDocId;
   const { executePromptSteps } = useWithExecutePrompt();
   const { addNewSubscriber, removeAllSubscribers } =
     useWithChatLogSubscribers();
@@ -34,19 +34,19 @@ export function useWithBuiltActivityHandler(
   );
 
   useEffect(() => {
-    if (!googleDocId) {
+    if (!curDocId) {
       //hack to ensure that sendMessageHelper is fully loaded with googleDocId
       return;
     }
     if (!selectedActivityBuilder?._id) {
       removeAllSubscribers();
       setBuiltActivityHandler(undefined);
-      clearChatLog(googleDocId);
+      clearChatLog(curDocId);
     } else if (!builtActivityHandler) {
       const newActivityHandler = new BuiltActivityHandler(
         sendMessageHelper,
         () => {
-          clearChatLog(googleDocId);
+          clearChatLog(curDocId);
         },
         (waiting: boolean) => {
           console.log(waiting);
@@ -54,7 +54,7 @@ export function useWithBuiltActivityHandler(
         coachResponsePending,
         updateSessionIntentionHelper,
         executePromptSteps,
-        googleDocId,
+        curDocId,
         editDocGoal,
         selectedActivityBuilder
       );
@@ -70,7 +70,7 @@ export function useWithBuiltActivityHandler(
       builtActivityHandler.resetActivity();
     }
   }, [
-    googleDocId,
+    curDocId,
     selectedActivityBuilder?._id,
     Boolean(builtActivityHandler),
     updatesFound,
@@ -85,7 +85,7 @@ export function useWithBuiltActivityHandler(
   }, [resetActivityCounter]);
 
   function sendMessageHelper(msg: ChatMessageTypes, clearChat?: boolean) {
-    sendMessage(msg, clearChat || false, googleDocId);
+    sendMessage(msg, clearChat || false, curDocId);
   }
 
   function updateSessionIntentionHelper(intention: string) {

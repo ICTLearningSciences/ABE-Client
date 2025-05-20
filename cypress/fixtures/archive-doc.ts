@@ -5,10 +5,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { GoogleDoc } from "../helpers/types"
+import { UserDoc } from "../helpers/types"
 
 
-export function archiveDocResponse(googleDoc: Partial<GoogleDoc>) {
+export function archiveDocResponse(googleDoc: Partial<UserDoc>) {
     return {
         "addOrUpdateDoc": {
             "googleDocId": googleDoc.googleDocId || "docId",

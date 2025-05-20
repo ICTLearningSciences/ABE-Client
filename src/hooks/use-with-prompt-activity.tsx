@@ -60,7 +60,7 @@ export function useWithPromptActivity(
   ) => void,
   setWaitingForUserAnswer: (waiting: boolean) => void
 ): Activity {
-  const googleDocId = useAppSelector((state) => state.state.googleDocId);
+  const curDocId = useAppSelector((state) => state.state.curDocId);
   enum StepNames {
     INTRO = 'INTRO',
     INTRO_2 = 'INTRO_2',
@@ -105,7 +105,7 @@ export function useWithPromptActivity(
                 aiServiceStepData: response.aiAllStepsData,
               },
               false,
-              googleDocId
+              curDocId
             );
             setCurStepName(StepNames.FREE_INPUT);
           }
@@ -136,7 +136,7 @@ export function useWithPromptActivity(
                   aiServiceStepData: response.aiAllStepsData,
                 },
                 false,
-                googleDocId
+                curDocId
               );
               sendMessage(
                 {
@@ -149,7 +149,7 @@ export function useWithPromptActivity(
                   mcqChoices: [MCQ_ANALYZE],
                 },
                 false,
-                googleDocId
+                curDocId
               );
             }
           );
@@ -166,7 +166,7 @@ export function useWithPromptActivity(
                 aiServiceStepData: response.aiAllStepsData,
               },
               false,
-              googleDocId
+              curDocId
             );
             sendMessage(
               {
@@ -179,7 +179,7 @@ export function useWithPromptActivity(
                 mcqChoices: [MCQ_ANALYZE],
               },
               false,
-              googleDocId
+              curDocId
             );
           });
         }

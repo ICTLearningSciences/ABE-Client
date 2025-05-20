@@ -22,10 +22,8 @@ export function useWithChatLogSubscribers() {
   const mostRecentDocVersion = useAppSelector(
     (state) => state.state.mostRecentDocVersion
   );
-  const googleDocId: string = useAppSelector(
-    (state) => state.state.googleDocId
-  );
-  const messages = state.chatLogs[googleDocId] || [];
+  const curDocId: string = useAppSelector((state) => state.state.curDocId);
+  const messages = state.chatLogs[curDocId] || [];
 
   useEffect(() => {
     for (let i = 0; i < subscribers.length; i++) {

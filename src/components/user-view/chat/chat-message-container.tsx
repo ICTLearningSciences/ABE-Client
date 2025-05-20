@@ -14,16 +14,16 @@ import { v4 as uuidv4 } from 'uuid';
 
 export function ChatMessagesContainer(props: {
   coachResponsePending: boolean;
-  googleDocId: string;
+  curDocId: string;
   setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
   sendMessage: (message: ChatMessageTypes) => void;
 }): JSX.Element {
-  const { coachResponsePending, googleDocId, setAiInfoToDisplay, sendMessage } =
+  const { coachResponsePending, curDocId, setAiInfoToDisplay, sendMessage } =
     props;
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
   const { state } = useWithChat();
-  const messages = state.chatLogs[googleDocId] || [];
+  const messages = state.chatLogs[curDocId] || [];
   const chatMessages: ChatMessageTypes[] = [
     ...messages,
     ...(coachResponsePending

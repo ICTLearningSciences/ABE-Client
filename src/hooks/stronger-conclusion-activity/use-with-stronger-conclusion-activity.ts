@@ -58,7 +58,7 @@ export function useWithStrongerConclusionActivity(
   prompts: GQLPrompt[],
   goal?: DocGoal
 ): Activity {
-  const googleDocId = useAppSelector((state) => state.state.googleDocId);
+  const curDocId = useAppSelector((state) => state.state.curDocId);
   const allActivityMessages: StepMessage[] = (activityGql.steps || [])?.reduce(
     (acc, step) => {
       return [...acc, ...step.messages];
@@ -267,7 +267,7 @@ export function useWithStrongerConclusionActivity(
                     aiServiceStepData: res.aiAllStepsData,
                   },
                   false,
-                  googleDocId
+                  curDocId
                 );
                 goToStep(StepNames.COLLECT_AUTHOR_ORIGINAL_INTENTION);
               }
@@ -316,7 +316,7 @@ export function useWithStrongerConclusionActivity(
                 aiServiceStepData: res.aiAllStepsData,
               },
               false,
-              googleDocId
+              curDocId
             );
           }
         );
@@ -356,7 +356,7 @@ export function useWithStrongerConclusionActivity(
                 aiServiceStepData: res.aiAllStepsData,
               },
               false,
-              googleDocId
+              curDocId
             );
           }
         );
@@ -398,7 +398,7 @@ export function useWithStrongerConclusionActivity(
                   aiServiceStepData: res.aiAllStepsData,
                 },
                 false,
-                googleDocId
+                curDocId
               );
             }
           );
@@ -438,7 +438,7 @@ export function useWithStrongerConclusionActivity(
                 aiServiceStepData: res.aiAllStepsData,
               },
               false,
-              googleDocId
+              curDocId
             );
           }
         );
