@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   AiServiceModel,
-  DocService,
   DocData,
   UserDoc,
   Intention,
@@ -31,7 +30,6 @@ export enum UserDocsLoadStatus {
 
 export interface State {
   curDocId: string;
-  docService: DocService;
   mostRecentDocVersion?: DocData;
   userDocs: UserDoc[];
   userDocsLoadStatus: UserDocsLoadStatus;
@@ -45,7 +43,6 @@ export interface State {
 
 const initialState: State = {
   curDocId: '',
-  docService: DocService.GOOGLE_DOCS,
   userDocsLoadStatus: UserDocsLoadStatus.NONE,
   userDocs: [],
   sessionId: uuidv4(),
@@ -98,9 +95,6 @@ export const stateSlice = createSlice({
   name: 'state',
   initialState,
   reducers: {
-    updateDocService: (state: State, action: PayloadAction<DocService>) => {
-      state.docService = action.payload;
-    },
     setWarnExpiredAccessToken: (
       state: State,
       action: PayloadAction<boolean>
@@ -206,7 +200,6 @@ export const {
   newSession,
   setSessionIntention,
   updateDocTitleLocally,
-  updateDocService,
   storeMostRecentDocVersion,
   setWarnExpiredAccessToken,
 } = stateSlice.actions;
