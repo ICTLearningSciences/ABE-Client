@@ -19,23 +19,13 @@ import {
   setArchiveUserDoc,
 } from '../store/slices/state';
 
-export interface DocRevisionResponse {
-  revisions: RevisionsItem[];
-}
-
-export interface RevisionsItem {
-  id: string;
-  modifiedTime: string;
-  rawText: string;
-}
-
 export interface SortConfig {
   field: string;
   ascend: boolean;
 }
 
-export interface UseWithGoogleDocs {
-  docId: string;
+export interface UseWithUsersDocs {
+  curDocId: string;
   googleDocs: UserDoc[];
   copyDocs: UserDoc[];
   creationInProgress: boolean;
@@ -57,7 +47,7 @@ export interface UseWithGoogleDocs {
   unarchiveDoc: (googleDocId: string) => Promise<void>;
 }
 
-export function useWithGoogleDocs(): UseWithGoogleDocs {
+export function useWithUsersDocs(): UseWithUsersDocs {
   const { updateCurrentDocId } = useWithState();
   const [sortBy, setSortByState] = useState<SortConfig>({
     field: 'updatedAt',
@@ -71,7 +61,7 @@ export function useWithGoogleDocs(): UseWithGoogleDocs {
     }));
   };
 
-  const googleDocId = useAppSelector((state) => state.state.googleDocId);
+  const curDocId = useAppSelector((state) => state.state.curDocId);
   const userEmail = useAppSelector((state) => state.login.user?.email);
   const userId = useAppSelector((state) => state.login.user?._id) || '';
   const googleDocs = useAppSelector((state) => state.state.userDocs);
@@ -178,7 +168,7 @@ export function useWithGoogleDocs(): UseWithGoogleDocs {
   }
 
   return {
-    docId: googleDocId,
+    curDocId,
     googleDocs: userDocs || [],
     copyDocs: copyDocs || [],
     creationInProgress,

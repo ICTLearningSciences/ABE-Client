@@ -75,7 +75,7 @@ export function Chat(props: {
   } = useWithSystemPromptsConfig();
   const { availableAiServiceModels } = useWithConfig();
   const { overrideAiModel, state } = useWithState();
-  const { googleDocId } = state;
+  const { curDocId } = state;
   const coachResponsePending = useAppSelector(
     (state) => state.chat.coachResponsePending
   );
@@ -100,7 +100,7 @@ export function Chat(props: {
       ? selectedActivity
       : undefined
   );
-  const messages = googleDocId ? chatState.chatLogs[googleDocId] : [];
+  const messages = curDocId ? chatState.chatLogs[curDocId] : [];
   const goalHasActivities =
     (selectedGoal?.activities && selectedGoal.activities.length > 0) ||
     (selectedGoal?.builtActivities && selectedGoal.builtActivities.length > 0);
@@ -161,17 +161,16 @@ export function Chat(props: {
             </ChatHeader>
             <ChatMessagesContainer
               sendMessage={(message) => {
-                sendMessage(message, false, googleDocId);
+                sendMessage(message, false, curDocId);
               }}
               coachResponsePending={coachResponsePending}
-              googleDocId={googleDocId}
+              curDocId={curDocId}
               setAiInfoToDisplay={setAiInfoToDisplay}
             />
             <ChatInput
               sendMessage={(message) => {
-                sendMessage(message, false, googleDocId);
+                sendMessage(message, false, curDocId);
               }}
-              googleDocId={googleDocId}
               disableInput={disableInput}
             />
             {userIsAdmin && state.viewingAdvancedOptions && (

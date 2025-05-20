@@ -25,7 +25,7 @@ import { hasHoursPassed } from '../../../helpers';
 import { InputDocumentIntention } from './input-document-intention';
 import { InputDocumentAssignment } from './input-document-assignment';
 import { InputDayIntention } from './input-day-inention';
-import { useWithGoogleDocs } from '../../../hooks/use-with-google-docs';
+import { useWithUsersDocs } from '../../../hooks/use-with-users-docs';
 import { FREE_INPUT_GOAL_ID } from '../../../constants';
 
 const style: SxProps<Theme> = {
@@ -73,9 +73,9 @@ export function DocGoalModal(props: {
     GOAL,
     ACTIVITY,
   }
-  const googleDocId = useAppSelector((state) => state.state.googleDocId);
+  const curDocId = useAppSelector((state) => state.state.curDocId);
   const googleDocs = useAppSelector((state) => state.state.userDocs);
-  const googleDoc = googleDocs.find((doc) => doc.googleDocId === googleDocId);
+  const curDoc = googleDocs.find((doc) => doc.googleDocId === curDocId);
   const [curStageIndex, setCurStageIndex] = useState(0);
   const [stages, setStages] = useState<SelectingStage[]>([]);
   const currentStage = stages[curStageIndex];
@@ -83,58 +83,58 @@ export function DocGoalModal(props: {
   const [_selectedGoal, _setSelectedGoal] = useState<DocGoal>();
   const [firstLoadComplete, setFirstLoadComplete] = useState(false);
   const [documentIntention, setDocumentIntention] = useState<string>(
-    googleDoc?.documentIntention?.description || ''
+    curDoc?.documentIntention?.description || ''
   );
   const [assignmentDescription, setAssignmentDescription] = useState<string>(
-    googleDoc?.assignmentDescription || ''
+    curDoc?.assignmentDescription || ''
   );
   const [dayIntention, setDayIntention] = useState<string>('');
-  const { updateUserDoc } = useWithGoogleDocs();
+  const { updateUserDoc } = useWithUsersDocs();
 
   useEffect(() => {
-    if (googleDoc?.googleDocId) {
-      setDocumentIntention(googleDoc.documentIntention?.description || '');
-      setAssignmentDescription(googleDoc.assignmentDescription || '');
-      setDayIntention(googleDoc.currentDayIntention?.description || '');
+    if (curDoc?.googleDocId) {
+      setDocumentIntention(curDoc.documentIntention?.description || '');
+      setAssignmentDescription(curDoc.assignmentDescription || '');
+      setDayIntention(curDoc.currentDayIntention?.description || '');
     }
-  }, [googleDoc?.googleDocId]);
+  }, [curDoc?.googleDocId]);
 
-  function getRequiredStages(googleDoc: UserDoc): SelectingStage[] {
+  function getRequiredStages(userDoc: UserDoc): SelectingStage[] {
     const stages: SelectingStage[] = [];
-    if (!googleDoc.documentIntention) {
+    if (!userDoc.documentIntention) {
       stages.push(SelectingStage.DOCUMENT_INTENTION);
     }
     if (
-      !googleDoc.assignmentDescription &&
-      googleDoc.assignmentDescription !== ''
+      !userDoc.assignmentDescription &&
+      userDoc.assignmentDescription !== ''
     ) {
       stages.push(SelectingStage.ASSIGNMENT_DESCRIPTION);
     }
 
-    const eightHoursSinceDocIntention = googleDoc.documentIntention?.createdAt
+    const eightHoursSinceDocIntention = userDoc.documentIntention?.createdAt
       ? hasHoursPassed(
-          googleDoc.documentIntention.createdAt,
+          userDoc.documentIntention.createdAt,
           new Date().toISOString(),
           8
         )
       : false;
-    const eightHoursSinceDayIntention = googleDoc.currentDayIntention?.createdAt
+    const eightHoursSinceDayIntention = userDoc.currentDayIntention?.createdAt
       ? hasHoursPassed(
-          googleDoc.currentDayIntention.createdAt,
+          userDoc.currentDayIntention.createdAt,
           new Date().toISOString(),
           8
         )
       : false;
 
     if (
-      googleDoc.currentDayIntention?.description &&
+      userDoc.currentDayIntention?.description &&
       eightHoursSinceDayIntention
     ) {
       stages.push(SelectingStage.DAY_INTENTION);
     }
 
     if (
-      !googleDoc.currentDayIntention?.description &&
+      !userDoc.currentDayIntention?.description &&
       eightHoursSinceDocIntention
     ) {
       stages.push(SelectingStage.DAY_INTENTION);
@@ -147,14 +147,14 @@ export function DocGoalModal(props: {
 
   // Manages first stage load
   useEffect(() => {
-    if (!googleDoc?.googleDocId || firstLoadComplete) {
+    if (!curDoc?.googleDocId || firstLoadComplete) {
       return;
     }
-    const requiredStages = getRequiredStages(googleDoc);
+    const requiredStages = getRequiredStages(curDoc);
     setCurStageIndex(0);
     setStages(requiredStages);
     setFirstLoadComplete(true);
-  }, [googleDoc?.googleDocId, firstLoadComplete]);
+  }, [curDoc?.googleDocId, firstLoadComplete]);
 
   function closeModal() {
     _setSelectedGoal(undefined);
@@ -173,7 +173,7 @@ export function DocGoalModal(props: {
   function completeModal(goal: DocGoal) {
     beginGoal(goal);
     beginActivity(_selectedActivity);
-    googleDoc && setStages(getRequiredStages(googleDoc));
+    curDoc && setStages(getRequiredStages(curDoc));
     setCurStageIndex(0);
     closeModal();
   }
@@ -272,25 +272,25 @@ export function DocGoalModal(props: {
     }
   }
 
-  function updateGoogleDocIntentions(curGoogleDoc: UserDoc) {
+  function updateUserDocIntentions(curUserDoc: UserDoc) {
     const newDocumentIntention: Intention | undefined =
       documentIntention &&
-      documentIntention !== curGoogleDoc.documentIntention?.description
+      documentIntention !== curUserDoc.documentIntention?.description
         ? { description: documentIntention }
         : undefined;
     const newAssignmentDescription: string | undefined =
-      assignmentDescription !== curGoogleDoc.assignmentDescription
+      assignmentDescription !== curUserDoc.assignmentDescription
         ? assignmentDescription
         : undefined;
     const newDayIntention: Intention | undefined =
       dayIntention &&
-      dayIntention !== curGoogleDoc.currentDayIntention?.description
+      dayIntention !== curUserDoc.currentDayIntention?.description
         ? { description: dayIntention }
         : undefined;
 
     updateUserDoc({
-      googleDocId: curGoogleDoc.googleDocId,
-      user: curGoogleDoc.user,
+      googleDocId: curUserDoc.googleDocId,
+      user: curUserDoc.user,
       ...(newDocumentIntention
         ? { documentIntention: newDocumentIntention }
         : {}),
@@ -302,7 +302,7 @@ export function DocGoalModal(props: {
   }
 
   function handleNextClick(currentStage: SelectingStage) {
-    if (!googleDoc) {
+    if (!curDoc) {
       return;
     }
     const nextStageIsGoal =
@@ -317,7 +317,7 @@ export function DocGoalModal(props: {
         SelectingStage.DAY_INTENTION,
       ].includes(currentStage)
     ) {
-      updateGoogleDocIntentions(googleDoc);
+      updateUserDocIntentions(curDoc);
     }
 
     if (currentStage === SelectingStage.GOAL) {

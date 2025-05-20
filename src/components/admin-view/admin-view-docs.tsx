@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { UseWithGoogleDocs } from '../../hooks/use-with-google-docs';
+import { UseWithUsersDocs } from '../../hooks/use-with-users-docs';
 import { ColumnCenterDiv } from '../../styled-components';
 import SelectCreateDocs from '../user-view/select-create-docs';
 import { useAppSelector } from '../../store/hooks';
@@ -15,13 +15,13 @@ import { useWithState } from '../../exported-files';
 import ExampleGoogleDocModal from '../user-view/example-google-docs-modal';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 export interface AdminViewUserGoogleDocsProps {
-  useWithGoogleDocs: UseWithGoogleDocs;
+  useWithUsersDocs: UseWithUsersDocs;
 }
 
 export default function ViewUserGoogleDocs(
   props: AdminViewUserGoogleDocsProps
 ): JSX.Element {
-  const { useWithGoogleDocs } = props;
+  const { useWithUsersDocs } = props;
   const {
     googleDocs,
     copyDocs,
@@ -33,7 +33,7 @@ export default function ViewUserGoogleDocs(
     sortBy,
     setSortBy,
     docsLoading,
-  } = useWithGoogleDocs;
+  } = useWithUsersDocs;
   const { updateCurrentDocId } = useWithState();
   const navigate = useNavigateWithParams();
   const userRole = useAppSelector((state) => state.login.userRole);

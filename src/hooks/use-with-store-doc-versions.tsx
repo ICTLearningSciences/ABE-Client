@@ -11,7 +11,7 @@ import { useAppSelector } from '../store/hooks';
 import useInterval from './use-interval';
 import { DocData, DocVersion, Intention } from '../types';
 import { hasHoursPassed } from '../helpers';
-import { useWithGoogleDocs } from './use-with-google-docs';
+import { useWithUsersDocs } from './use-with-users-docs';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { isAxiosError } from 'axios';
 
@@ -25,9 +25,7 @@ export function useWithStoreDocVersions(
 ) {
   const { state } = useWithChat();
   const { updateMostRecentDocVersion, warnExpiredAccessToken } = useWithState();
-  const googleDocId: string = useAppSelector(
-    (state) => state.state.googleDocId
-  );
+  const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const sessionId: string = useAppSelector((state) => state.state.sessionId);
   const sessionIntention: Intention | undefined = useAppSelector(
     (state) => state.state.sessionIntention
@@ -36,9 +34,9 @@ export function useWithStoreDocVersions(
     (state) => state.state.warnExpiredAccessToken
   );
   const curGoogleDoc = useAppSelector((state) =>
-    state.state.userDocs.find((doc) => doc.googleDocId === googleDocId)
+    state.state.userDocs.find((doc) => doc.googleDocId === curDocId)
   );
-  const { updateDocTitleLocally } = useWithGoogleDocs();
+  const { updateDocTitleLocally } = useWithUsersDocs();
   const useDayIntention = curGoogleDoc?.currentDayIntention?.createdAt
     ? !hasHoursPassed(
         curGoogleDoc.currentDayIntention.createdAt,
@@ -46,7 +44,7 @@ export function useWithStoreDocVersions(
         8
       )
     : false;
-  const messages = state.chatLogs[googleDocId] || [];
+  const messages = state.chatLogs[curDocId] || [];
   const [lastUpdatedId, setLastUpdatedId] = useState<string>('');
   const [lastUpdatedTitle, setLastUpdatedTitle] = useState<string>('');
   const [lastNumMessages, setLastNumMessages] = useState<number>(
@@ -62,7 +60,7 @@ export function useWithStoreDocVersions(
         if (!messages.length || !sessionId) {
           return;
         }
-        const docData = await getDocData(googleDocId).catch((e) => {
+        const docData = await getDocData(curDocId).catch((e) => {
           if (isAxiosError(e) && e.response?.status === 403) {
             warnExpiredAccessToken(true);
           }
@@ -70,7 +68,7 @@ export function useWithStoreDocVersions(
         });
         updateMostRecentDocVersion(docData);
         if (docData.title !== lastUpdatedTitle) {
-          updateDocTitleLocally(googleDocId, docData.title);
+          updateDocTitleLocally(curDocId, docData.title);
         }
         if (
           docData.lastChangedId === lastUpdatedId &&
@@ -86,7 +84,7 @@ export function useWithStoreDocVersions(
         setLastUpdatedPlainText(docData.plainText);
         setLastNumMessages(messages.length);
         const newDocData: DocVersion = {
-          docId: googleDocId,
+          docId: curDocId,
           plainText: docData.plainText,
           lastChangedId: docData.lastChangedId,
           sessionIntention,
@@ -109,7 +107,7 @@ export function useWithStoreDocVersions(
     },
     accessTokenExpired
       ? null
-      : googleDocId
+      : curDocId
       ? process.env.NODE_ENV === 'development'
         ? 5000
         : 5000

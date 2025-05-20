@@ -10,7 +10,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 export function ChatInput(props: {
   sendMessage: (message: ChatMessageTypes) => void;
-  googleDocId: string;
   disableInput: boolean;
 }): JSX.Element {
   const { sendMessage } = props;
