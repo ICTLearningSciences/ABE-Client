@@ -30,7 +30,7 @@ export enum UserDocsLoadStatus {
 }
 
 export interface State {
-  googleDocId: string;
+  curDocId: string;
   docService: DocService;
   mostRecentDocVersion?: DocData;
   userDocs: UserDoc[];
@@ -44,7 +44,7 @@ export interface State {
 }
 
 const initialState: State = {
-  googleDocId: '',
+  curDocId: '',
   docService: DocService.GOOGLE_DOCS,
   userDocsLoadStatus: UserDocsLoadStatus.NONE,
   userDocs: [],
@@ -111,7 +111,7 @@ export const stateSlice = createSlice({
       if (!action.payload) {
         state.mostRecentDocVersion = undefined;
       }
-      state.googleDocId = action.payload;
+      state.curDocId = action.payload;
     },
     newSession: (state: State) => {
       state.sessionId = uuidv4();

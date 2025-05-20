@@ -19,9 +19,7 @@ export function useWithExecutePrompt() {
     controller: AbortController;
     source: CancelTokenSource;
   }>();
-  const googleDocId: string = useAppSelector(
-    (state) => state.state.googleDocId
-  );
+  const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const { availableAiServiceModels } = useWithConfig();
   const defaultAiServiceModel = useAppSelector(
     (state) => state.config.config?.defaultAiModel
@@ -79,7 +77,7 @@ export function useWithExecutePrompt() {
       applyAvailableModelsToPromptSteps(aiPromptSteps);
 
     const res = await asyncPromptExecute(
-      googleDocId,
+      curDocId,
       processedAiPromptSteps,
       userId || '',
       source.token
