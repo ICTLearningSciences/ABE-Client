@@ -14,17 +14,17 @@ describe("User Doc Versioning", () => {
             cyMockDefault(cy);
             toPromptActivity(cy);
             // polls for changes every 5 seconds
-            cy.wait("@SubmitGoogleDocVersion", {timeout: 8000})
+            cy.wait("@SubmitDocVersion", {timeout: 8000})
         })
 
         it("If google doc text changed", ()=>{
             cyMockDefault(cy);
             cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
             toPromptActivity(cy);
-            cy.wait("@SubmitGoogleDocVersion", {timeout: 8000});
+            cy.wait("@SubmitDocVersion", {timeout: 8000});
             // new lastChangedId means doc changed
             cyMockGetDocData(cy, {lastChangedId: "321"})
-            cy.wait("@SubmitGoogleDocVersion", {timeout: 8000});
+            cy.wait("@SubmitDocVersion", {timeout: 8000});
         })
 
         it("If chat log changed", ()=>{
@@ -32,9 +32,9 @@ describe("User Doc Versioning", () => {
             cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
             toPromptActivity(cy);
             // polls for changes every 5 seconds
-            cy.wait("@SubmitGoogleDocVersion", {timeout: 8000});
+            cy.wait("@SubmitDocVersion", {timeout: 8000});
             cy.get("[data-cy=mcq-choice-Ready]").click();
-            cy.wait("@SubmitGoogleDocVersion", {timeout: 8000});
+            cy.wait("@SubmitDocVersion", {timeout: 8000});
         })
     })
 
@@ -43,24 +43,24 @@ describe("User Doc Versioning", () => {
         cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
         toPromptActivity(cy);
         // stores on first load
-        cy.wait("@SubmitGoogleDocVersion", {timeout: 8000});
+        cy.wait("@SubmitDocVersion", {timeout: 8000});
         // make sure it doesn't get stored again
         cy.wait(8000);
-        cy.get("@SubmitGoogleDocVersion.all").should("have.length", 1);
+        cy.get("@SubmitDocVersion.all").should("have.length", 1);
     })
 
     it("Sends proper data for saving", ()=>{
         cyMockDefault(cy);
         cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
         toPromptActivity(cy);
-        cy.wait("@SubmitGoogleDocVersion", {timeout: 8000}).then((xhr)=>{
+        cy.wait("@SubmitDocVersion", {timeout: 8000}).then((xhr)=>{
             const data = xhr.request.body.variables;
             expect(data.googleDocData.docId).to.be.eql(testGoogleDocId);
             expect(data.googleDocData.activity).to.be.eql("65a8592b26523c7ce5acac9e");
             expect(data.googleDocData.chatLog).to.have.length(1);
         })
         cy.get("[data-cy=mcq-choice-Ready]").click();
-        cy.wait("@SubmitGoogleDocVersion", {timeout: 8000}).then((xhr)=>{
+        cy.wait("@SubmitDocVersion", {timeout: 8000}).then((xhr)=>{
             const data = xhr.request.body.variables;
             expect(data.googleDocData.docId).to.be.eql(testGoogleDocId);
             expect(data.googleDocData.activity).to.be.eql("65a8592b26523c7ce5acac9e");
@@ -72,7 +72,7 @@ describe("User Doc Versioning", () => {
         cyMockDefault(cy);
         cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
         toPromptActivity(cy);
-        cy.wait("@SubmitGoogleDocVersion", {timeout: 8000}).then((xhr)=>{
+        cy.wait("@SubmitDocVersion", {timeout: 8000}).then((xhr)=>{
             const data = xhr.request.body.variables;
             expect(data.googleDocData.docId).to.be.eql(testGoogleDocId);
             expect(data.googleDocData.activity).to.be.eql("65a8592b26523c7ce5acac9e");
@@ -81,7 +81,7 @@ describe("User Doc Versioning", () => {
         cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
         cy.get("[data-cy=activity-display-658230f699045156193339ac]").click();
         cy.get("[data-cy=doc-goal-modal-next-button]").click();
-        cy.wait("@SubmitGoogleDocVersion", {timeout: 8000}).then((xhr)=>{
+        cy.wait("@SubmitDocVersion", {timeout: 8000}).then((xhr)=>{
             const data = xhr.request.body.variables;
             expect(data.googleDocData.docId).to.be.eql(testGoogleDocId);
             expect(data.googleDocData.activity).to.be.eql("658230f699045156193339ac");

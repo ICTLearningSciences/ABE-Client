@@ -5,14 +5,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { testGoogleDocId } from '../helpers/functions';
-import { GoogleDoc } from '../helpers/types';
+import { UserDoc } from '../helpers/types';
 import { testUser } from './user-data';
 
 const getNDaysAgo = (days: number) => {
   return new Date(new Date().getTime() - days * 24 * 60 * 60 * 1000).toISOString();
 };
 
-export const fetchGoogleDocsResponse: { fetchGoogleDocs: GoogleDoc[] } = {
+export const fetchGoogleDocsResponse: { fetchGoogleDocs: UserDoc[] } = {
   fetchGoogleDocs: [
     {
       user: testUser._id,
@@ -53,7 +53,7 @@ export const fetchGoogleDocsResponse: { fetchGoogleDocs: GoogleDoc[] } = {
   ],
 };
 
-export const fetchGoogleDocsDated: { fetchGoogleDocs: GoogleDoc[] } = {
+export const fetchGoogleDocsDated: { fetchGoogleDocs: UserDoc[] } = {
   fetchGoogleDocs: [
     {
       user: testUser._id,

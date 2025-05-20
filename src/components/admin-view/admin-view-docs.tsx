@@ -24,12 +24,12 @@ export default function ViewUserGoogleDocs(
   const { useWithGoogleDocs } = props;
   const {
     googleDocs,
-    copyGoogleDocs,
+    copyDocs,
     creationInProgress,
-    handleCreateGoogleDoc,
-    handleDeleteGoogleDoc,
-    archiveGoogleDoc,
-    unarchiveGoogleDoc,
+    handleCreateDoc,
+    handleDeleteDoc,
+    archiveDoc,
+    unarchiveDoc,
     sortBy,
     setSortBy,
     docsLoading,
@@ -57,14 +57,14 @@ export default function ViewUserGoogleDocs(
       }}
     >
       <SelectCreateDocs
-        handleDeleteGoogleDoc={handleDeleteGoogleDoc}
+        handleDeleteDoc={handleDeleteDoc}
         googleDocs={googleDocs}
         docsLoading={docsLoading}
-        copyGoogleDocs={copyGoogleDocs}
+        copyDocs={copyDocs}
         creationInProgress={creationInProgress}
-        handleCreateGoogleDoc={handleCreateGoogleDoc}
-        archiveGoogleDoc={archiveGoogleDoc}
-        unarchiveGoogleDoc={unarchiveGoogleDoc}
+        handleCreateDoc={handleCreateDoc}
+        archiveDoc={archiveDoc}
+        unarchiveDoc={unarchiveDoc}
         setSortBy={setSortBy}
         sortBy={sortBy}
         goToDoc={goToDoc}
@@ -80,13 +80,13 @@ export default function ViewUserGoogleDocs(
         close={() => {
           setExampleDocsOpen(false);
         }}
-        adminDocs={copyGoogleDocs}
+        adminDocs={copyDocs}
         onCreateDoc={(
           docIdtoCopy?: string,
           title?: string,
           isAdminDoc?: boolean
         ) => {
-          handleCreateGoogleDoc(docIdtoCopy, title, isAdminDoc, (data) => {
+          handleCreateDoc(docIdtoCopy, title, isAdminDoc, (data) => {
             goToDoc(data.docId, true);
           });
         }}

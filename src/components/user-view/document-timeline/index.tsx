@@ -16,7 +16,7 @@ export function DocumentTimelinePage(props: {
   const footerTimelineRef = useRef<HTMLElement | null>(null);
   const userId = useAppSelector((state) => state.login.user?._id);
   const [hasOverflowX, setHasOverflowX] = useState<boolean>(false);
-  const { googleDocs, updateGoogleDoc } = useWithGoogleDocs();
+  const { googleDocs, updateUserDoc } = useWithGoogleDocs();
   const currentGoogleDoc = googleDocs.find((doc) => doc.googleDocId === docId);
   const {
     fetchDocumentTimeline,
@@ -140,7 +140,7 @@ export function DocumentTimelinePage(props: {
               hasOverflowX={hasOverflowX}
               googleDoc={currentGoogleDoc}
               saveTimelinePoint={saveTimelinePoint}
-              updateGoogleDoc={updateGoogleDoc}
+              updateUserDoc={updateUserDoc}
               timelineGenerationInProgress={loadInProgress}
             />
           </div>

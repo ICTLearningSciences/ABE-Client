@@ -14,7 +14,7 @@ import {
   SxProps,
   Theme,
 } from '@mui/material';
-import { ActivityTypes, DocGoal, GoogleDoc, Intention } from '../../../types';
+import { ActivityTypes, DocGoal, UserDoc, Intention } from '../../../types';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
 import { useState } from 'react';
 import ChangeIcon from '@mui/icons-material/Construction';
@@ -74,7 +74,7 @@ export function DocGoalModal(props: {
     ACTIVITY,
   }
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
-  const googleDocs = useAppSelector((state) => state.state.userGoogleDocs);
+  const googleDocs = useAppSelector((state) => state.state.userDocs);
   const googleDoc = googleDocs.find((doc) => doc.googleDocId === googleDocId);
   const [curStageIndex, setCurStageIndex] = useState(0);
   const [stages, setStages] = useState<SelectingStage[]>([]);
@@ -89,7 +89,7 @@ export function DocGoalModal(props: {
     googleDoc?.assignmentDescription || ''
   );
   const [dayIntention, setDayIntention] = useState<string>('');
-  const { updateGoogleDoc } = useWithGoogleDocs();
+  const { updateUserDoc } = useWithGoogleDocs();
 
   useEffect(() => {
     if (googleDoc?.googleDocId) {
@@ -99,7 +99,7 @@ export function DocGoalModal(props: {
     }
   }, [googleDoc?.googleDocId]);
 
-  function getRequiredStages(googleDoc: GoogleDoc): SelectingStage[] {
+  function getRequiredStages(googleDoc: UserDoc): SelectingStage[] {
     const stages: SelectingStage[] = [];
     if (!googleDoc.documentIntention) {
       stages.push(SelectingStage.DOCUMENT_INTENTION);
@@ -272,7 +272,7 @@ export function DocGoalModal(props: {
     }
   }
 
-  function updateGoogleDocIntentions(curGoogleDoc: GoogleDoc) {
+  function updateGoogleDocIntentions(curGoogleDoc: UserDoc) {
     const newDocumentIntention: Intention | undefined =
       documentIntention &&
       documentIntention !== curGoogleDoc.documentIntention?.description
@@ -288,7 +288,7 @@ export function DocGoalModal(props: {
         ? { description: dayIntention }
         : undefined;
 
-    updateGoogleDoc({
+    updateUserDoc({
       googleDocId: curGoogleDoc.googleDocId,
       user: curGoogleDoc.user,
       ...(newDocumentIntention

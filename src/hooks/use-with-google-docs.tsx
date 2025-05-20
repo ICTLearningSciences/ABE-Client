@@ -5,18 +5,18 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React, { useEffect, useMemo, useState } from 'react';
-import { createNewGoogleDoc } from './api';
+import { createNewDoc } from './api';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { useWithState } from '../store/slices/state/use-with-state';
-import { GoogleDoc, NewDocData, StoreGoogleDoc } from '../types';
+import { UserDoc, NewDocData, StoreUserDoc } from '../types';
 
 import {
-  GoogleDocsLoadStatus,
-  loadUserGoogleDocs,
-  updateGoogleDoc as _updateGoogleDoc,
-  deleteUserGoogleDoc,
-  updateGoogleDocTitleLocally as _updateGoogleDocTitle,
-  setArchiveGoogleDoc,
+  UserDocsLoadStatus,
+  loadUserDocs,
+  updateUserDoc as _updateUserDoc,
+  deleteUserDoc,
+  updateDocTitleLocally as _updateDocTitle,
+  setArchiveUserDoc,
 } from '../store/slices/state';
 
 export interface DocRevisionResponse {
@@ -36,26 +36,25 @@ export interface SortConfig {
 
 export interface UseWithGoogleDocs {
   docId: string;
-  googleDocs: GoogleDoc[];
-  copyGoogleDocs: GoogleDoc[];
+  googleDocs: UserDoc[];
+  copyDocs: UserDoc[];
   creationInProgress: boolean;
-  handleCreateGoogleDoc: (
+  handleCreateDoc: (
     docIdToCopyFrom?: string,
     title?: string,
     isAdminDoc?: boolean,
     callback?: (newDocData: NewDocData) => void
   ) => Promise<void>;
-  handleSelectGoogleDocs: (docId: string) => void;
   docsLoading: boolean;
-  updateGoogleDoc: (googleDoc: StoreGoogleDoc) => Promise<GoogleDoc>;
-  loadUsersGoogleDocs: () => void;
-  handleDeleteGoogleDoc: (docId: string) => Promise<void>;
-  getCurrentGoogleDoc: (docId: string | undefined) => GoogleDoc | undefined;
-  updateGoogleDocTitleLocally: (googleDocId: string, title: string) => void;
+  updateUserDoc: (googleDoc: StoreUserDoc) => Promise<UserDoc>;
+  loadUsersDocs: () => void;
+  handleDeleteDoc: (docId: string) => Promise<void>;
+  getCurrentDoc: (docId: string | undefined) => UserDoc | undefined;
+  updateDocTitleLocally: (googleDocId: string, title: string) => void;
   sortBy: SortConfig;
   setSortBy: (config: SortConfig) => void;
-  archiveGoogleDoc: (googleDocId: string) => Promise<void>;
-  unarchiveGoogleDoc: (googleDocId: string) => Promise<void>;
+  archiveDoc: (googleDocId: string) => Promise<void>;
+  unarchiveDoc: (googleDocId: string) => Promise<void>;
 }
 
 export function useWithGoogleDocs(): UseWithGoogleDocs {
@@ -75,16 +74,16 @@ export function useWithGoogleDocs(): UseWithGoogleDocs {
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
   const userEmail = useAppSelector((state) => state.login.user?.email);
   const userId = useAppSelector((state) => state.login.user?._id) || '';
-  const googleDocs = useAppSelector((state) => state.state.userGoogleDocs);
+  const googleDocs = useAppSelector((state) => state.state.userDocs);
 
   const googleDocsLoadStatus = useAppSelector(
-    (state) => state.state.userGoogleDocsLoadStatus
+    (state) => state.state.userDocsLoadStatus
   );
   const dispatch = useAppDispatch();
   const config = useAppSelector((state) => state.config);
-  const isLoading = googleDocsLoadStatus === GoogleDocsLoadStatus.LOADING;
+  const isLoading = googleDocsLoadStatus === UserDocsLoadStatus.LOADING;
 
-  const userGoogleDocs = useMemo(() => {
+  const userDocs = useMemo(() => {
     const filteredDocs = googleDocs?.filter((doc) => !doc.admin) || [];
     return [...filteredDocs].sort((a, b) => {
       let comparison = 0;
@@ -105,9 +104,9 @@ export function useWithGoogleDocs(): UseWithGoogleDocs {
     });
   }, [googleDocs, sortBy]);
 
-  const exampleGoogleDocs = config.config?.exampleGoogleDocs || [];
-  const copyGoogleDocs = googleDocs?.filter((doc) => {
-    return exampleGoogleDocs.includes(doc.googleDocId);
+  const exampleDocs = config.config?.exampleGoogleDocs || [];
+  const copyDocs = googleDocs?.filter((doc) => {
+    return exampleDocs.includes(doc.googleDocId);
   });
 
   const [creationInProgress, setCreationInProgress] =
@@ -121,43 +120,32 @@ export function useWithGoogleDocs(): UseWithGoogleDocs {
     }
   }, []);
 
-  function loadUsersGoogleDocs() {
-    dispatch(loadUserGoogleDocs({ userId }));
+  function loadUsersDocs() {
+    dispatch(loadUserDocs({ userId }));
   }
 
-  const getCurrentGoogleDoc = (
-    docId: string | undefined
-  ): GoogleDoc | undefined => {
+  const getCurrentDoc = (docId: string | undefined): UserDoc | undefined => {
     if (!docId) return undefined;
 
-    return userGoogleDocs?.find((doc) => doc.googleDocId === docId);
+    return userDocs?.find((doc) => doc.googleDocId === docId);
   };
 
-  async function handleCreateGoogleDoc(
+  async function handleCreateDoc(
     docIdToCopyFrom?: string,
     title?: string,
     isAdminDoc?: boolean,
     callback?: (newDocData: NewDocData) => void
   ) {
     setCreationInProgress(true);
-    await createNewGoogleDoc(
-      userId,
-      userEmail,
-      docIdToCopyFrom,
-      title,
-      isAdminDoc
-    )
+    await createNewDoc(userId, userEmail, docIdToCopyFrom, title, isAdminDoc)
       .then((newDocData) => {
-        // if(navToNewDoc){
-        //   handleNewGoogleDoc(newDocData);
-        // }
         if (callback) {
           callback(newDocData);
         }
-        loadUsersGoogleDocs(); //reload the user's google docs since have new onces
+        loadUsersDocs(); //reload the user's docs since have new onces
       })
       .catch((err) => {
-        console.error('Error creating google doc');
+        console.error('Error creating doc');
         console.error(err);
       })
       .finally(() => {
@@ -165,57 +153,45 @@ export function useWithGoogleDocs(): UseWithGoogleDocs {
       });
   }
 
-  function handleSelectGoogleDocs(docId: string) {
-    updateCurrentDocId(docId);
+  async function updateUserDoc(userDoc: StoreUserDoc): Promise<UserDoc> {
+    const res = await dispatch(_updateUserDoc({ userDoc }));
+    return res.payload as UserDoc;
   }
 
-  async function updateGoogleDoc(
-    googleDoc: StoreGoogleDoc
-  ): Promise<GoogleDoc> {
-    const res = await dispatch(_updateGoogleDoc({ googleDoc }));
-    return res.payload as GoogleDoc;
-  }
-
-  async function handleDeleteGoogleDoc(docId: string) {
-    await dispatch(deleteUserGoogleDoc({ googleDocId: docId, userId }));
+  async function handleDeleteDoc(docId: string) {
+    await dispatch(deleteUserDoc({ googleDocId: docId, userId }));
   }
 
   /**
    * Note: This will only update the google doc as it is titled in local redux, not in any server
    */
-  async function updateGoogleDocTitleLocally(
-    googleDocId: string,
-    title: string
-  ) {
-    dispatch(_updateGoogleDocTitle({ googleDocId, title }));
+  async function updateDocTitleLocally(googleDocId: string, title: string) {
+    dispatch(_updateDocTitle({ googleDocId, title }));
   }
 
-  async function archiveGoogleDoc(googleDocId: string) {
-    await dispatch(setArchiveGoogleDoc({ googleDocId, userId, archive: true }));
+  async function archiveDoc(googleDocId: string) {
+    await dispatch(setArchiveUserDoc({ googleDocId, userId, archive: true }));
   }
 
-  async function unarchiveGoogleDoc(googleDocId: string) {
-    await dispatch(
-      setArchiveGoogleDoc({ googleDocId, userId, archive: false })
-    );
+  async function unarchiveDoc(googleDocId: string) {
+    await dispatch(setArchiveUserDoc({ googleDocId, userId, archive: false }));
   }
 
   return {
     docId: googleDocId,
-    googleDocs: userGoogleDocs || [],
-    copyGoogleDocs: copyGoogleDocs || [],
+    googleDocs: userDocs || [],
+    copyDocs: copyDocs || [],
     creationInProgress,
-    handleCreateGoogleDoc,
-    handleSelectGoogleDocs,
+    handleCreateDoc,
     docsLoading: isLoading,
-    updateGoogleDoc,
-    loadUsersGoogleDocs,
-    handleDeleteGoogleDoc,
-    getCurrentGoogleDoc,
-    updateGoogleDocTitleLocally,
+    updateUserDoc,
+    loadUsersDocs,
+    handleDeleteDoc,
+    getCurrentDoc,
+    updateDocTitleLocally,
     sortBy,
     setSortBy,
-    archiveGoogleDoc,
-    unarchiveGoogleDoc,
+    archiveDoc,
+    unarchiveDoc,
   };
 }

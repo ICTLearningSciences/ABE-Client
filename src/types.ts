@@ -84,9 +84,10 @@ export interface DocData {
 export enum DocService {
   GOOGLE_DOCS = 'GOOGLE_DOCS',
   MICROSOFT_WORD = 'MICROSOFT_WORD',
+  RAW_TEXT = 'RAW_TEXT',
 }
 
-export interface GoogleDoc {
+export interface UserDoc {
   googleDocId: string;
   wordDocId?: string;
   title: string;
@@ -128,7 +129,7 @@ export enum UserActions {
   SINGLE_PROMPT = 'SINGLE_PROMPT',
 }
 
-export interface StoreGoogleDoc {
+export interface StoreUserDoc {
   googleDocId: string;
   wordDocId?: string;
   user: string;
@@ -323,13 +324,6 @@ export interface DocGoalGQl {
 export interface DocGoal extends DocGoalGQl {
   activities: ActivityGQL[];
   builtActivities: ActivityBuilder[];
-}
-
-export interface UserActivityState {
-  userId: string;
-  activityId: string;
-  googleDocId: string;
-  metadata: string;
 }
 
 export enum JobStatus {

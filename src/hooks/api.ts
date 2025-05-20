@@ -14,7 +14,7 @@ import {
   CreateGoogleDocResponse,
   DocData,
   DocVersion,
-  GoogleDoc,
+  UserDoc,
   GoogleDocTextModifyActions,
   NewDocData,
   UserAccessToken,
@@ -24,10 +24,9 @@ import {
   Config,
   Connection,
   AiPromptStep,
-  UserActivityState,
   GQLDocumentTimeline,
   DocumentTimelineJobStatus,
-  StoreGoogleDoc,
+  StoreUserDoc,
   ActivityGQL,
   AiServiceModel,
   DocGoalGQl,
@@ -48,8 +47,9 @@ const API_ENDPOINT = process.env.REACT_APP_GOOGLE_API_ENDPOINT || '/docs';
 const GRAPHQL_ENDPOINT =
   process.env.REACT_APP_GRAPHQL_ENDPOINT || '/graphql/graphql';
 
-const DOCUMENT_SERVICE =
-  process.env.REACT_APP_DOCUMENT_SERVICE || DocService.GOOGLE_DOCS;
+export const DOCUMENT_SERVICE: DocService =
+  (process.env.REACT_APP_DOCUMENT_SERVICE as DocService) ||
+  DocService.GOOGLE_DOCS;
 
 const REQUEST_TIMEOUT_GRAPHQL_DEFAULT = 30000;
 
@@ -156,7 +156,7 @@ export async function execGql<T>(
  * Create a new google doc
  * @returns {string} docId of the new google doc
  */
-export async function createNewGoogleDoc(
+export async function createNewDoc(
   userId: string,
   userEmail?: string,
   docId?: string,
@@ -228,7 +228,7 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
   return await execGql<void>(
     {
       query: `
-        mutation SubmitGoogleDocVersion($googleDocData: GDocVersionInputType!) {
+        mutationSubmitDocVersion($googleDocData: GDocVersionInputType!) {
           submitGoogleDocVersion(googleDocData: $googleDocData) {
             docId
             plainText
@@ -282,7 +282,7 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
   );
 }
 
-export async function fetchGoogleDocs(userId: string): Promise<GoogleDoc[]> {
+export async function fetchDocs(userId: string): Promise<UserDoc[]> {
   const res = await axios.post(GRAPHQL_ENDPOINT, {
     query: `
         query FetchGoogleDocs($userId: ID!) {
@@ -334,17 +334,17 @@ export async function fetchPrompts(): Promise<GQLResPrompts> {
   return { prompts: data };
 }
 
-export async function deleteGoogleDoc(
+export async function deleteUserDoc(
   docId: string,
   userId: string
-): Promise<GoogleDoc> {
+): Promise<UserDoc> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   if (!accessToken) throw new Error('No access token');
-  const data = await execGql<GoogleDoc>(
+  const data = await execGql<UserDoc>(
     {
       query: `
       mutation DeleteGoogleDoc($googleDocId: String!, $userId: String!) {
-        deleteGoogleDoc(googleDocId: $googleDocId, userId: $userId) {
+        deleteUserDoc(googleDocId: $googleDocId, userId: $userId) {
             googleDocId
             user
                 }
@@ -356,7 +356,7 @@ export async function deleteGoogleDoc(
       },
     },
     {
-      dataPath: 'deleteGoogleDoc',
+      dataPath: 'deleteUserDoc',
       accessToken,
     }
   );
@@ -413,11 +413,11 @@ export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
   return savedPrompt;
 }
 
-export async function updateGoogleDocStorage(
-  googleDoc: StoreGoogleDoc
-): Promise<GoogleDoc> {
+export async function updateDocStorage(
+  googleDoc: StoreUserDoc
+): Promise<UserDoc> {
   // remove createdAt from storeData
-  const storeData: StoreGoogleDoc = {
+  const storeData: StoreUserDoc = {
     ...googleDoc,
     documentIntention: googleDoc.documentIntention
       ? {
@@ -430,10 +430,10 @@ export async function updateGoogleDocStorage(
         }
       : undefined,
   };
-  const data = await execGql<GoogleDoc>(
+  const data = await execGql<UserDoc>(
     {
       query: `
-        mutation StoreGoogleDoc($googleDoc: GoogleDocInputType!) {
+        mutation StoreUserDoc($googleDoc: GoogleDocInputType!) {
           storeGoogleDoc(googleDoc: $googleDoc) {
               googleDocId
               user
@@ -742,64 +742,6 @@ export async function fetchActivities(): Promise<ActivityGQL[]> {
   return res.edges.map((edge) => edge.node);
 }
 
-export async function updateUserActivityState(
-  userId: string,
-  activityId: string,
-  googleDocId: string,
-  metadata: string
-): Promise<UserActivityState> {
-  const res = await execGql<UserActivityState>(
-    {
-      query: `
-      mutation UpdateUserActivityState($userId: ID!, $activityId: ID!, $googleDocId: String!, $metadata: String!) {
-        updateUserActivityState(userId: $userId, activityId: $activityId, googleDocId: $googleDocId, metadata: $metadata) {
-            userId
-            activityId
-            googleDocId
-            metadata
-          }
-     }
-      `,
-      variables: {
-        userId: userId,
-        activityId: activityId,
-        googleDocId: googleDocId,
-        metadata: metadata,
-      },
-    },
-    {
-      dataPath: 'updateUserActivityState',
-    }
-  );
-  return res;
-}
-
-export async function fetchUserActivityStates(
-  userId: string
-): Promise<UserActivityState[]> {
-  const res = await execGql<UserActivityState[]>(
-    {
-      query: `
-        query FetchUserActivityStates($userId: ID!) {
-          fetchUserActivityStates(userId: $userId) {
-              userId
-              activityId
-              googleDocId
-              metadata
-            }
-        }
-      `,
-      variables: {
-        userId: userId,
-      },
-    },
-    {
-      dataPath: 'fetchUserActivityStates',
-    }
-  );
-  return res;
-}
-
 export type OpenAiJobId = string;
 
 export async function asyncOpenAiRequest(
@@ -1044,10 +986,10 @@ export async function archiveDoc(
   googleDocId: string,
   userId: string,
   archive: boolean
-): Promise<GoogleDoc> {
+): Promise<UserDoc> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   if (!accessToken) throw new Error('No access token');
-  const data = await execGql<GoogleDoc>(
+  const data = await execGql<UserDoc>(
     {
       query: `
       mutation AddOrUpdateDoc($googleDoc: GoogleDocInputType!) {

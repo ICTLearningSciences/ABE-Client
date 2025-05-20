@@ -9,21 +9,20 @@ import {
   AiServiceModel,
   DocService,
   DocData,
-  GoogleDoc,
+  UserDoc,
   Intention,
-  StoreGoogleDoc,
-  UserActivityState,
+  StoreUserDoc,
 } from '../../../types';
 import { UserRole } from '../login';
 import { v4 as uuidv4 } from 'uuid';
 import {
   archiveDoc,
-  deleteGoogleDoc,
-  fetchGoogleDocs,
-  updateGoogleDocStorage,
+  deleteUserDoc as _deleteUserDoc,
+  fetchDocs,
+  updateDocStorage,
 } from '../../../hooks/api';
 
-export enum GoogleDocsLoadStatus {
+export enum UserDocsLoadStatus {
   NONE,
   LOADING,
   SUCCEEDED,
@@ -34,11 +33,10 @@ export interface State {
   googleDocId: string;
   docService: DocService;
   mostRecentDocVersion?: DocData;
-  userGoogleDocs: GoogleDoc[];
-  userGoogleDocsLoadStatus: GoogleDocsLoadStatus;
+  userDocs: UserDoc[];
+  userDocsLoadStatus: UserDocsLoadStatus;
   sessionId: string;
   sessionIntention?: Intention;
-  userActivityStates: UserActivityState[];
   overrideAiServiceModel?: AiServiceModel;
   viewingRole: UserRole;
   viewingAdvancedOptions: boolean;
@@ -48,50 +46,49 @@ export interface State {
 const initialState: State = {
   googleDocId: '',
   docService: DocService.GOOGLE_DOCS,
-  userGoogleDocsLoadStatus: GoogleDocsLoadStatus.NONE,
-  userGoogleDocs: [],
+  userDocsLoadStatus: UserDocsLoadStatus.NONE,
+  userDocs: [],
   sessionId: uuidv4(),
-  userActivityStates: [],
   overrideAiServiceModel: undefined,
   viewingRole: UserRole.USER,
   viewingAdvancedOptions: false,
   warnExpiredAccessToken: false,
 };
 
-export const loadUserGoogleDocs = createAsyncThunk(
-  'state/loadUserGoogleDocs',
+export const loadUserDocs = createAsyncThunk(
+  'state/loadUserDocs',
   async (args: { userId: string }) => {
-    return await fetchGoogleDocs(args.userId);
+    return await fetchDocs(args.userId);
   }
 );
 
-export interface DeleteUserGoogleDocArgs {
+export interface DeleteUserDocArgs {
   googleDocId: string;
   userId: string;
 }
 
-export const deleteUserGoogleDoc = createAsyncThunk(
-  'state/deleteUserGoogleDoc',
-  async (args: DeleteUserGoogleDocArgs) => {
-    return await deleteGoogleDoc(args.googleDocId, args.userId);
+export const deleteUserDoc = createAsyncThunk(
+  'state/deleteUserDoc',
+  async (args: DeleteUserDocArgs) => {
+    return await _deleteUserDoc(args.googleDocId, args.userId);
   }
 );
 
-export const updateGoogleDoc = createAsyncThunk(
-  'state/updateGoogleDoc',
-  async (args: { googleDoc: StoreGoogleDoc }) => {
-    return await updateGoogleDocStorage(args.googleDoc);
+export const updateUserDoc = createAsyncThunk(
+  'state/updateUserDoc',
+  async (args: { userDoc: StoreUserDoc }) => {
+    return await updateDocStorage(args.userDoc);
   }
 );
 
-export const setArchiveGoogleDoc = createAsyncThunk(
-  'state/setArchiveGoogleDoc',
+export const setArchiveUserDoc = createAsyncThunk(
+  'state/setArchiveUserDoc',
   async (args: { googleDocId: string; userId: string; archive: boolean }) => {
     return await archiveDoc(args.googleDocId, args.userId, args.archive);
   }
 );
 
-interface UpdateGoogleDocTitle {
+interface UpdateDocTitle {
   googleDocId: string;
   title: string;
 }
@@ -126,12 +123,6 @@ export const stateSlice = createSlice({
     ) => {
       state.sessionIntention = action.payload;
     },
-    updateUserActivityStates: (
-      state: State,
-      action: PayloadAction<UserActivityState[]>
-    ) => {
-      state.userActivityStates = action.payload;
-    },
     overrideAiModel: (
       state: State,
       action: PayloadAction<AiServiceModel | undefined>
@@ -147,11 +138,11 @@ export const stateSlice = createSlice({
     ) => {
       state.viewingAdvancedOptions = action.payload;
     },
-    updateGoogleDocTitleLocally: (
+    updateDocTitleLocally: (
       state: State,
-      action: PayloadAction<UpdateGoogleDocTitle>
+      action: PayloadAction<UpdateDocTitle>
     ) => {
-      state.userGoogleDocs = state.userGoogleDocs.map((doc) => {
+      state.userDocs = state.userDocs.map((doc) => {
         if (doc.googleDocId === action.payload.googleDocId) {
           doc.title = action.payload.title;
         }
@@ -166,35 +157,35 @@ export const stateSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(loadUserGoogleDocs.fulfilled, (state, action) => {
-      state.userGoogleDocsLoadStatus = GoogleDocsLoadStatus.SUCCEEDED;
-      state.userGoogleDocs = action.payload;
+    builder.addCase(loadUserDocs.fulfilled, (state, action) => {
+      state.userDocsLoadStatus = UserDocsLoadStatus.SUCCEEDED;
+      state.userDocs = action.payload;
     }),
-      builder.addCase(loadUserGoogleDocs.rejected, (state) => {
-        state.userGoogleDocsLoadStatus = GoogleDocsLoadStatus.FAILED;
-        state.userGoogleDocs = [];
+      builder.addCase(loadUserDocs.rejected, (state) => {
+        state.userDocsLoadStatus = UserDocsLoadStatus.FAILED;
+        state.userDocs = [];
       }),
-      builder.addCase(loadUserGoogleDocs.pending, (state) => {
-        state.userGoogleDocsLoadStatus = GoogleDocsLoadStatus.LOADING;
-        state.userGoogleDocs = [];
+      builder.addCase(loadUserDocs.pending, (state) => {
+        state.userDocsLoadStatus = UserDocsLoadStatus.LOADING;
+        state.userDocs = [];
       });
 
-    builder.addCase(updateGoogleDoc.fulfilled, (state, action) => {
-      state.userGoogleDocs = state.userGoogleDocs.map((doc) => {
+    builder.addCase(updateUserDoc.fulfilled, (state, action) => {
+      state.userDocs = state.userDocs.map((doc) => {
         if (doc.googleDocId === action.payload.googleDocId) {
           return action.payload;
         }
         return doc;
       });
     });
-    builder.addCase(deleteUserGoogleDoc.fulfilled, (state, action) => {
-      state.userGoogleDocs = state.userGoogleDocs.filter(
+    builder.addCase(deleteUserDoc.fulfilled, (state, action) => {
+      state.userDocs = state.userDocs.filter(
         (doc) => doc.googleDocId !== action.payload.googleDocId
       );
     });
 
-    builder.addCase(setArchiveGoogleDoc.fulfilled, (state, action) => {
-      state.userGoogleDocs = state.userGoogleDocs.map((doc) => {
+    builder.addCase(setArchiveUserDoc.fulfilled, (state, action) => {
+      state.userDocs = state.userDocs.map((doc) => {
         if (
           doc.googleDocId === action.payload.googleDocId &&
           doc.user === action.payload.user
@@ -209,13 +200,12 @@ export const stateSlice = createSlice({
 
 export const {
   updateDocId,
-  updateUserActivityStates,
   overrideAiModel,
   updateViewingUserRole,
   updateViewingAdvancedOptions,
   newSession,
   setSessionIntention,
-  updateGoogleDocTitleLocally,
+  updateDocTitleLocally,
   updateDocService,
   storeMostRecentDocVersion,
   setWarnExpiredAccessToken,

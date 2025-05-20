@@ -215,8 +215,7 @@ export default function useWithStrongerHookActivity(
   goal?: DocGoal
 ): Activity {
   const googleDocId = useAppSelector((state) => state.state.googleDocId);
-  const userId = useAppSelector((state) => state.login.user?._id);
-  const { updateUserActivityState, updateSessionIntention } = useWithState();
+  const { updateSessionIntention } = useWithState();
 
   interface StrongerHookActivityPrompts {
     analyzeHookPrompt: GQLPrompt;
@@ -358,8 +357,6 @@ export default function useWithStrongerHookActivity(
     proposedNarrativityRevision: '',
   });
 
-  const [cannedResponse, setCannedResponse] = useState<string>('');
-
   // Reset this activity whenever a new activity starts
   useEffect(() => {
     resetActivity();
@@ -440,7 +437,6 @@ export default function useWithStrongerHookActivity(
       narrativityStory: '',
       proposedNarrativityRevision: '',
     });
-    setCannedResponse('');
   }
 
   function handleEntityDetectionResponse(response: AiServicesResponseTypes) {
@@ -520,14 +516,6 @@ export default function useWithStrongerHookActivity(
       const manualCannedResponse = `${narrativeCannedResponse}\n\n${emotionCannedResponse}`;
       const generatedCannedResponse = result.overall.justification;
       const cannedResponse = generatedCannedResponse || manualCannedResponse;
-      setCannedResponse(cannedResponse);
-      userId &&
-        updateUserActivityState(
-          userId,
-          googleDocId,
-          activityGql._id,
-          cannedResponse
-        );
       sendMessage(
         {
           id: uuidv4(),
@@ -826,13 +814,6 @@ export default function useWithStrongerHookActivity(
               false,
               googleDocId
             );
-            userId &&
-              updateUserActivityState(
-                userId,
-                googleDocId,
-                activityGql._id,
-                `${cannedResponse}\n\n\n${response}`
-              );
             setState((prevState) => {
               return {
                 ...prevState,

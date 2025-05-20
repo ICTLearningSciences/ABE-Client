@@ -36,9 +36,9 @@ export function useWithStoreDocVersions(
     (state) => state.state.warnExpiredAccessToken
   );
   const curGoogleDoc = useAppSelector((state) =>
-    state.state.userGoogleDocs.find((doc) => doc.googleDocId === googleDocId)
+    state.state.userDocs.find((doc) => doc.googleDocId === googleDocId)
   );
-  const { updateGoogleDocTitleLocally } = useWithGoogleDocs();
+  const { updateDocTitleLocally } = useWithGoogleDocs();
   const useDayIntention = curGoogleDoc?.currentDayIntention?.createdAt
     ? !hasHoursPassed(
         curGoogleDoc.currentDayIntention.createdAt,
@@ -70,7 +70,7 @@ export function useWithStoreDocVersions(
         });
         updateMostRecentDocVersion(docData);
         if (docData.title !== lastUpdatedTitle) {
-          updateGoogleDocTitleLocally(googleDocId, docData.title);
+          updateDocTitleLocally(googleDocId, docData.title);
         }
         if (
           docData.lastChangedId === lastUpdatedId &&
