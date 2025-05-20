@@ -118,6 +118,12 @@ export interface ClassroomCode {
   createdAt: string;
 }
 
+export enum LoginService {
+  GOOGLE = 'GOOGLE',
+  MICROSOFT = 'MICROSOFT',
+  EMAIL = 'EMAIL',
+}
+
 export interface User {
   _id: string;
   googleId: string;
@@ -127,6 +133,7 @@ export interface User {
   lastLoginAt: Date;
   classroomCode?: ClassroomCode;
   previousClassroomCodes?: ClassroomCode[];
+  loginService: LoginService;
 }
 
 export interface UserAccessToken {
@@ -157,11 +164,17 @@ export interface DocData {
   lastModifyingUser: string;
   modifiedTime: string;
 }
+export enum DocService {
+  GOOGLE_DOCS = 'GOOGLE_DOCS',
+  MICROSOFT_WORD = 'MICROSOFT_WORD',
+  RAW_TEXT = 'RAW_TEXT',
+}
 
 export interface UserDoc {
   googleDocId: string;
   title: string;
   user: string;
+  service: DocService;
   documentIntention?: Intention;
   currentDayIntention?: Intention;
   assignmentDescription?: string;

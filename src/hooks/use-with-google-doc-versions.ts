@@ -9,7 +9,7 @@ import { useWithChat } from '../store/slices/chat/use-with-chat';
 import { getDocData, submitDocVersion } from './api';
 import { useAppSelector } from '../store/hooks';
 import useInterval from './use-interval';
-import { DocVersion, Intention } from '../types';
+import { DocService, DocVersion, Intention } from '../types';
 import { hasHoursPassed } from '../helpers';
 import { useWithUsersDocs } from './use-with-users-docs';
 import { useWithState } from '../store/slices/state/use-with-state';
@@ -56,12 +56,14 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
       if (!messages.length || !sessionId) {
         return;
       }
-      const docData = await getDocData(curDocId).catch((e) => {
-        if (isAxiosError(e) && e.response?.status === 403) {
-          warnExpiredAccessToken(true);
+      const docData = await getDocData(curDocId, DocService.GOOGLE_DOCS).catch(
+        (e) => {
+          if (isAxiosError(e) && e.response?.status === 403) {
+            warnExpiredAccessToken(true);
+          }
+          throw e;
         }
-        throw e;
-      });
+      );
       updateMostRecentDocVersion(docData);
       if (docData.title !== lastUpdatedTitle) {
         updateDocTitleLocally(curDocId, docData.title);

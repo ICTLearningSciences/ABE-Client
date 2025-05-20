@@ -129,6 +129,7 @@ export function EditGoogleDoc(props: {
           docUrl={docUrl}
           width={googleDocWidth}
           returnToDocs={returnToDocs}
+          currentActivityId={goalActivityState?.selectedActivity?._id || ''}
         />
       )}
 

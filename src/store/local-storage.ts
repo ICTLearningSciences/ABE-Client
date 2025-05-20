@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 export const ACCESS_TOKEN_KEY = 'accessToken';
 export const ACTIVE_MENTOR_KEY = 'activeMentor';
 export const CLASSROOM_CODE_KEY = 'classroomCode';
-export const DOC_SERVICE_KEY = 'docService';
 
 export function localStorageGet(key: string): string | null {
   if (typeof window === 'undefined') {

@@ -14,7 +14,11 @@ export function useWithRawTextDocVersions() {
     (state) => state.state.sessionIntention
   );
   const user = useAppSelector((state) => state.login.user);
-  async function submitDocVersion(docText: string, title: string) {
+  async function submitDocVersion(
+    docText: string,
+    title: string,
+    activityId: string
+  ) {
     const newDocData: DocVersion = {
       docId: curDocId,
       plainText: docText,
@@ -24,7 +28,7 @@ export function useWithRawTextDocVersions() {
       documentIntention: undefined,
       sessionId,
       chatLog: [],
-      activity: curDocId,
+      activity: activityId,
       intent: '',
       title: title,
       lastModifyingUser: user?.email || '',

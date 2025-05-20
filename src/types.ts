@@ -11,7 +11,7 @@ import {
 import { DisplayIcons } from './helpers/display-icon-helper';
 import { StepData } from './hooks/use-with-stronger-hook-activity';
 import { ChatMessageTypes, UserInputType } from './store/slices/chat';
-import { UserRole } from './store/slices/login';
+import { LoginService, UserRole } from './store/slices/login';
 
 export interface Connection<T> {
   edges: Edge<T>[];
@@ -47,6 +47,7 @@ export interface User {
   name: string;
   email: string;
   userRole: UserRole;
+  loginService: LoginService;
   lastLoginAt: Date;
   classroomCode?: ClassroomCode;
   previousClassroomCodes?: ClassroomCode[];
@@ -85,6 +86,20 @@ export enum DocService {
   GOOGLE_DOCS = 'GOOGLE_DOCS',
   MICROSOFT_WORD = 'MICROSOFT_WORD',
   RAW_TEXT = 'RAW_TEXT',
+}
+
+export function getDocServiceFromLoginService(
+  loginService?: LoginService
+): DocService {
+  switch (loginService) {
+    case LoginService.GOOGLE:
+      return DocService.GOOGLE_DOCS;
+    case LoginService.MICROSOFT:
+      return DocService.MICROSOFT_WORD;
+    case LoginService.EMAIL:
+    default:
+      return DocService.RAW_TEXT;
+  }
 }
 
 export interface Intention {

@@ -14,7 +14,6 @@ import { extractErrorMessageFromError } from '../../../helpers';
 import { UpdateUserInfo, User, UserAccessToken } from '../../../types';
 import {
   ACCESS_TOKEN_KEY,
-  DOC_SERVICE_KEY,
   localStorageClear,
   localStorageStore,
 } from '../../local-storage';
@@ -70,6 +69,7 @@ export const logout = createAsyncThunk('login/logout', async () => {
 export enum LoginService {
   GOOGLE = 'GOOGLE',
   MICROSOFT = 'MICROSOFT',
+  EMAIL = 'EMAIL',
 }
 
 export const login = createAsyncThunk(
@@ -130,7 +130,6 @@ export const loginSlice = createSlice({
     builder
       .addCase(logout.fulfilled, (state) => {
         localStorageClear(ACCESS_TOKEN_KEY);
-        localStorageClear(DOC_SERVICE_KEY);
         state.userRole = UserRole.NONE;
         state.accessToken = undefined;
         state.loginStatus = LoginStatus.NOT_LOGGED_IN;

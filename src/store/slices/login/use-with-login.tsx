@@ -10,17 +10,10 @@ import { useEffect } from 'react';
 import {
   ACCESS_TOKEN_KEY,
   CLASSROOM_CODE_KEY,
-  DOC_SERVICE_KEY,
   localStorageClear,
   localStorageGet,
-  localStorageStore,
 } from '../../local-storage';
-import {
-  DocService,
-  UpdateUserInfo,
-  User,
-  UserAccessToken,
-} from '../../../types';
+import { UpdateUserInfo, User, UserAccessToken } from '../../../types';
 import { removeQueryParamFromUrl } from '../../../helpers';
 
 export interface UseWithLogin {
@@ -76,7 +69,6 @@ export function useWithLogin(): UseWithLogin {
       state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
       state.loginStatus === loginActions.LoginStatus.FAILED
     ) {
-      localStorageStore(DOC_SERVICE_KEY, DocService.RAW_TEXT);
       await dispatch(
         loginActions.login({
           accessToken: googleAccessToken,
@@ -92,7 +84,6 @@ export function useWithLogin(): UseWithLogin {
       state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
       state.loginStatus === loginActions.LoginStatus.FAILED
     ) {
-      localStorageStore(DOC_SERVICE_KEY, DocService.MICROSOFT_WORD);
       await dispatch(
         loginActions.login({
           accessToken: microsoftAccessToken,

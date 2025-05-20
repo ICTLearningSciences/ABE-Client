@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical';
 import React, { useEffect, useState } from 'react';
-import { DocData } from '../../../types';
+import { DocData, DocService } from '../../../types';
 import { useDebouncedCallback } from '../../../hooks/use-debounced-callback';
 import './raw-text-editor.css';
 
@@ -107,9 +107,13 @@ function onError(error: Error) {
 
 interface RawTextDocumentProps {
   docId?: string;
+  currentActivityId: string;
 }
 
-export function RawTextDocument({ docId }: RawTextDocumentProps = {}) {
+export function RawTextDocument({
+  docId,
+  currentActivityId,
+}: RawTextDocumentProps) {
   const [docData, setDocData] = useState<DocData | undefined>();
   const [loading, setLoading] = useState<boolean>(!!docId);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -120,7 +124,11 @@ export function RawTextDocument({ docId }: RawTextDocumentProps = {}) {
     if (docId) {
       try {
         console.log('submitting doc version');
-        await submitDocVersion(text, docData?.title || 'Raw Text Document');
+        await submitDocVersion(
+          text,
+          docData?.title || 'Raw Text Document',
+          currentActivityId
+        );
       } catch (error) {
         console.error('Error updating document text:', error);
       }
@@ -130,7 +138,11 @@ export function RawTextDocument({ docId }: RawTextDocumentProps = {}) {
   const handleTitleChange = async (newTitle: string) => {
     if (docId && docData) {
       try {
-        await submitDocVersion(docData.plainText || '', newTitle);
+        await submitDocVersion(
+          docData.plainText || '',
+          newTitle,
+          currentActivityId
+        );
         setDocData({ ...docData, title: newTitle });
         setIsEditingTitle(false);
         updateDocTitleLocally(docId, newTitle);
@@ -154,7 +166,7 @@ export function RawTextDocument({ docId }: RawTextDocumentProps = {}) {
   useEffect(() => {
     if (docId) {
       setLoading(true);
-      getDocData(docId)
+      getDocData(docId, DocService.RAW_TEXT)
         .then((docData) => {
           setDocData(docData);
         })

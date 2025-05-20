@@ -33,13 +33,10 @@ import {
   User,
   UpdateUserInfo,
   IGDocVersion,
+  DocService,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
-import {
-  ACCESS_TOKEN_KEY,
-  DOC_SERVICE_KEY,
-  localStorageGet,
-} from '../store/local-storage';
+import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
 import { addQueryParam } from '../helpers';
 import { isBulletPointMessage } from '../store/slices/chat/helpers';
 import { activityQueryData, promptQueryData } from './api-helpers';
@@ -209,9 +206,11 @@ export async function docTextAction(
   return;
 }
 
-export async function getDocData(docId: string): Promise<DocData> {
+export async function getDocData(
+  docId: string,
+  docService: DocService
+): Promise<DocData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY);
-  const docService = localStorageGet(DOC_SERVICE_KEY);
   const res = await axios.get<DocData>(
     `${API_ENDPOINT}/get_doc_data/${docId}/${docService}`,
     {
@@ -610,6 +609,7 @@ export const userDataQuery = `
   name
   email
   userRole
+  loginService
   lastLoginAt
   classroomCode{
     code
@@ -748,10 +748,10 @@ export async function asyncOpenAiRequest(
   docsId: string,
   aiPromptSteps: AiPromptStep[],
   userId: string,
+  docService: DocService,
   cancelToken?: CancelToken
 ): Promise<OpenAiJobId> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  const docService = localStorageGet(DOC_SERVICE_KEY);
   if (!accessToken) throw new Error('No access token');
   const res = await execHttp<OpenAiJobId>(
     'POST',
@@ -796,11 +796,11 @@ export async function asyncRequestDocTimeline(
   userId: string,
   docId: string,
   targetAiService: AiServiceModel,
+  docService: DocService,
   cancelToken?: CancelToken
 ): Promise<DocumentTimelineJobId> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   if (!accessToken) throw new Error('No access token');
-  const docService = localStorageGet(DOC_SERVICE_KEY);
   const res = await execHttp<DocumentTimelineJobId>(
     'POST',
     `${API_ENDPOINT}/async_get_document_timeline/?docId=${docId}&userId=${userId}&docService=${docService}`,

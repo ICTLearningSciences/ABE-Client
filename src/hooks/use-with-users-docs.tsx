@@ -8,9 +8,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createNewDoc } from './api';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { useWithState } from '../store/slices/state/use-with-state';
-import { UserDoc, NewDocData, StoreUserDoc, DocService } from '../types';
+import {
+  UserDoc,
+  NewDocData,
+  StoreUserDoc,
+  DocService,
+  getDocServiceFromLoginService,
+} from '../types';
 import { v4 as uuidv4 } from 'uuid';
-import { localStorageGet, DOC_SERVICE_KEY } from '../store/local-storage';
 
 import {
   UserDocsLoadStatus,
@@ -67,8 +72,12 @@ export function useWithUsersDocs(): UseWithUsersDocs {
   const curDocId = useAppSelector((state) => state.state.curDocId);
   const userEmail = useAppSelector((state) => state.login.user?.email);
   const userId = useAppSelector((state) => state.login.user?._id) || '';
-  const googleDocs = useAppSelector((state) => state.state.userDocs);
-
+  const _googleDocs = useAppSelector((state) => state.state.userDocs);
+  const loginService = useAppSelector(
+    (state) => state.login.user?.loginService
+  );
+  const docService = getDocServiceFromLoginService(loginService);
+  const googleDocs = _googleDocs.filter((doc) => doc.service === docService);
   const googleDocsLoadStatus = useAppSelector(
     (state) => state.state.userDocsLoadStatus
   );
@@ -132,7 +141,6 @@ export function useWithUsersDocs(): UseWithUsersDocs {
     setCreationInProgress(true);
 
     try {
-      const docService = localStorageGet(DOC_SERVICE_KEY);
       // For raw text documents, create it locally and save to backend
       if (docService === DocService.RAW_TEXT) {
         const docId = uuidv4();

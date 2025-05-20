@@ -6,21 +6,24 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { Button } from '@mui/material';
-import { DocService } from '../../types';
-import { DOC_SERVICE_KEY, localStorageGet } from '../../store/local-storage';
 import { RawTextDocument } from './raw-text-document';
 import { useWithStoreDocVersions } from '../../hooks/use-with-google-doc-versions';
+import { useAppSelector } from '../../store/hooks';
+import { LoginService } from '../../store/slices/login';
 interface UserDocumentDisplayProps {
   docId: string;
   docUrl: string;
   width: string;
   returnToDocs: () => void;
+  currentActivityId: string;
 }
 
-export function GoogleDocDisplay(props: { docUrl: string }): JSX.Element {
-  const { docUrl } = props;
-  // TODO: get activityID from context and pass here.
-  useWithStoreDocVersions('');
+export function GoogleDocDisplay(props: {
+  docUrl: string;
+  currentActivityId: string;
+}): JSX.Element {
+  const { docUrl, currentActivityId } = props;
+  useWithStoreDocVersions(currentActivityId);
   return (
     <iframe
       width={'98%'}
@@ -34,18 +37,29 @@ export function GoogleDocDisplay(props: { docUrl: string }): JSX.Element {
 export function UserDocumentDisplay(
   props: UserDocumentDisplayProps
 ): JSX.Element {
-  const { docId, docUrl, width, returnToDocs } = props;
-  const docService =
-    (localStorageGet(DOC_SERVICE_KEY) as DocService) || DocService.GOOGLE_DOCS;
+  const { docId, docUrl, width, returnToDocs, currentActivityId } = props;
+  const loginService = useAppSelector(
+    (state) => state.login.user?.loginService
+  );
 
   // Render appropriate document component based on doc service type
   const renderDocumentComponent = () => {
-    switch (docService) {
-      case DocService.RAW_TEXT:
-        return <RawTextDocument docId={docId} />;
-      case DocService.GOOGLE_DOCS:
+    switch (loginService) {
+      case LoginService.GOOGLE:
+        return (
+          <GoogleDocDisplay
+            docUrl={docUrl}
+            currentActivityId={currentActivityId}
+          />
+        );
+      case LoginService.EMAIL:
       default:
-        return <GoogleDocDisplay docUrl={docUrl} />;
+        return (
+          <RawTextDocument
+            docId={docId}
+            currentActivityId={currentActivityId}
+          />
+        );
     }
   };
 
