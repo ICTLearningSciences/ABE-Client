@@ -228,7 +228,7 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
   return await execGql<void>(
     {
       query: `
-        mutationSubmitDocVersion($googleDocData: GDocVersionInputType!) {
+        mutation SubmitDocVersion($googleDocData: GDocVersionInputType!) {
           submitGoogleDocVersion(googleDocData: $googleDocData) {
             docId
             plainText
@@ -414,19 +414,19 @@ export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
 }
 
 export async function updateDocStorage(
-  googleDoc: StoreUserDoc
+  userDoc: StoreUserDoc
 ): Promise<UserDoc> {
   // remove createdAt from storeData
   const storeData: StoreUserDoc = {
-    ...googleDoc,
-    documentIntention: googleDoc.documentIntention
+    ...userDoc,
+    documentIntention: userDoc.documentIntention
       ? {
-          description: googleDoc.documentIntention.description,
+          description: userDoc.documentIntention.description,
         }
       : undefined,
-    currentDayIntention: googleDoc.currentDayIntention
+    currentDayIntention: userDoc.currentDayIntention
       ? {
-          description: googleDoc.currentDayIntention.description,
+          description: userDoc.currentDayIntention.description,
         }
       : undefined,
   };

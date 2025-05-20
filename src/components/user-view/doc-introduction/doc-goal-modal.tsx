@@ -144,7 +144,7 @@ export function DocGoalModal(props: {
     stages.push(SelectingStage.ACTIVITY);
     return stages;
   }
-
+  console.log('curDoc', curDoc);
   // Manages first stage load
   useEffect(() => {
     if (!curDoc?.googleDocId || firstLoadComplete) {

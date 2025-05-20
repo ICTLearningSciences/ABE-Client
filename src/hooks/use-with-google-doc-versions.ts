@@ -6,10 +6,10 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { useState } from 'react';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
-import { submitDocVersion } from './api';
+import { getDocData, submitDocVersion } from './api';
 import { useAppSelector } from '../store/hooks';
 import useInterval from './use-interval';
-import { DocData, DocVersion, Intention } from '../types';
+import { DocVersion, Intention } from '../types';
 import { hasHoursPassed } from '../helpers';
 import { useWithUsersDocs } from './use-with-users-docs';
 import { useWithState } from '../store/slices/state/use-with-state';
@@ -19,10 +19,7 @@ import { isAxiosError } from 'axios';
  * Interval to store doc versions
  * @param selectedActivityId
  */
-export function useWithStoreDocVersions(
-  selectedActivityId: string,
-  getDocData: (docId: string) => Promise<DocData>
-) {
+export function useWithStoreDocVersions(selectedActivityId: string) {
   const { state } = useWithChat();
   const { updateMostRecentDocVersion, warnExpiredAccessToken } = useWithState();
   const curDocId: string = useAppSelector((state) => state.state.curDocId);
@@ -54,57 +51,59 @@ export function useWithStoreDocVersions(
   const [lastSavedSessionId, setLastSavedSessionId] =
     useState<string>(sessionId);
 
-  useInterval(
-    async () => {
-      try {
-        if (!messages.length || !sessionId) {
-          return;
-        }
-        const docData = await getDocData(curDocId).catch((e) => {
-          if (isAxiosError(e) && e.response?.status === 403) {
-            warnExpiredAccessToken(true);
-          }
-          throw e;
-        });
-        updateMostRecentDocVersion(docData);
-        if (docData.title !== lastUpdatedTitle) {
-          updateDocTitleLocally(curDocId, docData.title);
-        }
-        if (
-          docData.lastChangedId === lastUpdatedId &&
-          docData.plainText === lastUpdatedPlainText &&
-          docData.title === lastUpdatedTitle &&
-          messages.length === lastNumMessages &&
-          sessionId === lastSavedSessionId
-        )
-          return;
-        setLastSavedSessionId(sessionId);
-        setLastUpdatedId(docData.lastChangedId);
-        setLastUpdatedTitle(docData.title);
-        setLastUpdatedPlainText(docData.plainText);
-        setLastNumMessages(messages.length);
-        const newDocData: DocVersion = {
-          docId: curDocId,
-          plainText: docData.plainText,
-          lastChangedId: docData.lastChangedId,
-          sessionIntention,
-          dayIntention: useDayIntention
-            ? curGoogleDoc?.currentDayIntention
-            : undefined,
-          documentIntention: curGoogleDoc?.documentIntention,
-          sessionId: sessionId,
-          chatLog: messages,
-          activity: selectedActivityId,
-          intent: '',
-          title: docData.title,
-          lastModifyingUser: docData.lastModifyingUser,
-          modifiedTime: docData.modifiedTime,
-        };
-        await submitDocVersion(newDocData);
-      } catch (e) {
-        console.log(e);
+  async function checkForNewVersion() {
+    try {
+      if (!messages.length || !sessionId) {
+        return;
       }
-    },
+      const docData = await getDocData(curDocId).catch((e) => {
+        if (isAxiosError(e) && e.response?.status === 403) {
+          warnExpiredAccessToken(true);
+        }
+        throw e;
+      });
+      updateMostRecentDocVersion(docData);
+      if (docData.title !== lastUpdatedTitle) {
+        updateDocTitleLocally(curDocId, docData.title);
+      }
+      if (
+        docData.lastChangedId === lastUpdatedId &&
+        docData.plainText === lastUpdatedPlainText &&
+        docData.title === lastUpdatedTitle &&
+        messages.length === lastNumMessages &&
+        sessionId === lastSavedSessionId
+      )
+        return;
+      setLastSavedSessionId(sessionId);
+      setLastUpdatedId(docData.lastChangedId);
+      setLastUpdatedTitle(docData.title);
+      setLastUpdatedPlainText(docData.plainText);
+      setLastNumMessages(messages.length);
+      const newDocData: DocVersion = {
+        docId: curDocId,
+        plainText: docData.plainText,
+        lastChangedId: docData.lastChangedId,
+        sessionIntention,
+        dayIntention: useDayIntention
+          ? curGoogleDoc?.currentDayIntention
+          : undefined,
+        documentIntention: curGoogleDoc?.documentIntention,
+        sessionId: sessionId,
+        chatLog: messages,
+        activity: selectedActivityId,
+        intent: '',
+        title: docData.title,
+        lastModifyingUser: docData.lastModifyingUser,
+        modifiedTime: docData.modifiedTime,
+      };
+      await submitDocVersion(newDocData);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  useInterval(
+    checkForNewVersion,
     accessTokenExpired
       ? null
       : curDocId
@@ -113,4 +112,8 @@ export function useWithStoreDocVersions(
         : 5000
       : null
   );
+
+  return {
+    checkForNewVersion,
+  };
 }

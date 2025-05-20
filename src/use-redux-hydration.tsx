@@ -8,8 +8,6 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { loadUserDocs } from './store/slices/state';
 import { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import { DocService } from './types';
-import { DOC_SERVICE_KEY, localStorageStore } from './store/local-storage';
 
 export async function useReduxHydration() {
   const userId = useAppSelector((state) => state.login.user?._id);
@@ -19,7 +17,6 @@ export async function useReduxHydration() {
 
   useEffect(() => {
     if (!userId) return;
-    localStorageStore(DOC_SERVICE_KEY, DocService.GOOGLE_DOCS);
     dispatch(loadUserDocs({ userId }));
     loadActivities();
     loadBuiltActivities();

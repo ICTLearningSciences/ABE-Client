@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { Button, CircularProgress } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { useWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-activity';
 import { useState } from 'react';
 import { useAppSelector } from '../../store/hooks';
@@ -20,8 +20,8 @@ import { useWithWindowSize } from '../../hooks/use-with-window-size';
 import { ActivityBuilder } from '../activity-builder/types';
 import { UseWithPrompts } from '../../hooks/use-with-prompts';
 import { ChatActivity } from './chat-activity';
-import { getDocData } from '../../hooks/api';
 import { SingleNotificationDialog } from '../dialog';
+import { UserDocumentDisplay } from './user-document-display';
 
 export function EditGoogleDoc(props: {
   docId: string;
@@ -123,26 +123,14 @@ export function EditGoogleDoc(props: {
     : '45%';
   return (
     <div style={{ height: '100%', display: 'flex', flexGrow: 1 }}>
-      <div
-        style={{
-          display: viewingAdmin ? 'none' : 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          justifyContent: 'space-around',
-          alignItems: 'center',
-          width: googleDocWidth,
-        }}
-      >
-        <iframe
-          width={'98%'}
-          height={'98%'}
-          src={docUrl}
-          data-cy="google-doc-iframe"
+      {!viewingAdmin && (
+        <UserDocumentDisplay
+          docId={docId}
+          docUrl={docUrl}
+          width={googleDocWidth}
+          returnToDocs={returnToDocs}
         />
-        <Button variant="text" onClick={returnToDocs}>
-          Return
-        </Button>
-      </div>
+      )}
 
       <div
         style={{
@@ -165,7 +153,6 @@ export function EditGoogleDoc(props: {
           />
         ) : (
           <ChatActivity
-            getDocData={getDocData}
             activityFromParams={activityFromParams}
             goalFromParams={goalFromParams}
             isNewDoc={isNewDoc}

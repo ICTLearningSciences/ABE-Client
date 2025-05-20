@@ -76,7 +76,7 @@ export function useWithLogin(): UseWithLogin {
       state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
       state.loginStatus === loginActions.LoginStatus.FAILED
     ) {
-      localStorageStore(DOC_SERVICE_KEY, DocService.GOOGLE_DOCS);
+      localStorageStore(DOC_SERVICE_KEY, DocService.RAW_TEXT);
       await dispatch(
         loginActions.login({
           accessToken: googleAccessToken,

@@ -87,21 +87,6 @@ export enum DocService {
   RAW_TEXT = 'RAW_TEXT',
 }
 
-export interface UserDoc {
-  googleDocId: string;
-  wordDocId?: string;
-  title: string;
-  user: string;
-  documentIntention?: Intention;
-  currentDayIntention?: Intention;
-  assignmentDescription?: string;
-  createdAt: string;
-  updatedAt: string;
-  admin: boolean;
-  service: DocService;
-  archived: boolean;
-}
-
 export interface Intention {
   description: string;
   createdAt?: string;
@@ -129,15 +114,27 @@ export enum UserActions {
   SINGLE_PROMPT = 'SINGLE_PROMPT',
 }
 
-export interface StoreUserDoc {
+export interface UserDoc {
   googleDocId: string;
-  wordDocId?: string;
   user: string;
-  admin?: boolean;
-  currentDayIntention?: Intention;
+  wordDocId?: string;
+  title: string;
   documentIntention?: Intention;
+  currentDayIntention?: Intention;
   assignmentDescription?: string;
-  title?: string;
+  createdAt: string;
+  updatedAt: string;
+  admin: boolean;
+  service: DocService;
+  archived: boolean;
+}
+
+export interface StoreUserDoc
+  extends Partial<
+    Omit<UserDoc, 'createdAt' | 'updatedAt' | 'googleDocId' | 'user'>
+  > {
+  googleDocId: string;
+  user: string;
 }
 
 export interface GQLPrompt {
