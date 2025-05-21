@@ -30,6 +30,7 @@ export function useWithPrompts(): UseWithPrompts {
     saveAndReturnData,
   } = useWithPromptsData();
   function addPrompt(prompt: GQLPrompt) {
+    console.log("hello")
     if (!promptsData) {
       return;
     }
