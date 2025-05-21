@@ -50,6 +50,7 @@ const startPoint: GQLTimelinePoint = {
     },
     docId: '',
     plainText: '',
+    markdownText: '',
     lastChangedId: '',
     sessionId: '',
     chatLog: [],

@@ -231,6 +231,7 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
           submitGoogleDocVersion(googleDocData: $googleDocData) {
             docId
             plainText
+            markdownText
             lastChangedId
             chatLog {
               sender
@@ -853,6 +854,7 @@ const storeDocTimelineMutation = `mutation StoreDocTimeline($docTimeline: DocTim
           version{
             docId
             plainText
+            markdownText
             lastChangedId
             sessionId
             sessionIntention{
@@ -937,6 +939,7 @@ export const versionQueryData = `
           _id
           docId
           plainText
+          markdownText
           lastChangedId
           sessionId
           sessionIntention{

@@ -84,6 +84,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
       const newDocData: DocVersion = {
         docId: curDocId,
         plainText: docData.plainText,
+        markdownText: docData.markdownText,
         lastChangedId: docData.lastChangedId,
         sessionIntention,
         dayIntention: useDayIntention

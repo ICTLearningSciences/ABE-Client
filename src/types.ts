@@ -76,6 +76,7 @@ export enum GoogleDocTextModifyActions {
 
 export interface DocData {
   plainText: string;
+  markdownText: string;
   lastChangedId: string;
   title: string;
   lastModifyingUser: string;
@@ -110,6 +111,7 @@ export interface Intention {
 export interface DocVersion {
   docId: string;
   plainText: string;
+  markdownText: string;
   lastChangedId: string;
   sessionId: string;
   sessionIntention?: Intention;
@@ -394,6 +396,7 @@ export interface IGDocVersion {
   _id: string;
   docId: string;
   plainText: string;
+  markdownText: string;
   lastChangedId: string;
   sessionId: string;
   sessionIntention?: Intention;

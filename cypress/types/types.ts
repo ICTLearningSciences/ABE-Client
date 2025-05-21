@@ -12,6 +12,7 @@ export enum MockDefaultType {
 export interface IGDocVersion {
   docId: string;
   plainText: string;
+  markdownText: string;
   lastChangedId: string;
   sessionId: string;
   sessionIntention?: Intention;

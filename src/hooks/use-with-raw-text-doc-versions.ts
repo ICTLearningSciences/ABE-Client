@@ -48,6 +48,7 @@ export function useWithRawTextDocVersions(
 
   async function submitDocVersion(
     docText: string,
+    markdownText: string,
     title: string,
     messages: ChatMessageTypes[],
     sessionId: string
@@ -59,6 +60,7 @@ export function useWithRawTextDocVersions(
     const newDocData: DocVersion = {
       docId: curDocId,
       plainText: docText,
+      markdownText: markdownText,
       lastChangedId: '', // does not apply to raw text.
       sessionIntention,
       dayIntention: useDayIntention
@@ -76,7 +78,11 @@ export function useWithRawTextDocVersions(
     await submitDocVersionGQL(newDocData);
   }
 
-  function checkForNewVersion(title: string, docText: string) {
+  function checkForNewVersion(
+    title: string,
+    docText: string,
+    markdownText: string
+  ) {
     if (title !== lastUpdatedTitle) {
       updateDocTitleLocally(curDocId, title);
     }
@@ -88,13 +94,17 @@ export function useWithRawTextDocVersions(
     ) {
       return;
     }
-    submitDocVersion(docText, title, messages, sessionId);
+    submitDocVersion(docText, markdownText, title, messages, sessionId);
   }
 
   useInterval(
     async () => {
       if (docData) {
-        checkForNewVersion(docData.title, docData.plainText);
+        checkForNewVersion(
+          docData.title,
+          docData.plainText,
+          docData.markdownText
+        );
       }
     },
     accessTokenExpired

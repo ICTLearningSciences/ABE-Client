@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { RawTextDocument } from './raw-text-document';
+import { HugeRTEEditor } from './raw-text-document/huge-rte';
 import { useWithStoreDocVersions } from '../../hooks/use-with-google-doc-versions';
 import { useAppSelector } from '../../store/hooks';
 import { LoginService } from '../../store/slices/login';
@@ -53,10 +53,7 @@ export function UserDocumentDisplay(
       case LoginService.EMAIL:
       default:
         return (
-          <RawTextDocument
-            docId={docId}
-            currentActivityId={currentActivityId}
-          />
+          <HugeRTEEditor docId={docId} currentActivityId={currentActivityId} />
         );
     }
   };

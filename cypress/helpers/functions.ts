@@ -281,6 +281,7 @@ export function cyMockGetDocData(
 ) {
   const defaultDocData: DocData = {
     plainText: 'This is a test doc',
+    markdownText: 'This is a test doc',
     lastChangedId: '123',
     title: 'Test Doc',
     lastModifyingUser: '',
