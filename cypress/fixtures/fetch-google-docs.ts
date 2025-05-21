@@ -12,10 +12,11 @@ const getNDaysAgo = (days: number) => {
   return new Date(new Date().getTime() - days * 24 * 60 * 60 * 1000).toISOString();
 };
 
-export const fetchGoogleDocsResponse: { fetchGoogleDocs: UserDoc[] } = {
-  fetchGoogleDocs: [
-    {
-      user: testUser._id,
+export const fetchGoogleDocsResponse = (docService?: DocService): { fetchGoogleDocs: UserDoc[] } => {
+  return {
+    fetchGoogleDocs: [
+      {
+        user: testUser._id,
       title: 'Aliens',
       documentIntention: {
         description: 'Aliens document intention',
@@ -31,7 +32,7 @@ export const fetchGoogleDocsResponse: { fetchGoogleDocs: UserDoc[] } = {
       admin: false,
       googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       archived: false,
-      service: DocService.GOOGLE_DOCS,
+      service: docService || DocService.GOOGLE_DOCS,
     },
     {
       googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Z',
@@ -50,15 +51,17 @@ export const fetchGoogleDocsResponse: { fetchGoogleDocs: UserDoc[] } = {
       updatedAt: new Date().toISOString(),
       admin: false,
       archived: false,
-      service: DocService.GOOGLE_DOCS,
-    },
-  ],
+        service: docService || DocService.GOOGLE_DOCS,
+      },
+    ],
+  };
 };
 
-export const fetchGoogleDocsDated: { fetchGoogleDocs: UserDoc[] } = {
-  fetchGoogleDocs: [
-    {
-      user: testUser._id,
+export const fetchGoogleDocsDated = (docService?: DocService): { fetchGoogleDocs: UserDoc[] } => {
+  return {
+    fetchGoogleDocs: [
+      {
+        user: testUser._id,
       title: 'Aliens',
       documentIntention: {
         description: 'Aliens document intention',
@@ -74,7 +77,7 @@ export const fetchGoogleDocsDated: { fetchGoogleDocs: UserDoc[] } = {
       admin: false,
       googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       archived: false,
-      service: DocService.GOOGLE_DOCS,
+      service: docService || DocService.GOOGLE_DOCS,
     },
     {
       googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Z',
@@ -93,7 +96,8 @@ export const fetchGoogleDocsDated: { fetchGoogleDocs: UserDoc[] } = {
       updatedAt: getNDaysAgo(1),
       admin: false,
       archived: false,
-      service: DocService.GOOGLE_DOCS,
-    },
-  ],
+        service: docService || DocService.GOOGLE_DOCS,
+      },
+    ],
+  };
 };

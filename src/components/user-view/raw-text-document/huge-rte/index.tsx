@@ -155,6 +155,7 @@ export function HugeRTEEditor({
 
   return (
     <ColumnDiv
+      data-cy="hugerte-container"
       style={{
         height: '95%',
         width: '95%',

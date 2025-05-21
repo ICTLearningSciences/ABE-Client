@@ -33,6 +33,7 @@ import {
   UserRole,
   MockDefaultType,
   ActivityBuilderVisibility,
+  DocService,
 } from './types';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 
@@ -208,7 +209,7 @@ export function cyMockDefault(
       refreshAccessTokenResponse(args.userRole || UserRole.USER)
     ),
     mockGQL('DocVersions', fetchDocVersionsBuilder(docTimelineVersions)),
-    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse),
+    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.GOOGLE_DOCS)),
     mockGQL('FetchPrompts', fetchPromptTemplates),
     mockGQL('FetchConfig', fetchConfigResponse),
     mockGQL('FetchDocGoals', fetchDocGoalsResponse),
