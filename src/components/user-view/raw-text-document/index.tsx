@@ -118,17 +118,14 @@ export function RawTextDocument({
   const [loading, setLoading] = useState<boolean>(!!docId);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [tempTitle, setTempTitle] = useState('');
-  const { submitDocVersion } = useWithRawTextDocVersions();
+  useWithRawTextDocVersions(currentActivityId, docData);
   const { updateDocTitleLocally } = useWithUsersDocs();
   const handleTextChange = async (text: string) => {
     if (docId) {
       try {
-        console.log('submitting doc version');
-        await submitDocVersion(
-          text,
-          docData?.title || 'Raw Text Document',
-          currentActivityId
-        );
+        if (docData) {
+          setDocData({ ...docData, plainText: text });
+        }
       } catch (error) {
         console.error('Error updating document text:', error);
       }
@@ -138,11 +135,6 @@ export function RawTextDocument({
   const handleTitleChange = async (newTitle: string) => {
     if (docId && docData) {
       try {
-        await submitDocVersion(
-          docData.plainText || '',
-          newTitle,
-          currentActivityId
-        );
         setDocData({ ...docData, title: newTitle });
         setIsEditingTitle(false);
         updateDocTitleLocally(docId, newTitle);

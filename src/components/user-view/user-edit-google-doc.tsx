@@ -28,7 +28,6 @@ export function EditGoogleDoc(props: {
   docUrl: string;
   activityFromParams: string;
   goalFromParams: string;
-  returnToDocs: () => void;
   isNewDoc: boolean;
   useWithPrompts: UseWithPrompts;
 }): JSX.Element {
@@ -37,7 +36,6 @@ export function EditGoogleDoc(props: {
     docUrl,
     activityFromParams,
     goalFromParams,
-    returnToDocs,
     isNewDoc,
     useWithPrompts,
   } = props;
@@ -128,7 +126,6 @@ export function EditGoogleDoc(props: {
           docId={docId}
           docUrl={docUrl}
           width={googleDocWidth}
-          returnToDocs={returnToDocs}
           currentActivityId={goalActivityState?.selectedActivity?._id || ''}
         />
       )}

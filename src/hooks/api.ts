@@ -434,19 +434,24 @@ export async function updateDocStorage(
       query: `
         mutation StoreUserDoc($googleDoc: GoogleDocInputType!) {
           storeGoogleDoc(googleDoc: $googleDoc) {
-              googleDocId
-              user
-              admin
-              title
-              assignmentDescription
-              documentIntention {
-                  description
-              }
-              currentDayIntention{
-                  description
-              }
+            googleDocId
+            wordDocId
+            user
+            title
+            documentIntention {
+              description
               createdAt
-              service
+            }
+            currentDayIntention{
+              description
+              createdAt
+            }
+            assignmentDescription
+            createdAt
+            updatedAt
+            admin
+            service
+            archived
           }
         }
     `,

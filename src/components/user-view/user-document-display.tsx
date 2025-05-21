@@ -5,7 +5,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { Button } from '@mui/material';
 import { RawTextDocument } from './raw-text-document';
 import { useWithStoreDocVersions } from '../../hooks/use-with-google-doc-versions';
 import { useAppSelector } from '../../store/hooks';
@@ -14,7 +13,6 @@ interface UserDocumentDisplayProps {
   docId: string;
   docUrl: string;
   width: string;
-  returnToDocs: () => void;
   currentActivityId: string;
 }
 
@@ -37,7 +35,7 @@ export function GoogleDocDisplay(props: {
 export function UserDocumentDisplay(
   props: UserDocumentDisplayProps
 ): JSX.Element {
-  const { docId, docUrl, width, returnToDocs, currentActivityId } = props;
+  const { docId, docUrl, width, currentActivityId } = props;
   const loginService = useAppSelector(
     (state) => state.login.user?.loginService
   );
@@ -75,9 +73,6 @@ export function UserDocumentDisplay(
       }}
     >
       {renderDocumentComponent()}
-      <Button variant="text" onClick={returnToDocs}>
-        Return
-      </Button>
     </div>
   );
 }
