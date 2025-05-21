@@ -34,6 +34,7 @@ import {
   MockDefaultType,
   ActivityBuilderVisibility,
   DocService,
+  LoginService,
 } from './types';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 
@@ -575,4 +576,18 @@ export function roleSwitch(cy: CypressGlobal, targetNewRole: UserRole){
   cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText(targetNewRole))
   // click center of screen to close drawer
   cy.get("body").click(0, 0);
+}
+
+export function getDocServiceFromLoginService(
+  loginService?: LoginService
+): DocService {
+  switch (loginService) {
+    case LoginService.GOOGLE:
+      return DocService.GOOGLE_DOCS;
+    case LoginService.MICROSOFT:
+      return DocService.MICROSOFT_WORD;
+    case LoginService.EMAIL:
+    default:
+      return DocService.RAW_TEXT;
+  }
 }
