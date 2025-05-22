@@ -15,12 +15,14 @@ import {
 } from '../../local-storage';
 import { UpdateUserInfo, User, UserAccessToken } from '../../../types';
 import { removeQueryParamFromUrl } from '../../../helpers';
+import { useAuth } from 'react-oidc-context';
 
 export interface UseWithLogin {
   state: loginActions.LoginState;
   logout: () => Promise<void>;
   loginWithGoogle: (googleAccessToken: string) => Promise<void>;
   loginWithMicrosoft: (microsoftAccessToken: string) => Promise<void>;
+  loginWithAmazonCognito: (cognitoIdToken: string) => Promise<void>;
   refreshAccessToken: () => void;
   setUser: (user: UserAccessToken) => void;
   updateUserInfo: (userInfo: UpdateUserInfo) => Promise<User>;
@@ -30,6 +32,7 @@ export interface UseWithLogin {
 export function useWithLogin(): UseWithLogin {
   const dispatch = useAppDispatch();
   const state: loginActions.LoginState = useAppSelector((state) => state.login);
+  const awsCognitoAuth = useAuth();
 
   useEffect(() => {
     checkForClassroomCode(state.loginStatus);
@@ -93,6 +96,21 @@ export function useWithLogin(): UseWithLogin {
     }
   }
 
+  async function loginWithAmazonCognito(cognitoIdToken: string) {
+    if (
+      state.loginStatus === loginActions.LoginStatus.NONE ||
+      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
+      state.loginStatus === loginActions.LoginStatus.FAILED
+    ) {
+      await dispatch(
+        loginActions.login({
+          accessToken: cognitoIdToken,
+          service: loginActions.LoginService.AMAZON_COGNITO,
+        })
+      );
+    }
+  }
+
   function refreshAccessToken() {
     if (
       state.loginStatus === loginActions.LoginStatus.NONE ||
@@ -104,6 +122,13 @@ export function useWithLogin(): UseWithLogin {
   }
 
   async function logout() {
+    if (awsCognitoAuth.isAuthenticated) {
+      try {
+        await awsCognitoAuth.signoutSilent();
+      } catch (error) {
+        console.error(error);
+      }
+    }
     await dispatch(loginActions.logout());
   }
 
@@ -121,6 +146,7 @@ export function useWithLogin(): UseWithLogin {
     logout,
     loginWithGoogle,
     loginWithMicrosoft,
+    loginWithAmazonCognito,
     refreshAccessToken,
     setUser,
     updateUserInfo,

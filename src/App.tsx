@@ -19,6 +19,15 @@ import { useReduxHydration } from './use-redux-hydration';
 import { useConfigLoader } from './components/config-loading/use-config-loader';
 import DocHistoryContainer from './components/user-view/document-timeline/doc-history-container';
 import { useWithFavicon } from './hooks/use-with-favicon';
+import { AuthProvider as CognitoAuthProvider } from 'react-oidc-context';
+
+const cognitoAuthConfig = {
+  authority: process.env.REACT_APP_COGNITO_AUTHORITY,
+  client_id: process.env.REACT_APP_COGNITO_CLIENT_ID,
+  redirect_uri: process.env.REACT_APP_COGNITO_REDIRECT_URI,
+  response_type: 'code',
+  scope: 'email openid phone',
+};
 
 function MainApp() {
   const useLogin = useWithLogin();
@@ -99,9 +108,11 @@ function App() {
   return (
     <Provider store={store}>
       <div style={{ height: '100vh' }}>
-        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-          <MainApp />
-        </GoogleOAuthProvider>
+        <CognitoAuthProvider {...cognitoAuthConfig}>
+          <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+            <MainApp />
+          </GoogleOAuthProvider>
+        </CognitoAuthProvider>
       </div>
     </Provider>
   );

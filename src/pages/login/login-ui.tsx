@@ -11,6 +11,7 @@ import { useAppSelector } from '../../store/hooks';
 import { Button, CircularProgress } from '@mui/material';
 import AbeTitle from '../../static-images/abe-title.png';
 import AweTitle from '../../static-images/awe-title.png';
+import { useAuth } from 'react-oidc-context';
 
 export function LoginUI(props: {
   loginState: LoginState;
@@ -21,6 +22,8 @@ export function LoginUI(props: {
 }) {
   const { loginState, login, loginText, orgName, titleText } = props;
   const config = useAppSelector((state) => state.config);
+  const awsCognitoAuth = useAuth();
+
   return (
     <ColumnCenterDiv
       style={{
@@ -61,19 +64,28 @@ export function LoginUI(props: {
         {loginState.loginStatus === LoginStatus.IN_PROGRESS ? (
           <CircularProgress />
         ) : (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => login()}
+          <ColumnDiv
             style={{
-              fontSize: '16px',
-              margin: '10px',
-              width: 300,
+              alignItems: 'center',
             }}
-            data-cy="login-btn"
           >
-            {loginText}
-          </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => login()}
+              style={{
+                fontSize: '16px',
+                margin: '10px',
+                width: 300,
+              }}
+              data-cy="login-btn"
+            >
+              {loginText}
+            </Button>
+            <Button onClick={() => awsCognitoAuth.signinPopup()}>
+              Sign In With Email
+            </Button>
+          </ColumnDiv>
         )}
       </div>
     </ColumnCenterDiv>
