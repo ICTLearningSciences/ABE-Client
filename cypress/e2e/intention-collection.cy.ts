@@ -20,10 +20,9 @@ import {
   cyMockDefault,
   mockGQL,
   sendChatMessage,
-  testGoogleDocId,
   toStrongerHookActivity,
 } from '../helpers/functions';
-import { DocService, DocVersion, LoginService, UserRole } from '../helpers/types';
+import { DocService, DocVersion, LoginService, UserRole, testGoogleDocId } from '../helpers/types';
 
 function writeDocumentIntention(cy: CypressGlobal, input: string) {
   cy.get('[data-cy=input-document-intention]')

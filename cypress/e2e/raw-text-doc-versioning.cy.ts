@@ -7,8 +7,8 @@ The full terms of this copyright and license should always be found in the root 
 import { fetchGoogleDocsResponse } from "../fixtures/fetch-google-docs";
 import { refreshAccessTokenResponse } from "../fixtures/refresh-access-token";
 import { analyzeHookResponse } from "../fixtures/stronger-hook-activity/analyze-hook-response";
-import { cyMockDefault, cyMockOpenAiCall, CypressGlobal, mockGQL, testGoogleDocId, toPromptActivity } from "../helpers/functions";
-import { DocService, JobStatus, LoginService, UserRole } from "../helpers/types";
+import { cyMockDefault, cyMockOpenAiCall, CypressGlobal, mockGQL, toPromptActivity } from "../helpers/functions";
+import { DocService, JobStatus, LoginService, UserRole, testGoogleDocId } from "../helpers/types";
 
 export function runInEditor(cy: CypressGlobal, callback: () => void) {
     return cy

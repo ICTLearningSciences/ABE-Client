@@ -35,10 +35,10 @@ import {
   ActivityBuilderVisibility,
   DocService,
   LoginService,
+  testGoogleDocId,
 } from './types';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 
-export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';
 
 export type CypressGlobal = Cypress.cy & CyEventEmitter;
 

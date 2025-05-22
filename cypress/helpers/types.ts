@@ -12,6 +12,7 @@ export enum GptModels {
   GPT_4_TURBO_PREVIEW = 'gpt-4-turbo-preview',
   NONE = '',
 }
+export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';
 
 export enum DisplayIcons {
   LIGHT_BULB = 'LIGHT_BULB',
