@@ -29,7 +29,6 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
 
   useEffect(() => {
     if (awsCognitoAuth.isAuthenticated && awsCognitoAuth.user?.id_token) {
-      console.log('authenticating');
       loginWithAmazonCognito(awsCognitoAuth.user?.id_token);
     }
   }, [awsCognitoAuth.isAuthenticated, awsCognitoAuth.user?.id_token]);
