@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-  useCallback,
-} from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Editor } from '@hugerte/hugerte-react';
 import { ColumnDiv } from '../../../../styled-components';
 import {
@@ -84,7 +78,7 @@ export function HugeRTEEditor({
           });
         }
       }, 500),
-    [docData]
+    [docData, editor]
   );
 
   useEffect(() => {
@@ -108,12 +102,9 @@ export function HugeRTEEditor({
     };
   }, [debouncedUpdate]);
 
-  const handleEditorChange = useCallback(
-    (value: string) => {
-      debouncedUpdate(value);
-    },
-    [debouncedUpdate]
-  );
+  const handleEditorChange = (value: string) => {
+    debouncedUpdate(value);
+  };
 
   const handleTitleChange = async (newTitle: string) => {
     if (docId && docData) {
@@ -151,7 +142,7 @@ export function HugeRTEEditor({
         onEditorChange={handleEditorChange}
       />
     ),
-    [initialDocData]
+    [initialDocData, editor, handleEditorChange]
   );
 
   if (loading || !docData) {
