@@ -82,7 +82,7 @@ export function LoginUI(props: {
             >
               {loginText}
             </Button>
-            <Button onClick={() => awsCognitoAuth.signinPopup()}>
+            <Button onClick={async () => await awsCognitoAuth.signinRedirect()}>
               Sign In With Email
             </Button>
           </ColumnDiv>

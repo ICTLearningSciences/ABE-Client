@@ -124,7 +124,12 @@ export function useWithLogin(): UseWithLogin {
   async function logout() {
     if (awsCognitoAuth.isAuthenticated) {
       try {
-        await awsCognitoAuth.signoutSilent();
+        await awsCognitoAuth.signoutRedirect({
+          extraQueryParams: {
+            client_id: process.env.REACT_APP_COGNITO_CLIENT_ID || '',
+            logout_uri: process.env.REACT_APP_COGNITO_REDIRECT_URI || '',
+          },
+        });
       } catch (error) {
         console.error(error);
       }
