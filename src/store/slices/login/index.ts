@@ -141,6 +141,8 @@ export const loginSlice = createSlice({
         localStorageStore(ACCESS_TOKEN_KEY, action.payload.accessToken);
         state.userRole = action.payload.user.userRole;
         state.user = action.payload.user;
+        // TODO: remove this
+        state.user.loginService = LoginService.EMAIL;
         state.accessToken = action.payload.accessToken;
         state.loginStatus = LoginStatus.AUTHENTICATED;
       })
@@ -156,6 +158,8 @@ export const loginSlice = createSlice({
         localStorageStore(ACCESS_TOKEN_KEY, action.payload.accessToken);
         state.userRole = action.payload.user.userRole;
         state.user = action.payload.user;
+        // TODO: remove this
+        state.user.loginService = LoginService.EMAIL;
         state.accessToken = action.payload.accessToken;
         state.loginStatus = LoginStatus.AUTHENTICATED;
       })

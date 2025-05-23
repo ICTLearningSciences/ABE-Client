@@ -23,6 +23,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import './huge-rte.css';
+import Showdown from 'showdown';
 
 interface RawTextDocumentProps {
   docId?: string;
@@ -40,6 +41,9 @@ export function HugeRTEEditor({
   const [tempTitle, setTempTitle] = useState('');
   useWithRawTextDocVersions(currentActivityId, docData);
   const { updateDocTitleLocally } = useWithUsersDocs();
+  const converter = new Showdown.Converter({
+    smartIndentationFix: true,
+  });
 
   const editor = useRef<Editor>(null);
 
@@ -61,17 +65,22 @@ export function HugeRTEEditor({
     []
   );
 
-  // Debounced update function
   const debouncedUpdate = useMemo(
     () =>
-      debounce((markdownText: string) => {
+      debounce((htmlText: string) => {
         const rawText = editor.current?.editor?.getContent({ format: 'text' });
+        const mdText = converter.makeMarkdown(htmlText);
         if (docData) {
-          setDocData({
-            ...docData,
-            plainText: rawText || markdownText,
-            markdownText: markdownText,
-            lastChangedId: docData.lastChangedId || '',
+          setDocData((prevValue) => {
+            if (prevValue) {
+              return {
+                ...prevValue,
+                plainText: rawText || mdText,
+                markdownText: mdText,
+                lastChangedId: docData.lastChangedId || '',
+              };
+            }
+            return prevValue;
           });
         }
       }, 500),
@@ -132,7 +141,7 @@ export function HugeRTEEditor({
   const MemoizedEditor = useMemo(
     () => (
       <Editor
-        initialValue={initialDocData?.markdownText}
+        initialValue={converter.makeHtml(initialDocData?.markdownText || '')}
         ref={editor}
         onChange={(value) => {
           console.log(value.target);
