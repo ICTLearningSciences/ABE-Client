@@ -43,6 +43,21 @@ export function useWithSpfxLogin(): UseWithLogin {
     }
   }
 
+  async function loginWithAmazonCognito(cognitoIdToken: string) {
+    if (
+      state.loginStatus === loginActions.LoginStatus.NONE ||
+      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
+      state.loginStatus === loginActions.LoginStatus.FAILED
+    ) {
+      await dispatch(
+        loginActions.login({
+          accessToken: cognitoIdToken,
+          service: loginActions.LoginService.AMAZON_COGNITO,
+        })
+      );
+    }
+  }
+
   function refreshAccessToken() {
     if (
       state.loginStatus === loginActions.LoginStatus.NONE ||
@@ -71,6 +86,7 @@ export function useWithSpfxLogin(): UseWithLogin {
     logout,
     loginWithGoogle,
     loginWithMicrosoft,
+    loginWithAmazonCognito,
     refreshAccessToken,
     setUser,
     updateUserInfo,

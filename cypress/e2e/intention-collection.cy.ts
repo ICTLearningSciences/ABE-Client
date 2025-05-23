@@ -375,7 +375,7 @@ describe('collectin user intentions', () => {
       );
     });
   });
-[LoginService.EMAIL, LoginService.GOOGLE].forEach((loginService) => {
+[LoginService.AMAZON_COGNITO, LoginService.GOOGLE].forEach((loginService) => {
   const extraGqlQueries = [
       mockGQL(
           'RefreshAccessToken',

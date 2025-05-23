@@ -11,11 +11,13 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useAppSelector } from '../../store/hooks';
 import { LoginUI } from './login-ui';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
+import { useAuth } from 'react-oidc-context';
 export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
   const { loginWithGoogle, state: loginState } = useLogin;
   const navigate = useNavigateWithParams();
   const config = useAppSelector((state) => state.config);
+  const { loginWithAmazonCognito } = useLogin;
   const orgName = config.config?.orgName || 'ABE';
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
@@ -23,6 +25,13 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
       navigate('/docs');
     },
   });
+  const awsCognitoAuth = useAuth();
+
+  useEffect(() => {
+    if (awsCognitoAuth.isAuthenticated && awsCognitoAuth.user?.id_token) {
+      loginWithAmazonCognito(awsCognitoAuth.user?.id_token);
+    }
+  }, [awsCognitoAuth.isAuthenticated, awsCognitoAuth.user?.id_token]);
 
   useEffect(() => {
     if (loginState.loginStatus === LoginStatus.AUTHENTICATED) {

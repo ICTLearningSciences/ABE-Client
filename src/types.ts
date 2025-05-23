@@ -97,7 +97,7 @@ export function getDocServiceFromLoginService(
       return DocService.GOOGLE_DOCS;
     case LoginService.MICROSOFT:
       return DocService.MICROSOFT_WORD;
-    case LoginService.EMAIL:
+    case LoginService.AMAZON_COGNITO:
     default:
       return DocService.RAW_TEXT;
   }

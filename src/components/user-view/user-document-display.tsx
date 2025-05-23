@@ -50,7 +50,7 @@ export function UserDocumentDisplay(
             currentActivityId={currentActivityId}
           />
         );
-      case LoginService.EMAIL:
+      case LoginService.AMAZON_COGNITO:
       default:
         return (
           <HugeRTEEditor docId={docId} currentActivityId={currentActivityId} />
