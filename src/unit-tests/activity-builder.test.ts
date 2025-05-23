@@ -13,7 +13,12 @@ import {
   MessageDisplayType,
   Sender,
 } from '../store/slices/chat';
-import { AiPromptStep, PromptOutputTypes, PromptRoles } from '../types';
+import {
+  AiPromptStep,
+  DocService,
+  PromptOutputTypes,
+  PromptRoles,
+} from '../types';
 import {
   collectAiDataAndDisplayActivity,
   sendDataToPromptsActivity,
@@ -134,6 +139,7 @@ function prepareActivityBuilder(
     () => {
       console.log('edit doc goal');
     },
+    DocService.GOOGLE_DOCS,
     activityBuilderData
   );
 }

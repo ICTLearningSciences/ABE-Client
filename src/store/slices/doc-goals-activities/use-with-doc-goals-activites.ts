@@ -46,7 +46,6 @@ export function useWithDocGoalsActivities() {
   );
   const config = useAppSelector((state) => state.config);
   const displayedGoalActivities = config.config?.displayedGoalActivities || [];
-
   const getActivitById = (id: string): ActivityGQL | undefined => {
     return activities.find((a) => a._id === id);
   };

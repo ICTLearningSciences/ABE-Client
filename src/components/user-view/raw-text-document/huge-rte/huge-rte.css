@@ -1,0 +1,8 @@
+.tox{
+    height: 100% !important;
+    width: 100% !important;
+}
+
+.tox-statusbar__resize-handle{
+    display: none !important;
+}

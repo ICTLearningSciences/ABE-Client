@@ -69,6 +69,7 @@ export const logout = createAsyncThunk('login/logout', async () => {
 export enum LoginService {
   GOOGLE = 'GOOGLE',
   MICROSOFT = 'MICROSOFT',
+  EMAIL = 'EMAIL',
 }
 
 export const login = createAsyncThunk(

@@ -8,7 +8,7 @@ import { archiveDocResponse } from "../fixtures/archive-doc";
 import { fetchGoogleDocsDated } from "../fixtures/fetch-google-docs";
 import { testUser } from "../fixtures/user-data";
 import { cyMockDefault, mockGQL } from "../helpers/functions";
-import { UserRole } from "../helpers/types";
+import { UserRole, DocService } from "../helpers/types";
 
 describe('Doc Viewing', () => {
 
@@ -16,7 +16,7 @@ describe('Doc Viewing', () => {
       cyMockDefault(cy, {
         userRole: UserRole.ADMIN,
         gqlQueries: [
-          mockGQL('FetchGoogleDocs', fetchGoogleDocsDated)
+          mockGQL('FetchGoogleDocs', fetchGoogleDocsDated(DocService.GOOGLE_DOCS))
         ]
       });
       cy.visit(`/`);

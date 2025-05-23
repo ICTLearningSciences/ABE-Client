@@ -30,10 +30,10 @@ import {
   ActivityGQL,
   AiServiceModel,
   DocGoalGQl,
-  DocService,
   User,
   UpdateUserInfo,
   IGDocVersion,
+  DocService,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -46,10 +46,6 @@ import { OpenAiServiceJobStatusResponseType } from '../ai-services/open-ai-servi
 const API_ENDPOINT = process.env.REACT_APP_GOOGLE_API_ENDPOINT || '/docs';
 const GRAPHQL_ENDPOINT =
   process.env.REACT_APP_GRAPHQL_ENDPOINT || '/graphql/graphql';
-
-export const DOCUMENT_SERVICE: DocService =
-  (process.env.REACT_APP_DOCUMENT_SERVICE as DocService) ||
-  DocService.GOOGLE_DOCS;
 
 const REQUEST_TIMEOUT_GRAPHQL_DEFAULT = 30000;
 
@@ -210,10 +206,13 @@ export async function docTextAction(
   return;
 }
 
-export async function getDocData(docId: string): Promise<DocData> {
+export async function getDocData(
+  docId: string,
+  docService: DocService
+): Promise<DocData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY);
   const res = await axios.get<DocData>(
-    `${API_ENDPOINT}/get_doc_data/${docId}/${DOCUMENT_SERVICE}`,
+    `${API_ENDPOINT}/get_doc_data/${docId}/${docService}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -228,10 +227,11 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
   return await execGql<void>(
     {
       query: `
-        mutationSubmitDocVersion($googleDocData: GDocVersionInputType!) {
+        mutation SubmitDocVersion($googleDocData: GDocVersionInputType!) {
           submitGoogleDocVersion(googleDocData: $googleDocData) {
             docId
             plainText
+            markdownText
             lastChangedId
             chatLog {
               sender
@@ -414,19 +414,19 @@ export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
 }
 
 export async function updateDocStorage(
-  googleDoc: StoreUserDoc
+  userDoc: StoreUserDoc
 ): Promise<UserDoc> {
   // remove createdAt from storeData
   const storeData: StoreUserDoc = {
-    ...googleDoc,
-    documentIntention: googleDoc.documentIntention
+    ...userDoc,
+    documentIntention: userDoc.documentIntention
       ? {
-          description: googleDoc.documentIntention.description,
+          description: userDoc.documentIntention.description,
         }
       : undefined,
-    currentDayIntention: googleDoc.currentDayIntention
+    currentDayIntention: userDoc.currentDayIntention
       ? {
-          description: googleDoc.currentDayIntention.description,
+          description: userDoc.currentDayIntention.description,
         }
       : undefined,
   };
@@ -435,19 +435,24 @@ export async function updateDocStorage(
       query: `
         mutation StoreUserDoc($googleDoc: GoogleDocInputType!) {
           storeGoogleDoc(googleDoc: $googleDoc) {
-              googleDocId
-              user
-              admin
-              title
-              assignmentDescription
-              documentIntention {
-                  description
-              }
-              currentDayIntention{
-                  description
-              }
+            googleDocId
+            wordDocId
+            user
+            title
+            documentIntention {
+              description
               createdAt
-              service
+            }
+            currentDayIntention{
+              description
+              createdAt
+            }
+            assignmentDescription
+            createdAt
+            updatedAt
+            admin
+            service
+            archived
           }
         }
     `,
@@ -610,6 +615,7 @@ export const userDataQuery = `
   name
   email
   userRole
+  loginService
   lastLoginAt
   classroomCode{
     code
@@ -748,13 +754,14 @@ export async function asyncOpenAiRequest(
   docsId: string,
   aiPromptSteps: AiPromptStep[],
   userId: string,
+  docService: DocService,
   cancelToken?: CancelToken
 ): Promise<OpenAiJobId> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   if (!accessToken) throw new Error('No access token');
   const res = await execHttp<OpenAiJobId>(
     'POST',
-    `${API_ENDPOINT}/async_open_ai_doc_question/?docId=${docsId}&userAction=${UserActions.MULTISTEP_PROMPTS}&userId=${userId}&docService=${DOCUMENT_SERVICE}`,
+    `${API_ENDPOINT}/async_open_ai_doc_question/?docId=${docsId}&userAction=${UserActions.MULTISTEP_PROMPTS}&userId=${userId}&docService=${docService}`,
     {
       accessToken: accessToken,
       dataPath: ['response', 'jobId'],
@@ -795,13 +802,14 @@ export async function asyncRequestDocTimeline(
   userId: string,
   docId: string,
   targetAiService: AiServiceModel,
+  docService: DocService,
   cancelToken?: CancelToken
 ): Promise<DocumentTimelineJobId> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   if (!accessToken) throw new Error('No access token');
   const res = await execHttp<DocumentTimelineJobId>(
     'POST',
-    `${API_ENDPOINT}/async_get_document_timeline/?docId=${docId}&userId=${userId}&docService=${DOCUMENT_SERVICE}`,
+    `${API_ENDPOINT}/async_get_document_timeline/?docId=${docId}&userId=${userId}&docService=${docService}`,
     {
       accessToken: accessToken,
       dataPath: ['response', 'jobId'],
@@ -846,6 +854,7 @@ const storeDocTimelineMutation = `mutation StoreDocTimeline($docTimeline: DocTim
           version{
             docId
             plainText
+            markdownText
             lastChangedId
             sessionId
             sessionIntention{
@@ -930,6 +939,7 @@ export const versionQueryData = `
           _id
           docId
           plainText
+          markdownText
           lastChangedId
           sessionId
           sessionIntention{

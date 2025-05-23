@@ -13,11 +13,10 @@ import {
   updateViewingAdvancedOptions,
   newSession as _newSession,
   setSessionIntention,
-  updateDocService,
   storeMostRecentDocVersion,
   setWarnExpiredAccessToken,
 } from '.';
-import { AiServiceModel, DocService, DocData, Intention } from '../../../types';
+import { AiServiceModel, DocData, Intention } from '../../../types';
 import { UserRole } from '../login';
 
 interface UseWithState {
@@ -28,7 +27,6 @@ interface UseWithState {
   updateViewingAdvancedOptions: (advancedOptions: boolean) => void;
   newSession: () => void;
   updateSessionIntention: (intention?: Intention) => void;
-  updateDocService: (docService: DocService) => void;
   updateMostRecentDocVersion: (docData: DocData) => void;
   warnExpiredAccessToken: (warn: boolean) => void;
 }
@@ -43,10 +41,6 @@ export function useWithState(): UseWithState {
 
   function updateCurrentDocId(id: string) {
     dispatch(updateDocId(id));
-  }
-
-  function _updateDocService(docService: DocService) {
-    dispatch(updateDocService(docService));
   }
 
   function _updateViewingUserRole(role: UserRole) {
@@ -76,7 +70,6 @@ export function useWithState(): UseWithState {
   return {
     state,
     updateCurrentDocId,
-    updateDocService: _updateDocService,
     overrideAiModel,
     updateViewingUserRole: _updateViewingUserRole,
     updateViewingAdvancedOptions: _updateViewingAdvancedOptions,

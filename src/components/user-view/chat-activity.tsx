@@ -10,7 +10,7 @@ import { Chat } from './chat/chat';
 import { UseWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-activity';
 import { DocGoalModal } from './doc-introduction/doc-goal-modal';
 import { useEffect, useState } from 'react';
-import { ActivityGQL, DocGoal, DocData } from '../../types';
+import { ActivityGQL, DocGoal } from '../../types';
 import { DisplayIcons } from '../../helpers/display-icon-helper';
 import { v4 as uuidv4 } from 'uuid';
 import { removeDuplicatesByField } from '../../helpers';
@@ -21,7 +21,6 @@ export function ChatActivity(props: {
   goalFromParams: string;
   isNewDoc: boolean;
   useWithPrompts: UseWithPrompts;
-  getDocData: (docId: string) => Promise<DocData>;
   useCurrentGoalActivity: UseWithCurrentGoalActivity;
   previewingActivity: boolean;
   setPreviewingActivity: (previewingActivity: boolean) => void;
@@ -31,7 +30,6 @@ export function ChatActivity(props: {
     goalFromParams,
     isNewDoc,
     useWithPrompts,
-    getDocData,
     useCurrentGoalActivity,
     previewingActivity,
     setPreviewingActivity,
@@ -128,7 +126,6 @@ export function ChatActivity(props: {
           editDocGoal={editDocGoal}
           setSelectedActivity={setActivity}
           useWithPrompts={useWithPrompts}
-          getDocData={getDocData}
         />
         <DocGoalModal
           isNewDoc={isNewDoc}

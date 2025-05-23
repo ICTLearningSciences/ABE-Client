@@ -29,6 +29,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   AiPromptStep,
   DocData,
+  DocService,
   PromptConfiguration,
   PromptOutputTypes,
   PromptRoles,
@@ -82,6 +83,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   stepIdsSinceLastInput: string[];
   lastFailedStepId: string | null = null;
   docId: string;
+  docService: DocService;
 
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
@@ -157,9 +159,11 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     ) => Promise<AiServicesResponseTypes>,
     docId: string,
     editDocGoal: () => void,
+    docService: DocService,
     builtActivityData?: ActivityBuilder
   ) {
     this.docId = docId;
+    this.docService = docService;
     this.builtActivityData = builtActivityData;
     this.stateData = {};
     this.stepIdsSinceLastInput = [];
@@ -261,7 +265,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
   async handleLogicOperationStep(step: ConditionalActivityStep) {
     this.setResponsePending(true);
-    const docData = await getDocData(this.docId);
+    const docData = await getDocData(this.docId, this.docService);
     this.stateData = {
       ...this.stateData,
       [DOC_TEXT_KEY]: docData.plainText,

@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { CancelToken } from 'axios';
-import { JobStatus, AiPromptStep } from '../types';
+import { JobStatus, AiPromptStep, DocService } from '../types';
 import { asyncOpenAiJobStatus, asyncOpenAiRequest } from './api';
 import {
   AiServicesResponseTypes,
@@ -16,12 +16,14 @@ export async function asyncPromptExecute(
   googleDocId: string,
   aiPromptSteps: AiPromptStep[],
   userId: string,
+  docService: DocService,
   cancelToken?: CancelToken
 ): Promise<AiServicesResponseTypes> {
   const openAiJobId = await asyncOpenAiRequest(
     googleDocId,
     aiPromptSteps,
     userId,
+    docService,
     cancelToken
   );
   const pollFunction = () => {

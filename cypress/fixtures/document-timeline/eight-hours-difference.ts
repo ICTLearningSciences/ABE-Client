@@ -44,6 +44,7 @@ export const eightHoursBetweenSessionsDocVersions: IGDocVersion[] = [
     _id: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
     docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
     plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
+    markdownText: 'Hello, world! What’s going on ? I’m making more changes\n',
     lastChangedId:
       'ALBJ4LvpUjPG6iVXa8vibKE0FafnztNmt9B3Qmmn8h0Z5SfAgNZSjfH1Dk33Ygrte_B_WuN1EIxZ4uBJoekEju8',
     sessionIntention: {
