@@ -8,7 +8,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createNewDoc } from './api';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { useWithState } from '../store/slices/state/use-with-state';
-import { UserDoc, NewDocData, StoreUserDoc } from '../types';
+import {
+  UserDoc,
+  NewDocData,
+  StoreUserDoc,
+  DocService,
+  getDocServiceFromLoginService,
+} from '../types';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   UserDocsLoadStatus,
@@ -33,7 +40,8 @@ export interface UseWithUsersDocs {
     docIdToCopyFrom?: string,
     title?: string,
     isAdminDoc?: boolean,
-    callback?: (newDocData: NewDocData) => void
+    callback?: (newDocData: NewDocData) => void,
+    docService?: DocService
   ) => Promise<void>;
   docsLoading: boolean;
   updateUserDoc: (googleDoc: StoreUserDoc) => Promise<UserDoc>;
@@ -64,8 +72,12 @@ export function useWithUsersDocs(): UseWithUsersDocs {
   const curDocId = useAppSelector((state) => state.state.curDocId);
   const userEmail = useAppSelector((state) => state.login.user?.email);
   const userId = useAppSelector((state) => state.login.user?._id) || '';
-  const googleDocs = useAppSelector((state) => state.state.userDocs);
-
+  const _googleDocs = useAppSelector((state) => state.state.userDocs);
+  const loginService = useAppSelector(
+    (state) => state.login.user?.loginService
+  );
+  const docService = getDocServiceFromLoginService(loginService);
+  const googleDocs = _googleDocs.filter((doc) => doc.service === docService);
   const googleDocsLoadStatus = useAppSelector(
     (state) => state.state.userDocsLoadStatus
   );
@@ -127,20 +139,48 @@ export function useWithUsersDocs(): UseWithUsersDocs {
     callback?: (newDocData: NewDocData) => void
   ) {
     setCreationInProgress(true);
-    await createNewDoc(userId, userEmail, docIdToCopyFrom, title, isAdminDoc)
-      .then((newDocData) => {
+
+    try {
+      // For raw text documents, create it locally and save to backend
+      if (docService === DocService.RAW_TEXT) {
+        const docId = uuidv4();
+        const newDocData: NewDocData = {
+          docId,
+          docUrl: '', // Raw text doesn't have a URL
+        };
+
+        // Create new doc in backend via updateUserDoc
+        await updateUserDoc({
+          googleDocId: docId,
+          user: userId,
+          title: title || 'New Document',
+          admin: isAdminDoc || false,
+          service: DocService.RAW_TEXT,
+        });
+        loadUsersDocs();
         if (callback) {
           callback(newDocData);
         }
-        loadUsersDocs(); //reload the user's docs since have new onces
-      })
-      .catch((err) => {
-        console.error('Error creating doc');
-        console.error(err);
-      })
-      .finally(() => {
-        setCreationInProgress(false);
-      });
+      } else {
+        // Use existing createNewDoc for Google Docs
+        const newDocData = await createNewDoc(
+          userId,
+          userEmail,
+          docIdToCopyFrom,
+          title,
+          isAdminDoc
+        );
+        if (callback) {
+          callback(newDocData);
+        }
+        loadUsersDocs(); //reload the user's docs since have new ones
+      }
+    } catch (err) {
+      console.error('Error creating doc');
+      console.error(err);
+    } finally {
+      setCreationInProgress(false);
+    }
   }
 
   async function updateUserDoc(userDoc: StoreUserDoc): Promise<UserDoc> {

@@ -4,6 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { getDocServiceFromLoginService } from '../helpers/functions';
 import {
   gDocWithAllIntentions,
   gDocWithExpiredDayIntention,
@@ -12,16 +13,16 @@ import {
   gDocWithoutDocumentIntention,
   storeUserDocResponse,
 } from '../fixtures/intentions/google-docs-intentions';
+import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
 import {
   CypressGlobal,
   StepNames,
   cyMockDefault,
   mockGQL,
   sendChatMessage,
-  testGoogleDocId,
   toStrongerHookActivity,
 } from '../helpers/functions';
-import { DocVersion } from '../helpers/types';
+import { DocService, DocVersion, LoginService, UserRole, testGoogleDocId } from '../helpers/types';
 
 function writeDocumentIntention(cy: CypressGlobal, input: string) {
   cy.get('[data-cy=input-document-intention]')
@@ -374,10 +375,17 @@ describe('collectin user intentions', () => {
       );
     });
   });
-
-  describe('intentions are saved with doc versions', () => {
+[LoginService.AMAZON_COGNITO, LoginService.GOOGLE].forEach((loginService) => {
+  const extraGqlQueries = [
+      mockGQL(
+          'RefreshAccessToken',
+          refreshAccessTokenResponse(UserRole.USER, loginService)
+          ),
+  ]
+  const docService = getDocServiceFromLoginService(loginService)
+  describe(`intentions are saved with doc versions for ${loginService}`, () => {
     it('saves most up to date session intentions with doc versions', () => {
-      cyMockDefault(cy);
+      cyMockDefault(cy, {gqlQueries: extraGqlQueries});
       toStrongerHookActivity(cy, StepNames.Narrativity_Story_In_Mind);
       sendChatMessage(cy, 'I want to revise my introduction');
       cy.get('[data-cy=messages-container]').should(
@@ -396,14 +404,21 @@ describe('collectin user intentions', () => {
     it('saves day intentions with doc versions', () => {
       cyMockDefault(cy, {
         gqlQueries: [
+          ...extraGqlQueries,
           mockGQL('FetchGoogleDocs', {
             fetchGoogleDocs: [
-              gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention,
+              {
+                ...gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention,
+                service: docService
+              },
             ],
           }),
           mockGQL(
             'StoreUserDoc',
-            storeUserDocResponse(gDocWithAllIntentions)
+            storeUserDocResponse({
+              ...gDocWithAllIntentions,
+              service: docService
+            })
           ),
         ],
       });
@@ -423,12 +438,21 @@ describe('collectin user intentions', () => {
     it('save document intentions with doc versions', () => {
       cyMockDefault(cy, {
         gqlQueries: [
+          ...extraGqlQueries,
           mockGQL('FetchGoogleDocs', {
-            fetchGoogleDocs: [gDocWithoutDocumentIntention],
+            fetchGoogleDocs: [
+              {
+                ...gDocWithoutDocumentIntention,
+                service: docService
+              },
+            ],
           }),
           mockGQL(
             'StoreUserDoc',
-            storeUserDocResponse(gDocWithAllIntentions)
+            storeUserDocResponse({
+              ...gDocWithAllIntentions,
+              service: docService
+            })
           ),
         ],
       });
@@ -445,6 +469,7 @@ describe('collectin user intentions', () => {
       );
     });
   });
+});
 
   describe('sessionId changes', () => {
     it('sessionId exists when user visits a new document', () => {

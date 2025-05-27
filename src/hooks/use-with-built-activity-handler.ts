@@ -14,6 +14,8 @@ import { useWithChatLogSubscribers } from './use-with-chat-log-subscribers';
 import { useWithExecutePrompt } from './use-with-execute-prompts';
 import { ActivityBuilder } from '../components/activity-builder/types';
 import { equals } from '../helpers';
+import { getDocServiceFromLoginService } from '../types';
+import { useAppSelector } from '../store/hooks';
 
 export function useWithBuiltActivityHandler(
   resetActivityCounter: number,
@@ -23,6 +25,8 @@ export function useWithBuiltActivityHandler(
   const { sendMessage, clearChatLog, coachResponsePending } = useWithChat();
   const { state, updateSessionIntention, newSession } = useWithState();
   const curDocId = state.curDocId;
+  const user = useAppSelector((state) => state.login.user);
+  const docService = getDocServiceFromLoginService(user?.loginService);
   const { executePromptSteps } = useWithExecutePrompt();
   const { addNewSubscriber, removeAllSubscribers } =
     useWithChatLogSubscribers();
@@ -56,6 +60,7 @@ export function useWithBuiltActivityHandler(
         executePromptSteps,
         curDocId,
         editDocGoal,
+        docService,
         selectedActivityBuilder
       );
       newActivityHandler.initializeActivity();

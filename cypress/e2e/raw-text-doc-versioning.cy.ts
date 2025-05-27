@@ -4,31 +4,42 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { fetchGoogleDocsResponse } from "../fixtures/fetch-google-docs";
+import { refreshAccessTokenResponse } from "../fixtures/refresh-access-token";
 import { analyzeHookResponse } from "../fixtures/stronger-hook-activity/analyze-hook-response";
-import { cyMockDefault, cyMockGetDocData, cyMockOpenAiCall, toPromptActivity } from "../helpers/functions";
-import { JobStatus, testGoogleDocId } from "../helpers/types";
+import { cyMockDefault, cyMockOpenAiCall, CypressGlobal, mockGQL, toPromptActivity } from "../helpers/functions";
+import { DocService, JobStatus, LoginService, UserRole, testGoogleDocId } from "../helpers/types";
+
+export function runInEditor(cy: CypressGlobal, callback: () => void) {
+    return cy
+      .log('runInEditor')
+      .get(`[data-cy=hugerte-container] > iframe`, { log: false })
+      .should(iframe => expect(iframe.contents().find('ef-app-root')).to.exist)
+      .then(iframe => cy.wrap(iframe.contents().find('ef-app-root'), { log: false }))
+      .within({ log: false }, callback);
+  }
 
 describe("User Doc Versioning", () => {
-    describe("Saves a version", ()=>{
+    const gqlQueries = [
+        mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.RAW_TEXT)),
+        mockGQL(
+            'RefreshAccessToken',
+            refreshAccessTokenResponse(UserRole.USER, LoginService.AMAZON_COGNITO)
+            ),
+    ]
+    describe(`Saves a version for raw text document when`, ()=>{
         it("On first load", ()=>{
-            cyMockDefault(cy);
+            cyMockDefault(cy, {
+                gqlQueries
+            });
             toPromptActivity(cy);
             // polls for changes every 5 seconds
             cy.wait("@SubmitDocVersion", {timeout: 8000})
         })
 
-        it("If google doc text changed", ()=>{
-            cyMockDefault(cy);
-            cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
-            toPromptActivity(cy);
-            cy.wait("@SubmitDocVersion", {timeout: 8000});
-            // new lastChangedId means doc changed
-            cyMockGetDocData(cy, {lastChangedId: "321"})
-            cy.wait("@SubmitDocVersion", {timeout: 8000});
-        })
 
         it("If chat log changed", ()=>{
-            cyMockDefault(cy);
+            cyMockDefault(cy, {gqlQueries});
             cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
             toPromptActivity(cy);
             // polls for changes every 5 seconds
@@ -39,7 +50,7 @@ describe("User Doc Versioning", () => {
     })
 
     it("Does not store if no changes made", ()=>{
-        cyMockDefault(cy);
+        cyMockDefault(cy, {gqlQueries});
         cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
         toPromptActivity(cy);
         // stores on first load
@@ -50,7 +61,7 @@ describe("User Doc Versioning", () => {
     })
 
     it("Sends proper data for saving", ()=>{
-        cyMockDefault(cy);
+        cyMockDefault(cy, {gqlQueries});
         cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
         toPromptActivity(cy);
         cy.wait("@SubmitDocVersion", {timeout: 8000}).then((xhr)=>{
@@ -69,7 +80,7 @@ describe("User Doc Versioning", () => {
     })
 
     it("properly saves activity id on activity change", ()=>{
-        cyMockDefault(cy);
+        cyMockDefault(cy, {gqlQueries});
         cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
         toPromptActivity(cy);
         cy.wait("@SubmitDocVersion", {timeout: 8000}).then((xhr)=>{
@@ -87,5 +98,6 @@ describe("User Doc Versioning", () => {
             expect(data.googleDocData.activity).to.be.eql("658230f699045156193339ac");
         })
     })
+})
 
-});
+

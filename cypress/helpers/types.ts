@@ -12,6 +12,7 @@ export enum GptModels {
   GPT_4_TURBO_PREVIEW = 'gpt-4-turbo-preview',
   NONE = '',
 }
+export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';
 
 export enum DisplayIcons {
   LIGHT_BULB = 'LIGHT_BULB',
@@ -118,6 +119,12 @@ export interface ClassroomCode {
   createdAt: string;
 }
 
+export enum LoginService {
+  GOOGLE = 'GOOGLE',
+  MICROSOFT = 'MICROSOFT',
+  AMAZON_COGNITO = 'AMAZON_COGNITO',
+}
+
 export interface User {
   _id: string;
   googleId: string;
@@ -127,6 +134,7 @@ export interface User {
   lastLoginAt: Date;
   classroomCode?: ClassroomCode;
   previousClassroomCodes?: ClassroomCode[];
+  loginService: LoginService;
 }
 
 export interface UserAccessToken {
@@ -152,16 +160,23 @@ export enum GoogleDocTextModifyActions {
 
 export interface DocData {
   plainText: string;
+  markdownText: string;
   lastChangedId: string;
   title: string;
   lastModifyingUser: string;
   modifiedTime: string;
+}
+export enum DocService {
+  GOOGLE_DOCS = 'GOOGLE_DOCS',
+  MICROSOFT_WORD = 'MICROSOFT_WORD',
+  RAW_TEXT = 'RAW_TEXT',
 }
 
 export interface UserDoc {
   googleDocId: string;
   title: string;
   user: string;
+  service: DocService;
   documentIntention?: Intention;
   currentDayIntention?: Intention;
   assignmentDescription?: string;
@@ -179,6 +194,7 @@ export interface Intention {
 export interface DocVersion {
   docId: string;
   plainText: string;
+  markdownText: string;
   lastChangedId: string;
   sessionId: string;
   sessionIntention?: Intention;
@@ -451,6 +467,7 @@ export interface IGDocVersion {
   _id: string;
   docId: string;
   plainText: string;
+  markdownText: string;
   lastChangedId: string;
   sessionId: string;
   sessionIntention?: Intention;

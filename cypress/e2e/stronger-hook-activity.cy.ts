@@ -11,13 +11,12 @@ import {
   cyMockDefault,
   cyMockOpenAiCall,
   mockGQL,
-  testGoogleDocId,
   toStrongerHookActivity,
 } from '../helpers/functions';
 import { helpBrainstormResponse } from '../fixtures/stronger-hook-activity/help-brainstorm-response';
 import { audienceEmotionsResponse } from '../fixtures/stronger-hook-activity/audience-emotion-response';
 import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
-
+import { testGoogleDocId } from '../helpers/types';
 describe('Stronger Hook Activity', () => {
   it('Should show introduction text and ask if ready', () => {
     cyMockDefault(cy);

@@ -33,10 +33,12 @@ import {
   UserRole,
   MockDefaultType,
   ActivityBuilderVisibility,
+  DocService,
+  LoginService,
+  testGoogleDocId,
 } from './types';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 
-export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';
 
 export type CypressGlobal = Cypress.cy & CyEventEmitter;
 
@@ -208,7 +210,7 @@ export function cyMockDefault(
       refreshAccessTokenResponse(args.userRole || UserRole.USER)
     ),
     mockGQL('DocVersions', fetchDocVersionsBuilder(docTimelineVersions)),
-    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse),
+    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.GOOGLE_DOCS)),
     mockGQL('FetchPrompts', fetchPromptTemplates),
     mockGQL('FetchConfig', fetchConfigResponse),
     mockGQL('FetchDocGoals', fetchDocGoalsResponse),
@@ -281,6 +283,7 @@ export function cyMockGetDocData(
 ) {
   const defaultDocData: DocData = {
     plainText: 'This is a test doc',
+    markdownText: 'This is a test doc',
     lastChangedId: '123',
     title: 'Test Doc',
     lastModifyingUser: '',
@@ -573,4 +576,18 @@ export function roleSwitch(cy: CypressGlobal, targetNewRole: UserRole){
   cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText(targetNewRole))
   // click center of screen to close drawer
   cy.get("body").click(0, 0);
+}
+
+export function getDocServiceFromLoginService(
+  loginService?: LoginService
+): DocService {
+  switch (loginService) {
+    case LoginService.GOOGLE:
+      return DocService.GOOGLE_DOCS;
+    case LoginService.MICROSOFT:
+      return DocService.MICROSOFT_WORD;
+    case LoginService.AMAZON_COGNITO:
+    default:
+      return DocService.RAW_TEXT;
+  }
 }

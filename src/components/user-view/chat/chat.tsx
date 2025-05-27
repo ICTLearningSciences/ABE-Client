@@ -10,13 +10,11 @@ import {
 } from '@mui/material';
 import { useWithChat } from '../../../store/slices/chat/use-with-chat';
 import { ChatHeader, RowDiv, SmallGreyText } from '../../../styled-components';
-import { useWithStoreDocVersions } from '../../../hooks/use-with-store-doc-versions';
 import { useAppSelector } from '../../../store/hooks';
 import {
   ActivityGQL,
   ActivityTypes,
   AiServiceModel,
-  DocData,
   DocGoal,
   isActivityGql,
 } from '../../../types';
@@ -41,6 +39,7 @@ import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activ
 import { isActivityBuilder } from '../../activity-builder/types';
 import { createGlobalStyle } from 'styled-components';
 import { useWithConfig } from '../../../store/slices/config/use-with-config';
+import { ChatMessageTypes } from '../../../store/slices/chat';
 
 export const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
@@ -55,15 +54,8 @@ export function Chat(props: {
   editDocGoal: () => void;
   setSelectedActivity: (activity: ActivityGQL) => void;
   useWithPrompts: UseWithPrompts;
-  getDocData: (docId: string) => Promise<DocData>;
 }) {
-  const {
-    selectedGoal,
-    selectedActivity,
-    editDocGoal,
-    useWithPrompts,
-    getDocData,
-  } = props;
+  const { selectedGoal, selectedActivity, editDocGoal, useWithPrompts } = props;
   const { sendMessage, state: chatState, setSystemRole } = useWithChat();
   const {
     editedData: systemPromptData,
@@ -83,7 +75,6 @@ export function Chat(props: {
   const userIsAdmin = userRole === UserRole.ADMIN;
   const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
   useWithFreeInput(!selectedActivity ? selectedGoal : undefined);
-  useWithStoreDocVersions(selectedActivity?._id || '', getDocData);
   const { activityReady } = useWithActivityHandler(
     useWithPrompts,
     editDocGoal,
@@ -121,6 +112,10 @@ export function Chat(props: {
     setSystemRole(systemRole);
   }, [systemRole]);
 
+  async function sendNewMessage(message: ChatMessageTypes) {
+    sendMessage(message, false, curDocId);
+  }
+
   return (
     <div
       data-cy="chat-container-parent"
@@ -146,7 +141,6 @@ export function Chat(props: {
               alignItems: 'center',
               margin: '1rem',
               borderRadius: '1rem',
-              padding: '1rem',
             }}
           >
             <ChatHeader>
@@ -160,17 +154,13 @@ export function Chat(props: {
               />
             </ChatHeader>
             <ChatMessagesContainer
-              sendMessage={(message) => {
-                sendMessage(message, false, curDocId);
-              }}
+              sendMessage={sendNewMessage}
               coachResponsePending={coachResponsePending}
               curDocId={curDocId}
               setAiInfoToDisplay={setAiInfoToDisplay}
             />
             <ChatInput
-              sendMessage={(message) => {
-                sendMessage(message, false, curDocId);
-              }}
+              sendMessage={sendNewMessage}
               disableInput={disableInput}
             />
             {userIsAdmin && state.viewingAdvancedOptions && (

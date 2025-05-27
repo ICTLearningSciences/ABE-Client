@@ -10,6 +10,7 @@ import {
   refreshAccessToken as _refreshAccessToken,
   updateUserInfo,
 } from '../../../hooks/api';
+import { loginAmazonCognito } from '../../../hooks/aws-cognito-api';
 import { extractErrorMessageFromError } from '../../../helpers';
 import { UpdateUserInfo, User, UserAccessToken } from '../../../types';
 import {
@@ -69,6 +70,7 @@ export const logout = createAsyncThunk('login/logout', async () => {
 export enum LoginService {
   GOOGLE = 'GOOGLE',
   MICROSOFT = 'MICROSOFT',
+  AMAZON_COGNITO = 'AMAZON_COGNITO',
 }
 
 export const login = createAsyncThunk(
@@ -84,6 +86,8 @@ export const login = createAsyncThunk(
       const login =
         args.service === LoginService.GOOGLE
           ? await loginGoogle(args.accessToken)
+          : args.service === LoginService.AMAZON_COGNITO
+          ? await loginAmazonCognito(args.accessToken)
           : await loginMicrosoft(args.accessToken);
       // Note: This was previously done to convert from 15 min access token to 90 day access token, wrong way to go
       // return await login(googleLogin.accessToken);

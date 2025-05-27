@@ -162,6 +162,7 @@ export const tenTimelinePointsDocVersions: IGDocVersion[] = [
     _id: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
     docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
     plainText: 'Hello, world! What’s going on ?\n',
+    markdownText: 'Hello, world! What’s going on ?\n',
     lastChangedId:
       'ALBJ4LvGtDw60PlOb4l1tFcX4PLEKKguGqtBIRo_qqoSB4_bFjOkQDcvy7-FcRRMaoFZ6y2Q_3m77cwrMmm3WjA',
     sessionIntention: {
