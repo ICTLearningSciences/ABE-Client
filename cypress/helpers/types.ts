@@ -122,7 +122,7 @@ export interface ClassroomCode {
 export enum LoginService {
   GOOGLE = 'GOOGLE',
   MICROSOFT = 'MICROSOFT',
-  EMAIL = 'EMAIL',
+  AMAZON_COGNITO = 'AMAZON_COGNITO',
 }
 
 export interface User {

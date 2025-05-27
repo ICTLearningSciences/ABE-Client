@@ -6,10 +6,16 @@ env:
     REACT_APP_GRAPHQL_ENDPOINT: "https://api-qa.abewriting.org/graphql/graphql"
     REACT_APP_DOCUMENT_SERVICE: "GOOGLE_DOCS"
     STAGE: 'qa'
+    REACT_APP_COGNITO_REDIRECT_URI: "https://qa.abewriting.org"
+    REACT_APP_COGNITO_LOGOUT_REDIRECT_URI: "https://qa.abewriting.org"
   parameter-store:
     REACT_APP_GOOGLE_CLIENT_ID: "/ABE/google_client_id"
     S3_DEPLOY_BUCKET_QA: "/abewriting/qa/s3-websites/NAME"
     CDN_ID_QA: "/abewriting/qa/CLOUDFRONT_DISTRIBUTION_ID"
+    REACT_APP_COGNITO_DOMAIN: "/ABE/COGNITO_DOMAIN"
+    REACT_APP_COGNITO_CLIENT_ID: "/ABE/COGNITO_CLIENT_ID"
+    REACT_APP_COGNITO_AUTHORITY: "/ABE/COGNITO_AUTHORITY"
+
 
 phases:
   install:

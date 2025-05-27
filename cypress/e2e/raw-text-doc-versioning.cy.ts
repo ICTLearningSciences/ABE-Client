@@ -24,7 +24,7 @@ describe("User Doc Versioning", () => {
         mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.RAW_TEXT)),
         mockGQL(
             'RefreshAccessToken',
-            refreshAccessTokenResponse(UserRole.USER, LoginService.EMAIL)
+            refreshAccessTokenResponse(UserRole.USER, LoginService.AMAZON_COGNITO)
             ),
     ]
     describe(`Saves a version for raw text document when`, ()=>{
