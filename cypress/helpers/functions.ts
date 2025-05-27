@@ -13,17 +13,15 @@ import { fetchConfigResponse } from '../fixtures/fetch-config';
 import { fetchDocGoalsResponse } from '../fixtures/fetch-doc-goals';
 import { fetchGoogleDocsResponse } from '../fixtures/fetch-google-docs';
 import { fetchPromptTemplates } from '../fixtures/fetch-prompt-templates';
-import { fetchUserActivityStatesResponse } from '../fixtures/fetch-user-activity-states';
 import {
   gDocWithAllIntentions,
-  storeGoogleDocResponse,
+  storeUserDocResponse,
 } from '../fixtures/intentions/google-docs-intentions';
 import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
 import { analyzeHookResponse } from '../fixtures/stronger-hook-activity/analyze-hook-response';
 import { audienceEmotionsResponse } from '../fixtures/stronger-hook-activity/audience-emotion-response';
 import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
 import { entityFoundResponse } from '../fixtures/stronger-hook-activity/entity-found-response';
-import { updateUserActivityStatesResponse } from '../fixtures/update-user-activity-states';
 import { updateUserInfoResponse } from '../fixtures/update-user-info';
 import { testUser } from '../fixtures/user-data';
 import { ACCESS_TOKEN_KEY } from './local-storage';
@@ -35,10 +33,12 @@ import {
   UserRole,
   MockDefaultType,
   ActivityBuilderVisibility,
+  DocService,
+  LoginService,
+  testGoogleDocId,
 } from './types';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 
-export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';
 
 export type CypressGlobal = Cypress.cy & CyEventEmitter;
 
@@ -210,14 +210,12 @@ export function cyMockDefault(
       refreshAccessTokenResponse(args.userRole || UserRole.USER)
     ),
     mockGQL('DocVersions', fetchDocVersionsBuilder(docTimelineVersions)),
-    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse),
+    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.GOOGLE_DOCS)),
     mockGQL('FetchPrompts', fetchPromptTemplates),
-    mockGQL('FetchUserActivityStates', fetchUserActivityStatesResponse),
     mockGQL('FetchConfig', fetchConfigResponse),
     mockGQL('FetchDocGoals', fetchDocGoalsResponse),
     mockGQL('FetchSystemPrompts', fetchConfigResponse),
-    mockGQL('UpdateUserActivityState', updateUserActivityStatesResponse),
-    mockGQL('StoreGoogleDoc', storeGoogleDocResponse(gDocWithAllIntentions)),
+    mockGQL('StoreUserDoc', storeUserDocResponse(gDocWithAllIntentions)),
     mockGQL('FetchActivities', fetchActivitiesResponse),
     mockGQL('FetchBuiltActivities', fetchBuiltActivitiesResponse),
     mockGQL('FetchBuiltActivityVersions', {fetchBuiltActivityVersions: {
@@ -225,7 +223,7 @@ export function cyMockDefault(
     }}),
     mockGQL('AddOrUpdateBuiltActivity', {}),
     mockGQL('StoreBuiltActivityVersion', {storeBuiltActivityVersion:{activity:{}}}),
-    mockGQL('SubmitGoogleDocVersion', {}),
+    mockGQL('SubmitDocVersion', {}),
     mockGQL('CopyBuiltActivity', {copyBuiltActivity:createActivityBuilder(testUser._id, 'Copied Activity', 'copied-activity', ActivityBuilderVisibility.EDITABLE)}, {delayMs:1000}),
     mockGQL('DeleteBuiltActivity', {deleteBuiltActivity: ""}),
     mockGQL('UpdateUserInfo', updateUserInfoResponse("123")),
@@ -285,6 +283,7 @@ export function cyMockGetDocData(
 ) {
   const defaultDocData: DocData = {
     plainText: 'This is a test doc',
+    markdownText: 'This is a test doc',
     lastChangedId: '123',
     title: 'Test Doc',
     lastModifyingUser: '',
@@ -577,4 +576,18 @@ export function roleSwitch(cy: CypressGlobal, targetNewRole: UserRole){
   cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText(targetNewRole))
   // click center of screen to close drawer
   cy.get("body").click(0, 0);
+}
+
+export function getDocServiceFromLoginService(
+  loginService?: LoginService
+): DocService {
+  switch (loginService) {
+    case LoginService.GOOGLE:
+      return DocService.GOOGLE_DOCS;
+    case LoginService.MICROSOFT:
+      return DocService.MICROSOFT_WORD;
+    case LoginService.AMAZON_COGNITO:
+    default:
+      return DocService.RAW_TEXT;
+  }
 }

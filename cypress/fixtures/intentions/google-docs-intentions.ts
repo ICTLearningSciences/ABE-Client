@@ -4,12 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { testGoogleDocId } from "../../helpers/functions"
-import { GoogleDoc } from "../../helpers/types"
+import { DocService, testGoogleDocId, UserDoc } from "../../helpers/types"
 import { testUser } from "../user-data"
 
-export const gDocWithNoIntentions: GoogleDoc = {
-    "googleDocId": testGoogleDocId,
+export const gDocWithNoIntentions: UserDoc = {
+    "googleDocId": testGoogleDocId, 
     "user": testUser._id,
     "title": "Aliens",
     "documentIntention": undefined,
@@ -18,26 +17,28 @@ export const gDocWithNoIntentions: GoogleDoc = {
     "createdAt": new Date().toISOString(),
     "admin": false,
     "updatedAt": new Date().toISOString(),
-    "archived": false
+    "archived": false,
+    "service": DocService.GOOGLE_DOCS
 }
 
-export const gDocWithoutDocumentIntention: GoogleDoc = {
-    "googleDocId": testGoogleDocId,
-    "user": testUser._id,
-    "title": "Aliens",
-    "documentIntention": undefined,
+export const gDocWithoutDocumentIntention: UserDoc = {
+    googleDocId: testGoogleDocId,
+    user: testUser._id,
+    title: "Aliens",
+    documentIntention: undefined,
     currentDayIntention: {
         description: "Aliens day intention",
         createdAt: new Date().toISOString(),
     },
     assignmentDescription: "Aliens assignment description",
-    "createdAt": new Date().toISOString(),
-    "admin": false,
-    "updatedAt": new Date().toISOString(),
-    "archived": false
+    createdAt: new Date().toISOString(),
+    admin: false,
+    updatedAt: new Date().toISOString(),
+    archived: false,
+    service: DocService.GOOGLE_DOCS
 }
 
-export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: GoogleDoc = {
+export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: UserDoc = {
     "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
@@ -50,10 +51,11 @@ export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: GoogleDo
     "createdAt": "2021-06-01T00:00:00.000Z",
     "admin": false,
     "updatedAt": new Date().toISOString(),
-    "archived": false
+    "archived": false,
+    "service": DocService.GOOGLE_DOCS
 }
 
-export const gDocWithoutAssignmentDescription: GoogleDoc = {
+export const gDocWithoutAssignmentDescription: UserDoc = {
     "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
@@ -69,10 +71,11 @@ export const gDocWithoutAssignmentDescription: GoogleDoc = {
     "createdAt": new Date().toISOString(),
     "admin": false,
     "updatedAt": new Date().toISOString(),
-    "archived": false
+    "archived": false,
+    "service": DocService.GOOGLE_DOCS
 }
 
-export const gDocWithAllIntentions: GoogleDoc = {
+export const gDocWithAllIntentions: UserDoc = {
     "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
@@ -88,10 +91,11 @@ export const gDocWithAllIntentions: GoogleDoc = {
     "createdAt": new Date().toISOString(),
     "admin": false,
     "updatedAt": new Date().toISOString(),
-    "archived": false
+    "archived": false,
+    "service": DocService.GOOGLE_DOCS
 }
 
-export const gDocWithExpiredDayIntention: GoogleDoc = {
+export const gDocWithExpiredDayIntention: UserDoc = {
     "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
@@ -107,10 +111,11 @@ export const gDocWithExpiredDayIntention: GoogleDoc = {
     "createdAt": new Date().toISOString(),
     "admin": false,
     "updatedAt": new Date().toISOString(),
-    "archived": false
+    "archived": false,
+    "service": DocService.GOOGLE_DOCS
 }
 
-export function storeGoogleDocResponse(gDoc: GoogleDoc): {storeGoogleDoc: GoogleDoc} {
+export function storeUserDocResponse(gDoc: UserDoc): {storeGoogleDoc: UserDoc} {
     return {
         storeGoogleDoc: gDoc
     }

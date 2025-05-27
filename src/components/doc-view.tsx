@@ -43,7 +43,6 @@ function DocView(): JSX.Element {
   return (
     <EditGoogleDoc
       docId={docId}
-      returnToDocs={() => navigate('/docs')}
       docUrl={googleDocUrl}
       activityFromParams={activityFromParams || ''}
       goalFromParams={goalFromParams || ''}

@@ -11,7 +11,7 @@ import {
 import { DisplayIcons } from './helpers/display-icon-helper';
 import { StepData } from './hooks/use-with-stronger-hook-activity';
 import { ChatMessageTypes, UserInputType } from './store/slices/chat';
-import { UserRole } from './store/slices/login';
+import { LoginService, UserRole } from './store/slices/login';
 
 export interface Connection<T> {
   edges: Edge<T>[];
@@ -47,6 +47,7 @@ export interface User {
   name: string;
   email: string;
   userRole: UserRole;
+  loginService: LoginService;
   lastLoginAt: Date;
   classroomCode?: ClassroomCode;
   previousClassroomCodes?: ClassroomCode[];
@@ -75,6 +76,7 @@ export enum GoogleDocTextModifyActions {
 
 export interface DocData {
   plainText: string;
+  markdownText: string;
   lastChangedId: string;
   title: string;
   lastModifyingUser: string;
@@ -84,21 +86,21 @@ export interface DocData {
 export enum DocService {
   GOOGLE_DOCS = 'GOOGLE_DOCS',
   MICROSOFT_WORD = 'MICROSOFT_WORD',
+  RAW_TEXT = 'RAW_TEXT',
 }
 
-export interface GoogleDoc {
-  googleDocId: string;
-  wordDocId?: string;
-  title: string;
-  user: string;
-  documentIntention?: Intention;
-  currentDayIntention?: Intention;
-  assignmentDescription?: string;
-  createdAt: string;
-  updatedAt: string;
-  admin: boolean;
-  service: DocService;
-  archived: boolean;
+export function getDocServiceFromLoginService(
+  loginService?: LoginService
+): DocService {
+  switch (loginService) {
+    case LoginService.GOOGLE:
+      return DocService.GOOGLE_DOCS;
+    case LoginService.MICROSOFT:
+      return DocService.MICROSOFT_WORD;
+    case LoginService.AMAZON_COGNITO:
+    default:
+      return DocService.RAW_TEXT;
+  }
 }
 
 export interface Intention {
@@ -109,6 +111,7 @@ export interface Intention {
 export interface DocVersion {
   docId: string;
   plainText: string;
+  markdownText: string;
   lastChangedId: string;
   sessionId: string;
   sessionIntention?: Intention;
@@ -128,15 +131,27 @@ export enum UserActions {
   SINGLE_PROMPT = 'SINGLE_PROMPT',
 }
 
-export interface StoreGoogleDoc {
+export interface UserDoc {
   googleDocId: string;
-  wordDocId?: string;
   user: string;
-  admin?: boolean;
-  currentDayIntention?: Intention;
+  wordDocId?: string;
+  title: string;
   documentIntention?: Intention;
+  currentDayIntention?: Intention;
   assignmentDescription?: string;
-  title?: string;
+  createdAt: string;
+  updatedAt: string;
+  admin: boolean;
+  service: DocService;
+  archived: boolean;
+}
+
+export interface StoreUserDoc
+  extends Partial<
+    Omit<UserDoc, 'createdAt' | 'updatedAt' | 'googleDocId' | 'user'>
+  > {
+  googleDocId: string;
+  user: string;
 }
 
 export interface GQLPrompt {
@@ -325,13 +340,6 @@ export interface DocGoal extends DocGoalGQl {
   builtActivities: ActivityBuilder[];
 }
 
-export interface UserActivityState {
-  userId: string;
-  activityId: string;
-  googleDocId: string;
-  metadata: string;
-}
-
 export enum JobStatus {
   QUEUED = 'QUEUED',
   IN_PROGRESS = 'IN_PROGRESS',
@@ -388,6 +396,7 @@ export interface IGDocVersion {
   _id: string;
   docId: string;
   plainText: string;
+  markdownText: string;
   lastChangedId: string;
   sessionId: string;
   sessionIntention?: Intention;

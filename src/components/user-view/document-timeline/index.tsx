@@ -6,7 +6,7 @@ import { ColumnDiv, RowDiv } from '../../../styled-components';
 import TimepointDocumentText from './timepoint-document-text';
 import { TimepointOutline } from './timepoint-outline';
 import TimelineFooter from './timeline-footer';
-import { useWithGoogleDocs } from '../../../hooks/use-with-google-docs';
+import { useWithUsersDocs } from '../../../hooks/use-with-users-docs';
 
 export function DocumentTimelinePage(props: {
   returnToDocs: () => void;
@@ -16,7 +16,7 @@ export function DocumentTimelinePage(props: {
   const footerTimelineRef = useRef<HTMLElement | null>(null);
   const userId = useAppSelector((state) => state.login.user?._id);
   const [hasOverflowX, setHasOverflowX] = useState<boolean>(false);
-  const { googleDocs, updateGoogleDoc } = useWithGoogleDocs();
+  const { googleDocs, updateUserDoc } = useWithUsersDocs();
   const currentGoogleDoc = googleDocs.find((doc) => doc.googleDocId === docId);
   const {
     fetchDocumentTimeline,
@@ -140,7 +140,7 @@ export function DocumentTimelinePage(props: {
               hasOverflowX={hasOverflowX}
               googleDoc={currentGoogleDoc}
               saveTimelinePoint={saveTimelinePoint}
-              updateGoogleDoc={updateGoogleDoc}
+              updateUserDoc={updateUserDoc}
               timelineGenerationInProgress={loadInProgress}
             />
           </div>

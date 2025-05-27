@@ -4,22 +4,34 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from './store/hooks';
-import { loadUserDocs } from './store/slices/state';
-import { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
+import { UserAccessToken } from '../types';
+import { execGql, userDataQuery } from './api';
 
-export async function useReduxHydration() {
-  const userId = useAppSelector((state) => state.login.user?._id);
-  const dispatch = useAppDispatch();
-  const { loadActivities, loadDocGoals, loadBuiltActivities } =
-    useWithDocGoalsActivities();
-
-  useEffect(() => {
-    if (!userId) return;
-    dispatch(loadUserDocs({ userId }));
-    loadActivities();
-    loadBuiltActivities();
-    loadDocGoals();
-  }, [userId]);
+export async function loginAmazonCognito(
+  idToken: string
+): Promise<UserAccessToken> {
+  return await execGql<UserAccessToken>(
+    {
+      query: `
+        mutation LoginAmazonCognito($idToken: String!) {
+        loginAmazonCognito(idToken: $idToken) {
+            user {
+              ${userDataQuery}
+            }
+            accessToken
+          }
+        }
+      `,
+      variables: {
+        idToken: idToken,
+      },
+    },
+    // login responds with set-cookie, w/o withCredentials it doesnt get stored
+    {
+      dataPath: 'loginAmazonCognito',
+      axiosConfig: {
+        withCredentials: true,
+      },
+    }
+  );
 }

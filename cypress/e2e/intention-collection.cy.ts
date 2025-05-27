@@ -4,24 +4,25 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { getDocServiceFromLoginService } from '../helpers/functions';
 import {
   gDocWithAllIntentions,
   gDocWithExpiredDayIntention,
   gDocWithoutAssignmentDescription,
   gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention,
   gDocWithoutDocumentIntention,
-  storeGoogleDocResponse,
+  storeUserDocResponse,
 } from '../fixtures/intentions/google-docs-intentions';
+import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
 import {
   CypressGlobal,
   StepNames,
   cyMockDefault,
   mockGQL,
   sendChatMessage,
-  testGoogleDocId,
   toStrongerHookActivity,
 } from '../helpers/functions';
-import { DocVersion, Intention, StoreGoogleDoc } from '../helpers/types';
+import { DocService, DocVersion, LoginService, UserRole, testGoogleDocId } from '../helpers/types';
 
 function writeDocumentIntention(cy: CypressGlobal, input: string) {
   cy.get('[data-cy=input-document-intention]')
@@ -68,7 +69,7 @@ function didDocDataGetSaved(
   docAssignment?: string,
   dayIntention?: string
 ) {
-  cy.wait('@StoreGoogleDoc').then((xhr) => {
+  cy.wait('@StoreUserDoc').then((xhr) => {
     const variablesSent = xhr.request.body.variables;
     if (docIntention) {
       expect(variablesSent.googleDoc.documentIntention.description).to.eql(
@@ -103,7 +104,7 @@ function didDocVersionDataGetSaved(
   dayIntention?: string
 ) {
   cy.wait(6000); //to allow next version to be submitted
-  cy.get('@SubmitGoogleDocVersion.all').then((xhr) => {
+  cy.get('@SubmitDocVersion.all').then((xhr) => {
     const lastRequest: any = xhr[xhr.length - 1];
     const variablesSent: Partial<DocVersion> =
       lastRequest.request.body.variables.googleDocData;
@@ -129,7 +130,7 @@ function didDocVersionDataGetSaved(
 
 function checkNumberSessionIds(cy: CypressGlobal, num: number) {
   cy.wait(6000); //to allow next version to be submitted
-  cy.get('@SubmitGoogleDocVersion.all').then((xhr) => {
+  cy.get('@SubmitDocVersion.all').then((xhr) => {
     const sessionIds = xhr.map(
       (x: any) => x.request.body.variables.googleDocData.sessionId
     );
@@ -146,8 +147,8 @@ describe('collectin user intentions', () => {
             fetchGoogleDocs: [gDocWithoutDocumentIntention],
           }),
           mockGQL(
-            'StoreGoogleDoc',
-            storeGoogleDocResponse(gDocWithAllIntentions)
+            'StoreUserDoc',
+            storeUserDocResponse(gDocWithAllIntentions)
           ),
         ],
       });
@@ -164,8 +165,8 @@ describe('collectin user intentions', () => {
             fetchGoogleDocs: [gDocWithoutDocumentIntention],
           }),
           mockGQL(
-            'StoreGoogleDoc',
-            storeGoogleDocResponse(gDocWithAllIntentions)
+            'StoreUserDoc',
+            storeUserDocResponse(gDocWithAllIntentions)
           ),
         ],
       });
@@ -186,8 +187,8 @@ describe('collectin user intentions', () => {
             fetchGoogleDocs: [gDocWithoutDocumentIntention],
           }),
           mockGQL(
-            'StoreGoogleDoc',
-            storeGoogleDocResponse(gDocWithAllIntentions)
+            'StoreUserDoc',
+            storeUserDocResponse(gDocWithAllIntentions)
           ),
         ],
       });
@@ -211,8 +212,8 @@ describe('collectin user intentions', () => {
             fetchGoogleDocs: [gDocWithAllIntentions],
           }),
           mockGQL(
-            'StoreGoogleDoc',
-            storeGoogleDocResponse(gDocWithAllIntentions)
+            'StoreUserDoc',
+            storeUserDocResponse(gDocWithAllIntentions)
           ),
         ],
       });
@@ -230,8 +231,8 @@ describe('collectin user intentions', () => {
             ],
           }),
           mockGQL(
-            'StoreGoogleDoc',
-            storeGoogleDocResponse(gDocWithAllIntentions)
+            'StoreUserDoc',
+            storeUserDocResponse(gDocWithAllIntentions)
           ),
         ],
       });
@@ -248,8 +249,8 @@ describe('collectin user intentions', () => {
             fetchGoogleDocs: [gDocWithExpiredDayIntention],
           }),
           mockGQL(
-            'StoreGoogleDoc',
-            storeGoogleDocResponse(gDocWithAllIntentions)
+            'StoreUserDoc',
+            storeUserDocResponse(gDocWithAllIntentions)
           ),
         ],
       });
@@ -266,8 +267,8 @@ describe('collectin user intentions', () => {
             fetchGoogleDocs: [gDocWithExpiredDayIntention],
           }),
           mockGQL(
-            'StoreGoogleDoc',
-            storeGoogleDocResponse(gDocWithAllIntentions)
+            'StoreUserDoc',
+            storeUserDocResponse(gDocWithAllIntentions)
           ),
         ],
       });
@@ -290,8 +291,8 @@ describe('collectin user intentions', () => {
             fetchGoogleDocs: [gDocWithoutAssignmentDescription],
           }),
           mockGQL(
-            'StoreGoogleDoc',
-            storeGoogleDocResponse(gDocWithAllIntentions)
+            'StoreUserDoc',
+            storeUserDocResponse(gDocWithAllIntentions)
           ),
         ],
       });
@@ -308,8 +309,8 @@ describe('collectin user intentions', () => {
             fetchGoogleDocs: [gDocWithoutAssignmentDescription],
           }),
           mockGQL(
-            'StoreGoogleDoc',
-            storeGoogleDocResponse(gDocWithAllIntentions)
+            'StoreUserDoc',
+            storeUserDocResponse(gDocWithAllIntentions)
           ),
         ],
       });
@@ -374,10 +375,17 @@ describe('collectin user intentions', () => {
       );
     });
   });
-
-  describe('intentions are saved with doc versions', () => {
+[LoginService.AMAZON_COGNITO, LoginService.GOOGLE].forEach((loginService) => {
+  const extraGqlQueries = [
+      mockGQL(
+          'RefreshAccessToken',
+          refreshAccessTokenResponse(UserRole.USER, loginService)
+          ),
+  ]
+  const docService = getDocServiceFromLoginService(loginService)
+  describe(`intentions are saved with doc versions for ${loginService}`, () => {
     it('saves most up to date session intentions with doc versions', () => {
-      cyMockDefault(cy);
+      cyMockDefault(cy, {gqlQueries: extraGqlQueries});
       toStrongerHookActivity(cy, StepNames.Narrativity_Story_In_Mind);
       sendChatMessage(cy, 'I want to revise my introduction');
       cy.get('[data-cy=messages-container]').should(
@@ -396,14 +404,21 @@ describe('collectin user intentions', () => {
     it('saves day intentions with doc versions', () => {
       cyMockDefault(cy, {
         gqlQueries: [
+          ...extraGqlQueries,
           mockGQL('FetchGoogleDocs', {
             fetchGoogleDocs: [
-              gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention,
+              {
+                ...gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention,
+                service: docService
+              },
             ],
           }),
           mockGQL(
-            'StoreGoogleDoc',
-            storeGoogleDocResponse(gDocWithAllIntentions)
+            'StoreUserDoc',
+            storeUserDocResponse({
+              ...gDocWithAllIntentions,
+              service: docService
+            })
           ),
         ],
       });
@@ -423,12 +438,21 @@ describe('collectin user intentions', () => {
     it('save document intentions with doc versions', () => {
       cyMockDefault(cy, {
         gqlQueries: [
+          ...extraGqlQueries,
           mockGQL('FetchGoogleDocs', {
-            fetchGoogleDocs: [gDocWithoutDocumentIntention],
+            fetchGoogleDocs: [
+              {
+                ...gDocWithoutDocumentIntention,
+                service: docService
+              },
+            ],
           }),
           mockGQL(
-            'StoreGoogleDoc',
-            storeGoogleDocResponse(gDocWithAllIntentions)
+            'StoreUserDoc',
+            storeUserDocResponse({
+              ...gDocWithAllIntentions,
+              service: docService
+            })
           ),
         ],
       });
@@ -445,6 +469,7 @@ describe('collectin user intentions', () => {
       );
     });
   });
+});
 
   describe('sessionId changes', () => {
     it('sessionId exists when user visits a new document', () => {

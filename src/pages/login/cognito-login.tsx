@@ -4,22 +4,26 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from './store/hooks';
-import { loadUserDocs } from './store/slices/state';
-import { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
+import { Button } from '@mui/material';
+import React from 'react';
+import { AuthContextProps } from 'react-oidc-context';
 
-export async function useReduxHydration() {
-  const userId = useAppSelector((state) => state.login.user?._id);
-  const dispatch = useAppDispatch();
-  const { loadActivities, loadDocGoals, loadBuiltActivities } =
-    useWithDocGoalsActivities();
+function CognitoLogin(props: { awsCognitoAuth: AuthContextProps }) {
+  const { awsCognitoAuth } = props;
+  if (props.awsCognitoAuth.isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  useEffect(() => {
-    if (!userId) return;
-    dispatch(loadUserDocs({ userId }));
-    loadActivities();
-    loadBuiltActivities();
-    loadDocGoals();
-  }, [userId]);
+  return (
+    <div>
+      {awsCognitoAuth.error && (
+        <div>Encountering error... {awsCognitoAuth.error.message}</div>
+      )}
+      <Button onClick={() => awsCognitoAuth.signinPopup()}>
+        Sign In With Email
+      </Button>
+    </div>
+  );
 }
+
+export default CognitoLogin;

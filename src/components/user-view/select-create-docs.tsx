@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { Button, CircularProgress } from '@mui/material';
-import { GoogleDoc, NewDocData, SortConfig } from '../../types';
+import { UserDoc, NewDocData, SortConfig } from '../../types';
 import { RowDiv } from '../../styled-components';
 import {
   Table,
@@ -23,36 +23,36 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { GoogleDocItemRow } from './google-doc-item-row';
 
 export default function SelectCreateDocs(props: {
-  googleDocs?: GoogleDoc[];
-  copyGoogleDocs?: GoogleDoc[];
+  googleDocs?: UserDoc[];
+  copyDocs?: UserDoc[];
   creationInProgress: boolean;
-  handleCreateGoogleDoc: (
+  handleCreateDoc: (
     docIdToCopy?: string,
     title?: string,
     isAdminDoc?: boolean,
     callback?: (newDocData: NewDocData) => void
   ) => void;
-  handleDeleteGoogleDoc: (docId: string) => Promise<void>;
+  handleDeleteDoc: (docId: string) => Promise<void>;
   onHistoryClicked: (docId: string) => void;
   goToDoc: (docId: string, newDoc?: boolean) => void;
   sx?: React.CSSProperties;
   setExampleDocsOpen: (open: boolean) => void;
   setSortBy: (config: SortConfig) => void;
   sortBy: SortConfig;
-  archiveGoogleDoc: (googleDocId: string) => Promise<void>;
-  unarchiveGoogleDoc: (googleDocId: string) => Promise<void>;
+  archiveDoc: (googleDocId: string) => Promise<void>;
+  unarchiveDoc: (googleDocId: string) => Promise<void>;
   docsLoading: boolean;
 }): JSX.Element {
   const {
     googleDocs: _googleDocs,
-    copyGoogleDocs,
+    copyDocs,
     creationInProgress,
-    handleCreateGoogleDoc,
-    handleDeleteGoogleDoc,
+    handleCreateDoc,
+    handleDeleteDoc,
     onHistoryClicked,
     goToDoc,
-    archiveGoogleDoc,
-    unarchiveGoogleDoc,
+    archiveDoc,
+    unarchiveDoc,
     sx,
     setExampleDocsOpen,
     setSortBy,
@@ -63,7 +63,7 @@ export default function SelectCreateDocs(props: {
   const unarchivedDocs = _googleDocs?.filter((doc) => !doc.archived);
   const [viewingArchived, setViewingArchived] = React.useState(false);
   const googleDocs = viewingArchived ? archivedDocs : unarchivedDocs;
-  const [docToDelete, setDocToDelete] = React.useState<GoogleDoc>();
+  const [docToDelete, setDocToDelete] = React.useState<UserDoc>();
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
 
   function SortIndicator(props: { field: string }) {
@@ -122,14 +122,9 @@ export default function SelectCreateDocs(props: {
             >
               <Button
                 onClick={() => {
-                  handleCreateGoogleDoc(
-                    undefined,
-                    undefined,
-                    undefined,
-                    (data) => {
-                      goToDoc(data.docId, true);
-                    }
-                  );
+                  handleCreateDoc(undefined, undefined, undefined, (data) => {
+                    goToDoc(data.docId, true);
+                  });
                 }}
                 size="large"
                 style={{
@@ -140,7 +135,7 @@ export default function SelectCreateDocs(props: {
               >
                 + New
               </Button>
-              {copyGoogleDocs && copyGoogleDocs.length > 0 && (
+              {copyDocs && copyDocs.length > 0 && (
                 <Button
                   onClick={() => {
                     setExampleDocsOpen(true);
@@ -231,8 +226,8 @@ export default function SelectCreateDocs(props: {
                   onHistoryClick={() => {
                     onHistoryClicked(doc.googleDocId);
                   }}
-                  onArchiveClick={() => archiveGoogleDoc(doc.googleDocId)}
-                  onUnarchiveClick={() => unarchiveGoogleDoc(doc.googleDocId)}
+                  onArchiveClick={() => archiveDoc(doc.googleDocId)}
+                  onUnarchiveClick={() => unarchiveDoc(doc.googleDocId)}
                   onDeleteClick={() => {
                     setDocToDelete(doc);
                   }}
@@ -251,12 +246,10 @@ export default function SelectCreateDocs(props: {
             display: 'Delete',
             onClick: () => {
               setDeleteInProgress(true);
-              handleDeleteGoogleDoc(docToDelete?.googleDocId || '').finally(
-                () => {
-                  setDeleteInProgress(false);
-                  setDocToDelete(undefined);
-                }
-              );
+              handleDeleteDoc(docToDelete?.googleDocId || '').finally(() => {
+                setDeleteInProgress(false);
+                setDocToDelete(undefined);
+              });
             },
           }}
           option2={{

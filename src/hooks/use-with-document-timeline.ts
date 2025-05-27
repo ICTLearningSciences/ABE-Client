@@ -13,6 +13,7 @@ import {
   AiGenerationStatus,
   TimelinePointType,
   DehydratedGQLDocumentTimeline,
+  getDocServiceFromLoginService,
 } from '../types';
 import {
   asyncRequestDocTimeline,
@@ -29,6 +30,7 @@ import { LoadingStatusType } from './generic-loading-reducer';
 import { CancelToken } from 'axios';
 import { pollUntilTrue } from './use-with-synchronous-polling';
 import { useWithConfig } from '../store/slices/config/use-with-config';
+import { useAppSelector } from '../store/hooks';
 
 const initialState: TimelineState = {
   status: LoadingStatusType.NONE,
@@ -48,6 +50,7 @@ const startPoint: GQLTimelinePoint = {
     },
     docId: '',
     plainText: '',
+    markdownText: '',
     lastChangedId: '',
     sessionId: '',
     chatLog: [],
@@ -107,7 +110,8 @@ export function useWithDocumentTimeline() {
   const [state, dispatch] = useReducer(TimelineReducer, initialState);
   const { state: config } = useWithConfig();
   const requestedVersionIds = useRef<Set<string>>(new Set());
-
+  const user = useAppSelector((state) => state.login.user);
+  const docService = getDocServiceFromLoginService(user?.loginService);
   const hydratedGqlTimeline: GQLDocumentTimeline | undefined = useMemo(() => {
     if (!state.data) {
       return undefined;
@@ -175,6 +179,7 @@ export function useWithDocumentTimeline() {
         userId,
         docId,
         config.config.defaultAiModel,
+        docService,
         cancelToken
       );
       const pollFunction = () => {

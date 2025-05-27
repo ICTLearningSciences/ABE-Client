@@ -9,9 +9,9 @@ import ActivityTranscript from './ActivityTranscript';
 import { equals, formatISODateToReadable } from '../../../helpers';
 import {
   GQLTimelinePoint,
-  GoogleDoc,
+  UserDoc,
   AiGenerationStatus,
-  StoreGoogleDoc,
+  StoreUserDoc,
   TimelinePointType,
 } from '../../../types';
 import {
@@ -48,16 +48,16 @@ export const TimepointOutline = React.memo(
   function TimepointOutline(props: {
     timelinePoint: GQLTimelinePoint;
     timelineGenerationInProgress: boolean;
-    googleDoc?: GoogleDoc;
+    googleDoc?: UserDoc;
     hasOverflowX: boolean;
     saveTimelinePoint: (timelinePoint: GQLTimelinePoint) => Promise<void>;
-    updateGoogleDoc: (googleDoc: StoreGoogleDoc) => Promise<GoogleDoc>;
+    updateUserDoc: (googleDoc: StoreUserDoc) => Promise<UserDoc>;
   }): JSX.Element {
     const {
       timelinePoint,
       hasOverflowX,
       googleDoc,
-      updateGoogleDoc,
+      updateUserDoc,
       timelineGenerationInProgress,
     } = props;
 
@@ -544,7 +544,7 @@ and dynamically adjust the height of the input field. */
                   googleDocId: googleDoc.googleDocId,
                   assignmentDescription: description,
                 };
-                await updateGoogleDoc(updatedGoogleDoc);
+                await updateUserDoc(updatedGoogleDoc);
               }}
             />
           </div>
@@ -619,7 +619,7 @@ and dynamically adjust the height of the input field. */
     const googleDocChanges =
       prevProps.googleDoc &&
       nextProps.googleDoc &&
-      !equals<GoogleDoc>(prevProps.googleDoc, nextProps.googleDoc);
+      !equals<UserDoc>(prevProps.googleDoc, nextProps.googleDoc);
     const generationInProgressChanges =
       prevProps.timelineGenerationInProgress !==
       nextProps.timelineGenerationInProgress;

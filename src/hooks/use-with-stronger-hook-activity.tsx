@@ -214,9 +214,8 @@ export default function useWithStrongerHookActivity(
   prompts: GQLPrompt[],
   goal?: DocGoal
 ): Activity {
-  const googleDocId = useAppSelector((state) => state.state.googleDocId);
-  const userId = useAppSelector((state) => state.login.user?._id);
-  const { updateUserActivityState, updateSessionIntention } = useWithState();
+  const curDocId = useAppSelector((state) => state.state.curDocId);
+  const { updateSessionIntention } = useWithState();
 
   interface StrongerHookActivityPrompts {
     analyzeHookPrompt: GQLPrompt;
@@ -358,8 +357,6 @@ export default function useWithStrongerHookActivity(
     proposedNarrativityRevision: '',
   });
 
-  const [cannedResponse, setCannedResponse] = useState<string>('');
-
   // Reset this activity whenever a new activity starts
   useEffect(() => {
     resetActivity();
@@ -440,7 +437,6 @@ export default function useWithStrongerHookActivity(
       narrativityStory: '',
       proposedNarrativityRevision: '',
     });
-    setCannedResponse('');
   }
 
   function handleEntityDetectionResponse(response: AiServicesResponseTypes) {
@@ -477,7 +473,7 @@ export default function useWithStrongerHookActivity(
           displayType: MessageDisplayType.TEXT,
         },
         false,
-        googleDocId
+        curDocId
       );
     } else {
       sendMessage(
@@ -488,7 +484,7 @@ export default function useWithStrongerHookActivity(
           displayType: MessageDisplayType.TEXT,
         },
         false,
-        googleDocId
+        curDocId
       );
       setCurStepName(StepNames.NARRATIVE_WEAK_STEP_THREE);
     }
@@ -520,14 +516,6 @@ export default function useWithStrongerHookActivity(
       const manualCannedResponse = `${narrativeCannedResponse}\n\n${emotionCannedResponse}`;
       const generatedCannedResponse = result.overall.justification;
       const cannedResponse = generatedCannedResponse || manualCannedResponse;
-      setCannedResponse(cannedResponse);
-      userId &&
-        updateUserActivityState(
-          userId,
-          googleDocId,
-          activityGql._id,
-          cannedResponse
-        );
       sendMessage(
         {
           id: uuidv4(),
@@ -539,7 +527,7 @@ export default function useWithStrongerHookActivity(
           aiServiceStepData: response.aiAllStepsData,
         },
         false,
-        googleDocId
+        curDocId
       );
 
       if (nextStage) {
@@ -602,7 +590,7 @@ export default function useWithStrongerHookActivity(
           aiServiceStepData: res.aiAllStepsData,
         },
         false,
-        googleDocId
+        curDocId
       );
     } else {
       // We have all our audience and emotions, now analyze them all
@@ -634,7 +622,7 @@ export default function useWithStrongerHookActivity(
               aiServiceStepData: response.aiAllStepsData,
             },
             false,
-            googleDocId
+            curDocId
           );
           setCurStepName(StepNames.EMOTION_WEAK_STEP_TWO);
         }
@@ -760,7 +748,7 @@ export default function useWithStrongerHookActivity(
                   aiServiceStepData: res.aiAllStepsData,
                 },
                 false,
-                googleDocId
+                curDocId
               );
               sendMessage(
                 {
@@ -771,7 +759,7 @@ export default function useWithStrongerHookActivity(
                   mcqChoices: [HELP_ME_BRAINSTORM],
                 },
                 false,
-                googleDocId
+                curDocId
               );
             }
           );
@@ -824,15 +812,8 @@ export default function useWithStrongerHookActivity(
                 aiServiceStepData: response.aiAllStepsData,
               },
               false,
-              googleDocId
+              curDocId
             );
-            userId &&
-              updateUserActivityState(
-                userId,
-                googleDocId,
-                activityGql._id,
-                `${cannedResponse}\n\n\n${response}`
-              );
             setState((prevState) => {
               return {
                 ...prevState,
@@ -910,7 +891,7 @@ export default function useWithStrongerHookActivity(
                 aiServiceStepData: response.aiAllStepsData,
               },
               false,
-              googleDocId
+              curDocId
             );
 
             setCurStepName(StepNames.NARRATIVE_WEAK_STEP_SEVEN);
@@ -998,7 +979,7 @@ export default function useWithStrongerHookActivity(
                 aiServiceStepData: res.aiAllStepsData,
               },
               false,
-              googleDocId
+              curDocId
             );
             setState((prevState) => {
               return {
@@ -1036,7 +1017,7 @@ export default function useWithStrongerHookActivity(
                 aiServiceStepData: response.aiAllStepsData,
               },
               false,
-              googleDocId
+              curDocId
             );
             setCurStepName(StepNames.OUTRO);
           }
@@ -1063,7 +1044,7 @@ export default function useWithStrongerHookActivity(
               aiServiceStepData: response.aiAllStepsData,
             },
             false,
-            googleDocId
+            curDocId
           );
         });
       },

@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import axios, { CancelTokenSource } from 'axios';
 import { AiServicesResponseTypes } from '../ai-services/ai-service-types';
-import { AiPromptStep } from '../types';
+import { AiPromptStep, getDocServiceFromLoginService } from '../types';
 import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { useState } from 'react';
 import { useAppSelector } from '../store/hooks';
@@ -19,9 +19,9 @@ export function useWithExecutePrompt() {
     controller: AbortController;
     source: CancelTokenSource;
   }>();
-  const googleDocId: string = useAppSelector(
-    (state) => state.state.googleDocId
-  );
+  const curDocId: string = useAppSelector((state) => state.state.curDocId);
+  const user = useAppSelector((state) => state.login.user);
+  const docService = getDocServiceFromLoginService(user?.loginService);
   const { availableAiServiceModels } = useWithConfig();
   const defaultAiServiceModel = useAppSelector(
     (state) => state.config.config?.defaultAiModel
@@ -79,9 +79,10 @@ export function useWithExecutePrompt() {
       applyAvailableModelsToPromptSteps(aiPromptSteps);
 
     const res = await asyncPromptExecute(
-      googleDocId,
+      curDocId,
       processedAiPromptSteps,
       userId || '',
+      docService,
       source.token
     );
 

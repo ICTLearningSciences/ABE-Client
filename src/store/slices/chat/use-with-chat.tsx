@@ -37,7 +37,7 @@ interface UseWithChat {
 export function useWithChat(): UseWithChat {
   const dispatch = useAppDispatch();
   const chatState: ChatState = useAppSelector((state) => state.chat);
-  const currentDoc = useAppSelector((state) => state.state.googleDocId);
+  const currentDoc = useAppSelector((state) => state.state.curDocId);
 
   function sendMessage(
     msg: ChatMessageTypes,

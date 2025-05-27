@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { Box, Button, Modal, Theme } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
-import { GoogleDoc } from '../../types';
+import { UserDoc } from '../../types';
 import { RowDiv, RowDivSB } from '../../styled-components';
 import React, { useEffect } from 'react';
 import CreateNewAdminGoogleDoc from '../admin-view/author-new-google-doc-modal';
@@ -37,7 +37,7 @@ export const StyledExampleGoogleDocItem = styled(RowDivSB)`
 `;
 
 export default function ExampleGoogleDocModal(props: {
-  adminDocs?: GoogleDoc[];
+  adminDocs?: UserDoc[];
   onCreateDoc: (docId?: string, title?: string, isAdminDoc?: boolean) => void;
   open: boolean;
   close: () => void;
