@@ -1,7 +1,7 @@
 import React from 'react';
 import withAuthorizationOnly from '../../../hooks/wrap-with-authorization-only';
 import { UseWithLogin } from '../../../store/slices/login/use-with-login';
-import Header from '../../header';
+import Header from '../../header/header';
 import { DocumentTimelinePage } from './index';
 import { useParams } from 'react-router-dom';
 import { useNavigateWithParams } from '../../../hooks/use-navigate-with-params';

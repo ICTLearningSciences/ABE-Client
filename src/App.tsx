@@ -10,7 +10,7 @@ import AdminView from './pages/admin/admin-view';
 import Login from './pages/login/login';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
-import Header from './components/header';
+import Header from './components/header/header';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import DocView from './components/doc-view';

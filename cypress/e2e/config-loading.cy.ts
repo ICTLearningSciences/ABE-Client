@@ -65,5 +65,25 @@ describe("Config Loading Screen", ()=>{
         cy.get("[data-cy=config-loading-spinner]").should("exist");
     })
 
+    it("gets banner from config", ()=>{
+        cyMockDefault(cy,
+            {
+                gqlQueries: [
+                    mockGQL('FetchConfig', {
+                        fetchConfig: {
+                            ...fetchConfigResponse.fetchConfig,
+                            banner:{
+                                bannerText: "THIS AWE SYSTEM IS UNCLASSIFIED - DO NOT USE WITH CUI OR RESTRICTED MATERIALS",
+                                bannerTextColor: "#ffffff",
+                                bannerBgColor: "#067a35"
+                            }
+                        }
+                    }, {statusCode: 200})
+                ]
+            }
+        );
+        cy.visit("/");
+        cy.get("[data-cy=cui-banner]").should("exist");
+    })
 
 })
