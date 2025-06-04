@@ -28,8 +28,17 @@ export function CuiHeader() {
         color: cuiBanner.bannerTextColor,
         fontWeight: 'bold',
         textAlign: 'center',
-        fontSize: '24px',
-        height: '32px',
+        fontSize: 'clamp(14px, 2vw, 24px)',
+        height: '6vh',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        padding: '0 10px',
+        boxSizing: 'border-box',
       }}
     >
       {cuiBanner.bannerText}

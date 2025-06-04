@@ -35,7 +35,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: '94%', //header takes 6%
+              height: '88vh',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -54,7 +54,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: '94%', //header takes 6%
+              height: '90vh',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

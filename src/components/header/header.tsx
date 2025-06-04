@@ -86,12 +86,14 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
         data-cy="header"
         style={{
           width: '100%',
-          height: '6%',
+          height: '6vh',
           backgroundColor: colorTheme.headerColor,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'white',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
         }}
       >
         <div
