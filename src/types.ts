@@ -251,7 +251,7 @@ export interface Config {
   orgName?: string;
   loginScreenTitle?: string;
   surveyConfig?: SurveyConfig;
-  banner?: BannerConfig;
+  bannerConfig?: BannerConfig;
 }
 
 export interface BannerConfig {

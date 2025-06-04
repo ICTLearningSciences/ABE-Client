@@ -9,7 +9,7 @@ import { useAppSelector } from '../../store/hooks';
 
 export function CuiHeader() {
   const config = useAppSelector((state) => state.config);
-  const cuiBanner = config.config?.banner;
+  const cuiBanner = config.config?.bannerConfig;
   const displayBanner =
     cuiBanner &&
     cuiBanner.bannerText &&

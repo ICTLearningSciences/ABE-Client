@@ -72,7 +72,7 @@ describe("Config Loading Screen", ()=>{
                     mockGQL('FetchConfig', {
                         fetchConfig: {
                             ...fetchConfigResponse.fetchConfig,
-                            banner:{
+                            bannerConfig:{
                                 bannerText: "THIS AWE SYSTEM IS UNCLASSIFIED - DO NOT USE WITH CUI OR RESTRICTED MATERIALS",
                                 bannerTextColor: "#ffffff",
                                 bannerBgColor: "#067a35"
