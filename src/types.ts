@@ -251,6 +251,13 @@ export interface Config {
   orgName?: string;
   loginScreenTitle?: string;
   surveyConfig?: SurveyConfig;
+  bannerConfig?: BannerConfig;
+}
+
+export interface BannerConfig {
+  bannerText: string;
+  bannerTextColor: string;
+  bannerBgColor: string;
 }
 
 export enum ActivityStepTypes {

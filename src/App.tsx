@@ -10,7 +10,7 @@ import AdminView from './pages/admin/admin-view';
 import Login from './pages/login/login';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
-import Header from './components/header';
+import Header from './components/header/header';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import DocView from './components/doc-view';
@@ -25,6 +25,7 @@ import {
 } from 'react-oidc-context';
 
 function MainApp() {
+  const mainAppHeight = '88vh';
   const useLogin = useWithLogin();
   const router = createBrowserRouter([
     {
@@ -35,7 +36,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: '94%', //header takes 6%
+              height: mainAppHeight,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -54,7 +55,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: '94%', //header takes 6%
+              height: mainAppHeight,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -73,7 +74,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: '94%', //header takes 6%
+              height: mainAppHeight,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

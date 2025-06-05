@@ -12,16 +12,17 @@ import {
   ThemeProvider,
   createTheme,
 } from '@mui/material';
-import { UseWithLogin } from '../store/slices/login/use-with-login';
-import { useAppSelector } from '../store/hooks';
-import { LoginStatus } from '../store/slices/login';
-import { DEFAULT_COLOR_THEME } from '../constants';
+import { UseWithLogin } from '../../store/slices/login/use-with-login';
+import { useAppSelector } from '../../store/hooks';
+import { LoginStatus } from '../../store/slices/login';
+import { DEFAULT_COLOR_THEME } from '../../constants';
 import { Home } from '@mui/icons-material';
-import { HeaderTitle } from './header-title';
-import { useNavigateWithParams } from '../hooks/use-navigate-with-params';
+import { HeaderTitle } from '../header-title';
+import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 import PersonIcon from '@mui/icons-material/Person';
-import { UserInfoSettings } from './settings/user-info-settings';
+import { UserInfoSettings } from '../settings/user-info-settings';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { CuiHeader } from './cui-header';
 export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
   const { logout } = useLogin;
@@ -38,9 +39,9 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
     },
   });
   const [profileOpen, setProfileOpen] = useState(false);
-
   return (
     <ThemeProvider theme={theme}>
+      <CuiHeader />
       <Drawer
         anchor="right"
         open={profileOpen && loggedIn}
@@ -85,12 +86,14 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
         data-cy="header"
         style={{
           width: '100%',
-          height: '6%',
+          height: '6vh',
           backgroundColor: colorTheme.headerColor,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'white',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
         }}
       >
         <div

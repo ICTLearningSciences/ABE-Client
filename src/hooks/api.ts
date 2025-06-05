@@ -548,6 +548,11 @@ export async function fetchConfig(subdomain?: string): Promise<Config> {
               surveyQueryParam
               surveyClassroomParam
             }
+            bannerConfig{
+              bannerText
+              bannerTextColor
+              bannerBgColor
+            }
           }
         }
       `,
