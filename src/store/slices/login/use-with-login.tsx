@@ -122,19 +122,19 @@ export function useWithLogin(): UseWithLogin {
   }
 
   async function logout() {
+    await dispatch(loginActions.logout());
     if (awsCognitoAuth.isAuthenticated) {
       try {
         await awsCognitoAuth.signoutRedirect({
           extraQueryParams: {
             client_id: process.env.REACT_APP_COGNITO_CLIENT_ID || '',
-            logout_uri: process.env.REACT_APP_COGNITO_REDIRECT_URI || '',
+            logout_uri: window.location.origin,
           },
         });
       } catch (error) {
         console.error(error);
       }
     }
-    await dispatch(loginActions.logout());
   }
 
   async function setUser(user: UserAccessToken) {
