@@ -14,7 +14,6 @@ import { useWithState } from '../../store/slices/state/use-with-state';
 import { ActivityTypes } from '../../types';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
 import { isActivityBuilder } from '../activity-builder/types';
-import { UseWithPrompts } from '../../hooks/use-with-prompts';
 import { ChatActivity } from './chat-activity';
 import { SingleNotificationDialog } from '../dialog';
 import { UserDocumentDisplay } from './user-document-display';
@@ -27,16 +26,8 @@ export function EditGoogleDoc(props: {
   activityFromParams: string;
   goalFromParams: string;
   isNewDoc: boolean;
-  useWithPrompts: UseWithPrompts;
 }): JSX.Element {
-  const {
-    docId,
-    docUrl,
-    activityFromParams,
-    goalFromParams,
-    isNewDoc,
-    useWithPrompts,
-  } = props;
+  const { docId, docUrl, activityFromParams, goalFromParams, isNewDoc } = props;
   const useCurrentGoalActivity = useWithCurrentGoalActivity();
   const {
     goalActivityState,
@@ -124,7 +115,6 @@ export function EditGoogleDoc(props: {
             activityFromParams={activityFromParams}
             goalFromParams={goalFromParams}
             isNewDoc={isNewDoc}
-            useWithPrompts={useWithPrompts}
             useCurrentGoalActivity={useCurrentGoalActivity}
             previewingActivity={previewingActivity}
             setPreviewingActivity={setPreviewingActivity}

@@ -11,16 +11,12 @@ import { UseWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-ac
 import { DocGoalModal } from './doc-introduction/doc-goal-modal';
 import { useEffect, useState } from 'react';
 import { ActivityGQL, DocGoal } from '../../types';
-import { DisplayIcons } from '../../helpers/display-icon-helper';
-import { v4 as uuidv4 } from 'uuid';
 import { removeDuplicatesByField } from '../../helpers';
-import { UseWithPrompts } from '../../hooks/use-with-prompts';
 
 export function ChatActivity(props: {
   activityFromParams: string;
   goalFromParams: string;
   isNewDoc: boolean;
-  useWithPrompts: UseWithPrompts;
   useCurrentGoalActivity: UseWithCurrentGoalActivity;
   previewingActivity: boolean;
   setPreviewingActivity: (previewingActivity: boolean) => void;
@@ -29,7 +25,6 @@ export function ChatActivity(props: {
     activityFromParams,
     goalFromParams,
     isNewDoc,
-    useWithPrompts,
     useCurrentGoalActivity,
     previewingActivity,
     setPreviewingActivity,
@@ -43,7 +38,6 @@ export function ChatActivity(props: {
     isLoading: goalsLoading,
   } = useCurrentGoalActivity;
 
-  const { prompts } = useWithPrompts;
   const [docGoalModalOpen, setDocGoalModalOpen] = useState(false);
   const allActivities = getAllActivites(docGoals || []);
   const [checkedUrlParams, setCheckedUrlParams] = useState<boolean>(false);
@@ -60,31 +54,8 @@ export function ChatActivity(props: {
       return [];
     }
     const _activities = docGoals.flatMap((goal) => goal.activities || []);
-    // Multiple
     const activities = removeDuplicatesByField<ActivityGQL>(_activities, '_id');
-    if (!prompts.length) {
-      return activities;
-    }
-    const promptsWithoutActivities = prompts.filter(
-      (prompt) =>
-        !activities.find((activity) => activity.prompt?._id === prompt._id)
-    );
-    const orphanPromptActivities: ActivityGQL[] = promptsWithoutActivities.map(
-      (prompt) => {
-        return {
-          _id: uuidv4(),
-          activityType: 'gql',
-          prompt,
-          steps: [],
-          title: prompt.title,
-          description: '',
-          introduction: '',
-          displayIcon: DisplayIcons.DEFAULT,
-          disabled: false,
-        };
-      }
-    );
-    return [...activities, ...orphanPromptActivities];
+    return activities;
   }
 
   useEffect(() => {
