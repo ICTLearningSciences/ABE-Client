@@ -1,5 +1,4 @@
 import React from 'react';
-import { DisplayIcon } from '../../../helpers/display-icon-helper';
 import { ColumnDiv } from '../../../styled-components';
 import { ActivityTypes } from '../../../types';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
@@ -58,12 +57,6 @@ function ActivityDisplay(props: {
           />
         )}
       </div>
-      <DisplayIcon
-        iconName={activity.displayIcon}
-        style={{
-          margin: 10,
-        }}
-      />
       <ColumnDiv
         style={{
           alignItems: 'center',
