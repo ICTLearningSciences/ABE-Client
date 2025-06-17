@@ -8,10 +8,12 @@ import { DocVersion, DocData } from '../types';
 import { useAppSelector } from '../store/hooks';
 import { submitDocVersion as submitDocVersionGQL } from './api';
 import { useWithChat, useWithUsersDocs } from '../exported-files';
-import { hasHoursPassed } from '../helpers';
+import { equals, hasHoursPassed } from '../helpers';
 import useInterval from './use-interval';
 import { useState } from 'react';
 import { ChatMessageTypes } from '../store/slices/chat';
+import { TrackedState } from './use-with-google-doc-versions';
+
 export function useWithRawTextDocVersions(
   currentActivityId: string,
   docData?: DocData
@@ -21,15 +23,14 @@ export function useWithRawTextDocVersions(
   const sessionId = useAppSelector((state) => state.state.sessionId);
   const { updateDocTitleLocally } = useWithUsersDocs();
   const messages = chatState.chatLogs[curDocId] || [];
-  const [lastNumMessages, setLastNumMessages] = useState<number>(
-    messages.length
-  );
-  const [lastUpdatedTitle, setLastUpdatedTitle] = useState<string>('');
-  const [lastUpdatedPlainText, setLastUpdatedPlainText] = useState<string>('');
-  const [lastSavedSessionId, setLastSavedSessionId] =
-    useState<string>(sessionId);
-  const [lastSavedActivityId, setLastSavedActivityId] =
-    useState<string>(currentActivityId);
+  const [lastSavedVersion, setLastSavedVersion] = useState<TrackedState>({
+    id: '',
+    title: '',
+    plainText: '',
+    numMessages: messages.length,
+    sessionId: sessionId,
+    activityId: currentActivityId,
+  });
   const sessionIntention = useAppSelector(
     (state) => state.state.sessionIntention
   );
@@ -55,11 +56,6 @@ export function useWithRawTextDocVersions(
     messages: ChatMessageTypes[],
     sessionId: string
   ) {
-    setLastUpdatedTitle(title);
-    setLastUpdatedPlainText(docText);
-    setLastNumMessages(messages.length);
-    setLastSavedSessionId(sessionId);
-    setLastSavedActivityId(currentActivityId);
     const newDocData: DocVersion = {
       docId: curDocId,
       plainText: docText,
@@ -87,18 +83,21 @@ export function useWithRawTextDocVersions(
     markdownText: string,
     currentActivityId: string
   ) {
-    if (title !== lastUpdatedTitle) {
+    if (title !== lastSavedVersion.title) {
       updateDocTitleLocally(curDocId, title);
     }
-    if (
-      title === lastUpdatedTitle &&
-      docText === lastUpdatedPlainText &&
-      messages.length === lastNumMessages &&
-      sessionId === lastSavedSessionId &&
-      currentActivityId === lastSavedActivityId
-    ) {
-      return;
-    }
+
+    const newState: TrackedState = {
+      id: '',
+      title: title,
+      plainText: docText,
+      numMessages: messages.length,
+      sessionId: sessionId,
+      activityId: currentActivityId,
+    };
+    const stateChanged = !equals(lastSavedVersion, newState);
+    if (!stateChanged) return;
+    setLastSavedVersion(newState);
     submitDocVersion(docText, markdownText, title, messages, sessionId);
   }
 
@@ -121,9 +120,4 @@ export function useWithRawTextDocVersions(
         : 5000
       : null
   );
-
-  return {
-    submitDocVersion,
-    checkForNewVersion,
-  };
 }

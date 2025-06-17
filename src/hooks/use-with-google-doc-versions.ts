@@ -10,10 +10,19 @@ import { getDocData, submitDocVersion } from './api';
 import { useAppSelector } from '../store/hooks';
 import useInterval from './use-interval';
 import { DocService, DocVersion, Intention } from '../types';
-import { hasHoursPassed } from '../helpers';
+import { equals, hasHoursPassed } from '../helpers';
 import { useWithUsersDocs } from './use-with-users-docs';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { isAxiosError } from 'axios';
+
+export interface TrackedState {
+  id: string;
+  title: string;
+  plainText: string;
+  numMessages: number;
+  sessionId: string;
+  activityId: string;
+}
 
 /**
  * Interval to store doc versions
@@ -42,16 +51,14 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
       )
     : false;
   const messages = state.chatLogs[curDocId] || [];
-  const [lastUpdatedId, setLastUpdatedId] = useState<string>('');
-  const [lastUpdatedTitle, setLastUpdatedTitle] = useState<string>('');
-  const [lastNumMessages, setLastNumMessages] = useState<number>(
-    messages.length
-  );
-  const [lastUpdatedPlainText, setLastUpdatedPlainText] = useState<string>('');
-  const [lastSavedSessionId, setLastSavedSessionId] =
-    useState<string>(sessionId);
-  const [lastSavedActivityId, setLastSavedActivityId] =
-    useState<string>(selectedActivityId);
+  const [lastSavedVersion, setLastSavedVersion] = useState<TrackedState>({
+    id: '',
+    title: '',
+    plainText: '',
+    numMessages: messages.length,
+    sessionId: sessionId,
+    activityId: selectedActivityId,
+  });
 
   async function checkForNewVersion() {
     try {
@@ -67,24 +74,21 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         }
       );
       updateMostRecentDocVersion(docData);
-      if (docData.title !== lastUpdatedTitle) {
+      const newState: TrackedState = {
+        id: docData.lastChangedId,
+        title: docData.title,
+        plainText: docData.plainText,
+        numMessages: messages.length,
+        sessionId: sessionId,
+        activityId: selectedActivityId,
+      };
+      if (docData.title !== lastSavedVersion.title) {
         updateDocTitleLocally(curDocId, docData.title);
       }
-      if (
-        docData.lastChangedId === lastUpdatedId &&
-        docData.plainText === lastUpdatedPlainText &&
-        docData.title === lastUpdatedTitle &&
-        messages.length === lastNumMessages &&
-        sessionId === lastSavedSessionId &&
-        selectedActivityId === lastSavedActivityId
-      )
-        return;
-      setLastSavedSessionId(sessionId);
-      setLastUpdatedId(docData.lastChangedId);
-      setLastUpdatedTitle(docData.title);
-      setLastUpdatedPlainText(docData.plainText);
-      setLastNumMessages(messages.length);
-      setLastSavedActivityId(selectedActivityId);
+      const stateChanged = !equals(lastSavedVersion, newState);
+      if (!stateChanged) return;
+
+      setLastSavedVersion(newState);
       const newDocData: DocVersion = {
         docId: curDocId,
         plainText: docData.plainText,
