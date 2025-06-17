@@ -10,18 +10,16 @@ import { useWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-ac
 import { useState } from 'react';
 import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
-import ActivityGqlButtonology from '../admin-view/buttonology';
 import { useWithState } from '../../store/slices/state/use-with-state';
-import { ActivityGQL, ActivityTypes, DocGoal } from '../../types';
-import { DisplayIcons } from '../../helpers/display-icon-helper';
-import { v4 as uuidv4 } from 'uuid';
-import { removeDuplicatesByField } from '../../helpers';
+import { ActivityTypes } from '../../types';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
-import { ActivityBuilder } from '../activity-builder/types';
+import { isActivityBuilder } from '../activity-builder/types';
 import { UseWithPrompts } from '../../hooks/use-with-prompts';
 import { ChatActivity } from './chat-activity';
 import { SingleNotificationDialog } from '../dialog';
 import { UserDocumentDisplay } from './user-document-display';
+import { ColumnCenterDiv, ColumnDiv } from '../../styled-components';
+import { ActivityBuilderPage } from '../activity-builder/activity-builder-page';
 
 export function EditGoogleDoc(props: {
   docId: string;
@@ -41,67 +39,22 @@ export function EditGoogleDoc(props: {
   } = props;
   const useCurrentGoalActivity = useWithCurrentGoalActivity();
   const {
-    docGoals,
     goalActivityState,
     setGoalAndActivity,
     isLoading: goalsLoading,
   } = useCurrentGoalActivity;
 
-  const { prompts } = useWithPrompts;
   const { width: windowWidth } = useWithWindowSize();
   const { updateViewingUserRole, state } = useWithState();
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const viewingAdmin =
     viewingRole === UserRole.ADMIN || viewingRole === UserRole.CONTENT_MANAGER;
-  const allActivities = getAllActivites(docGoals || []);
   const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
 
   function goToActivityPreview(activity: ActivityTypes) {
     setPreviewingActivity(true);
     setGoalAndActivity(undefined, activity);
     updateViewingUserRole(UserRole.USER);
-  }
-
-  /**
-   * Returns all activities from all goals, including orphaned prompts
-   */
-  function getAllActivites(docGoals: DocGoal[]): ActivityGQL[] {
-    if (!docGoals.length) {
-      return [];
-    }
-    const _activities = docGoals.flatMap((goal) => goal.activities || []);
-    // Multiple
-    const activities = removeDuplicatesByField<ActivityGQL>(_activities, '_id');
-    if (!prompts.length) {
-      return activities;
-    }
-    const promptsWithoutActivities = prompts.filter(
-      (prompt) =>
-        !activities.find((activity) => activity.prompt?._id === prompt._id)
-    );
-    const orphanPromptActivities: ActivityGQL[] = promptsWithoutActivities.map(
-      (prompt) => {
-        return {
-          _id: uuidv4(),
-          activityType: 'gql',
-          prompt,
-          steps: [],
-          title: prompt.title,
-          description: '',
-          introduction: '',
-          displayIcon: DisplayIcons.DEFAULT,
-          disabled: false,
-        };
-      }
-    );
-    return [...activities, ...orphanPromptActivities];
-  }
-
-  function getAllBuiltActivities(docGoals: DocGoal[]): ActivityBuilder[] {
-    if (!docGoals.length) {
-      return [];
-    }
-    return docGoals.flatMap((goal) => goal.builtActivities || []);
   }
 
   if (goalsLoading) {
@@ -119,6 +72,10 @@ export function EditGoogleDoc(props: {
     : smallWindowWidth
     ? '40%'
     : '45%';
+  const curActivity =
+    previewingActivity && goalActivityState?.selectedActivity
+      ? goalActivityState?.selectedActivity
+      : undefined;
   return (
     <div style={{ height: '100%', display: 'flex', flexGrow: 1 }}>
       {!viewingAdmin && (
@@ -137,18 +94,31 @@ export function EditGoogleDoc(props: {
         }}
       >
         {viewingAdmin ? (
-          <ActivityGqlButtonology
-            googleDocId={docId}
-            activities={allActivities}
-            builtActivities={getAllBuiltActivities(docGoals || [])}
-            goToActivity={goToActivityPreview}
-            useWithPrompts={useWithPrompts}
-            curActivity={
-              previewingActivity && goalActivityState?.selectedActivity
-                ? goalActivityState?.selectedActivity
-                : undefined
-            }
-          />
+          <ColumnCenterDiv
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+          >
+            <ColumnDiv
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
+            >
+              <ActivityBuilderPage
+                curActivity={
+                  curActivity && isActivityBuilder(curActivity)
+                    ? curActivity
+                    : undefined
+                }
+                goToActivity={goToActivityPreview}
+              />
+            </ColumnDiv>
+          </ColumnCenterDiv>
         ) : (
           <ChatActivity
             activityFromParams={activityFromParams}

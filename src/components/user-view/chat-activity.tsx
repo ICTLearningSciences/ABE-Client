@@ -125,7 +125,6 @@ export function ChatActivity(props: {
           selectedGoal={goalActivityState?.selectedGoal}
           editDocGoal={editDocGoal}
           setSelectedActivity={setActivity}
-          useWithPrompts={useWithPrompts}
         />
         <DocGoalModal
           isNewDoc={isNewDoc}

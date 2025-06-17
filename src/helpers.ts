@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 import axios from 'axios';
 import {
-  ActivityGQL,
   GQLPrompt,
   GQLTimelinePoint,
   AiGenerationStatus,
@@ -172,35 +171,6 @@ export function removeDuplicatesByField<T extends GenericObject>(
   });
 }
 
-export function isPromptInActivity(
-  prompt: GQLPrompt,
-  activities: ActivityGQL[]
-): boolean {
-  return activities.some((activities) => {
-    const prompts = activities.prompts;
-    if (prompts) {
-      return prompts.find((p) => p.promptId === prompt._id);
-    }
-    return false;
-  });
-}
-
-export function isPromptOrphan(
-  prompt: GQLPrompt,
-  activities: ActivityGQL[]
-): boolean {
-  return (
-    !activities.find((activity) => activity.prompt?._id === prompt._id) &&
-    !activities.some((activities) => {
-      const prompts = activities.prompts;
-      if (prompts) {
-        return prompts.find((p) => p.promptId === prompt._id);
-      }
-      return false;
-    })
-  );
-}
-
 export function addContextToPromptSteps(
   prompt: GQLPrompt,
   context: PromptConfiguration[]
@@ -214,22 +184,6 @@ export function addContextToPromptSteps(
       };
     }),
   };
-}
-
-export function getPromptsByIds(
-  promptIds: string[],
-  prompts: GQLPrompt[]
-): Record<string, GQLPrompt> {
-  if (!prompts) {
-    return {};
-  }
-  const promptsById: Record<string, GQLPrompt> = {};
-  prompts.forEach((prompt) => {
-    if (promptIds.includes(prompt._id)) {
-      promptsById[prompt._id] = prompt;
-    }
-  });
-  return promptsById;
 }
 
 export function hasHoursPassed(
