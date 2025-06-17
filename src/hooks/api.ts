@@ -678,29 +678,6 @@ mutation UpdateUserInfo($userInfo: UserInputType!) {
   );
 }
 
-export async function addOrUpdateActivity(
-  activity: ActivityGQL
-): Promise<ActivityGQL> {
-  const res = await execGql<ActivityGQL>(
-    {
-      query: `
-      mutation AddOrUpdateActivity($activity: ActivityInputType!) {
-        addOrUpdateActivity(activity: $activity) {
-          ${activityQueryData}
-            }
-       }
-      `,
-      variables: {
-        activity,
-      },
-    },
-    {
-      dataPath: 'addOrUpdateActivity',
-    }
-  );
-  return res;
-}
-
 export async function fetchDocGoals(): Promise<DocGoalGQl[]> {
   const res = await execGql<Connection<DocGoalGQl>>(
     {

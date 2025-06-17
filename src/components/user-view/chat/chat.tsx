@@ -80,8 +80,7 @@ export function Chat(props: {
   );
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
   const goalHasActivities =
-    (selectedGoal?.activities && selectedGoal.activities.length > 0) ||
-    (selectedGoal?.builtActivities && selectedGoal.builtActivities.length > 0);
+    selectedGoal?.builtActivities && selectedGoal.builtActivities.length > 0;
   const disableInput =
     coachResponsePending ||
     Boolean(

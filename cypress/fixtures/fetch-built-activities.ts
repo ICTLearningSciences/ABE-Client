@@ -37,7 +37,7 @@ export const myEditableActivity: ActivityBuilder = {
             stepId: '2',
             stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
             message: 'What is your name?',
-            saveAsIntention: false,
+            saveAsIntention: true,
             saveResponseVariableName: 'name',
             disableFreeInput: false,
             predefinedResponses: [],
@@ -46,6 +46,7 @@ export const myEditableActivity: ActivityBuilder = {
             stepId: '3',
             stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
             message: 'Hello, {{name}}!',
+            
           } as SystemMessageActivityStep,
           {
             stepId: '3.1',

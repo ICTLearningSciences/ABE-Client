@@ -10,8 +10,9 @@ import { Chat } from './chat/chat';
 import { UseWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-activity';
 import { DocGoalModal } from './doc-introduction/doc-goal-modal';
 import { useEffect, useState } from 'react';
-import { ActivityGQL, DocGoal } from '../../types';
+import { DocGoal } from '../../types';
 import { removeDuplicatesByField } from '../../helpers';
+import { ActivityBuilder } from '../activity-builder/types';
 
 export function ChatActivity(props: {
   activityFromParams: string;
@@ -49,12 +50,15 @@ export function ChatActivity(props: {
   /**
    * Returns all activities from all goals, including orphaned prompts
    */
-  function getAllActivites(docGoals: DocGoal[]): ActivityGQL[] {
+  function getAllActivites(docGoals: DocGoal[]): ActivityBuilder[] {
     if (!docGoals.length) {
       return [];
     }
-    const _activities = docGoals.flatMap((goal) => goal.activities || []);
-    const activities = removeDuplicatesByField<ActivityGQL>(_activities, '_id');
+    const _activities = docGoals.flatMap((goal) => goal.builtActivities || []);
+    const activities = removeDuplicatesByField<ActivityBuilder>(
+      _activities,
+      '_id'
+    );
     return activities;
   }
 
@@ -73,8 +77,7 @@ export function ChatActivity(props: {
       (activity) => activity?._id === activityFromParams
     );
     setGoalAndActivity(goal, activity);
-    const goalHasActivities =
-      goal?.activities?.length || goal?.builtActivities?.length;
+    const goalHasActivities = goal?.builtActivities?.length;
     if (!activity && goalHasActivities) {
       setDocGoalModalOpen(true);
     }

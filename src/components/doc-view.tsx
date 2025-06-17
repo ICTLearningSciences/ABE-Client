@@ -16,7 +16,7 @@ import { useNavigateWithParams } from '../hooks/use-navigate-with-params';
 function DocView(): JSX.Element {
   const { docId } = useParams<Record<string, string>>();
   const navigate = useNavigateWithParams();
-  const { updateCurrentDocId } = useWithState();
+  const { updateCurrentDocId, newSession } = useWithState();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const activityFromParams = queryParams.get('activityId');
@@ -31,6 +31,10 @@ function DocView(): JSX.Element {
       updateCurrentDocId(docId);
     }
   }, [docId]);
+
+  useEffect(() => {
+    newSession();
+  }, []);
 
   if (!docId) {
     navigate('/docs');

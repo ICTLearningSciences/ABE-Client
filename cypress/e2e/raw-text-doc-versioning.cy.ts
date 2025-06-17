@@ -7,7 +7,8 @@ The full terms of this copyright and license should always be found in the root 
 import { fetchGoogleDocsResponse } from "../fixtures/fetch-google-docs";
 import { refreshAccessTokenResponse } from "../fixtures/refresh-access-token";
 import { analyzeHookResponse } from "../fixtures/stronger-hook-activity/analyze-hook-response";
-import { cyMockDefault, cyMockOpenAiCall, CypressGlobal, mockGQL, toPromptActivity } from "../helpers/functions";
+import { openAiJsonResponse } from "../fixtures/stronger-hook-activity/basic-json-response";
+import { cyMockDefault, cyMockOpenAiCall, CypressGlobal, mockGQL, toMyEditableActivity } from "../helpers/functions";
 import { DocService, JobStatus, LoginService, UserRole, testGoogleDocId } from "../helpers/types";
 
 export function runInEditor(cy: CypressGlobal, callback: () => void) {
@@ -32,7 +33,7 @@ describe("User Doc Versioning", () => {
             cyMockDefault(cy, {
                 gqlQueries
             });
-            toPromptActivity(cy);
+            toMyEditableActivity(cy);
             // polls for changes every 5 seconds
             cy.wait("@SubmitDocVersion", {timeout: 8000})
         })
@@ -40,11 +41,14 @@ describe("User Doc Versioning", () => {
 
         it("If chat log changed", ()=>{
             cyMockDefault(cy, {gqlQueries});
-            cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
-            toPromptActivity(cy);
+            cyMockOpenAiCall(cy, {response: openAiJsonResponse(JSON.stringify({
+                "nickname1": "3",
+              }))});
+            toMyEditableActivity(cy);
             // polls for changes every 5 seconds
             cy.wait("@SubmitDocVersion", {timeout: 8000});
-            cy.get("[data-cy=mcq-choice-Ready]").click();
+            cy.get("[data-cy=chat-input]").type("Hello");
+            cy.get("[data-cy=send-input-button]").click();
             cy.wait("@SubmitDocVersion", {timeout: 8000});
         })
     })
@@ -52,7 +56,7 @@ describe("User Doc Versioning", () => {
     it("Does not store if no changes made", ()=>{
         cyMockDefault(cy, {gqlQueries});
         cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
-        toPromptActivity(cy);
+        toMyEditableActivity(cy);
         // stores on first load
         cy.wait("@SubmitDocVersion", {timeout: 8000});
         // make sure it doesn't get stored again
@@ -62,19 +66,22 @@ describe("User Doc Versioning", () => {
 
     it("Sends proper data for saving", ()=>{
         cyMockDefault(cy, {gqlQueries});
-        cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
-        toPromptActivity(cy);
+        cyMockOpenAiCall(cy, {response: openAiJsonResponse(JSON.stringify({
+            "nickname1": "3",
+          }))});
+        toMyEditableActivity(cy);
         cy.wait("@SubmitDocVersion", {timeout: 8000}).then((xhr)=>{
             const data = xhr.request.body.variables;
             expect(data.googleDocData.docId).to.be.eql(testGoogleDocId);
-            expect(data.googleDocData.activity).to.be.eql("65a8592b26523c7ce5acac9e");
+            expect(data.googleDocData.activity).to.be.eql("my-editable-activity");
             expect(data.googleDocData.chatLog).to.have.length(1);
         })
-        cy.get("[data-cy=mcq-choice-Ready]").click();
+        cy.get("[data-cy=chat-input]").type("Hello");
+        cy.get("[data-cy=send-input-button]").click();
         cy.wait("@SubmitDocVersion", {timeout: 8000}).then((xhr)=>{
             const data = xhr.request.body.variables;
             expect(data.googleDocData.docId).to.be.eql(testGoogleDocId);
-            expect(data.googleDocData.activity).to.be.eql("65a8592b26523c7ce5acac9e");
+            expect(data.googleDocData.activity).to.be.eql("my-editable-activity");
             expect(data.googleDocData.chatLog).to.have.length(4);
         })
     })
@@ -82,20 +89,20 @@ describe("User Doc Versioning", () => {
     it("properly saves activity id on activity change", ()=>{
         cyMockDefault(cy, {gqlQueries});
         cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
-        toPromptActivity(cy);
+        toMyEditableActivity(cy);
         cy.wait("@SubmitDocVersion", {timeout: 8000}).then((xhr)=>{
             const data = xhr.request.body.variables;
             expect(data.googleDocData.docId).to.be.eql(testGoogleDocId);
-            expect(data.googleDocData.activity).to.be.eql("65a8592b26523c7ce5acac9e");
+            expect(data.googleDocData.activity).to.be.eql("my-editable-activity");
         })
         cy.get("[data-cy=edit-goal-button]").click();
         cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
-        cy.get("[data-cy=activity-display-658230f699045156193339ac]").click();
+        cy.get("[data-cy=activity-display-my-read-only-activity]").click();
         cy.get("[data-cy=doc-goal-modal-next-button]").click();
         cy.wait("@SubmitDocVersion", {timeout: 8000}).then((xhr)=>{
             const data = xhr.request.body.variables;
             expect(data.googleDocData.docId).to.be.eql(testGoogleDocId);
-            expect(data.googleDocData.activity).to.be.eql("658230f699045156193339ac");
+            expect(data.googleDocData.activity).to.be.eql("my-read-only-activity");
         })
     })
 })

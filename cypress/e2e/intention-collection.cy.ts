@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { getDocServiceFromLoginService } from '../helpers/functions';
+import { cyMockOpenAiCall, getDocServiceFromLoginService } from '../helpers/functions';
 import {
   gDocWithAllIntentions,
   gDocWithExpiredDayIntention,
@@ -16,13 +16,12 @@ import {
 import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
 import {
   CypressGlobal,
-  StepNames,
   cyMockDefault,
   mockGQL,
   sendChatMessage,
-  toStrongerHookActivity,
 } from '../helpers/functions';
-import { DocService, DocVersion, LoginService, UserRole, testGoogleDocId } from '../helpers/types';
+import { DocVersion, LoginService, UserRole, testGoogleDocId } from '../helpers/types';
+import { myEditableActivityResponse, openAiJsonResponse } from '../fixtures/stronger-hook-activity/basic-json-response';
 
 function writeDocumentIntention(cy: CypressGlobal, input: string) {
   cy.get('[data-cy=input-document-intention]')
@@ -57,9 +56,9 @@ function clickNextIntentionModal(cy: CypressGlobal) {
   cy.get('[data-cy=doc-goal-modal-next-button]').click();
 }
 
-function goToStrongerHookActivity(cy: CypressGlobal) {
+function goToMyEditableActivity(cy: CypressGlobal) {
   cy.get('[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]').click();
-  cy.get('[data-cy=activity-display-658230f699045156193339ac]').click();
+  cy.get('[data-cy=activity-display-my-editable-activity]').click();
   cy.get('[data-cy=doc-goal-modal-next-button]').click();
 }
 
@@ -174,7 +173,7 @@ describe('collectin user intentions', () => {
       writeDocumentIntention(cy, 'test');
       clickNextIntentionModal(cy);
       didDocDataGetSaved(cy, 'test');
-      goToStrongerHookActivity(cy);
+      goToMyEditableActivity(cy);
       reOpenModal(cy);
       isOnSelectGoalScreen(cy);
       isBackButtonDisabled(cy);
@@ -196,7 +195,7 @@ describe('collectin user intentions', () => {
       writeDocumentIntention(cy, 'test');
       clickNextIntentionModal(cy);
       didDocDataGetSaved(cy, 'test');
-      goToStrongerHookActivity(cy);
+      goToMyEditableActivity(cy);
       cy.get('[data-cy=home-button]').click();
       cy.get('[data-cy=doc-list-item-Aliens]').click();
       isOnSelectGoalScreen(cy);
@@ -276,7 +275,7 @@ describe('collectin user intentions', () => {
       writeDayIntention(cy, 'test');
       clickNextIntentionModal(cy);
       didDocDataGetSaved(cy, undefined, undefined, 'test');
-      goToStrongerHookActivity(cy);
+      goToMyEditableActivity(cy);
       reOpenModal(cy);
       isOnSelectGoalScreen(cy);
       isBackButtonDisabled(cy);
@@ -318,7 +317,7 @@ describe('collectin user intentions', () => {
       writeDocumentAssignment(cy, 'test');
       clickNextIntentionModal(cy);
       didDocDataGetSaved(cy, undefined, 'test');
-      goToStrongerHookActivity(cy);
+      goToMyEditableActivity(cy);
       reOpenModal(cy);
       isOnSelectGoalScreen(cy);
       isBackButtonDisabled(cy);
@@ -329,12 +328,9 @@ describe('collectin user intentions', () => {
     describe('stronger hook activity', () => {
       it("collects and saves session intention when asked what they'd like to revise", () => {
         cyMockDefault(cy);
-        toStrongerHookActivity(cy, StepNames.Narrativity_Story_In_Mind);
-        sendChatMessage(cy, 'I want to revise my introduction');
-        cy.get('[data-cy=messages-container]').should(
-          'contain.text',
-          'What kind of revision are you thinking of doing now?'
-        );
+        cy.visit(`/docs/${testGoogleDocId}`);
+        cyMockOpenAiCall(cy, {response: myEditableActivityResponse()});
+        goToMyEditableActivity(cy);
         sendChatMessage(cy, 'This is my session intention.');
         didDocVersionDataGetSaved(
           cy,
@@ -347,22 +343,23 @@ describe('collectin user intentions', () => {
 
     it('resetting activity clears session intention', () => {
       cyMockDefault(cy);
-      toStrongerHookActivity(cy, StepNames.Narrativity_Story_In_Mind);
+      cy.visit(`/docs/${testGoogleDocId}`);
+      cyMockOpenAiCall(cy, {response: myEditableActivityResponse()});
+      goToMyEditableActivity(cy);
       didDocVersionDataGetSaved(
         cy,
         undefined,
         'Aliens document intention',
         'Aliens day intention'
       );
-      sendChatMessage(cy, 'I want to revise my introduction');
+      sendChatMessage(cy, 'This is my intention');
       cy.get('[data-cy=messages-container]').should(
         'contain.text',
-        'What kind of revision are you thinking of doing now?'
+        'Hello, This is my intention!'
       );
-      sendChatMessage(cy, 'This is my session intention.');
       didDocVersionDataGetSaved(
         cy,
-        'This is my session intention.',
+        'This is my intention',
         'Aliens document intention',
         'Aliens day intention'
       );
@@ -386,12 +383,9 @@ describe('collectin user intentions', () => {
   describe(`intentions are saved with doc versions for ${loginService}`, () => {
     it('saves most up to date session intentions with doc versions', () => {
       cyMockDefault(cy, {gqlQueries: extraGqlQueries});
-      toStrongerHookActivity(cy, StepNames.Narrativity_Story_In_Mind);
-      sendChatMessage(cy, 'I want to revise my introduction');
-      cy.get('[data-cy=messages-container]').should(
-        'contain.text',
-        'What kind of revision are you thinking of doing now?'
-      );
+      cy.visit(`/docs/${testGoogleDocId}`);
+      cyMockOpenAiCall(cy, {response: myEditableActivityResponse()});
+      goToMyEditableActivity(cy);
       sendChatMessage(cy, 'This is my session intention.');
       didDocVersionDataGetSaved(
         cy,
@@ -426,7 +420,7 @@ describe('collectin user intentions', () => {
       writeDayIntention(cy, 'Aliens day intention');
       clickNextIntentionModal(cy);
       didDocDataGetSaved(cy, undefined, undefined, 'Aliens day intention');
-      goToStrongerHookActivity(cy);
+      goToMyEditableActivity(cy);
       didDocVersionDataGetSaved(
         cy,
         undefined,
@@ -460,7 +454,7 @@ describe('collectin user intentions', () => {
       writeDocumentIntention(cy, 'Aliens document intention');
       clickNextIntentionModal(cy);
       didDocDataGetSaved(cy, 'Aliens document intention');
-      goToStrongerHookActivity(cy);
+      goToMyEditableActivity(cy);
       didDocVersionDataGetSaved(
         cy,
         undefined,
@@ -475,25 +469,25 @@ describe('collectin user intentions', () => {
     it('sessionId exists when user visits a new document', () => {
       cyMockDefault(cy);
       cy.visit(`/docs/${testGoogleDocId}`);
-      goToStrongerHookActivity(cy);
+      goToMyEditableActivity(cy);
       checkNumberSessionIds(cy, 1);
     });
 
     it('sessionId changes when user revisits a document', () => {
       cyMockDefault(cy);
       cy.visit(`/docs/${testGoogleDocId}`);
-      goToStrongerHookActivity(cy);
+      goToMyEditableActivity(cy);
       checkNumberSessionIds(cy, 1);
       cy.get('[data-cy=home-button]').click();
       cy.get('[data-cy=doc-list-item-Aliens-2]').click();
-      goToStrongerHookActivity(cy);
+      goToMyEditableActivity(cy);
       checkNumberSessionIds(cy, 2);
     });
 
     it('sessionId changes when resetting activity', () => {
       cyMockDefault(cy);
       cy.visit(`/docs/${testGoogleDocId}`);
-      goToStrongerHookActivity(cy);
+      goToMyEditableActivity(cy);
       checkNumberSessionIds(cy, 1);
       cy.get('[data-cy=reset-activity-button]').click();
       checkNumberSessionIds(cy, 2);

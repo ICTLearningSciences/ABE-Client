@@ -50,6 +50,8 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
   const [lastUpdatedPlainText, setLastUpdatedPlainText] = useState<string>('');
   const [lastSavedSessionId, setLastSavedSessionId] =
     useState<string>(sessionId);
+  const [lastSavedActivityId, setLastSavedActivityId] =
+    useState<string>(selectedActivityId);
 
   async function checkForNewVersion() {
     try {
@@ -73,7 +75,8 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         docData.plainText === lastUpdatedPlainText &&
         docData.title === lastUpdatedTitle &&
         messages.length === lastNumMessages &&
-        sessionId === lastSavedSessionId
+        sessionId === lastSavedSessionId &&
+        selectedActivityId === lastSavedActivityId
       )
         return;
       setLastSavedSessionId(sessionId);
@@ -81,6 +84,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
       setLastUpdatedTitle(docData.title);
       setLastUpdatedPlainText(docData.plainText);
       setLastNumMessages(messages.length);
+      setLastSavedActivityId(selectedActivityId);
       const newDocData: DocVersion = {
         docId: curDocId,
         plainText: docData.plainText,

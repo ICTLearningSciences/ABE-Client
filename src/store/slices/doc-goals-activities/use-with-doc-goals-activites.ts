@@ -1,7 +1,6 @@
 import {
   fetchDocGoals as _fetchDocGoals,
   fetchActivities as _fetchActivities,
-  addOrUpdateActivity as _addOrUpdateActivity,
   fetchBuiltActivities as _fetchBuiltActivities,
   addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
   LoadStatus,
@@ -14,19 +13,32 @@ import {
   ActivityBuilder,
   defaultActivityBuilder,
 } from '../../../components/activity-builder/types';
-import { ActivityGQL, ActivityTypes, DocGoal } from '../../../types';
+import {
+  ActivityGQL,
+  ActivityTypes,
+  DocGoal,
+  DocGoalGQl,
+} from '../../../types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
 export interface UseWithDocGoalsActivities {
-  getActivitById: (id: string) => ActivityTypes;
-  loadDocGoals: () => Promise<void>;
-  loadActivities: () => Promise<void>;
-  addOrUpdateActivity: (activity: ActivityTypes) => Promise<void>;
-  activities: ActivityTypes[];
+  loadDocGoals: () => Promise<DocGoalGQl[]>;
+  loadBuiltActivities: () => Promise<ActivityBuilder[]>;
+  loadActivities: () => Promise<ActivityGQL[]>;
+  addOrUpdateBuiltActivity: (
+    activity: ActivityBuilder
+  ) => Promise<ActivityBuilder>;
+  addNewLocalBuiltActivity: () => ActivityBuilder;
+  copyBuiltActivity: (activityId: string) => Promise<ActivityBuilder>;
+  deleteBuiltActivity: (activityId: string) => Promise<void>;
+  activities: ActivityGQL[];
+  builtActivities: ActivityBuilder[];
   docGoals: DocGoal[];
+  getActivityById: (id: string) => ActivityTypes | undefined;
+  isLoading: boolean;
 }
 
-export function useWithDocGoalsActivities() {
+export function useWithDocGoalsActivities(): UseWithDocGoalsActivities {
   const dispatch = useAppDispatch();
   const activitiesLoadingState = useAppSelector(
     (state) => state.docGoalsActivities.activitiesLoadStatus
@@ -41,14 +53,14 @@ export function useWithDocGoalsActivities() {
   const builtActivities = useAppSelector(
     (state) => state.docGoalsActivities.builtActivities
   );
+  const builtActivitiesLoadingState = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivitiesLoadStatus
+  );
   const docGoalsGql = useAppSelector(
     (state) => state.docGoalsActivities.docGoals
   );
   const config = useAppSelector((state) => state.config);
   const displayedGoalActivities = config.config?.displayedGoalActivities || [];
-  const getActivitById = (id: string): ActivityGQL | undefined => {
-    return activities.find((a) => a._id === id);
-  };
 
   const getBuiltActivityById = (id: string): ActivityBuilder | undefined => {
     return builtActivities.find((a) => a._id === id);
@@ -60,13 +72,7 @@ export function useWithDocGoalsActivities() {
       if (!goal) {
         return acc;
       }
-      const activities = goalActivity.activities.reduce((acc, activityId) => {
-        const activity = getActivitById(activityId.activity);
-        if (!activity) {
-          return acc;
-        }
-        return [...acc, { ...activity, disabled: activityId.disabled }];
-      }, [] as ActivityGQL[]);
+
       const builtActivities = goalActivity.builtActivities?.reduce(
         (acc, builtActivity) => {
           const activity = getBuiltActivityById(builtActivity.activity);
@@ -77,28 +83,28 @@ export function useWithDocGoalsActivities() {
         },
         [] as ActivityBuilder[]
       );
-      return [
-        ...acc,
-        { ...goal, activities, builtActivities: builtActivities || [] },
-      ];
+      return [...acc, { ...goal, builtActivities: builtActivities || [] }];
     },
     [] as DocGoal[]
   );
 
+  const getActivityById = (id: string): ActivityTypes | undefined => {
+    return (
+      builtActivities.find((a) => a._id === id) ||
+      activities.find((a) => a._id === id)
+    );
+  };
+
   async function loadDocGoals() {
-    return await dispatch(_fetchDocGoals());
+    return await dispatch(_fetchDocGoals()).unwrap();
   }
 
   async function loadActivities() {
-    return await dispatch(_fetchActivities());
+    return await dispatch(_fetchActivities()).unwrap();
   }
 
-  async function addOrUpdateActivity(activity: ActivityGQL) {
-    return await dispatch(_addOrUpdateActivity(activity));
-  }
-
-  async function loadBuiltActivities() {
-    return await dispatch(_fetchBuiltActivities());
+  async function loadBuiltActivities(): Promise<ActivityBuilder[]> {
+    return await dispatch(_fetchBuiltActivities()).unwrap();
   }
 
   function addNewLocalBuiltActivity(): ActivityBuilder {
@@ -125,20 +131,20 @@ export function useWithDocGoalsActivities() {
   }
 
   return {
-    getActivitById,
     loadDocGoals,
-    loadActivities,
     loadBuiltActivities,
-    addOrUpdateActivity,
     addOrUpdateBuiltActivity,
     addNewLocalBuiltActivity,
     copyBuiltActivity,
     deleteBuiltActivity,
+    getActivityById,
+    loadActivities,
     builtActivities,
     activities,
     docGoals: docGoalsActivities,
     isLoading:
-      activitiesLoadingState === LoadStatus.LOADING ||
-      docGoalsLoadingState === LoadStatus.LOADING,
+      docGoalsLoadingState === LoadStatus.LOADING ||
+      builtActivitiesLoadingState === LoadStatus.LOADING ||
+      activitiesLoadingState === LoadStatus.LOADING,
   };
 }

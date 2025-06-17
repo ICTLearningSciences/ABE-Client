@@ -218,7 +218,6 @@ export interface IActivityConfig {
 
 export interface IGoalActivites {
   goal: string;
-  activities: IActivityConfig[];
   builtActivities: IActivityConfig[];
 }
 
@@ -320,16 +319,7 @@ export interface ActivityPrompt {
   prompt: GQLPrompt;
 }
 
-export type ActivityTypes = ActivityGQL | ActivityBuilder;
-
-export function isActivityGql(
-  activity: ActivityGQL | ActivityBuilder
-): activity is ActivityGQL {
-  return (
-    !(activity as ActivityGQL).activityType ||
-    (activity as ActivityGQL).activityType === 'gql'
-  );
-}
+export type ActivityTypes = ActivityBuilder | ActivityGQL;
 
 export interface ActivityGQL extends IActivity {
   _id: string;
@@ -355,7 +345,6 @@ export interface DocGoalGQl {
 }
 
 export interface DocGoal extends DocGoalGQl {
-  activities: ActivityGQL[];
   builtActivities: ActivityBuilder[];
 }
 

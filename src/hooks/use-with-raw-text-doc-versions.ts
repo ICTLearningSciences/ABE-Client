@@ -28,6 +28,8 @@ export function useWithRawTextDocVersions(
   const [lastUpdatedPlainText, setLastUpdatedPlainText] = useState<string>('');
   const [lastSavedSessionId, setLastSavedSessionId] =
     useState<string>(sessionId);
+  const [lastSavedActivityId, setLastSavedActivityId] =
+    useState<string>(currentActivityId);
   const sessionIntention = useAppSelector(
     (state) => state.state.sessionIntention
   );
@@ -57,6 +59,7 @@ export function useWithRawTextDocVersions(
     setLastUpdatedPlainText(docText);
     setLastNumMessages(messages.length);
     setLastSavedSessionId(sessionId);
+    setLastSavedActivityId(currentActivityId);
     const newDocData: DocVersion = {
       docId: curDocId,
       plainText: docText,
@@ -81,7 +84,8 @@ export function useWithRawTextDocVersions(
   function checkForNewVersion(
     title: string,
     docText: string,
-    markdownText: string
+    markdownText: string,
+    currentActivityId: string
   ) {
     if (title !== lastUpdatedTitle) {
       updateDocTitleLocally(curDocId, title);
@@ -90,7 +94,8 @@ export function useWithRawTextDocVersions(
       title === lastUpdatedTitle &&
       docText === lastUpdatedPlainText &&
       messages.length === lastNumMessages &&
-      sessionId === lastSavedSessionId
+      sessionId === lastSavedSessionId &&
+      currentActivityId === lastSavedActivityId
     ) {
       return;
     }
@@ -103,7 +108,8 @@ export function useWithRawTextDocVersions(
         checkForNewVersion(
           docData.title,
           docData.plainText,
-          docData.markdownText
+          docData.markdownText,
+          currentActivityId
         );
       }
     },

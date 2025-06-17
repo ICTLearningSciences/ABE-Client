@@ -24,8 +24,7 @@ export const fetchDocGoalsResponse = {
                     "description": "Review and Revise your paper.",
                     "displayIcon": "PENCIL",
                     "introduction": "",
-                    "activities": [ "6580e4e80ac7bcb42fc8d279","658230f699045156193339ac","65a8592b26523c7ce5acac9e","65a8592b26523c7ce5acacsa"
-                    ]
+                    "activities": [],
                     
                 }
             },
