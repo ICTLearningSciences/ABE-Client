@@ -21,7 +21,7 @@ import {
   sendChatMessage,
 } from '../helpers/functions';
 import { DocVersion, LoginService, UserRole, testGoogleDocId } from '../helpers/types';
-import { myEditableActivityResponse, openAiJsonResponse } from '../fixtures/stronger-hook-activity/basic-json-response';
+import { myEditableActivityResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
 
 function writeDocumentIntention(cy: CypressGlobal, input: string) {
   cy.get('[data-cy=input-document-intention]')

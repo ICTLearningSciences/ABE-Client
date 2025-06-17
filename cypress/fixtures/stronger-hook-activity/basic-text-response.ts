@@ -7,6 +7,11 @@ The full terms of this copyright and license should always be found in the root 
 
 import { JobStatus, AiJobStatusApiRes } from "../../helpers/types"
 
+export function myEditableActivityResponse(){
+    return openAiTextResponse(JSON.stringify({
+        "nickname1": "3",
+      }))
+}
 
 export const openAiTextResponse = (resText: string, jobStatus?: JobStatus): AiJobStatusApiRes => {
     return {
