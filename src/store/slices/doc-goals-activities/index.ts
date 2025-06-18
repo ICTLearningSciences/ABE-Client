@@ -9,7 +9,6 @@ import { ActivityGQL, DocGoalGQl } from '../../../types';
 import {
   fetchDocGoals as _fetchDocGoals,
   fetchActivities as _fetchActivities,
-  addOrUpdateActivity as _addOrUpdateActivity,
 } from '../../../hooks/api';
 import {
   fetchBuiltActivities as _fetchBuiltActivities,
@@ -64,13 +63,6 @@ export const fetchActivities = createAsyncThunk(
   'state/fetchActivities',
   async () => {
     return await _fetchActivities();
-  }
-);
-
-export const addOrUpdateActivity = createAsyncThunk(
-  'state/addOrUpdateActivity',
-  async (activity: ActivityGQL) => {
-    return await _addOrUpdateActivity(activity);
   }
 );
 
@@ -165,15 +157,6 @@ export const stateSlice = createSlice({
       })
       .addCase(fetchBuiltActivities.rejected, (state) => {
         state.builtActivitiesLoadStatus = LoadStatus.FAILED;
-      })
-
-      .addCase(addOrUpdateActivity.fulfilled, (state, action) => {
-        state.activities = state.activities.map((a) => {
-          if (a._id === action.payload._id) {
-            return action.payload;
-          }
-          return a;
-        });
       })
 
       .addCase(addOrUpdateBuiltActivity.fulfilled, (state, action) => {

@@ -426,6 +426,7 @@ export function PromptStepBuilder(props: {
         flexDirection: 'column',
         padding: 10,
       }}
+      data-cy="prompt-step-builder"
     >
       <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>
       <div
@@ -468,6 +469,7 @@ export function PromptStepBuilder(props: {
                 onClick={() => {
                   executePromptTest();
                 }}
+                data-cy="run-prompt-button"
               >
                 Run
               </Button>
@@ -522,6 +524,7 @@ export function PromptStepBuilder(props: {
             width: 'fit-content',
             alignSelf: 'center',
           }}
+          data-cy="preview-prompt-button"
           onClick={() => {
             if (previewed) {
               stopPreview();

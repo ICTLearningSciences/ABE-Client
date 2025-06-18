@@ -4,20 +4,28 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { cyMockDefault, cyMockOpenAiCall, toPromptEditing } from "../helpers/functions";
-import { UserRole } from "../helpers/types";
+import {
+  AiJobStatusType,
+  AiResponseType,
+  AiServiceStepDataTypes,
+  AiStepData,
+} from './ai-service-types';
+import Anthropic from '@anthropic-ai/sdk';
+export type AnthropicReqType =
+  Anthropic.Messages.MessageCreateParamsNonStreaming;
+export type AnthropicResType = Anthropic.Messages.Message;
 
+export type AnthropicStepDataType = AiStepData<
+  AnthropicReqType,
+  AnthropicResType
+>;
+export type AnthropicPromptResponse = AiResponseType<AnthropicStepDataType>;
 
+export type AnthropicServiceJobStatusResponseType =
+  AiJobStatusType<AnthropicPromptResponse>;
 
-describe('Prompt Editing', () => {
-
-    it("Can visit prompt editing", ()=>{
-      cyMockDefault(cy, {
-        userRole: UserRole.ADMIN
-      });
-      cyMockOpenAiCall(cy, {response: {data:{error:"Error Message"}}, statusCode: 500})
-      toPromptEditing(cy);
-      cy.get("[data-cy=run-prompt-button]").click();
-      cy.get("[data-cy=error-dialog]").should("contain.text", "Error Message")
-    })
-  });
+export function isAnthropicData(
+  stepData: AiServiceStepDataTypes
+): stepData is AnthropicStepDataType {
+  return 'content' in stepData.aiServiceResponse;
+}

@@ -16,15 +16,12 @@ import {
   ActivityTypes,
   AiServiceModel,
   DocGoal,
-  isActivityGql,
 } from '../../../types';
 import SystemPromptModal from './system-prompt-modal';
 import { useWithSystemPromptsConfig } from '../../../hooks/use-with-system-prompts-config';
 import { UserRole } from '../../../store/slices/login';
 import useWithFreeInput from '../../../hooks/use-with-free-input';
-import { useWithActivityHandler } from '../../../hooks/use-with-activity-handler';
 import { useWithState } from '../../../store/slices/state/use-with-state';
-import { UseWithPrompts } from '../../../hooks/use-with-prompts';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import {
   aiServiceModelStringParse,
@@ -53,9 +50,8 @@ export function Chat(props: {
   selectedActivity?: ActivityTypes;
   editDocGoal: () => void;
   setSelectedActivity: (activity: ActivityGQL) => void;
-  useWithPrompts: UseWithPrompts;
 }) {
-  const { selectedGoal, selectedActivity, editDocGoal, useWithPrompts } = props;
+  const { selectedGoal, selectedActivity, editDocGoal } = props;
   const { sendMessage, state: chatState, setSystemRole } = useWithChat();
   const {
     editedData: systemPromptData,
@@ -75,15 +71,6 @@ export function Chat(props: {
   const userIsAdmin = userRole === UserRole.ADMIN;
   const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
   useWithFreeInput(!selectedActivity ? selectedGoal : undefined);
-  const { activityReady } = useWithActivityHandler(
-    useWithPrompts,
-    editDocGoal,
-    resetActivityCounter,
-    selectedGoal,
-    selectedActivity && isActivityGql(selectedActivity)
-      ? selectedActivity
-      : undefined
-  );
   const { activityReady: builtActivityReady } = useWithBuiltActivityHandler(
     resetActivityCounter,
     editDocGoal,
@@ -93,8 +80,7 @@ export function Chat(props: {
   );
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
   const goalHasActivities =
-    (selectedGoal?.activities && selectedGoal.activities.length > 0) ||
-    (selectedGoal?.builtActivities && selectedGoal.builtActivities.length > 0);
+    selectedGoal?.builtActivities && selectedGoal.builtActivities.length > 0;
   const disableInput =
     coachResponsePending ||
     Boolean(
@@ -128,7 +114,7 @@ export function Chat(props: {
       }}
     >
       <GlobalChatStyles />
-      {activityReady || builtActivityReady || !goalHasActivities ? (
+      {builtActivityReady || !goalHasActivities ? (
         <>
           <div
             data-cy="chat-box"

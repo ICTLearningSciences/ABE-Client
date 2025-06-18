@@ -4,10 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import {
-  AiServicesResponseTypes,
-  extractServiceStepResponse,
-} from '../../ai-services/ai-service-types';
+import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
 import {
   ActivityBuilder,
   ActivityBuilderStep,
@@ -583,7 +580,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // handle sending prompt
     const requestFunction = async () => {
       const _response = await this.executePrompt(aiPromptSteps);
-      const response = extractServiceStepResponse(_response, 0);
+      const response = _response.answer;
       if (step.outputDataType === PromptOutputTypes.JSON) {
         if (!isJsonString(response)) {
           throw new Error('Did not receive valid JSON data');

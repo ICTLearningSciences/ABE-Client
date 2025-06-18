@@ -11,13 +11,12 @@ import { EditGoogleDoc } from './user-view/user-edit-google-doc';
 import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { URL_PARAM_NEW_DOC } from '../constants';
-import { useWithPrompts } from '../hooks/use-with-prompts';
 import { useNavigateWithParams } from '../hooks/use-navigate-with-params';
 
 function DocView(): JSX.Element {
   const { docId } = useParams<Record<string, string>>();
   const navigate = useNavigateWithParams();
-  const { updateCurrentDocId } = useWithState();
+  const { updateCurrentDocId, newSession } = useWithState();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const activityFromParams = queryParams.get('activityId');
@@ -27,13 +26,15 @@ function DocView(): JSX.Element {
   const [urlSearchParams] = useSearchParams();
   const isNewGoogleDoc = urlSearchParams.get(URL_PARAM_NEW_DOC) === 'true';
 
-  const prompts = useWithPrompts();
-
   useEffect(() => {
     if (docId) {
       updateCurrentDocId(docId);
     }
   }, [docId]);
+
+  useEffect(() => {
+    newSession();
+  }, []);
 
   if (!docId) {
     navigate('/docs');
@@ -47,7 +48,6 @@ function DocView(): JSX.Element {
       activityFromParams={activityFromParams || ''}
       goalFromParams={goalFromParams || ''}
       isNewDoc={isNewGoogleDoc}
-      useWithPrompts={prompts}
     />
   );
 }

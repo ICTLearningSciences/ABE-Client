@@ -81,8 +81,8 @@ function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
 
   const open = Boolean(anchorEl);
 
-  const { getActivitById } = useWithDocGoalsActivities();
-  const activity = getActivitById(activityId);
+  const { getActivityById } = useWithDocGoalsActivities();
+  const activity = getActivityById(activityId);
   const activityTitle = activity?.title || '';
   return (
     <Text3>

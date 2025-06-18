@@ -41,11 +41,11 @@ import {
 timeline point's version. */
 const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
   const { timelinePoint } = props;
-  const { getActivitById } = useWithDocGoalsActivities();
+  const { getActivityById } = useWithDocGoalsActivities();
   const { getCurrentDoc } = useWithUsersDocs();
   const { docId } = useParams<Record<string, string>>();
 
-  const activity = getActivitById(timelinePoint.version.activity || '');
+  const activity = getActivityById(timelinePoint.version.activity || '');
   const googleDoc = getCurrentDoc(docId);
   const title = activity?.title || googleDoc?.title || '';
 

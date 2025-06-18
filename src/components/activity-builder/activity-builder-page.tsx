@@ -13,9 +13,8 @@ import { ActivityBuilder } from './types';
 export function ActivityBuilderPage(props: {
   goToActivity: (activity: ActivityBuilder) => void;
   curActivity?: ActivityBuilder;
-  goToOldActivityEditor: () => void;
 }): JSX.Element {
-  const { goToActivity, curActivity, goToOldActivityEditor } = props;
+  const { goToActivity, curActivity } = props;
   const {
     builtActivities,
     addOrUpdateBuiltActivity,
@@ -33,7 +32,6 @@ export function ActivityBuilderPage(props: {
     return (
       <SelectCreateActivity
         copyActivity={copyBuiltActivity}
-        goToOldActivityEditor={goToOldActivityEditor}
         goToActivity={goToActivity}
         builtActivities={builtActivities}
         onEditActivity={(activity) => {

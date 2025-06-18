@@ -4,12 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { AiServicesResponseTypes } from './ai-services/ai-service-types';
 import {
   ActivityBuilder,
   IActivity,
 } from './components/activity-builder/types';
 import { DisplayIcons } from './helpers/display-icon-helper';
-import { StepData } from './hooks/use-with-stronger-hook-activity';
 import { ChatMessageTypes, UserInputType } from './store/slices/chat';
 import { LoginService, UserRole } from './store/slices/login';
 
@@ -218,7 +218,6 @@ export interface IActivityConfig {
 
 export interface IGoalActivites {
   goal: string;
-  activities: IActivityConfig[];
   builtActivities: IActivityConfig[];
 }
 
@@ -288,6 +287,18 @@ export interface ActivityStepGQL {
   prompts?: string[];
 }
 
+export interface StepData {
+  executePrompt: (
+    prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
+    callback?: (response: AiServicesResponseTypes) => void,
+    customSystemRoleMessage?: string
+  ) => Promise<void>;
+  openSelectActivityModal: () => void;
+  sendMessage: (msg: ChatMessageTypes) => void;
+  setWaitingForUserAnswer: (waiting: boolean) => void;
+  updateSessionIntention: (intention?: Intention) => void;
+}
+
 export interface Activity extends ActivityGQL {
   steps: ActivityStepGQL[];
   getStep: (stepData: StepData) => ActiveActivityStep;
@@ -308,16 +319,7 @@ export interface ActivityPrompt {
   prompt: GQLPrompt;
 }
 
-export type ActivityTypes = ActivityGQL | ActivityBuilder;
-
-export function isActivityGql(
-  activity: ActivityGQL | ActivityBuilder
-): activity is ActivityGQL {
-  return (
-    !(activity as ActivityGQL).activityType ||
-    (activity as ActivityGQL).activityType === 'gql'
-  );
-}
+export type ActivityTypes = ActivityBuilder | ActivityGQL;
 
 export interface ActivityGQL extends IActivity {
   _id: string;
@@ -343,7 +345,6 @@ export interface DocGoalGQl {
 }
 
 export interface DocGoal extends DocGoalGQl {
-  activities: ActivityGQL[];
   builtActivities: ActivityBuilder[];
 }
 

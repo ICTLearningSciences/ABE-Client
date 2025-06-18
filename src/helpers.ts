@@ -6,17 +6,14 @@ The full terms of this copyright and license should always be found in the root 
 */
 import axios from 'axios';
 import {
-  ActivityGQL,
-  GQLPrompt,
   GQLTimelinePoint,
   AiGenerationStatus,
-  PromptConfiguration,
   AiServiceModel,
   AiServiceNames,
   User,
 } from './types';
 import Validator, { Schema } from 'jsonschema';
-import { ChatLog, Sender, UserInputType } from './store/slices/chat';
+import { ChatLog } from './store/slices/chat';
 import {
   ActivityBuilder,
   ActivityBuilderVisibility,
@@ -140,17 +137,6 @@ export function validateJsonResponse<T>(response: string, schema: Schema): T {
   }
 }
 
-export function getLastUserMessage(chatLog: ChatLog) {
-  const reversedChatLog: ChatLog = [...chatLog].reverse();
-  const lastUserMessage = reversedChatLog.find(
-    (msg) =>
-      msg.sender === Sender.USER &&
-      msg.userInputType === UserInputType.FREE_INPUT
-  );
-  const message = lastUserMessage ? lastUserMessage.message : '';
-  return message;
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type GenericObject = Record<string, any>;
 
@@ -172,66 +158,6 @@ export function removeDuplicatesByField<T extends GenericObject>(
   });
 }
 
-export function isPromptInActivity(
-  prompt: GQLPrompt,
-  activities: ActivityGQL[]
-): boolean {
-  return activities.some((activities) => {
-    const prompts = activities.prompts;
-    if (prompts) {
-      return prompts.find((p) => p.promptId === prompt._id);
-    }
-    return false;
-  });
-}
-
-export function isPromptOrphan(
-  prompt: GQLPrompt,
-  activities: ActivityGQL[]
-): boolean {
-  return (
-    !activities.find((activity) => activity.prompt?._id === prompt._id) &&
-    !activities.some((activities) => {
-      const prompts = activities.prompts;
-      if (prompts) {
-        return prompts.find((p) => p.promptId === prompt._id);
-      }
-      return false;
-    })
-  );
-}
-
-export function addContextToPromptSteps(
-  prompt: GQLPrompt,
-  context: PromptConfiguration[]
-) {
-  return {
-    ...prompt,
-    aiPromptSteps: prompt.aiPromptSteps.map((step) => {
-      return {
-        ...step,
-        prompts: [...context, ...step.prompts],
-      };
-    }),
-  };
-}
-
-export function getPromptsByIds(
-  promptIds: string[],
-  prompts: GQLPrompt[]
-): Record<string, GQLPrompt> {
-  if (!prompts) {
-    return {};
-  }
-  const promptsById: Record<string, GQLPrompt> = {};
-  prompts.forEach((prompt) => {
-    if (promptIds.includes(prompt._id)) {
-      promptsById[prompt._id] = prompt;
-    }
-  });
-  return promptsById;
-}
-
 export function hasHoursPassed(
   lastDateISOtime: string,
   nextDateISOtime: string,
@@ -251,27 +177,6 @@ export function hasMinutesPassed(
     new Date().getTime() - new Date(timeToCheck).getTime() > minutes * 60 * 1000
   );
 }
-
-/**
- * This TypeScript function converts a given date string into a formatted date and time string in UTC
- * timezone.
- */
-export const convertDateTimelinePointDate = (date: string): string => {
-  if (!date) return '';
-  const timestamp = new Date(date);
-
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true,
-    timeZone: 'UTC',
-  };
-
-  return timestamp.toLocaleString('en-US', options);
-};
 
 /**
  * The function `convertDateTimelinePointTime` takes a date string as input and returns the time in

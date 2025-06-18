@@ -163,10 +163,7 @@ export function DocGoalModal(props: {
   }
 
   function goalHasActivities(goal: DocGoal) {
-    return (
-      (goal.activities && goal.activities.length) ||
-      goal.builtActivities?.length
-    );
+    return goal.builtActivities?.length;
   }
 
   function completeModal(goal: DocGoal) {
@@ -257,12 +254,9 @@ export function DocGoalModal(props: {
       );
     } else {
       return (
-        _selectedGoal?.activities && (
+        _selectedGoal?.builtActivities && (
           <ActivitiesDisplay
-            activities={[
-              ..._selectedGoal.activities,
-              ..._selectedGoal.builtActivities,
-            ]}
+            activities={_selectedGoal.builtActivities}
             setSelectedActivity={_setSelectedActivity}
             selectedActivity={_selectedActivity}
           />
