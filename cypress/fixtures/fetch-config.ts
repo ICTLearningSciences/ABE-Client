@@ -55,20 +55,45 @@ export const fetchConfigResponse: FetchConfigResponse = {
             "serviceName": AiServiceNames.OPEN_AI,
             "model": "gpt-3.5-turbo-16k"
         },
-        "availableAiServiceModels": [
+        "aiServiceModelConfigs": [
             {
                 "serviceName": AiServiceNames.OPEN_AI,
-                "models": [
-                    "gpt-3.5-turbo-16k",
-                    "gpt-4",
-                    "gpt-4-turbo-preview"
+                "modelList": [
+                    {
+                        "name": "gpt-3.5-turbo-16k",
+                        "maxTokens": 16384,
+                        "supportsWebSearch": true,
+                        "onlyAdminUse": false
+                    },
+                    {
+                        "name": "gpt-4",
+                        "maxTokens": 8192,
+                        "supportsWebSearch": true,
+                        "onlyAdminUse": false
+                    },
+                    {
+                        "name": "gpt-4-turbo-preview",
+                        "maxTokens": 16384,
+                        "supportsWebSearch": true,
+                        "onlyAdminUse": false
+                    }
                 ]
             },
             {
                 "serviceName": AiServiceNames.AZURE,
-                "models": [
-                    "ABE-GPT-3_5_turbo_16k",
-                    "ABE-gpt-4-turbo-preview"
+                "modelList": [
+                    {
+                        "name": "ABE-GPT-3_5_turbo_16k",
+                        "maxTokens": 16384,
+                        "supportsWebSearch": true,
+                        "onlyAdminUse": false
+                    },
+                    {
+                        "name": "ABE-gpt-4-turbo-preview",
+                        "maxTokens": 16384,
+                        "supportsWebSearch": true,
+                        "onlyAdminUse": false
+                    }
                 ]
             }
         ],

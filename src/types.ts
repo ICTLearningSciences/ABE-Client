@@ -236,6 +236,19 @@ export interface SurveyConfig {
   surveyClassroomParam: string;
 }
 
+export interface ServiceModelInfo {
+  name: string;
+  maxTokens: number;
+  supportsWebSearch: boolean;
+  onlyAdminUse?: boolean;
+  disabled?: boolean;
+}
+
+export type AiServiceModelConfigs = {
+  serviceName: AiServiceNames;
+  modelList: ServiceModelInfo[];
+};
+
 export interface Config {
   aiSystemPrompt: string[];
   colorTheme?: ColorThemeConfig;
@@ -243,8 +256,7 @@ export interface Config {
   exampleGoogleDocs?: string[];
   overrideAiModel?: AiServiceModel;
   defaultAiModel?: AiServiceModel;
-  availableAiServiceModels?: AvailableAiServiceModels[];
-  emailAiServiceModels?: AvailableAiServiceModels[];
+  aiServiceModelConfigs?: AiServiceModelConfigs[];
   approvedEmailsForAiModels?: string[];
   headerTitle?: string; // first word will be golden
   orgName?: string;

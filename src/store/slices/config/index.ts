@@ -61,13 +61,14 @@ export const configSlice = createSlice({
         state.status = ConfigStatus.IN_PROGRESS;
       })
       .addCase(getConfig.fulfilled, (state, action) => {
-        const availableAiServiceModels =
-          action.payload.availableAiServiceModels;
+        const aiServiceModelConfigs = action.payload.aiServiceModelConfigs;
         const firstAvailableAiServiceModel: AiServiceModel | undefined =
-          availableAiServiceModels && availableAiServiceModels.length > 0
+          aiServiceModelConfigs &&
+          aiServiceModelConfigs.length > 0 &&
+          aiServiceModelConfigs[0].modelList.length > 0
             ? {
-                serviceName: availableAiServiceModels[0].serviceName,
-                model: availableAiServiceModels[0].models[0],
+                serviceName: aiServiceModelConfigs[0].serviceName,
+                model: aiServiceModelConfigs[0].modelList[0].name,
               }
             : undefined;
         const defaultAiModel =
