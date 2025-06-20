@@ -38,6 +38,12 @@ export function useWithBuiltActivityHandler(
   );
 
   useEffect(() => {
+    if (builtActivityHandler) {
+      builtActivityHandler.executePrompt = executePromptSteps;
+    }
+  }, [executePromptSteps]);
+
+  useEffect(() => {
     if (!curDocId) {
       //hack to ensure that sendMessageHelper is fully loaded with googleDocId
       return;
