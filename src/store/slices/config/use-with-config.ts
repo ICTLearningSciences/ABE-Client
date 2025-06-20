@@ -21,16 +21,17 @@ export function useWithConfig(): UseWithConfig {
   const dispatch = useAppDispatch();
   const state = useAppSelector((state) => state.config);
   const userEmail = useAppSelector((state) => state.login.user?.email);
-  const _availableAiServiceModels = state.config?.availableAiServiceModels;
   const approvedEmailsForAiModels = state.config?.approvedEmailsForAiModels;
   const isApprovedEmail =
     userEmail && approvedEmailsForAiModels?.includes(userEmail);
-  const availableAiServiceModels = !isApprovedEmail
-    ? _availableAiServiceModels || []
-    : [
-        ...(_availableAiServiceModels || []),
-        ...(state.config?.emailAiServiceModels || []),
-      ];
+  const _aiServiceModelConfigs = state.config?.aiServiceModelConfigs || [];
+  // If not approved email, filter out the models that are onlyAdminUse
+  const aiServiceModelConfigs = isApprovedEmail
+    ? _aiServiceModelConfigs
+    : _aiServiceModelConfigs.map((config) => ({
+        ...config,
+        modelList: config.modelList.filter((model) => !model.onlyAdminUse),
+      }));
 
   function isConfigLoaded(): boolean {
     return state.status === config.ConfigStatus.SUCCEEDED;
@@ -56,7 +57,10 @@ export function useWithConfig(): UseWithConfig {
 
   return {
     state,
-    availableAiServiceModels,
+    availableAiServiceModels: aiServiceModelConfigs.map((config) => ({
+      serviceName: config.serviceName,
+      models: config.modelList.map((model) => model.name),
+    })),
     loadConfig,
     isConfigLoaded,
     updateConfig,

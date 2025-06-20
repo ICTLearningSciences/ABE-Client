@@ -272,6 +272,20 @@ export interface AiServiceModel {
   model: string;
 }
 
+export interface ServiceModelInfo {
+  name: string;
+  maxTokens: number;
+  supportsWebSearch: boolean;
+  onlyAdminUse?: boolean;
+  disabled?: boolean;
+}
+
+
+export type AiServiceModelConfigs = {
+  serviceName: AiServiceNames;
+  modelList: ServiceModelInfo[];
+};
+
 export interface AiPromptStep {
   prompts: PromptConfiguration[];
   targetAiServiceModel?: AiServiceModel;
@@ -334,12 +348,13 @@ export interface Config {
   exampleGoogleDocs?: string[];
   overrideAiModel?: AiServiceModel;
   defaultAiModel?: AiServiceModel;
-  availableAiServiceModels?: AvailableAiServiceModels[];
 
   headerTitle?: string; // first word will be golden
   orgName?: string;
   loginScreenTitle?: string;
   surveyConfig?: SurveyConfig;
+
+  aiServiceModelConfigs?: AiServiceModelConfigs[];
 }
 
 export enum ActivityStepTypes {

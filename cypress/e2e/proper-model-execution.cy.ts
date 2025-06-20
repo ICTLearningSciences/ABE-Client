@@ -127,7 +127,7 @@ describe("prompt requests use proper model execution", ()=>{
                         runFirstAvailablePrompt(cy);
                         confirmModelInAiRequest({
                             serviceName: AiServiceNames.OPEN_AI,
-                            model: fetchConfigResponse.fetchConfig.availableAiServiceModels![0].models[0]
+                            model: fetchConfigResponse.fetchConfig.aiServiceModelConfigs![0].modelList![0].name
                         });
                     })
             
@@ -170,7 +170,7 @@ describe("prompt requests use proper model execution", ()=>{
                             ...fetchConfigResponse.fetchConfig,
                             overrideAiModel: undefined,
                             defaultAiModel: undefined,
-                            availableAiServiceModels: []
+                            aiServiceModelConfigs: []
                         }
                     }),
                     mockGQL('FetchPrompts', setPromptsTargetModel(undefined)),

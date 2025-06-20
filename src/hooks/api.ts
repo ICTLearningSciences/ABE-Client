@@ -531,14 +531,6 @@ export async function fetchConfig(subdomain?: string): Promise<Config> {
               serviceName
               model
             }
-            availableAiServiceModels{
-              serviceName
-              models
-            }
-            emailAiServiceModels{
-              serviceName
-              models
-            }
             approvedEmailsForAiModels
             headerTitle
             orgName
@@ -552,6 +544,15 @@ export async function fetchConfig(subdomain?: string): Promise<Config> {
               bannerText
               bannerTextColor
               bannerBgColor
+            }
+            aiServiceModelConfigs{
+              serviceName
+              modelList{
+                name
+                maxTokens
+                supportsWebSearch
+                onlyAdminUse
+              }
             }
           }
         }
