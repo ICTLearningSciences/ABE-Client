@@ -28,15 +28,6 @@ export const LOADING_NAME = 'Loading';
 
 export const MOBILE_CUTOFF_SIZE = 1300;
 
-export enum GptModels {
-  OPEN_AI_GPT_3_5 = 'gpt-3.5-turbo-16k',
-  OPEN_AI_GPT_4_TURBO_PREVIEW = 'gpt-4-turbo-preview',
-  OPEN_AI_GPT_4 = 'gpt-4',
-  AZURE_GPT_3_5 = 'ABE-GPT-3_5_turbo_16k',
-  AZURE_GPT_4_TURBO_PREVIEW = 'ABE-gpt-4-turbo-preview',
-  NONE = '',
-}
-
 export const FREE_INPUT_GOAL_ID = '65823a8799045156193339b2';
 
 export const STRONGER_HOOK_ID = '658230f699045156193339ac';

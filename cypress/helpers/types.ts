@@ -6,12 +6,8 @@ The full terms of this copyright and license should always be found in the root 
 */
 import OpenAI from 'openai';
 import { AiServiceStepDataTypes } from '../../src/ai-services/ai-service-types';
-export enum GptModels {
-  GPT_3_5 = 'gpt-3.5-turbo-16k',
-  GPT_4 = 'gpt-4',
-  GPT_4_TURBO_PREVIEW = 'gpt-4-turbo-preview',
-  NONE = '',
-}
+
+
 export const testGoogleDocId = '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y';
 
 export enum DisplayIcons {
