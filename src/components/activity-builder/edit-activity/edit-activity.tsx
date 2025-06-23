@@ -127,41 +127,55 @@ export function EditActivity(props: {
       <ColumnDiv
         data-cy="edit-activity-header"
         style={{
+          width: '50%',
           alignSelf: 'center',
+          justifyContent: 'center',
           alignItems: 'center',
         }}
       >
-        <RowDiv>
-          <InputField
-            label="Activity Name"
-            value={localActivityCopy.title}
-            width="fit-content"
-            disabled={!canEditActivity}
-            key={localActivityCopy.clientId}
-            onChange={(v) => {
-              setLocalActivityCopy((prevValue) => {
-                return {
-                  ...prevValue,
-                  title: v,
-                };
-              });
-            }}
-          />
-          <SelectInputField
-            label="Visibility"
-            value={localActivityCopy.visibility}
-            options={Object.values(ActivityBuilderVisibility)}
-            disabled={!canEditActivity}
-            onChange={(v) => {
-              setLocalActivityCopy((prevValue) => {
-                return {
-                  ...prevValue,
-                  visibility: v as ActivityBuilderVisibility,
-                };
-              });
-            }}
-          />
-        </RowDiv>
+        <InputField
+          label="Activity Name"
+          value={localActivityCopy.title}
+          width="100%"
+          disabled={!canEditActivity}
+          key={localActivityCopy.clientId}
+          onChange={(v) => {
+            setLocalActivityCopy((prevValue) => {
+              return {
+                ...prevValue,
+                title: v,
+              };
+            });
+          }}
+        />
+        <InputField
+          label="Activity Description"
+          width="100%"
+          value={localActivityCopy.description}
+          onChange={(v) => {
+            setLocalActivityCopy((prevValue) => {
+              return {
+                ...prevValue,
+                description: v,
+              };
+            });
+          }}
+        />
+        <SelectInputField
+          label="Visibility"
+          value={localActivityCopy.visibility}
+          options={Object.values(ActivityBuilderVisibility)}
+          disabled={!canEditActivity}
+          onChange={(v) => {
+            setLocalActivityCopy((prevValue) => {
+              return {
+                ...prevValue,
+                visibility: v as ActivityBuilderVisibility,
+              };
+            });
+          }}
+        />
+
         <RowDiv>
           <Button
             style={{
