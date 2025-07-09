@@ -45,6 +45,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
+import { InfoTooltip } from '../../../info-tooltip';
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
     clientId: uuid(),
@@ -55,12 +56,32 @@ export function getEmptyJsonResponseData(): JsonResponseData {
   };
 }
 
-export function defaultPromptBuilder(): PromptActivityStep {
+export function defaultEditDocPromptBuilder(): PromptActivityStep {
   return {
     stepId: uuid(),
     stepType: ActivityBuilderStepType.PROMPT,
     promptText: '',
     responseFormat: '',
+    editDoc: true,
+    outputDataType: PromptOutputTypes.TEXT,
+    jsonResponseData: [],
+    includeChatLogContext: false,
+    includeEssay: true,
+    customSystemRole: '',
+    jumpToStepId: '',
+  };
+}
+
+export function defaultPromptBuilder(editDoc?: boolean): PromptActivityStep {
+  if (editDoc) {
+    return defaultEditDocPromptBuilder();
+  }
+  return {
+    stepId: uuid(),
+    stepType: ActivityBuilderStepType.PROMPT,
+    promptText: '',
+    responseFormat: '',
+    editDoc: false,
     outputDataType: PromptOutputTypes.TEXT,
     jsonResponseData: [],
     includeChatLogContext: false,
@@ -390,6 +411,7 @@ export function PromptStepBuilder(props: {
       prompts: [],
       outputDataType: step.outputDataType,
       responseFormat: step.responseFormat,
+      editDoc: step.editDoc || false,
       systemRole: step.customSystemRole,
       webSearch: step.webSearch || false,
     });
@@ -548,7 +570,10 @@ export function PromptStepBuilder(props: {
       >
         <Delete />
       </IconButton>
-      <h4 style={{ alignSelf: 'center' }}>Prompt</h4>
+      <h4 style={{ alignSelf: 'center' }}>
+        {step.editDoc ? 'Edit Document Prompt' : 'Prompt'}
+        {step.editDoc ? <InfoTooltip title="This will enable the LLM to edit the text of the document. You will not be able to modify the response format for this type of prompt. Currently supported operations are: adding, removing, replacing, and highlighting text." /> : undefined}
+      </h4>
       {errors && errors.length > 0 && (
         <span style={{ color: 'red', textAlign: 'center' }}>
           {errors.join(', ')}
@@ -567,15 +592,17 @@ export function PromptStepBuilder(props: {
           }}
           width="100%"
         />
-        <SelectInputField
-          label="Output Data Type"
-          value={step.outputDataType}
-          options={[...Object.values(PromptOutputTypes)]}
-          onChange={(e) => {
-            updateField('outputDataType', e);
-          }}
-        />
-        {step.outputDataType === PromptOutputTypes.TEXT ? (
+        {!step.editDoc && (
+          <SelectInputField
+            label="Output Data Type"
+            value={step.outputDataType}
+            options={[...Object.values(PromptOutputTypes)]}
+            onChange={(e) => {
+              updateField('outputDataType', e);
+            }}
+          />
+        )}
+        {step.outputDataType === PromptOutputTypes.TEXT && !step.editDoc ? (
           <InputField
             label="Text Response Format"
             value={step.responseFormat}
@@ -610,13 +637,15 @@ export function PromptStepBuilder(props: {
           }}
         />
 
-        <CheckBoxInput
-          label="Include Essay"
-          value={step.includeEssay}
-          onChange={(e) => {
-            updateField('includeEssay', e);
-          }}
-        />
+        {!step.editDoc && (
+          <CheckBoxInput
+            label="Include Essay"
+            value={step.includeEssay}
+            onChange={(e) => {
+              updateField('includeEssay', e);
+            }}
+          />
+        )}
 
         <CheckBoxInput
           label="Enable Web Search"
@@ -626,14 +655,16 @@ export function PromptStepBuilder(props: {
           }}
         />
 
-        <InputField
-          label="Custom System Role"
-          value={step.customSystemRole}
-          onChange={(e) => {
-            updateField('customSystemRole', e);
-          }}
-          width="100%"
-        />
+        {!step.editDoc && (
+          <InputField
+            label="Custom System Role"
+            value={step.customSystemRole}
+            onChange={(e) => {
+              updateField('customSystemRole', e);
+            }}
+            width="100%"
+          />
+        )}
 
         <JumpToAlternateStep
           step={step}

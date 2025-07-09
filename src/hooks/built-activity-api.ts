@@ -59,6 +59,7 @@ export const fullBuiltActivityQueryData = `
                               jumpToStepId
                               promptText
                               responseFormat
+                              editDoc
                               includeChatLogContext
                               includeEssay
                               outputDataType

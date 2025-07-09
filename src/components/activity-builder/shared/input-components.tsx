@@ -13,6 +13,8 @@ import {
 } from '@mui/material';
 import { useDebouncedCallback } from '../../../hooks/use-debounced-callback';
 import { Edit as EditIcon, Save as SaveIcon } from '@mui/icons-material';
+import { RowDiv } from '../../../styled-components';
+import { InfoTooltip } from '../../info-tooltip';
 
 export function InputField(props: {
   label: string;
@@ -58,24 +60,28 @@ export function CheckBoxInput(props: {
   value: boolean;
   onChange: (value: boolean) => void;
   disabled?: boolean;
+  tooltip?: string;
 }): JSX.Element {
   return (
-    <FormControlLabel
-      label={props.label}
-      style={{
-        margin: 0,
-      }}
-      control={
-        <Checkbox
-          checked={Boolean(props.value)}
-          indeterminate={false}
-          onChange={(e) => {
-            props.onChange(e.target.checked);
-          }}
-          disabled={props.disabled}
-        />
-      }
-    />
+    <RowDiv>
+      <FormControlLabel
+        label={props.label}
+        style={{
+          margin: 0,
+        }}
+        control={
+          <Checkbox
+            checked={Boolean(props.value)}
+            indeterminate={false}
+            onChange={(e) => {
+              props.onChange(e.target.checked);
+            }}
+            disabled={props.disabled}
+          />
+        }
+      />
+      {props.tooltip && <InfoTooltip title={props.tooltip} />}
+    </RowDiv>
   );
 }
 

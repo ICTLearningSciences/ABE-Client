@@ -188,6 +188,7 @@ export interface AiPromptStep {
   includeChatLogContext?: boolean;
   responseFormat?: string;
   webSearch?: boolean;
+  editDoc?: boolean;
 }
 
 export enum PromptOutputTypes {

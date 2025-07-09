@@ -6,10 +6,17 @@ import { ActivityBuilderStepType } from '../types';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CloseIcon from '@mui/icons-material/Close';
 
+export type AddNewActivityStepType =
+  | ActivityBuilderStepType
+  | 'EDIT_DOC_PROMPT';
+
 export function AddNewActivityButton(props: {
-  insertNewActivityStep: (stepType: ActivityBuilderStepType) => void;
+  insertNewActivityStep: (stepType: AddNewActivityStepType) => void;
 }): JSX.Element {
-  const options = Object.values(ActivityBuilderStepType);
+  const options = [
+    ...Object.values(ActivityBuilderStepType),
+    'EDIT_DOC_PROMPT',
+  ];
   const [displayOptions, setDisplayOptions] = useState<boolean>(false);
   return (
     <div
@@ -35,7 +42,7 @@ export function AddNewActivityButton(props: {
                   marginRight: 5,
                 }}
                 onClick={() => {
-                  props.insertNewActivityStep(option);
+                  props.insertNewActivityStep(option as AddNewActivityStepType);
                   setDisplayOptions(false);
                 }}
               >

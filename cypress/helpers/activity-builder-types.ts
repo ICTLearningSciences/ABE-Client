@@ -176,6 +176,7 @@ export interface PromptActivityStepGql extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.PROMPT;
   promptText: string;
   responseFormat: string;
+  editDoc?: boolean;
   includeChatLogContext: boolean;
   includeEssay: boolean;
   outputDataType: PromptOutputTypes;

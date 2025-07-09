@@ -38,6 +38,7 @@ import {
   getDefaultConditionalStep,
 } from './step-builder/conditional-step-builder';
 import { StepErrors } from '../../../classes/activity-builder-activity/activity-step-error-checker';
+import { AddNewActivityStepType } from '../shared/add-new-activity-button';
 
 export function FlowStepsBuilderTab(props: {
   stepsErrors?: StepErrors;
@@ -138,7 +139,7 @@ export function FlowStepsBuilderTab(props: {
     });
   }
 
-  function insertNewActivityStep(stepType: ActivityBuilderStepType, i: number) {
+  function insertNewActivityStep(stepType: AddNewActivityStepType, i: number) {
     const newStep: ActivityBuilderStepTypes =
       stepType === ActivityBuilderStepType.SYSTEM_MESSAGE
         ? getDefaultSystemMessage()
@@ -146,7 +147,7 @@ export function FlowStepsBuilderTab(props: {
         ? getDefaultRequestUserInputBuilder()
         : stepType === ActivityBuilderStepType.CONDITIONAL
         ? getDefaultConditionalStep()
-        : defaultPromptBuilder();
+        : defaultPromptBuilder(stepType === 'EDIT_DOC_PROMPT');
     updateLocalActivity((prevValue) => {
       return {
         ...prevValue,

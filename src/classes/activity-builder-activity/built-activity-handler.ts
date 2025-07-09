@@ -548,6 +548,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       responseFormat,
       systemRole: customSystemRole,
       webSearch: step.webSearch || false,
+      editDoc: step.editDoc || false,
     });
 
     if (step.includeChatLogContext) {

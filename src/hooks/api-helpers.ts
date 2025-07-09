@@ -65,5 +65,6 @@ _id
                   outputDataType
                     includeChatLogContext
                     responseFormat
+                    editDoc
                   }
                   `;
