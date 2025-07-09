@@ -572,7 +572,9 @@ export function PromptStepBuilder(props: {
       </IconButton>
       <h4 style={{ alignSelf: 'center' }}>
         {step.editDoc ? 'Edit Document Prompt' : 'Prompt'}
-        {step.editDoc ? <InfoTooltip title="This will enable the LLM to edit the text of the document. You will not be able to modify the response format for this type of prompt. Currently supported operations are: adding, removing, replacing, and highlighting text." /> : undefined}
+        {step.editDoc ? (
+          <InfoTooltip title="This will enable the LLM to edit the text of the document. You will not be able to modify the response format for this type of prompt. Currently supported operations are: adding, removing, replacing, and highlighting text." />
+        ) : undefined}
       </h4>
       {errors && errors.length > 0 && (
         <span style={{ color: 'red', textAlign: 'center' }}>

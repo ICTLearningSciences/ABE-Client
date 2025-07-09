@@ -239,6 +239,7 @@ test('can collect data from ai response and display', async () => {
           promptRole: PromptRoles.USER,
         },
       ],
+      editDoc: false,
       outputDataType: PromptOutputTypes.JSON,
       responseFormat:
         'Respond in JSON. Validate that your response is valid JSON. Your JSON must follow this format:\n{\n  "nickname": "string"\n}\n',
@@ -305,6 +306,7 @@ test('can send data to prompt requests', async () => {
           promptRole: PromptRoles.USER,
         },
       ],
+      editDoc: false,
       outputDataType: PromptOutputTypes.JSON,
       responseFormat:
         'Respond in JSON. Validate that your response is valid JSON. Your JSON must follow this format:\n{\n  "nickname": "string"\t// a nickname generated for the supplied name\n}\n',
