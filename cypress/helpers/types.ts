@@ -288,6 +288,7 @@ export interface AiPromptStep {
   outputDataType: PromptOutputTypes;
   includeChatLogContext?: boolean;
   responseFormat?:string;
+  editDoc?: boolean;
 }
 
 export interface AiServiceResponse {
