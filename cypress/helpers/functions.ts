@@ -209,7 +209,7 @@ export function cyMockDefault(
       'RefreshAccessToken',
       refreshAccessTokenResponse(args.userRole || UserRole.USER)
     ),
-    mockGQL('DocVersions', fetchDocVersionsBuilder(docTimelineVersions)),
+    mockGQL('FetchVersionsById', fetchDocVersionsBuilder(docTimelineVersions)),
     mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.GOOGLE_DOCS)),
     mockGQL('FetchPrompts', fetchPromptTemplates),
     mockGQL('FetchConfig', fetchConfigResponse),
