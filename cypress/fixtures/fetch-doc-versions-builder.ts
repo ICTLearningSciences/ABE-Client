@@ -9,10 +9,6 @@ import { IGDocVersion } from "../helpers/types";
 
 export function fetchDocVersionsBuilder(versions: IGDocVersion[]) {
     return {
-        "docVersions": {
-            "edges": versions.map((version) => ({
-                "node": version,
-            })),
-        },
+        "fetchVersionsById": versions,
     };
 }
