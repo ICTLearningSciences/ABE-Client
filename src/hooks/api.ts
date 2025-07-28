@@ -915,10 +915,8 @@ export async function storeDocTimeline(
 }
 
 export const versionQueryData = `
- query DocVersions($limit: Int, $filterObject: Object, $sortAscending: Boolean, $sortBy: String) {
-                docVersions(limit: $limit, filterObject: $filterObject, sortAscending: $sortAscending, sortBy: $sortBy) {
-                      edges {
-                        node{
+query FetchVersionsById($ids: [String!]!) {
+  fetchVersionsById(ids: $ids) {
           _id
           docId
           plainText
@@ -948,31 +946,23 @@ export const versionQueryData = `
           modifiedTime
           createdAt
           updatedAt
-                        }
-                    }
-                    }
-                }`;
-
+}
+}`;
 export async function fetchDocVersions(
   versionIds: string[]
 ): Promise<IGDocVersion[]> {
-  const res = await execGql<Connection<IGDocVersion>>(
+  const res = await execGql<IGDocVersion[]>(
     {
       query: versionQueryData,
       variables: {
-        limit: 9999,
-        filterObject: {
-          _id: {
-            $in: versionIds,
-          },
-        },
+        ids: versionIds,
       },
     },
     {
-      dataPath: 'docVersions',
+      dataPath: 'fetchVersionsById',
     }
   );
-  return res.edges.map((edge) => edge.node);
+  return res;
 }
 
 export async function archiveDoc(
