@@ -1,4 +1,4 @@
-import { fetchCourses as _fetchCourses, fetchAssignments as _fetchAssignments, fetchSections as _fetchSections, fetchStudentsInMyCourses as _fetchStudentsInMyCourses, createCourse as _createCourse, updateCourse as _updateCourse, deleteCourse as _deleteCourse, LoadStatus } from '.';
+import { fetchCourses as _fetchCourses, fetchAssignments as _fetchAssignments, fetchSections as _fetchSections, fetchStudentsInMyCourses as _fetchStudentsInMyCourses, createCourse as _createCourse, updateCourse as _updateCourse, deleteCourse as _deleteCourse, createSection as _createSection, updateSection as _updateSection, deleteSection as _deleteSection, LoadStatus } from '.';
 import { Course, Assignment, Section, StudentData } from './educational-api';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
@@ -10,6 +10,9 @@ export interface UseWithEducationalManagement {
   createCourse: () => Promise<Course>;
   updateCourse: (courseData: Partial<Course>) => Promise<Course>;
   deleteCourse: (courseId: string) => Promise<Course>;
+  createSection: (courseId: string) => Promise<Section>;
+  updateSection: (courseId: string, sectionData: Partial<Section>) => Promise<Section>;
+  deleteSection: (courseId: string, sectionId: string) => Promise<Section>;
   courses: Course[];
   assignments: Assignment[];
   sections: Section[];
@@ -17,6 +20,8 @@ export interface UseWithEducationalManagement {
   isLoading: boolean;
   isCourseModifying: boolean;
   courseModificationFailed: boolean;
+  isSectionModifying: boolean;
+  sectionModificationFailed: boolean;
 }
 
 export function useWithEducationalManagement(): UseWithEducationalManagement {
@@ -35,6 +40,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   );
   const courseModificationStatus = useAppSelector(
     (state) => state.educationManagement.courseModificationStatus
+  );
+  const sectionModificationStatus = useAppSelector(
+    (state) => state.educationManagement.sectionModificationStatus
   );
   const courses = useAppSelector(
     (state) => state.educationManagement.courses
@@ -80,6 +88,21 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as Course;
   }
 
+  async function createSection(courseId: string) {
+    const res = await dispatch(_createSection(courseId));
+    return res.payload as Section;
+  }
+
+  async function updateSection(courseId: string, sectionData: Partial<Section>) {
+    const res = await dispatch(_updateSection({ courseId, sectionData }));
+    return res.payload as Section;
+  }
+
+  async function deleteSection(courseId: string, sectionId: string) {
+    const res = await dispatch(_deleteSection({ courseId, sectionId }));
+    return res.payload as Section;
+  }
+
   return {
     loadCourses,
     loadAssignments,
@@ -88,6 +111,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     createCourse,
     updateCourse,
     deleteCourse,
+    createSection,
+    updateSection,
+    deleteSection,
     courses,
     assignments,
     sections,
@@ -95,5 +121,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     isLoading: coursesLoadingState === LoadStatus.LOADING || assignmentsLoadingState === LoadStatus.LOADING || sectionsLoadingState === LoadStatus.LOADING || studentsLoadingState === LoadStatus.LOADING,
     isCourseModifying: courseModificationStatus === LoadStatus.LOADING,
     courseModificationFailed: courseModificationStatus === LoadStatus.FAILED,
+    isSectionModifying: sectionModificationStatus === LoadStatus.LOADING,
+    sectionModificationFailed: sectionModificationStatus === LoadStatus.FAILED,
   };
 }

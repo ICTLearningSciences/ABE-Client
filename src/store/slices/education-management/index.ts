@@ -14,7 +14,8 @@ import {
   fetchAssignments as _fetchAssignments,
   fetchSections as _fetchSections,
   fetchStudentsInMyCourses as _fetchStudentsInMyCourses,
-  addOrUpdateCourse as _addOrUpdateCourse
+  addOrUpdateCourse as _addOrUpdateCourse,
+  addOrUpdateSection as _addOrUpdateSection
 } from './educational-api';
 
 export enum LoadStatus {
@@ -32,6 +33,7 @@ export interface State {
   assignmentsLoadStatus: LoadStatus;
   sections: Section[];
   sectionsLoadStatus: LoadStatus;
+  sectionModificationStatus: LoadStatus;
   students: StudentData[];
   studentsLoadStatus: LoadStatus;
 }
@@ -44,6 +46,7 @@ const initialState: State = {
   assignmentsLoadStatus: LoadStatus.NONE,
   sections: [],
   sectionsLoadStatus: LoadStatus.NONE,
+  sectionModificationStatus: LoadStatus.NONE,
   students: [],
   studentsLoadStatus: LoadStatus.NONE,
 };
@@ -94,6 +97,27 @@ export const deleteCourse = createAsyncThunk(
   'educationManagement/deleteCourse',
   async (courseId: string) => {
     return await _addOrUpdateCourse({ _id: courseId }, 'DELETE');
+  }
+);
+
+export const createSection = createAsyncThunk(
+  'educationManagement/createSection',
+  async (courseId: string) => {
+    return await _addOrUpdateSection(courseId, undefined, 'CREATE');
+  }
+);
+
+export const updateSection = createAsyncThunk(
+  'educationManagement/updateSection',
+  async (params: { courseId: string; sectionData: Partial<Section> }) => {
+    return await _addOrUpdateSection(params.courseId, params.sectionData, 'MODIFY');
+  }
+);
+
+export const deleteSection = createAsyncThunk(
+  'educationManagement/deleteSection',
+  async (params: { courseId: string; sectionId: string }) => {
+    return await _addOrUpdateSection(params.courseId, { _id: params.sectionId }, 'DELETE');
   }
 );
 
@@ -192,6 +216,52 @@ export const educationManagementSlice = createSlice({
       })
       .addCase(deleteCourse.rejected, (state) => {
         state.courseModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Section creation
+      .addCase(createSection.pending, (state) => {
+        state.sectionModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(createSection.fulfilled, (state, action) => {
+        state.sectionModificationStatus = LoadStatus.SUCCEEDED;
+        // Add the new section to the list
+        state.sections.push(action.payload);
+      })
+      .addCase(createSection.rejected, (state) => {
+        state.sectionModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Section update
+      .addCase(updateSection.pending, (state) => {
+        state.sectionModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(updateSection.fulfilled, (state, action) => {
+        state.sectionModificationStatus = LoadStatus.SUCCEEDED;
+        // Update the existing section in the list
+        const sectionIndex = state.sections.findIndex(
+          (s) => s._id === action.payload._id
+        );
+        if (sectionIndex >= 0) {
+          state.sections[sectionIndex] = action.payload;
+        }
+      })
+      .addCase(updateSection.rejected, (state) => {
+        state.sectionModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Section deletion
+      .addCase(deleteSection.pending, (state) => {
+        state.sectionModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(deleteSection.fulfilled, (state, action) => {
+        state.sectionModificationStatus = LoadStatus.SUCCEEDED;
+        // Remove the section from the list
+        state.sections = state.sections.filter(
+          (s) => s._id !== action.payload._id
+        );
+      })
+      .addCase(deleteSection.rejected, (state) => {
+        state.sectionModificationStatus = LoadStatus.FAILED;
       });
   },
 });

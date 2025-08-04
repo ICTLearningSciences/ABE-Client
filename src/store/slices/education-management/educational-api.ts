@@ -222,3 +222,33 @@ export async function addOrUpdateCourse(
   );
   return res;
 }
+
+// Create, modify, or delete a section
+export async function addOrUpdateSection(
+  courseId: string,
+  sectionData?: Partial<Section>,
+  action: 'CREATE' | 'MODIFY' | 'DELETE' = 'CREATE'
+): Promise<Section> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Section>(
+    {
+      query: `
+        mutation AddOrUpdateSection($courseId: ID!, $sectionData: SectionInputType, $action: SectionAction!) {
+          addOrUpdateSection(courseId: $courseId, sectionData: $sectionData, action: $action) {
+            ${sectionQueryData}
+          }
+        }
+      `,
+      variables: {
+        courseId,
+        sectionData,
+        action,
+      },
+    },
+    {
+      dataPath: 'addOrUpdateSection',
+      accessToken,
+    }
+  );
+  return res;
+}
