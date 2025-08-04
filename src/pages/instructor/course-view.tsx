@@ -15,9 +15,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { courseEditUrl } from './course-edit';
 import SectionViewItem from './components/section-view-item';
-
-export const sectionViewUrl = (courseId: string, sectionId: string) =>
-  `/section-view/${courseId}/${sectionId}`;
+import { sectionViewUrl } from './section-view';
 
 export default function CourseView() {
   const { courseId } = useParams<{ courseId: string }>();

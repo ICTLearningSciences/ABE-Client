@@ -11,19 +11,15 @@ import { TwoOptionDialog } from '../../components/dialog';
 import SectionListItem from './components/section-list-item';
 import { instructorDashboardUrl } from './dashboard';
 import { Course } from '../../store/slices/education-management/types';
+import { sectionViewUrl } from './section-view';
 
 export const courseEditPath = '/course-edit/:courseId/edit';
 export const courseViewPath = '/course-view/:courseId/view';
-export const sectionEditPath = '/section-edit/:courseId/:sectionId';
 
 export const courseEditUrl = (courseId: string) =>
   courseEditPath.replace(':courseId', courseId);
 export const courseViewUrl = (courseId: string) =>
   courseViewPath.replace(':courseId', courseId);
-export const sectionEditUrl = (courseId: string, sectionId: string) =>
-  sectionEditPath
-    .replace(':courseId', courseId)
-    .replace(':sectionId', sectionId);
 
 export default function CourseEdit() {
   const { courseId } = useParams<{ courseId: string }>();
@@ -97,14 +93,14 @@ export default function CourseEdit() {
 
     try {
       const newSection = await createSection(courseId);
-      navigate(sectionEditUrl(courseId, newSection._id));
+      navigate(sectionViewUrl(courseId, newSection._id));
     } catch (error) {
       console.error('Failed to create section:', error);
     }
   };
 
   const handleEditSection = (sectionId: string) => {
-    navigate(sectionEditUrl(courseId!, sectionId));
+    navigate(sectionViewUrl(courseId!, sectionId));
   };
 
   const handleRemoveSection = async (sectionId: string) => {
