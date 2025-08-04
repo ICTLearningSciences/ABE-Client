@@ -5,8 +5,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { 
-  Course, 
+import {
+  Course,
   Assignment,
   Section,
   StudentData,
@@ -18,7 +18,7 @@ import {
   addOrUpdateSection as _addOrUpdateSection,
   addOrUpdateAssignment as _addOrUpdateAssignment,
   modifySectionEnrollment as _modifySectionEnrollment,
-  modifyStudentAssignmentProgress as _modifyStudentAssignmentProgress
+  modifyStudentAssignmentProgress as _modifyStudentAssignmentProgress,
 } from './educational-api';
 
 export enum LoadStatus {
@@ -117,14 +117,22 @@ export const createSection = createAsyncThunk(
 export const updateSection = createAsyncThunk(
   'educationManagement/updateSection',
   async (params: { courseId: string; sectionData: Partial<Section> }) => {
-    return await _addOrUpdateSection(params.courseId, params.sectionData, 'MODIFY');
+    return await _addOrUpdateSection(
+      params.courseId,
+      params.sectionData,
+      'MODIFY'
+    );
   }
 );
 
 export const deleteSection = createAsyncThunk(
   'educationManagement/deleteSection',
   async (params: { courseId: string; sectionId: string }) => {
-    return await _addOrUpdateSection(params.courseId, { _id: params.sectionId }, 'DELETE');
+    return await _addOrUpdateSection(
+      params.courseId,
+      { _id: params.sectionId },
+      'DELETE'
+    );
   }
 );
 
@@ -138,35 +146,75 @@ export const createAssignment = createAsyncThunk(
 export const updateAssignment = createAsyncThunk(
   'educationManagement/updateAssignment',
   async (params: { courseId: string; assignmentData: Partial<Assignment> }) => {
-    return await _addOrUpdateAssignment(params.courseId, params.assignmentData, 'MODIFY');
+    return await _addOrUpdateAssignment(
+      params.courseId,
+      params.assignmentData,
+      'MODIFY'
+    );
   }
 );
 
 export const deleteAssignment = createAsyncThunk(
   'educationManagement/deleteAssignment',
   async (params: { courseId: string; assignmentId: string }) => {
-    return await _addOrUpdateAssignment(params.courseId, { _id: params.assignmentId }, 'DELETE');
+    return await _addOrUpdateAssignment(
+      params.courseId,
+      { _id: params.assignmentId },
+      'DELETE'
+    );
   }
 );
 
 export const enrollInSection = createAsyncThunk(
   'educationManagement/enrollInSection',
-  async (params: { targetUserId: string; courseId: string; sectionId: string; sectionCode: string }) => {
-    return await _modifySectionEnrollment(params.targetUserId, params.courseId, params.sectionId, 'ENROLL', params.sectionCode);
+  async (params: {
+    targetUserId: string;
+    courseId: string;
+    sectionId: string;
+    sectionCode: string;
+  }) => {
+    return await _modifySectionEnrollment(
+      params.targetUserId,
+      params.courseId,
+      params.sectionId,
+      'ENROLL',
+      params.sectionCode
+    );
   }
 );
 
 export const removeFromSection = createAsyncThunk(
   'educationManagement/removeFromSection',
-  async (params: { targetUserId: string; courseId: string; sectionId: string }) => {
-    return await _modifySectionEnrollment(params.targetUserId, params.courseId, params.sectionId, 'REMOVE');
+  async (params: {
+    targetUserId: string;
+    courseId: string;
+    sectionId: string;
+  }) => {
+    return await _modifySectionEnrollment(
+      params.targetUserId,
+      params.courseId,
+      params.sectionId,
+      'REMOVE'
+    );
   }
 );
 
 export const updateStudentAssignmentProgress = createAsyncThunk(
   'educationManagement/updateStudentAssignmentProgress',
-  async (params: { targetUserId: string; courseId: string; sectionId: string; assignmentId: string; progress: 'COMPLETE' | 'INCOMPLETE' }) => {
-    return await _modifyStudentAssignmentProgress(params.targetUserId, params.courseId, params.sectionId, params.assignmentId, params.progress);
+  async (params: {
+    targetUserId: string;
+    courseId: string;
+    sectionId: string;
+    assignmentId: string;
+    progress: 'COMPLETE' | 'INCOMPLETE';
+  }) => {
+    return await _modifyStudentAssignmentProgress(
+      params.targetUserId,
+      params.courseId,
+      params.sectionId,
+      params.assignmentId,
+      params.progress
+    );
   }
 );
 

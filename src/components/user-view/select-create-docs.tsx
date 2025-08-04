@@ -21,7 +21,6 @@ import { TwoOptionDialog } from '../dialog';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { GoogleDocItemRow } from './google-doc-item-row';
-import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: UserDoc[];
@@ -66,7 +65,6 @@ export default function SelectCreateDocs(props: {
   const googleDocs = viewingArchived ? archivedDocs : unarchivedDocs;
   const [docToDelete, setDocToDelete] = React.useState<UserDoc>();
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
-  const { createAssignment, updateAssignment, deleteAssignment } = useWithEducationalManagement();
   function SortIndicator(props: { field: string }) {
     const { field } = props;
     const isActive = sortBy.field === field;
@@ -150,13 +148,6 @@ export default function SelectCreateDocs(props: {
             </RowDiv>
           )}
           <h2>{viewingArchived ? 'Archived' : 'Your'} Docs</h2>
-          <Button onClick={() => {
-            deleteAssignment('689012c1daba7ec53ea15e12', '689038ee9a478ae5f053ece0').then((assignment) => {
-              console.log(assignment);
-            });
-          }}>
-            Create Assignment
-          </Button>
           <Button
             data-cy={`toggle-view-archived`}
             style={{

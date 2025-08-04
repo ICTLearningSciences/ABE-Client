@@ -1,5 +1,31 @@
-import { fetchCourses as _fetchCourses, fetchAssignments as _fetchAssignments, fetchSections as _fetchSections, fetchStudentsInMyCourses as _fetchStudentsInMyCourses, createCourse as _createCourse, updateCourse as _updateCourse, deleteCourse as _deleteCourse, createSection as _createSection, updateSection as _updateSection, deleteSection as _deleteSection, createAssignment as _createAssignment, updateAssignment as _updateAssignment, deleteAssignment as _deleteAssignment, enrollInSection as _enrollInSection, removeFromSection as _removeFromSection, updateStudentAssignmentProgress as _updateStudentAssignmentProgress, LoadStatus } from '.';
-import { Course, Assignment, Section, StudentData } from './educational-api';
+import {
+  fetchCourses as _fetchCourses,
+  fetchAssignments as _fetchAssignments,
+  fetchSections as _fetchSections,
+  fetchStudentsInMyCourses as _fetchStudentsInMyCourses,
+  createCourse as _createCourse,
+  updateCourse as _updateCourse,
+  deleteCourse as _deleteCourse,
+  createSection as _createSection,
+  updateSection as _updateSection,
+  deleteSection as _deleteSection,
+  createAssignment as _createAssignment,
+  updateAssignment as _updateAssignment,
+  deleteAssignment as _deleteAssignment,
+  enrollInSection as _enrollInSection,
+  removeFromSection as _removeFromSection,
+  updateStudentAssignmentProgress as _updateStudentAssignmentProgress,
+  LoadStatus,
+} from '.';
+import {
+  Course,
+  Assignment,
+  Section,
+  StudentData,
+  Instructor,
+  createNewInstructor as _createNewInstructor,
+  createNewStudent as _createNewStudent,
+} from './educational-api';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
 export interface UseWithEducationalManagement {
@@ -11,14 +37,40 @@ export interface UseWithEducationalManagement {
   updateCourse: (courseData: Partial<Course>) => Promise<Course>;
   deleteCourse: (courseId: string) => Promise<Course>;
   createSection: (courseId: string) => Promise<Section>;
-  updateSection: (courseId: string, sectionData: Partial<Section>) => Promise<Section>;
+  updateSection: (
+    courseId: string,
+    sectionData: Partial<Section>
+  ) => Promise<Section>;
   deleteSection: (courseId: string, sectionId: string) => Promise<Section>;
   createAssignment: (courseId: string) => Promise<Assignment>;
-  updateAssignment: (courseId: string, assignmentData: Partial<Assignment>) => Promise<Assignment>;
-  deleteAssignment: (courseId: string, assignmentId: string) => Promise<Assignment>;
-  enrollStudentInSection: (targetUserId: string, courseId: string, sectionId: string, sectionCode: string) => Promise<StudentData>;
-  removeStudentFromSection: (targetUserId: string, courseId: string, sectionId: string) => Promise<StudentData>;
-  updateStudentAssignmentProgress: (targetUserId: string, courseId: string, sectionId: string, assignmentId: string, progress: 'COMPLETE' | 'INCOMPLETE') => Promise<StudentData>;
+  updateAssignment: (
+    courseId: string,
+    assignmentData: Partial<Assignment>
+  ) => Promise<Assignment>;
+  deleteAssignment: (
+    courseId: string,
+    assignmentId: string
+  ) => Promise<Assignment>;
+  enrollStudentInSection: (
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    sectionCode: string
+  ) => Promise<StudentData>;
+  removeStudentFromSection: (
+    targetUserId: string,
+    courseId: string,
+    sectionId: string
+  ) => Promise<StudentData>;
+  updateStudentAssignmentProgress: (
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    progress: 'COMPLETE' | 'INCOMPLETE'
+  ) => Promise<StudentData>;
+  createNewInstructor: (userId: string) => Promise<Instructor>;
+  createNewStudent: (userId: string) => Promise<StudentData>;
   courses: Course[];
   assignments: Assignment[];
   sections: Section[];
@@ -60,9 +112,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   const enrollmentModificationStatus = useAppSelector(
     (state) => state.educationManagement.enrollmentModificationStatus
   );
-  const courses = useAppSelector(
-    (state) => state.educationManagement.courses
-  );
+  const courses = useAppSelector((state) => state.educationManagement.courses);
   const assignments = useAppSelector(
     (state) => state.educationManagement.assignments
   );
@@ -109,7 +159,10 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as Section;
   }
 
-  async function updateSection(courseId: string, sectionData: Partial<Section>) {
+  async function updateSection(
+    courseId: string,
+    sectionData: Partial<Section>
+  ) {
     const res = await dispatch(_updateSection({ courseId, sectionData }));
     return res.payload as Section;
   }
@@ -124,7 +177,10 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as Assignment;
   }
 
-  async function updateAssignment(courseId: string, assignmentData: Partial<Assignment>) {
+  async function updateAssignment(
+    courseId: string,
+    assignmentData: Partial<Assignment>
+  ) {
     const res = await dispatch(_updateAssignment({ courseId, assignmentData }));
     return res.payload as Assignment;
   }
@@ -134,19 +190,54 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as Assignment;
   }
 
-  async function enrollStudentInSection(targetUserId: string, courseId: string, sectionId: string, sectionCode: string) {
-    const res = await dispatch(_enrollInSection({ targetUserId, courseId, sectionId, sectionCode }));
+  async function enrollStudentInSection(
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    sectionCode: string
+  ) {
+    const res = await dispatch(
+      _enrollInSection({ targetUserId, courseId, sectionId, sectionCode })
+    );
     return res.payload as StudentData;
   }
 
-  async function removeStudentFromSection(targetUserId: string, courseId: string, sectionId: string) {
-    const res = await dispatch(_removeFromSection({ targetUserId, courseId, sectionId }));
+  async function removeStudentFromSection(
+    targetUserId: string,
+    courseId: string,
+    sectionId: string
+  ) {
+    const res = await dispatch(
+      _removeFromSection({ targetUserId, courseId, sectionId })
+    );
     return res.payload as StudentData;
   }
 
-  async function updateStudentAssignmentProgress(targetUserId: string, courseId: string, sectionId: string, assignmentId: string, progress: 'COMPLETE' | 'INCOMPLETE') {
-    const res = await dispatch(_updateStudentAssignmentProgress({ targetUserId, courseId, sectionId, assignmentId, progress }));
+  async function updateStudentAssignmentProgress(
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    progress: 'COMPLETE' | 'INCOMPLETE'
+  ) {
+    const res = await dispatch(
+      _updateStudentAssignmentProgress({
+        targetUserId,
+        courseId,
+        sectionId,
+        assignmentId,
+        progress,
+      })
+    );
     return res.payload as StudentData;
+  }
+
+  async function createNewInstructor(userId: string) {
+    return await _createNewInstructor(userId);
+  }
+
+  async function createNewStudent(userId: string) {
+    return await _createNewStudent(userId);
   }
 
   return {
@@ -166,18 +257,26 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     enrollStudentInSection,
     removeStudentFromSection,
     updateStudentAssignmentProgress,
+    createNewInstructor,
+    createNewStudent,
     courses,
     assignments,
     sections,
     students,
-    isLoading: coursesLoadingState === LoadStatus.LOADING || assignmentsLoadingState === LoadStatus.LOADING || sectionsLoadingState === LoadStatus.LOADING || studentsLoadingState === LoadStatus.LOADING,
+    isLoading:
+      coursesLoadingState === LoadStatus.LOADING ||
+      assignmentsLoadingState === LoadStatus.LOADING ||
+      sectionsLoadingState === LoadStatus.LOADING ||
+      studentsLoadingState === LoadStatus.LOADING,
     isCourseModifying: courseModificationStatus === LoadStatus.LOADING,
     courseModificationFailed: courseModificationStatus === LoadStatus.FAILED,
     isSectionModifying: sectionModificationStatus === LoadStatus.LOADING,
     sectionModificationFailed: sectionModificationStatus === LoadStatus.FAILED,
     isAssignmentModifying: assignmentModificationStatus === LoadStatus.LOADING,
-    assignmentModificationFailed: assignmentModificationStatus === LoadStatus.FAILED,
+    assignmentModificationFailed:
+      assignmentModificationStatus === LoadStatus.FAILED,
     isEnrollmentModifying: enrollmentModificationStatus === LoadStatus.LOADING,
-    enrollmentModificationFailed: enrollmentModificationStatus === LoadStatus.FAILED,
+    enrollmentModificationFailed:
+      enrollmentModificationStatus === LoadStatus.FAILED,
   };
 }

@@ -15,7 +15,12 @@ export async function useReduxHydration() {
   const dispatch = useAppDispatch();
   const { loadActivities, loadDocGoals, loadBuiltActivities } =
     useWithDocGoalsActivities();
-  const { loadCourses, loadAssignments, loadSections, loadStudentsInMyCourses } = useWithEducationalManagement();
+  const {
+    loadCourses,
+    loadAssignments,
+    loadSections,
+    loadStudentsInMyCourses,
+  } = useWithEducationalManagement();
 
   useEffect(() => {
     if (!userId) return;

@@ -55,6 +55,13 @@ export interface StudentData {
   assignmentProgress: AssignmentProgress[];
 }
 
+// TypeScript interface for Instructor
+export interface Instructor {
+  _id: string;
+  userId: string;
+  courseIds: string[];
+}
+
 // GraphQL query fragment for course data
 export const courseQueryData = `
   _id
@@ -99,6 +106,13 @@ export const studentDataQueryData = `
   }
 `;
 
+// GraphQL query fragment for instructor data
+export const instructorQueryData = `
+  _id
+  userId
+  courseIds
+`;
+
 // Fetch courses for a specific user
 export async function fetchCourses(forUserId: string): Promise<Course[]> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
@@ -124,7 +138,9 @@ export async function fetchCourses(forUserId: string): Promise<Course[]> {
 }
 
 // Fetch assignments for a specific user
-export async function fetchAssignments(forUserId: string): Promise<Assignment[]> {
+export async function fetchAssignments(
+  forUserId: string
+): Promise<Assignment[]> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   const res = await execGql<Assignment[]>(
     {
@@ -172,7 +188,9 @@ export async function fetchSections(forUserId: string): Promise<Section[]> {
 }
 
 // Fetch students in instructor's courses
-export async function fetchStudentsInMyCourses(instructorId: string): Promise<StudentData[]> {
+export async function fetchStudentsInMyCourses(
+  instructorId: string
+): Promise<StudentData[]> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   const res = await execGql<StudentData[]>(
     {
@@ -321,7 +339,7 @@ export async function modifySectionEnrollment(
 export async function modifyStudentAssignmentProgress(
   targetUserId: string,
   courseId: string,
-  sectionId: string,  
+  sectionId: string,
   assignmentId: string,
   progress: 'COMPLETE' | 'INCOMPLETE'
 ): Promise<StudentData> {
@@ -345,6 +363,54 @@ mutation ModifyStudentAssignmentProgress($targetUserId: ID!, $courseId: ID!, $se
     },
     {
       dataPath: 'modifyStudentAssignmentProgress',
+      accessToken,
+    }
+  );
+  return res;
+}
+
+// Create a new student
+export async function createNewStudent(userId: string): Promise<StudentData> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<StudentData>(
+    {
+      query: `
+        mutation CreateNewStudent($userId: ID!) {
+          createNewStudent(userId: $userId) {
+            ${studentDataQueryData}
+          }
+        }
+      `,
+      variables: {
+        userId,
+      },
+    },
+    {
+      dataPath: 'createNewStudent',
+      accessToken,
+    }
+  );
+  return res;
+}
+
+// Create a new instructor
+export async function createNewInstructor(userId: string): Promise<Instructor> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Instructor>(
+    {
+      query: `
+        mutation CreateNewInstructor($userId: ID!) {
+          createNewInstructor(userId: $userId) {
+            ${instructorQueryData}
+          }
+        }
+      `,
+      variables: {
+        userId,
+      },
+    },
+    {
+      dataPath: 'createNewInstructor',
       accessToken,
     }
   );
