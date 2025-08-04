@@ -16,7 +16,8 @@ import {
   fetchStudentsInMyCourses as _fetchStudentsInMyCourses,
   addOrUpdateCourse as _addOrUpdateCourse,
   addOrUpdateSection as _addOrUpdateSection,
-  addOrUpdateAssignment as _addOrUpdateAssignment
+  addOrUpdateAssignment as _addOrUpdateAssignment,
+  modifySectionEnrollment as _modifySectionEnrollment
 } from './educational-api';
 
 export enum LoadStatus {
@@ -38,6 +39,7 @@ export interface State {
   sectionModificationStatus: LoadStatus;
   students: StudentData[];
   studentsLoadStatus: LoadStatus;
+  enrollmentModificationStatus: LoadStatus;
 }
 
 const initialState: State = {
@@ -52,6 +54,7 @@ const initialState: State = {
   sectionModificationStatus: LoadStatus.NONE,
   students: [],
   studentsLoadStatus: LoadStatus.NONE,
+  enrollmentModificationStatus: LoadStatus.NONE,
 };
 
 export const fetchCourses = createAsyncThunk(
@@ -142,6 +145,20 @@ export const deleteAssignment = createAsyncThunk(
   'educationManagement/deleteAssignment',
   async (params: { courseId: string; assignmentId: string }) => {
     return await _addOrUpdateAssignment(params.courseId, { _id: params.assignmentId }, 'DELETE');
+  }
+);
+
+export const enrollInSection = createAsyncThunk(
+  'educationManagement/enrollInSection',
+  async (params: { targetUserId: string; courseId: string; sectionId: string; sectionCode: string }) => {
+    return await _modifySectionEnrollment(params.targetUserId, params.courseId, params.sectionId, 'ENROLL', params.sectionCode);
+  }
+);
+
+export const removeFromSection = createAsyncThunk(
+  'educationManagement/removeFromSection',
+  async (params: { targetUserId: string; courseId: string; sectionId: string }) => {
+    return await _modifySectionEnrollment(params.targetUserId, params.courseId, params.sectionId, 'REMOVE');
   }
 );
 
@@ -332,6 +349,45 @@ export const educationManagementSlice = createSlice({
       })
       .addCase(deleteAssignment.rejected, (state) => {
         state.assignmentModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Section enrollment
+      .addCase(enrollInSection.pending, (state) => {
+        state.enrollmentModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(enrollInSection.fulfilled, (state, action) => {
+        state.enrollmentModificationStatus = LoadStatus.SUCCEEDED;
+        // Update the student data in the students list
+        const studentIndex = state.students.findIndex(
+          (s) => s.userId === action.payload.userId
+        );
+        if (studentIndex >= 0) {
+          state.students[studentIndex] = action.payload;
+        } else {
+          // If student not in list, add them
+          state.students.push(action.payload);
+        }
+      })
+      .addCase(enrollInSection.rejected, (state) => {
+        state.enrollmentModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Section removal
+      .addCase(removeFromSection.pending, (state) => {
+        state.enrollmentModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(removeFromSection.fulfilled, (state, action) => {
+        state.enrollmentModificationStatus = LoadStatus.SUCCEEDED;
+        // Update the student data in the students list
+        const studentIndex = state.students.findIndex(
+          (s) => s.userId === action.payload.userId
+        );
+        if (studentIndex >= 0) {
+          state.students[studentIndex] = action.payload;
+        }
+      })
+      .addCase(removeFromSection.rejected, (state) => {
+        state.enrollmentModificationStatus = LoadStatus.FAILED;
       });
   },
 });

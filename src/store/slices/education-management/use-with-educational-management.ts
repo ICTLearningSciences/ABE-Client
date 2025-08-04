@@ -1,4 +1,4 @@
-import { fetchCourses as _fetchCourses, fetchAssignments as _fetchAssignments, fetchSections as _fetchSections, fetchStudentsInMyCourses as _fetchStudentsInMyCourses, createCourse as _createCourse, updateCourse as _updateCourse, deleteCourse as _deleteCourse, createSection as _createSection, updateSection as _updateSection, deleteSection as _deleteSection, createAssignment as _createAssignment, updateAssignment as _updateAssignment, deleteAssignment as _deleteAssignment, LoadStatus } from '.';
+import { fetchCourses as _fetchCourses, fetchAssignments as _fetchAssignments, fetchSections as _fetchSections, fetchStudentsInMyCourses as _fetchStudentsInMyCourses, createCourse as _createCourse, updateCourse as _updateCourse, deleteCourse as _deleteCourse, createSection as _createSection, updateSection as _updateSection, deleteSection as _deleteSection, createAssignment as _createAssignment, updateAssignment as _updateAssignment, deleteAssignment as _deleteAssignment, enrollInSection as _enrollInSection, removeFromSection as _removeFromSection, LoadStatus } from '.';
 import { Course, Assignment, Section, StudentData } from './educational-api';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
@@ -16,6 +16,8 @@ export interface UseWithEducationalManagement {
   createAssignment: (courseId: string) => Promise<Assignment>;
   updateAssignment: (courseId: string, assignmentData: Partial<Assignment>) => Promise<Assignment>;
   deleteAssignment: (courseId: string, assignmentId: string) => Promise<Assignment>;
+  enrollStudentInSection: (targetUserId: string, courseId: string, sectionId: string, sectionCode: string) => Promise<StudentData>;
+  removeStudentFromSection: (targetUserId: string, courseId: string, sectionId: string) => Promise<StudentData>;
   courses: Course[];
   assignments: Assignment[];
   sections: Section[];
@@ -27,6 +29,8 @@ export interface UseWithEducationalManagement {
   sectionModificationFailed: boolean;
   isAssignmentModifying: boolean;
   assignmentModificationFailed: boolean;
+  isEnrollmentModifying: boolean;
+  enrollmentModificationFailed: boolean;
 }
 
 export function useWithEducationalManagement(): UseWithEducationalManagement {
@@ -51,6 +55,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   );
   const assignmentModificationStatus = useAppSelector(
     (state) => state.educationManagement.assignmentModificationStatus
+  );
+  const enrollmentModificationStatus = useAppSelector(
+    (state) => state.educationManagement.enrollmentModificationStatus
   );
   const courses = useAppSelector(
     (state) => state.educationManagement.courses
@@ -126,6 +133,16 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as Assignment;
   }
 
+  async function enrollStudentInSection(targetUserId: string, courseId: string, sectionId: string, sectionCode: string) {
+    const res = await dispatch(_enrollInSection({ targetUserId, courseId, sectionId, sectionCode }));
+    return res.payload as StudentData;
+  }
+
+  async function removeStudentFromSection(targetUserId: string, courseId: string, sectionId: string) {
+    const res = await dispatch(_removeFromSection({ targetUserId, courseId, sectionId }));
+    return res.payload as StudentData;
+  }
+
   return {
     loadCourses,
     loadAssignments,
@@ -140,6 +157,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     createAssignment,
     updateAssignment,
     deleteAssignment,
+    enrollStudentInSection,
+    removeStudentFromSection,
     courses,
     assignments,
     sections,
@@ -151,5 +170,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     sectionModificationFailed: sectionModificationStatus === LoadStatus.FAILED,
     isAssignmentModifying: assignmentModificationStatus === LoadStatus.LOADING,
     assignmentModificationFailed: assignmentModificationStatus === LoadStatus.FAILED,
+    isEnrollmentModifying: enrollmentModificationStatus === LoadStatus.LOADING,
+    enrollmentModificationFailed: enrollmentModificationStatus === LoadStatus.FAILED,
   };
 }
