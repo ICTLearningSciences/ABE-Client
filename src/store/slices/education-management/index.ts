@@ -15,7 +15,8 @@ import {
   fetchSections as _fetchSections,
   fetchStudentsInMyCourses as _fetchStudentsInMyCourses,
   addOrUpdateCourse as _addOrUpdateCourse,
-  addOrUpdateSection as _addOrUpdateSection
+  addOrUpdateSection as _addOrUpdateSection,
+  addOrUpdateAssignment as _addOrUpdateAssignment
 } from './educational-api';
 
 export enum LoadStatus {
@@ -31,6 +32,7 @@ export interface State {
   courseModificationStatus: LoadStatus;
   assignments: Assignment[];
   assignmentsLoadStatus: LoadStatus;
+  assignmentModificationStatus: LoadStatus;
   sections: Section[];
   sectionsLoadStatus: LoadStatus;
   sectionModificationStatus: LoadStatus;
@@ -44,6 +46,7 @@ const initialState: State = {
   courseModificationStatus: LoadStatus.NONE,
   assignments: [],
   assignmentsLoadStatus: LoadStatus.NONE,
+  assignmentModificationStatus: LoadStatus.NONE,
   sections: [],
   sectionsLoadStatus: LoadStatus.NONE,
   sectionModificationStatus: LoadStatus.NONE,
@@ -118,6 +121,27 @@ export const deleteSection = createAsyncThunk(
   'educationManagement/deleteSection',
   async (params: { courseId: string; sectionId: string }) => {
     return await _addOrUpdateSection(params.courseId, { _id: params.sectionId }, 'DELETE');
+  }
+);
+
+export const createAssignment = createAsyncThunk(
+  'educationManagement/createAssignment',
+  async (courseId: string) => {
+    return await _addOrUpdateAssignment(courseId, undefined, 'CREATE');
+  }
+);
+
+export const updateAssignment = createAsyncThunk(
+  'educationManagement/updateAssignment',
+  async (params: { courseId: string; assignmentData: Partial<Assignment> }) => {
+    return await _addOrUpdateAssignment(params.courseId, params.assignmentData, 'MODIFY');
+  }
+);
+
+export const deleteAssignment = createAsyncThunk(
+  'educationManagement/deleteAssignment',
+  async (params: { courseId: string; assignmentId: string }) => {
+    return await _addOrUpdateAssignment(params.courseId, { _id: params.assignmentId }, 'DELETE');
   }
 );
 
@@ -262,6 +286,52 @@ export const educationManagementSlice = createSlice({
       })
       .addCase(deleteSection.rejected, (state) => {
         state.sectionModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Assignment creation
+      .addCase(createAssignment.pending, (state) => {
+        state.assignmentModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(createAssignment.fulfilled, (state, action) => {
+        state.assignmentModificationStatus = LoadStatus.SUCCEEDED;
+        // Add the new assignment to the list
+        state.assignments.push(action.payload);
+      })
+      .addCase(createAssignment.rejected, (state) => {
+        state.assignmentModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Assignment update
+      .addCase(updateAssignment.pending, (state) => {
+        state.assignmentModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(updateAssignment.fulfilled, (state, action) => {
+        state.assignmentModificationStatus = LoadStatus.SUCCEEDED;
+        // Update the existing assignment in the list
+        const assignmentIndex = state.assignments.findIndex(
+          (a) => a._id === action.payload._id
+        );
+        if (assignmentIndex >= 0) {
+          state.assignments[assignmentIndex] = action.payload;
+        }
+      })
+      .addCase(updateAssignment.rejected, (state) => {
+        state.assignmentModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Assignment deletion
+      .addCase(deleteAssignment.pending, (state) => {
+        state.assignmentModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(deleteAssignment.fulfilled, (state, action) => {
+        state.assignmentModificationStatus = LoadStatus.SUCCEEDED;
+        // Remove the assignment from the list
+        state.assignments = state.assignments.filter(
+          (a) => a._id !== action.payload._id
+        );
+      })
+      .addCase(deleteAssignment.rejected, (state) => {
+        state.assignmentModificationStatus = LoadStatus.FAILED;
       });
   },
 });

@@ -252,3 +252,33 @@ export async function addOrUpdateSection(
   );
   return res;
 }
+
+// Create, modify, or delete an assignment
+export async function addOrUpdateAssignment(
+  courseId: string,
+  assignmentData?: Partial<Assignment>,
+  action: 'CREATE' | 'MODIFY' | 'DELETE' = 'CREATE'
+): Promise<Assignment> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Assignment>(
+    {
+      query: `
+        mutation AddOrUpdateAssignment($courseId: ID!, $assignmentData: AssignmentInputType, $action: AssignmentAction!) {
+          addOrUpdateAssignment(courseId: $courseId, assignmentData: $assignmentData, action: $action) {
+            ${assignmentQueryData}
+          }
+        }
+      `,
+      variables: {
+        courseId,
+        assignmentData,
+        action,
+      },
+    },
+    {
+      dataPath: 'addOrUpdateAssignment',
+      accessToken,
+    }
+  );
+  return res;
+}
