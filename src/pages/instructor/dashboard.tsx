@@ -8,7 +8,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { Course } from '../../store/slices/education-management/types';
-import { courseEditUrl, courseViewUrl } from './course-edit';
+import { courseEditUrl, courseViewUrl } from './course-view';
 
 interface CourseListItemProps {
   course: Course;

@@ -13,14 +13,6 @@ import { instructorDashboardUrl } from './dashboard';
 import { Course } from '../../store/slices/education-management/types';
 import { sectionViewUrl } from './section-view';
 
-export const courseEditPath = '/course-edit/:courseId/edit';
-export const courseViewPath = '/course-view/:courseId/view';
-
-export const courseEditUrl = (courseId: string) =>
-  courseEditPath.replace(':courseId', courseId);
-export const courseViewUrl = (courseId: string) =>
-  courseViewPath.replace(':courseId', courseId);
-
 export default function CourseEdit() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();

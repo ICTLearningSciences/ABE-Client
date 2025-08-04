@@ -13,9 +13,16 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
-import { courseEditUrl } from './course-edit';
 import SectionViewItem from './components/section-view-item';
 import { sectionViewUrl } from './section-view';
+
+export const courseEditPath = '/course-edit/:courseId/edit';
+export const courseViewPath = '/course-view/:courseId/view';
+
+export const courseEditUrl = (courseId: string) =>
+  courseEditPath.replace(':courseId', courseId);
+export const courseViewUrl = (courseId: string) =>
+  courseViewPath.replace(':courseId', courseId);
 
 export default function CourseView() {
   const { courseId } = useParams<{ courseId: string }>();

@@ -26,11 +26,11 @@ import {
 import InstructorDashboard, {
   instructorDashboardUrl,
 } from './pages/instructor/dashboard';
-import CourseEdit, {
+import CourseEdit from './pages/instructor/course-edit';
+import CourseView, {
   courseEditPath,
   courseViewPath,
-} from './pages/instructor/course-edit';
-import CourseView from './pages/instructor/course-view';
+} from './pages/instructor/course-view';
 import SectionView, { sectionViewPath } from './pages/instructor/section-view';
 
 function MainApp() {
