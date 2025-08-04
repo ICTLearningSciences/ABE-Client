@@ -32,6 +32,7 @@ import CourseView, {
   courseViewPath,
 } from './pages/instructor/course-view';
 import SectionView, { sectionViewPath } from './pages/instructor/section-view';
+import SectionEdit, { sectionEditPath } from './pages/instructor/section-edit';
 
 function MainApp() {
   const mainAppHeight = '88vh';
@@ -163,6 +164,23 @@ function MainApp() {
             }}
           >
             <SectionView />
+          </div>
+        </>
+      ),
+    },
+    {
+      path: sectionEditPath,
+      element: (
+        <>
+          <Header useLogin={useLogin} />
+          <div
+            style={{
+              width: '100%',
+              height: mainAppHeight,
+              overflow: 'auto',
+            }}
+          >
+            <SectionEdit />
           </div>
         </>
       ),
