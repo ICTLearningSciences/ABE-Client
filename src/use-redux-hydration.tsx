@@ -8,12 +8,14 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { loadUserDocs } from './store/slices/state';
 import { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
+import { useWithEducationalManagement } from './store/slices/education-management/use-with-educational-management';
 
 export async function useReduxHydration() {
   const userId = useAppSelector((state) => state.login.user?._id);
   const dispatch = useAppDispatch();
   const { loadActivities, loadDocGoals, loadBuiltActivities } =
     useWithDocGoalsActivities();
+  const { loadCourses } = useWithEducationalManagement();
 
   useEffect(() => {
     if (!userId) return;
@@ -21,5 +23,6 @@ export async function useReduxHydration() {
     loadActivities();
     loadBuiltActivities();
     loadDocGoals();
+    loadCourses(userId);
   }, [userId]);
 }
