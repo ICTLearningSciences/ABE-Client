@@ -16,6 +16,15 @@ export interface Course {
   sectionIds: string[];
 }
 
+// TypeScript interface for Assignment
+export interface Assignment {
+  _id: string;
+  title: string;
+  description: string;
+  activityIds: string[];
+  instructorId: string;
+}
+
 // GraphQL query fragment for course data
 export const courseQueryData = `
   _id
@@ -23,6 +32,15 @@ export const courseQueryData = `
   description
   instructorId
   sectionIds
+`;
+
+// GraphQL query fragment for assignment data
+export const assignmentQueryData = `
+  _id
+  title
+  description
+  activityIds
+  instructorId
 `;
 
 // Fetch courses for a specific user
@@ -43,6 +61,30 @@ export async function fetchCourses(forUserId: string): Promise<Course[]> {
     },
     {
       dataPath: 'fetchCourses',
+      accessToken,
+    }
+  );
+  return res;
+}
+
+// Fetch assignments for a specific user
+export async function fetchAssignments(forUserId: string): Promise<Assignment[]> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Assignment[]>(
+    {
+      query: `
+        query FetchAssignments($forUserId: ID!) {
+          fetchAssignments(forUserId: $forUserId) {
+            ${assignmentQueryData}
+          }
+        }
+      `,
+      variables: {
+        forUserId,
+      },
+    },
+    {
+      dataPath: 'fetchAssignments',
       accessToken,
     }
   );

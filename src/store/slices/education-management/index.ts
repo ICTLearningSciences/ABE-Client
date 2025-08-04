@@ -5,7 +5,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Course, fetchCourses as _fetchCourses } from './educational-api';
+import { 
+  Course, 
+  Assignment,
+  fetchCourses as _fetchCourses,
+  fetchAssignments as _fetchAssignments 
+} from './educational-api';
 
 export enum LoadStatus {
   NONE,
@@ -17,17 +22,28 @@ export enum LoadStatus {
 export interface State {
   courses: Course[];
   coursesLoadStatus: LoadStatus;
+  assignments: Assignment[];
+  assignmentsLoadStatus: LoadStatus;
 }
 
 const initialState: State = {
   courses: [],
   coursesLoadStatus: LoadStatus.NONE,
+  assignments: [],
+  assignmentsLoadStatus: LoadStatus.NONE,
 };
 
 export const fetchCourses = createAsyncThunk(
   'educationManagement/fetchCourses',
   async (forUserId: string) => {
     return await _fetchCourses(forUserId);
+  }
+);
+
+export const fetchAssignments = createAsyncThunk(
+  'educationManagement/fetchAssignments',
+  async (forUserId: string) => {
+    return await _fetchAssignments(forUserId);
   }
 );
 
@@ -47,6 +63,17 @@ export const educationManagementSlice = createSlice({
       })
       .addCase(fetchCourses.rejected, (state) => {
         state.coursesLoadStatus = LoadStatus.FAILED;
+      })
+
+      .addCase(fetchAssignments.pending, (state) => {
+        state.assignmentsLoadStatus = LoadStatus.LOADING;
+      })
+      .addCase(fetchAssignments.fulfilled, (state, action) => {
+        state.assignments = action.payload;
+        state.assignmentsLoadStatus = LoadStatus.SUCCEEDED;
+      })
+      .addCase(fetchAssignments.rejected, (state) => {
+        state.assignmentsLoadStatus = LoadStatus.FAILED;
       });
   },
 });
