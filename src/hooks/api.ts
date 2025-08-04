@@ -631,6 +631,7 @@ export const userDataQuery = `
     code
     createdAt
   }
+  educationalRole
 `;
 export async function refreshAccessToken(): Promise<UserAccessToken> {
   return execGql<UserAccessToken>(

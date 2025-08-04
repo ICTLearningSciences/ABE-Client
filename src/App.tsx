@@ -23,6 +23,9 @@ import {
   AuthProviderProps,
   AuthProvider as CognitoAuthProvider,
 } from 'react-oidc-context';
+import InstructorDashboard, {
+  instructorDashboardUrl,
+} from './pages/instructor/dashboard';
 
 function MainApp() {
   const mainAppHeight = '88vh';
@@ -88,6 +91,23 @@ function MainApp() {
     {
       path: '/docs/history/:docId',
       element: <DocHistoryContainer useLogin={useLogin} />,
+    },
+    {
+      path: instructorDashboardUrl,
+      element: (
+        <>
+          <Header useLogin={useLogin} />
+          <div
+            style={{
+              width: '100%',
+              height: mainAppHeight,
+              overflow: 'auto',
+            }}
+          >
+            <InstructorDashboard />
+          </div>
+        </>
+      ),
     },
   ]);
   const { ConfigLoader, configLoaded } = useConfigLoader();

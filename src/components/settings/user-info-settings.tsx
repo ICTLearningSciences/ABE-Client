@@ -13,6 +13,7 @@ import { AdminControls } from './admin-controls';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { formatISODateToReadable } from '../../helpers';
 import { EditableText } from '../activity-builder/shared/input-components';
+import GoToEducationDashboardButton from './go-to-education-dashboard-button';
 export function UserInfoSettings(): JSX.Element {
   const { state, updateUserInfo } = useWithLogin();
   const { state: configState } = useWithConfig();
@@ -59,6 +60,7 @@ export function UserInfoSettings(): JSX.Element {
           <b>Created At:</b> {formatISODateToReadable(classroomCode.createdAt)}
         </div>
       )}
+      <GoToEducationDashboardButton />
       {previousClassroomCodes && previousClassroomCodes.length > 0 && (
         <Tooltip
           data-cy="previous-classroom-codes-tooltip"
