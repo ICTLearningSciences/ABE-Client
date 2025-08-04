@@ -8,8 +8,12 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { 
   Course, 
   Assignment,
+  Section,
+  StudentData,
   fetchCourses as _fetchCourses,
-  fetchAssignments as _fetchAssignments 
+  fetchAssignments as _fetchAssignments,
+  fetchSections as _fetchSections,
+  fetchStudentsInMyCourses as _fetchStudentsInMyCourses
 } from './educational-api';
 
 export enum LoadStatus {
@@ -24,6 +28,10 @@ export interface State {
   coursesLoadStatus: LoadStatus;
   assignments: Assignment[];
   assignmentsLoadStatus: LoadStatus;
+  sections: Section[];
+  sectionsLoadStatus: LoadStatus;
+  students: StudentData[];
+  studentsLoadStatus: LoadStatus;
 }
 
 const initialState: State = {
@@ -31,6 +39,10 @@ const initialState: State = {
   coursesLoadStatus: LoadStatus.NONE,
   assignments: [],
   assignmentsLoadStatus: LoadStatus.NONE,
+  sections: [],
+  sectionsLoadStatus: LoadStatus.NONE,
+  students: [],
+  studentsLoadStatus: LoadStatus.NONE,
 };
 
 export const fetchCourses = createAsyncThunk(
@@ -44,6 +56,20 @@ export const fetchAssignments = createAsyncThunk(
   'educationManagement/fetchAssignments',
   async (forUserId: string) => {
     return await _fetchAssignments(forUserId);
+  }
+);
+
+export const fetchSections = createAsyncThunk(
+  'educationManagement/fetchSections',
+  async (forUserId: string) => {
+    return await _fetchSections(forUserId);
+  }
+);
+
+export const fetchStudentsInMyCourses = createAsyncThunk(
+  'educationManagement/fetchStudentsInMyCourses',
+  async (instructorId: string) => {
+    return await _fetchStudentsInMyCourses(instructorId);
   }
 );
 
@@ -74,6 +100,28 @@ export const educationManagementSlice = createSlice({
       })
       .addCase(fetchAssignments.rejected, (state) => {
         state.assignmentsLoadStatus = LoadStatus.FAILED;
+      })
+
+      .addCase(fetchSections.pending, (state) => {
+        state.sectionsLoadStatus = LoadStatus.LOADING;
+      })
+      .addCase(fetchSections.fulfilled, (state, action) => {
+        state.sections = action.payload;
+        state.sectionsLoadStatus = LoadStatus.SUCCEEDED;
+      })
+      .addCase(fetchSections.rejected, (state) => {
+        state.sectionsLoadStatus = LoadStatus.FAILED;
+      })
+
+      .addCase(fetchStudentsInMyCourses.pending, (state) => {
+        state.studentsLoadStatus = LoadStatus.LOADING;
+      })
+      .addCase(fetchStudentsInMyCourses.fulfilled, (state, action) => {
+        state.students = action.payload;
+        state.studentsLoadStatus = LoadStatus.SUCCEEDED;
+      })
+      .addCase(fetchStudentsInMyCourses.rejected, (state) => {
+        state.studentsLoadStatus = LoadStatus.FAILED;
       });
   },
 });

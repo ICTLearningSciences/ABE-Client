@@ -25,6 +25,36 @@ export interface Assignment {
   instructorId: string;
 }
 
+// TypeScript interface for Section
+export interface SectionAssignment {
+  assignmentId: string;
+  mandatory: boolean;
+}
+
+export interface Section {
+  _id: string;
+  title: string;
+  sectionCode: string;
+  description: string;
+  instructorId: string;
+  assignments: SectionAssignment[];
+  numOptionalAssignmentsRequired: number;
+}
+
+// TypeScript interface for StudentData
+export interface AssignmentProgress {
+  assignmentId: string;
+  complete: boolean;
+}
+
+export interface StudentData {
+  _id: string;
+  userId: string;
+  enrolledCourses: string[];
+  enrolledSections: string[];
+  assignmentProgress: AssignmentProgress[];
+}
+
 // GraphQL query fragment for course data
 export const courseQueryData = `
   _id
@@ -41,6 +71,32 @@ export const assignmentQueryData = `
   description
   activityIds
   instructorId
+`;
+
+// GraphQL query fragment for section data
+export const sectionQueryData = `
+  _id
+  title
+  sectionCode
+  description
+  instructorId
+  assignments {
+    assignmentId
+    mandatory
+  }
+  numOptionalAssignmentsRequired
+`;
+
+// GraphQL query fragment for student data
+export const studentDataQueryData = `
+  _id
+  userId
+  enrolledCourses
+  enrolledSections
+  assignmentProgress {
+    assignmentId
+    complete
+  }
 `;
 
 // Fetch courses for a specific user
@@ -85,6 +141,54 @@ export async function fetchAssignments(forUserId: string): Promise<Assignment[]>
     },
     {
       dataPath: 'fetchAssignments',
+      accessToken,
+    }
+  );
+  return res;
+}
+
+// Fetch sections for a specific user
+export async function fetchSections(forUserId: string): Promise<Section[]> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Section[]>(
+    {
+      query: `
+        query FetchSections($forUserId: ID!) {
+          fetchSections(forUserId: $forUserId) {
+            ${sectionQueryData}
+          }
+        }
+      `,
+      variables: {
+        forUserId,
+      },
+    },
+    {
+      dataPath: 'fetchSections',
+      accessToken,
+    }
+  );
+  return res;
+}
+
+// Fetch students in instructor's courses
+export async function fetchStudentsInMyCourses(instructorId: string): Promise<StudentData[]> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<StudentData[]>(
+    {
+      query: `
+        query FetchStudentsInMyCourses($instructorId: ID!) {
+          fetchStudentsInMyCourses(instructorId: $instructorId) {
+            ${studentDataQueryData}
+          }
+        }
+      `,
+      variables: {
+        instructorId,
+      },
+    },
+    {
+      dataPath: 'fetchStudentsInMyCourses',
       accessToken,
     }
   );
