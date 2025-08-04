@@ -13,7 +13,8 @@ import {
   fetchCourses as _fetchCourses,
   fetchAssignments as _fetchAssignments,
   fetchSections as _fetchSections,
-  fetchStudentsInMyCourses as _fetchStudentsInMyCourses
+  fetchStudentsInMyCourses as _fetchStudentsInMyCourses,
+  addOrUpdateCourse as _addOrUpdateCourse
 } from './educational-api';
 
 export enum LoadStatus {
@@ -26,6 +27,7 @@ export enum LoadStatus {
 export interface State {
   courses: Course[];
   coursesLoadStatus: LoadStatus;
+  courseModificationStatus: LoadStatus;
   assignments: Assignment[];
   assignmentsLoadStatus: LoadStatus;
   sections: Section[];
@@ -37,6 +39,7 @@ export interface State {
 const initialState: State = {
   courses: [],
   coursesLoadStatus: LoadStatus.NONE,
+  courseModificationStatus: LoadStatus.NONE,
   assignments: [],
   assignmentsLoadStatus: LoadStatus.NONE,
   sections: [],
@@ -70,6 +73,27 @@ export const fetchStudentsInMyCourses = createAsyncThunk(
   'educationManagement/fetchStudentsInMyCourses',
   async (instructorId: string) => {
     return await _fetchStudentsInMyCourses(instructorId);
+  }
+);
+
+export const createCourse = createAsyncThunk(
+  'educationManagement/createCourse',
+  async () => {
+    return await _addOrUpdateCourse(undefined, 'CREATE');
+  }
+);
+
+export const updateCourse = createAsyncThunk(
+  'educationManagement/updateCourse',
+  async (courseData: Partial<Course>) => {
+    return await _addOrUpdateCourse(courseData, 'MODIFY');
+  }
+);
+
+export const deleteCourse = createAsyncThunk(
+  'educationManagement/deleteCourse',
+  async (courseId: string) => {
+    return await _addOrUpdateCourse({ _id: courseId }, 'DELETE');
   }
 );
 
@@ -122,6 +146,52 @@ export const educationManagementSlice = createSlice({
       })
       .addCase(fetchStudentsInMyCourses.rejected, (state) => {
         state.studentsLoadStatus = LoadStatus.FAILED;
+      })
+
+      // Course creation
+      .addCase(createCourse.pending, (state) => {
+        state.courseModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(createCourse.fulfilled, (state, action) => {
+        state.courseModificationStatus = LoadStatus.SUCCEEDED;
+        // Add the new course to the list
+        state.courses.push(action.payload);
+      })
+      .addCase(createCourse.rejected, (state) => {
+        state.courseModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Course update
+      .addCase(updateCourse.pending, (state) => {
+        state.courseModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(updateCourse.fulfilled, (state, action) => {
+        state.courseModificationStatus = LoadStatus.SUCCEEDED;
+        // Update the existing course in the list
+        const courseIndex = state.courses.findIndex(
+          (c) => c._id === action.payload._id
+        );
+        if (courseIndex >= 0) {
+          state.courses[courseIndex] = action.payload;
+        }
+      })
+      .addCase(updateCourse.rejected, (state) => {
+        state.courseModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Course deletion
+      .addCase(deleteCourse.pending, (state) => {
+        state.courseModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(deleteCourse.fulfilled, (state, action) => {
+        state.courseModificationStatus = LoadStatus.SUCCEEDED;
+        // Remove the course from the list
+        state.courses = state.courses.filter(
+          (c) => c._id !== action.payload._id
+        );
+      })
+      .addCase(deleteCourse.rejected, (state) => {
+        state.courseModificationStatus = LoadStatus.FAILED;
       });
   },
 });

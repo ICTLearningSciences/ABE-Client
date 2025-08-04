@@ -194,3 +194,31 @@ export async function fetchStudentsInMyCourses(instructorId: string): Promise<St
   );
   return res;
 }
+
+// Create, modify, or delete a course
+export async function addOrUpdateCourse(
+  courseData?: Partial<Course>,
+  action: 'CREATE' | 'MODIFY' | 'DELETE' = 'CREATE'
+): Promise<Course> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Course>(
+    {
+      query: `
+        mutation AddOrUpdateCourse($courseData: CourseInputType, $action: CourseAction!) {
+          addOrUpdateCourse(courseData: $courseData, action: $action) {
+            ${courseQueryData}
+          }
+        }
+      `,
+      variables: {
+        courseData,
+        action,
+      },
+    },
+    {
+      dataPath: 'addOrUpdateCourse',
+      accessToken,
+    }
+  );
+  return res;
+}
