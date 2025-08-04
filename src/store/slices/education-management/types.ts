@@ -2,6 +2,7 @@ export interface Course {
   _id: string;
   title: string;
   description: string;
+  courseCode: string;
   instructorId: string;
   sectionIds: string[];
 }

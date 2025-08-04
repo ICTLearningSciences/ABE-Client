@@ -8,6 +8,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { Course } from '../../store/slices/education-management/types';
+import { courseEditUrl, courseViewUrl } from './course-edit';
 
 interface CourseListItemProps {
   course: Course;
@@ -52,14 +53,14 @@ export default function InstructorDashboard() {
   const handleCreateCourse = async () => {
     try {
       const newCourse = await createCourse();
-      navigate(`/courses/${newCourse._id}/edit`);
+      navigate(courseEditUrl(newCourse._id));
     } catch (error) {
       console.error('Failed to create course:', error);
     }
   };
 
   const handleCourseClick = (courseId: string) => {
-    navigate(`/courses/${courseId}`);
+    navigate(courseViewUrl(courseId));
   };
 
   if (isLoading) {

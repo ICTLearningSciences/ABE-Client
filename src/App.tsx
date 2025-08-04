@@ -26,10 +26,16 @@ import {
 import InstructorDashboard, {
   instructorDashboardUrl,
 } from './pages/instructor/dashboard';
+import CourseEdit, {
+  courseEditPath,
+  courseViewPath,
+} from './pages/instructor/course-edit';
+import CourseView from './pages/instructor/course-view';
 
 function MainApp() {
   const mainAppHeight = '88vh';
   const useLogin = useWithLogin();
+
   const router = createBrowserRouter([
     {
       path: '/',
@@ -105,6 +111,40 @@ function MainApp() {
             }}
           >
             <InstructorDashboard />
+          </div>
+        </>
+      ),
+    },
+    {
+      path: courseEditPath,
+      element: (
+        <>
+          <Header useLogin={useLogin} />
+          <div
+            style={{
+              width: '100%',
+              height: mainAppHeight,
+              overflow: 'auto',
+            }}
+          >
+            <CourseEdit />
+          </div>
+        </>
+      ),
+    },
+    {
+      path: courseViewPath,
+      element: (
+        <>
+          <Header useLogin={useLogin} />
+          <div
+            style={{
+              width: '100%',
+              height: mainAppHeight,
+              overflow: 'auto',
+            }}
+          >
+            <CourseView />
           </div>
         </>
       ),

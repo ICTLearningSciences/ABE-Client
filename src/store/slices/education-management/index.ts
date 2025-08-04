@@ -107,7 +107,11 @@ export const deleteCourse = createAsyncThunk(
 export const createSection = createAsyncThunk(
   'educationManagement/createSection',
   async (courseId: string) => {
-    return await _addOrUpdateSection(courseId, undefined, 'CREATE');
+    const newSection = await _addOrUpdateSection(courseId, undefined, 'CREATE');
+    return {
+      courseId,
+      newSection,
+    };
   }
 );
 
@@ -125,11 +129,15 @@ export const updateSection = createAsyncThunk(
 export const deleteSection = createAsyncThunk(
   'educationManagement/deleteSection',
   async (params: { courseId: string; sectionId: string }) => {
-    return await _addOrUpdateSection(
+    await _addOrUpdateSection(
       params.courseId,
       { _id: params.sectionId },
       'DELETE'
     );
+    return {
+      courseId: params.courseId,
+      sectionId: params.sectionId,
+    };
   }
 );
 
@@ -319,7 +327,15 @@ export const educationManagementSlice = createSlice({
       .addCase(createSection.fulfilled, (state, action) => {
         state.sectionModificationStatus = LoadStatus.SUCCEEDED;
         // Add the new section to the list
-        state.sections.push(action.payload);
+        state.sections.push(action.payload.newSection);
+        const courseIndex = state.courses.findIndex(
+          (c) => c._id === action.payload.courseId
+        );
+        if (courseIndex >= 0) {
+          state.courses[courseIndex].sectionIds.push(
+            action.payload.newSection._id
+          );
+        }
       })
       .addCase(createSection.rejected, (state) => {
         state.sectionModificationStatus = LoadStatus.FAILED;
@@ -351,8 +367,16 @@ export const educationManagementSlice = createSlice({
         state.sectionModificationStatus = LoadStatus.SUCCEEDED;
         // Remove the section from the list
         state.sections = state.sections.filter(
-          (s) => s._id !== action.payload._id
+          (s) => s._id !== action.payload.sectionId
         );
+        const courseIndex = state.courses.findIndex(
+          (c) => c._id === action.payload.courseId
+        );
+        if (courseIndex >= 0) {
+          state.courses[courseIndex].sectionIds = state.courses[
+            courseIndex
+          ].sectionIds.filter((id) => id !== action.payload.sectionId);
+        }
       })
       .addCase(deleteSection.rejected, (state) => {
         state.sectionModificationStatus = LoadStatus.FAILED;
