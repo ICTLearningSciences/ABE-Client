@@ -316,3 +316,37 @@ export async function modifySectionEnrollment(
   );
   return res;
 }
+
+// Modify student assignment progress
+export async function modifyStudentAssignmentProgress(
+  targetUserId: string,
+  courseId: string,
+  sectionId: string,  
+  assignmentId: string,
+  progress: 'COMPLETE' | 'INCOMPLETE'
+): Promise<StudentData> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<StudentData>(
+    {
+      query: `
+mutation ModifyStudentAssignmentProgress($targetUserId: ID!, $courseId: ID!, $sectionId: ID!, $assignmentId: ID!, $progress: ModifyStudentAssignmentProgressInputType!) {
+          modifyStudentAssignmentProgress(targetUserId: $targetUserId, courseId: $courseId, sectionId: $sectionId, assignmentId: $assignmentId, progress: $progress) {
+            ${studentDataQueryData}
+          }
+        }
+      `,
+      variables: {
+        targetUserId,
+        courseId,
+        sectionId,
+        assignmentId,
+        progress,
+      },
+    },
+    {
+      dataPath: 'modifyStudentAssignmentProgress',
+      accessToken,
+    }
+  );
+  return res;
+}

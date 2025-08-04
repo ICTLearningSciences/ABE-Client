@@ -1,4 +1,4 @@
-import { fetchCourses as _fetchCourses, fetchAssignments as _fetchAssignments, fetchSections as _fetchSections, fetchStudentsInMyCourses as _fetchStudentsInMyCourses, createCourse as _createCourse, updateCourse as _updateCourse, deleteCourse as _deleteCourse, createSection as _createSection, updateSection as _updateSection, deleteSection as _deleteSection, createAssignment as _createAssignment, updateAssignment as _updateAssignment, deleteAssignment as _deleteAssignment, enrollInSection as _enrollInSection, removeFromSection as _removeFromSection, LoadStatus } from '.';
+import { fetchCourses as _fetchCourses, fetchAssignments as _fetchAssignments, fetchSections as _fetchSections, fetchStudentsInMyCourses as _fetchStudentsInMyCourses, createCourse as _createCourse, updateCourse as _updateCourse, deleteCourse as _deleteCourse, createSection as _createSection, updateSection as _updateSection, deleteSection as _deleteSection, createAssignment as _createAssignment, updateAssignment as _updateAssignment, deleteAssignment as _deleteAssignment, enrollInSection as _enrollInSection, removeFromSection as _removeFromSection, updateStudentAssignmentProgress as _updateStudentAssignmentProgress, LoadStatus } from '.';
 import { Course, Assignment, Section, StudentData } from './educational-api';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
@@ -18,6 +18,7 @@ export interface UseWithEducationalManagement {
   deleteAssignment: (courseId: string, assignmentId: string) => Promise<Assignment>;
   enrollStudentInSection: (targetUserId: string, courseId: string, sectionId: string, sectionCode: string) => Promise<StudentData>;
   removeStudentFromSection: (targetUserId: string, courseId: string, sectionId: string) => Promise<StudentData>;
+  updateStudentAssignmentProgress: (targetUserId: string, courseId: string, sectionId: string, assignmentId: string, progress: 'COMPLETE' | 'INCOMPLETE') => Promise<StudentData>;
   courses: Course[];
   assignments: Assignment[];
   sections: Section[];
@@ -143,6 +144,11 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as StudentData;
   }
 
+  async function updateStudentAssignmentProgress(targetUserId: string, courseId: string, sectionId: string, assignmentId: string, progress: 'COMPLETE' | 'INCOMPLETE') {
+    const res = await dispatch(_updateStudentAssignmentProgress({ targetUserId, courseId, sectionId, assignmentId, progress }));
+    return res.payload as StudentData;
+  }
+
   return {
     loadCourses,
     loadAssignments,
@@ -159,6 +165,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     deleteAssignment,
     enrollStudentInSection,
     removeStudentFromSection,
+    updateStudentAssignmentProgress,
     courses,
     assignments,
     sections,

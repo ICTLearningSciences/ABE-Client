@@ -17,7 +17,8 @@ import {
   addOrUpdateCourse as _addOrUpdateCourse,
   addOrUpdateSection as _addOrUpdateSection,
   addOrUpdateAssignment as _addOrUpdateAssignment,
-  modifySectionEnrollment as _modifySectionEnrollment
+  modifySectionEnrollment as _modifySectionEnrollment,
+  modifyStudentAssignmentProgress as _modifyStudentAssignmentProgress
 } from './educational-api';
 
 export enum LoadStatus {
@@ -159,6 +160,13 @@ export const removeFromSection = createAsyncThunk(
   'educationManagement/removeFromSection',
   async (params: { targetUserId: string; courseId: string; sectionId: string }) => {
     return await _modifySectionEnrollment(params.targetUserId, params.courseId, params.sectionId, 'REMOVE');
+  }
+);
+
+export const updateStudentAssignmentProgress = createAsyncThunk(
+  'educationManagement/updateStudentAssignmentProgress',
+  async (params: { targetUserId: string; courseId: string; sectionId: string; assignmentId: string; progress: 'COMPLETE' | 'INCOMPLETE' }) => {
+    return await _modifyStudentAssignmentProgress(params.targetUserId, params.courseId, params.sectionId, params.assignmentId, params.progress);
   }
 );
 
@@ -387,6 +395,24 @@ export const educationManagementSlice = createSlice({
         }
       })
       .addCase(removeFromSection.rejected, (state) => {
+        state.enrollmentModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Assignment progress update
+      .addCase(updateStudentAssignmentProgress.pending, (state) => {
+        state.enrollmentModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(updateStudentAssignmentProgress.fulfilled, (state, action) => {
+        state.enrollmentModificationStatus = LoadStatus.SUCCEEDED;
+        // Update the student data in the students list
+        const studentIndex = state.students.findIndex(
+          (s) => s.userId === action.payload.userId
+        );
+        if (studentIndex >= 0) {
+          state.students[studentIndex] = action.payload;
+        }
+      })
+      .addCase(updateStudentAssignmentProgress.rejected, (state) => {
         state.enrollmentModificationStatus = LoadStatus.FAILED;
       });
   },
