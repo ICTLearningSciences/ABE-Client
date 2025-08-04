@@ -6,61 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
 import { execGql } from '../../../hooks/api';
-
-// TypeScript interface for Course
-export interface Course {
-  _id: string;
-  title: string;
-  description: string;
-  instructorId: string;
-  sectionIds: string[];
-}
-
-// TypeScript interface for Assignment
-export interface Assignment {
-  _id: string;
-  title: string;
-  description: string;
-  activityIds: string[];
-  instructorId: string;
-}
-
-// TypeScript interface for Section
-export interface SectionAssignment {
-  assignmentId: string;
-  mandatory: boolean;
-}
-
-export interface Section {
-  _id: string;
-  title: string;
-  sectionCode: string;
-  description: string;
-  instructorId: string;
-  assignments: SectionAssignment[];
-  numOptionalAssignmentsRequired: number;
-}
-
-// TypeScript interface for StudentData
-export interface AssignmentProgress {
-  assignmentId: string;
-  complete: boolean;
-}
-
-export interface StudentData {
-  _id: string;
-  userId: string;
-  enrolledCourses: string[];
-  enrolledSections: string[];
-  assignmentProgress: AssignmentProgress[];
-}
-
-// TypeScript interface for Instructor
-export interface Instructor {
-  _id: string;
-  userId: string;
-  courseIds: string[];
-}
+import { Course, Assignment, Section, StudentData, Instructor } from './types';
 
 // GraphQL query fragment for course data
 export const courseQueryData = `

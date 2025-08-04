@@ -18,14 +18,10 @@ import {
   LoadStatus,
 } from '.';
 import {
-  Course,
-  Assignment,
-  Section,
-  StudentData,
-  Instructor,
   createNewInstructor as _createNewInstructor,
   createNewStudent as _createNewStudent,
 } from './educational-api';
+import { Course, Assignment, Section, StudentData, Instructor } from './types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
 export interface UseWithEducationalManagement {

@@ -6,10 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
-  Course,
-  Assignment,
-  Section,
-  StudentData,
   fetchCourses as _fetchCourses,
   fetchAssignments as _fetchAssignments,
   fetchSections as _fetchSections,
@@ -20,6 +16,7 @@ import {
   modifySectionEnrollment as _modifySectionEnrollment,
   modifyStudentAssignmentProgress as _modifyStudentAssignmentProgress,
 } from './educational-api';
+import { Course, Assignment, Section, StudentData } from './types';
 
 export enum LoadStatus {
   NONE,
