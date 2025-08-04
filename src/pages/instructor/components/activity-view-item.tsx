@@ -5,44 +5,27 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { Assignment } from '../../../store/slices/education-management/types';
 
-interface AssignmentViewItemProps {
-  assignment: Assignment;
-  onClick: () => void;
+interface ActivityViewItemProps {
+  activityId: string;
 }
 
-export default function AssignmentViewItem({
-  assignment,
-  onClick,
-}: AssignmentViewItemProps) {
+export default function ActivityViewItem({
+  activityId,
+}: ActivityViewItemProps) {
   return (
     <div
-      onClick={onClick}
       style={{
         border: '1px solid #ccc',
         borderRadius: '8px',
         padding: '16px',
         margin: '8px 0',
-        cursor: 'pointer',
         backgroundColor: '#fff',
-        transition: 'background-color 0.2s',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = '#f5f5f5';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = '#fff';
       }}
     >
-      <h4 style={{ margin: '0 0 4px 0', color: '#1B6A9C' }}>
-        {assignment.title || 'No Assignment Name'}
+      <h4 style={{ margin: '0', color: '#1B6A9C' }}>
+        Activity ID: {activityId}
       </h4>
-      {assignment.description && (
-        <p style={{ margin: '0', color: '#666', fontSize: '14px' }}>
-          {assignment.description}
-        </p>
-      )}
     </div>
   );
 }

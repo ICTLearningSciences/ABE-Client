@@ -7,10 +7,8 @@ The full terms of this copyright and license should always be found in the root 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
-import { Section } from '../../store/slices/education-management/types';
 import { TwoOptionDialog } from '../../components/dialog';
 import AssignmentListItem from './components/assignment-list-item';
-import { sectionViewUrl } from './section-view';
 import { courseViewUrl } from './course-view';
 
 export const sectionEditPath = '/section-edit/:courseId/:sectionId';
@@ -19,18 +17,25 @@ export const sectionEditUrl = (courseId: string, sectionId: string) =>
     .replace(':courseId', courseId)
     .replace(':sectionId', sectionId);
 
-export const assignmentEditPath = '/assignment-edit/:courseId/:sectionId/:assignmentId';
-export const assignmentEditUrl = (courseId: string, sectionId: string, assignmentId: string) =>
+export const assignmentEditPath =
+  '/assignment-edit/:courseId/:sectionId/:assignmentId';
+export const assignmentEditUrl = (
+  courseId: string,
+  sectionId: string,
+  assignmentId: string
+) =>
   assignmentEditPath
     .replace(':courseId', courseId)
     .replace(':sectionId', sectionId)
     .replace(':assignmentId', assignmentId);
 
 export default function SectionEdit() {
-  const { courseId, sectionId } = useParams<{ courseId: string; sectionId: string }>();
+  const { courseId, sectionId } = useParams<{
+    courseId: string;
+    sectionId: string;
+  }>();
   const navigate = useNavigate();
   const {
-    courses,
     sections,
     assignments,
     updateSection,
@@ -47,15 +52,16 @@ export default function SectionEdit() {
     numOptionalAssignmentsRequired: 0,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
-  const currentCourse = courses.find((course) => course._id === courseId);
   const currentSection = sections.find((section) => section._id === sectionId);
-  
+
   const requiredAssignments = currentSection
     ? assignments.filter((assignment) =>
         currentSection.assignments.some(
           (sectionAssignment) =>
-            sectionAssignment.assignmentId === assignment._id && sectionAssignment.mandatory
+            sectionAssignment.assignmentId === assignment._id &&
+            sectionAssignment.mandatory
         )
       )
     : [];
@@ -64,7 +70,8 @@ export default function SectionEdit() {
     ? assignments.filter((assignment) =>
         currentSection.assignments.some(
           (sectionAssignment) =>
-            sectionAssignment.assignmentId === assignment._id && !sectionAssignment.mandatory
+            sectionAssignment.assignmentId === assignment._id &&
+            !sectionAssignment.mandatory
         )
       )
     : [];
@@ -75,21 +82,27 @@ export default function SectionEdit() {
         title: currentSection.title,
         description: currentSection.description,
         sectionCode: currentSection.sectionCode || '',
-        numOptionalAssignmentsRequired: currentSection.numOptionalAssignmentsRequired || 0,
+        numOptionalAssignmentsRequired:
+          currentSection.numOptionalAssignmentsRequired || 0,
       });
     }
   }, [currentSection]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ 
-      ...prev, 
-      [name]: name === 'numOptionalAssignmentsRequired' ? parseInt(value) || 0 : value 
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        name === 'numOptionalAssignmentsRequired'
+          ? parseInt(value) || 0
+          : value,
     }));
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!courseId || !sectionId || !currentSection) return;
 
     try {
@@ -101,6 +114,14 @@ export default function SectionEdit() {
     } catch (error) {
       console.error('Failed to update section:', error);
     }
+  };
+
+  const handleCancel = () => {
+    setShowCancelConfirm(true);
+  };
+
+  const confirmCancel = () => {
+    navigate(-1);
   };
 
   const handleDeleteSection = async () => {
@@ -123,7 +144,7 @@ export default function SectionEdit() {
       if (currentSection) {
         const updatedAssignments = [
           ...currentSection.assignments,
-          { assignmentId: newAssignment._id, mandatory: true }
+          { assignmentId: newAssignment._id, mandatory: true },
         ];
         await updateSection(courseId, {
           _id: sectionId!,
@@ -145,7 +166,7 @@ export default function SectionEdit() {
       if (currentSection) {
         const updatedAssignments = [
           ...currentSection.assignments,
-          { assignmentId: newAssignment._id, mandatory: false }
+          { assignmentId: newAssignment._id, mandatory: false },
         ];
         await updateSection(courseId, {
           _id: sectionId!,
@@ -180,28 +201,38 @@ export default function SectionEdit() {
 
   if (!currentSection) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '400px' 
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '400px',
+        }}
+      >
         <p>Section not found</p>
       </div>
     );
   }
 
   return (
-    <div style={{ 
-      maxWidth: '80%', 
-      margin: '0 auto', 
-      padding: '24px' 
-    }}>
+    <div
+      style={{
+        maxWidth: '80%',
+        margin: '0 auto',
+        padding: '24px',
+      }}
+    >
       <h1 style={{ margin: '0 0 32px 0', color: '#000' }}>Edit Section</h1>
 
-      <form onSubmit={handleSave} style={{ marginBottom: '48px' }}>
+      <div style={{ marginBottom: '48px' }}>
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: 'bold',
+            }}
+          >
             Section Title
           </label>
           <input
@@ -221,7 +252,13 @@ export default function SectionEdit() {
         </div>
 
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: 'bold',
+            }}
+          >
             Section Code
           </label>
           <input
@@ -240,7 +277,13 @@ export default function SectionEdit() {
         </div>
 
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: 'bold',
+            }}
+          >
             Description
           </label>
           <textarea
@@ -260,7 +303,13 @@ export default function SectionEdit() {
         </div>
 
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: 'bold',
+            }}
+          >
             Number of Optional Assignments Required
           </label>
           <input
@@ -278,33 +327,20 @@ export default function SectionEdit() {
             }}
           />
         </div>
-
-        <button
-          type="submit"
-          disabled={isSectionModifying}
-          style={{
-            backgroundColor: '#1B6A9C',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '12px 24px',
-            fontSize: '16px',
-            cursor: isSectionModifying ? 'not-allowed' : 'pointer',
-            opacity: isSectionModifying ? 0.6 : 1,
-          }}
-        >
-          {isSectionModifying ? 'Saving...' : 'Save'}
-        </button>
-      </form>
+      </div>
 
       <div style={{ marginBottom: '48px' }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          marginBottom: '24px' 
-        }}>
-          <h2 style={{ margin: '0', color: '#000' }}>Manage Required Assignments</h2>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '24px',
+          }}
+        >
+          <h2 style={{ margin: '0', color: '#000' }}>
+            Manage Required Assignments
+          </h2>
           <button
             onClick={handleCreateRequiredAssignment}
             disabled={isAssignmentModifying}
@@ -325,14 +361,18 @@ export default function SectionEdit() {
 
         <div>
           {requiredAssignments.length === 0 ? (
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '32px', 
-              color: '#666',
-              border: '1px solid #ccc',
-              borderRadius: '8px',
-            }}>
-              <p>No required assignments. Create your first required assignment!</p>
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '32px',
+                color: '#666',
+                border: '1px solid #ccc',
+                borderRadius: '8px',
+              }}
+            >
+              <p>
+                No required assignments. Create your first required assignment!
+              </p>
             </div>
           ) : (
             requiredAssignments.map((assignment) => (
@@ -349,13 +389,17 @@ export default function SectionEdit() {
       </div>
 
       <div style={{ marginBottom: '48px' }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          marginBottom: '24px' 
-        }}>
-          <h2 style={{ margin: '0', color: '#000' }}>Manage Optional Assignments</h2>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '24px',
+          }}
+        >
+          <h2 style={{ margin: '0', color: '#000' }}>
+            Manage Optional Assignments
+          </h2>
           <button
             onClick={handleCreateOptionalAssignment}
             disabled={isAssignmentModifying}
@@ -376,14 +420,18 @@ export default function SectionEdit() {
 
         <div>
           {optionalAssignments.length === 0 ? (
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '32px', 
-              color: '#666',
-              border: '1px solid #ccc',
-              borderRadius: '8px',
-            }}>
-              <p>No optional assignments. Create your first optional assignment!</p>
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '32px',
+                color: '#666',
+                border: '1px solid #ccc',
+                borderRadius: '8px',
+              }}
+            >
+              <p>
+                No optional assignments. Create your first optional assignment!
+              </p>
             </div>
           ) : (
             optionalAssignments.map((assignment) => (
@@ -399,12 +447,51 @@ export default function SectionEdit() {
         </div>
       </div>
 
-      <div style={{ 
-        display: 'flex', 
-        gap: '16px', 
-        paddingTop: '24px', 
-        borderTop: '1px solid #ccc' 
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: '16px',
+          paddingTop: '24px',
+          borderTop: '1px solid #ccc',
+          width: '100%',
+        }}
+      >
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <button
+            onClick={() => handleSave()}
+            disabled={isSectionModifying}
+            style={{
+              backgroundColor: '#1B6A9C',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '12px 24px',
+              fontSize: '16px',
+              cursor: isSectionModifying ? 'not-allowed' : 'pointer',
+              opacity: isSectionModifying ? 0.6 : 1,
+            }}
+          >
+            {isSectionModifying ? 'Saving...' : 'Save'}
+          </button>
+
+          <button
+            onClick={handleCancel}
+            disabled={isSectionModifying}
+            style={{
+              backgroundColor: '#6c757d',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '12px 24px',
+              fontSize: '16px',
+              cursor: isSectionModifying ? 'not-allowed' : 'pointer',
+              opacity: isSectionModifying ? 0.6 : 1,
+            }}
+          >
+            Cancel
+          </button>
+        </div>
         <button
           onClick={() => setShowDeleteConfirm(true)}
           disabled={isSectionModifying}
@@ -417,6 +504,7 @@ export default function SectionEdit() {
             fontSize: '16px',
             cursor: isSectionModifying ? 'not-allowed' : 'pointer',
             opacity: isSectionModifying ? 0.6 : 1,
+            justifySelf: 'flex-end',
           }}
         >
           Delete Section
@@ -434,6 +522,20 @@ export default function SectionEdit() {
         option2={{
           display: 'Delete',
           onClick: handleDeleteSection,
+        }}
+      />
+
+      <TwoOptionDialog
+        title="Discard unsaved changes?"
+        open={showCancelConfirm}
+        actionInProgress={false}
+        option1={{
+          display: 'Keep Editing',
+          onClick: () => setShowCancelConfirm(false),
+        }}
+        option2={{
+          display: 'Discard Changes',
+          onClick: confirmCancel,
         }}
       />
     </div>

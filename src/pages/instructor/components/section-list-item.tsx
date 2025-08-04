@@ -10,14 +10,14 @@ import { TwoOptionDialog } from '../../../components/dialog';
 
 interface SectionListItemProps {
   section: Section;
-  onEdit: () => void;
+  onView: () => void;
   onRemove: () => void;
   isRemoving?: boolean;
 }
 
 export default function SectionListItem({
   section,
-  onEdit,
+  onView,
   onRemove,
   isRemoving = false,
 }: SectionListItemProps) {
@@ -47,7 +47,7 @@ export default function SectionListItem({
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
-            onClick={onEdit}
+            onClick={onView}
             style={{
               backgroundColor: '#1B6A9C',
               color: 'white',
@@ -58,7 +58,7 @@ export default function SectionListItem({
               fontSize: '14px',
             }}
           >
-            Edit
+            View
           </button>
           <button
             onClick={() => setShowRemoveConfirm(true)}

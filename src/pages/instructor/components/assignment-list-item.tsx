@@ -15,11 +15,11 @@ interface AssignmentListItemProps {
   isRemoving?: boolean;
 }
 
-export default function AssignmentListItem({ 
-  assignment, 
-  onEdit, 
-  onRemove, 
-  isRemoving = false 
+export default function AssignmentListItem({
+  assignment,
+  onEdit,
+  onRemove,
+  isRemoving = false,
 }: AssignmentListItemProps) {
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 
@@ -38,7 +38,9 @@ export default function AssignmentListItem({
         }}
       >
         <div>
-          <h4 style={{ margin: '0 0 4px 0', color: '#1B6A9C' }}>{assignment.title}</h4>
+          <h4 style={{ margin: '0 0 4px 0', color: '#1B6A9C' }}>
+            {assignment.title}
+          </h4>
           {assignment.description && (
             <p style={{ margin: '0', color: '#666', fontSize: '14px' }}>
               {assignment.description}
@@ -78,7 +80,7 @@ export default function AssignmentListItem({
           </button>
         </div>
       </div>
-      
+
       <TwoOptionDialog
         title={`Remove assignment "${assignment.title}" from this section?`}
         open={showRemoveConfirm}

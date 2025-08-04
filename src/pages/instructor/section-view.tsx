@@ -111,16 +111,6 @@ export default function SectionView() {
             <h1 style={{ margin: '0 0 8px 0', color: '#000' }}>
               {currentSection.title}
             </h1>
-            <p
-              style={{
-                margin: '0 0 16px 0',
-                color: '#666',
-                fontSize: '18px',
-                fontWeight: 'bold',
-              }}
-            >
-              {currentSection.description}
-            </p>
             {currentSection.sectionCode && (
               <p
                 style={{
@@ -133,18 +123,15 @@ export default function SectionView() {
                 Section Code: {currentSection.sectionCode}
               </p>
             )}
-            {currentSection.description && (
-              <p
-                style={{
-                  margin: '0',
-                  color: '#333',
-                  fontSize: '16px',
-                  lineHeight: '1.5',
-                }}
-              >
-                {currentSection.description}
-              </p>
-            )}
+            <p
+              style={{
+                margin: '0 0 16px 0',
+                color: '#666',
+                fontSize: '18px',
+              }}
+            >
+              {currentSection.description}
+            </p>
           </div>
           <button
             onClick={handleEditSection}
@@ -221,9 +208,9 @@ export default function SectionView() {
               fontWeight: 'bold',
             }}
           >
-            **Student must complete{' '}
+            Student must complete{' '}
             {currentSection.numOptionalAssignmentsRequired} of the optional
-            assignments below.**
+            assignments below.
           </p>
         )}
 

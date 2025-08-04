@@ -91,7 +91,7 @@ export default function CourseEdit() {
     }
   };
 
-  const handleEditSection = (sectionId: string) => {
+  const handleViewSection = (sectionId: string) => {
     navigate(sectionViewUrl(courseId!, sectionId));
   };
 
@@ -271,7 +271,7 @@ export default function CourseEdit() {
               <SectionListItem
                 key={section._id}
                 section={section}
-                onEdit={() => handleEditSection(section._id)}
+                onView={() => handleViewSection(section._id)}
                 onRemove={() => handleRemoveSection(section._id)}
                 isRemoving={isCourseModifying}
               />
