@@ -10,11 +10,12 @@ import CollapsibleTree, { TreeItem } from './components/collapsible-tree';
 import CourseView from './components/course-view';
 import SectionView from './components/section-view';
 import AssignmentView from './components/assignment-view';
+import BreadcrumbNavigation from './components/breadcrumb-navigation';
 import { getCourseManagementTreeData } from './helpers';
 
 export const courseManagementUrl = '/course-management';
 
-interface CourseManagementState {
+export interface CourseManagementState {
   view: 'dashboard' | 'course' | 'section' | 'assignment';
   selectedCourseId?: string;
   selectedSectionId?: string;
@@ -166,10 +167,23 @@ const CourseManagement: React.FC = () => {
         flex: 1,
         padding: '24px',
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center'
+        flexDirection: 'column'
       }}>
+          <BreadcrumbNavigation 
+            educationManagement={educationManagement}
+            viewState={viewState}
+            handleCourseSelect={handleCourseSelect}
+            handleSectionSelect={handleSectionSelect}
+            handleAssignmentSelect={handleAssignmentSelect}
+          />
+
+        {/* Content Area */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
         {viewState.view === 'dashboard' && (
           <div style={{
             textAlign: 'center',
@@ -219,6 +233,7 @@ const CourseManagement: React.FC = () => {
             assignmentId={viewState.selectedAssignmentId}
           />
         )}
+        </div>
       </div>
     </div>
   );
