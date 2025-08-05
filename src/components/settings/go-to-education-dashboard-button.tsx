@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { instructorDashboardUrl } from '../../pages/instructor/dashboard';
 import { Button } from '@mui/material';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
 
@@ -19,7 +18,7 @@ export default function GoToEducationDashboardButton() {
         variant="contained"
         color="primary"
         onClick={() => {
-          navigate(instructorDashboardUrl);
+          navigate('');
         }}
       >
         Instructor Dashboard
