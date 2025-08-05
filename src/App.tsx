@@ -23,6 +23,8 @@ import {
   AuthProviderProps,
   AuthProvider as CognitoAuthProvider,
 } from 'react-oidc-context';
+import CourseManagement from './pages/instructor/course-management';
+import { courseManagementUrl } from './pages/instructor/course-management';
 
 function MainApp() {
   const mainAppHeight = '88vh';
@@ -89,6 +91,25 @@ function MainApp() {
     {
       path: '/docs/history/:docId',
       element: <DocHistoryContainer useLogin={useLogin} />,
+    },
+    {
+      path: courseManagementUrl,
+      element: (
+        <>
+          <Header useLogin={useLogin} />
+          <div
+            style={{
+              width: '100%',
+              height: mainAppHeight,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <CourseManagement />
+          </div>
+        </>
+      ),
     },
   ]);
   const { ConfigLoader, configLoaded } = useConfigLoader();

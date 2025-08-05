@@ -8,7 +8,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
-
+import { courseManagementUrl } from '../../pages/instructor/course-management';
 export default function GoToEducationDashboardButton() {
   const navigate = useNavigate();
   const { state: loginState } = useWithLogin();
@@ -18,7 +18,7 @@ export default function GoToEducationDashboardButton() {
         variant="contained"
         color="primary"
         onClick={() => {
-          navigate('');
+          navigate(courseManagementUrl);
         }}
       >
         Instructor Dashboard
