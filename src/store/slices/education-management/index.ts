@@ -85,8 +85,8 @@ export const fetchStudentsInMyCourses = createAsyncThunk(
 
 export const createCourse = createAsyncThunk(
   'educationManagement/createCourse',
-  async () => {
-    return await _addOrUpdateCourse(undefined, 'CREATE');
+  async (courseData?: Partial<Course>) => {
+    return await _addOrUpdateCourse(courseData, 'CREATE');
   }
 );
 
@@ -106,10 +106,14 @@ export const deleteCourse = createAsyncThunk(
 
 export const createSection = createAsyncThunk(
   'educationManagement/createSection',
-  async (courseId: string) => {
-    const newSection = await _addOrUpdateSection(courseId, undefined, 'CREATE');
+  async (params: { courseId: string; sectionData?: Partial<Section> }) => {
+    const newSection = await _addOrUpdateSection(
+      params.courseId,
+      params.sectionData,
+      'CREATE'
+    );
     return {
-      courseId,
+      courseId: params.courseId,
       newSection,
     };
   }
@@ -143,8 +147,15 @@ export const deleteSection = createAsyncThunk(
 
 export const createAssignment = createAsyncThunk(
   'educationManagement/createAssignment',
-  async (courseId: string) => {
-    return await _addOrUpdateAssignment(courseId, undefined, 'CREATE');
+  async (params: {
+    courseId: string;
+    assignmentData?: Partial<Assignment>;
+  }) => {
+    return await _addOrUpdateAssignment(
+      params.courseId,
+      params.assignmentData,
+      'CREATE'
+    );
   }
 );
 

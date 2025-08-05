@@ -254,43 +254,6 @@ const SectionModal: React.FC<SectionModalProps> = ({
               },
             }}
           />
-
-          <TextField
-            fullWidth
-            required
-            type="number"
-            label="Optional Assignments Required"
-            placeholder="0"
-            value={formData.numOptionalAssignmentsRequired || 0}
-            onChange={(e) =>
-              handleInputChange(
-                'numOptionalAssignmentsRequired',
-                parseInt(e.target.value) || 0
-              )
-            }
-            error={!!errors.numOptionalAssignmentsRequired}
-            helperText={
-              errors.numOptionalAssignmentsRequired ||
-              'Number of optional assignments students must complete'
-            }
-            disabled={isLoading}
-            sx={{ mb: 3 }}
-            InputProps={{
-              inputProps: { min: 0 },
-              sx: {
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1B6A9C',
-                },
-              },
-            }}
-            InputLabelProps={{
-              sx: {
-                '&.Mui-focused': {
-                  color: '#1B6A9C',
-                },
-              },
-            }}
-          />
         </Box>
       </DialogContent>
 

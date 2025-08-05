@@ -17,8 +17,12 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import { Section } from '../../../store/slices/education-management/types';
+import {
+  Section,
+  Assignment,
+} from '../../../store/slices/education-management/types';
 import SectionModal from './section-modal';
+import AssignmentModal from './assignment-modal';
 import { getAssignmentsForSection } from '../helpers';
 import DeleteConfirmationModal from './delete-confirmation-modal';
 
@@ -35,6 +39,7 @@ const SectionView: React.FC<SectionViewProps> = ({
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const assignments = getAssignmentsForSection(educationManagement, sectionId);
 
   const section = educationManagement.sections.find((s) => s._id === sectionId);
@@ -48,19 +53,30 @@ const SectionView: React.FC<SectionViewProps> = ({
     }
   };
 
-  const handleAddAssignment = async () => {
+  const handleAddAssignment = async (assignmentData: Partial<Assignment>) => {
     try {
-      const newAssignment =
-        await educationManagement.createAssignment(courseId);
+      const newAssignment = await educationManagement.createAssignment(
+        courseId,
+        assignmentData
+      );
       await educationManagement.addAssignmentToSection(
         courseId,
         sectionId,
         newAssignment._id,
         true
       );
+      setShowAssignmentModal(false);
     } catch (error) {
       console.error('Failed to create assignment:', error);
     }
+  };
+
+  const handleOpenAssignmentModal = () => {
+    setShowAssignmentModal(true);
+  };
+
+  const handleCloseAssignmentModal = () => {
+    setShowAssignmentModal(false);
   };
 
   const handleDeleteSection = async () => {
@@ -196,7 +212,7 @@ const SectionView: React.FC<SectionViewProps> = ({
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={handleAddAssignment}
+          onClick={handleOpenAssignmentModal}
           disabled={educationManagement.isAssignmentModifying}
           fullWidth
           sx={{
@@ -288,6 +304,16 @@ const SectionView: React.FC<SectionViewProps> = ({
         mode="edit"
         initialData={section}
         isLoading={educationManagement.isSectionModifying}
+      />
+
+      {/* Assignment Modal */}
+      <AssignmentModal
+        isOpen={showAssignmentModal}
+        onClose={handleCloseAssignmentModal}
+        onSubmit={handleAddAssignment}
+        mode="create"
+        sectionId={sectionId}
+        isLoading={educationManagement.isAssignmentModifying}
       />
     </Box>
   );

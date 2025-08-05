@@ -12,7 +12,9 @@ import CourseView from './components/course-view';
 import SectionView from './components/section-view';
 import AssignmentView from './components/assignment-view';
 import BreadcrumbNavigation from './components/breadcrumb-navigation';
+import CourseModal from './components/course-modal';
 import { getCourseManagementTreeData } from './helpers';
+import { Course } from '../../store/slices/education-management/types';
 
 export const courseManagementUrl = '/course-management';
 
@@ -28,17 +30,27 @@ const CourseManagement: React.FC = () => {
   const [viewState, setViewState] = useState<CourseManagementState>({
     view: 'dashboard',
   });
+  const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
 
-  const handleCreateCourse = async () => {
+  const handleCreateCourse = async (courseData: Partial<Course>) => {
     try {
-      const newCourse = await educationManagement.createCourse();
+      const newCourse = await educationManagement.createCourse(courseData);
       setViewState({
         view: 'course',
         selectedCourseId: newCourse._id,
       });
+      setIsCourseModalOpen(false);
     } catch (error) {
       console.error('Failed to create course:', error);
     }
+  };
+
+  const handleOpenCourseModal = () => {
+    setIsCourseModalOpen(true);
+  };
+
+  const handleCloseCourseModal = () => {
+    setIsCourseModalOpen(false);
   };
 
   const handleCourseSelect = (courseId: string) => {
@@ -128,7 +140,7 @@ const CourseManagement: React.FC = () => {
         </Box>
 
         <Button
-          onClick={handleCreateCourse}
+          onClick={handleOpenCourseModal}
           disabled={educationManagement.isCourseModifying}
           variant="contained"
           fullWidth
@@ -285,6 +297,13 @@ const CourseManagement: React.FC = () => {
             )}
         </Box>
       </Box>
+      <CourseModal
+        isOpen={isCourseModalOpen}
+        onClose={handleCloseCourseModal}
+        onSubmit={handleCreateCourse}
+        mode="create"
+        isLoading={educationManagement.isCourseModifying}
+      />
     </Box>
   );
 };

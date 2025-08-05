@@ -16,8 +16,12 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import { Course } from '../../../store/slices/education-management/types';
+import {
+  Course,
+  Section,
+} from '../../../store/slices/education-management/types';
 import CourseModal from './course-modal';
+import SectionModal from './section-modal';
 import DeleteConfirmationModal from './delete-confirmation-modal';
 
 interface CourseViewProps {
@@ -33,6 +37,7 @@ const CourseView: React.FC<CourseViewProps> = ({
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(startWithEditModal);
+  const [showSectionModal, setShowSectionModal] = useState(false);
   const course = educationManagement.courses.find((c) => c._id === courseId);
   const courseSections = educationManagement.sections.filter(
     (section) => course?.sectionIds.includes(section._id)
@@ -47,12 +52,21 @@ const CourseView: React.FC<CourseViewProps> = ({
     }
   };
 
-  const handleAddSection = async () => {
+  const handleAddSection = async (sectionData: Partial<Section>) => {
     try {
-      await educationManagement.createSection(courseId);
+      await educationManagement.createSection(courseId, sectionData);
+      setShowSectionModal(false);
     } catch (error) {
       console.error('Failed to create section:', error);
     }
+  };
+
+  const handleOpenSectionModal = () => {
+    setShowSectionModal(true);
+  };
+
+  const handleCloseSectionModal = () => {
+    setShowSectionModal(false);
   };
 
   const handleDeleteCourse = async () => {
@@ -167,7 +181,7 @@ const CourseView: React.FC<CourseViewProps> = ({
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={handleAddSection}
+          onClick={handleOpenSectionModal}
           disabled={educationManagement.isSectionModifying}
           fullWidth
           sx={{
@@ -267,6 +281,15 @@ const CourseView: React.FC<CourseViewProps> = ({
         mode="edit"
         initialData={course}
         isLoading={educationManagement.isCourseModifying}
+      />
+
+      {/* Add Section Modal */}
+      <SectionModal
+        isOpen={showSectionModal}
+        onClose={handleCloseSectionModal}
+        onSubmit={handleAddSection}
+        mode="create"
+        isLoading={educationManagement.isSectionModifying}
       />
     </Box>
   );

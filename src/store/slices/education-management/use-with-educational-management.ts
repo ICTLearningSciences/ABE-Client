@@ -29,16 +29,22 @@ export interface UseWithEducationalManagement {
   loadAssignments: (forUserId: string) => Promise<Assignment[]>;
   loadSections: (forUserId: string) => Promise<Section[]>;
   loadStudentsInMyCourses: (instructorId: string) => Promise<StudentData[]>;
-  createCourse: () => Promise<Course>;
+  createCourse: (courseData?: Partial<Course>) => Promise<Course>;
   updateCourse: (courseData: Partial<Course>) => Promise<Course>;
   deleteCourse: (courseId: string) => Promise<Course>;
-  createSection: (courseId: string) => Promise<Section>;
+  createSection: (
+    courseId: string,
+    sectionData?: Partial<Section>
+  ) => Promise<Section>;
   updateSection: (
     courseId: string,
     sectionData: Partial<Section>
   ) => Promise<Section>;
   deleteSection: (courseId: string, sectionId: string) => Promise<Section>;
-  createAssignment: (courseId: string) => Promise<Assignment>;
+  createAssignment: (
+    courseId: string,
+    assignmentData?: Partial<Assignment>
+  ) => Promise<Assignment>;
   updateAssignment: (
     courseId: string,
     assignmentData: Partial<Assignment>
@@ -141,8 +147,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return await dispatch(_fetchStudentsInMyCourses(instructorId)).unwrap();
   }
 
-  async function createCourse() {
-    const res = await dispatch(_createCourse());
+  async function createCourse(courseData?: Partial<Course>) {
+    const res = await dispatch(_createCourse(courseData));
     return res.payload as Course;
   }
 
@@ -156,8 +162,11 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as Course;
   }
 
-  async function createSection(courseId: string) {
-    const res = await dispatch(_createSection(courseId));
+  async function createSection(
+    courseId: string,
+    sectionData?: Partial<Section>
+  ) {
+    const res = await dispatch(_createSection({ courseId, sectionData }));
     return res.payload as Section;
   }
 
@@ -174,8 +183,11 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as Section;
   }
 
-  async function createAssignment(courseId: string) {
-    const res = await dispatch(_createAssignment(courseId));
+  async function createAssignment(
+    courseId: string,
+    assignmentData?: Partial<Assignment>
+  ) {
+    const res = await dispatch(_createAssignment({ courseId, assignmentData }));
     return res.payload as Assignment;
   }
 

@@ -38,7 +38,6 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   const assignment = educationManagement.assignments.find(
     (a) => a._id === assignmentId
   );
-  const course = educationManagement.courses.find((c) => c._id === courseId);
   const section = sectionId
     ? educationManagement.sections.find((s) => s._id === sectionId)
     : null;
@@ -133,10 +132,11 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
               </Typography>
 
               <Stack
-                direction="row"
+                direction="column"
                 spacing={1}
                 alignItems="center"
                 sx={{ mb: 1 }}
+                width="fit-content"
               >
                 {sectionId && (
                   <Chip
@@ -150,19 +150,6 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                   {assignment.activityIds.length} activit
                   {assignment.activityIds.length !== 1 ? 'ies' : 'y'}
                 </Typography>
-              </Stack>
-
-              <Stack direction="column" spacing={0.5}>
-                {course && (
-                  <Typography variant="body2" color="text.secondary">
-                    Course: {course.title}
-                  </Typography>
-                )}
-                {section && (
-                  <Typography variant="body2" color="text.secondary">
-                    Section: {section.title}
-                  </Typography>
-                )}
               </Stack>
             </Box>
 
