@@ -4,50 +4,250 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+import React, { useState } from 'react';
+import {
+  Box,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  Stack,
+  Chip
+} from '@mui/material';
+import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
+import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
+import { Section } from '../../../store/slices/education-management/types';
+import SectionModal from './section-modal';
+import { getAssignmentsForSection } from '../helpers';
 
 interface SectionViewProps {
-  courseId: string;
   sectionId: string;
+  courseId: string;
+  onAssignmentSelect?: (assignmentId: string) => void;
 }
 
-const SectionView: React.FC<SectionViewProps> = ({ courseId, sectionId }) => {
+const SectionView: React.FC<SectionViewProps> = ({ sectionId, courseId, onAssignmentSelect }) => {
+  const educationManagement = useWithEducationalManagement();
+  const [showEditModal, setShowEditModal] = useState(false);
+  const assignments = getAssignmentsForSection(educationManagement, sectionId);
+
+  const section = educationManagement.sections.find(s => s._id === sectionId);
+  const course = section ? educationManagement.courses.find(c => c.sectionIds.includes(sectionId)) : null;
+
+  const handleEditSection = async (sectionData: Partial<Section>) => {
+    try {
+      await educationManagement.updateSection(courseId, sectionData);
+      setShowEditModal(false);
+    } catch (error) {
+      console.error('Failed to update section:', error);
+    }
+  };
+
+  const handleAddAssignment = async () => {
+    try {
+      const newAssignment = await educationManagement.createAssignment(courseId);
+      await educationManagement.addAssignmentToSection(courseId, sectionId, newAssignment._id, true);
+    } catch (error) {
+      console.error('Failed to create assignment:', error);
+    }
+  };
+
+  if (!section) {
+    return (
+      <Box sx={{ 
+        textAlign: 'center', 
+        maxWidth: 400,
+        mx: 'auto',
+        py: 8
+      }}>
+        <Typography variant="h1" sx={{ fontSize: '48px', mb: 3 }}>
+          ❌
+        </Typography>
+        <Typography variant="h4" sx={{ mb: 2, color: 'text.primary' }}>
+          Section Not Found
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          The section you&apos;re looking for could not be found.
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <div style={{
-      textAlign: 'center',
-      maxWidth: '400px'
+    <Box sx={{ 
+      width: '100%', 
+      maxWidth: 800, 
+      px: 2.5
     }}>
-      <div style={{
-        fontSize: '48px',
-        color: '#1B6A9C',
-        marginBottom: '24px'
-      }}>
-        📑
-      </div>
-      <h3 style={{
-        margin: '0 0 16px 0',
-        fontSize: '24px',
-        fontWeight: '600',
-        color: '#495057'
-      }}>
-        Section View
-      </h3>
-      <p style={{
-        margin: '0',
-        fontSize: '16px',
-        color: '#6c757d',
-        lineHeight: '1.5'
-      }}>
-        Section details will be displayed here. This will be implemented in a later phase.
-      </p>
-      <p style={{
-        margin: '16px 0 0 0',
-        fontSize: '12px',
-        color: '#adb5bd'
-      }}>
-        Course ID: {courseId} | Section ID: {sectionId}
-      </p>
-    </div>
+      {/* Section Header */}
+      <Card sx={{ mb: 4, backgroundColor: 'grey.50' }}>
+        <CardContent sx={{ p: 3 }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+            <Box sx={{ flex: 1 }}>
+              <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
+                <Typography sx={{ fontSize: '32px', mr: 2 }}>📑</Typography>
+                <Typography 
+                  variant="h4" 
+                  sx={{ 
+                    color: '#1B6A9C',
+                    fontWeight: 600,
+                    fontSize: '1.75rem'
+                  }}
+                >
+                  {section.title}
+                </Typography>
+              </Stack>
+              
+              <Typography 
+                variant="body1" 
+                color="text.primary" 
+                sx={{ mb: 1.5, lineHeight: 1.5 }}
+              >
+                {section.description}
+              </Typography>
+
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                <Chip 
+                  label={`Section Code: ${section.sectionCode}`} 
+                  size="small" 
+                  variant="outlined"
+                  sx={{ fontSize: '11px' }}
+                />
+              </Stack>
+            </Box>
+
+            <Button
+              variant="outlined"
+              startIcon={<EditIcon />}
+              onClick={() => setShowEditModal(true)}
+              disabled={educationManagement.isSectionModifying}
+              sx={{
+                color: '#1B6A9C',
+                borderColor: '#1B6A9C',
+                '&:hover': {
+                  backgroundColor: '#1B6A9C',
+                  color: 'white'
+                }
+              }}
+            >
+              Edit Section
+            </Button>
+          </Stack>
+        </CardContent>
+      </Card>
+
+      {/* Assignments */}
+      <Box>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+            Assignments
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {section.assignments.length} assignment{section.assignments.length !== 1 ? 's' : ''}
+          </Typography>
+        </Stack>
+
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleAddAssignment}
+          disabled={educationManagement.isAssignmentModifying}
+          fullWidth
+          sx={{
+            py: 2,
+            mb: 3,
+            backgroundColor: '#1B6A9C',
+            '&:hover': {
+              backgroundColor: '#145a87'
+            }
+          }}
+        >
+          Add Assignment
+        </Button>
+
+        {section.assignments.length === 0 ? (
+          <Card 
+            variant="outlined" 
+            sx={{ 
+              border: '2px dashed',
+              borderColor: 'grey.300',
+              textAlign: 'center',
+              py: 5,
+              px: 2.5
+            }}
+          >
+            <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
+              📝
+            </Typography>
+            <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+              No assignments yet
+            </Typography>
+            <Typography variant="body2" color="text.disabled">
+              Add your first assignment to get students started
+            </Typography>
+          </Card>
+        ) : (
+          <Grid container spacing={2}>
+            {assignments.map((assignment) => (
+              <Grid item xs={12} key={assignment._id}>
+                <Card 
+                  variant="outlined"
+                  sx={{
+                    cursor: onAssignmentSelect ? 'pointer' : 'default',
+                    transition: 'all 0.2s ease',
+                    '&:hover': onAssignmentSelect ? {
+                      borderColor: '#1B6A9C',
+                      boxShadow: 2
+                    } : {}
+                  }}
+                  onClick={() => onAssignmentSelect?.(assignment._id)}
+                >
+                  <CardContent>
+                    <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
+                      <Typography sx={{ fontSize: '20px', mr: 1.5 }}>📝</Typography>
+                      <Typography 
+                        variant="h6" 
+                        sx={{ 
+                          color: '#1B6A9C',
+                          fontWeight: 600,
+                          fontSize: '1rem'
+                        }}
+                      >
+                        {assignment.title}
+                      </Typography>
+                    </Stack>
+                    
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary" 
+                      sx={{ mb: 1.5, lineHeight: 1.4 }}
+                    >
+                      {assignment.description}
+                    </Typography>
+
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Box>
+
+      {/* Edit Section Modal */}
+      <SectionModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onSubmit={handleEditSection}
+        mode="edit"
+        courseId={course?._id || ''}
+        initialData={section}
+        isLoading={educationManagement.isSectionModifying}
+      />
+    </Box>
   );
 };
 

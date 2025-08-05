@@ -2,7 +2,7 @@ import { Assignment, Section } from "../../store/slices/education-management/typ
 import { UseWithEducationalManagement } from "../../store/slices/education-management/use-with-educational-management";
 import { TreeItem } from "./components/collapsible-tree";
 
-const getSectionsForCourse = (educationManagement: UseWithEducationalManagement, courseId: string): Section[] => {
+export const getSectionsForCourse = (educationManagement: UseWithEducationalManagement, courseId: string): Section[] => {
     return educationManagement.sections.filter(section => 
       educationManagement.courses.find(course => 
         course._id === courseId && course.sectionIds.includes(section._id)
@@ -10,7 +10,7 @@ const getSectionsForCourse = (educationManagement: UseWithEducationalManagement,
     );
   };
 
-  const getAssignmentsForSection = (educationManagement: UseWithEducationalManagement, sectionId: string): Assignment[] => {
+  export const getAssignmentsForSection = (educationManagement: UseWithEducationalManagement, sectionId: string): Assignment[] => {
     const section = educationManagement.sections.find(s => s._id === sectionId);
     if (!section) return [];
     

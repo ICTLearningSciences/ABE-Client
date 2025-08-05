@@ -181,8 +181,10 @@ const CourseManagement: React.FC = () => {
         <div style={{
           flex: 1,
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          overflow: 'auto',
+          minHeight: 0
         }}>
         {viewState.view === 'dashboard' && (
           <div style={{
@@ -216,7 +218,10 @@ const CourseManagement: React.FC = () => {
         )}
 
         {viewState.view === 'course' && viewState.selectedCourseId && (
-          <CourseView courseId={viewState.selectedCourseId} />
+          <CourseView 
+            courseId={viewState.selectedCourseId}
+            onSectionSelect={(sectionId) => handleSectionSelect(viewState.selectedCourseId!, sectionId)}
+          />
         )}
 
         {viewState.view === 'section' && viewState.selectedCourseId && viewState.selectedSectionId && (
