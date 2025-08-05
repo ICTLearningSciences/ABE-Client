@@ -33,6 +33,7 @@ interface AssignmentViewProps {
   courseId: string;
   builtActivities: ActivityBuilder[];
   sectionId?: string;
+  onAssignmentDeleted?: (courseId: string, sectionId: string) => void;
 }
 
 const AssignmentView: React.FC<AssignmentViewProps> = ({
@@ -40,6 +41,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   courseId,
   sectionId,
   builtActivities,
+  onAssignmentDeleted,
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -109,6 +111,9 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   const handleDeleteAssignment = async () => {
     try {
       await educationManagement.deleteAssignment(courseId, assignmentId);
+      if (sectionId) {
+        onAssignmentDeleted?.(courseId, sectionId);
+      }
     } catch (error) {
       console.error('Failed to delete assignment:', error);
     }

@@ -30,12 +30,14 @@ interface SectionViewProps {
   sectionId: string;
   courseId: string;
   onAssignmentSelect: (assignmentId: string) => void;
+  onSectionDeleted?: (courseId: string) => void;
 }
 
 const SectionView: React.FC<SectionViewProps> = ({
   sectionId,
   courseId,
   onAssignmentSelect,
+  onSectionDeleted,
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -81,6 +83,7 @@ const SectionView: React.FC<SectionViewProps> = ({
   const handleDeleteSection = async () => {
     try {
       await educationManagement.deleteSection(courseId, sectionId);
+      onSectionDeleted?.(courseId);
     } catch (error) {
       console.error('Failed to delete section:', error);
     }

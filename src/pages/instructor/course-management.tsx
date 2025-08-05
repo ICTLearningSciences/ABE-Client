@@ -83,6 +83,28 @@ const CourseManagement: React.FC = () => {
     });
   };
 
+  // Navigation handlers for deletion scenarios
+  const handleCourseDeleted = () => {
+    setViewState({
+      view: 'dashboard',
+    });
+  };
+
+  const handleSectionDeleted = (courseId: string) => {
+    setViewState({
+      view: 'course',
+      selectedCourseId: courseId,
+    });
+  };
+
+  const handleAssignmentDeleted = (courseId: string, sectionId: string) => {
+    setViewState({
+      view: 'section',
+      selectedCourseId: courseId,
+      selectedSectionId: sectionId,
+    });
+  };
+
   const treeData: TreeItem[] = useMemo(() => {
     return getCourseManagementTreeData(
       educationManagement,
@@ -268,6 +290,7 @@ const CourseManagement: React.FC = () => {
               onSectionSelect={(sectionId) =>
                 handleSectionSelect(viewState.selectedCourseId!, sectionId)
               }
+              onCourseDeleted={handleCourseDeleted}
             />
           )}
 
@@ -284,6 +307,7 @@ const CourseManagement: React.FC = () => {
                     assignmentId
                   )
                 }
+                onSectionDeleted={handleSectionDeleted}
               />
             )}
 
@@ -296,6 +320,7 @@ const CourseManagement: React.FC = () => {
                 sectionId={viewState.selectedSectionId}
                 assignmentId={viewState.selectedAssignmentId}
                 builtActivities={builtActivities}
+                onAssignmentDeleted={handleAssignmentDeleted}
               />
             )}
         </Box>

@@ -27,12 +27,14 @@ import DeleteConfirmationModal from './delete-confirmation-modal';
 interface CourseViewProps {
   courseId: string;
   onSectionSelect?: (sectionId: string) => void;
+  onCourseDeleted?: () => void;
   startWithEditModal?: boolean;
 }
 
 const CourseView: React.FC<CourseViewProps> = ({
   courseId,
   onSectionSelect,
+  onCourseDeleted,
   startWithEditModal = false,
 }) => {
   const educationManagement = useWithEducationalManagement();
@@ -72,6 +74,7 @@ const CourseView: React.FC<CourseViewProps> = ({
   const handleDeleteCourse = async () => {
     try {
       await educationManagement.deleteCourse(courseId);
+      onCourseDeleted?.();
     } catch (error) {
       console.error('Failed to delete course:', error);
     }
