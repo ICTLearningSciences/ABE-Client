@@ -14,16 +14,24 @@ import {
   Grid,
   Stack,
   Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  IconButton,
 } from '@mui/material';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { Assignment } from '../../../store/slices/education-management/types';
 import AssignmentModal from './assignment-modal';
 import DeleteConfirmationModal from './delete-confirmation-modal';
+import { ActivityBuilder } from '../../../components/activity-builder/types';
 
 interface AssignmentViewProps {
   assignmentId: string;
   courseId: string;
+  builtActivities: ActivityBuilder[];
   sectionId?: string;
 }
 
@@ -31,9 +39,11 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   assignmentId,
   courseId,
   sectionId,
+  builtActivities,
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedActivityId, setSelectedActivityId] = useState<string>('');
 
   const assignment = educationManagement.assignments.find(
     (a) => a._id === assignmentId
@@ -48,6 +58,11 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   );
   const isMandatory = sectionAssignment?.mandatory ?? false;
 
+  // Filter out activities that are already in the assignment
+  const availableActivities = builtActivities.filter(
+    (activity) => !assignment?.activityIds.includes(activity._id)
+  );
+
   const handleEditAssignment = async (assignmentData: Partial<Assignment>) => {
     try {
       await educationManagement.updateAssignment(courseId, assignmentData);
@@ -58,12 +73,36 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   };
 
   const handleAddActivity = async () => {
+    if (!selectedActivityId || !assignment) return;
+
     try {
-      // This would create a new activity and add it to the assignment
-      // Implementation depends on activity management system
-      console.log('Add activity functionality not yet implemented');
+      const updatedActivityIds = [
+        ...assignment.activityIds,
+        selectedActivityId,
+      ];
+      await educationManagement.updateAssignment(courseId, {
+        _id: assignmentId,
+        activityIds: updatedActivityIds,
+      });
+      setSelectedActivityId(''); // Reset selection
     } catch (error) {
-      console.error('Failed to create activity:', error);
+      console.error('Failed to add activity to assignment:', error);
+    }
+  };
+
+  const handleRemoveActivity = async (activityIdToRemove: string) => {
+    if (!assignment) return;
+
+    try {
+      const updatedActivityIds = assignment.activityIds.filter(
+        (id) => id !== activityIdToRemove
+      );
+      await educationManagement.updateAssignment(courseId, {
+        _id: assignmentId,
+        activityIds: updatedActivityIds,
+      });
+    } catch (error) {
+      console.error('Failed to remove activity from assignment:', error);
     }
   };
 
@@ -198,23 +237,60 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
           </Typography>
         </Stack>
 
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddActivity}
-          disabled={educationManagement.isAssignmentModifying}
-          fullWidth
-          sx={{
-            py: 2,
-            mb: 3,
-            backgroundColor: '#1B6A9C',
-            '&:hover': {
-              backgroundColor: '#145a87',
-            },
-          }}
-        >
-          Add Activity
-        </Button>
+        {/* Add Activity Section */}
+        <Card variant="outlined" sx={{ mb: 3, p: 2.5 }}>
+          <Typography variant="h6" sx={{ mb: 2, color: 'text.primary' }}>
+            Add Activity
+          </Typography>
+
+          {availableActivities.length === 0 ? (
+            <Typography variant="body2" color="text.secondary">
+              No more activities available to add to this assignment.
+            </Typography>
+          ) : (
+            <Stack direction="row" spacing={2} alignItems="center">
+              <FormControl fullWidth>
+                <InputLabel id="activity-select-label">
+                  Select Activity
+                </InputLabel>
+                <Select
+                  labelId="activity-select-label"
+                  value={selectedActivityId}
+                  label="Select Activity"
+                  onChange={(e) => setSelectedActivityId(e.target.value)}
+                  disabled={educationManagement.isAssignmentModifying}
+                >
+                  {availableActivities.map((activity) => (
+                    <MenuItem key={activity._id} value={activity._id}>
+                      {activity.title}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAddActivity}
+                disabled={
+                  !selectedActivityId ||
+                  educationManagement.isAssignmentModifying
+                }
+                sx={{
+                  backgroundColor: '#1B6A9C',
+                  '&:hover': {
+                    backgroundColor: '#145a87',
+                  },
+                  '&:disabled': {
+                    backgroundColor: 'grey.300',
+                  },
+                }}
+              >
+                Add
+              </Button>
+            </Stack>
+          )}
+        </Card>
 
         {assignment.activityIds.length === 0 ? (
           <Card
@@ -239,52 +315,51 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
           </Card>
         ) : (
           <Grid container spacing={2}>
-            {assignment.activityIds.map((activityId) => (
-              <Grid item xs={12} key={activityId}>
-                <Card
-                  variant="outlined"
-                  sx={{
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      borderColor: '#1B6A9C',
-                      boxShadow: 2,
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                      <Typography sx={{ fontSize: '20px', mr: 1.5 }}>
-                        🎯
-                      </Typography>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          color: '#1B6A9C',
-                          fontWeight: 600,
-                          fontSize: '1rem',
-                        }}
+            {assignment.activityIds.map((activityId) => {
+              const activity = builtActivities.find(
+                (a) => a._id === activityId
+              );
+              return (
+                <Grid item xs={12} key={activityId}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
                       >
-                        Activity {activityId}
-                      </Typography>
-                    </Stack>
-
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 1.5, lineHeight: 1.4 }}
-                    >
-                      Activity details will be loaded from the activity
-                      management system
-                    </Typography>
-
-                    <Typography variant="caption" color="text.disabled">
-                      Click to view activity details
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            color: '#1B6A9C',
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                          }}
+                        >
+                          {activity?.title || `Activity ${activityId}`}
+                        </Typography>
+                        <IconButton
+                          onClick={() => handleRemoveActivity(activityId)}
+                          disabled={educationManagement.isAssignmentModifying}
+                          sx={{
+                            color: '#d32f2f',
+                            '&:hover': {
+                              backgroundColor: '#ffebee',
+                            },
+                            '&:disabled': {
+                              color: 'grey.400',
+                            },
+                          }}
+                          size="small"
+                        >
+                          <RemoveCircleIcon />
+                        </IconButton>
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
           </Grid>
         )}
       </Box>

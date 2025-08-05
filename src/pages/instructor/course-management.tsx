@@ -15,6 +15,7 @@ import BreadcrumbNavigation from './components/breadcrumb-navigation';
 import CourseModal from './components/course-modal';
 import { getCourseManagementTreeData } from './helpers';
 import { Course } from '../../store/slices/education-management/types';
+import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 
 export const courseManagementUrl = '/course-management';
 
@@ -31,6 +32,7 @@ const CourseManagement: React.FC = () => {
     view: 'dashboard',
   });
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
+  const { builtActivities } = useWithDocGoalsActivities();
 
   const handleCreateCourse = async (courseData: Partial<Course>) => {
     try {
@@ -293,6 +295,7 @@ const CourseManagement: React.FC = () => {
                 courseId={viewState.selectedCourseId}
                 sectionId={viewState.selectedSectionId}
                 assignmentId={viewState.selectedAssignmentId}
+                builtActivities={builtActivities}
               />
             )}
         </Box>

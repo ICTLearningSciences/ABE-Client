@@ -41,7 +41,6 @@ const SectionView: React.FC<SectionViewProps> = ({
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const assignments = getAssignmentsForSection(educationManagement, sectionId);
-
   const section = educationManagement.sections.find((s) => s._id === sectionId);
 
   const handleEditSection = async (sectionData: Partial<Section>) => {
