@@ -66,6 +66,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'space-around',
+              height: '100%',
             }}
           >
             <UserInfoSettings />

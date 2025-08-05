@@ -41,49 +41,55 @@ export function UserInfoSettings(): JSX.Element {
     <ColumnDiv
       data-cy="user-info-settings"
       style={{
-        alignItems: 'center',
+        alignItems: 'space-around',
+        height: '100%',
+        justifyContent: 'space-around',
       }}
     >
       {userName && <p>{userName}</p>}
-      {classroomCode && (
-        <div data-cy="current-classroom-code">
-          <b>Classroom Code:</b>{' '}
-          <EditableText
-            text={classroomCode.code}
-            onSave={async (newText) => {
-              await updateUserInfo({
-                classroomCode: newText,
-              });
-            }}
-          />
-          <br />
-          <b>Created At:</b> {formatISODateToReadable(classroomCode.createdAt)}
-        </div>
-      )}
-      <GoToEducationDashboardButton />
-      {previousClassroomCodes && previousClassroomCodes.length > 0 && (
-        <Tooltip
-          data-cy="previous-classroom-codes-tooltip"
-          title={previousClassroomCodes.map((code) => (
-            <p key={code.code}>
-              <b>Classroom Code:</b> {code.code}
-              <br />
-              <b>Created At:</b> {formatISODateToReadable(code.createdAt)}
-            </p>
-          ))}
-        >
-          <p
-            data-cy="previous-classroom-codes"
-            style={{
-              opacity: 0.5,
-              cursor: 'pointer',
-            }}
+      <div>
+        {classroomCode && (
+          <div data-cy="current-classroom-code">
+            <b>Classroom Code:</b>{' '}
+            <EditableText
+              text={classroomCode.code}
+              onSave={async (newText) => {
+                await updateUserInfo({
+                  classroomCode: newText,
+                });
+              }}
+            />
+            <br />
+            <b>Created At:</b>{' '}
+            {formatISODateToReadable(classroomCode.createdAt)}
+          </div>
+        )}
+        {previousClassroomCodes && previousClassroomCodes.length > 0 && (
+          <Tooltip
+            data-cy="previous-classroom-codes-tooltip"
+            title={previousClassroomCodes.map((code) => (
+              <p key={code.code}>
+                <b>Classroom Code:</b> {code.code}
+                <br />
+                <b>Created At:</b> {formatISODateToReadable(code.createdAt)}
+              </p>
+            ))}
           >
-            Previous Classroom Codes
-          </p>
-        </Tooltip>
-      )}
+            <p
+              data-cy="previous-classroom-codes"
+              style={{
+                opacity: 0.5,
+                cursor: 'pointer',
+              }}
+            >
+              Previous Classroom Codes
+            </p>
+          </Tooltip>
+        )}
+        <GoToEducationDashboardButton />
+      </div>
       <AdminControls />
+
       {surveyUrl && surveyUrlParam && (
         <Button
           variant="contained"
