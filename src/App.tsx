@@ -100,7 +100,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: mainAppHeight,
+              height: '100vh',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

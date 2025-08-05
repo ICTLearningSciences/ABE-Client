@@ -19,6 +19,7 @@ import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { Assignment } from '../../../store/slices/education-management/types';
 import AssignmentModal from './assignment-modal';
+import DeleteConfirmationModal from './delete-confirmation-modal';
 
 interface AssignmentViewProps {
   assignmentId: string;
@@ -64,6 +65,14 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
       console.log('Add activity functionality not yet implemented');
     } catch (error) {
       console.error('Failed to create activity:', error);
+    }
+  };
+
+  const handleDeleteAssignment = async () => {
+    try {
+      await educationManagement.deleteAssignment(courseId, assignmentId);
+    } catch (error) {
+      console.error('Failed to delete assignment:', error);
     }
   };
 
@@ -173,6 +182,11 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
             >
               Edit Assignment
             </Button>
+            <DeleteConfirmationModal
+              onDelete={handleDeleteAssignment}
+              entityType="assignment"
+              entityName={assignment.title}
+            />
           </Stack>
         </CardContent>
       </Card>

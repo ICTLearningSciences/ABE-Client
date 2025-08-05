@@ -5,6 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React, { useState, useMemo } from 'react';
+import { Box, Typography, Button, Paper } from '@mui/material';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import CollapsibleTree, { TreeItem } from './components/collapsible-tree';
 import CourseView from './components/course-view';
@@ -30,7 +31,11 @@ const CourseManagement: React.FC = () => {
 
   const handleCreateCourse = async () => {
     try {
-      await educationManagement.createCourse();
+      const newCourse = await educationManagement.createCourse();
+      setViewState({
+        view: 'course',
+        selectedCourseId: newCourse._id,
+      });
     } catch (error) {
       console.error('Failed to create course:', error);
     }
@@ -85,10 +90,9 @@ const CourseManagement: React.FC = () => {
   };
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         width: '100%',
-        maxWidth: '1200px',
         height: '100%',
         display: 'flex',
         backgroundColor: 'white',
@@ -97,8 +101,9 @@ const CourseManagement: React.FC = () => {
       }}
     >
       {/* Sidebar */}
-      <div
-        style={{
+      <Paper
+        elevation={0}
+        sx={{
           width: '300px',
           backgroundColor: '#f8f9fa',
           borderRadius: '8px 0 0 8px',
@@ -106,95 +111,82 @@ const CourseManagement: React.FC = () => {
           padding: '24px 16px',
         }}
       >
-        <div
-          style={{
-            marginBottom: '24px',
-          }}
-        >
-          <h2
-            style={{
-              margin: '0 0 8px 0',
-              fontSize: '20px',
-              fontWeight: '600',
+        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="h5"
+            sx={{
+              mb: 1,
               color: '#1B6A9C',
+              fontWeight: 600,
             }}
           >
             Course Management
-          </h2>
-          <p
-            style={{
-              margin: '0',
-              fontSize: '14px',
-              color: '#6c757d',
-            }}
-          >
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
             Manage your courses, sections, and assignments
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        <button
+        <Button
           onClick={handleCreateCourse}
           disabled={educationManagement.isCourseModifying}
-          style={{
-            width: '100%',
-            padding: '12px 16px',
+          variant="contained"
+          fullWidth
+          sx={{
+            mb: 3,
             backgroundColor: '#1B6A9C',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            fontSize: '14px',
-            fontWeight: '500',
-            cursor: educationManagement.isCourseModifying
-              ? 'not-allowed'
-              : 'pointer',
-            opacity: educationManagement.isCourseModifying ? 0.6 : 1,
-            marginBottom: '24px',
+            '&:hover': {
+              backgroundColor: '#145a87',
+            },
+            '&:disabled': {
+              backgroundColor: '#1B6A9C',
+              opacity: 0.6,
+            },
           }}
         >
           + New Course
-        </button>
+        </Button>
 
         {/* Course Tree */}
-        <div>
+        <Box>
           {treeData.length === 0 ? (
-            <div
-              style={{
+            <Box
+              sx={{
                 textAlign: 'center',
-                padding: '40px 20px',
+                py: 5,
+                px: 2.5,
               }}
             >
-              <div
-                style={{
+              <Typography
+                sx={{
                   fontSize: '48px',
                   color: '#dee2e6',
-                  marginBottom: '16px',
+                  mb: 2,
                 }}
               >
                 📚
-              </div>
-              <div
-                style={{
-                  fontSize: '14px',
-                  color: '#6c757d',
-                  lineHeight: '1.5',
-                }}
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ lineHeight: 1.5 }}
               >
                 No courses yet
                 <br />
                 Create your first course to get started
-              </div>
-            </div>
+              </Typography>
+            </Box>
           ) : (
             <CollapsibleTree items={treeData} selectedId={getSelectedId()} />
           )}
-        </div>
-      </div>
+        </Box>
+      </Paper>
 
       {/* Main Content Area */}
-      <div
-        style={{
+      <Box
+        sx={{
           flex: 1,
-          padding: '24px',
+          p: 3,
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -208,8 +200,8 @@ const CourseManagement: React.FC = () => {
         />
 
         {/* Content Area */}
-        <div
-          style={{
+        <Box
+          sx={{
             flex: 1,
             display: 'flex',
             alignItems: 'flex-start',
@@ -219,44 +211,41 @@ const CourseManagement: React.FC = () => {
           }}
         >
           {viewState.view === 'dashboard' && (
-            <div
-              style={{
+            <Box
+              sx={{
                 textAlign: 'center',
                 maxWidth: '400px',
               }}
             >
-              <div
-                style={{
+              <Typography
+                sx={{
                   fontSize: '64px',
                   color: '#dee2e6',
-                  marginBottom: '24px',
+                  mb: 3,
                 }}
               >
                 📖
-              </div>
-              <h3
-                style={{
-                  margin: '0 0 16px 0',
-                  fontSize: '24px',
-                  fontWeight: '600',
-                  color: '#495057',
+              </Typography>
+              <Typography
+                variant="h4"
+                sx={{
+                  mb: 2,
+                  color: 'text.primary',
+                  fontWeight: 600,
                 }}
               >
                 Course Management
-              </h3>
-              <p
-                style={{
-                  margin: '0',
-                  fontSize: '16px',
-                  color: '#6c757d',
-                  lineHeight: '1.5',
-                }}
+              </Typography>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{ lineHeight: 1.5 }}
               >
                 Select a course, section, or assignment from the sidebar to view
                 and edit its details. You can also create new items using the
                 buttons in the sidebar.
-              </p>
-            </div>
+              </Typography>
+            </Box>
           )}
 
           {viewState.view === 'course' && viewState.selectedCourseId && (
@@ -274,6 +263,13 @@ const CourseManagement: React.FC = () => {
               <SectionView
                 courseId={viewState.selectedCourseId}
                 sectionId={viewState.selectedSectionId}
+                onAssignmentSelect={(assignmentId) =>
+                  handleAssignmentSelect(
+                    viewState.selectedCourseId!,
+                    viewState.selectedSectionId!,
+                    assignmentId
+                  )
+                }
               />
             )}
 
@@ -287,9 +283,9 @@ const CourseManagement: React.FC = () => {
                 assignmentId={viewState.selectedAssignmentId}
               />
             )}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

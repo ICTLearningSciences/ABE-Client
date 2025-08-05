@@ -5,6 +5,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React, { useState } from 'react';
+import { Box, Typography, IconButton } from '@mui/material';
+import {
+  ExpandMore,
+  ChevronRight,
+  FiberManualRecord,
+} from '@mui/icons-material';
 
 export interface TreeItem {
   id: string;
@@ -85,80 +91,83 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
   };
 
   return (
-    <div>
-      <div
-        style={{
+    <Box>
+      <Box
+        sx={{
           display: 'flex',
           alignItems: 'center',
-          padding: level === 0 ? '8px 0' : level === 1 ? '6px 0' : '4px 0',
+          py: level === 0 ? 1 : level === 1 ? 0.75 : 0.5,
           cursor: 'pointer',
-          marginLeft: `${indentWidth}px`,
+          ml: `${indentWidth}px`,
         }}
       >
         {/* Expand/Collapse Button */}
-        <div
+        <IconButton
           onClick={() => hasSubItems && onToggleExpand(item.id)}
-          style={{
+          size="small"
+          sx={{
             width: '20px',
             height: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: '8px',
-            fontSize: '12px',
-            color: '#6c757d',
+            mr: 1,
+            color: 'text.secondary',
             cursor: hasSubItems ? 'pointer' : 'default',
+            '&:hover': {
+              backgroundColor: hasSubItems ? 'action.hover' : 'transparent',
+            },
           }}
         >
-          {hasSubItems ? (isExpanded ? '▼' : '▶') : '•'}
-        </div>
+          {hasSubItems ? (
+            isExpanded ? (
+              <ExpandMore sx={{ fontSize: '12px' }} />
+            ) : (
+              <ChevronRight sx={{ fontSize: '12px' }} />
+            )
+          ) : (
+            <FiberManualRecord sx={{ fontSize: '8px' }} />
+          )}
+        </IconButton>
 
         {/* Item Content */}
-        <div
+        <Box
           onClick={item.onClick}
-          style={{
+          sx={{
             display: 'flex',
             alignItems: 'center',
             flex: 1,
-            padding: '4px 8px',
-            borderRadius: '4px',
+            px: 1,
+            py: 0.5,
+            borderRadius: 1,
             backgroundColor: isSelected ? '#e3f2fd' : 'transparent',
             transition: 'background-color 0.2s ease',
-          }}
-          onMouseEnter={(e) => {
-            if (!isSelected) {
-              e.currentTarget.style.backgroundColor = '#f8f9fa';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isSelected) {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }
+            cursor: 'pointer',
+            '&:hover': {
+              backgroundColor: isSelected ? '#e3f2fd' : 'grey.50',
+            },
           }}
         >
-          <span
-            style={{
+          <Typography
+            sx={{
               fontSize: getIconSize(level),
-              marginRight: '8px',
+              mr: 1,
             }}
           >
             {item.icon}
-          </span>
-          <span
-            style={{
+          </Typography>
+          <Typography
+            sx={{
               fontSize: getFontSize(level),
               fontWeight: getFontWeight(level),
               color: getTextColor(level),
             }}
           >
             {item.title}
-          </span>
-        </div>
-      </div>
+          </Typography>
+        </Box>
+      </Box>
 
       {/* Sub Items */}
       {hasSubItems && isExpanded && (
-        <div>
+        <Box>
           {item.subItems!.map((subItem) => (
             <TreeItemComponent
               key={subItem.id}
@@ -169,9 +178,9 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
               onToggleExpand={onToggleExpand}
             />
           ))}
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 
@@ -196,7 +205,7 @@ const CollapsibleTree: React.FC<CollapsibleTreeProps> = ({
   };
 
   return (
-    <div className={className} style={style}>
+    <Box className={className} sx={style}>
       {items.map((item) => (
         <TreeItemComponent
           key={item.id}
@@ -207,7 +216,7 @@ const CollapsibleTree: React.FC<CollapsibleTreeProps> = ({
           onToggleExpand={handleToggleExpand}
         />
       ))}
-    </div>
+    </Box>
   );
 };
 

@@ -18,19 +18,21 @@ import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { Course } from '../../../store/slices/education-management/types';
 import CourseModal from './course-modal';
+import DeleteConfirmationModal from './delete-confirmation-modal';
 
 interface CourseViewProps {
   courseId: string;
   onSectionSelect?: (sectionId: string) => void;
+  startWithEditModal?: boolean;
 }
 
 const CourseView: React.FC<CourseViewProps> = ({
   courseId,
   onSectionSelect,
+  startWithEditModal = false,
 }) => {
   const educationManagement = useWithEducationalManagement();
-  const [showEditModal, setShowEditModal] = useState(false);
-
+  const [showEditModal, setShowEditModal] = useState(startWithEditModal);
   const course = educationManagement.courses.find((c) => c._id === courseId);
   const courseSections = educationManagement.sections.filter(
     (section) => course?.sectionIds.includes(section._id)
@@ -50,6 +52,14 @@ const CourseView: React.FC<CourseViewProps> = ({
       await educationManagement.createSection(courseId);
     } catch (error) {
       console.error('Failed to create section:', error);
+    }
+  };
+
+  const handleDeleteCourse = async () => {
+    try {
+      await educationManagement.deleteCourse(courseId);
+    } catch (error) {
+      console.error('Failed to delete course:', error);
     }
   };
 
@@ -109,7 +119,6 @@ const CourseView: React.FC<CourseViewProps> = ({
                 {course.description}
               </Typography>
             </Box>
-
             <Button
               variant="outlined"
               startIcon={<EditIcon />}
@@ -126,6 +135,11 @@ const CourseView: React.FC<CourseViewProps> = ({
             >
               Edit Course
             </Button>
+            <DeleteConfirmationModal
+              onDelete={handleDeleteCourse}
+              entityType="course"
+              entityName={course.title}
+            />
           </Stack>
         </CardContent>
       </Card>

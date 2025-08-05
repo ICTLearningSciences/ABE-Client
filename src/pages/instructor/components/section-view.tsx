@@ -20,11 +20,12 @@ import { useWithEducationalManagement } from '../../../store/slices/education-ma
 import { Section } from '../../../store/slices/education-management/types';
 import SectionModal from './section-modal';
 import { getAssignmentsForSection } from '../helpers';
+import DeleteConfirmationModal from './delete-confirmation-modal';
 
 interface SectionViewProps {
   sectionId: string;
   courseId: string;
-  onAssignmentSelect?: (assignmentId: string) => void;
+  onAssignmentSelect: (assignmentId: string) => void;
 }
 
 const SectionView: React.FC<SectionViewProps> = ({
@@ -59,6 +60,14 @@ const SectionView: React.FC<SectionViewProps> = ({
       );
     } catch (error) {
       console.error('Failed to create assignment:', error);
+    }
+  };
+
+  const handleDeleteSection = async () => {
+    try {
+      await educationManagement.deleteSection(courseId, sectionId);
+    } catch (error) {
+      console.error('Failed to delete section:', error);
     }
   };
 
@@ -155,6 +164,11 @@ const SectionView: React.FC<SectionViewProps> = ({
             >
               Edit Section
             </Button>
+            <DeleteConfirmationModal
+              onDelete={handleDeleteSection}
+              entityType="section"
+              entityName={section.title}
+            />
           </Stack>
         </CardContent>
       </Card>
@@ -225,16 +239,14 @@ const SectionView: React.FC<SectionViewProps> = ({
                 <Card
                   variant="outlined"
                   sx={{
-                    cursor: onAssignmentSelect ? 'pointer' : 'default',
+                    cursor: 'pointer',
                     transition: 'all 0.2s ease',
-                    '&:hover': onAssignmentSelect
-                      ? {
-                          borderColor: '#1B6A9C',
-                          boxShadow: 2,
-                        }
-                      : {},
+                    '&:hover': {
+                      borderColor: '#1B6A9C',
+                      boxShadow: 2,
+                    },
                   }}
-                  onClick={() => onAssignmentSelect?.(assignment._id)}
+                  onClick={() => onAssignmentSelect(assignment._id)}
                 >
                   <CardContent>
                     <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
@@ -258,14 +270,8 @@ const SectionView: React.FC<SectionViewProps> = ({
                       color="text.secondary"
                       sx={{ mb: 1.5, lineHeight: 1.4 }}
                     >
-                      {assignment.description}
+                      {assignment.description} hello
                     </Typography>
-
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      alignItems="center"
-                    ></Stack>
                   </CardContent>
                 </Card>
               </Grid>

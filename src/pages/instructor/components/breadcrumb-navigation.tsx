@@ -5,6 +5,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React, { useMemo } from 'react';
+import { Box, Typography, Breadcrumbs } from '@mui/material';
+import { NavigateNext } from '@mui/icons-material';
 import { UseWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { CourseManagementState } from '../course-management';
 
@@ -104,75 +106,61 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
   }
 
   return (
-    <nav
-      style={{
-        padding: '12px 0',
+    <Box
+      sx={{
+        py: 1.5,
         borderBottom: '1px solid #e9ecef',
-        marginBottom: '24px',
+        mb: 3,
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '8px',
+      <Breadcrumbs
+        separator={<NavigateNext fontSize="small" />}
+        sx={{
+          '& .MuiBreadcrumbs-separator': {
+            color: 'text.disabled',
+            fontSize: '12px',
+          },
         }}
       >
         {items.map((item, index) => (
-          <React.Fragment key={item.id}>
-            <div
-              onClick={item.onClick}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s ease',
-                backgroundColor: 'transparent',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f8f9fa';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
+          <Box
+            key={item.id}
+            onClick={item.onClick}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.75,
+              px: 1,
+              py: 0.5,
+              borderRadius: 0.5,
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
+              backgroundColor: 'transparent',
+              '&:hover': {
+                backgroundColor: 'grey.50',
+              },
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: '14px',
               }}
             >
-              <span
-                style={{
-                  fontSize: '14px',
-                }}
-              >
-                {item.icon}
-              </span>
-              <span
-                style={{
-                  fontSize: '14px',
-                  fontWeight: index === items.length - 1 ? '600' : '500',
-                  color: index === items.length - 1 ? '#1B6A9C' : '#495057',
-                }}
-              >
-                {item.title}
-              </span>
-            </div>
-
-            {index < items.length - 1 && (
-              <span
-                style={{
-                  fontSize: '12px',
-                  color: '#6c757d',
-                  userSelect: 'none',
-                }}
-              >
-                →
-              </span>
-            )}
-          </React.Fragment>
+              {item.icon}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: '14px',
+                fontWeight: index === items.length - 1 ? '600' : '500',
+                color: index === items.length - 1 ? '#1B6A9C' : 'text.primary',
+              }}
+            >
+              {item.title}
+            </Typography>
+          </Box>
         ))}
-      </div>
-    </nav>
+      </Breadcrumbs>
+    </Box>
   );
 };
 
