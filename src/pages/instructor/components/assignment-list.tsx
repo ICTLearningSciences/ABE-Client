@@ -15,78 +15,87 @@ import {
   Stack,
   Chip,
 } from '@mui/material';
-import { Section } from '../../../store/slices/education-management/types';
+import { Assignment } from '../../../store/slices/education-management/types';
 
-interface SectionListProps {
-  sections: Section[];
-  onSectionSelect: (sectionId: string) => void;
-  selectedSectionId?: string;
+interface AssignmentListProps {
+  assignments: Assignment[];
+  onAssignmentSelect: (assignmentId: string) => void;
+  selectedAssignmentId?: string;
   isLoading?: boolean;
+  sectionAssignments?: { assignmentId: string; mandatory: boolean }[];
 }
 
-const SectionList: React.FC<SectionListProps> = ({
-  sections,
-  onSectionSelect,
-  selectedSectionId,
+const AssignmentList: React.FC<AssignmentListProps> = ({
+  assignments,
+  onAssignmentSelect,
+  selectedAssignmentId,
   isLoading = false,
+  sectionAssignments = [],
 }) => {
   if (isLoading) {
     return (
       <Box sx={{ textAlign: 'center', py: 5 }}>
         <CircularProgress size={40} sx={{ color: '#1B6A9C' }} />
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-          Loading sections...
+          Loading assignments...
         </Typography>
       </Box>
     );
   }
 
-  if (sections.length === 0) {
+  if (assignments.length === 0) {
     return (
       <Box sx={{ textAlign: 'center', py: 5 }}>
         <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
-          📑
+          📝
         </Typography>
         <Typography
           variant="body1"
           color="text.secondary"
           sx={{ lineHeight: 1.5 }}
         >
-          No sections yet
+          No assignments yet
           <br />
-          Create your first section to organize assignments
+          Create your first assignment to engage students
         </Typography>
       </Box>
     );
   }
 
+  const getAssignmentMandatory = (assignmentId: string): boolean => {
+    const sectionAssignment = sectionAssignments.find(
+      (sa) => sa.assignmentId === assignmentId
+    );
+    return sectionAssignment?.mandatory ?? false;
+  };
+
   return (
     <Box sx={{ width: '100%', maxWidth: 800 }}>
       <Grid container spacing={2}>
-        {sections.map((section) => (
-          <Grid item xs={12} sm={6} key={section._id}>
+        {assignments.map((assignment) => (
+          <Grid item xs={12} sm={6} key={assignment._id}>
             <Card
               variant="outlined"
               sx={{
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 border:
-                  selectedSectionId === section._id
+                  selectedAssignmentId === assignment._id
                     ? '2px solid #1B6A9C'
                     : '2px solid transparent',
                 backgroundColor:
-                  selectedSectionId === section._id ? '#e3f2fd' : 'white',
-                boxShadow: selectedSectionId === section._id ? 2 : 1,
+                  selectedAssignmentId === assignment._id ? '#e3f2fd' : 'white',
+                boxShadow: selectedAssignmentId === assignment._id ? 2 : 1,
                 '&:hover': {
                   borderColor: '#1B6A9C',
                   boxShadow: 3,
                 },
               }}
-              onClick={() => onSectionSelect(section._id)}
+              onClick={() => onAssignmentSelect(assignment._id)}
             >
               <CardContent sx={{ p: 2.5 }}>
                 <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                  <Typography sx={{ fontSize: '24px', mr: 1.5 }}>📑</Typography>
+                  <Typography sx={{ fontSize: '24px', mr: 1.5 }}>📝</Typography>
                   <Typography
                     variant="h6"
                     sx={{
@@ -95,7 +104,7 @@ const SectionList: React.FC<SectionListProps> = ({
                       fontSize: '1.125rem',
                     }}
                   >
-                    {section.title}
+                    {assignment.title}
                   </Typography>
                 </Stack>
 
@@ -104,24 +113,26 @@ const SectionList: React.FC<SectionListProps> = ({
                   color="text.secondary"
                   sx={{ mb: 1.5, lineHeight: 1.4 }}
                 >
-                  {section.description}
+                  {assignment.description}
                 </Typography>
 
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <Chip
-                    label={section.sectionCode}
-                    size="small"
-                    variant="outlined"
-                    sx={{ fontSize: '11px' }}
-                  />
                   <Typography variant="caption" color="text.disabled">
-                    {section.assignments.length} assignment
-                    {section.assignments.length !== 1 ? 's' : ''}
+                    {assignment.activityIds.length} activit
+                    {assignment.activityIds.length !== 1 ? 'ies' : 'y'}
                   </Typography>
                   <Chip
-                    label={`${section.numOptionalAssignmentsRequired} optional required`}
+                    label={
+                      getAssignmentMandatory(assignment._id)
+                        ? 'Required'
+                        : 'Optional'
+                    }
                     size="small"
-                    color="secondary"
+                    color={
+                      getAssignmentMandatory(assignment._id)
+                        ? 'primary'
+                        : 'secondary'
+                    }
                     sx={{ fontSize: '10px' }}
                   />
                 </Stack>
@@ -134,4 +145,4 @@ const SectionList: React.FC<SectionListProps> = ({
   );
 };
 
-export default SectionList;
+export default AssignmentList;

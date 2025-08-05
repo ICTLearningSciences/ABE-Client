@@ -14,7 +14,7 @@ import {
   Button,
   IconButton,
   Typography,
-  Box
+  Box,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { Course } from '../../../store/slices/education-management/types';
@@ -34,13 +34,13 @@ const CourseModal: React.FC<CourseModalProps> = ({
   onSubmit,
   mode,
   initialData,
-  isLoading = false
+  isLoading = false,
 }) => {
   const [formData, setFormData] = useState<Partial<Course>>({
     title: '',
     description: '',
   });
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     if (isOpen) {
@@ -60,7 +60,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
   }, [isOpen, mode, initialData]);
 
   const validateForm = () => {
-    const newErrors: {[key: string]: string} = {};
+    const newErrors: { [key: string]: string } = {};
 
     if (!formData.title?.trim()) {
       newErrors.title = 'Title is required';
@@ -76,7 +76,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -94,16 +94,16 @@ const CourseModal: React.FC<CourseModalProps> = ({
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [field]: ''
+        [field]: '',
       }));
     }
   };
@@ -117,18 +117,20 @@ const CourseModal: React.FC<CourseModalProps> = ({
       PaperProps={{
         sx: {
           borderRadius: 2,
-          p: 1
-        }
+          p: 1,
+        },
       }}
     >
-      <DialogTitle sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        color: '#1B6A9C',
-        fontWeight: 600,
-        fontSize: '1.25rem'
-      }}>
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          color: '#1B6A9C',
+          fontWeight: 600,
+          fontSize: '1.25rem',
+        }}
+      >
         {mode === 'create' ? 'Create New Course' : 'Edit Course'}
         <IconButton
           onClick={onClose}
@@ -141,15 +143,10 @@ const CourseModal: React.FC<CourseModalProps> = ({
       </DialogTitle>
 
       <DialogContent>
-        <Typography 
-          variant="body2" 
-          color="text.secondary" 
-          sx={{ mb: 3 }}
-        >
-          {mode === 'create' 
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          {mode === 'create'
             ? 'Add a new course to your curriculum. You can add sections and assignments later.'
-            : 'Update the course information below.'
-          }
+            : 'Update the course information below.'}
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
@@ -167,16 +164,16 @@ const CourseModal: React.FC<CourseModalProps> = ({
             InputProps={{
               sx: {
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1B6A9C'
-                }
-              }
+                  borderColor: '#1B6A9C',
+                },
+              },
             }}
             InputLabelProps={{
               sx: {
                 '&.Mui-focused': {
-                  color: '#1B6A9C'
-                }
-              }
+                  color: '#1B6A9C',
+                },
+              },
             }}
           />
 
@@ -196,16 +193,16 @@ const CourseModal: React.FC<CourseModalProps> = ({
             InputProps={{
               sx: {
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1B6A9C'
-                }
-              }
+                  borderColor: '#1B6A9C',
+                },
+              },
             }}
             InputLabelProps={{
               sx: {
                 '&.Mui-focused': {
-                  color: '#1B6A9C'
-                }
-              }
+                  color: '#1B6A9C',
+                },
+              },
             }}
           />
         </Box>
@@ -216,13 +213,13 @@ const CourseModal: React.FC<CourseModalProps> = ({
           onClick={onClose}
           disabled={isLoading}
           variant="outlined"
-          sx={{ 
+          sx={{
             color: 'grey.600',
             borderColor: 'grey.300',
             '&:hover': {
               borderColor: 'grey.400',
-              backgroundColor: 'grey.50'
-            }
+              backgroundColor: 'grey.50',
+            },
           }}
         >
           Cancel
@@ -231,14 +228,18 @@ const CourseModal: React.FC<CourseModalProps> = ({
           onClick={handleSubmit}
           disabled={isLoading}
           variant="contained"
-          sx={{ 
+          sx={{
             backgroundColor: '#1B6A9C',
             '&:hover': {
-              backgroundColor: '#145a87'
-            }
+              backgroundColor: '#145a87',
+            },
           }}
         >
-          {isLoading ? 'Saving...' : mode === 'create' ? 'Create Course' : 'Update Course'}
+          {isLoading
+            ? 'Saving...'
+            : mode === 'create'
+            ? 'Create Course'
+            : 'Update Course'}
         </Button>
       </DialogActions>
     </Dialog>

@@ -20,7 +20,11 @@ interface BreadcrumbNavigationProps {
   viewState: CourseManagementState;
   handleCourseSelect: (courseId: string) => void;
   handleSectionSelect: (courseId: string, sectionId: string) => void;
-  handleAssignmentSelect: (courseId: string, sectionId: string, assignmentId: string) => void;
+  handleAssignmentSelect: (
+    courseId: string,
+    sectionId: string,
+    assignmentId: string
+  ) => void;
 }
 
 const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
@@ -28,72 +32,93 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
   viewState,
   handleCourseSelect,
   handleSectionSelect,
-  handleAssignmentSelect
+  handleAssignmentSelect,
 }) => {
-
-
   const items: BreadcrumbItem[] = useMemo(() => {
     const items: BreadcrumbItem[] = [];
 
     if (viewState.selectedCourseId) {
-      const course = educationManagement.courses.find(c => c._id === viewState.selectedCourseId);
+      const course = educationManagement.courses.find(
+        (c) => c._id === viewState.selectedCourseId
+      );
       if (course) {
         items.push({
           id: course._id,
           title: course.title,
           icon: '📚',
-          onClick: () => handleCourseSelect(course._id)
+          onClick: () => handleCourseSelect(course._id),
         });
       }
     }
 
     if (viewState.selectedSectionId && viewState.selectedCourseId) {
-      const section = educationManagement.sections.find(s => s._id === viewState.selectedSectionId);
+      const section = educationManagement.sections.find(
+        (s) => s._id === viewState.selectedSectionId
+      );
       if (section) {
         items.push({
           id: section._id,
           title: section.title,
           icon: '📑',
-          onClick: () => handleSectionSelect(viewState.selectedCourseId!, section._id)
+          onClick: () =>
+            handleSectionSelect(viewState.selectedCourseId!, section._id),
         });
       }
     }
 
-    if (viewState.selectedAssignmentId && viewState.selectedCourseId && viewState.selectedSectionId) {
-      const assignment = educationManagement.assignments.find(a => a._id === viewState.selectedAssignmentId);
+    if (
+      viewState.selectedAssignmentId &&
+      viewState.selectedCourseId &&
+      viewState.selectedSectionId
+    ) {
+      const assignment = educationManagement.assignments.find(
+        (a) => a._id === viewState.selectedAssignmentId
+      );
       if (assignment) {
         items.push({
           id: assignment._id,
           title: assignment.title,
           icon: '📝',
-          onClick: () => handleAssignmentSelect(viewState.selectedCourseId!, viewState.selectedSectionId!, assignment._id)
+          onClick: () =>
+            handleAssignmentSelect(
+              viewState.selectedCourseId!,
+              viewState.selectedSectionId!,
+              assignment._id
+            ),
         });
       }
     }
 
     return items;
-  }, [viewState, educationManagement.courses, educationManagement.sections, educationManagement.assignments]);
+  }, [
+    viewState,
+    educationManagement.courses,
+    educationManagement.sections,
+    educationManagement.assignments,
+  ]);
 
   console.log(items);
-  
+
   if (items.length === 0) {
     return null;
   }
 
   return (
-    <nav 
+    <nav
       style={{
         padding: '12px 0',
         borderBottom: '1px solid #e9ecef',
         marginBottom: '24px',
       }}
     >
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '8px'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '8px',
+        }}
+      >
         {items.map((item, index) => (
           <React.Fragment key={item.id}>
             <div
@@ -106,7 +131,7 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
                 borderRadius: '4px',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s ease',
-                backgroundColor: 'transparent'
+                backgroundColor: 'transparent',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = '#f8f9fa';
@@ -115,26 +140,32 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              <span style={{
-                fontSize: '14px'
-              }}>
+              <span
+                style={{
+                  fontSize: '14px',
+                }}
+              >
                 {item.icon}
               </span>
-              <span style={{
-                fontSize: '14px',
-                fontWeight: index === items.length - 1 ? '600' : '500',
-                color: index === items.length - 1 ? '#1B6A9C' : '#495057'
-              }}>
+              <span
+                style={{
+                  fontSize: '14px',
+                  fontWeight: index === items.length - 1 ? '600' : '500',
+                  color: index === items.length - 1 ? '#1B6A9C' : '#495057',
+                }}
+              >
                 {item.title}
               </span>
             </div>
-            
+
             {index < items.length - 1 && (
-              <span style={{
-                fontSize: '12px',
-                color: '#6c757d',
-                userSelect: 'none'
-              }}>
+              <span
+                style={{
+                  fontSize: '12px',
+                  color: '#6c757d',
+                  userSelect: 'none',
+                }}
+              >
                 →
               </span>
             )}

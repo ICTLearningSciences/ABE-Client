@@ -17,30 +17,30 @@ import {
   Box,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-import { Section } from '../../../store/slices/education-management/types';
+import { Assignment } from '../../../store/slices/education-management/types';
 
-interface SectionModalProps {
+interface AssignmentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (sectionData: Partial<Section>) => void;
+  onSubmit: (assignmentData: Partial<Assignment>) => void;
   mode: 'create' | 'edit';
-  initialData?: Section;
+  sectionId?: string;
+  initialData?: Assignment;
   isLoading?: boolean;
 }
 
-const SectionModal: React.FC<SectionModalProps> = ({
+const AssignmentModal: React.FC<AssignmentModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
   mode,
+  sectionId,
   initialData,
   isLoading = false,
 }) => {
-  const [formData, setFormData] = useState<Partial<Section>>({
+  const [formData, setFormData] = useState<Partial<Assignment>>({
     title: '',
     description: '',
-    sectionCode: '',
-    numOptionalAssignmentsRequired: 0,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -50,16 +50,11 @@ const SectionModal: React.FC<SectionModalProps> = ({
         setFormData({
           title: initialData.title || '',
           description: initialData.description || '',
-          sectionCode: initialData.sectionCode || '',
-          numOptionalAssignmentsRequired:
-            initialData.numOptionalAssignmentsRequired || 0,
         });
       } else {
         setFormData({
           title: '',
           description: '',
-          sectionCode: '',
-          numOptionalAssignmentsRequired: 0,
         });
       }
       setErrors({});
@@ -77,17 +72,6 @@ const SectionModal: React.FC<SectionModalProps> = ({
       newErrors.description = 'Description is required';
     }
 
-    if (!formData.sectionCode?.trim()) {
-      newErrors.sectionCode = 'Section code is required';
-    }
-
-    if (
-      formData.numOptionalAssignmentsRequired === undefined ||
-      formData.numOptionalAssignmentsRequired < 0
-    ) {
-      newErrors.numOptionalAssignmentsRequired = 'Must be 0 or greater';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -99,13 +83,10 @@ const SectionModal: React.FC<SectionModalProps> = ({
       return;
     }
 
-    const submitData: Partial<Section> = {
+    const submitData: Partial<Assignment> = {
       title: formData.title?.trim() || '',
       description: formData.description?.trim() || '',
-      sectionCode: formData.sectionCode?.trim() || '',
-      numOptionalAssignmentsRequired:
-        formData.numOptionalAssignmentsRequired || 0,
-      assignments: mode === 'edit' ? initialData?.assignments || [] : [],
+      activityIds: mode === 'edit' ? initialData?.activityIds || [] : [],
     };
 
     if (mode === 'edit' && initialData) {
@@ -115,7 +96,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
     onSubmit(submitData);
   };
 
-  const handleInputChange = (field: string, value: string | number) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -153,7 +134,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
           fontSize: '1.25rem',
         }}
       >
-        {mode === 'create' ? 'Create New Section' : 'Edit Section'}
+        {mode === 'create' ? 'Create New Assignment' : 'Edit Assignment'}
         <IconButton
           onClick={onClose}
           disabled={isLoading}
@@ -167,8 +148,8 @@ const SectionModal: React.FC<SectionModalProps> = ({
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {mode === 'create'
-            ? 'Add a new section to organize course content. You can add assignments later.'
-            : 'Update the section information below.'}
+            ? 'Create a new assignment with activities and learning objectives. You can add activities later.'
+            : 'Update the assignment information below.'}
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
@@ -176,7 +157,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
             fullWidth
             required
             label="Title"
-            placeholder="e.g., Getting Started"
+            placeholder="e.g., Introduction to Variables"
             value={formData.title || ''}
             onChange={(e) => handleInputChange('title', e.target.value)}
             error={!!errors.title}
@@ -202,81 +183,17 @@ const SectionModal: React.FC<SectionModalProps> = ({
           <TextField
             fullWidth
             required
-            label="Section Code"
-            placeholder="e.g., SEC001"
-            value={formData.sectionCode || ''}
-            onChange={(e) => handleInputChange('sectionCode', e.target.value)}
-            error={!!errors.sectionCode}
-            helperText={errors.sectionCode}
-            disabled={isLoading}
-            sx={{ mb: 2.5 }}
-            InputProps={{
-              sx: {
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1B6A9C',
-                },
-              },
-            }}
-            InputLabelProps={{
-              sx: {
-                '&.Mui-focused': {
-                  color: '#1B6A9C',
-                },
-              },
-            }}
-          />
-
-          <TextField
-            fullWidth
-            required
             multiline
             rows={4}
             label="Description"
-            placeholder="Brief description of the section..."
+            placeholder="Brief description of the assignment objectives and content..."
             value={formData.description || ''}
             onChange={(e) => handleInputChange('description', e.target.value)}
             error={!!errors.description}
             helperText={errors.description}
             disabled={isLoading}
-            sx={{ mb: 2.5 }}
+            sx={{ mb: sectionId ? 2.5 : 3 }}
             InputProps={{
-              sx: {
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1B6A9C',
-                },
-              },
-            }}
-            InputLabelProps={{
-              sx: {
-                '&.Mui-focused': {
-                  color: '#1B6A9C',
-                },
-              },
-            }}
-          />
-
-          <TextField
-            fullWidth
-            required
-            type="number"
-            label="Optional Assignments Required"
-            placeholder="0"
-            value={formData.numOptionalAssignmentsRequired || 0}
-            onChange={(e) =>
-              handleInputChange(
-                'numOptionalAssignmentsRequired',
-                parseInt(e.target.value) || 0
-              )
-            }
-            error={!!errors.numOptionalAssignmentsRequired}
-            helperText={
-              errors.numOptionalAssignmentsRequired ||
-              'Number of optional assignments students must complete'
-            }
-            disabled={isLoading}
-            sx={{ mb: 3 }}
-            InputProps={{
-              inputProps: { min: 0 },
               sx: {
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                   borderColor: '#1B6A9C',
@@ -324,12 +241,12 @@ const SectionModal: React.FC<SectionModalProps> = ({
           {isLoading
             ? 'Saving...'
             : mode === 'create'
-            ? 'Create Section'
-            : 'Update Section'}
+            ? 'Create Assignment'
+            : 'Update Assignment'}
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default SectionModal;
+export default AssignmentModal;

@@ -80,7 +80,12 @@ export interface UseWithEducationalManagement {
   assignmentModificationFailed: boolean;
   isEnrollmentModifying: boolean;
   enrollmentModificationFailed: boolean;
-  addAssignmentToSection: (courseId: string, sectionId: string, assignmentId: string, mandatory: boolean) => Promise<Section>;
+  addAssignmentToSection: (
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    mandatory: boolean
+  ) => Promise<Section>;
 }
 
 export function useWithEducationalManagement(): UseWithEducationalManagement {
@@ -229,17 +234,32 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as StudentData;
   }
 
-  async function addAssignmentToSection(courseId: string, sectionId: string, assignmentId: string, mandatory: boolean) {
-    const section = sections.find(s => s._id === sectionId);
+  async function addAssignmentToSection(
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    mandatory: boolean
+  ) {
+    const section = sections.find((s) => s._id === sectionId);
     if (!section) {
       throw new Error('Section not found');
     }
-    const assignmentAlreadyExists = section.assignments.some(a => a.assignmentId === assignmentId);
+    const assignmentAlreadyExists = section.assignments.some(
+      (a) => a.assignmentId === assignmentId
+    );
     if (assignmentAlreadyExists) {
       throw new Error('Assignment already exists in section');
     }
-    const newAssignmentList = [...section.assignments, { assignmentId, mandatory }];
-    const res = await dispatch(_updateSection({ courseId, sectionData: { _id: sectionId, assignments: newAssignmentList } })).unwrap();
+    const newAssignmentList = [
+      ...section.assignments,
+      { assignmentId, mandatory },
+    ];
+    const res = await dispatch(
+      _updateSection({
+        courseId,
+        sectionData: { _id: sectionId, assignments: newAssignmentList },
+      })
+    ).unwrap();
     return res as Section;
   }
 

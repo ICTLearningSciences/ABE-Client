@@ -13,7 +13,7 @@ import {
   Grid,
   CircularProgress,
   Stack,
-  Chip
+  Chip,
 } from '@mui/material';
 import { Course } from '../../../store/slices/education-management/types';
 
@@ -28,7 +28,7 @@ const CourseList: React.FC<CourseListProps> = ({
   courses,
   onCourseSelect,
   selectedCourseId,
-  isLoading = false
+  isLoading = false,
 }) => {
   if (isLoading) {
     return (
@@ -47,7 +47,11 @@ const CourseList: React.FC<CourseListProps> = ({
         <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
           📚
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ lineHeight: 1.5 }}
+        >
           No courses yet
           <br />
           Create your first course to get started
@@ -61,53 +65,58 @@ const CourseList: React.FC<CourseListProps> = ({
       <Grid container spacing={2}>
         {courses.map((course) => (
           <Grid item xs={12} sm={6} md={4} key={course._id}>
-            <Card 
+            <Card
               variant="outlined"
               sx={{
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
-                border: selectedCourseId === course._id ? '2px solid #1B6A9C' : '2px solid transparent',
-                backgroundColor: selectedCourseId === course._id ? '#e3f2fd' : 'white',
+                border:
+                  selectedCourseId === course._id
+                    ? '2px solid #1B6A9C'
+                    : '2px solid transparent',
+                backgroundColor:
+                  selectedCourseId === course._id ? '#e3f2fd' : 'white',
                 boxShadow: selectedCourseId === course._id ? 2 : 1,
                 '&:hover': {
                   borderColor: '#1B6A9C',
-                  boxShadow: 3
-                }
+                  boxShadow: 3,
+                },
               }}
               onClick={() => onCourseSelect(course._id)}
             >
               <CardContent sx={{ p: 2.5 }}>
                 <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
                   <Typography sx={{ fontSize: '24px', mr: 1.5 }}>📚</Typography>
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
+                  <Typography
+                    variant="h6"
+                    sx={{
                       color: '#1B6A9C',
                       fontWeight: 600,
-                      fontSize: '1.125rem'
+                      fontSize: '1.125rem',
                     }}
                   >
                     {course.title}
                   </Typography>
                 </Stack>
-                
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary" 
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
                   sx={{ mb: 1.5, lineHeight: 1.4 }}
                 >
                   {course.description}
                 </Typography>
 
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <Chip 
-                    label={course.courseCode} 
-                    size="small" 
+                  <Chip
+                    label={course.courseCode}
+                    size="small"
                     variant="outlined"
                     sx={{ fontSize: '11px' }}
                   />
                   <Typography variant="caption" color="text.disabled">
-                    {course.sectionIds.length} section{course.sectionIds.length !== 1 ? 's' : ''}
+                    {course.sectionIds.length} section
+                    {course.sectionIds.length !== 1 ? 's' : ''}
                   </Typography>
                 </Stack>
               </CardContent>

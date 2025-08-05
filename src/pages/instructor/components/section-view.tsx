@@ -13,7 +13,7 @@ import {
   CardContent,
   Grid,
   Stack,
-  Chip
+  Chip,
 } from '@mui/material';
 import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
@@ -27,13 +27,16 @@ interface SectionViewProps {
   onAssignmentSelect?: (assignmentId: string) => void;
 }
 
-const SectionView: React.FC<SectionViewProps> = ({ sectionId, courseId, onAssignmentSelect }) => {
+const SectionView: React.FC<SectionViewProps> = ({
+  sectionId,
+  courseId,
+  onAssignmentSelect,
+}) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
   const assignments = getAssignmentsForSection(educationManagement, sectionId);
 
-  const section = educationManagement.sections.find(s => s._id === sectionId);
-  const course = section ? educationManagement.courses.find(c => c.sectionIds.includes(sectionId)) : null;
+  const section = educationManagement.sections.find((s) => s._id === sectionId);
 
   const handleEditSection = async (sectionData: Partial<Section>) => {
     try {
@@ -46,8 +49,14 @@ const SectionView: React.FC<SectionViewProps> = ({ sectionId, courseId, onAssign
 
   const handleAddAssignment = async () => {
     try {
-      const newAssignment = await educationManagement.createAssignment(courseId);
-      await educationManagement.addAssignmentToSection(courseId, sectionId, newAssignment._id, true);
+      const newAssignment =
+        await educationManagement.createAssignment(courseId);
+      await educationManagement.addAssignmentToSection(
+        courseId,
+        sectionId,
+        newAssignment._id,
+        true
+      );
     } catch (error) {
       console.error('Failed to create assignment:', error);
     }
@@ -55,12 +64,14 @@ const SectionView: React.FC<SectionViewProps> = ({ sectionId, courseId, onAssign
 
   if (!section) {
     return (
-      <Box sx={{ 
-        textAlign: 'center', 
-        maxWidth: 400,
-        mx: 'auto',
-        py: 8
-      }}>
+      <Box
+        sx={{
+          textAlign: 'center',
+          maxWidth: 400,
+          mx: 'auto',
+          py: 8,
+        }}
+      >
         <Typography variant="h1" sx={{ fontSize: '48px', mb: 3 }}>
           ❌
         </Typography>
@@ -75,42 +86,53 @@ const SectionView: React.FC<SectionViewProps> = ({ sectionId, courseId, onAssign
   }
 
   return (
-    <Box sx={{ 
-      width: '100%', 
-      maxWidth: 800, 
-      px: 2.5
-    }}>
+    <Box
+      sx={{
+        width: '100%',
+        maxWidth: 800,
+        px: 2.5,
+      }}
+    >
       {/* Section Header */}
       <Card sx={{ mb: 4, backgroundColor: 'grey.50' }}>
         <CardContent sx={{ p: 3 }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+          >
             <Box sx={{ flex: 1 }}>
               <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
                 <Typography sx={{ fontSize: '32px', mr: 2 }}>📑</Typography>
-                <Typography 
-                  variant="h4" 
-                  sx={{ 
+                <Typography
+                  variant="h4"
+                  sx={{
                     color: '#1B6A9C',
                     fontWeight: 600,
-                    fontSize: '1.75rem'
+                    fontSize: '1.75rem',
                   }}
                 >
                   {section.title}
                 </Typography>
               </Stack>
-              
-              <Typography 
-                variant="body1" 
-                color="text.primary" 
+
+              <Typography
+                variant="body1"
+                color="text.primary"
                 sx={{ mb: 1.5, lineHeight: 1.5 }}
               >
                 {section.description}
               </Typography>
 
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                <Chip 
-                  label={`Section Code: ${section.sectionCode}`} 
-                  size="small" 
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                sx={{ mb: 1 }}
+              >
+                <Chip
+                  label={`Section Code: ${section.sectionCode}`}
+                  size="small"
                   variant="outlined"
                   sx={{ fontSize: '11px' }}
                 />
@@ -127,8 +149,8 @@ const SectionView: React.FC<SectionViewProps> = ({ sectionId, courseId, onAssign
                 borderColor: '#1B6A9C',
                 '&:hover': {
                   backgroundColor: '#1B6A9C',
-                  color: 'white'
-                }
+                  color: 'white',
+                },
               }}
             >
               Edit Section
@@ -139,12 +161,21 @@ const SectionView: React.FC<SectionViewProps> = ({ sectionId, courseId, onAssign
 
       {/* Assignments */}
       <Box>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
-          <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 2.5 }}
+        >
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 600, color: 'text.primary' }}
+          >
             Assignments
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {section.assignments.length} assignment{section.assignments.length !== 1 ? 's' : ''}
+            {section.assignments.length} assignment
+            {section.assignments.length !== 1 ? 's' : ''}
           </Typography>
         </Stack>
 
@@ -159,22 +190,22 @@ const SectionView: React.FC<SectionViewProps> = ({ sectionId, courseId, onAssign
             mb: 3,
             backgroundColor: '#1B6A9C',
             '&:hover': {
-              backgroundColor: '#145a87'
-            }
+              backgroundColor: '#145a87',
+            },
           }}
         >
           Add Assignment
         </Button>
 
         {section.assignments.length === 0 ? (
-          <Card 
-            variant="outlined" 
-            sx={{ 
+          <Card
+            variant="outlined"
+            sx={{
               border: '2px dashed',
               borderColor: 'grey.300',
               textAlign: 'center',
               py: 5,
-              px: 2.5
+              px: 2.5,
             }}
           >
             <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
@@ -191,44 +222,50 @@ const SectionView: React.FC<SectionViewProps> = ({ sectionId, courseId, onAssign
           <Grid container spacing={2}>
             {assignments.map((assignment) => (
               <Grid item xs={12} key={assignment._id}>
-                <Card 
+                <Card
                   variant="outlined"
                   sx={{
                     cursor: onAssignmentSelect ? 'pointer' : 'default',
                     transition: 'all 0.2s ease',
-                    '&:hover': onAssignmentSelect ? {
-                      borderColor: '#1B6A9C',
-                      boxShadow: 2
-                    } : {}
+                    '&:hover': onAssignmentSelect
+                      ? {
+                          borderColor: '#1B6A9C',
+                          boxShadow: 2,
+                        }
+                      : {},
                   }}
                   onClick={() => onAssignmentSelect?.(assignment._id)}
                 >
                   <CardContent>
                     <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                      <Typography sx={{ fontSize: '20px', mr: 1.5 }}>📝</Typography>
-                      <Typography 
-                        variant="h6" 
-                        sx={{ 
+                      <Typography sx={{ fontSize: '20px', mr: 1.5 }}>
+                        📝
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{
                           color: '#1B6A9C',
                           fontWeight: 600,
-                          fontSize: '1rem'
+                          fontSize: '1rem',
                         }}
                       >
                         {assignment.title}
                       </Typography>
                     </Stack>
-                    
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary" 
+
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
                       sx={{ mb: 1.5, lineHeight: 1.4 }}
                     >
                       {assignment.description}
                     </Typography>
 
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      
-                    </Stack>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      alignItems="center"
+                    ></Stack>
                   </CardContent>
                 </Card>
               </Grid>
@@ -243,7 +280,6 @@ const SectionView: React.FC<SectionViewProps> = ({ sectionId, courseId, onAssign
         onClose={() => setShowEditModal(false)}
         onSubmit={handleEditSection}
         mode="edit"
-        courseId={course?._id || ''}
         initialData={section}
         isLoading={educationManagement.isSectionModifying}
       />

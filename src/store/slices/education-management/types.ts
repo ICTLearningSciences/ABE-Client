@@ -3,7 +3,6 @@ export interface Course {
   title: string;
   description: string;
   courseCode: string;
-  instructorId: string;
   sectionIds: string[];
 }
 
@@ -12,7 +11,6 @@ export interface Assignment {
   title: string;
   description: string;
   activityIds: string[];
-  instructorId: string;
 }
 
 export interface SectionAssignment {
@@ -25,7 +23,6 @@ export interface Section {
   title: string;
   sectionCode: string;
   description: string;
-  instructorId: string;
   assignments: SectionAssignment[];
   numOptionalAssignmentsRequired: number;
 }

@@ -34,7 +34,7 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
   level,
   selectedId,
   expandedItems,
-  onToggleExpand
+  onToggleExpand,
 }) => {
   const hasSubItems = item.subItems && item.subItems.length > 0;
   const isExpanded = expandedItems.has(item.id);
@@ -43,28 +43,40 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
 
   const getFontSize = (level: number) => {
     switch (level) {
-      case 0: return '14px';
-      case 1: return '13px';
-      case 2: return '12px';
-      default: return '12px';
+      case 0:
+        return '14px';
+      case 1:
+        return '13px';
+      case 2:
+        return '12px';
+      default:
+        return '12px';
     }
   };
 
   const getIconSize = (level: number) => {
     switch (level) {
-      case 0: return '16px';
-      case 1: return '14px';
-      case 2: return '12px';
-      default: return '12px';
+      case 0:
+        return '16px';
+      case 1:
+        return '14px';
+      case 2:
+        return '12px';
+      default:
+        return '12px';
     }
   };
 
   const getTextColor = (level: number) => {
     switch (level) {
-      case 0: return '#1B6A9C';
-      case 1: return '#495057';
-      case 2: return '#6c757d';
-      default: return '#6c757d';
+      case 0:
+        return '#1B6A9C';
+      case 1:
+        return '#495057';
+      case 2:
+        return '#6c757d';
+      default:
+        return '#6c757d';
     }
   };
 
@@ -74,13 +86,15 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
 
   return (
     <div>
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: level === 0 ? '8px 0' : level === 1 ? '6px 0' : '4px 0',
-        cursor: 'pointer',
-        marginLeft: `${indentWidth}px`
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: level === 0 ? '8px 0' : level === 1 ? '6px 0' : '4px 0',
+          cursor: 'pointer',
+          marginLeft: `${indentWidth}px`,
+        }}
+      >
         {/* Expand/Collapse Button */}
         <div
           onClick={() => hasSubItems && onToggleExpand(item.id)}
@@ -93,7 +107,7 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
             marginRight: '8px',
             fontSize: '12px',
             color: '#6c757d',
-            cursor: hasSubItems ? 'pointer' : 'default'
+            cursor: hasSubItems ? 'pointer' : 'default',
           }}
         >
           {hasSubItems ? (isExpanded ? '▼' : '▶') : '•'}
@@ -109,7 +123,7 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
             padding: '4px 8px',
             borderRadius: '4px',
             backgroundColor: isSelected ? '#e3f2fd' : 'transparent',
-            transition: 'background-color 0.2s ease'
+            transition: 'background-color 0.2s ease',
           }}
           onMouseEnter={(e) => {
             if (!isSelected) {
@@ -122,17 +136,21 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
             }
           }}
         >
-          <span style={{
-            fontSize: getIconSize(level),
-            marginRight: '8px'
-          }}>
+          <span
+            style={{
+              fontSize: getIconSize(level),
+              marginRight: '8px',
+            }}
+          >
             {item.icon}
           </span>
-          <span style={{
-            fontSize: getFontSize(level),
-            fontWeight: getFontWeight(level),
-            color: getTextColor(level)
-          }}>
+          <span
+            style={{
+              fontSize: getFontSize(level),
+              fontWeight: getFontWeight(level),
+              color: getTextColor(level),
+            }}
+          >
             {item.title}
           </span>
         </div>
@@ -161,12 +179,12 @@ const CollapsibleTree: React.FC<CollapsibleTreeProps> = ({
   items,
   selectedId,
   className,
-  style
+  style,
 }) => {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   const handleToggleExpand = (id: string) => {
-    setExpandedItems(prev => {
+    setExpandedItems((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
         newSet.delete(id);

@@ -12,7 +12,7 @@ import {
   Card,
   CardContent,
   Grid,
-  Stack
+  Stack,
 } from '@mui/material';
 import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
@@ -24,13 +24,16 @@ interface CourseViewProps {
   onSectionSelect?: (sectionId: string) => void;
 }
 
-const CourseView: React.FC<CourseViewProps> = ({ courseId, onSectionSelect }) => {
+const CourseView: React.FC<CourseViewProps> = ({
+  courseId,
+  onSectionSelect,
+}) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const course = educationManagement.courses.find(c => c._id === courseId);
-  const courseSections = educationManagement.sections.filter(section => 
-    course?.sectionIds.includes(section._id)
+  const course = educationManagement.courses.find((c) => c._id === courseId);
+  const courseSections = educationManagement.sections.filter(
+    (section) => course?.sectionIds.includes(section._id)
   );
 
   const handleEditCourse = async (courseData: Partial<Course>) => {
@@ -52,12 +55,14 @@ const CourseView: React.FC<CourseViewProps> = ({ courseId, onSectionSelect }) =>
 
   if (!course) {
     return (
-      <Box sx={{ 
-        textAlign: 'center', 
-        maxWidth: 400,
-        mx: 'auto',
-        py: 8
-      }}>
+      <Box
+        sx={{
+          textAlign: 'center',
+          maxWidth: 400,
+          mx: 'auto',
+          py: 8,
+        }}
+      >
         <Typography variant="h1" sx={{ fontSize: '48px', mb: 3 }}>
           ❌
         </Typography>
@@ -76,30 +81,33 @@ const CourseView: React.FC<CourseViewProps> = ({ courseId, onSectionSelect }) =>
       {/* Course Header */}
       <Card sx={{ mb: 4, backgroundColor: 'grey.50' }}>
         <CardContent sx={{ p: 3 }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+          >
             <Box sx={{ flex: 1 }}>
               <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
                 <Typography sx={{ fontSize: '32px', mr: 2 }}>📚</Typography>
-                <Typography 
-                  variant="h4" 
-                  sx={{ 
+                <Typography
+                  variant="h4"
+                  sx={{
                     color: '#1B6A9C',
                     fontWeight: 600,
-                    fontSize: '1.75rem'
+                    fontSize: '1.75rem',
                   }}
                 >
                   {course.title}
                 </Typography>
               </Stack>
-              
-              <Typography 
-                variant="body1" 
-                color="text.primary" 
+
+              <Typography
+                variant="body1"
+                color="text.primary"
                 sx={{ mb: 1.5, lineHeight: 1.5 }}
               >
                 {course.description}
               </Typography>
-
             </Box>
 
             <Button
@@ -112,8 +120,8 @@ const CourseView: React.FC<CourseViewProps> = ({ courseId, onSectionSelect }) =>
                 borderColor: '#1B6A9C',
                 '&:hover': {
                   backgroundColor: '#1B6A9C',
-                  color: 'white'
-                }
+                  color: 'white',
+                },
               }}
             >
               Edit Course
@@ -124,12 +132,21 @@ const CourseView: React.FC<CourseViewProps> = ({ courseId, onSectionSelect }) =>
 
       {/* Sections */}
       <Box>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
-          <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 2.5 }}
+        >
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 600, color: 'text.primary' }}
+          >
             Sections
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {courseSections.length} section{courseSections.length !== 1 ? 's' : ''}
+            {courseSections.length} section
+            {courseSections.length !== 1 ? 's' : ''}
           </Typography>
         </Stack>
 
@@ -144,22 +161,22 @@ const CourseView: React.FC<CourseViewProps> = ({ courseId, onSectionSelect }) =>
             mb: 3,
             backgroundColor: '#1B6A9C',
             '&:hover': {
-              backgroundColor: '#145a87'
-            }
+              backgroundColor: '#145a87',
+            },
           }}
         >
           Add Section
         </Button>
 
         {courseSections.length === 0 ? (
-          <Card 
-            variant="outlined" 
-            sx={{ 
+          <Card
+            variant="outlined"
+            sx={{
               border: '2px dashed',
               borderColor: 'grey.300',
               textAlign: 'center',
               py: 5,
-              px: 2.5
+              px: 2.5,
             }}
           >
             <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
@@ -176,43 +193,49 @@ const CourseView: React.FC<CourseViewProps> = ({ courseId, onSectionSelect }) =>
           <Grid container spacing={2}>
             {courseSections.map((section) => (
               <Grid item xs={12} key={section._id}>
-                <Card 
+                <Card
                   variant="outlined"
                   sx={{
                     cursor: onSectionSelect ? 'pointer' : 'default',
                     transition: 'all 0.2s ease',
-                    '&:hover': onSectionSelect ? {
-                      borderColor: '#1B6A9C',
-                      boxShadow: 2
-                    } : {}
+                    '&:hover': onSectionSelect
+                      ? {
+                          borderColor: '#1B6A9C',
+                          boxShadow: 2,
+                        }
+                      : {},
                   }}
                   onClick={() => onSectionSelect?.(section._id)}
                 >
                   <CardContent>
                     <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                      <Typography sx={{ fontSize: '20px', mr: 1.5 }}>📑</Typography>
-                      <Typography 
-                        variant="h6" 
-                        sx={{ 
+                      <Typography sx={{ fontSize: '20px', mr: 1.5 }}>
+                        📑
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{
                           color: '#1B6A9C',
                           fontWeight: 600,
-                          fontSize: '1rem'
+                          fontSize: '1rem',
                         }}
                       >
                         {section.title}
                       </Typography>
                     </Stack>
-                    
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary" 
+
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
                       sx={{ mb: 1.5, lineHeight: 1.4 }}
                     >
                       {section.description}
                     </Typography>
 
                     <Typography variant="caption" color="text.disabled">
-                      Section Code: {section.sectionCode} • {section.assignments.length} assignment{section.assignments.length !== 1 ? 's' : ''}
+                      Section Code: {section.sectionCode} •{' '}
+                      {section.assignments.length} assignment
+                      {section.assignments.length !== 1 ? 's' : ''}
                     </Typography>
                   </CardContent>
                 </Card>
