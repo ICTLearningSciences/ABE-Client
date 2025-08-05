@@ -7,17 +7,21 @@ The full terms of this copyright and license should always be found in the root 
 import React, { useState, useMemo } from 'react';
 import { Box, Typography, Button, Paper } from '@mui/material';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
+import { useWithLogin } from '../../store/slices/login/use-with-login';
 import CollapsibleTree, { TreeItem } from './components/collapsible-tree';
 import CourseView from './components/course-view';
 import SectionView from './components/section-view';
 import AssignmentView from './components/assignment-view';
 import BreadcrumbNavigation from './components/breadcrumb-navigation';
 import CourseModal from './components/course-modal';
+import JoinSectionModal from './components/join-section-modal';
 import { getCourseManagementTreeData } from './helpers';
 import { Course } from '../../store/slices/education-management/types';
 import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
+import { EducationalRole } from '../../types';
 
 export const courseManagementUrl = '/course-management';
+export const studentCoursesUrl = '/student/courses';
 
 export interface CourseManagementState {
   view: 'dashboard' | 'course' | 'section' | 'assignment';
@@ -26,13 +30,24 @@ export interface CourseManagementState {
   selectedAssignmentId?: string;
 }
 
-const CourseManagement: React.FC = () => {
+interface CourseManagementProps {
+  userRole?: EducationalRole;
+}
+
+const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const educationManagement = useWithEducationalManagement();
+  const { state: loginState } = useWithLogin();
   const [viewState, setViewState] = useState<CourseManagementState>({
     view: 'dashboard',
   });
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
+  const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
   const { builtActivities } = useWithDocGoalsActivities();
+
+  // Determine if user is a student - either from prop or from login state
+  const isStudent =
+    userRole === EducationalRole.STUDENT ||
+    loginState.user?.educationalRole === EducationalRole.STUDENT;
 
   const handleCreateCourse = async (courseData: Partial<Course>) => {
     try {
@@ -105,6 +120,31 @@ const CourseManagement: React.FC = () => {
     });
   };
 
+  const handleJoinSection = async (sectionCode: string) => {
+    if (!loginState.user?._id) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      await educationManagement.enrollStudentInSection(
+        loginState.user._id,
+        sectionCode
+      );
+      setIsJoinSectionModalOpen(false);
+    } catch (error) {
+      console.error('Failed to join section:', error);
+      throw error;
+    }
+  };
+
+  const handleOpenJoinSectionModal = () => {
+    setIsJoinSectionModalOpen(true);
+  };
+
+  const handleCloseJoinSectionModal = () => {
+    setIsJoinSectionModalOpen(false);
+  };
+
   const treeData: TreeItem[] = useMemo(() => {
     return getCourseManagementTreeData(
       educationManagement,
@@ -156,32 +196,56 @@ const CourseManagement: React.FC = () => {
               fontWeight: 600,
             }}
           >
-            Course Management
+            {isStudent ? 'My Courses' : 'Course Management'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Manage your courses, sections, and assignments
+            {isStudent
+              ? 'View your enrolled courses, sections, and assignments'
+              : 'Manage your courses, sections, and assignments'}
           </Typography>
         </Box>
 
-        <Button
-          onClick={handleOpenCourseModal}
-          disabled={educationManagement.isCourseModifying}
-          variant="contained"
-          fullWidth
-          sx={{
-            mb: 3,
-            backgroundColor: '#1B6A9C',
-            '&:hover': {
-              backgroundColor: '#145a87',
-            },
-            '&:disabled': {
+        {isStudent ? (
+          <Button
+            onClick={handleOpenJoinSectionModal}
+            disabled={educationManagement.isSectionModifying}
+            variant="contained"
+            fullWidth
+            sx={{
+              mb: 3,
               backgroundColor: '#1B6A9C',
-              opacity: 0.6,
-            },
-          }}
-        >
-          + New Course
-        </Button>
+              '&:hover': {
+                backgroundColor: '#145a87',
+              },
+              '&:disabled': {
+                backgroundColor: '#1B6A9C',
+                opacity: 0.6,
+              },
+            }}
+          >
+            + Join Section
+          </Button>
+        ) : (
+          <Button
+            onClick={handleOpenCourseModal}
+            disabled={educationManagement.isCourseModifying}
+            variant="contained"
+            fullWidth
+            sx={{
+              mb: 3,
+              backgroundColor: '#1B6A9C',
+              '&:hover': {
+                backgroundColor: '#145a87',
+              },
+              '&:disabled': {
+                backgroundColor: '#1B6A9C',
+                opacity: 0.6,
+              },
+            }}
+          >
+            + New Course
+          </Button>
+        )}
 
         {/* Course Tree */}
         <Box>
@@ -207,9 +271,19 @@ const CourseManagement: React.FC = () => {
                 color="text.secondary"
                 sx={{ lineHeight: 1.5 }}
               >
-                No courses yet
-                <br />
-                Create your first course to get started
+                {isStudent ? (
+                  <>
+                    No courses yet
+                    <br />
+                    Join your first section to get started
+                  </>
+                ) : (
+                  <>
+                    No courses yet
+                    <br />
+                    Create your first course to get started
+                  </>
+                )}
               </Typography>
             </Box>
           ) : (
@@ -270,16 +344,16 @@ const CourseManagement: React.FC = () => {
                   fontWeight: 600,
                 }}
               >
-                Course Management
+                {isStudent ? 'My Courses' : 'Course Management'}
               </Typography>
               <Typography
                 variant="body1"
                 color="text.secondary"
                 sx={{ lineHeight: 1.5 }}
               >
-                Select a course, section, or assignment from the sidebar to view
-                and edit its details. You can also create new items using the
-                buttons in the sidebar.
+                {isStudent
+                  ? 'Select a course, section, or assignment from the sidebar to view its details and access your learning materials.'
+                  : 'Select a course, section, or assignment from the sidebar to view and edit its details. You can also create new items using the buttons in the sidebar.'}
               </Typography>
             </Box>
           )}
@@ -291,6 +365,7 @@ const CourseManagement: React.FC = () => {
                 handleSectionSelect(viewState.selectedCourseId!, sectionId)
               }
               onCourseDeleted={handleCourseDeleted}
+              isStudentView={isStudent}
             />
           )}
 
@@ -308,6 +383,7 @@ const CourseManagement: React.FC = () => {
                   )
                 }
                 onSectionDeleted={handleSectionDeleted}
+                isStudentView={isStudent}
               />
             )}
 
@@ -321,6 +397,7 @@ const CourseManagement: React.FC = () => {
                 assignmentId={viewState.selectedAssignmentId}
                 builtActivities={builtActivities}
                 onAssignmentDeleted={handleAssignmentDeleted}
+                isStudentView={isStudent}
               />
             )}
         </Box>
@@ -331,6 +408,12 @@ const CourseManagement: React.FC = () => {
         onSubmit={handleCreateCourse}
         mode="create"
         isLoading={educationManagement.isCourseModifying}
+      />
+      <JoinSectionModal
+        isOpen={isJoinSectionModalOpen}
+        onClose={handleCloseJoinSectionModal}
+        onSubmit={handleJoinSection}
+        isLoading={educationManagement.isSectionModifying}
       />
     </Box>
   );

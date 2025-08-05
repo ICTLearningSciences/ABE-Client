@@ -183,17 +183,12 @@ export const deleteAssignment = createAsyncThunk(
 
 export const enrollInSection = createAsyncThunk(
   'educationManagement/enrollInSection',
-  async (params: {
-    targetUserId: string;
-    courseId: string;
-    sectionId: string;
-    sectionCode: string;
-  }) => {
+  async (params: { targetUserId: string; sectionCode: string }) => {
     return await _modifySectionEnrollment(
       params.targetUserId,
-      params.courseId,
-      params.sectionId,
       'ENROLL',
+      undefined,
+      undefined,
       params.sectionCode
     );
   }
@@ -208,9 +203,10 @@ export const removeFromSection = createAsyncThunk(
   }) => {
     return await _modifySectionEnrollment(
       params.targetUserId,
+      'REMOVE',
       params.courseId,
       params.sectionId,
-      'REMOVE'
+      undefined
     );
   }
 );

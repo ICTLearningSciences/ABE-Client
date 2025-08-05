@@ -24,7 +24,11 @@ import {
   AuthProvider as CognitoAuthProvider,
 } from 'react-oidc-context';
 import CourseManagement from './pages/instructor/course-management';
-import { courseManagementUrl } from './pages/instructor/course-management';
+import {
+  courseManagementUrl,
+  studentCoursesUrl,
+} from './pages/instructor/course-management';
+import { EducationalRole } from './types';
 
 function MainApp() {
   const mainAppHeight = '88vh';
@@ -106,7 +110,26 @@ function MainApp() {
               justifyContent: 'center',
             }}
           >
-            <CourseManagement />
+            <CourseManagement userRole={EducationalRole.INSTRUCTOR} />
+          </div>
+        </>
+      ),
+    },
+    {
+      path: studentCoursesUrl,
+      element: (
+        <>
+          <Header useLogin={useLogin} />
+          <div
+            style={{
+              width: '100%',
+              height: '100vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <CourseManagement userRole={EducationalRole.STUDENT} />
           </div>
         </>
       ),

@@ -8,11 +8,15 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
-import { courseManagementUrl } from '../../pages/instructor/course-management';
+import {
+  courseManagementUrl,
+  studentCoursesUrl,
+} from '../../pages/instructor/course-management';
+import { EducationalRole } from '../../types';
 export default function GoToEducationDashboardButton() {
   const navigate = useNavigate();
   const { state: loginState } = useWithLogin();
-  if (loginState.user?.educationalRole === 'INSTRUCTOR') {
+  if (loginState.user?.educationalRole === EducationalRole.INSTRUCTOR) {
     return (
       <Button
         variant="contained"
@@ -24,14 +28,13 @@ export default function GoToEducationDashboardButton() {
         Instructor Dashboard
       </Button>
     );
-  } else if (loginState.user?.educationalRole === 'STUDENT') {
+  } else if (loginState.user?.educationalRole === EducationalRole.STUDENT) {
     return (
       <Button
         variant="contained"
         color="primary"
         onClick={() => {
-          // navigate(studentDashboardUrl);
-          console.log('Student Dashboard');
+          navigate(studentCoursesUrl);
         }}
       >
         Student Dashboard

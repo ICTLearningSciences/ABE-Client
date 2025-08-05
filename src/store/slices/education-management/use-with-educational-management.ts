@@ -55,8 +55,6 @@ export interface UseWithEducationalManagement {
   ) => Promise<Assignment>;
   enrollStudentInSection: (
     targetUserId: string,
-    courseId: string,
-    sectionId: string,
     sectionCode: string
   ) => Promise<StudentData>;
   removeStudentFromSection: (
@@ -206,13 +204,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
 
   async function enrollStudentInSection(
     targetUserId: string,
-    courseId: string,
-    sectionId: string,
     sectionCode: string
   ) {
-    const res = await dispatch(
-      _enrollInSection({ targetUserId, courseId, sectionId, sectionCode })
-    );
+    const res = await dispatch(_enrollInSection({ targetUserId, sectionCode }));
     return res.payload as StudentData;
   }
 

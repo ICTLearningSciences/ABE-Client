@@ -41,6 +41,11 @@ export interface UpdateUserInfo {
   classroomCode?: string;
 }
 
+export enum EducationalRole {
+  INSTRUCTOR = 'INSTRUCTOR',
+  STUDENT = 'STUDENT',
+}
+
 export interface User {
   _id: string;
   googleId: string;
@@ -51,7 +56,7 @@ export interface User {
   lastLoginAt: Date;
   classroomCode?: ClassroomCode;
   previousClassroomCodes?: ClassroomCode[];
-  educationalRole?: 'INSTRUCTOR' | 'STUDENT';
+  educationalRole?: EducationalRole;
 }
 
 export interface UserAccessToken {

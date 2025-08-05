@@ -250,16 +250,16 @@ export async function addOrUpdateAssignment(
 // Modify section enrollment (enroll/remove student)
 export async function modifySectionEnrollment(
   targetUserId: string,
-  courseId: string,
-  sectionId: string,
   action: 'ENROLL' | 'REMOVE',
+  courseId?: string,
+  sectionId?: string,
   sectionCode?: string
 ): Promise<StudentData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   const res = await execGql<StudentData>(
     {
       query: `
-        mutation ModifySectionEnrollment($targetUserId: ID!, $courseId: ID!, $sectionId: ID!, $action: SectionEnrollmentAction!, $sectionCode: String) {
+        mutation ModifySectionEnrollment($targetUserId: ID!, $courseId: ID, $sectionId: ID, $action: SectionEnrollmentAction!, $sectionCode: String) {
           modifySectionEnrollment(targetUserId: $targetUserId, courseId: $courseId, sectionId: $sectionId, action: $action, sectionCode: $sectionCode) {
             ${studentDataQueryData}
           }

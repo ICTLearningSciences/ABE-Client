@@ -34,6 +34,7 @@ interface AssignmentViewProps {
   builtActivities: ActivityBuilder[];
   sectionId?: string;
   onAssignmentDeleted?: (courseId: string, sectionId: string) => void;
+  isStudentView?: boolean;
 }
 
 const AssignmentView: React.FC<AssignmentViewProps> = ({
@@ -42,6 +43,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   sectionId,
   builtActivities,
   onAssignmentDeleted,
+  isStudentView = false,
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -197,27 +199,31 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
               </Stack>
             </Box>
 
-            <Button
-              variant="outlined"
-              startIcon={<EditIcon />}
-              onClick={() => setShowEditModal(true)}
-              disabled={educationManagement.isAssignmentModifying}
-              sx={{
-                color: '#1B6A9C',
-                borderColor: '#1B6A9C',
-                '&:hover': {
-                  backgroundColor: '#1B6A9C',
-                  color: 'white',
-                },
-              }}
-            >
-              Edit Assignment
-            </Button>
-            <DeleteConfirmationModal
-              onDelete={handleDeleteAssignment}
-              entityType="assignment"
-              entityName={assignment.title}
-            />
+            {!isStudentView && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={<EditIcon />}
+                  onClick={() => setShowEditModal(true)}
+                  disabled={educationManagement.isAssignmentModifying}
+                  sx={{
+                    color: '#1B6A9C',
+                    borderColor: '#1B6A9C',
+                    '&:hover': {
+                      backgroundColor: '#1B6A9C',
+                      color: 'white',
+                    },
+                  }}
+                >
+                  Edit Assignment
+                </Button>
+                <DeleteConfirmationModal
+                  onDelete={handleDeleteAssignment}
+                  entityType="assignment"
+                  entityName={assignment.title}
+                />
+              </>
+            )}
           </Stack>
         </CardContent>
       </Card>
@@ -243,59 +249,61 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
         </Stack>
 
         {/* Add Activity Section */}
-        <Card variant="outlined" sx={{ mb: 3, p: 2.5 }}>
-          <Typography variant="h6" sx={{ mb: 2, color: 'text.primary' }}>
-            Add Activity
-          </Typography>
-
-          {availableActivities.length === 0 ? (
-            <Typography variant="body2" color="text.secondary">
-              No more activities available to add to this assignment.
+        {!isStudentView && (
+          <Card variant="outlined" sx={{ mb: 3, p: 2.5 }}>
+            <Typography variant="h6" sx={{ mb: 2, color: 'text.primary' }}>
+              Add Activity
             </Typography>
-          ) : (
-            <Stack direction="row" spacing={2} alignItems="center">
-              <FormControl fullWidth>
-                <InputLabel id="activity-select-label">
-                  Select Activity
-                </InputLabel>
-                <Select
-                  labelId="activity-select-label"
-                  value={selectedActivityId}
-                  label="Select Activity"
-                  onChange={(e) => setSelectedActivityId(e.target.value)}
-                  disabled={educationManagement.isAssignmentModifying}
-                >
-                  {availableActivities.map((activity) => (
-                    <MenuItem key={activity._id} value={activity._id}>
-                      {activity.title}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
 
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleAddActivity}
-                disabled={
-                  !selectedActivityId ||
-                  educationManagement.isAssignmentModifying
-                }
-                sx={{
-                  backgroundColor: '#1B6A9C',
-                  '&:hover': {
-                    backgroundColor: '#145a87',
-                  },
-                  '&:disabled': {
-                    backgroundColor: 'grey.300',
-                  },
-                }}
-              >
-                Add
-              </Button>
-            </Stack>
-          )}
-        </Card>
+            {availableActivities.length === 0 ? (
+              <Typography variant="body2" color="text.secondary">
+                No more activities available to add to this assignment.
+              </Typography>
+            ) : (
+              <Stack direction="row" spacing={2} alignItems="center">
+                <FormControl fullWidth>
+                  <InputLabel id="activity-select-label">
+                    Select Activity
+                  </InputLabel>
+                  <Select
+                    labelId="activity-select-label"
+                    value={selectedActivityId}
+                    label="Select Activity"
+                    onChange={(e) => setSelectedActivityId(e.target.value)}
+                    disabled={educationManagement.isAssignmentModifying}
+                  >
+                    {availableActivities.map((activity) => (
+                      <MenuItem key={activity._id} value={activity._id}>
+                        {activity.title}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddActivity}
+                  disabled={
+                    !selectedActivityId ||
+                    educationManagement.isAssignmentModifying
+                  }
+                  sx={{
+                    backgroundColor: '#1B6A9C',
+                    '&:hover': {
+                      backgroundColor: '#145a87',
+                    },
+                    '&:disabled': {
+                      backgroundColor: 'grey.300',
+                    },
+                  }}
+                >
+                  Add
+                </Button>
+              </Stack>
+            )}
+          </Card>
+        )}
 
         {assignment.activityIds.length === 0 ? (
           <Card
@@ -343,22 +351,24 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                         >
                           {activity?.title || `Activity ${activityId}`}
                         </Typography>
-                        <IconButton
-                          onClick={() => handleRemoveActivity(activityId)}
-                          disabled={educationManagement.isAssignmentModifying}
-                          sx={{
-                            color: '#d32f2f',
-                            '&:hover': {
-                              backgroundColor: '#ffebee',
-                            },
-                            '&:disabled': {
-                              color: 'grey.400',
-                            },
-                          }}
-                          size="small"
-                        >
-                          <RemoveCircleIcon />
-                        </IconButton>
+                        {!isStudentView && (
+                          <IconButton
+                            onClick={() => handleRemoveActivity(activityId)}
+                            disabled={educationManagement.isAssignmentModifying}
+                            sx={{
+                              color: '#d32f2f',
+                              '&:hover': {
+                                backgroundColor: '#ffebee',
+                              },
+                              '&:disabled': {
+                                color: 'grey.400',
+                              },
+                            }}
+                            size="small"
+                          >
+                            <RemoveCircleIcon />
+                          </IconButton>
+                        )}
                       </Stack>
                     </CardContent>
                   </Card>
@@ -370,15 +380,17 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
       </Box>
 
       {/* Edit Assignment Modal */}
-      <AssignmentModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        onSubmit={handleEditAssignment}
-        mode="edit"
-        sectionId={sectionId}
-        initialData={assignment}
-        isLoading={educationManagement.isAssignmentModifying}
-      />
+      {!isStudentView && (
+        <AssignmentModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSubmit={handleEditAssignment}
+          mode="edit"
+          sectionId={sectionId}
+          initialData={assignment}
+          isLoading={educationManagement.isAssignmentModifying}
+        />
+      )}
     </Box>
   );
 };

@@ -29,6 +29,7 @@ interface CourseViewProps {
   onSectionSelect?: (sectionId: string) => void;
   onCourseDeleted?: () => void;
   startWithEditModal?: boolean;
+  isStudentView?: boolean;
 }
 
 const CourseView: React.FC<CourseViewProps> = ({
@@ -36,6 +37,7 @@ const CourseView: React.FC<CourseViewProps> = ({
   onSectionSelect,
   onCourseDeleted,
   startWithEditModal = false,
+  isStudentView = false,
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(startWithEditModal);
@@ -136,27 +138,31 @@ const CourseView: React.FC<CourseViewProps> = ({
                 {course.description}
               </Typography>
             </Box>
-            <Button
-              variant="outlined"
-              startIcon={<EditIcon />}
-              onClick={() => setShowEditModal(true)}
-              disabled={educationManagement.isCourseModifying}
-              sx={{
-                color: '#1B6A9C',
-                borderColor: '#1B6A9C',
-                '&:hover': {
-                  backgroundColor: '#1B6A9C',
-                  color: 'white',
-                },
-              }}
-            >
-              Edit Course
-            </Button>
-            <DeleteConfirmationModal
-              onDelete={handleDeleteCourse}
-              entityType="course"
-              entityName={course.title}
-            />
+            {!isStudentView && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={<EditIcon />}
+                  onClick={() => setShowEditModal(true)}
+                  disabled={educationManagement.isCourseModifying}
+                  sx={{
+                    color: '#1B6A9C',
+                    borderColor: '#1B6A9C',
+                    '&:hover': {
+                      backgroundColor: '#1B6A9C',
+                      color: 'white',
+                    },
+                  }}
+                >
+                  Edit Course
+                </Button>
+                <DeleteConfirmationModal
+                  onDelete={handleDeleteCourse}
+                  entityType="course"
+                  entityName={course.title}
+                />
+              </>
+            )}
           </Stack>
         </CardContent>
       </Card>
@@ -181,23 +187,25 @@ const CourseView: React.FC<CourseViewProps> = ({
           </Typography>
         </Stack>
 
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleOpenSectionModal}
-          disabled={educationManagement.isSectionModifying}
-          fullWidth
-          sx={{
-            py: 2,
-            mb: 3,
-            backgroundColor: '#1B6A9C',
-            '&:hover': {
-              backgroundColor: '#145a87',
-            },
-          }}
-        >
-          Add Section
-        </Button>
+        {!isStudentView && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleOpenSectionModal}
+            disabled={educationManagement.isSectionModifying}
+            fullWidth
+            sx={{
+              py: 2,
+              mb: 3,
+              backgroundColor: '#1B6A9C',
+              '&:hover': {
+                backgroundColor: '#145a87',
+              },
+            }}
+          >
+            Add Section
+          </Button>
+        )}
 
         {courseSections.length === 0 ? (
           <Card
@@ -277,23 +285,27 @@ const CourseView: React.FC<CourseViewProps> = ({
       </Box>
 
       {/* Edit Course Modal */}
-      <CourseModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        onSubmit={handleEditCourse}
-        mode="edit"
-        initialData={course}
-        isLoading={educationManagement.isCourseModifying}
-      />
+      {!isStudentView && (
+        <>
+          <CourseModal
+            isOpen={showEditModal}
+            onClose={() => setShowEditModal(false)}
+            onSubmit={handleEditCourse}
+            mode="edit"
+            initialData={course}
+            isLoading={educationManagement.isCourseModifying}
+          />
 
-      {/* Add Section Modal */}
-      <SectionModal
-        isOpen={showSectionModal}
-        onClose={handleCloseSectionModal}
-        onSubmit={handleAddSection}
-        mode="create"
-        isLoading={educationManagement.isSectionModifying}
-      />
+          {/* Add Section Modal */}
+          <SectionModal
+            isOpen={showSectionModal}
+            onClose={handleCloseSectionModal}
+            onSubmit={handleAddSection}
+            mode="create"
+            isLoading={educationManagement.isSectionModifying}
+          />
+        </>
+      )}
     </Box>
   );
 };

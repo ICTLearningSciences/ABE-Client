@@ -31,6 +31,7 @@ interface SectionViewProps {
   courseId: string;
   onAssignmentSelect: (assignmentId: string) => void;
   onSectionDeleted?: (courseId: string) => void;
+  isStudentView?: boolean;
 }
 
 const SectionView: React.FC<SectionViewProps> = ({
@@ -38,6 +39,7 @@ const SectionView: React.FC<SectionViewProps> = ({
   courseId,
   onAssignmentSelect,
   onSectionDeleted,
+  isStudentView = false,
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -166,27 +168,31 @@ const SectionView: React.FC<SectionViewProps> = ({
               </Stack>
             </Box>
 
-            <Button
-              variant="outlined"
-              startIcon={<EditIcon />}
-              onClick={() => setShowEditModal(true)}
-              disabled={educationManagement.isSectionModifying}
-              sx={{
-                color: '#1B6A9C',
-                borderColor: '#1B6A9C',
-                '&:hover': {
-                  backgroundColor: '#1B6A9C',
-                  color: 'white',
-                },
-              }}
-            >
-              Edit Section
-            </Button>
-            <DeleteConfirmationModal
-              onDelete={handleDeleteSection}
-              entityType="section"
-              entityName={section.title}
-            />
+            {!isStudentView && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={<EditIcon />}
+                  onClick={() => setShowEditModal(true)}
+                  disabled={educationManagement.isSectionModifying}
+                  sx={{
+                    color: '#1B6A9C',
+                    borderColor: '#1B6A9C',
+                    '&:hover': {
+                      backgroundColor: '#1B6A9C',
+                      color: 'white',
+                    },
+                  }}
+                >
+                  Edit Section
+                </Button>
+                <DeleteConfirmationModal
+                  onDelete={handleDeleteSection}
+                  entityType="section"
+                  entityName={section.title}
+                />
+              </>
+            )}
           </Stack>
         </CardContent>
       </Card>
@@ -211,23 +217,25 @@ const SectionView: React.FC<SectionViewProps> = ({
           </Typography>
         </Stack>
 
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleOpenAssignmentModal}
-          disabled={educationManagement.isAssignmentModifying}
-          fullWidth
-          sx={{
-            py: 2,
-            mb: 3,
-            backgroundColor: '#1B6A9C',
-            '&:hover': {
-              backgroundColor: '#145a87',
-            },
-          }}
-        >
-          Add Assignment
-        </Button>
+        {!isStudentView && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleOpenAssignmentModal}
+            disabled={educationManagement.isAssignmentModifying}
+            fullWidth
+            sx={{
+              py: 2,
+              mb: 3,
+              backgroundColor: '#1B6A9C',
+              '&:hover': {
+                backgroundColor: '#145a87',
+              },
+            }}
+          >
+            Add Assignment
+          </Button>
+        )}
 
         {section.assignments.length === 0 ? (
           <Card
@@ -299,24 +307,28 @@ const SectionView: React.FC<SectionViewProps> = ({
       </Box>
 
       {/* Edit Section Modal */}
-      <SectionModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        onSubmit={handleEditSection}
-        mode="edit"
-        initialData={section}
-        isLoading={educationManagement.isSectionModifying}
-      />
+      {!isStudentView && (
+        <>
+          <SectionModal
+            isOpen={showEditModal}
+            onClose={() => setShowEditModal(false)}
+            onSubmit={handleEditSection}
+            mode="edit"
+            initialData={section}
+            isLoading={educationManagement.isSectionModifying}
+          />
 
-      {/* Assignment Modal */}
-      <AssignmentModal
-        isOpen={showAssignmentModal}
-        onClose={handleCloseAssignmentModal}
-        onSubmit={handleAddAssignment}
-        mode="create"
-        sectionId={sectionId}
-        isLoading={educationManagement.isAssignmentModifying}
-      />
+          {/* Assignment Modal */}
+          <AssignmentModal
+            isOpen={showAssignmentModal}
+            onClose={handleCloseAssignmentModal}
+            onSubmit={handleAddAssignment}
+            mode="create"
+            sectionId={sectionId}
+            isLoading={educationManagement.isAssignmentModifying}
+          />
+        </>
+      )}
     </Box>
   );
 };
