@@ -12,7 +12,7 @@ import {
   studentCoursesUrl,
 } from '../../pages/instructor/course-management';
 import { EducationalRole } from '../../types';
-export default function GoToEducationDashboardButton(props:{
+export default function GoToEducationDashboardButton(props: {
   educationalRole: EducationalRole;
 }) {
   const navigate = useNavigate();

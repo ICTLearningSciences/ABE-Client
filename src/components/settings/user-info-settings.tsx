@@ -90,12 +90,14 @@ export function UserInfoSettings(): JSX.Element {
         )}
       </div>
       {educationalRole && (
-          <GoToEducationDashboardButton educationalRole={educationalRole} />
-        )}
-        {/* For testing purposes */}
-        {educationalRole && educationalRole === EducationalRole.INSTRUCTOR && (
-          <GoToEducationDashboardButton educationalRole={EducationalRole.STUDENT} />
-        )}
+        <GoToEducationDashboardButton educationalRole={educationalRole} />
+      )}
+      {/* For testing purposes */}
+      {educationalRole && educationalRole === EducationalRole.INSTRUCTOR && (
+        <GoToEducationDashboardButton
+          educationalRole={EducationalRole.STUDENT}
+        />
+      )}
       <AdminControls />
 
       {surveyUrl && surveyUrlParam && (
