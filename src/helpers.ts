@@ -29,6 +29,9 @@ export function extractErrorMessageFromError(err: any | unknown): string {
       console.error(err);
     }
   }
+  if (err.message) {
+    return err.message;
+  }
   if (err instanceof Error) {
     return err.message;
   } else if (axios.isAxiosError(err)) {

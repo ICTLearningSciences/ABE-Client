@@ -206,8 +206,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     targetUserId: string,
     sectionCode: string
   ) {
-    const res = await dispatch(_enrollInSection({ targetUserId, sectionCode }));
-    return res.payload as StudentData;
+    return await dispatch(
+      _enrollInSection({ targetUserId, sectionCode })
+    ).unwrap();
   }
 
   async function removeStudentFromSection(

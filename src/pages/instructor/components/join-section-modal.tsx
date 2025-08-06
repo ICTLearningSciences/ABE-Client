@@ -18,6 +18,7 @@ import {
   Alert,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
+import { extractErrorMessageFromError } from '../../../helpers';
 
 interface JoinSectionModalProps {
   isOpen: boolean;
@@ -57,7 +58,7 @@ const JoinSectionModal: React.FC<JoinSectionModalProps> = ({
       setSectionCode('');
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to join section');
+      setError(extractErrorMessageFromError(err) || 'Failed to join section');
     }
   };
 
@@ -67,6 +68,11 @@ const JoinSectionModal: React.FC<JoinSectionModalProps> = ({
       setError('');
       onClose();
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSectionCode(e.target.value);
+    setError('');
   };
 
   return (
@@ -124,7 +130,7 @@ const JoinSectionModal: React.FC<JoinSectionModalProps> = ({
               fullWidth
               label="Section Code"
               value={sectionCode}
-              onChange={(e) => setSectionCode(e.target.value)}
+              onChange={handleInputChange}
               placeholder="Enter section code"
               disabled={isLoading}
               autoFocus
