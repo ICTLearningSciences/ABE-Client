@@ -7,16 +7,16 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
-import { useWithLogin } from '../../store/slices/login/use-with-login';
 import {
   courseManagementUrl,
   studentCoursesUrl,
 } from '../../pages/instructor/course-management';
 import { EducationalRole } from '../../types';
-export default function GoToEducationDashboardButton() {
+export default function GoToEducationDashboardButton(props:{
+  educationalRole: EducationalRole;
+}) {
   const navigate = useNavigate();
-  const { state: loginState } = useWithLogin();
-  if (loginState.user?.educationalRole === EducationalRole.INSTRUCTOR) {
+  if (props.educationalRole === EducationalRole.INSTRUCTOR) {
     return (
       <Button
         variant="contained"
@@ -28,7 +28,7 @@ export default function GoToEducationDashboardButton() {
         Instructor Dashboard
       </Button>
     );
-  } else if (loginState.user?.educationalRole === EducationalRole.STUDENT) {
+  } else if (props.educationalRole === EducationalRole.STUDENT) {
     return (
       <Button
         variant="contained"

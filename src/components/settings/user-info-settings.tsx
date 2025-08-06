@@ -14,11 +14,13 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import { formatISODateToReadable } from '../../helpers';
 import { EditableText } from '../activity-builder/shared/input-components';
 import GoToEducationDashboardButton from './go-to-education-dashboard-button';
+import { EducationalRole } from '../../types';
 export function UserInfoSettings(): JSX.Element {
   const { state, updateUserInfo } = useWithLogin();
   const { state: configState } = useWithConfig();
   const userName = state.user?.name;
   const classroomCode = state.user?.classroomCode;
+  const educationalRole = state.user?.educationalRole;
   const previousClassroomCodes = state.user?.previousClassroomCodes;
   const surveyUrl = configState.config?.surveyConfig?.surveyLink;
   const surveyUrlParam = configState.config?.surveyConfig?.surveyQueryParam;
@@ -86,8 +88,14 @@ export function UserInfoSettings(): JSX.Element {
             </p>
           </Tooltip>
         )}
-        <GoToEducationDashboardButton />
       </div>
+      {educationalRole && (
+          <GoToEducationDashboardButton educationalRole={educationalRole} />
+        )}
+        {/* For testing purposes */}
+        {educationalRole && educationalRole === EducationalRole.INSTRUCTOR && (
+          <GoToEducationDashboardButton educationalRole={EducationalRole.STUDENT} />
+        )}
       <AdminControls />
 
       {surveyUrl && surveyUrlParam && (
