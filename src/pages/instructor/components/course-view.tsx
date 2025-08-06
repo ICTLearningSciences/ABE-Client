@@ -284,28 +284,25 @@ const CourseView: React.FC<CourseViewProps> = ({
         )}
       </Box>
 
-      {/* Edit Course Modal */}
-      {!isStudentView && (
-        <>
-          <CourseModal
-            isOpen={showEditModal}
-            onClose={() => setShowEditModal(false)}
-            onSubmit={handleEditCourse}
-            mode="edit"
-            initialData={course}
-            isLoading={educationManagement.isCourseModifying}
-          />
+      <>
+        <CourseModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSubmit={handleEditCourse}
+          mode="edit"
+          initialData={course}
+          isLoading={educationManagement.isCourseModifying}
+        />
 
-          {/* Add Section Modal */}
-          <SectionModal
-            isOpen={showSectionModal}
-            onClose={handleCloseSectionModal}
-            onSubmit={handleAddSection}
-            mode="create"
-            isLoading={educationManagement.isSectionModifying}
-          />
-        </>
-      )}
+        {/* Add Section Modal */}
+        <SectionModal
+          isOpen={showSectionModal}
+          onClose={handleCloseSectionModal}
+          onSubmit={handleAddSection}
+          mode="create"
+          isLoading={educationManagement.isSectionModifying}
+        />
+      </>
     </Box>
   );
 };

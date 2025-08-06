@@ -38,10 +38,12 @@ export interface StudentData {
   enrolledCourses: string[];
   enrolledSections: string[];
   assignmentProgress: AssignmentProgress[];
+  name: string;
 }
 
 export interface Instructor {
   _id: string;
   userId: string;
   courseIds: string[];
+  name: string;
 }

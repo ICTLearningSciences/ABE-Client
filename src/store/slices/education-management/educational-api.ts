@@ -46,6 +46,7 @@ export const studentDataQueryData = `
   userId
   enrolledCourses
   enrolledSections
+  name
   assignmentProgress {
     assignmentId
     complete
@@ -57,6 +58,7 @@ export const instructorQueryData = `
   _id
   userId
   courseIds
+  name
 `;
 
 // Fetch courses for a specific user

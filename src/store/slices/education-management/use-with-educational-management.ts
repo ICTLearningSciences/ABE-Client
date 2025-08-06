@@ -90,6 +90,9 @@ export interface UseWithEducationalManagement {
     assignmentId: string,
     mandatory: boolean
   ) => Promise<Section>;
+  getSectionForSectionId: (sectionId: string) => Section | undefined;
+  getStudentsInSection: (sectionId: string) => StudentData[];
+  getAssignmentsInSection: (section?: Section) => Assignment[];
 }
 
 export function useWithEducationalManagement(): UseWithEducationalManagement {
@@ -278,6 +281,23 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return await _createNewStudent(userId);
   }
 
+  function getSectionForSectionId(sectionId: string) {
+    return sections.find((s) => s._id === sectionId);
+  }
+
+  function getStudentsInSection(sectionId: string) {
+    return students.filter((s) => s.enrolledSections.includes(sectionId));
+  }
+
+  function getAssignmentsInSection(section?: Section) {
+    if (!section) {
+      return [];
+    }
+    return assignments.filter((a) =>
+      section.assignments.some((s) => s.assignmentId === a._id)
+    );
+  }
+
   return {
     loadCourses,
     loadAssignments,
@@ -317,5 +337,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     enrollmentModificationFailed:
       enrollmentModificationStatus === LoadStatus.FAILED,
     addAssignmentToSection,
+    getSectionForSectionId,
+    getStudentsInSection,
+    getAssignmentsInSection,
   };
 }

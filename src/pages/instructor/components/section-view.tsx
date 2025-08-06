@@ -11,20 +11,18 @@ import {
   Button,
   Card,
   CardContent,
-  Grid,
   Stack,
   Chip,
+  Tabs,
+  Tab,
 } from '@mui/material';
-import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
+import { Edit as EditIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import {
-  Section,
-  Assignment,
-} from '../../../store/slices/education-management/types';
+import { Section } from '../../../store/slices/education-management/types';
 import SectionModal from './section-modal';
-import AssignmentModal from './assignment-modal';
-import { getAssignmentsForSection } from '../helpers';
 import DeleteConfirmationModal from './delete-confirmation-modal';
+import SectionContent from './section-content';
+import SectionStudentsGrades from './section-students-grades';
 
 interface SectionViewProps {
   sectionId: string;
@@ -43,10 +41,11 @@ const SectionView: React.FC<SectionViewProps> = ({
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
-  const assignments = getAssignmentsForSection(educationManagement, sectionId);
-  const section = educationManagement.sections.find((s) => s._id === sectionId);
-
+  const [selectedTab, setSelectedTab] = useState(0);
+  const section = educationManagement.getSectionForSectionId(sectionId);
+  const studentsInSection = educationManagement.getStudentsInSection(sectionId);
+  const assignmentsInSection =
+    educationManagement.getAssignmentsInSection(section);
   const handleEditSection = async (sectionData: Partial<Section>) => {
     try {
       await educationManagement.updateSection(courseId, sectionData);
@@ -56,30 +55,8 @@ const SectionView: React.FC<SectionViewProps> = ({
     }
   };
 
-  const handleAddAssignment = async (assignmentData: Partial<Assignment>) => {
-    try {
-      const newAssignment = await educationManagement.createAssignment(
-        courseId,
-        assignmentData
-      );
-      await educationManagement.addAssignmentToSection(
-        courseId,
-        sectionId,
-        newAssignment._id,
-        true
-      );
-      setShowAssignmentModal(false);
-    } catch (error) {
-      console.error('Failed to create assignment:', error);
-    }
-  };
-
-  const handleOpenAssignmentModal = () => {
-    setShowAssignmentModal(true);
-  };
-
-  const handleCloseAssignmentModal = () => {
-    setShowAssignmentModal(false);
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setSelectedTab(newValue);
   };
 
   const handleDeleteSection = async () => {
@@ -197,138 +174,64 @@ const SectionView: React.FC<SectionViewProps> = ({
         </CardContent>
       </Card>
 
-      {/* Assignments */}
-      <Box>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ mb: 2.5 }}
-        >
-          <Typography
-            variant="h5"
-            sx={{ fontWeight: 600, color: 'text.primary' }}
-          >
-            Assignments
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {section.assignments.length} assignment
-            {section.assignments.length !== 1 ? 's' : ''}
-          </Typography>
-        </Stack>
-
-        {!isStudentView && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleOpenAssignmentModal}
-            disabled={educationManagement.isAssignmentModifying}
-            fullWidth
+      {/* Section Tabs - Only visible to instructors */}
+      {!isStudentView ? (
+        <Box>
+          <Tabs
+            value={selectedTab}
+            onChange={handleTabChange}
             sx={{
-              py: 2,
+              borderBottom: 1,
+              borderColor: 'divider',
               mb: 3,
-              backgroundColor: '#1B6A9C',
-              '&:hover': {
-                backgroundColor: '#145a87',
+              '& .MuiTab-root': {
+                color: '#666',
+                '&.Mui-selected': {
+                  color: '#1B6A9C',
+                },
+              },
+              '& .MuiTabs-indicator': {
+                backgroundColor: '#1B6A9C',
               },
             }}
           >
-            Add Assignment
-          </Button>
-        )}
+            <Tab label="Section Content" />
+            <Tab label="Students and Grades" />
+          </Tabs>
 
-        {section.assignments.length === 0 ? (
-          <Card
-            variant="outlined"
-            sx={{
-              border: '2px dashed',
-              borderColor: 'grey.300',
-              textAlign: 'center',
-              py: 5,
-              px: 2.5,
-            }}
-          >
-            <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
-              📝
-            </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-              No assignments yet
-            </Typography>
-            <Typography variant="body2" color="text.disabled">
-              Add your first assignment to get students started
-            </Typography>
-          </Card>
-        ) : (
-          <Grid container spacing={2}>
-            {assignments.map((assignment) => (
-              <Grid item xs={12} key={assignment._id}>
-                <Card
-                  variant="outlined"
-                  sx={{
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      borderColor: '#1B6A9C',
-                      boxShadow: 2,
-                    },
-                  }}
-                  onClick={() => onAssignmentSelect(assignment._id)}
-                >
-                  <CardContent>
-                    <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                      <Typography sx={{ fontSize: '20px', mr: 1.5 }}>
-                        📝
-                      </Typography>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          color: '#1B6A9C',
-                          fontWeight: 600,
-                          fontSize: '1rem',
-                        }}
-                      >
-                        {assignment.title}
-                      </Typography>
-                    </Stack>
+          {selectedTab === 0 && (
+            <SectionContent
+              sectionId={sectionId}
+              courseId={courseId}
+              onAssignmentSelect={onAssignmentSelect}
+              isStudentView={isStudentView}
+            />
+          )}
 
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 1.5, lineHeight: 1.4 }}
-                    >
-                      {assignment.description} hello
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        )}
-      </Box>
-
-      {/* Edit Section Modal */}
-      {!isStudentView && (
-        <>
-          <SectionModal
-            isOpen={showEditModal}
-            onClose={() => setShowEditModal(false)}
-            onSubmit={handleEditSection}
-            mode="edit"
-            initialData={section}
-            isLoading={educationManagement.isSectionModifying}
-          />
-
-          {/* Assignment Modal */}
-          <AssignmentModal
-            isOpen={showAssignmentModal}
-            onClose={handleCloseAssignmentModal}
-            onSubmit={handleAddAssignment}
-            mode="create"
-            sectionId={sectionId}
-            isLoading={educationManagement.isAssignmentModifying}
-          />
-        </>
+          {selectedTab === 1 && (
+            <SectionStudentsGrades
+              assignmentsInSection={assignmentsInSection}
+              studentsInSection={studentsInSection}
+            />
+          )}
+        </Box>
+      ) : (
+        <SectionContent
+          sectionId={sectionId}
+          courseId={courseId}
+          onAssignmentSelect={onAssignmentSelect}
+          isStudentView={isStudentView}
+        />
       )}
+
+      <SectionModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onSubmit={handleEditSection}
+        mode="edit"
+        initialData={section}
+        isLoading={educationManagement.isSectionModifying}
+      />
     </Box>
   );
 };
