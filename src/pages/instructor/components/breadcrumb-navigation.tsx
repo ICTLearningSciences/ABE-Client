@@ -99,8 +99,6 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
     educationManagement.assignments,
   ]);
 
-  console.log(items);
-
   if (items.length === 0) {
     return null;
   }

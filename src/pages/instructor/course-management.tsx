@@ -124,17 +124,11 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     if (!loginState.user?._id) {
       throw new Error('User not authenticated');
     }
-
-    try {
-      await educationManagement.enrollStudentInSection(
-        loginState.user._id,
-        sectionCode
-      );
-      setIsJoinSectionModalOpen(false);
-    } catch (error) {
-      console.error('Failed to join section:', error);
-      throw error;
-    }
+    await educationManagement.enrollStudentInSection(
+      loginState.user._id,
+      sectionCode
+    );
+    setIsJoinSectionModalOpen(false);
   };
 
   const handleOpenJoinSectionModal = () => {
