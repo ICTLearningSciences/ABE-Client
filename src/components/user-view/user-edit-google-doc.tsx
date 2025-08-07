@@ -26,8 +26,16 @@ export function EditGoogleDoc(props: {
   activityFromParams: string;
   goalFromParams: string;
   isNewDoc: boolean;
+  disableActivitySelector?: boolean;
 }): JSX.Element {
-  const { docId, docUrl, activityFromParams, goalFromParams, isNewDoc } = props;
+  const {
+    docId,
+    docUrl,
+    activityFromParams,
+    goalFromParams,
+    isNewDoc,
+    disableActivitySelector,
+  } = props;
   const useCurrentGoalActivity = useWithCurrentGoalActivity();
   const {
     goalActivityState,
@@ -118,6 +126,7 @@ export function EditGoogleDoc(props: {
             useCurrentGoalActivity={useCurrentGoalActivity}
             previewingActivity={previewingActivity}
             setPreviewingActivity={setPreviewingActivity}
+            disableActivitySelector={disableActivitySelector}
           />
         )}
       </div>

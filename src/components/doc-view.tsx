@@ -13,14 +13,21 @@ import { useWithState } from '../store/slices/state/use-with-state';
 import { URL_PARAM_NEW_DOC } from '../constants';
 import { useNavigateWithParams } from '../hooks/use-navigate-with-params';
 
-function DocView(): JSX.Element {
-  const { docId } = useParams<Record<string, string>>();
+function DocView(props: {
+  docId?: string;
+  activityId?: string;
+  goalId?: string;
+  disableActivitySelector?: boolean;
+}): JSX.Element {
+  const { docId: docIdFromUrlParams } = useParams<Record<string, string>>();
+  const docId = props.docId || docIdFromUrlParams;
   const navigate = useNavigateWithParams();
   const { updateCurrentDocId, newSession } = useWithState();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const activityFromParams = queryParams.get('activityId');
-  const goalFromParams = queryParams.get('goalId');
+  const activityFromParams =
+    props.activityId || queryParams.get('activityId') || '';
+  const goalFromParams = props.goalId || queryParams.get('goalId') || '';
   const googleDocUrl = `https://docs.google.com/document/d/${docId}/edit`;
 
   const [urlSearchParams] = useSearchParams();
@@ -45,9 +52,10 @@ function DocView(): JSX.Element {
     <EditGoogleDoc
       docId={docId}
       docUrl={googleDocUrl}
-      activityFromParams={activityFromParams || ''}
-      goalFromParams={goalFromParams || ''}
+      activityFromParams={activityFromParams}
+      goalFromParams={goalFromParams}
       isNewDoc={isNewGoogleDoc}
+      disableActivitySelector={props.disableActivitySelector}
     />
   );
 }

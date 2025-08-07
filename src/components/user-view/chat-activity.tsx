@@ -21,6 +21,7 @@ export function ChatActivity(props: {
   useCurrentGoalActivity: UseWithCurrentGoalActivity;
   previewingActivity: boolean;
   setPreviewingActivity: (previewingActivity: boolean) => void;
+  disableActivitySelector?: boolean;
 }): JSX.Element {
   const {
     activityFromParams,
@@ -29,6 +30,7 @@ export function ChatActivity(props: {
     useCurrentGoalActivity,
     previewingActivity,
     setPreviewingActivity,
+    disableActivitySelector,
   } = props;
   const {
     docGoals,
@@ -99,6 +101,7 @@ export function ChatActivity(props: {
           selectedGoal={goalActivityState?.selectedGoal}
           editDocGoal={editDocGoal}
           setSelectedActivity={setActivity}
+          disableActivitySelector={disableActivitySelector}
         />
         <DocGoalModal
           isNewDoc={isNewDoc}

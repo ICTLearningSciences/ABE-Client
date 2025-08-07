@@ -9,6 +9,7 @@ import { Box, Typography, Breadcrumbs } from '@mui/material';
 import { NavigateNext } from '@mui/icons-material';
 import { UseWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { CourseManagementState } from '../course-management';
+import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 
 export interface BreadcrumbItem {
   id: string;
@@ -36,6 +37,7 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
   handleSectionSelect,
   handleAssignmentSelect,
 }) => {
+  const { getActivityById } = useWithDocGoalsActivities();
   const items: BreadcrumbItem[] = useMemo(() => {
     const items: BreadcrumbItem[] = [];
 
@@ -89,6 +91,23 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
             ),
         });
       }
+    }
+
+    if (
+      viewState.selectedActivityId &&
+      viewState.selectedCourseId &&
+      viewState.selectedSectionId &&
+      viewState.selectedAssignmentId
+    ) {
+      const activity = getActivityById(viewState.selectedActivityId);
+      items.push({
+        id: viewState.selectedActivityId,
+        title: activity?.title || 'Activity',
+        icon: '📝',
+        onClick: () => {
+          console.log('activity clicked');
+        },
+      });
     }
 
     return items;

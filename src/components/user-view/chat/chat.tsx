@@ -50,8 +50,14 @@ export function Chat(props: {
   selectedActivity?: ActivityTypes;
   editDocGoal: () => void;
   setSelectedActivity: (activity: ActivityGQL) => void;
+  disableActivitySelector?: boolean;
 }) {
-  const { selectedGoal, selectedActivity, editDocGoal } = props;
+  const {
+    selectedGoal,
+    selectedActivity,
+    editDocGoal,
+    disableActivitySelector,
+  } = props;
   const { sendMessage, state: chatState, setSystemRole } = useWithChat();
   const {
     editedData: systemPromptData,
@@ -137,6 +143,7 @@ export function Chat(props: {
                 editDocGoal={editDocGoal}
                 selectedGoal={selectedGoal}
                 selectedActivity={selectedActivity}
+                disableActivitySelector={disableActivitySelector}
               />
             </ChatHeader>
             <ChatMessagesContainer

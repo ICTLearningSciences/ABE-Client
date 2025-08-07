@@ -6,24 +6,26 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import ViewUserGoogleDocs from '../../components/admin-view/admin-view-docs';
-import { useWithUsersDocs } from '../../hooks/use-with-users-docs';
 import withAuthorizationOnly from '../../hooks/wrap-with-authorization-only';
+import { useNavigate } from 'react-router-dom';
+import { useWithState } from '../../store/slices/state/use-with-state';
+import { URL_PARAM_NEW_DOC } from '../../constants';
 
-export enum AdminPages {
-  VIEW_ADMIN_ACTIONS = 'VIEW_ADMIN_ACTIONS',
-  VIEW_USER_DOCS = 'VIEW_USER_DOCS',
-  AUTHOR_GOOGLE_DOCS = 'AUTHOR_GOOGLE_DOCS',
-}
-
-/**
- * Manages admin view by:
- * 1. Preloading all data hooks for all pages
- * 2. Switch between pages and pass respective data hooks
- * 3. Provide each page with a way to return to admin actions
- */
 function AdminView(): JSX.Element {
-  const _useWithGoogleDocs = useWithUsersDocs();
-  return <ViewUserGoogleDocs useWithUsersDocs={_useWithGoogleDocs} />;
+  const { updateCurrentDocId } = useWithState();
+  const navigate = useNavigate();
+  function goToDoc(docId: string, newDoc?: boolean) {
+    updateCurrentDocId(docId);
+    navigate(`/docs/${docId}?${newDoc ? `${URL_PARAM_NEW_DOC}=true` : ''}`);
+  }
+
+  function onHistoryClicked(docId: string) {
+    navigate(`/docs/history/${docId}`);
+  }
+
+  return (
+    <ViewUserGoogleDocs goToDoc={goToDoc} onHistoryClicked={onHistoryClicked} />
+  );
 }
 
 export default withAuthorizationOnly(AdminView);

@@ -31,7 +31,7 @@ import {
 import { EducationalRole } from './types';
 
 function MainApp() {
-  const mainAppHeight = '88vh';
+  const mainAppHeight = '94vh';
   const useLogin = useWithLogin();
 
   const router = createBrowserRouter([
@@ -104,7 +104,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: '100vh',
+              height: mainAppHeight,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -123,7 +123,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: '100vh',
+              height: mainAppHeight,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

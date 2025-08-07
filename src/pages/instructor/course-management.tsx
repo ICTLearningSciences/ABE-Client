@@ -20,15 +20,17 @@ import { Course } from '../../store/slices/education-management/types';
 import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { EducationalRole } from '../../types';
 import withAuthorizationOnly from '../../hooks/wrap-with-authorization-only';
+import { ActivityView } from './components/activity-view';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
 
 export interface CourseManagementState {
-  view: 'dashboard' | 'course' | 'section' | 'assignment';
+  view: 'dashboard' | 'course' | 'section' | 'assignment' | 'activity';
   selectedCourseId?: string;
   selectedSectionId?: string;
   selectedAssignmentId?: string;
+  selectedActivityId?: string;
 }
 
 interface CourseManagementProps {
@@ -96,6 +98,21 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       selectedCourseId: courseId,
       selectedSectionId: sectionId,
       selectedAssignmentId: assignmentId,
+    });
+  };
+
+  const handleActivitySelect = (
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string
+  ) => {
+    setViewState({
+      view: 'activity',
+      selectedCourseId: courseId,
+      selectedSectionId: sectionId,
+      selectedAssignmentId: assignmentId,
+      selectedActivityId: activityId,
     });
   };
 
@@ -291,7 +308,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       <Box
         sx={{
           flex: 1,
-          p: 3,
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -393,8 +409,30 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 builtActivities={builtActivities}
                 onAssignmentDeleted={handleAssignmentDeleted}
                 isStudentView={isStudent}
+                onActivitySelect={(activityId) => {
+                  if (
+                    !viewState.selectedCourseId ||
+                    !viewState.selectedSectionId ||
+                    !viewState.selectedAssignmentId
+                  ) {
+                    console.error(
+                      'Missing required view state for activity select'
+                    );
+                    return;
+                  }
+                  handleActivitySelect(
+                    viewState.selectedCourseId,
+                    viewState.selectedSectionId,
+                    viewState.selectedAssignmentId,
+                    activityId
+                  );
+                }}
               />
             )}
+
+          {viewState.view === 'activity' && viewState.selectedActivityId && (
+            <ActivityView activityId={viewState.selectedActivityId} />
+          )}
         </Box>
       </Box>
       <CourseModal

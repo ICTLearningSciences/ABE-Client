@@ -12,12 +12,14 @@ export function ChatHeaderGenerator(props: {
   editDocGoal: () => void;
   selectedGoal?: DocGoal;
   selectedActivity?: ActivityTypes;
+  disableActivitySelector?: boolean;
 }): JSX.Element {
   const {
     incrementActivityCounter,
     editDocGoal,
     selectedGoal,
     selectedActivity,
+    disableActivitySelector,
   } = props;
   const viewingAdvancedOptions = useAppSelector(
     (state) => state.state.viewingAdvancedOptions
@@ -30,17 +32,19 @@ export function ChatHeaderGenerator(props: {
   return (
     <ChatHeader>
       <span data-cy="chat-header">{title}</span>
-      <IconButton
-        data-cy="edit-goal-button"
-        onClick={editDocGoal}
-        style={{
-          padding: 3,
-          marginBottom: 5,
-          marginLeft: 5,
-        }}
-      >
-        <ChangeIcon />
-      </IconButton>
+      {!disableActivitySelector && (
+        <IconButton
+          data-cy="edit-goal-button"
+          onClick={editDocGoal}
+          style={{
+            padding: 3,
+            marginBottom: 5,
+            marginLeft: 5,
+          }}
+        >
+          <ChangeIcon />
+        </IconButton>
+      )}
       <IconButton
         data-cy="reset-activity-button"
         onClick={incrementActivityCounter}
