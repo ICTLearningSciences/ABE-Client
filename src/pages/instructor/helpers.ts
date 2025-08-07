@@ -6,7 +6,9 @@ The full terms of this copyright and license should always be found in the root 
 */
 import {
   Assignment,
+  AssignmentProgress,
   Section,
+  StudentData,
 } from '../../store/slices/education-management/types';
 import { UseWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { TreeItem } from './components/collapsible-tree';
@@ -73,4 +75,99 @@ export function getCourseManagementTreeData(
       ),
     })
   );
+}
+
+export interface CompletedAssignmentDict {
+  [assignmentId: string]: boolean;
+}
+
+export function getCompletedAssignmentDictForStudent(
+  studentData?: StudentData
+): CompletedAssignmentDict {
+  if (!studentData) return {};
+  return studentData.assignmentProgress.reduce(
+    (acc: CompletedAssignmentDict, progress: AssignmentProgress) => {
+      acc[progress.assignmentId] = progress.complete;
+      return acc;
+    },
+    {}
+  );
+}
+
+export interface AssignmentsInSection {
+  requiredAssignments: Assignment[];
+  optionalAssignments: Assignment[];
+}
+
+export function getAssignmentsInSection(
+  assignments: Assignment[],
+  section?: Section
+): AssignmentsInSection {
+  if (!section) {
+    return {
+      requiredAssignments: [],
+      optionalAssignments: [],
+    };
+  }
+  const _requiredAssignments = section.assignments.filter((sa) => sa.mandatory);
+  const _optionalAssignments = section.assignments.filter(
+    (sa) => !sa.mandatory
+  );
+  return {
+    requiredAssignments: _requiredAssignments.reduce((acc, sa) => {
+      const assignment = assignments.find((a) => a._id === sa.assignmentId);
+      if (assignment) {
+        acc.push(assignment);
+      }
+      return acc;
+    }, [] as Assignment[]),
+    optionalAssignments: _optionalAssignments.reduce((acc, sa) => {
+      const assignment = assignments.find((a) => a._id === sa.assignmentId);
+      if (assignment) {
+        acc.push(assignment);
+      }
+      return acc;
+    }, [] as Assignment[]),
+  };
+}
+
+// takes a student and a section and returns a dict
+export interface StudentSectionProgress {
+  studentData: StudentData;
+  requiredAssignmentsProgress: {
+    [assignmentId: string]: boolean;
+  };
+  optionalAssignmentsProgress: {
+    [assignmentId: string]: boolean;
+  };
+}
+
+export function getStudentSectionProgress(
+  studentData: StudentData,
+  assignments: AssignmentsInSection
+): StudentSectionProgress {
+  const { requiredAssignments, optionalAssignments } = assignments;
+  const requiredAssignmentsProgress = requiredAssignments.reduce(
+    (acc, assignment) => {
+      acc[assignment._id] = studentData.assignmentProgress.some(
+        (ap) => ap.assignmentId === assignment._id && ap.complete
+      );
+      return acc;
+    },
+    {} as { [assignmentId: string]: boolean }
+  );
+  const optionalAssignmentsProgress = optionalAssignments.reduce(
+    (acc, assignment) => {
+      acc[assignment._id] = studentData.assignmentProgress.some(
+        (ap) => ap.assignmentId === assignment._id && ap.complete
+      );
+      return acc;
+    },
+    {} as { [assignmentId: string]: boolean }
+  );
+  return {
+    studentData,
+    requiredAssignmentsProgress,
+    optionalAssignmentsProgress,
+  };
 }

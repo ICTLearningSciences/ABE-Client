@@ -26,52 +26,43 @@ import {
   RadioButtonUnchecked as UncheckedIcon,
 } from '@mui/icons-material';
 import {
-  Assignment,
+  Section,
   StudentData,
+  Assignment,
 } from '../../../store/slices/education-management/types';
+import { SectionStudentsProgress } from '../../../store/slices/education-management/use-with-educational-management';
+import { getAssignmentsInSection } from '../helpers';
 
 interface SectionStudentsGradesProps {
-  assignmentsInSection: Assignment[];
-  studentsInSection: StudentData[];
+  sectionStudentsProgress: SectionStudentsProgress;
+  section: Section;
+  assignments: Assignment[];
 }
 
 const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
-  assignmentsInSection,
-  studentsInSection,
+  sectionStudentsProgress,
+  section,
+  assignments,
 }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentData | null>(
     null
   );
 
-  const getStudentAssignmentCompletion = (student: StudentData) => {
-    const completedAssignments =
-      student.assignmentProgress?.filter((progress) =>
-        assignmentsInSection.some(
-          (assignment) => assignment._id === progress.assignmentId
-        )
-      ) || [];
+  const assignmentsInSection = getAssignmentsInSection(assignments, section);
 
-    return {
-      completed: completedAssignments.length,
-      total: assignmentsInSection.length,
-    };
-  };
+  const getStudentProgressCounts = (studentId: string) => {
+    const studentProgress = sectionStudentsProgress[studentId];
+    if (!studentProgress) return { requiredCompleted: 0, optionalCompleted: 0 };
 
-  const getStudentAssignmentDetails = (student: StudentData) => {
-    const completedAssignmentIds = new Set(
-      student.assignmentProgress?.map((progress) => progress.assignmentId) || []
-    );
+    const requiredCompleted = Object.values(
+      studentProgress.requiredAssignmentsProgress
+    ).filter(Boolean).length;
+    const optionalCompleted = Object.values(
+      studentProgress.optionalAssignmentsProgress
+    ).filter(Boolean).length;
 
-    const assignmentDetails = assignmentsInSection.map((assignment) => ({
-      assignment,
-      isCompleted: completedAssignmentIds.has(assignment._id),
-    }));
-
-    return assignmentDetails.sort((a, b) => {
-      if (a.isCompleted === b.isCompleted) return 0;
-      return a.isCompleted ? 1 : -1;
-    });
+    return { requiredCompleted, optionalCompleted };
   };
 
   const handleStudentClick = (student: StudentData) => {
@@ -84,7 +75,7 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
     setSelectedStudent(null);
   };
 
-  if (studentsInSection.length === 0) {
+  if (Object.keys(sectionStudentsProgress).length === 0) {
     return (
       <Box>
         <Typography
@@ -132,69 +123,73 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
           Students and Grades
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {studentsInSection.length} student
-          {studentsInSection.length !== 1 ? 's' : ''}
+          {Object.keys(sectionStudentsProgress).length} student
+          {Object.keys(sectionStudentsProgress).length !== 1 ? 's' : ''}
         </Typography>
       </Stack>
 
       <List sx={{ width: '100%' }}>
-        {studentsInSection.map((student) => {
-          const completion = getStudentAssignmentCompletion(student);
-          return (
-            <ListItem
-              key={student._id}
-              onClick={() => handleStudentClick(student)}
-              sx={{
-                cursor: 'pointer',
-                borderRadius: 2,
-                mb: 1,
-                border: '1px solid',
-                borderColor: 'grey.200',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  borderColor: '#1B6A9C',
-                  backgroundColor: 'rgba(27, 106, 156, 0.04)',
-                },
-              }}
-            >
-              <ListItemIcon>
-                <PersonIcon sx={{ color: '#1B6A9C' }} />
-              </ListItemIcon>
-              <ListItemText
-                primary={
+        {Object.entries(sectionStudentsProgress).map(
+          ([studentId, studentProgress]) => {
+            const { requiredCompleted, optionalCompleted } =
+              getStudentProgressCounts(studentId);
+            const student = studentProgress.studentData;
+
+            return (
+              <ListItem
+                key={student._id}
+                onClick={() => handleStudentClick(student)}
+                sx={{
+                  cursor: 'pointer',
+                  borderRadius: 2,
+                  mb: 1,
+                  border: '1px solid',
+                  borderColor: 'grey.200',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    borderColor: '#1B6A9C',
+                    backgroundColor: 'rgba(27, 106, 156, 0.04)',
+                  },
+                }}
+              >
+                <ListItemIcon>
+                  <PersonIcon sx={{ color: '#1B6A9C' }} />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 600, color: 'text.primary' }}
+                    >
+                      {student.name}
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography variant="body2" color="text.secondary">
+                      {student.userId}
+                    </Typography>
+                  }
+                />
+                <Box sx={{ textAlign: 'right' }}>
                   <Typography
-                    variant="h6"
-                    sx={{ fontWeight: 600, color: 'text.primary' }}
+                    variant="body1"
+                    sx={{ fontWeight: 600, color: '#1B6A9C' }}
                   >
-                    {student.name}
+                    Required: {requiredCompleted}/
+                    {assignmentsInSection.requiredAssignments.length}
                   </Typography>
-                }
-                secondary={
-                  <Typography variant="body2" color="text.secondary">
-                    {student.userId}
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: 600, color: '#1B6A9C' }}
+                  >
+                    Optional: {optionalCompleted}/
+                    {section.numOptionalAssignmentsRequired || 0}
                   </Typography>
-                }
-              />
-              <Box sx={{ textAlign: 'right' }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 600,
-                    color:
-                      completion.completed === completion.total
-                        ? '#4caf50'
-                        : '#1B6A9C',
-                  }}
-                >
-                  {completion.completed}/{completion.total}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  assignments complete
-                </Typography>
-              </Box>
-            </ListItem>
-          );
-        })}
+                </Box>
+              </ListItem>
+            );
+          }
+        )}
       </List>
 
       <Drawer
@@ -238,69 +233,185 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
 
             <Divider sx={{ mb: 3 }} />
 
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-              Assignment Progress
-            </Typography>
+            {/* Required Assignments Section */}
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ mb: 2 }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                Required Assignments
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {
+                  getStudentProgressCounts(selectedStudent._id)
+                    .requiredCompleted
+                }
+                /{assignmentsInSection.requiredAssignments.length} completed
+              </Typography>
+            </Stack>
 
-            <List>
-              {getStudentAssignmentDetails(selectedStudent).map((item) => (
-                <ListItem
-                  key={item.assignment._id}
-                  sx={{
-                    borderRadius: 2,
-                    mb: 1,
-                    border: '1px solid',
-                    borderColor: item.isCompleted ? '#4caf50' : 'grey.200',
-                    backgroundColor: item.isCompleted
-                      ? 'rgba(76, 175, 80, 0.04)'
-                      : 'transparent',
-                  }}
-                >
-                  <ListItemIcon>
-                    {item.isCompleted ? (
-                      <CheckCircleIcon sx={{ color: '#4caf50' }} />
-                    ) : (
-                      <UncheckedIcon sx={{ color: 'grey.400' }} />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: 500,
-                          color: item.isCompleted
-                            ? 'text.primary'
-                            : 'text.secondary',
-                        }}
-                      >
-                        {item.assignment.title}
-                      </Typography>
-                    }
-                    secondary={
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 0.5 }}
-                      >
-                        {item.assignment.description}
-                      </Typography>
-                    }
-                  />
-                  <Chip
-                    label={item.isCompleted ? 'Complete' : 'Incomplete'}
-                    size="small"
+            <List sx={{ mb: 3 }}>
+              {assignmentsInSection.requiredAssignments.map((assignment) => {
+                const studentProgress =
+                  sectionStudentsProgress[selectedStudent._id];
+                const isCompleted =
+                  studentProgress?.requiredAssignmentsProgress[
+                    assignment._id
+                  ] || false;
+
+                return (
+                  <ListItem
+                    key={assignment._id}
                     sx={{
-                      backgroundColor: item.isCompleted
-                        ? '#4caf50'
-                        : 'grey.200',
-                      color: item.isCompleted ? 'white' : 'text.secondary',
-                      fontWeight: 500,
+                      borderRadius: 2,
+                      mb: 1,
+                      border: '1px solid',
+                      borderColor: isCompleted ? '#4caf50' : 'grey.200',
+                      backgroundColor: isCompleted
+                        ? 'rgba(76, 175, 80, 0.04)'
+                        : 'transparent',
                     }}
-                  />
-                </ListItem>
-              ))}
+                  >
+                    <ListItemIcon>
+                      {isCompleted ? (
+                        <CheckCircleIcon sx={{ color: '#4caf50' }} />
+                      ) : (
+                        <UncheckedIcon sx={{ color: 'grey.400' }} />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            fontWeight: 500,
+                            color: isCompleted
+                              ? 'text.primary'
+                              : 'text.secondary',
+                          }}
+                        >
+                          {assignment.title}
+                        </Typography>
+                      }
+                      secondary={
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mt: 0.5 }}
+                        >
+                          {assignment.description}
+                        </Typography>
+                      }
+                    />
+                    <Chip
+                      label={isCompleted ? 'Complete' : 'Incomplete'}
+                      size="small"
+                      sx={{
+                        backgroundColor: isCompleted ? '#4caf50' : 'grey.200',
+                        color: isCompleted ? 'white' : 'text.secondary',
+                        fontWeight: 500,
+                      }}
+                    />
+                  </ListItem>
+                );
+              })}
             </List>
+
+            {/* Optional Assignments Section */}
+            {assignmentsInSection.optionalAssignments.length > 0 && (
+              <>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  sx={{ mb: 2 }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    Optional Assignments
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {
+                      getStudentProgressCounts(selectedStudent._id)
+                        .optionalCompleted
+                    }
+                    /{section.numOptionalAssignmentsRequired || 0} completed
+                  </Typography>
+                </Stack>
+
+                <List>
+                  {assignmentsInSection.optionalAssignments.map(
+                    (assignment) => {
+                      const studentProgress =
+                        sectionStudentsProgress[selectedStudent._id];
+                      const isCompleted =
+                        studentProgress?.optionalAssignmentsProgress[
+                          assignment._id
+                        ] || false;
+
+                      return (
+                        <ListItem
+                          key={assignment._id}
+                          sx={{
+                            borderRadius: 2,
+                            mb: 1,
+                            border: '1px solid',
+                            borderColor: isCompleted ? '#4caf50' : 'grey.200',
+                            backgroundColor: isCompleted
+                              ? 'rgba(76, 175, 80, 0.04)'
+                              : 'transparent',
+                          }}
+                        >
+                          <ListItemIcon>
+                            {isCompleted ? (
+                              <CheckCircleIcon sx={{ color: '#4caf50' }} />
+                            ) : (
+                              <UncheckedIcon sx={{ color: 'grey.400' }} />
+                            )}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Typography
+                                variant="body1"
+                                sx={{
+                                  fontWeight: 500,
+                                  color: isCompleted
+                                    ? 'text.primary'
+                                    : 'text.secondary',
+                                }}
+                              >
+                                {assignment.title}
+                              </Typography>
+                            }
+                            secondary={
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ mt: 0.5 }}
+                              >
+                                {assignment.description}
+                              </Typography>
+                            }
+                          />
+                          <Chip
+                            label={isCompleted ? 'Complete' : 'Incomplete'}
+                            size="small"
+                            sx={{
+                              backgroundColor: isCompleted
+                                ? '#4caf50'
+                                : 'grey.200',
+                              color: isCompleted ? 'white' : 'text.secondary',
+                              fontWeight: 500,
+                            }}
+                          />
+                        </ListItem>
+                      );
+                    }
+                  )}
+                </List>
+              </>
+            )}
           </Box>
         )}
       </Drawer>

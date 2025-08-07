@@ -15,6 +15,8 @@ import {
   IconButton,
   Typography,
   Box,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { Assignment } from '../../../store/slices/education-management/types';
@@ -22,10 +24,11 @@ import { Assignment } from '../../../store/slices/education-management/types';
 interface AssignmentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (assignmentData: Partial<Assignment>) => void;
+  onSubmit: (assignmentData: Partial<Assignment>, mandatory?: boolean) => void;
   mode: 'create' | 'edit';
   sectionId?: string;
   initialData?: Assignment;
+  initialMandatory?: boolean;
   isLoading?: boolean;
 }
 
@@ -36,12 +39,14 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   mode,
   sectionId,
   initialData,
+  initialMandatory = true,
   isLoading = false,
 }) => {
   const [formData, setFormData] = useState<Partial<Assignment>>({
     title: '',
     description: '',
   });
+  const [mandatory, setMandatory] = useState<boolean>(true);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -51,15 +56,17 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
           title: initialData.title || '',
           description: initialData.description || '',
         });
+        setMandatory(initialMandatory);
       } else {
         setFormData({
           title: '',
           description: '',
         });
+        setMandatory(initialMandatory);
       }
       setErrors({});
     }
-  }, [isOpen, mode, initialData]);
+  }, [isOpen, mode, initialData, initialMandatory]);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -93,7 +100,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
       submitData._id = initialData._id;
     }
 
-    onSubmit(submitData);
+    onSubmit(submitData, mandatory);
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -192,7 +199,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             error={!!errors.description}
             helperText={errors.description}
             disabled={isLoading}
-            sx={{ mb: sectionId ? 2.5 : 3 }}
+            sx={{ mb: 2.5 }}
             InputProps={{
               sx: {
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -208,6 +215,30 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
               },
             }}
           />
+
+          {sectionId && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={mandatory}
+                  onChange={(e) => setMandatory(e.target.checked)}
+                  disabled={isLoading}
+                  sx={{
+                    color: '#1B6A9C',
+                    '&.Mui-checked': {
+                      color: '#1B6A9C',
+                    },
+                  }}
+                />
+              }
+              label={
+                <Typography variant="body2" color="text.primary">
+                  Required Assignment
+                </Typography>
+              }
+              sx={{ mb: 2.5 }}
+            />
+          )}
         </Box>
       </DialogContent>
 

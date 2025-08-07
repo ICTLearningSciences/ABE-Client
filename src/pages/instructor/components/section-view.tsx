@@ -43,9 +43,8 @@ const SectionView: React.FC<SectionViewProps> = ({
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const section = educationManagement.getSectionForSectionId(sectionId);
-  const studentsInSection = educationManagement.getStudentsInSection(sectionId);
-  const assignmentsInSection =
-    educationManagement.getAssignmentsInSection(section);
+  const currentSectionStudentsProgress =
+    educationManagement.allSectionsStudentsProgress[sectionId] || {};
   const handleEditSection = async (sectionData: Partial<Section>) => {
     try {
       await educationManagement.updateSection(courseId, sectionData);
@@ -210,8 +209,9 @@ const SectionView: React.FC<SectionViewProps> = ({
 
           {selectedTab === 1 && (
             <SectionStudentsGrades
-              assignmentsInSection={assignmentsInSection}
-              studentsInSection={studentsInSection}
+              sectionStudentsProgress={currentSectionStudentsProgress}
+              section={section}
+              assignments={educationManagement.assignments}
             />
           )}
         </Box>

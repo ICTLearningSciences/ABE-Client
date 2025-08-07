@@ -19,6 +19,7 @@ import { getCourseManagementTreeData } from './helpers';
 import { Course } from '../../store/slices/education-management/types';
 import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { EducationalRole } from '../../types';
+import withAuthorizationOnly from '../../hooks/wrap-with-authorization-only';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -413,4 +414,4 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   );
 };
 
-export default CourseManagement;
+export default withAuthorizationOnly(CourseManagement);

@@ -4,21 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Stack,
-} from '@mui/material';
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Button, Card, Grid, Stack } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { Assignment } from '../../../store/slices/education-management/types';
 import AssignmentModal from './assignment-modal';
-import { getAssignmentsForSection } from '../helpers';
+import AssignmentCard from './assignment-card';
+import OptionalRequirements from './optional-requirements';
+import { getAssignmentsInSection } from '../helpers';
+import { useAppSelector } from '../../../store/hooks';
+import { EducationalRole } from '../../../types';
 
 interface SectionContentProps {
   sectionId: string;
@@ -35,10 +31,34 @@ const SectionContent: React.FC<SectionContentProps> = ({
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
-  const assignments = getAssignmentsForSection(educationManagement, sectionId);
+  const [optionalAssignmentsRequired, setOptionalAssignmentsRequired] =
+    useState(0);
   const section = educationManagement.sections.find((s) => s._id === sectionId);
+  const assignmentsInSection = useMemo(
+    () => getAssignmentsInSection(educationManagement.assignments, section),
+    [educationManagement.assignments, section]
+  );
+  const userData = useAppSelector((state) => state.login.user);
+  const sectionStudentsProgress =
+    educationManagement.allSectionsStudentsProgress[sectionId] || {};
+  const mySectionProgress =
+    userData && userData.educationalRole === EducationalRole.STUDENT
+      ? sectionStudentsProgress[userData._id]
+      : null;
 
-  const handleAddAssignment = async (assignmentData: Partial<Assignment>) => {
+  // Initialize the optional assignments required value
+  React.useEffect(() => {
+    if (section) {
+      setOptionalAssignmentsRequired(
+        section.numOptionalAssignmentsRequired || 0
+      );
+    }
+  }, [section]);
+
+  const handleAddAssignment = async (
+    assignmentData: Partial<Assignment>,
+    mandatory = true
+  ) => {
     try {
       const newAssignment = await educationManagement.createAssignment(
         courseId,
@@ -48,7 +68,7 @@ const SectionContent: React.FC<SectionContentProps> = ({
         courseId,
         sectionId,
         newAssignment._id,
-        true
+        mandatory
       );
       setShowAssignmentModal(false);
     } catch (error) {
@@ -62,6 +82,86 @@ const SectionContent: React.FC<SectionContentProps> = ({
 
   const handleCloseAssignmentModal = () => {
     setShowAssignmentModal(false);
+  };
+
+  const handleOptionalRequiredChange = async (value: number) => {
+    if (!section) return;
+    try {
+      await educationManagement.updateSection(courseId, {
+        _id: sectionId,
+        numOptionalAssignmentsRequired: value,
+      });
+      setOptionalAssignmentsRequired(value);
+    } catch (error) {
+      console.error('Failed to update optional assignments required:', error);
+    }
+  };
+
+  const renderAssignmentList = (
+    assignments: Assignment[],
+    title: string,
+    options: {
+      showCompletionCounter?: boolean;
+      completedCount?: number;
+      showOptionalRequirements?: boolean;
+    } = {}
+  ) => {
+    if (assignments.length === 0) return null;
+
+    const {
+      showCompletionCounter = false,
+      completedCount = 0,
+      showOptionalRequirements = false,
+    } = options;
+
+    return (
+      <Box sx={{ mb: 4 }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 2 }}
+        >
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 600, color: 'text.primary' }}
+          >
+            {title}
+          </Typography>
+          {showCompletionCounter ? (
+            <Typography variant="body2" color="text.secondary">
+              {completedCount}/{assignments.length} completed
+            </Typography>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              {assignments.length} assignment
+              {assignments.length !== 1 ? 's' : ''}
+            </Typography>
+          )}
+        </Stack>
+
+        {showOptionalRequirements && (
+          <OptionalRequirements
+            isStudentView={isStudentView}
+            optionalAssignmentsRequired={optionalAssignmentsRequired}
+            totalOptionalAssignments={assignments.length}
+            onRequiredChange={setOptionalAssignmentsRequired}
+            onRequiredUpdate={handleOptionalRequiredChange}
+          />
+        )}
+
+        <Grid container spacing={2}>
+          {assignments.map((assignment) => (
+            <Grid item xs={12} key={assignment._id}>
+              <AssignmentCard
+                assignment={assignment}
+                onClick={onAssignmentSelect}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    );
   };
 
   if (!section) {
@@ -130,50 +230,28 @@ const SectionContent: React.FC<SectionContentProps> = ({
           </Typography>
         </Card>
       ) : (
-        <Grid container spacing={2}>
-          {assignments.map((assignment) => (
-            <Grid item xs={12} key={assignment._id}>
-              <Card
-                variant="outlined"
-                sx={{
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    borderColor: '#1B6A9C',
-                    boxShadow: 2,
-                  },
-                }}
-                onClick={() => onAssignmentSelect(assignment._id)}
-              >
-                <CardContent>
-                  <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                    <Typography sx={{ fontSize: '20px', mr: 1.5 }}>
-                      📝
-                    </Typography>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        color: '#1B6A9C',
-                        fontWeight: 600,
-                        fontSize: '1rem',
-                      }}
-                    >
-                      {assignment.title}
-                    </Typography>
-                  </Stack>
+        <>
+          {/* Required Assignments */}
+          {renderAssignmentList(
+            assignmentsInSection.requiredAssignments,
+            'Required Assignments'
+          )}
 
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 1.5, lineHeight: 1.4 }}
-                  >
-                    {assignment.description} hello
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+          {/* Optional Assignments */}
+          {renderAssignmentList(
+            assignmentsInSection.optionalAssignments,
+            'Optional Assignments',
+            {
+              showCompletionCounter: isStudentView,
+              completedCount: mySectionProgress
+                ? Object.values(
+                    mySectionProgress.optionalAssignmentsProgress
+                  ).filter((complete) => complete).length
+                : 0,
+              showOptionalRequirements: true,
+            }
+          )}
+        </>
       )}
 
       <AssignmentModal

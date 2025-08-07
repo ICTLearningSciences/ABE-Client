@@ -16,13 +16,18 @@ import {
   removeFromSection as _removeFromSection,
   updateStudentAssignmentProgress as _updateStudentAssignmentProgress,
   LoadStatus,
+  loadInstructorData as _loadInstructorData,
+  loadStudentData as _loadStudentData,
 } from '.';
-import {
-  createNewInstructor as _createNewInstructor,
-  createNewStudent as _createNewStudent,
-} from './educational-api';
-import { Course, Assignment, Section, StudentData, Instructor } from './types';
+import { Course, Assignment, Section, StudentData } from './types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
+import { EducationalRole } from '../../../types';
+import { useMemo } from 'react';
+import {
+  getAssignmentsInSection,
+  getStudentSectionProgress,
+  StudentSectionProgress,
+} from '../../../pages/instructor/helpers';
 
 export interface UseWithEducationalManagement {
   loadCourses: (forUserId: string) => Promise<Course[]>;
@@ -69,8 +74,6 @@ export interface UseWithEducationalManagement {
     assignmentId: string,
     progress: 'COMPLETE' | 'INCOMPLETE'
   ) => Promise<StudentData>;
-  createNewInstructor: (userId: string) => Promise<Instructor>;
-  createNewStudent: (userId: string) => Promise<StudentData>;
   courses: Course[];
   assignments: Assignment[];
   sections: Section[];
@@ -92,7 +95,19 @@ export interface UseWithEducationalManagement {
   ) => Promise<Section>;
   getSectionForSectionId: (sectionId: string) => Section | undefined;
   getStudentsInSection: (sectionId: string) => StudentData[];
-  getAssignmentsInSection: (section?: Section) => Assignment[];
+  loadUserEducationalData: (
+    forUserId: string,
+    educationalRole: EducationalRole
+  ) => void;
+  allSectionsStudentsProgress: AllSectionsStudentsProgress;
+}
+
+export interface SectionStudentsProgress {
+  [studentId: string]: StudentSectionProgress;
+}
+
+export interface AllSectionsStudentsProgress {
+  [sectionId: string]: SectionStudentsProgress;
 }
 
 export function useWithEducationalManagement(): UseWithEducationalManagement {
@@ -145,7 +160,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   }
 
   async function loadStudentsInMyCourses(instructorId: string) {
-    return await dispatch(_fetchStudentsInMyCourses(instructorId)).unwrap();
+    const res = await dispatch(_fetchStudentsInMyCourses(instructorId));
+    return res.payload as StudentData[];
   }
 
   async function createCourse(courseData?: Partial<Course>) {
@@ -273,14 +289,6 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res as Section;
   }
 
-  async function createNewInstructor(userId: string) {
-    return await _createNewInstructor(userId);
-  }
-
-  async function createNewStudent(userId: string) {
-    return await _createNewStudent(userId);
-  }
-
   function getSectionForSectionId(sectionId: string) {
     return sections.find((s) => s._id === sectionId);
   }
@@ -289,14 +297,44 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return students.filter((s) => s.enrolledSections.includes(sectionId));
   }
 
-  function getAssignmentsInSection(section?: Section) {
-    if (!section) {
-      return [];
+  function loadUserEducationalData(
+    forUserId: string,
+    educationalRole: EducationalRole
+  ) {
+    if (educationalRole === EducationalRole.INSTRUCTOR) {
+      dispatch(_loadInstructorData(forUserId));
+    } else if (educationalRole === EducationalRole.STUDENT) {
+      dispatch(_loadStudentData(forUserId));
+    } else {
+      throw new Error('Invalid educational role');
     }
-    return assignments.filter((a) =>
-      section.assignments.some((s) => s.assignmentId === a._id)
-    );
   }
+
+  const allSectionsStudentsProgress: AllSectionsStudentsProgress =
+    useMemo(() => {
+      const allSectionsStudentsProgress: AllSectionsStudentsProgress = {};
+      for (const section of sections) {
+        const assignmentsInSection = getAssignmentsInSection(
+          assignments,
+          section
+        );
+        allSectionsStudentsProgress[section._id] = students
+          .filter((student) => student.enrolledSections.includes(section._id))
+          .reduce(
+            (acc, student) => {
+              acc[student._id] = getStudentSectionProgress(
+                student,
+                assignmentsInSection
+              );
+              return acc;
+            },
+            {} as { [studentId: string]: StudentSectionProgress }
+          );
+      }
+      return allSectionsStudentsProgress;
+    }, [students, sections, assignments]);
+
+  console.log(allSectionsStudentsProgress);
 
   return {
     loadCourses,
@@ -315,8 +353,6 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     enrollStudentInSection,
     removeStudentFromSection,
     updateStudentAssignmentProgress,
-    createNewInstructor,
-    createNewStudent,
     courses,
     assignments,
     sections,
@@ -336,9 +372,10 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     isEnrollmentModifying: enrollmentModificationStatus === LoadStatus.LOADING,
     enrollmentModificationFailed:
       enrollmentModificationStatus === LoadStatus.FAILED,
+    allSectionsStudentsProgress,
     addAssignmentToSection,
     getSectionForSectionId,
     getStudentsInSection,
-    getAssignmentsInSection,
+    loadUserEducationalData,
   };
 }

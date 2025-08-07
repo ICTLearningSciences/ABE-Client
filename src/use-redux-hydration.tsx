@@ -11,7 +11,7 @@ import { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/u
 import { useWithEducationalManagement } from './store/slices/education-management/use-with-educational-management';
 
 export async function useReduxHydration() {
-  const userId = useAppSelector((state) => state.login.user?._id);
+  const userData = useAppSelector((state) => state.login.user);
   const dispatch = useAppDispatch();
   const { loadActivities, loadDocGoals, loadBuiltActivities } =
     useWithDocGoalsActivities();
@@ -20,17 +20,21 @@ export async function useReduxHydration() {
     loadAssignments,
     loadSections,
     loadStudentsInMyCourses,
+    loadUserEducationalData,
   } = useWithEducationalManagement();
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userData) return;
+    const { _id: userId, educationalRole } = userData;
     dispatch(loadUserDocs({ userId }));
     loadActivities();
     loadBuiltActivities();
     loadDocGoals();
+    // TODO: merge these together into one query
     loadCourses(userId);
     loadAssignments(userId);
     loadSections(userId);
     loadStudentsInMyCourses(userId);
-  }, [userId]);
+    loadUserEducationalData(userId, educationalRole);
+  }, [userData]);
 }

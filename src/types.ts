@@ -56,7 +56,7 @@ export interface User {
   lastLoginAt: Date;
   classroomCode?: ClassroomCode;
   previousClassroomCodes?: ClassroomCode[];
-  educationalRole?: EducationalRole;
+  educationalRole: EducationalRole;
 }
 
 export interface UserAccessToken {

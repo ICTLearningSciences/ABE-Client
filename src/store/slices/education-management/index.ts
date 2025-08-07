@@ -15,8 +15,10 @@ import {
   addOrUpdateAssignment as _addOrUpdateAssignment,
   modifySectionEnrollment as _modifySectionEnrollment,
   modifyStudentAssignmentProgress as _modifyStudentAssignmentProgress,
+  createNewInstructor as _createNewInstructor,
+  createNewStudent as _createNewStudent,
 } from './educational-api';
-import { Course, Assignment, Section, StudentData } from './types';
+import { Course, Assignment, Section, StudentData, Instructor } from './types';
 
 export enum LoadStatus {
   NONE,
@@ -38,6 +40,9 @@ export interface State {
   students: StudentData[];
   studentsLoadStatus: LoadStatus;
   enrollmentModificationStatus: LoadStatus;
+  instructorData?: Instructor;
+  studentData?: StudentData;
+  educationalDataLoadStatus: LoadStatus;
 }
 
 const initialState: State = {
@@ -53,6 +58,9 @@ const initialState: State = {
   students: [],
   studentsLoadStatus: LoadStatus.NONE,
   enrollmentModificationStatus: LoadStatus.NONE,
+  instructorData: undefined,
+  studentData: undefined,
+  educationalDataLoadStatus: LoadStatus.NONE,
 };
 
 export const fetchCourses = createAsyncThunk(
@@ -230,6 +238,20 @@ export const updateStudentAssignmentProgress = createAsyncThunk(
   }
 );
 
+export const loadInstructorData = createAsyncThunk(
+  'educationManagement/loadInstructorData',
+  async (userId: string) => {
+    return await _createNewInstructor(userId);
+  }
+);
+
+export const loadStudentData = createAsyncThunk(
+  'educationManagement/loadStudentData',
+  async (userId: string) => {
+    return await _createNewStudent(userId);
+  }
+);
+
 /** Reducer */
 export const educationManagementSlice = createSlice({
   name: 'educationManagement',
@@ -237,6 +259,28 @@ export const educationManagementSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(loadInstructorData.pending, (state) => {
+        state.educationalDataLoadStatus = LoadStatus.LOADING;
+      })
+      .addCase(loadInstructorData.fulfilled, (state, action) => {
+        state.educationalDataLoadStatus = LoadStatus.SUCCEEDED;
+        state.instructorData = action.payload;
+      })
+      .addCase(loadInstructorData.rejected, (state) => {
+        state.educationalDataLoadStatus = LoadStatus.FAILED;
+      })
+
+      .addCase(loadStudentData.pending, (state) => {
+        state.educationalDataLoadStatus = LoadStatus.LOADING;
+      })
+      .addCase(loadStudentData.fulfilled, (state, action) => {
+        state.educationalDataLoadStatus = LoadStatus.SUCCEEDED;
+        state.studentData = action.payload;
+      })
+      .addCase(loadStudentData.rejected, (state) => {
+        state.educationalDataLoadStatus = LoadStatus.FAILED;
+      })
+
       .addCase(fetchCourses.pending, (state) => {
         state.coursesLoadStatus = LoadStatus.LOADING;
       })
@@ -430,6 +474,13 @@ export const educationManagementSlice = createSlice({
         state.assignments = state.assignments.filter(
           (a) => a._id !== action.payload._id
         );
+        // Remove the assignment from the sections
+        state.sections = state.sections.map((s) => ({
+          ...s,
+          assignments: s.assignments.filter(
+            (a) => a.assignmentId !== action.payload._id
+          ),
+        }));
       })
       .addCase(deleteAssignment.rejected, (state) => {
         state.assignmentModificationStatus = LoadStatus.FAILED;
@@ -451,6 +502,9 @@ export const educationManagementSlice = createSlice({
           // If student not in list, add them
           state.students.push(action.payload);
         }
+        if (state.studentData?.userId === action.payload.userId) {
+          state.studentData = action.payload;
+        }
       })
       .addCase(enrollInSection.rejected, (state) => {
         state.enrollmentModificationStatus = LoadStatus.FAILED;
@@ -469,6 +523,9 @@ export const educationManagementSlice = createSlice({
         if (studentIndex >= 0) {
           state.students[studentIndex] = action.payload;
         }
+        if (state.studentData?.userId === action.payload.userId) {
+          state.studentData = action.payload;
+        }
       })
       .addCase(removeFromSection.rejected, (state) => {
         state.enrollmentModificationStatus = LoadStatus.FAILED;
@@ -486,6 +543,9 @@ export const educationManagementSlice = createSlice({
         );
         if (studentIndex >= 0) {
           state.students[studentIndex] = action.payload;
+        }
+        if (state.studentData?.userId === action.payload.userId) {
+          state.studentData = action.payload;
         }
       })
       .addCase(updateStudentAssignmentProgress.rejected, (state) => {
