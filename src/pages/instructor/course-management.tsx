@@ -101,17 +101,20 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     });
   };
 
-  const handleActivitySelect = (
-    courseId: string,
-    sectionId: string,
-    assignmentId: string,
-    activityId: string
-  ) => {
+  const handleActivitySelect = (activityId: string) => {
+    if (
+      !viewState.selectedCourseId ||
+      !viewState.selectedSectionId ||
+      !viewState.selectedAssignmentId
+    ) {
+      console.error('Missing required view state for activity select');
+      return;
+    }
     setViewState({
       view: 'activity',
-      selectedCourseId: courseId,
-      selectedSectionId: sectionId,
-      selectedAssignmentId: assignmentId,
+      selectedCourseId: viewState.selectedCourseId,
+      selectedSectionId: viewState.selectedSectionId,
+      selectedAssignmentId: viewState.selectedAssignmentId,
       selectedActivityId: activityId,
     });
   };
@@ -409,24 +412,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 builtActivities={builtActivities}
                 onAssignmentDeleted={handleAssignmentDeleted}
                 isStudentView={isStudent}
-                onActivitySelect={(activityId) => {
-                  if (
-                    !viewState.selectedCourseId ||
-                    !viewState.selectedSectionId ||
-                    !viewState.selectedAssignmentId
-                  ) {
-                    console.error(
-                      'Missing required view state for activity select'
-                    );
-                    return;
-                  }
-                  handleActivitySelect(
-                    viewState.selectedCourseId,
-                    viewState.selectedSectionId,
-                    viewState.selectedAssignmentId,
-                    activityId
-                  );
-                }}
+                onActivitySelect={handleActivitySelect}
               />
             )}
 
