@@ -56,7 +56,6 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
             alignItems: 'center',
             justifyContent: 'space-around',
             height: '100%',
-            padding: 20,
           }}
           data-cy="profile-drawer"
         >
@@ -66,7 +65,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'space-around',
-              height: '100%',
+              height: '90%',
             }}
           >
             <UserInfoSettings />

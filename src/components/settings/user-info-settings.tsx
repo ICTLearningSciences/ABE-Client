@@ -6,17 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
-import { 
-  Button, 
-  Tooltip, 
-  Box, 
-  Typography, 
-  Paper, 
-  Stack, 
-  Divider,
-  Card,
-  CardContent
-} from '@mui/material';
+import { Button, Tooltip, Box, Typography, Paper, Stack } from '@mui/material';
 import { useWithConfig } from '../../exported-files';
 import { AdminControls } from './admin-controls';
 import AssignmentIcon from '@mui/icons-material/Assignment';
@@ -54,12 +44,12 @@ export function UserInfoSettings(): JSX.Element {
     <Box
       data-cy="user-info-settings"
       sx={{
-        height: '90%',
+        height: '100%',
         p: 3,
         display: 'flex',
         flexDirection: 'column',
         gap: 3,
-        overflowY: 'auto'
+        overflowY: 'auto',
       }}
     >
       {/* User Profile Section */}
@@ -74,8 +64,82 @@ export function UserInfoSettings(): JSX.Element {
         </Paper>
       )}
 
+      {/* Classroom Code Section */}
+      {classroomCode && (
+        <Paper elevation={2} sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Current Classroom
+          </Typography>
+          <Stack spacing={2}>
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Classroom Code
+              </Typography>
+              <EditableText
+                text={classroomCode.code}
+                onSave={async (newText) => {
+                  await updateUserInfo({
+                    classroomCode: newText,
+                  });
+                }}
+              />
+            </Box>
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Created At
+              </Typography>
+              <Typography variant="body1">
+                {formatISODateToReadable(classroomCode.createdAt)}
+              </Typography>
+            </Box>
+          </Stack>
+        </Paper>
+      )}
+
+      {/* Previous Classroom Codes */}
+      {previousClassroomCodes && previousClassroomCodes.length > 0 && (
+        <Paper elevation={2} sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Previous Classrooms
+          </Typography>
+          <Tooltip
+            data-cy="previous-classroom-codes-tooltip"
+            title={
+              <Box sx={{ p: 1 }}>
+                {previousClassroomCodes.map((code) => (
+                  <Box key={code.code} sx={{ mb: 1 }}>
+                    <Typography variant="body2" fontWeight="bold">
+                      {code.code}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {formatISODateToReadable(code.createdAt)}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            }
+          >
+            <Typography
+              data-cy="previous-classroom-codes"
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                '&:hover': {
+                  color: 'primary.main',
+                },
+              }}
+            >
+              View {previousClassroomCodes.length} previous classroom code
+              {previousClassroomCodes.length > 1 ? 's' : ''}
+            </Typography>
+          </Tooltip>
+        </Paper>
+      )}
+
       {/* Education Dashboard Section */}
-      {(educationalRole || (educationalRole === EducationalRole.INSTRUCTOR)) && (
+      {(educationalRole || educationalRole === EducationalRole.INSTRUCTOR) && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
             Education Dashboard
@@ -85,11 +149,12 @@ export function UserInfoSettings(): JSX.Element {
               <GoToEducationDashboardButton educationalRole={educationalRole} />
             )}
             {/* For testing purposes */}
-            {educationalRole && educationalRole === EducationalRole.INSTRUCTOR && (
-              <GoToEducationDashboardButton
-                educationalRole={EducationalRole.STUDENT}
-              />
-            )}
+            {educationalRole &&
+              educationalRole === EducationalRole.INSTRUCTOR && (
+                <GoToEducationDashboardButton
+                  educationalRole={EducationalRole.STUDENT}
+                />
+              )}
           </Stack>
         </Paper>
       )}
