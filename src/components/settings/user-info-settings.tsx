@@ -66,7 +66,11 @@ export function UserInfoSettings(): JSX.Element {
 
       {/* Classroom Code Section */}
       {classroomCode && (
-        <Paper elevation={2} sx={{ p: 3 }}>
+        <Paper
+          data-cy="current-classroom-code-paper"
+          elevation={2}
+          sx={{ p: 3 }}
+        >
           <Typography variant="h6" gutterBottom>
             Current Classroom
           </Typography>

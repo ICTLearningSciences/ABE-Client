@@ -24,7 +24,7 @@ describe("classroom code", ()=>{
       cy.url().should('include', 'test=true');
     })
 
-    it("classroom code is viewable in settings UI", ()=>{
+    it  ("classroom code is viewable in settings UI", ()=>{
       cyMockDefault(cy, {
         userRole: UserRole.ADMIN,
         gqlQueries: [
@@ -33,7 +33,7 @@ describe("classroom code", ()=>{
       });
       cy.visit("/?classroomCode=123");
       cy.get("[data-cy=profile-button]").click();
-      cy.get("[data-cy=current-classroom-code]").should('contain', "1234123412341234123");
+      cy.get("[data-cy=current-classroom-code-paper]").should('contain', "1234123412341234123");
     })
 
     it("previous classroom codes are viewable in settings UI", ()=>{
@@ -45,7 +45,7 @@ describe("classroom code", ()=>{
       });
       cy.visit("/?classroomCode=123");
       cy.get("[data-cy=profile-button]").click();
-      cy.get("[data-cy=current-classroom-code]").should('contain', "1234123412341234123");
+      cy.get("[data-cy=current-classroom-code-paper]").should('contain', "1234123412341234123");
       cy.get("[data-cy=previous-classroom-codes]").click()
       cy.get("[role=tooltip]").should('contain.text', "1234432112344321")
       cy.get("[role=tooltip]").should('contain.text', "5467765445677654")
@@ -64,11 +64,11 @@ describe("classroom code", ()=>{
       });
       cy.visit("/?classroomCode=abc");
       cy.get("[data-cy=profile-button]").click();
-      cy.get("[data-cy=current-classroom-code]").should('contain', "abc");
+      cy.get("[data-cy=current-classroom-code-paper]").should('contain', "abc");
       cy.get("[data-cy=editable-text-edit-button]").click();
       cy.get("[data-cy=editable-text-input]").clear().type("def");
       cy.get("[data-cy=editable-text-save-button]").click();
-      cy.get("[data-cy=current-classroom-code]").should('contain', "def");
+      cy.get("[data-cy=current-classroom-code-paper]").should('contain', "def");
     })
 
     it("classroom code is removed from url when user navigates to docs", ()=>{

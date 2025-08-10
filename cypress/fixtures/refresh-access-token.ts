@@ -13,7 +13,7 @@ export const refreshAccessTokenResponse = (role: UserRole, loginService?: LoginS
         ...testUser,
         userRole: role,
         loginService: loginService || LoginService.GOOGLE,
-        educationalRole: educationalRole || EducationalRole.INSTRUCTOR
+        educationalRole: educationalRole || undefined
     }
     
     return  { "refreshAccessToken": {
