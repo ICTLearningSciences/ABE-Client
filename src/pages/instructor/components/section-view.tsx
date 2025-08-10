@@ -16,7 +16,7 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
-import { Edit as EditIcon } from '@mui/icons-material';
+import { Edit as EditIcon, ExitToApp as ExitIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { Section } from '../../../store/slices/education-management/types';
 import SectionModal from './section-modal';
@@ -29,6 +29,7 @@ interface SectionViewProps {
   courseId: string;
   onAssignmentSelect: (assignmentId: string) => void;
   onSectionDeleted?: (courseId: string) => void;
+  onRemoveFromSection?: (courseId: string, sectionId: string) => void;
   isStudentView?: boolean;
 }
 
@@ -37,6 +38,7 @@ const SectionView: React.FC<SectionViewProps> = ({
   courseId,
   onAssignmentSelect,
   onSectionDeleted,
+  onRemoveFromSection,
   isStudentView = false,
 }) => {
   const educationManagement = useWithEducationalManagement();
@@ -64,6 +66,12 @@ const SectionView: React.FC<SectionViewProps> = ({
       onSectionDeleted?.(courseId);
     } catch (error) {
       console.error('Failed to delete section:', error);
+    }
+  };
+
+  const handleRemoveFromSection = async () => {
+    if (onRemoveFromSection) {
+      await onRemoveFromSection(courseId, sectionId);
     }
   };
 
@@ -168,6 +176,24 @@ const SectionView: React.FC<SectionViewProps> = ({
                   entityName={section.title}
                 />
               </>
+            )}
+            {isStudentView && (
+              <Button
+                variant="outlined"
+                startIcon={<ExitIcon />}
+                onClick={handleRemoveFromSection}
+                disabled={educationManagement.isEnrollmentModifying}
+                sx={{
+                  color: '#d32f2f',
+                  borderColor: '#d32f2f',
+                  '&:hover': {
+                    backgroundColor: '#d32f2f',
+                    color: 'white',
+                  },
+                }}
+              >
+                Remove from Section
+              </Button>
             )}
           </Stack>
         </CardContent>

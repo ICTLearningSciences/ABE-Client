@@ -172,6 +172,30 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     setIsJoinSectionModalOpen(false);
   };
 
+  const handleRemoveFromSection = async (
+    courseId: string,
+    sectionId: string
+  ) => {
+    if (!loginState.user?._id) {
+      console.error('No current user found');
+      return;
+    }
+
+    try {
+      await educationManagement.removeStudentFromSection(
+        loginState.user._id,
+        courseId,
+        sectionId
+      );
+
+      setViewState({
+        view: 'dashboard',
+      });
+    } catch (error) {
+      console.error('Failed to remove from section:', error);
+    }
+  };
+
   const treeData: TreeItem[] = useMemo(() => {
     return getCourseManagementTreeData(
       educationManagement,
@@ -409,6 +433,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                   )
                 }
                 onSectionDeleted={handleSectionDeleted}
+                onRemoveFromSection={handleRemoveFromSection}
                 isStudentView={isStudent}
               />
             )}
