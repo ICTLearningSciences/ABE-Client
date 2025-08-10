@@ -5,9 +5,18 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { ColumnDiv } from '../../styled-components';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
-import { Button, Tooltip } from '@mui/material';
+import { 
+  Button, 
+  Tooltip, 
+  Box, 
+  Typography, 
+  Paper, 
+  Stack, 
+  Divider,
+  Card,
+  CardContent
+} from '@mui/material';
 import { useWithConfig } from '../../exported-files';
 import { AdminControls } from './admin-controls';
 import AssignmentIcon from '@mui/icons-material/Assignment';
@@ -15,6 +24,7 @@ import { formatISODateToReadable } from '../../helpers';
 import { EditableText } from '../activity-builder/shared/input-components';
 import GoToEducationDashboardButton from './go-to-education-dashboard-button';
 import { EducationalRole } from '../../types';
+
 export function UserInfoSettings(): JSX.Element {
   const { state, updateUserInfo } = useWithLogin();
   const { state: configState } = useWithConfig();
@@ -26,6 +36,7 @@ export function UserInfoSettings(): JSX.Element {
   const surveyUrlParam = configState.config?.surveyConfig?.surveyQueryParam;
   const surveyClassroomParam =
     configState.config?.surveyConfig?.surveyClassroomParam;
+
   function takeSurvey() {
     if (surveyUrl) {
       const url = new URL(surveyUrl);
@@ -40,78 +51,74 @@ export function UserInfoSettings(): JSX.Element {
   }
 
   return (
-    <ColumnDiv
+    <Box
       data-cy="user-info-settings"
-      style={{
-        alignItems: 'space-around',
-        height: '100%',
-        justifyContent: 'space-around',
+      sx={{
+        height: '90%',
+        p: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+        overflowY: 'auto'
       }}
     >
-      {userName && <p>{userName}</p>}
-      <div>
-        {classroomCode && (
-          <div data-cy="current-classroom-code">
-            <b>Classroom Code:</b>{' '}
-            <EditableText
-              text={classroomCode.code}
-              onSave={async (newText) => {
-                await updateUserInfo({
-                  classroomCode: newText,
-                });
-              }}
-            />
-            <br />
-            <b>Created At:</b>{' '}
-            {formatISODateToReadable(classroomCode.createdAt)}
-          </div>
-        )}
-        {previousClassroomCodes && previousClassroomCodes.length > 0 && (
-          <Tooltip
-            data-cy="previous-classroom-codes-tooltip"
-            title={previousClassroomCodes.map((code) => (
-              <p key={code.code}>
-                <b>Classroom Code:</b> {code.code}
-                <br />
-                <b>Created At:</b> {formatISODateToReadable(code.createdAt)}
-              </p>
-            ))}
-          >
-            <p
-              data-cy="previous-classroom-codes"
-              style={{
-                opacity: 0.5,
-                cursor: 'pointer',
-              }}
-            >
-              Previous Classroom Codes
-            </p>
-          </Tooltip>
-        )}
-      </div>
-      {educationalRole && (
-        <GoToEducationDashboardButton educationalRole={educationalRole} />
+      {/* User Profile Section */}
+      {userName && (
+        <Paper elevation={2} sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Profile
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {userName}
+          </Typography>
+        </Paper>
       )}
-      {/* For testing purposes */}
-      {educationalRole && educationalRole === EducationalRole.INSTRUCTOR && (
-        <GoToEducationDashboardButton
-          educationalRole={EducationalRole.STUDENT}
-        />
-      )}
-      <AdminControls />
 
-      {surveyUrl && surveyUrlParam && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={takeSurvey}
-          style={{
-            marginTop: 10,
-          }}
-        >
-          Take Survey <AssignmentIcon style={{ marginLeft: 10 }} />
-        </Button>
+      {/* Education Dashboard Section */}
+      {(educationalRole || (educationalRole === EducationalRole.INSTRUCTOR)) && (
+        <Paper elevation={2} sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Education Dashboard
+          </Typography>
+          <Stack spacing={2}>
+            {educationalRole && (
+              <GoToEducationDashboardButton educationalRole={educationalRole} />
+            )}
+            {/* For testing purposes */}
+            {educationalRole && educationalRole === EducationalRole.INSTRUCTOR && (
+              <GoToEducationDashboardButton
+                educationalRole={EducationalRole.STUDENT}
+              />
+            )}
+          </Stack>
+        </Paper>
       )}
-    </ColumnDiv>
+
+      {/* Admin Controls Section */}
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Admin Settings
+        </Typography>
+        <AdminControls />
+      </Paper>
+
+      {/* Survey Section */}
+      {surveyUrl && surveyUrlParam && (
+        <Paper elevation={2} sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Feedback
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={takeSurvey}
+            startIcon={<AssignmentIcon />}
+            fullWidth
+          >
+            Take Survey
+          </Button>
+        </Paper>
+      )}
+    </Box>
   );
 }

@@ -39,6 +39,7 @@ export function AdminControls(): JSX.Element {
         <ColumnDiv
           style={{
             marginRight: 20,
+            alignItems: 'flex-start',
           }}
         >
           <ThemeProvider theme={() => switchTheme()}>
