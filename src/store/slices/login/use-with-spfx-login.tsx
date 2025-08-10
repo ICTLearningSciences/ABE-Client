@@ -19,12 +19,12 @@ export function useWithSpfxLogin(): UseWithLogin {
       state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
       state.loginStatus === loginActions.LoginStatus.FAILED
     ) {
-      await dispatch(
+      return await dispatch(
         loginActions.login({
           accessToken: googleAccessToken,
           service: loginActions.LoginService.GOOGLE,
         })
-      );
+      ).unwrap();
     }
   }
 

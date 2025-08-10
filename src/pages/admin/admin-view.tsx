@@ -7,13 +7,13 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import ViewUserGoogleDocs from '../../components/admin-view/admin-view-docs';
 import withAuthorizationOnly from '../../hooks/wrap-with-authorization-only';
-import { useNavigate } from 'react-router-dom';
 import { useWithState } from '../../store/slices/state/use-with-state';
 import { URL_PARAM_NEW_DOC } from '../../constants';
+import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 
 function AdminView(): JSX.Element {
   const { updateCurrentDocId } = useWithState();
-  const navigate = useNavigate();
+  const navigate = useNavigateWithParams();
   function goToDoc(docId: string, newDoc?: boolean) {
     updateCurrentDocId(docId);
     navigate(`/docs/${docId}?${newDoc ? `${URL_PARAM_NEW_DOC}=true` : ''}`);

@@ -5,17 +5,38 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import {
   courseManagementUrl,
   studentCoursesUrl,
 } from '../../pages/instructor/course-management';
 import { EducationalRole } from '../../types';
+import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
+
 export default function GoToEducationDashboardButton(props: {
   educationalRole: EducationalRole;
 }) {
-  const navigate = useNavigate();
+  const navigate = useNavigateWithParams();
+
+  const currentPath = window.location.pathname;
+  const isOnEducationDashboard =
+    currentPath.includes(studentCoursesUrl) ||
+    currentPath.includes(courseManagementUrl);
+
+  if (isOnEducationDashboard) {
+    return (
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          navigate('/docs');
+        }}
+      >
+        Free Doc Editing
+      </Button>
+    );
+  }
+
   if (props.educationalRole === EducationalRole.INSTRUCTOR) {
     return (
       <Button

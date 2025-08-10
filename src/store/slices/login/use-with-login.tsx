@@ -20,7 +20,9 @@ import { useAuth } from 'react-oidc-context';
 export interface UseWithLogin {
   state: loginActions.LoginState;
   logout: () => Promise<void>;
-  loginWithGoogle: (googleAccessToken: string) => Promise<void>;
+  loginWithGoogle: (
+    googleAccessToken: string
+  ) => Promise<UserAccessToken | undefined>;
   loginWithMicrosoft: (microsoftAccessToken: string) => Promise<void>;
   loginWithAmazonCognito: (cognitoIdToken: string) => Promise<void>;
   refreshAccessToken: () => void;
@@ -72,12 +74,12 @@ export function useWithLogin(): UseWithLogin {
       state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
       state.loginStatus === loginActions.LoginStatus.FAILED
     ) {
-      await dispatch(
+      return await dispatch(
         loginActions.login({
           accessToken: googleAccessToken,
           service: loginActions.LoginService.GOOGLE,
         })
-      );
+      ).unwrap();
     }
   }
 
