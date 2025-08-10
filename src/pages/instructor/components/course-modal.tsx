@@ -114,6 +114,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      data-cy="course-modal"
       PaperProps={{
         sx: {
           borderRadius: 2,
@@ -160,6 +161,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
             error={!!errors.title}
             helperText={errors.title}
             disabled={isLoading}
+            data-cy="course-title-input"
             sx={{ mb: 2.5 }}
             InputProps={{
               sx: {
@@ -189,6 +191,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
             error={!!errors.description}
             helperText={errors.description}
             disabled={isLoading}
+            data-cy="course-description-input"
             sx={{ mb: 3 }}
             InputProps={{
               sx: {
@@ -213,6 +216,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
           onClick={onClose}
           disabled={isLoading}
           variant="outlined"
+          data-cy="course-modal-cancel-button"
           sx={{
             color: 'grey.600',
             borderColor: 'grey.300',
@@ -228,6 +232,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
           onClick={handleSubmit}
           disabled={isLoading}
           variant="contained"
+          data-cy="course-modal-submit-button"
           sx={{
             backgroundColor: '#1B6A9C',
             '&:hover': {

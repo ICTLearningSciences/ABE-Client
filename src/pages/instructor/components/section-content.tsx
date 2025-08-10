@@ -195,6 +195,7 @@ const SectionContent: React.FC<SectionContentProps> = ({
           onClick={handleOpenAssignmentModal}
           disabled={educationManagement.isAssignmentModifying}
           fullWidth
+          data-cy="add-assignment-button"
           sx={{
             py: 2,
             mb: 3,

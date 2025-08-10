@@ -81,6 +81,7 @@ const JoinSectionModal: React.FC<JoinSectionModalProps> = ({
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
+      data-cy="join-section-modal"
       PaperProps={{
         sx: {
           borderRadius: 2,
@@ -135,6 +136,7 @@ const JoinSectionModal: React.FC<JoinSectionModalProps> = ({
               disabled={isLoading}
               autoFocus
               variant="outlined"
+              data-cy="section-code-input"
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '&:hover fieldset': {
@@ -157,6 +159,7 @@ const JoinSectionModal: React.FC<JoinSectionModalProps> = ({
             onClick={handleClose}
             disabled={isLoading}
             variant="outlined"
+            data-cy="join-section-cancel-button"
             sx={{
               color: 'grey.600',
               borderColor: 'grey.300',
@@ -172,6 +175,7 @@ const JoinSectionModal: React.FC<JoinSectionModalProps> = ({
             type="submit"
             variant="contained"
             disabled={isLoading || !sectionCode.trim()}
+            data-cy="join-section-submit-button"
             sx={{
               backgroundColor: '#1B6A9C',
               '&:hover': {

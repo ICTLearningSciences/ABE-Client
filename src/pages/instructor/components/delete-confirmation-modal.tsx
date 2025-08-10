@@ -55,6 +55,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
         onClose={() => setIsOpen(false)}
         maxWidth="sm"
         fullWidth
+        data-cy="delete-confirmation-modal"
         PaperProps={{
           sx: {
             borderRadius: 2,
@@ -131,6 +132,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
             onClick={() => setIsOpen(false)}
             disabled={isLoading}
             variant="outlined"
+            data-cy="delete-cancel-button"
             sx={{
               color: 'grey.600',
               borderColor: 'grey.300',
@@ -147,6 +149,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
             disabled={isLoading}
             variant="contained"
             color="error"
+            data-cy="delete-confirm-button"
             sx={{
               backgroundColor: '#d32f2f',
               '&:hover': {
@@ -173,6 +176,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
           marginLeft: 2,
         }}
         onClick={() => setIsOpen(true)}
+        data-cy={`delete-${entityType}-button`}
       >
         {' '}
         <TrashIcon />{' '}

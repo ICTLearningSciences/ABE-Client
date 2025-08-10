@@ -196,6 +196,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                   startIcon={<EditIcon />}
                   onClick={() => setShowEditModal(true)}
                   disabled={educationManagement.isAssignmentModifying}
+                  data-cy="edit-assignment-button"
                   sx={{
                     color: '#1B6A9C',
                     borderColor: '#1B6A9C',

@@ -20,6 +20,7 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
   return (
     <Card
       variant="outlined"
+      data-cy={`assignment-card-${assignment._id}`}
       sx={{
         cursor: 'pointer',
         transition: 'all 0.2s ease',

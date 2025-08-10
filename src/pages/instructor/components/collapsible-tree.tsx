@@ -130,6 +130,7 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
         {/* Item Content */}
         <Box
           onClick={item.onClick}
+          data-cy={`tree-item-${item.id}`}
           sx={{
             display: 'flex',
             alignItems: 'center',

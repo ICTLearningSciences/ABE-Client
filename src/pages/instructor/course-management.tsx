@@ -239,6 +239,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         <Box sx={{ mb: 3 }}>
           <Typography
             variant="h5"
+            data-cy="course-management-title"
             sx={{
               mb: 1,
               color: '#1B6A9C',
@@ -247,7 +248,11 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
           >
             {isStudent ? 'My Courses' : 'Course Management'}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            data-cy="course-management-description"
+          >
             {isStudent
               ? 'View your enrolled courses, sections, and assignments'
               : 'Manage your courses, sections, and assignments'}
@@ -260,6 +265,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
             disabled={educationManagement.isSectionModifying}
             variant="contained"
             fullWidth
+            data-cy="join-section-button"
             sx={{
               mb: 3,
               backgroundColor: '#1B6A9C',
@@ -280,6 +286,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
             disabled={educationManagement.isCourseModifying}
             variant="contained"
             fullWidth
+            data-cy="new-course-button"
             sx={{
               mb: 3,
               backgroundColor: '#1B6A9C',
@@ -383,6 +390,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               </Typography>
               <Typography
                 variant="h4"
+                data-cy="course-management-main-title"
                 sx={{
                   mb: 2,
                   color: 'text.primary',

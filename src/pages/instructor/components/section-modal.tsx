@@ -136,6 +136,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      data-cy="section-modal"
       PaperProps={{
         sx: {
           borderRadius: 2,
@@ -182,6 +183,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
             error={!!errors.title}
             helperText={errors.title}
             disabled={isLoading}
+            data-cy="section-title-input"
             sx={{ mb: 2.5 }}
             InputProps={{
               sx: {
@@ -209,6 +211,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
             error={!!errors.sectionCode}
             helperText={errors.sectionCode}
             disabled={isLoading}
+            data-cy="section-code-input"
             sx={{ mb: 2.5 }}
             InputProps={{
               sx: {
@@ -238,6 +241,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
             error={!!errors.description}
             helperText={errors.description}
             disabled={isLoading}
+            data-cy="section-description-input"
             sx={{ mb: 2.5 }}
             InputProps={{
               sx: {
@@ -262,6 +266,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
           onClick={onClose}
           disabled={isLoading}
           variant="outlined"
+          data-cy="section-modal-cancel-button"
           sx={{
             color: 'grey.600',
             borderColor: 'grey.300',
@@ -277,6 +282,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
           onClick={handleSubmit}
           disabled={isLoading}
           variant="contained"
+          data-cy="section-modal-submit-button"
           sx={{
             backgroundColor: '#1B6A9C',
             '&:hover': {

@@ -145,6 +145,7 @@ const CourseView: React.FC<CourseViewProps> = ({
                   startIcon={<EditIcon />}
                   onClick={() => setShowEditModal(true)}
                   disabled={educationManagement.isCourseModifying}
+                  data-cy="edit-course-button"
                   sx={{
                     color: '#1B6A9C',
                     borderColor: '#1B6A9C',
@@ -194,6 +195,7 @@ const CourseView: React.FC<CourseViewProps> = ({
             onClick={handleOpenSectionModal}
             disabled={educationManagement.isSectionModifying}
             fullWidth
+            data-cy="add-section-button"
             sx={{
               py: 2,
               mb: 3,
@@ -234,6 +236,7 @@ const CourseView: React.FC<CourseViewProps> = ({
               <Grid item xs={12} key={section._id}>
                 <Card
                   variant="outlined"
+                  data-cy={`section-card-${section._id}`}
                   sx={{
                     cursor: onSectionSelect ? 'pointer' : 'default',
                     transition: 'all 0.2s ease',

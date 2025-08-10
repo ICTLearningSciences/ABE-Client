@@ -4,19 +4,19 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { EducationalRole } from "../../src/types";
-import { LoginService, UserRole } from "../helpers/types";
-import { testUser } from "./user-data";
+import { Instructor } from '../../../src/store/slices/education-management/types';
 
-export const refreshAccessTokenResponse = (role: UserRole, loginService?: LoginService, educationalRole?: EducationalRole) =>{
-    const newUser = {
-        ...testUser,
-        userRole: role,
-        loginService: loginService || LoginService.GOOGLE,
-        educationalRole: educationalRole || EducationalRole.INSTRUCTOR
-    }
-    
-    return  { "refreshAccessToken": {
-    "user": newUser,
-    "accessToken": "fake-access-token-2"
-} }}
+export const testInstructor: Instructor = {
+  _id: 'instructor-123',
+  userId: 'instructor-user-123',
+  courseIds: ['course-123', 'course-456'],
+  name: 'Professor Smith'
+};
+
+export interface CreateNewInstructorResponse {
+  createNewInstructor: Instructor;
+}
+
+export const createNewInstructorResponse: CreateNewInstructorResponse = {
+  createNewInstructor: testInstructor
+};

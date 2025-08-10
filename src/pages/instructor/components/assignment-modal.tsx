@@ -124,6 +124,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      data-cy="assignment-modal"
       PaperProps={{
         sx: {
           borderRadius: 2,
@@ -140,6 +141,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
           fontWeight: 600,
           fontSize: '1.25rem',
         }}
+        data-cy="assignment-modal-title"
       >
         {mode === 'create' ? 'Create New Assignment' : 'Edit Assignment'}
         <IconButton
@@ -147,6 +149,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
           disabled={isLoading}
           size="small"
           sx={{ color: 'grey.500' }}
+          data-cy="assignment-modal-close-button"
         >
           <CloseIcon />
         </IconButton>
@@ -185,6 +188,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                 },
               },
             }}
+            data-cy="assignment-modal-title-input"
           />
 
           <TextField
@@ -214,6 +218,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                 },
               },
             }}
+            data-cy="assignment-modal-description-input"
           />
 
           {sectionId && (
@@ -237,6 +242,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                 </Typography>
               }
               sx={{ mb: 2.5 }}
+              data-cy="assignment-modal-mandatory-checkbox"
             />
           )}
         </Box>
@@ -255,6 +261,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
               backgroundColor: 'grey.50',
             },
           }}
+          data-cy="assignment-modal-cancel-button"
         >
           Cancel
         </Button>
@@ -268,6 +275,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
               backgroundColor: '#145a87',
             },
           }}
+          data-cy="assignment-modal-submit-button"
         >
           {isLoading
             ? 'Saving...'

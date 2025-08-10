@@ -39,7 +39,6 @@ import {
 } from './types';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 
-
 export type CypressGlobal = Cypress.cy & CyEventEmitter;
 
 interface StaticResponse {
@@ -77,7 +76,7 @@ interface StaticResponse {
   throttleKbps?: number;
 }
 
-interface MockGraphQLQuery {
+export interface MockGraphQLQuery {
   query: string;
   data: any | any[];
   params?: { statusCode?: number, delayMs?: number };

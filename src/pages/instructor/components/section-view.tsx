@@ -159,6 +159,7 @@ const SectionView: React.FC<SectionViewProps> = ({
                   startIcon={<EditIcon />}
                   onClick={() => setShowEditModal(true)}
                   disabled={educationManagement.isSectionModifying}
+                  data-cy="edit-section-button"
                   sx={{
                     color: '#1B6A9C',
                     borderColor: '#1B6A9C',
@@ -183,6 +184,7 @@ const SectionView: React.FC<SectionViewProps> = ({
                 startIcon={<ExitIcon />}
                 onClick={handleRemoveFromSection}
                 disabled={educationManagement.isEnrollmentModifying}
+                data-cy="remove-from-section-button"
                 sx={{
                   color: '#d32f2f',
                   borderColor: '#d32f2f',

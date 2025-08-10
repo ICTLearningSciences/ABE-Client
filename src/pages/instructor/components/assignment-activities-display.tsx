@@ -111,6 +111,7 @@ const AssignmentActivitiesDisplay: React.FC<
                   label="Select Activity"
                   onChange={(e) => setSelectedActivityId(e.target.value)}
                   disabled={isAssignmentModifying}
+                  data-cy="activity-select-dropdown"
                 >
                   {availableActivities.map((activity) => (
                     <MenuItem key={activity._id} value={activity._id}>
@@ -125,6 +126,7 @@ const AssignmentActivitiesDisplay: React.FC<
                 startIcon={<AddIcon />}
                 onClick={handleAddActivity}
                 disabled={!selectedActivityId || isAssignmentModifying}
+                data-cy="add-activity-to-assignment-button"
                 sx={{
                   backgroundColor: '#1B6A9C',
                   '&:hover': {
@@ -179,6 +181,7 @@ const AssignmentActivitiesDisplay: React.FC<
                       <Typography
                         variant="h6"
                         onClick={() => onActivitySelect(activityId)}
+                        data-cy={`activity-item-${activityId}`}
                         sx={{
                           color: '#1B6A9C',
                           fontWeight: 600,
