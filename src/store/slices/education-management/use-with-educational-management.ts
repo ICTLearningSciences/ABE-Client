@@ -25,6 +25,7 @@ import {
   Section,
   StudentData,
   ActivityCompletion,
+  Instructor,
 } from './types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { EducationalRole } from '../../../types';
@@ -40,6 +41,22 @@ export interface UseWithEducationalManagement {
   loadAssignments: (forUserId: string) => Promise<Assignment[]>;
   loadSections: (forUserId: string) => Promise<Section[]>;
   loadStudentsInMyCourses: (instructorId: string) => Promise<StudentData[]>;
+  loadAllEducationalData: (forUserId: string) => Promise<{
+    courses: Course[];
+    assignments: Assignment[];
+    sections: Section[];
+    students: StudentData[];
+  }>;
+  loadAllEducationalDataWithUserData: (
+    forUserId: string,
+    educationalRole: EducationalRole
+  ) => Promise<{
+    courses: Course[];
+    assignments: Assignment[];
+    sections: Section[];
+    students: StudentData[];
+    userData: StudentData | Instructor;
+  }>;
   createCourse: (courseData?: Partial<Course>) => Promise<Course>;
   updateCourse: (courseData: Partial<Course>) => Promise<Course>;
   deleteCourse: (courseId: string) => Promise<Course>;
@@ -340,13 +357,54 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       return allSectionsStudentsProgress;
     }, [students, sections, assignments]);
 
-  console.log(allSectionsStudentsProgress);
+  async function loadAllEducationalData(forUserId: string) {
+    const [courses, assignments, sections, students] = await Promise.all([
+      dispatch(_fetchCourses(forUserId)).unwrap(),
+      dispatch(_fetchAssignments(forUserId)).unwrap(),
+      dispatch(_fetchSections(forUserId)).unwrap(),
+      dispatch(_fetchStudentsInMyCourses(forUserId)).unwrap(),
+    ]);
+
+    return {
+      courses,
+      assignments,
+      sections,
+      students,
+    };
+  }
+
+  async function loadAllEducationalDataWithUserData(
+    forUserId: string,
+    educationalRole: EducationalRole
+  ) {
+    // Perform all fetches in parallel including user data
+    const [courses, assignments, sections, students, userData] =
+      await Promise.all([
+        dispatch(_fetchCourses(forUserId)).unwrap(),
+        dispatch(_fetchAssignments(forUserId)).unwrap(),
+        dispatch(_fetchSections(forUserId)).unwrap(),
+        dispatch(_fetchStudentsInMyCourses(forUserId)).unwrap(),
+        educationalRole === EducationalRole.INSTRUCTOR
+          ? dispatch(_loadInstructorData(forUserId)).unwrap()
+          : dispatch(_loadStudentData(forUserId)).unwrap(),
+      ]);
+
+    return {
+      courses,
+      assignments,
+      sections,
+      students,
+      userData,
+    };
+  }
 
   return {
     loadCourses,
     loadAssignments,
     loadSections,
     loadStudentsInMyCourses,
+    loadAllEducationalData,
+    loadAllEducationalDataWithUserData,
     createCourse,
     updateCourse,
     deleteCourse,

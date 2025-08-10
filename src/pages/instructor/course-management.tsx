@@ -47,7 +47,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
   const { builtActivities } = useWithDocGoalsActivities();
 
-  // Determine if user is a student - either from prop or from login state
   const isStudent =
     userRole === EducationalRole.STUDENT ||
     loginState.user?.educationalRole === EducationalRole.STUDENT;
@@ -131,7 +130,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     });
   };
 
-  // Navigation handlers for deletion scenarios
   const handleCourseDeleted = () => {
     setViewState({
       view: 'dashboard',
@@ -161,6 +159,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       loginState.user._id,
       sectionCode
     );
+    await educationManagement.loadAllEducationalData(loginState.user._id);
     setIsJoinSectionModalOpen(false);
   };
 
@@ -187,7 +186,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         courseId,
         sectionId
       );
-
+      await educationManagement.loadAllEducationalData(loginState.user._id);
       setViewState({
         view: 'dashboard',
       });
@@ -227,7 +226,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       }}
     >
-      {/* Sidebar */}
       <Paper
         elevation={0}
         sx={{
@@ -298,7 +296,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
           </Button>
         )}
 
-        {/* Course Tree */}
         <Box>
           {treeData.length === 0 ? (
             <Box
@@ -343,7 +340,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         </Box>
       </Paper>
 
-      {/* Main Content Area */}
       <Box
         sx={{
           flex: 1,
@@ -359,7 +355,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
           handleAssignmentSelect={handleAssignmentSelect}
         />
 
-        {/* Content Area */}
         <Box
           sx={{
             flex: 1,

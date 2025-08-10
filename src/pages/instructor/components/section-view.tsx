@@ -192,7 +192,7 @@ const SectionView: React.FC<SectionViewProps> = ({
                   },
                 }}
               >
-                Remove from Section
+                Leave Section
               </Button>
             )}
           </Stack>

@@ -15,13 +15,7 @@ export async function useReduxHydration() {
   const dispatch = useAppDispatch();
   const { loadActivities, loadDocGoals, loadBuiltActivities } =
     useWithDocGoalsActivities();
-  const {
-    loadCourses,
-    loadAssignments,
-    loadSections,
-    loadStudentsInMyCourses,
-    loadUserEducationalData,
-  } = useWithEducationalManagement();
+  const { loadAllEducationalDataWithUserData } = useWithEducationalManagement();
 
   useEffect(() => {
     if (!userData) return;
@@ -30,11 +24,6 @@ export async function useReduxHydration() {
     loadActivities();
     loadBuiltActivities();
     loadDocGoals();
-    // TODO: merge these together into one query
-    loadCourses(userId);
-    loadAssignments(userId);
-    loadSections(userId);
-    loadStudentsInMyCourses(userId);
-    loadUserEducationalData(userId, educationalRole);
+    loadAllEducationalDataWithUserData(userId, educationalRole);
   }, [userData]);
 }
