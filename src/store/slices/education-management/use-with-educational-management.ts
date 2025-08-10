@@ -19,7 +19,13 @@ import {
   loadInstructorData as _loadInstructorData,
   loadStudentData as _loadStudentData,
 } from '.';
-import { Course, Assignment, Section, StudentData } from './types';
+import {
+  Course,
+  Assignment,
+  Section,
+  StudentData,
+  ActivityCompletion,
+} from './types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { EducationalRole } from '../../../types';
 import { useMemo } from 'react';
@@ -72,7 +78,7 @@ export interface UseWithEducationalManagement {
     courseId: string,
     sectionId: string,
     assignmentId: string,
-    progress: 'COMPLETE' | 'INCOMPLETE'
+    activityCompletions: ActivityCompletion[]
   ) => Promise<StudentData>;
   courses: Course[];
   assignments: Assignment[];
@@ -246,7 +252,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     courseId: string,
     sectionId: string,
     assignmentId: string,
-    progress: 'COMPLETE' | 'INCOMPLETE'
+    activityCompletions: ActivityCompletion[]
   ) {
     const res = await dispatch(
       _updateStudentAssignmentProgress({
@@ -254,7 +260,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         courseId,
         sectionId,
         assignmentId,
-        progress,
+        activityCompletions,
       })
     );
     return res.payload as StudentData;

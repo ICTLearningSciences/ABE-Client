@@ -18,7 +18,14 @@ import {
   createNewInstructor as _createNewInstructor,
   createNewStudent as _createNewStudent,
 } from './educational-api';
-import { Course, Assignment, Section, StudentData, Instructor } from './types';
+import {
+  Course,
+  Assignment,
+  Section,
+  StudentData,
+  Instructor,
+  ActivityCompletion,
+} from './types';
 
 export enum LoadStatus {
   NONE,
@@ -226,14 +233,14 @@ export const updateStudentAssignmentProgress = createAsyncThunk(
     courseId: string;
     sectionId: string;
     assignmentId: string;
-    progress: 'COMPLETE' | 'INCOMPLETE';
+    activityCompletions: ActivityCompletion[];
   }) => {
     return await _modifyStudentAssignmentProgress(
       params.targetUserId,
       params.courseId,
       params.sectionId,
       params.assignmentId,
-      params.progress
+      params.activityCompletions
     );
   }
 );

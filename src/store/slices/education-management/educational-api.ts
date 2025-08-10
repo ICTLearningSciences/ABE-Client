@@ -6,7 +6,14 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
 import { execGql } from '../../../hooks/api';
-import { Course, Assignment, Section, StudentData, Instructor } from './types';
+import {
+  Course,
+  Assignment,
+  Section,
+  StudentData,
+  Instructor,
+  ActivityCompletion,
+} from './types';
 
 // GraphQL query fragment for course data
 export const courseQueryData = `
@@ -49,7 +56,10 @@ export const studentDataQueryData = `
   name
   assignmentProgress {
     assignmentId
-    complete
+    activityCompletions {
+      activityId
+      complete
+    }
   }
 `;
 
@@ -289,14 +299,14 @@ export async function modifyStudentAssignmentProgress(
   courseId: string,
   sectionId: string,
   assignmentId: string,
-  progress: 'COMPLETE' | 'INCOMPLETE'
+  activityCompletions: ActivityCompletion[]
 ): Promise<StudentData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   const res = await execGql<StudentData>(
     {
       query: `
-mutation ModifyStudentAssignmentProgress($targetUserId: ID!, $courseId: ID!, $sectionId: ID!, $assignmentId: ID!, $progress: ModifyStudentAssignmentProgressInputType!) {
-          modifyStudentAssignmentProgress(targetUserId: $targetUserId, courseId: $courseId, sectionId: $sectionId, assignmentId: $assignmentId, progress: $progress) {
+        mutation ModifyStudentAssignmentProgress($targetUserId: ID!, $courseId: ID!, $sectionId: ID!, $assignmentId: ID!, $activityCompletions: [ActivityCompletionInputType!]!) {
+          modifyStudentAssignmentProgress(targetUserId: $targetUserId, courseId: $courseId, sectionId: $sectionId, assignmentId: $assignmentId, activityCompletions: $activityCompletions) {
             ${studentDataQueryData}
           }
         }
@@ -306,7 +316,7 @@ mutation ModifyStudentAssignmentProgress($targetUserId: ID!, $courseId: ID!, $se
         courseId,
         sectionId,
         assignmentId,
-        progress,
+        activityCompletions,
       },
     },
     {

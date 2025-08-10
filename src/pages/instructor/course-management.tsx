@@ -110,6 +110,18 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       console.error('Missing required view state for activity select');
       return;
     }
+    if (!loginState.user?._id) {
+      console.error('User not authenticated');
+      return;
+    }
+    // TODO: set student progress to complete for this activity
+    educationManagement.updateStudentAssignmentProgress(
+      loginState.user?._id,
+      viewState.selectedCourseId,
+      viewState.selectedSectionId,
+      viewState.selectedAssignmentId,
+      [{ activityId, complete: true }]
+    );
     setViewState({
       view: 'activity',
       selectedCourseId: viewState.selectedCourseId,

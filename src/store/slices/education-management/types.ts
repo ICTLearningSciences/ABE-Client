@@ -27,9 +27,14 @@ export interface Section {
   numOptionalAssignmentsRequired: number;
 }
 
+export interface ActivityCompletion {
+  activityId: string;
+  complete: boolean;
+}
+
 export interface AssignmentProgress {
   assignmentId: string;
-  complete: boolean;
+  activityCompletions: ActivityCompletion[];
 }
 
 export interface StudentData {
