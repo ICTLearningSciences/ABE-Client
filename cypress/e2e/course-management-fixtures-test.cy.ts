@@ -6,8 +6,8 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import { cyMockEducationalManagement } from '../helpers/educational-management-functions';
+import { EducationalRole } from '../fixtures/educational-management/educational-types';
 import { UserRole } from '../helpers/types';
-import { EducationalRole } from '../../src/types';
 
 describe('Course Management Fixtures Test', () => {
   it('Should load all fixtures without errors - Instructor', () => {

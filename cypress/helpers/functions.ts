@@ -18,10 +18,6 @@ import {
   storeUserDocResponse,
 } from '../fixtures/intentions/google-docs-intentions';
 import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
-import { analyzeHookResponse } from '../fixtures/stronger-hook-activity/analyze-hook-response';
-import { audienceEmotionsResponse } from '../fixtures/stronger-hook-activity/audience-emotion-response';
-import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
-import { entityFoundResponse } from '../fixtures/stronger-hook-activity/entity-found-response';
 import { updateUserInfoResponse } from '../fixtures/update-user-info';
 import { testUser } from '../fixtures/user-data';
 import { ACCESS_TOKEN_KEY } from './local-storage';

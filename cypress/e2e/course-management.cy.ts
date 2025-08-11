@@ -6,8 +6,8 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import { cyMockEducationalManagement } from '../helpers/educational-management-functions';
+import { EducationalRole } from '../fixtures/educational-management/educational-types';
 import { UserRole } from '../helpers/types';
-import { EducationalRole } from '../../src/types';
 import { mockGQL } from '../helpers/functions';
 import { createAssignmentResponse, deleteAssignmentResponse, newTestAssignment, updateAssignmentResponse, updatedTestAssignment } from '../fixtures/educational-management/assignment-operations';
 import { fetchCoursesResponseEmpty, fetchCoursesResponseStudent, removeFromSectionResponse, studentAfterRemoval, updatedTestSection, updateTestSectionWithAssignmentsResponse } from '../fixtures/educational-management';

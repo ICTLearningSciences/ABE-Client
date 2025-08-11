@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { CypressGlobal, cySetup, cyMockLogin, cyInterceptGraphQL, mockGQL } from './functions';
-import { UserRole } from './types';
+import { DocService, UserRole } from './types';
 import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
 import { fetchConfigResponse } from '../fixtures/fetch-config';
 import {
@@ -37,8 +37,14 @@ import {
   updateStudentProgressResponse,
 } from '../fixtures/educational-management';
 import { fetchBuiltActivitiesResponse } from '../fixtures/fetch-built-activities';
-import { EducationalRole } from '../../src/types';
+import { EducationalRole } from '../fixtures/educational-management/educational-types';
 import { MockGraphQLQuery } from './functions';
+import { gDocWithAllIntentions, storeUserDocResponse } from '../fixtures/intentions/google-docs-intentions';
+import { fetchGoogleDocsResponse } from '../fixtures/fetch-google-docs';
+import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
+import { fetchDocGoalsResponse } from '../fixtures/fetch-doc-goals';
+import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
+import { fetchPromptTemplates } from '../fixtures/fetch-prompt-templates';
 
 export interface EducationalMockOptions {
   gqlQueries?: MockGraphQLQuery[] | MockGraphQLQuery;
@@ -146,5 +152,20 @@ export function cyMockEducationalManagement(
     
     // Built Activities (for assignment activities)
     mockGQL('FetchBuiltActivities', fetchBuiltActivitiesResponse),
+
+
+    //
+    mockGQL('FetchVersionsById', fetchDocVersionsBuilder([])),
+    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.GOOGLE_DOCS)),
+    mockGQL('FetchPrompts', fetchPromptTemplates),
+    mockGQL('FetchConfig', fetchConfigResponse),
+    mockGQL('FetchDocGoals', fetchDocGoalsResponse),
+    mockGQL('FetchSystemPrompts', fetchConfigResponse),
+    mockGQL('StoreUserDoc', storeUserDocResponse(gDocWithAllIntentions)),
+    mockGQL('FetchActivities', fetchActivitiesResponse),
+    mockGQL('FetchBuiltActivities', fetchBuiltActivitiesResponse),
+    mockGQL('FetchBuiltActivityVersions', {fetchBuiltActivityVersions: {
+      edges: []
+    }}),
   ]);
 }

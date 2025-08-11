@@ -24,6 +24,8 @@ export async function useReduxHydration() {
     loadActivities();
     loadBuiltActivities();
     loadDocGoals();
-    loadAllEducationalDataWithUserData(userId, educationalRole);
+    if (educationalRole) {
+      loadAllEducationalDataWithUserData(userId, educationalRole);
+    }
   }, [userData]);
 }
