@@ -351,7 +351,6 @@ describe('Course Management', () => {
         gqlQueries: [
           mockGQL('FetchCourses', [
             fetchCoursesResponseEmpty,
-            fetchCoursesResponseEmpty,
             fetchCoursesResponseStudent
           ])
         ]
@@ -405,7 +404,6 @@ describe('Course Management', () => {
         educationalRole: EducationalRole.STUDENT,
         gqlQueries: [
           mockGQL('FetchCourses', [
-            fetchCoursesResponseStudent,
             fetchCoursesResponseStudent,
             fetchCoursesResponseEmpty,
           ]),
