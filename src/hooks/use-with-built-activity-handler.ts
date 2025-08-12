@@ -113,7 +113,7 @@ export function useWithBuiltActivityHandler(
       return;
     }
     updateStudentAssignmentProgress(
-      myEducationalData._id,
+      myEducationalData.userId,
       viewState.selectedCourseId,
       viewState.selectedSectionId,
       viewState.selectedAssignmentId,

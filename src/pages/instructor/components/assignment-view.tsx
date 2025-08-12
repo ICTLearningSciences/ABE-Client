@@ -14,9 +14,18 @@ import {
   Stack,
   Chip,
 } from '@mui/material';
-import { Edit as EditIcon } from '@mui/icons-material';
+import {
+  Edit as EditIcon,
+  CheckCircle,
+  RadioButtonUnchecked,
+} from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import { Assignment } from '../../../store/slices/education-management/types';
+import {
+  ActivityCompletion,
+  Assignment,
+  AssignmentProgress,
+  StudentData,
+} from '../../../store/slices/education-management/types';
 import AssignmentModal from './assignment-modal';
 import DeleteConfirmationModal from './delete-confirmation-modal';
 import AssignmentActivitiesDisplay from './assignment-activities-display';
@@ -60,6 +69,30 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   const availableActivities = builtActivities.filter(
     (activity) => !assignment?.activityIds.includes(activity._id)
   );
+
+  const getAssignmentCompletionStatus = () => {
+    if (!isStudentView || !assignment || !educationManagement.myData)
+      return false;
+    const studentData = educationManagement.myData as StudentData;
+    if (!studentData.assignmentProgress) return false;
+    const assignmentProgress = studentData.assignmentProgress.find(
+      (progress: AssignmentProgress) => progress.assignmentId === assignmentId
+    );
+    if (!assignmentProgress || !assignmentProgress.activityCompletions)
+      return false;
+
+    // Check if all activities in the assignment are completed
+    const completedActivityIds = assignmentProgress.activityCompletions
+      .filter((completion: ActivityCompletion) => completion.complete)
+      .map((completion: ActivityCompletion) => completion.activityId);
+
+    // Assignment is complete if all activity IDs are in the completed list
+    return assignment.activityIds.every((activityId) =>
+      completedActivityIds.includes(activityId)
+    );
+  };
+
+  const isAssignmentComplete = getAssignmentCompletionStatus();
 
   const handleEditAssignment = async (assignmentData: Partial<Assignment>) => {
     try {
@@ -157,6 +190,54 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                 >
                   {assignment.title}
                 </Typography>
+                {isStudentView && (
+                  <Box
+                    sx={{
+                      ml: 'auto',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                    }}
+                  >
+                    {isAssignmentComplete ? (
+                      <>
+                        <CheckCircle
+                          sx={{
+                            color: 'green',
+                            fontSize: '28px',
+                          }}
+                        />
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: 'green',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Complete
+                        </Typography>
+                      </>
+                    ) : (
+                      <>
+                        <RadioButtonUnchecked
+                          sx={{
+                            color: 'grey.400',
+                            fontSize: '28px',
+                          }}
+                        />
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: 'grey.400',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Incomplete
+                        </Typography>
+                      </>
+                    )}
+                  </Box>
+                )}
               </Stack>
 
               <Typography

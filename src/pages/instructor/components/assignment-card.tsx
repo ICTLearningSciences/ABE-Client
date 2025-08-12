@@ -51,7 +51,7 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
           color="text.secondary"
           sx={{ mb: 1.5, lineHeight: 1.4 }}
         >
-          {assignment.description} hello
+          {assignment.description}
         </Typography>
       </CardContent>
     </Card>

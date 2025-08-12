@@ -31,6 +31,7 @@ import {
   StudentData,
   ActivityCompletion,
   Instructor,
+  AssignmentProgress,
 } from './types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { EducationalRole } from '../../../types';
@@ -154,6 +155,7 @@ export interface UseWithEducationalManagement {
     activityId: string
   ) => Promise<void>;
   viewDashboard: () => Promise<void>;
+  haveICompletedActivity: (assignmentId: string, activityId: string) => boolean;
 }
 
 export interface SectionStudentsProgress {
@@ -522,6 +524,24 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     );
   }
 
+  function haveICompletedActivity(assignmentId: string, activityId: string) {
+    const studentData = myData as StudentData;
+    if (!studentData.assignmentProgress) return false;
+
+    const assignmentProgress = studentData.assignmentProgress.find(
+      (progress: AssignmentProgress) => progress.assignmentId === assignmentId
+    );
+
+    if (!assignmentProgress || !assignmentProgress.activityCompletions)
+      return false;
+
+    const activityCompletion = assignmentProgress.activityCompletions.find(
+      (completion: ActivityCompletion) => completion.activityId === activityId
+    );
+
+    return activityCompletion?.complete ?? false;
+  }
+
   return {
     loadCourses,
     loadAssignments,
@@ -547,6 +567,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     viewAssignment,
     viewActivity,
     viewDashboard,
+    haveICompletedActivity,
     courses,
     assignments,
     sections,

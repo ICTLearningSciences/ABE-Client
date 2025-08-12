@@ -10,9 +10,7 @@ import { Chat } from './chat/chat';
 import { UseWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-activity';
 import { DocGoalModal } from './doc-introduction/doc-goal-modal';
 import { useEffect, useState } from 'react';
-import { DocGoal } from '../../types';
-import { removeDuplicatesByField } from '../../helpers';
-import { ActivityBuilder } from '../activity-builder/types';
+import { useAppSelector } from '../../store/hooks';
 
 export function ChatActivity(props: {
   activityFromParams: string;
@@ -42,26 +40,13 @@ export function ChatActivity(props: {
   } = useCurrentGoalActivity;
 
   const [docGoalModalOpen, setDocGoalModalOpen] = useState(false);
-  const allActivities = getAllActivites(docGoals || []);
+  const builtActivities = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivities
+  );
   const [checkedUrlParams, setCheckedUrlParams] = useState<boolean>(false);
   function editDocGoal() {
     setDocGoalModalOpen(true);
     setPreviewingActivity(false);
-  }
-
-  /**
-   * Returns all activities from all goals, including orphaned prompts
-   */
-  function getAllActivites(docGoals: DocGoal[]): ActivityBuilder[] {
-    if (!docGoals.length) {
-      return [];
-    }
-    const _activities = docGoals.flatMap((goal) => goal.builtActivities || []);
-    const activities = removeDuplicatesByField<ActivityBuilder>(
-      _activities,
-      '_id'
-    );
-    return activities;
   }
 
   useEffect(() => {
@@ -75,7 +60,7 @@ export function ChatActivity(props: {
       return;
     }
     const goal = docGoals.find((goal) => goal._id === goalFromParams);
-    const activity = allActivities?.find(
+    const activity = builtActivities?.find(
       (activity) => activity?._id === activityFromParams
     );
     setGoalAndActivity(goal, activity);

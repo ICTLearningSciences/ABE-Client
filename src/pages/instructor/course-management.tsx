@@ -459,9 +459,14 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               />
             )}
 
-          {viewState.view === 'activity' && viewState.selectedActivityId && (
-            <ActivityView activityId={viewState.selectedActivityId} />
-          )}
+          {viewState.view === 'activity' &&
+            viewState.selectedActivityId &&
+            viewState.selectedAssignmentId && (
+              <ActivityView
+                activityId={viewState.selectedActivityId}
+                assignmentId={viewState.selectedAssignmentId}
+              />
+            )}
         </Box>
       </Box>
       <CourseModal
