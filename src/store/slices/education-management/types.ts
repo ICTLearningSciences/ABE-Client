@@ -62,3 +62,9 @@ export interface Instructor {
   courses: CourseData[];
   name: string;
 }
+
+export function isStudentData(
+  data: StudentData | Instructor
+): data is StudentData {
+  return 'assignmentProgress' in data;
+}

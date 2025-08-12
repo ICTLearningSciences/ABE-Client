@@ -30,7 +30,6 @@ export const assignmentQueryData = `
   title
   description
   activityIds
-  instructorId
 `;
 
 // GraphQL query fragment for section data
@@ -39,7 +38,6 @@ export const sectionQueryData = `
   title
   sectionCode
   description
-  instructorId
   assignments {
     assignmentId
     mandatory

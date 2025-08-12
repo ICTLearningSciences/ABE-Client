@@ -22,7 +22,7 @@ import {
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import {
   Assignment,
-  StudentData,
+  isStudentData,
 } from '../../../store/slices/education-management/types';
 import AssignmentModal from './assignment-modal';
 import DeleteConfirmationModal from './delete-confirmation-modal';
@@ -67,12 +67,16 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   );
 
   const activityIdToCompletionStatus = useMemo(() => {
-    if (!assignment || !educationManagement.myData) return {};
-    const assignmentProgress = (
-      educationManagement.myData as StudentData
-    ).assignmentProgress.find(
-      (progress) => progress.assignmentId === assignmentId
-    );
+    if (
+      !assignment ||
+      !educationManagement.myData ||
+      !isStudentData(educationManagement.myData)
+    )
+      return {};
+    const assignmentProgress =
+      educationManagement.myData.assignmentProgress.find(
+        (progress) => progress.assignmentId === assignmentId
+      );
     if (!assignmentProgress) return {};
     return assignmentProgress.activityCompletions.reduce(
       (acc, completion) => {
