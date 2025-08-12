@@ -140,6 +140,9 @@ function prepareActivityBuilder(
       console.log('edit doc goal');
     },
     DocService.GOOGLE_DOCS,
+    () => {
+      console.log('handle student activity complete');
+    },
     activityBuilderData
   );
 }

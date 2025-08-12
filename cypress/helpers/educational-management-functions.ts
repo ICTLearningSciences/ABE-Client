@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { CypressGlobal, cySetup, cyMockLogin, cyInterceptGraphQL, mockGQL } from './functions';
+import { CypressGlobal, cySetup, cyMockLogin, cyInterceptGraphQL, mockGQL, cyMockGoogleDoc } from './functions';
 import { DocService, UserRole } from './types';
 import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
 import { fetchConfigResponse } from '../fixtures/fetch-config';
@@ -73,6 +73,7 @@ export function cyMockEducationalManagement(
 
   cySetup(cy);
   cyMockLogin(cy);
+  cyMockGoogleDoc(cy);
 
   // Choose appropriate responses based on role and empty flags
   const coursesResponse = emptyCourses 

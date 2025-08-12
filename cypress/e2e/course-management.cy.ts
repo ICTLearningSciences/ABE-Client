@@ -470,6 +470,8 @@ describe('Course Management', () => {
       // Click on an activity
       cy.get('[data-cy=activity-item-my-editable-activity]').click();
       
+      cy.get('[data-cy=doc-list-item-Aliens]').click();
+
       // Verify the API request is made to update student progress
       cy.wait('@ModifyStudentAssignmentProgress').then((xhr) => {
         const data = xhr.request.body.variables;

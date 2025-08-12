@@ -8,8 +8,8 @@ import React, { useMemo } from 'react';
 import { Box, Typography, Breadcrumbs } from '@mui/material';
 import { NavigateNext } from '@mui/icons-material';
 import { UseWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import { CourseManagementState } from '../course-management';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
+import { CourseManagementState } from '../../../store/slices/education-management';
 
 export interface BreadcrumbItem {
   id: string;

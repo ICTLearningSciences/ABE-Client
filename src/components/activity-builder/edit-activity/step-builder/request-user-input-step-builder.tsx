@@ -433,6 +433,13 @@ export function RequestUserInputStepBuilder(props: {
             updateField('disableFreeInput', e);
           }}
         />
+        <CheckBoxInput
+          label="Set Student Activity Complete?"
+          value={step.setStudentActivityComplete ?? false}
+          onChange={(e) => {
+            updateField('setStudentActivityComplete', e);
+          }}
+        />
         <PredefinedResponsesUpdater
           width="100%"
           step={step}

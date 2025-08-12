@@ -16,6 +16,7 @@ import { ActivityBuilder } from '../components/activity-builder/types';
 import { equals } from '../helpers';
 import { getDocServiceFromLoginService } from '../types';
 import { useAppSelector } from '../store/hooks';
+import { useWithEducationalManagement } from '../store/slices/education-management/use-with-educational-management';
 
 export function useWithBuiltActivityHandler(
   resetActivityCounter: number,
@@ -30,6 +31,11 @@ export function useWithBuiltActivityHandler(
   const { executePromptSteps } = useWithExecutePrompt();
   const { addNewSubscriber, removeAllSubscribers } =
     useWithChatLogSubscribers();
+  const { myData: myEducationalData, updateStudentAssignmentProgress } =
+    useWithEducationalManagement();
+  const viewState = useAppSelector(
+    (state) => state.educationManagement.viewState
+  );
   const [builtActivityHandler, setBuiltActivityHandler] =
     useState<BuiltActivityHandler>();
   const updatesFound = !equals(
@@ -67,6 +73,7 @@ export function useWithBuiltActivityHandler(
         curDocId,
         editDocGoal,
         docService,
+        handleStudentActivityComplete,
         selectedActivityBuilder
       );
       newActivityHandler.initializeActivity();
@@ -94,6 +101,25 @@ export function useWithBuiltActivityHandler(
     newSession();
     builtActivityHandler.resetActivity();
   }, [resetActivityCounter]);
+
+  function handleStudentActivityComplete() {
+    if (
+      !myEducationalData ||
+      !viewState.selectedCourseId ||
+      !viewState.selectedSectionId ||
+      !viewState.selectedAssignmentId ||
+      !selectedActivityBuilder?._id
+    ) {
+      return;
+    }
+    updateStudentAssignmentProgress(
+      myEducationalData._id,
+      viewState.selectedCourseId,
+      viewState.selectedSectionId,
+      viewState.selectedAssignmentId,
+      [{ activityId: selectedActivityBuilder._id, complete: true }]
+    );
+  }
 
   function sendMessageHelper(msg: ChatMessageTypes, clearChat?: boolean) {
     sendMessage(msg, clearChat || false, curDocId);

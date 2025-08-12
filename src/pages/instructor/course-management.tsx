@@ -29,24 +29,23 @@ import { useAppSelector } from '../../store/hooks';
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
 
-export interface CourseManagementState {
-  view: 'dashboard' | 'course' | 'section' | 'assignment' | 'activity';
-  selectedCourseId?: string;
-  selectedSectionId?: string;
-  selectedAssignmentId?: string;
-  selectedActivityId?: string;
-}
-
 interface CourseManagementProps {
   userRole?: EducationalRole;
 }
 
 const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const educationManagement = useWithEducationalManagement();
+  const {
+    viewCourse,
+    viewSection,
+    viewAssignment,
+    viewActivity,
+    viewDashboard,
+  } = educationManagement;
   const { state: loginState } = useWithLogin();
-  const [viewState, setViewState] = useState<CourseManagementState>({
-    view: 'dashboard',
-  });
+  const viewState = useAppSelector(
+    (state) => state.educationManagement.viewState
+  );
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
   const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
   const { builtActivities } = useWithDocGoalsActivities();
@@ -69,10 +68,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     }
     try {
       const newCourse = await educationManagement.createCourse(courseData);
-      setViewState({
-        view: 'course',
-        selectedCourseId: newCourse._id,
-      });
+      viewCourse(newCourse._id);
       setIsCourseModalOpen(false);
     } catch (error) {
       console.error('Failed to create course:', error);
@@ -88,18 +84,11 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   };
 
   const handleCourseSelect = (courseId: string) => {
-    setViewState({
-      view: 'course',
-      selectedCourseId: courseId,
-    });
+    viewCourse(courseId);
   };
 
   const handleSectionSelect = (courseId: string, sectionId: string) => {
-    setViewState({
-      view: 'section',
-      selectedCourseId: courseId,
-      selectedSectionId: sectionId,
-    });
+    viewSection(courseId, sectionId);
   };
 
   const handleAssignmentSelect = (
@@ -107,12 +96,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     sectionId: string,
     assignmentId: string
   ) => {
-    setViewState({
-      view: 'assignment',
-      selectedCourseId: courseId,
-      selectedSectionId: sectionId,
-      selectedAssignmentId: assignmentId,
-    });
+    viewAssignment(courseId, sectionId, assignmentId);
   };
 
   const handleActivitySelect = (activityId: string) => {
@@ -124,46 +108,24 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       console.error('Missing required view state for activity select');
       return;
     }
-    if (!loginState.user?._id) {
-      console.error('User not authenticated');
-      return;
-    }
-    // TODO: set student progress to complete for this activity
-    educationManagement.updateStudentAssignmentProgress(
-      loginState.user?._id,
+    viewActivity(
       viewState.selectedCourseId,
       viewState.selectedSectionId,
       viewState.selectedAssignmentId,
-      [{ activityId, complete: true }]
+      activityId
     );
-    setViewState({
-      view: 'activity',
-      selectedCourseId: viewState.selectedCourseId,
-      selectedSectionId: viewState.selectedSectionId,
-      selectedAssignmentId: viewState.selectedAssignmentId,
-      selectedActivityId: activityId,
-    });
   };
 
   const handleCourseDeleted = () => {
-    setViewState({
-      view: 'dashboard',
-    });
+    viewDashboard();
   };
 
   const handleSectionDeleted = (courseId: string) => {
-    setViewState({
-      view: 'course',
-      selectedCourseId: courseId,
-    });
+    viewCourse(courseId);
   };
 
   const handleAssignmentDeleted = (courseId: string, sectionId: string) => {
-    setViewState({
-      view: 'section',
-      selectedCourseId: courseId,
-      selectedSectionId: sectionId,
-    });
+    viewSection(courseId, sectionId);
   };
 
   const handleJoinSection = async (sectionCode: string) => {
@@ -202,9 +164,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         sectionId
       );
       await educationManagement.loadAllEducationalData(loginState.user._id);
-      setViewState({
-        view: 'dashboard',
-      });
+      viewDashboard();
     } catch (error) {
       console.error('Failed to remove from section:', error);
     }

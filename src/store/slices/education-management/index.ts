@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   fetchCourses as _fetchCourses,
   fetchAssignments as _fetchAssignments,
@@ -37,6 +37,14 @@ export enum LoadStatus {
   FAILED,
 }
 
+export interface CourseManagementState {
+  view: 'dashboard' | 'course' | 'section' | 'assignment' | 'activity';
+  selectedCourseId?: string;
+  selectedSectionId?: string;
+  selectedAssignmentId?: string;
+  selectedActivityId?: string;
+}
+
 export interface State {
   courses: Course[];
   coursesLoadStatus: LoadStatus;
@@ -55,6 +63,7 @@ export interface State {
   educationalDataLoadStatus: LoadStatus;
   instructors: Instructor[];
   instructorsLoadStatus: LoadStatus;
+  viewState: CourseManagementState;
 }
 
 const initialState: State = {
@@ -75,6 +84,9 @@ const initialState: State = {
   educationalDataLoadStatus: LoadStatus.NONE,
   instructors: [],
   instructorsLoadStatus: LoadStatus.NONE,
+  viewState: {
+    view: 'dashboard',
+  },
 };
 
 export const fetchCourses = createAsyncThunk(
@@ -299,7 +311,11 @@ export const fetchInstructors = createAsyncThunk(
 export const educationManagementSlice = createSlice({
   name: 'educationManagement',
   initialState,
-  reducers: {},
+  reducers: {
+    setViewState: (state, action: PayloadAction<CourseManagementState>) => {
+      state.viewState = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchInstructors.pending, (state) => {
@@ -655,5 +671,7 @@ export const educationManagementSlice = createSlice({
       });
   },
 });
+
+export const { setViewState } = educationManagementSlice.actions;
 
 export default educationManagementSlice.reducer;

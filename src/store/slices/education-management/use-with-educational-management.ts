@@ -21,6 +21,8 @@ import {
   fetchInstructors as _fetchInstructors,
   shareCourseWithInstructor as _shareCourseWithInstructor,
   unshareCourseWithInstructor as _unshareCourseWithInstructor,
+  CourseManagementState,
+  setViewState,
 } from '.';
 import {
   Course,
@@ -107,6 +109,7 @@ export interface UseWithEducationalManagement {
   students: StudentData[];
   instructors: Instructor[];
   myData: StudentData | Instructor | undefined;
+  viewState: CourseManagementState;
   isLoading: boolean;
   isCourseModifying: boolean;
   courseModificationFailed: boolean;
@@ -137,6 +140,20 @@ export interface UseWithEducationalManagement {
     instructorId: string,
     courseId: string
   ) => Promise<Instructor>;
+  viewCourse: (courseId: string) => Promise<void>;
+  viewSection: (courseId: string, sectionId: string) => Promise<void>;
+  viewAssignment: (
+    courseId: string,
+    sectionId: string,
+    assignmentId: string
+  ) => Promise<void>;
+  viewActivity: (
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string
+  ) => Promise<void>;
+  viewDashboard: () => Promise<void>;
 }
 
 export interface SectionStudentsProgress {
@@ -190,6 +207,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     (state) =>
       state.educationManagement.instructorData ||
       state.educationManagement.studentData
+  );
+  const viewState = useAppSelector(
+    (state) => state.educationManagement.viewState
   );
 
   async function loadCourses(forUserId: string) {
@@ -452,6 +472,56 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as Instructor;
   }
 
+  async function viewDashboard() {
+    dispatch(setViewState({ view: 'dashboard' }));
+  }
+
+  async function viewCourse(courseId: string) {
+    dispatch(setViewState({ view: 'course', selectedCourseId: courseId }));
+  }
+
+  async function viewSection(courseId: string, sectionId: string) {
+    dispatch(
+      setViewState({
+        view: 'section',
+        selectedCourseId: courseId,
+        selectedSectionId: sectionId,
+      })
+    );
+  }
+
+  async function viewAssignment(
+    courseId: string,
+    sectionId: string,
+    assignmentId: string
+  ) {
+    dispatch(
+      setViewState({
+        view: 'assignment',
+        selectedCourseId: courseId,
+        selectedSectionId: sectionId,
+        selectedAssignmentId: assignmentId,
+      })
+    );
+  }
+
+  async function viewActivity(
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string
+  ) {
+    dispatch(
+      setViewState({
+        view: 'activity',
+        selectedCourseId: courseId,
+        selectedSectionId: sectionId,
+        selectedAssignmentId: assignmentId,
+        selectedActivityId: activityId,
+      })
+    );
+  }
+
   return {
     loadCourses,
     loadAssignments,
@@ -472,12 +542,18 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     removeStudentFromSection,
     updateStudentAssignmentProgress,
     loadInstructors,
+    viewCourse,
+    viewSection,
+    viewAssignment,
+    viewActivity,
+    viewDashboard,
     courses,
     assignments,
     sections,
     students,
     instructors,
     myData,
+    viewState,
     isLoading:
       coursesLoadingState === LoadStatus.LOADING ||
       assignmentsLoadingState === LoadStatus.LOADING ||
