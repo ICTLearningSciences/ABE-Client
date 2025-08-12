@@ -158,7 +158,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {mode === 'create'
-            ? 'Create a new assignment with activities and learning objectives. You can add activities later.'
+            ? 'Create a new assignment with activities and learning objectives. You can add activities after creating the assignment.'
             : 'Update the assignment information below.'}
         </Typography>
 
