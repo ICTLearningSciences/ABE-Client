@@ -6,26 +6,24 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { CourseOwnership, Instructor } from './educational-types';
 
-export const testInstructor: Instructor = {
-  _id: 'instructor-123',
-  userId: 'instructor-user-123',
+export const otherInstructor: Instructor = {
+  _id: 'instructor-456',
+  userId: 'instructor-user-456',
   courses: [
-    {
-      courseId: 'course-123',
-      ownership: CourseOwnership.OWNER
-    },
-    {
-      courseId: 'course-456',
-      ownership: CourseOwnership.OWNER
-    }
+    { courseId: 'course-456', ownership: CourseOwnership.SHARED }
   ],
-  name: 'Professor Smith'
+  name: 'Other Instructor'
 };
 
-export interface CreateNewInstructorResponse {
-  createNewInstructor: Instructor;
+
+export interface FetchInstructorsResponse {
+  fetchInstructors: Instructor[];
 }
 
-export const createNewInstructorResponse: CreateNewInstructorResponse = {
-  createNewInstructor: testInstructor
+export const fetchInstructorsResponseInstructor: FetchInstructorsResponse = {
+  fetchInstructors: [otherInstructor]
+};
+
+export const fetchInstructorsResponseEmpty: FetchInstructorsResponse = {
+  fetchInstructors: []
 };

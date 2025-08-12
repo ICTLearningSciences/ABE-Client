@@ -60,6 +60,13 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   );
 
   const handleCreateCourse = async (courseData: Partial<Course>) => {
+    if (
+      !loginState.user?._id ||
+      loginState.user?.educationalRole !== EducationalRole.INSTRUCTOR
+    ) {
+      console.error('User is not an instructor');
+      return;
+    }
     try {
       const newCourse = await educationManagement.createCourse(courseData);
       setViewState({

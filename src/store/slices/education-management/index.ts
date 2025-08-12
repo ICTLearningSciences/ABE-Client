@@ -27,6 +27,7 @@ import {
   StudentData,
   ActivityCompletion,
   Instructor,
+  CourseOwnership,
 } from './types';
 
 export enum LoadStatus {
@@ -427,6 +428,13 @@ export const educationManagementSlice = createSlice({
         state.courseModificationStatus = LoadStatus.SUCCEEDED;
         // Add the new course to the list
         state.courses.push(action.payload);
+        // Add the course to the instructor's courses
+        if (state.instructorData) {
+          state.instructorData.courses.push({
+            courseId: action.payload._id,
+            ownership: CourseOwnership.OWNER,
+          });
+        }
       })
       .addCase(createCourse.rejected, (state) => {
         state.courseModificationStatus = LoadStatus.FAILED;
