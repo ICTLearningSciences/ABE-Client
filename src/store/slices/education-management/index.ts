@@ -17,14 +17,16 @@ import {
   modifyStudentAssignmentProgress as _modifyStudentAssignmentProgress,
   createNewInstructor as _createNewInstructor,
   createNewStudent as _createNewStudent,
+  modifyCourseShareStatus as _modifyCourseShareStatus,
+  fetchInstructors as _fetchInstructors,
 } from './educational-api';
 import {
   Course,
   Assignment,
   Section,
   StudentData,
-  Instructor,
   ActivityCompletion,
+  Instructor,
 } from './types';
 
 export enum LoadStatus {
@@ -50,6 +52,8 @@ export interface State {
   instructorData?: Instructor;
   studentData?: StudentData;
   educationalDataLoadStatus: LoadStatus;
+  instructors: Instructor[];
+  instructorsLoadStatus: LoadStatus;
 }
 
 const initialState: State = {
@@ -68,6 +72,8 @@ const initialState: State = {
   instructorData: undefined,
   studentData: undefined,
   educationalDataLoadStatus: LoadStatus.NONE,
+  instructors: [],
+  instructorsLoadStatus: LoadStatus.NONE,
 };
 
 export const fetchCourses = createAsyncThunk(
@@ -259,6 +265,35 @@ export const loadStudentData = createAsyncThunk(
   }
 );
 
+export const shareCourseWithInstructor = createAsyncThunk(
+  'educationManagement/shareCourseWithInstructor',
+  async (params: { instructorId: string; courseId: string }) => {
+    return await _modifyCourseShareStatus(
+      params.instructorId,
+      params.courseId,
+      'SHARE'
+    );
+  }
+);
+
+export const unshareCourseWithInstructor = createAsyncThunk(
+  'educationManagement/unshareCourseWithInstructor',
+  async (params: { instructorId: string; courseId: string }) => {
+    return await _modifyCourseShareStatus(
+      params.instructorId,
+      params.courseId,
+      'UNSHARE'
+    );
+  }
+);
+
+export const fetchInstructors = createAsyncThunk(
+  'educationManagement/fetchInstructors',
+  async () => {
+    return await _fetchInstructors();
+  }
+);
+
 /** Reducer */
 export const educationManagementSlice = createSlice({
   name: 'educationManagement',
@@ -266,6 +301,58 @@ export const educationManagementSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchInstructors.pending, (state) => {
+        state.instructorsLoadStatus = LoadStatus.LOADING;
+      })
+      .addCase(fetchInstructors.fulfilled, (state, action) => {
+        state.instructors = action.payload;
+        state.instructorsLoadStatus = LoadStatus.SUCCEEDED;
+      })
+      .addCase(fetchInstructors.rejected, (state) => {
+        state.instructorsLoadStatus = LoadStatus.FAILED;
+      })
+
+      .addCase(shareCourseWithInstructor.pending, (state) => {
+        state.courseModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(shareCourseWithInstructor.fulfilled, (state, action) => {
+        state.courseModificationStatus = LoadStatus.SUCCEEDED;
+        // Update the instructor data in the instructors list
+        const instructorIndex = state.instructors.findIndex(
+          (i) => i.userId === action.payload.userId
+        );
+        if (instructorIndex >= 0) {
+          state.instructors[instructorIndex] = action.payload;
+        } else {
+          // If instructor not in list, add them
+          state.instructors.push(action.payload);
+        }
+      })
+      .addCase(shareCourseWithInstructor.rejected, (state) => {
+        state.courseModificationStatus = LoadStatus.FAILED;
+      })
+
+      .addCase(unshareCourseWithInstructor.pending, (state) => {
+        state.courseModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(unshareCourseWithInstructor.fulfilled, (state, action) => {
+        state.courseModificationStatus = LoadStatus.SUCCEEDED;
+        // Update the instructor data in the instructors list
+        const instructorIndex = state.instructors.findIndex(
+          (i) => i.userId === action.payload.userId
+        );
+        if (instructorIndex >= 0) {
+          state.instructors[instructorIndex] = action.payload;
+        } else {
+          // If instructor not in list, add them
+          state.instructors.push(action.payload);
+        }
+      })
+      .addCase(unshareCourseWithInstructor.rejected, (state) => {
+        state.courseModificationStatus = LoadStatus.FAILED;
+      })
+
+      // Instructor data loading
       .addCase(loadInstructorData.pending, (state) => {
         state.educationalDataLoadStatus = LoadStatus.LOADING;
       })

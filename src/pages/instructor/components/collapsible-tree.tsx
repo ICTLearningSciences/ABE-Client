@@ -20,8 +20,14 @@ export interface TreeItem {
   subItems?: TreeItem[];
 }
 
-interface CollapsibleTreeProps {
+export interface TreeSection {
+  id: string;
+  title: string;
   items: TreeItem[];
+}
+
+interface CollapsibleTreeProps {
+  sections: TreeSection[];
   selectedId?: string;
   className?: string;
   style?: React.CSSProperties;
@@ -34,6 +40,37 @@ interface TreeItemProps {
   expandedItems: Set<string>;
   onToggleExpand: (id: string) => void;
 }
+
+interface SectionHeaderProps {
+  title: string;
+}
+
+const SectionHeader: React.FC<SectionHeaderProps> = ({ title }) => {
+  return (
+    <Box
+      sx={{
+        py: 1.5,
+        px: 1,
+        borderBottom: 1,
+        borderColor: 'divider',
+        mb: 1,
+      }}
+    >
+      <Typography
+        variant="subtitle2"
+        sx={{
+          fontWeight: 600,
+          color: 'text.primary',
+          textTransform: 'uppercase',
+          fontSize: '11px',
+          letterSpacing: '0.5px',
+        }}
+      >
+        {title}
+      </Typography>
+    </Box>
+  );
+};
 
 const TreeItemComponent: React.FC<TreeItemProps> = ({
   item,
@@ -186,7 +223,7 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
 };
 
 const CollapsibleTree: React.FC<CollapsibleTreeProps> = ({
-  items,
+  sections,
   selectedId,
   className,
   style,
@@ -207,15 +244,21 @@ const CollapsibleTree: React.FC<CollapsibleTreeProps> = ({
 
   return (
     <Box className={className} sx={style}>
-      {items.map((item) => (
-        <TreeItemComponent
-          key={item.id}
-          item={item}
-          level={0}
-          selectedId={selectedId}
-          expandedItems={expandedItems}
-          onToggleExpand={handleToggleExpand}
-        />
+      {sections.map((section, sectionIndex) => (
+        <Box key={section.id}>
+          <SectionHeader title={section.title} />
+          {section.items.map((item) => (
+            <TreeItemComponent
+              key={item.id}
+              item={item}
+              level={0}
+              selectedId={selectedId}
+              expandedItems={expandedItems}
+              onToggleExpand={handleToggleExpand}
+            />
+          ))}
+          {sectionIndex < sections.length - 1 && <Box sx={{ mb: 2 }} />}
+        </Box>
       ))}
     </Box>
   );

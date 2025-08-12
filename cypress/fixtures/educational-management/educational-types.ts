@@ -56,11 +56,21 @@ export interface Course {
     assignmentProgress: AssignmentProgress[];
     name: string;
   }
+
+export enum CourseOwnership {
+  OWNER = "OWNER",
+  SHARED = "SHARED",
+}
+
+export interface CourseData {
+  courseId: string;
+  ownership: CourseOwnership;
+}
   
   export interface Instructor {
     _id: string;
     userId: string;
-    courseIds: string[];
+    courses: CourseData[];
     name: string;
   }
   

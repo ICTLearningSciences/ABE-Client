@@ -18,6 +18,9 @@ import {
   LoadStatus,
   loadInstructorData as _loadInstructorData,
   loadStudentData as _loadStudentData,
+  fetchInstructors as _fetchInstructors,
+  shareCourseWithInstructor as _shareCourseWithInstructor,
+  unshareCourseWithInstructor as _unshareCourseWithInstructor,
 } from '.';
 import {
   Course,
@@ -97,10 +100,13 @@ export interface UseWithEducationalManagement {
     assignmentId: string,
     activityCompletions: ActivityCompletion[]
   ) => Promise<StudentData>;
+  loadInstructors: () => Promise<Instructor[]>;
   courses: Course[];
   assignments: Assignment[];
   sections: Section[];
   students: StudentData[];
+  instructors: Instructor[];
+  myData: StudentData | Instructor | undefined;
   isLoading: boolean;
   isCourseModifying: boolean;
   courseModificationFailed: boolean;
@@ -123,6 +129,14 @@ export interface UseWithEducationalManagement {
     educationalRole: EducationalRole
   ) => void;
   allSectionsStudentsProgress: AllSectionsStudentsProgress;
+  shareCourseWithInstructor: (
+    instructorId: string,
+    courseId: string
+  ) => Promise<Instructor>;
+  unshareCourseWithInstructor: (
+    instructorId: string,
+    courseId: string
+  ) => Promise<Instructor>;
 }
 
 export interface SectionStudentsProgress {
@@ -168,6 +182,14 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   );
   const students = useAppSelector(
     (state) => state.educationManagement.students
+  );
+  const instructors = useAppSelector(
+    (state) => state.educationManagement.instructors
+  );
+  const myData = useAppSelector(
+    (state) =>
+      state.educationManagement.instructorData ||
+      state.educationManagement.studentData
   );
 
   async function loadCourses(forUserId: string) {
@@ -378,15 +400,21 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     educationalRole: EducationalRole
   ) {
     // Perform all fetches in parallel including user data
-    const [courses, assignments, sections, students, userData] =
+
+    const userData =
+      educationalRole === EducationalRole.INSTRUCTOR
+        ? await dispatch(_loadInstructorData(forUserId)).unwrap()
+        : await dispatch(_loadStudentData(forUserId)).unwrap();
+
+    const [courses, assignments, sections, students, instructors] =
       await Promise.all([
         dispatch(_fetchCourses(forUserId)).unwrap(),
         dispatch(_fetchAssignments(forUserId)).unwrap(),
         dispatch(_fetchSections(forUserId)).unwrap(),
         dispatch(_fetchStudentsInMyCourses(forUserId)).unwrap(),
         educationalRole === EducationalRole.INSTRUCTOR
-          ? dispatch(_loadInstructorData(forUserId)).unwrap()
-          : dispatch(_loadStudentData(forUserId)).unwrap(),
+          ? dispatch(_fetchInstructors()).unwrap()
+          : [],
       ]);
 
     return {
@@ -394,8 +422,34 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       assignments,
       sections,
       students,
+      instructors,
       userData,
     };
+  }
+
+  async function loadInstructors() {
+    const res = await dispatch(_fetchInstructors());
+    return res.payload as Instructor[];
+  }
+
+  async function shareCourseWithInstructor(
+    instructorId: string,
+    courseId: string
+  ) {
+    const res = await dispatch(
+      _shareCourseWithInstructor({ instructorId, courseId })
+    );
+    return res.payload as Instructor;
+  }
+
+  async function unshareCourseWithInstructor(
+    instructorId: string,
+    courseId: string
+  ) {
+    const res = await dispatch(
+      _unshareCourseWithInstructor({ instructorId, courseId })
+    );
+    return res.payload as Instructor;
   }
 
   return {
@@ -417,10 +471,13 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     enrollStudentInSection,
     removeStudentFromSection,
     updateStudentAssignmentProgress,
+    loadInstructors,
     courses,
     assignments,
     sections,
     students,
+    instructors,
+    myData,
     isLoading:
       coursesLoadingState === LoadStatus.LOADING ||
       assignmentsLoadingState === LoadStatus.LOADING ||
@@ -441,5 +498,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     getSectionForSectionId,
     getStudentsInSection,
     loadUserEducationalData,
+    shareCourseWithInstructor,
+    unshareCourseWithInstructor,
   };
 }

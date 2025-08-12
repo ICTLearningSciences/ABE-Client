@@ -67,7 +67,10 @@ export const studentDataQueryData = `
 export const instructorQueryData = `
   _id
   userId
-  courseIds
+  courses {
+    courseId
+    ownership
+  }
   name
 `;
 
@@ -327,7 +330,6 @@ export async function modifyStudentAssignmentProgress(
   return res;
 }
 
-// Create a new student
 export async function createNewStudent(userId: string): Promise<StudentData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   const res = await execGql<StudentData>(
@@ -351,7 +353,6 @@ export async function createNewStudent(userId: string): Promise<StudentData> {
   return res;
 }
 
-// Create a new instructor
 export async function createNewInstructor(userId: string): Promise<Instructor> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   const res = await execGql<Instructor>(
@@ -369,6 +370,57 @@ export async function createNewInstructor(userId: string): Promise<Instructor> {
     },
     {
       dataPath: 'createNewInstructor',
+      accessToken,
+    }
+  );
+  return res;
+}
+
+const courseShareStatusMutation = `
+mutation ModifyCourseShareStatus($instructorId: ID!, $courseId: ID!, $action: ShareCourseWithInstructorAction!) {
+  modifyCourseShareStatus(instructorId: $instructorId, courseId: $courseId, action: $action) {
+    ${instructorQueryData}
+  }
+}
+`;
+
+export async function modifyCourseShareStatus(
+  instructorId: string,
+  courseId: string,
+  action: 'SHARE' | 'UNSHARE'
+): Promise<Instructor> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Instructor>(
+    {
+      query: courseShareStatusMutation,
+      variables: {
+        instructorId: instructorId,
+        courseId: courseId,
+        action: action,
+      },
+    },
+    {
+      dataPath: 'modifyCourseShareStatus',
+      accessToken,
+    }
+  );
+  return res;
+}
+
+export async function fetchInstructors(): Promise<Instructor[]> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Instructor[]>(
+    {
+      query: `
+    query FetchInstructors {
+          fetchInstructors {
+            ${instructorQueryData}
+          }
+        }
+      `,
+    },
+    {
+      dataPath: 'fetchInstructors',
       accessToken,
     }
   );

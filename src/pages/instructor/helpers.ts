@@ -9,9 +9,12 @@ import {
   AssignmentProgress,
   Section,
   StudentData,
+  CourseOwnership,
+  Instructor,
+  Course,
 } from '../../store/slices/education-management/types';
 import { UseWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
-import { TreeItem } from './components/collapsible-tree';
+import { TreeItem, TreeSection } from './components/collapsible-tree';
 
 export const getSectionsForCourse = (
   educationManagement: UseWithEducationalManagement,
@@ -75,6 +78,86 @@ export function getCourseManagementTreeData(
       ),
     })
   );
+}
+
+export function getCourseManagementSectionedTreeData(
+  educationManagement: UseWithEducationalManagement,
+  handleCourseSelect: (courseId: string) => void,
+  handleSectionSelect: (courseId: string, sectionId: string) => void,
+  handleAssignmentSelect: (
+    courseId: string,
+    sectionId: string,
+    assignmentId: string
+  ) => void,
+  currentInstructor?: Instructor
+): TreeSection[] {
+  if (!currentInstructor) {
+    return [];
+  }
+
+  const createCourseTreeItem = (course: Course): TreeItem => ({
+    id: course._id,
+    icon: '📚',
+    title: course.title,
+    onClick: () => handleCourseSelect(course._id),
+    subItems: getSectionsForCourse(educationManagement, course._id).map(
+      (section): TreeItem => ({
+        id: section._id,
+        icon: '📑',
+        title: section.title,
+        onClick: () => handleSectionSelect(course._id, section._id),
+        subItems: getAssignmentsForSection(
+          educationManagement,
+          section._id
+        ).map(
+          (assignment): TreeItem => ({
+            id: assignment._id,
+            icon: '📝',
+            title: assignment.title,
+            onClick: () =>
+              handleAssignmentSelect(course._id, section._id, assignment._id),
+          })
+        ),
+      })
+    ),
+  });
+
+  // Separate owned and shared courses
+  const ownedCourseIds = currentInstructor.courses
+    .filter((courseData) => courseData.ownership === CourseOwnership.OWNER)
+    .map((courseData) => courseData.courseId);
+
+  const sharedCourseIds = currentInstructor.courses
+    .filter((courseData) => courseData.ownership === CourseOwnership.SHARED)
+    .map((courseData) => courseData.courseId);
+
+  const ownedCourses = educationManagement.courses
+    .filter((course) => ownedCourseIds.includes(course._id))
+    .map(createCourseTreeItem);
+
+  const sharedCourses = educationManagement.courses
+    .filter((course) => sharedCourseIds.includes(course._id))
+    .map(createCourseTreeItem);
+
+  const sections: TreeSection[] = [];
+
+  if (ownedCourses.length > 0) {
+    sections.push({
+      id: 'my-courses',
+      title: 'My Courses',
+      items: ownedCourses,
+    });
+  }
+
+  if (sharedCourses.length > 0) {
+    sections.push({
+      id: 'shared-courses',
+      title: 'Courses Shared with Me',
+      items: sharedCourses,
+    });
+  }
+
+  return sections;
 }
 
 export interface CompletedAssignmentDict {

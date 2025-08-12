@@ -11,18 +11,21 @@ import {
   Button,
   Card,
   CardContent,
-  Grid,
   Stack,
+  Tabs,
+  Tab,
 } from '@mui/material';
-import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
+import { Edit as EditIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import {
   Course,
-  Section,
+  CourseOwnership,
 } from '../../../store/slices/education-management/types';
 import CourseModal from './course-modal';
-import SectionModal from './section-modal';
 import DeleteConfirmationModal from './delete-confirmation-modal';
+import CourseContent from './course-content';
+import CourseSharedInstructors from './course-shared-instructors';
+import { useAppSelector } from '../../../store/hooks';
 
 interface CourseViewProps {
   courseId: string;
@@ -41,10 +44,13 @@ const CourseView: React.FC<CourseViewProps> = ({
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(startWithEditModal);
-  const [showSectionModal, setShowSectionModal] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
   const course = educationManagement.courses.find((c) => c._id === courseId);
-  const courseSections = educationManagement.sections.filter(
-    (section) => course?.sectionIds.includes(section._id)
+  const myInstructorData = useAppSelector(
+    (state) => state.educationManagement.instructorData
+  );
+  const ownsThisCourse = myInstructorData?.courses.some(
+    (c) => c.courseId === courseId && c.ownership === CourseOwnership.OWNER
   );
 
   const handleEditCourse = async (courseData: Partial<Course>) => {
@@ -56,23 +62,6 @@ const CourseView: React.FC<CourseViewProps> = ({
     }
   };
 
-  const handleAddSection = async (sectionData: Partial<Section>) => {
-    try {
-      await educationManagement.createSection(courseId, sectionData);
-      setShowSectionModal(false);
-    } catch (error) {
-      console.error('Failed to create section:', error);
-    }
-  };
-
-  const handleOpenSectionModal = () => {
-    setShowSectionModal(true);
-  };
-
-  const handleCloseSectionModal = () => {
-    setShowSectionModal(false);
-  };
-
   const handleDeleteCourse = async () => {
     try {
       await educationManagement.deleteCourse(courseId);
@@ -80,6 +69,10 @@ const CourseView: React.FC<CourseViewProps> = ({
     } catch (error) {
       console.error('Failed to delete course:', error);
     }
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setSelectedTab(newValue);
   };
 
   if (!course) {
@@ -138,7 +131,7 @@ const CourseView: React.FC<CourseViewProps> = ({
                 {course.description}
               </Typography>
             </Box>
-            {!isStudentView && (
+            {!isStudentView && ownsThisCourse && (
               <>
                 <Button
                   variant="outlined"
@@ -168,144 +161,56 @@ const CourseView: React.FC<CourseViewProps> = ({
         </CardContent>
       </Card>
 
-      {/* Sections */}
-      <Box>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ mb: 2.5 }}
-        >
-          <Typography
-            variant="h5"
-            sx={{ fontWeight: 600, color: 'text.primary' }}
-          >
-            Sections
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {courseSections.length} section
-            {courseSections.length !== 1 ? 's' : ''}
-          </Typography>
-        </Stack>
-
-        {!isStudentView && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleOpenSectionModal}
-            disabled={educationManagement.isSectionModifying}
-            fullWidth
-            data-cy="add-section-button"
+      {/* Course Tabs - Only visible to instructors who own the course */}
+      {!isStudentView && ownsThisCourse ? (
+        <Box>
+          <Tabs
+            value={selectedTab}
+            onChange={handleTabChange}
             sx={{
-              py: 2,
+              borderBottom: 1,
+              borderColor: 'divider',
               mb: 3,
-              backgroundColor: '#1B6A9C',
-              '&:hover': {
-                backgroundColor: '#145a87',
+              '& .MuiTab-root': {
+                color: '#666',
+                '&.Mui-selected': {
+                  color: '#1B6A9C',
+                },
+              },
+              '& .MuiTabs-indicator': {
+                backgroundColor: '#1B6A9C',
               },
             }}
           >
-            Add Section
-          </Button>
-        )}
+            <Tab label="Content" />
+            <Tab label="Share Course" />
+          </Tabs>
 
-        {courseSections.length === 0 ? (
-          <Card
-            variant="outlined"
-            sx={{
-              border: '2px dashed',
-              borderColor: 'grey.300',
-              textAlign: 'center',
-              py: 5,
-              px: 2.5,
-            }}
-          >
-            <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
-              📑
-            </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-              No sections yet
-            </Typography>
-            <Typography variant="body2" color="text.disabled">
-              Add your first section to organize course content
-            </Typography>
-          </Card>
-        ) : (
-          <Grid container spacing={2}>
-            {courseSections.map((section) => (
-              <Grid item xs={12} key={section._id}>
-                <Card
-                  variant="outlined"
-                  data-cy={`section-card-${section._id}`}
-                  sx={{
-                    cursor: onSectionSelect ? 'pointer' : 'default',
-                    transition: 'all 0.2s ease',
-                    '&:hover': onSectionSelect
-                      ? {
-                          borderColor: '#1B6A9C',
-                          boxShadow: 2,
-                        }
-                      : {},
-                  }}
-                  onClick={() => onSectionSelect?.(section._id)}
-                >
-                  <CardContent>
-                    <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                      <Typography sx={{ fontSize: '20px', mr: 1.5 }}>
-                        📑
-                      </Typography>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          color: '#1B6A9C',
-                          fontWeight: 600,
-                          fontSize: '1rem',
-                        }}
-                      >
-                        {section.title}
-                      </Typography>
-                    </Stack>
+          {selectedTab === 0 && (
+            <CourseContent
+              courseId={courseId}
+              onSectionSelect={onSectionSelect}
+            />
+          )}
 
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 1.5, lineHeight: 1.4 }}
-                    >
-                      {section.description}
-                    </Typography>
-
-                    <Typography variant="caption" color="text.disabled">
-                      Section Code: {section.sectionCode} •{' '}
-                      {section.assignments.length} assignment
-                      {section.assignments.length !== 1 ? 's' : ''}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        )}
-      </Box>
-
-      <>
-        <CourseModal
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          onSubmit={handleEditCourse}
-          mode="edit"
-          initialData={course}
-          isLoading={educationManagement.isCourseModifying}
+          {selectedTab === 1 && <CourseSharedInstructors courseId={courseId} />}
+        </Box>
+      ) : (
+        <CourseContent
+          courseId={courseId}
+          onSectionSelect={onSectionSelect}
+          isStudentView={isStudentView}
         />
+      )}
 
-        {/* Add Section Modal */}
-        <SectionModal
-          isOpen={showSectionModal}
-          onClose={handleCloseSectionModal}
-          onSubmit={handleAddSection}
-          mode="create"
-          isLoading={educationManagement.isSectionModifying}
-        />
-      </>
+      <CourseModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onSubmit={handleEditCourse}
+        mode="edit"
+        initialData={course}
+        isLoading={educationManagement.isCourseModifying}
+      />
     </Box>
   );
 };

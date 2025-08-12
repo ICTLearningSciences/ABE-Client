@@ -8,19 +8,23 @@ import React, { useState, useMemo } from 'react';
 import { Box, Typography, Button, Paper } from '@mui/material';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
-import CollapsibleTree, { TreeItem } from './components/collapsible-tree';
+import CollapsibleTree, { TreeSection } from './components/collapsible-tree';
 import CourseView from './components/course-view';
 import SectionView from './components/section-view';
 import AssignmentView from './components/assignment-view';
 import BreadcrumbNavigation from './components/breadcrumb-navigation';
 import CourseModal from './components/course-modal';
 import JoinSectionModal from './components/join-section-modal';
-import { getCourseManagementTreeData } from './helpers';
+import {
+  getCourseManagementTreeData,
+  getCourseManagementSectionedTreeData,
+} from './helpers';
 import { Course } from '../../store/slices/education-management/types';
 import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { EducationalRole } from '../../types';
 import withAuthorizationOnly from '../../hooks/wrap-with-authorization-only';
 import { ActivityView } from './components/activity-view';
+import { useAppSelector } from '../../store/hooks';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -50,6 +54,10 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const isStudent =
     userRole === EducationalRole.STUDENT ||
     loginState.user?.educationalRole === EducationalRole.STUDENT;
+
+  const myInstructorData = useAppSelector(
+    (state) => state.educationManagement.instructorData
+  );
 
   const handleCreateCourse = async (courseData: Partial<Course>) => {
     try {
@@ -195,17 +203,39 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     }
   };
 
-  const treeData: TreeItem[] = useMemo(() => {
-    return getCourseManagementTreeData(
+  const treeSections: TreeSection[] = useMemo(() => {
+    // For students, use the original function with all courses in one section
+    if (isStudent) {
+      const treeItems = getCourseManagementTreeData(
+        educationManagement,
+        handleCourseSelect,
+        handleSectionSelect,
+        handleAssignmentSelect
+      );
+      return [
+        {
+          id: 'my-courses',
+          title: 'My Courses',
+          items: treeItems,
+        },
+      ];
+    }
+
+    // For instructors, use the new sectioned function
+    return getCourseManagementSectionedTreeData(
       educationManagement,
       handleCourseSelect,
       handleSectionSelect,
-      handleAssignmentSelect
+      handleAssignmentSelect,
+      myInstructorData
     );
   }, [
     educationManagement.courses,
     educationManagement.sections,
     educationManagement.assignments,
+    educationManagement.instructors,
+    myInstructorData,
+    isStudent,
   ]);
 
   const getSelectedId = (): string | undefined => {
@@ -304,7 +334,8 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         )}
 
         <Box>
-          {treeData.length === 0 ? (
+          {treeSections.length === 0 ||
+          treeSections.every((section) => section.items.length === 0) ? (
             <Box
               sx={{
                 textAlign: 'center',
@@ -342,7 +373,10 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               </Typography>
             </Box>
           ) : (
-            <CollapsibleTree items={treeData} selectedId={getSelectedId()} />
+            <CollapsibleTree
+              sections={treeSections}
+              selectedId={getSelectedId()}
+            />
           )}
         </Box>
       </Paper>
