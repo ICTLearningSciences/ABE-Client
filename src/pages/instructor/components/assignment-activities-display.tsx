@@ -20,7 +20,11 @@ import {
   IconButton,
 } from '@mui/material';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import { Add as AddIcon } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  CheckCircle,
+  RadioButtonUnchecked,
+} from '@mui/icons-material';
 import { ActivityBuilder } from '../../../components/activity-builder/types';
 import { Assignment } from '../../../store/slices/education-management/types';
 
@@ -33,6 +37,7 @@ interface AssignmentActivitiesDisplayProps {
   onAddActivity: (activityId: string) => Promise<void>;
   onRemoveActivity: (activityId: string) => Promise<void>;
   onActivitySelect: (activityId: string) => void;
+  activityIdToCompletionStatus: Record<string, boolean>;
 }
 
 const AssignmentActivitiesDisplay: React.FC<
@@ -46,6 +51,7 @@ const AssignmentActivitiesDisplay: React.FC<
   onAddActivity,
   onRemoveActivity,
   onActivitySelect,
+  activityIdToCompletionStatus,
 }) => {
   const [selectedActivityId, setSelectedActivityId] = useState<string>('');
 
@@ -169,6 +175,7 @@ const AssignmentActivitiesDisplay: React.FC<
         <Grid container spacing={2}>
           {assignment.activityIds.map((activityId) => {
             const activity = builtActivities.find((a) => a._id === activityId);
+            const isComplete = activityIdToCompletionStatus[activityId];
             return (
               <Grid item xs={12} key={activityId}>
                 <Card variant="outlined">
@@ -195,6 +202,10 @@ const AssignmentActivitiesDisplay: React.FC<
                       >
                         {activity?.title || `Activity ${activityId}`}
                       </Typography>
+                      {isComplete && <CheckCircle sx={{ color: 'green' }} />}
+                      {!isComplete && (
+                        <RadioButtonUnchecked sx={{ color: 'grey' }} />
+                      )}
                       {!isStudentView && (
                         <IconButton
                           onClick={() => handleRemoveActivity(activityId)}

@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Box,
   Typography,
@@ -21,9 +21,7 @@ import {
 } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import {
-  ActivityCompletion,
   Assignment,
-  AssignmentProgress,
   StudentData,
 } from '../../../store/slices/education-management/types';
 import AssignmentModal from './assignment-modal';
@@ -59,40 +57,38 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
     ? educationManagement.sections.find((s) => s._id === sectionId)
     : null;
 
-  // Get mandatory status if assignment is part of a section
   const sectionAssignment = section?.assignments.find(
     (sa) => sa.assignmentId === assignmentId
   );
   const isMandatory = sectionAssignment?.mandatory ?? false;
 
-  // Filter out activities that are already in the assignment
   const availableActivities = builtActivities.filter(
     (activity) => !assignment?.activityIds.includes(activity._id)
   );
 
-  const getAssignmentCompletionStatus = () => {
-    if (!isStudentView || !assignment || !educationManagement.myData)
-      return false;
-    const studentData = educationManagement.myData as StudentData;
-    if (!studentData.assignmentProgress) return false;
-    const assignmentProgress = studentData.assignmentProgress.find(
-      (progress: AssignmentProgress) => progress.assignmentId === assignmentId
+  const activityIdToCompletionStatus = useMemo(() => {
+    if (!assignment || !educationManagement.myData) return {};
+    const assignmentProgress = (
+      educationManagement.myData as StudentData
+    ).assignmentProgress.find(
+      (progress) => progress.assignmentId === assignmentId
     );
-    if (!assignmentProgress || !assignmentProgress.activityCompletions)
-      return false;
-
-    // Check if all activities in the assignment are completed
-    const completedActivityIds = assignmentProgress.activityCompletions
-      .filter((completion: ActivityCompletion) => completion.complete)
-      .map((completion: ActivityCompletion) => completion.activityId);
-
-    // Assignment is complete if all activity IDs are in the completed list
-    return assignment.activityIds.every((activityId) =>
-      completedActivityIds.includes(activityId)
+    if (!assignmentProgress) return {};
+    return assignmentProgress.activityCompletions.reduce(
+      (acc, completion) => {
+        acc[completion.activityId] = completion.complete;
+        return acc;
+      },
+      {} as Record<string, boolean>
     );
-  };
+  }, [assignment, educationManagement.myData]);
 
-  const isAssignmentComplete = getAssignmentCompletionStatus();
+  const isAssignmentComplete = useMemo(() => {
+    if (!activityIdToCompletionStatus) return false;
+    return Object.values(activityIdToCompletionStatus).every(
+      (complete) => complete
+    );
+  }, [activityIdToCompletionStatus]);
 
   const handleEditAssignment = async (assignmentData: Partial<Assignment>) => {
     try {
@@ -214,7 +210,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                             fontWeight: 500,
                           }}
                         >
-                          Complete
+                          All Activities Complete
                         </Typography>
                       </>
                     ) : (
@@ -232,7 +228,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                             fontWeight: 500,
                           }}
                         >
-                          Incomplete
+                          Complete All Activities
                         </Typography>
                       </>
                     )}
@@ -309,6 +305,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
         onAddActivity={handleAddActivity}
         onRemoveActivity={handleRemoveActivity}
         onActivitySelect={onActivitySelect}
+        activityIdToCompletionStatus={activityIdToCompletionStatus}
       />
 
       {!isStudentView && (
