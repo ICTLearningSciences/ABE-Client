@@ -23,6 +23,7 @@ import SectionModal from './section-modal';
 import DeleteConfirmationModal from './delete-confirmation-modal';
 import SectionContent from './section-content';
 import SectionStudentsGrades from './section-students-grades';
+import BannedStudents from './banned-students';
 
 interface SectionViewProps {
   sectionId: string;
@@ -224,6 +225,7 @@ const SectionView: React.FC<SectionViewProps> = ({
           >
             <Tab label="Section Content" />
             <Tab label="Students and Grades" />
+            <Tab label="Banned Students" />
           </Tabs>
 
           {selectedTab === 0 && (
@@ -240,6 +242,13 @@ const SectionView: React.FC<SectionViewProps> = ({
               sectionStudentsProgress={currentSectionStudentsProgress}
               section={section}
               assignments={educationManagement.assignments}
+            />
+          )}
+
+          {selectedTab === 2 && (
+            <BannedStudents
+              section={section}
+              students={educationManagement.students}
             />
           )}
         </Box>

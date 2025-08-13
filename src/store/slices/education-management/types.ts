@@ -23,6 +23,7 @@ export interface Section {
   title: string;
   sectionCode: string;
   description: string;
+  bannedStudentUserIds: string[];
   assignments: SectionAssignment[];
   numOptionalAssignmentsRequired: number;
 }

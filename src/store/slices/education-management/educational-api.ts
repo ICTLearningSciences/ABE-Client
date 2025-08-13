@@ -38,6 +38,7 @@ export const sectionQueryData = `
   title
   sectionCode
   description
+  bannedStudentUserIds
   assignments {
     assignmentId
     mandatory
@@ -419,6 +420,38 @@ export async function fetchInstructors(): Promise<Instructor[]> {
     },
     {
       dataPath: 'fetchInstructors',
+      accessToken,
+    }
+  );
+  return res;
+}
+
+export enum BanStudentFromSectionAction {
+  BAN = 'BAN',
+  UNBAN = 'UNBAN',
+}
+
+export async function modifyStudentBanInSection(
+  sectionId: string,
+  studentId: string,
+  action: BanStudentFromSectionAction
+): Promise<Section> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Section>(
+    {
+      query: `mutation ModifyStudentBanInSection($sectionId: ID!, $studentId: ID!, $action: BanStudentFromSectionAction!) {
+          modifyStudentBanInSection(sectionId: $sectionId, studentId: $studentId, action: $action) {
+            ${sectionQueryData}
+          }
+        }`,
+      variables: {
+        sectionId,
+        studentId,
+        action,
+      },
+    },
+    {
+      dataPath: 'modifyStudentBanInSection',
       accessToken,
     }
   );

@@ -23,6 +23,8 @@ import {
   unshareCourseWithInstructor as _unshareCourseWithInstructor,
   CourseManagementState,
   setViewState,
+  banStudentFromSection as _banStudentFromSection,
+  unbanStudentFromSection as _unbanStudentFromSection,
 } from '.';
 import {
   Course,
@@ -156,6 +158,14 @@ export interface UseWithEducationalManagement {
   ) => Promise<void>;
   viewDashboard: () => Promise<void>;
   haveICompletedActivity: (assignmentId: string, activityId: string) => boolean;
+  banStudentFromSection: (
+    sectionId: string,
+    studentId: string
+  ) => Promise<Section>;
+  unbanStudentFromSection: (
+    sectionId: string,
+    studentId: string
+  ) => Promise<Section>;
 }
 
 export interface SectionStudentsProgress {
@@ -542,6 +552,20 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return activityCompletion?.complete ?? false;
   }
 
+  async function banStudentFromSection(sectionId: string, studentId: string) {
+    const res = await dispatch(
+      _banStudentFromSection({ sectionId, studentId })
+    );
+    return res.payload as Section;
+  }
+
+  async function unbanStudentFromSection(sectionId: string, studentId: string) {
+    const res = await dispatch(
+      _unbanStudentFromSection({ sectionId, studentId })
+    );
+    return res.payload as Section;
+  }
+
   return {
     loadCourses,
     loadAssignments,
@@ -597,5 +621,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     loadUserEducationalData,
     shareCourseWithInstructor,
     unshareCourseWithInstructor,
+    banStudentFromSection,
+    unbanStudentFromSection,
   };
 }

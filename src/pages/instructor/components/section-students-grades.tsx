@@ -18,19 +18,24 @@ import {
   Chip,
   IconButton,
   Divider,
+  Button,
 } from '@mui/material';
 import {
   Person as PersonIcon,
   Close as CloseIcon,
   CheckCircle as CheckCircleIcon,
   RadioButtonUnchecked as UncheckedIcon,
+  Block as BanIcon,
 } from '@mui/icons-material';
 import {
   Section,
   StudentData,
   Assignment,
 } from '../../../store/slices/education-management/types';
-import { SectionStudentsProgress } from '../../../store/slices/education-management/use-with-educational-management';
+import {
+  SectionStudentsProgress,
+  useWithEducationalManagement,
+} from '../../../store/slices/education-management/use-with-educational-management';
 import { getAssignmentsInSection } from '../helpers';
 
 interface SectionStudentsGradesProps {
@@ -44,6 +49,7 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
   section,
   assignments,
 }) => {
+  const educationManagement = useWithEducationalManagement();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentData | null>(
     null
@@ -73,6 +79,19 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
     setSelectedStudent(null);
+  };
+
+  const handleBanStudent = async (studentUserId: string) => {
+    try {
+      await educationManagement.banStudentFromSection(
+        section._id,
+        studentUserId
+      );
+      setDrawerOpen(false);
+      setSelectedStudent(null);
+    } catch (error) {
+      console.error('Failed to ban student:', error);
+    }
   };
 
   if (Object.keys(sectionStudentsProgress).length === 0) {
@@ -412,6 +431,28 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
                 </List>
               </>
             )}
+
+            <Divider sx={{ mb: 3 }} />
+
+            {/* Ban Student Section */}
+            <Box sx={{ mb: 3, textAlign: 'center' }}>
+              <Button
+                variant="contained"
+                startIcon={<BanIcon />}
+                onClick={() => handleBanStudent(selectedStudent.userId)}
+                disabled={educationManagement.isSectionModifying}
+                sx={{
+                  backgroundColor: '#d32f2f',
+                  '&:hover': {
+                    backgroundColor: '#c62828',
+                  },
+                  fontWeight: 600,
+                  px: 3,
+                }}
+              >
+                BAN STUDENT
+              </Button>
+            </Box>
           </Box>
         )}
       </Drawer>

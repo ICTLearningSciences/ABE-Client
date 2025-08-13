@@ -19,6 +19,8 @@ import {
   createNewStudent as _createNewStudent,
   modifyCourseShareStatus as _modifyCourseShareStatus,
   fetchInstructors as _fetchInstructors,
+  modifyStudentBanInSection as _modifyStudentBanInSection,
+  BanStudentFromSectionAction,
 } from './educational-api';
 import {
   Course,
@@ -307,6 +309,35 @@ export const fetchInstructors = createAsyncThunk(
   }
 );
 
+export const banStudentFromSection = createAsyncThunk(
+  'educationManagement/banStudentFromSection',
+  async (params: { sectionId: string; studentId: string }) => {
+    const updatedSection = await _modifyStudentBanInSection(
+      params.sectionId,
+      params.studentId,
+      BanStudentFromSectionAction.BAN
+    );
+    return {
+      section: updatedSection,
+      bannedStudentId: params.studentId,
+    };
+  }
+);
+export const unbanStudentFromSection = createAsyncThunk(
+  'educationManagement/unbanStudentFromSection',
+  async (params: { sectionId: string; studentId: string }) => {
+    const updatedSection = await _modifyStudentBanInSection(
+      params.sectionId,
+      params.studentId,
+      BanStudentFromSectionAction.UNBAN
+    );
+    return {
+      section: updatedSection,
+      bannedStudentId: params.studentId,
+    };
+  }
+);
+
 /** Reducer */
 export const educationManagementSlice = createSlice({
   name: 'educationManagement',
@@ -318,6 +349,48 @@ export const educationManagementSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(banStudentFromSection.pending, (state) => {
+        state.sectionModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(banStudentFromSection.fulfilled, (state, action) => {
+        state.sectionModificationStatus = LoadStatus.SUCCEEDED;
+        const sectionIndex = state.sections.findIndex(
+          (s) => s._id === action.payload.section._id
+        );
+        if (sectionIndex >= 0) {
+          state.sections[sectionIndex] = action.payload.section;
+        }
+
+        const bannedStudentId = action.payload.bannedStudentId;
+        const studentIndex = state.students.findIndex(
+          (s) => s.userId === bannedStudentId
+        );
+        if (studentIndex >= 0) {
+          state.students[studentIndex].enrolledSections = state.students[
+            studentIndex
+          ].enrolledSections.filter((s) => s !== action.payload.section._id);
+        }
+      })
+      .addCase(banStudentFromSection.rejected, (state) => {
+        state.sectionModificationStatus = LoadStatus.FAILED;
+      })
+
+      .addCase(unbanStudentFromSection.pending, (state) => {
+        state.sectionModificationStatus = LoadStatus.LOADING;
+      })
+      .addCase(unbanStudentFromSection.fulfilled, (state, action) => {
+        state.sectionModificationStatus = LoadStatus.SUCCEEDED;
+        const sectionIndex = state.sections.findIndex(
+          (s) => s._id === action.payload.section._id
+        );
+        if (sectionIndex >= 0) {
+          state.sections[sectionIndex] = action.payload.section;
+        }
+      })
+      .addCase(unbanStudentFromSection.rejected, (state) => {
+        state.sectionModificationStatus = LoadStatus.FAILED;
+      })
+
       .addCase(fetchInstructors.pending, (state) => {
         state.instructorsLoadStatus = LoadStatus.LOADING;
       })
