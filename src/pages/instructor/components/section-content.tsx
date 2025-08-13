@@ -9,7 +9,7 @@ import { Box, Typography, Button, Card, Grid, Stack } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { Assignment } from '../../../store/slices/education-management/types';
-import AssignmentModal from './assignment-modal';
+import AssignmentModal, { AssignmentModalMode } from './assignment-modal';
 import AssignmentCard from './assignment-card';
 import OptionalRequirements from './optional-requirements';
 import { getAssignmentsInSection } from '../helpers';
@@ -259,7 +259,7 @@ const SectionContent: React.FC<SectionContentProps> = ({
         isOpen={showAssignmentModal}
         onClose={handleCloseAssignmentModal}
         onSubmit={handleAddAssignment}
-        mode="create"
+        mode={AssignmentModalMode.CREATE}
         sectionId={sectionId}
         isLoading={educationManagement.isAssignmentModifying}
       />

@@ -19,11 +19,16 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material';
 import { Section } from '../../../store/slices/education-management/types';
 
+export enum SectionModalMode {
+  CREATE = 'create',
+  EDIT = 'edit',
+}
+
 interface SectionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (sectionData: Partial<Section>) => void;
-  mode: 'create' | 'edit';
+  mode: SectionModalMode;
   initialData?: Section;
   isLoading?: boolean;
 }
@@ -46,7 +51,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      if (mode === 'edit' && initialData) {
+      if (mode === SectionModalMode.EDIT && initialData) {
         setFormData({
           title: initialData.title || '',
           description: initialData.description || '',
@@ -108,7 +113,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
       assignments: mode === 'edit' ? initialData?.assignments || [] : [],
     };
 
-    if (mode === 'edit' && initialData) {
+    if (mode === SectionModalMode.EDIT && initialData) {
       submitData._id = initialData._id;
     }
 
@@ -154,7 +159,9 @@ const SectionModal: React.FC<SectionModalProps> = ({
           fontSize: '1.25rem',
         }}
       >
-        {mode === 'create' ? 'Create New Section' : 'Edit Section'}
+        {mode === SectionModalMode.CREATE
+          ? 'Create New Section'
+          : 'Edit Section'}
         <IconButton
           onClick={onClose}
           disabled={isLoading}
@@ -167,7 +174,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
 
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          {mode === 'create'
+          {mode === SectionModalMode.CREATE
             ? 'Add a new section to organize course content. You can add assignments later.'
             : 'Update the section information below.'}
         </Typography>
@@ -292,7 +299,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
         >
           {isLoading
             ? 'Saving...'
-            : mode === 'create'
+            : mode === SectionModalMode.CREATE
             ? 'Create Section'
             : 'Update Section'}
         </Button>

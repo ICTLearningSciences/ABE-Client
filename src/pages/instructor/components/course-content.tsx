@@ -17,7 +17,7 @@ import {
 import { Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { Section } from '../../../store/slices/education-management/types';
-import SectionModal from './section-modal';
+import SectionModal, { SectionModalMode } from './section-modal';
 
 interface CourseContentProps {
   courseId: string;
@@ -179,7 +179,7 @@ const CourseContent: React.FC<CourseContentProps> = ({
         isOpen={showSectionModal}
         onClose={handleCloseSectionModal}
         onSubmit={handleAddSection}
-        mode="create"
+        mode={SectionModalMode.CREATE}
         isLoading={educationManagement.isSectionModifying}
       />
     </Box>

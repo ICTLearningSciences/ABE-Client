@@ -19,11 +19,16 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material';
 import { Course } from '../../../store/slices/education-management/types';
 
+export enum CourseModalMode {
+  CREATE = 'create',
+  EDIT = 'edit',
+}
+
 interface CourseModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (courseData: Partial<Course>) => void;
-  mode: 'create' | 'edit';
+  mode: CourseModalMode;
   initialData?: Course;
   isLoading?: boolean;
 }
@@ -44,7 +49,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      if (mode === 'edit' && initialData) {
+      if (mode === CourseModalMode.EDIT && initialData) {
         setFormData({
           title: initialData.title || '',
           description: initialData.description || '',
@@ -86,7 +91,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
       description: formData.description?.trim() || '',
     };
 
-    if (mode === 'edit' && initialData) {
+    if (mode === CourseModalMode.EDIT && initialData) {
       submitData._id = initialData._id;
     }
 
@@ -132,7 +137,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
           fontSize: '1.25rem',
         }}
       >
-        {mode === 'create' ? 'Create New Course' : 'Edit Course'}
+        {mode === CourseModalMode.CREATE ? 'Create New Course' : 'Edit Course'}
         <IconButton
           onClick={onClose}
           disabled={isLoading}
@@ -145,7 +150,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
 
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          {mode === 'create'
+          {mode === CourseModalMode.CREATE
             ? 'Add a new course to your curriculum. You can add sections and assignments later.'
             : 'Update the course information below.'}
         </Typography>
@@ -242,7 +247,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
         >
           {isLoading
             ? 'Saving...'
-            : mode === 'create'
+            : mode === CourseModalMode.CREATE
             ? 'Create Course'
             : 'Update Course'}
         </Button>

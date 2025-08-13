@@ -19,7 +19,7 @@ import {
 import { Edit as EditIcon, ExitToApp as ExitIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { Section } from '../../../store/slices/education-management/types';
-import SectionModal from './section-modal';
+import SectionModal, { SectionModalMode } from './section-modal';
 import DeleteConfirmationModal from './delete-confirmation-modal';
 import SectionContent from './section-content';
 import SectionStudentsGrades from './section-students-grades';
@@ -265,7 +265,7 @@ const SectionView: React.FC<SectionViewProps> = ({
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSubmit={handleEditSection}
-        mode="edit"
+        mode={SectionModalMode.EDIT}
         initialData={section}
         isLoading={educationManagement.isSectionModifying}
       />

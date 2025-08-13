@@ -21,11 +21,16 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material';
 import { Assignment } from '../../../store/slices/education-management/types';
 
+export enum AssignmentModalMode {
+  CREATE = 'create',
+  EDIT = 'edit',
+}
+
 interface AssignmentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (assignmentData: Partial<Assignment>, mandatory?: boolean) => void;
-  mode: 'create' | 'edit';
+  mode: AssignmentModalMode;
   sectionId?: string;
   initialData?: Assignment;
   initialMandatory?: boolean;
@@ -51,7 +56,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      if (mode === 'edit' && initialData) {
+      if (mode === AssignmentModalMode.EDIT && initialData) {
         setFormData({
           title: initialData.title || '',
           description: initialData.description || '',
@@ -93,10 +98,11 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
     const submitData: Partial<Assignment> = {
       title: formData.title?.trim() || '',
       description: formData.description?.trim() || '',
-      activityIds: mode === 'edit' ? initialData?.activityIds || [] : [],
+      activityIds:
+        mode === AssignmentModalMode.EDIT ? initialData?.activityIds || [] : [],
     };
 
-    if (mode === 'edit' && initialData) {
+    if (mode === AssignmentModalMode.EDIT && initialData) {
       submitData._id = initialData._id;
     }
 
@@ -143,7 +149,9 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         }}
         data-cy="assignment-modal-title"
       >
-        {mode === 'create' ? 'Create New Assignment' : 'Edit Assignment'}
+        {mode === AssignmentModalMode.CREATE
+          ? 'Create New Assignment'
+          : 'Edit Assignment'}
         <IconButton
           onClick={onClose}
           disabled={isLoading}
@@ -157,8 +165,8 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
 
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          {mode === 'create'
-            ? 'Create a new assignment with activities and learning objectives. You can add activities after creating the assignment.'
+          {mode === AssignmentModalMode.CREATE
+            ? 'Create a new assignment with activities and learning objectives. You can add activities later.'
             : 'Update the assignment information below.'}
         </Typography>
 
@@ -279,7 +287,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         >
           {isLoading
             ? 'Saving...'
-            : mode === 'create'
+            : mode === AssignmentModalMode.CREATE
             ? 'Create Assignment'
             : 'Update Assignment'}
         </Button>

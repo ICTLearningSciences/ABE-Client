@@ -11,9 +11,9 @@ import { useWithLogin } from '../../store/slices/login/use-with-login';
 import CollapsibleTree, { TreeSection } from './components/collapsible-tree';
 import CourseView from './components/course-view';
 import SectionView from './components/section-view';
-import AssignmentView from './components/assignment-view';
+import AssignmentView from './components/assignment-view/assignment-view';
 import BreadcrumbNavigation from './components/breadcrumb-navigation';
-import CourseModal from './components/course-modal';
+import CourseModal, { CourseModalMode } from './components/course-modal';
 import JoinSectionModal from './components/join-section-modal';
 import {
   getCourseManagementTreeData,
@@ -473,7 +473,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         isOpen={isCourseModalOpen}
         onClose={handleCloseCourseModal}
         onSubmit={handleCreateCourse}
-        mode="create"
+        mode={CourseModalMode.CREATE}
         isLoading={educationManagement.isCourseModifying}
       />
       <JoinSectionModal

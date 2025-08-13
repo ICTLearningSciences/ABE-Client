@@ -21,7 +21,7 @@ import {
   Course,
   CourseOwnership,
 } from '../../../store/slices/education-management/types';
-import CourseModal from './course-modal';
+import CourseModal, { CourseModalMode } from './course-modal';
 import DeleteConfirmationModal from './delete-confirmation-modal';
 import CourseContent from './course-content';
 import CourseSharedInstructors from './course-shared-instructors';
@@ -207,7 +207,7 @@ const CourseView: React.FC<CourseViewProps> = ({
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSubmit={handleEditCourse}
-        mode="edit"
+        mode={CourseModalMode.EDIT}
         initialData={course}
         isLoading={educationManagement.isCourseModifying}
       />

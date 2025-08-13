@@ -14,20 +14,17 @@ import {
   Stack,
   Chip,
 } from '@mui/material';
-import {
-  Edit as EditIcon,
-  CheckCircle,
-  RadioButtonUnchecked,
-} from '@mui/icons-material';
-import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
+import { Edit as EditIcon } from '@mui/icons-material';
+import { useWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
 import {
   Assignment,
   isStudentData,
-} from '../../../store/slices/education-management/types';
-import AssignmentModal from './assignment-modal';
-import DeleteConfirmationModal from './delete-confirmation-modal';
-import AssignmentActivitiesDisplay from './assignment-activities-display';
-import { ActivityBuilder } from '../../../components/activity-builder/types';
+} from '../../../../store/slices/education-management/types';
+import AssignmentModal, { AssignmentModalMode } from '../assignment-modal';
+import DeleteConfirmationModal from '../delete-confirmation-modal';
+import AssignmentActivitiesDisplay from '../assignment-activities-display';
+import { ActivityBuilder } from '../../../../components/activity-builder/types';
+import { AssignmentCompleteStatus } from './assignment-complete-status';
 
 interface AssignmentViewProps {
   assignmentId: string;
@@ -169,7 +166,6 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
 
   return (
     <Box sx={{ width: '100%', maxWidth: 800, px: 2.5 }}>
-      {/* Assignment Header */}
       <Card sx={{ mb: 4, backgroundColor: 'grey.50' }}>
         <CardContent sx={{ p: 3 }}>
           <Stack
@@ -191,52 +187,9 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                   {assignment.title}
                 </Typography>
                 {isStudentView && (
-                  <Box
-                    sx={{
-                      ml: 'auto',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                    }}
-                  >
-                    {isAssignmentComplete ? (
-                      <>
-                        <CheckCircle
-                          sx={{
-                            color: 'green',
-                            fontSize: '28px',
-                          }}
-                        />
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: 'green',
-                            fontWeight: 500,
-                          }}
-                        >
-                          All Activities Complete
-                        </Typography>
-                      </>
-                    ) : (
-                      <>
-                        <RadioButtonUnchecked
-                          sx={{
-                            color: 'grey.400',
-                            fontSize: '28px',
-                          }}
-                        />
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: 'grey.400',
-                            fontWeight: 500,
-                          }}
-                        >
-                          Complete All Activities
-                        </Typography>
-                      </>
-                    )}
-                  </Box>
+                  <AssignmentCompleteStatus
+                    isAssignmentComplete={isAssignmentComplete}
+                  />
                 )}
               </Stack>
 
@@ -317,7 +270,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
           onSubmit={handleEditAssignment}
-          mode="edit"
+          mode={AssignmentModalMode.EDIT}
           sectionId={sectionId}
           initialData={assignment}
           isLoading={educationManagement.isAssignmentModifying}
