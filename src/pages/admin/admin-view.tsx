@@ -15,11 +15,19 @@ function AdminView(): JSX.Element {
   const { updateCurrentDocId } = useWithState();
   const navigate = useNavigateWithParams();
   function goToDoc(docId: string, newDoc?: boolean) {
+    if (!docId) {
+      console.warn('goToDoc no docId');
+      return;
+    }
     updateCurrentDocId(docId);
     navigate(`/docs/${docId}?${newDoc ? `${URL_PARAM_NEW_DOC}=true` : ''}`);
   }
 
   function onHistoryClicked(docId: string) {
+    if (!docId) {
+      console.warn('onHistoryClicked no docId');
+      return;
+    }
     navigate(`/docs/history/${docId}`);
   }
 

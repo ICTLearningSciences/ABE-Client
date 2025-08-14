@@ -270,9 +270,9 @@ export function RequestUserInputStepBuilder(props: {
     setRerender(rerender + 1);
   }
 
-  function updateField(
-    field: string,
-    value: string | boolean | PredefinedResponse[]
+  function updateField<K extends keyof RequestUserInputActivityStep>(
+    field: K,
+    value: RequestUserInputActivityStep[K]
   ) {
     updateLocalActivity((prevValue) => {
       return {

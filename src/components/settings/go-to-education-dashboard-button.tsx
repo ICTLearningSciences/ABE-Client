@@ -18,7 +18,8 @@ export default function GoToEducationDashboardButton(props: {
 }) {
   const navigate = useNavigateWithParams();
 
-  const currentPath = window.location.pathname;
+  const currentPath =
+    typeof window !== 'undefined' ? window.location.pathname : '';
   const isOnEducationDashboard =
     currentPath.includes(studentCoursesUrl) ||
     currentPath.includes(courseManagementUrl);

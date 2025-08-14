@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BuiltActivityHandler } from '../classes/activity-builder-activity/built-activity-handler';
 import { ChatMessageTypes } from '../store/slices/chat';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
@@ -102,7 +102,7 @@ export function useWithBuiltActivityHandler(
     builtActivityHandler.resetActivity();
   }, [resetActivityCounter]);
 
-  function handleStudentActivityComplete() {
+  const handleStudentActivityComplete = useCallback(() => {
     if (
       !myEducationalData ||
       !viewState.selectedCourseId ||
@@ -119,7 +119,14 @@ export function useWithBuiltActivityHandler(
       viewState.selectedAssignmentId,
       [{ activityId: selectedActivityBuilder._id, complete: true }]
     );
-  }
+  }, [
+    myEducationalData,
+    viewState.selectedCourseId,
+    viewState.selectedSectionId,
+    viewState.selectedAssignmentId,
+    selectedActivityBuilder?._id,
+    updateStudentAssignmentProgress,
+  ]);
 
   function sendMessageHelper(msg: ChatMessageTypes, clearChat?: boolean) {
     sendMessage(msg, clearChat || false, curDocId);

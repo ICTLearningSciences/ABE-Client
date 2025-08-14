@@ -31,7 +31,7 @@ import {
 import { EducationalRole } from './types';
 
 function MainApp() {
-  const mainAppHeight = '94vh';
+  const MAIN_APP_HEIGHT = '94vh';
   const useLogin = useWithLogin();
 
   const router = createBrowserRouter([
@@ -43,7 +43,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: mainAppHeight,
+              height: MAIN_APP_HEIGHT,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -62,7 +62,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: mainAppHeight,
+              height: MAIN_APP_HEIGHT,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -81,7 +81,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: mainAppHeight,
+              height: MAIN_APP_HEIGHT,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -104,7 +104,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: mainAppHeight,
+              height: MAIN_APP_HEIGHT,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -123,7 +123,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: mainAppHeight,
+              height: MAIN_APP_HEIGHT,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

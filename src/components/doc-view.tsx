@@ -27,7 +27,6 @@ function DocView(props: {
   const queryParams = new URLSearchParams(location.search);
   const activityFromParams =
     props.activityId || queryParams.get('activityId') || '';
-  console.log(`activityFromParams: ${activityFromParams}`);
   const goalFromParams = props.goalId || queryParams.get('goalId') || '';
   const googleDocUrl = `https://docs.google.com/document/d/${docId}/edit`;
 
