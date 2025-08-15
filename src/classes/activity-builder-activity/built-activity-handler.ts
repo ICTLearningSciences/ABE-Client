@@ -81,7 +81,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   lastFailedStepId: string | null = null;
   docId: string;
   docService: DocService;
-
+  handleStudentActivityComplete: () => void;
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
       !this.builtActivityData ||
@@ -157,6 +157,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     docId: string,
     editDocGoal: () => void,
     docService: DocService,
+    handleStudentActivityComplete: () => void,
     builtActivityData?: ActivityBuilder
   ) {
     this.docId = docId;
@@ -172,7 +173,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.executePrompt = executePrompt;
     this.setResponsePending = setResponsePending;
     this.editDocGoal = editDocGoal;
-
+    this.handleStudentActivityComplete = handleStudentActivityComplete;
     this.setBuiltActivityData = this.setBuiltActivityData.bind(this);
     this.initializeActivity = this.initializeActivity.bind(this);
     this.resetActivity = this.resetActivity.bind(this);
@@ -223,6 +224,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   async handleStep(step: ActivityBuilderStep) {
     if (this.curStep?.stepId !== step.stepId) {
       this.curStep = step;
+    }
+    if (step.setStudentActivityComplete) {
+      this.handleStudentActivityComplete();
     }
     if (step.stepType === ActivityBuilderStepType.REQUEST_USER_INPUT) {
       this.stepIdsSinceLastInput = [];

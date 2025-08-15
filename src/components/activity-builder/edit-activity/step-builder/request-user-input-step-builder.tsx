@@ -270,9 +270,9 @@ export function RequestUserInputStepBuilder(props: {
     setRerender(rerender + 1);
   }
 
-  function updateField(
-    field: string,
-    value: string | boolean | PredefinedResponse[]
+  function updateField<K extends keyof RequestUserInputActivityStep>(
+    field: K,
+    value: RequestUserInputActivityStep[K]
   ) {
     updateLocalActivity((prevValue) => {
       return {
@@ -431,6 +431,13 @@ export function RequestUserInputStepBuilder(props: {
           value={step.disableFreeInput}
           onChange={(e) => {
             updateField('disableFreeInput', e);
+          }}
+        />
+        <CheckBoxInput
+          label="Set Student Activity Complete?"
+          value={step.setStudentActivityComplete ?? false}
+          onChange={(e) => {
+            updateField('setStudentActivityComplete', e);
           }}
         />
         <PredefinedResponsesUpdater

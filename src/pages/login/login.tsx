@@ -12,6 +12,11 @@ import { useAppSelector } from '../../store/hooks';
 import { LoginUI } from './login-ui';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 import { useAuth } from 'react-oidc-context';
+import { EducationalRole } from '../../types';
+import {
+  courseManagementUrl,
+  studentCoursesUrl,
+} from '../instructor/course-management';
 export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
   const { loginWithGoogle, state: loginState } = useLogin;
@@ -21,10 +26,23 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
   const orgName = config.config?.orgName || 'ABE';
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      loginWithGoogle(tokenResponse.access_token);
-      navigate('/docs');
+      loginWithGoogle(tokenResponse.access_token).then((user) => {
+        handleLoginNavigate(user?.user.educationalRole);
+      });
     },
   });
+
+  function handleLoginNavigate(educationalRole?: EducationalRole) {
+    if (!educationalRole) {
+      navigate('/docs');
+    }
+    if (educationalRole === EducationalRole.STUDENT) {
+      navigate(studentCoursesUrl);
+    } else if (educationalRole === EducationalRole.INSTRUCTOR) {
+      navigate(courseManagementUrl);
+    }
+  }
+
   const awsCognitoAuth = useAuth();
 
   useEffect(() => {
@@ -35,7 +53,7 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
 
   useEffect(() => {
     if (loginState.loginStatus === LoginStatus.AUTHENTICATED) {
-      navigate('/docs');
+      handleLoginNavigate(loginState.user?.educationalRole);
     }
   }, [loginState.loginStatus]);
 

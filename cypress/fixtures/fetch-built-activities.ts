@@ -41,6 +41,7 @@ export const myEditableActivity: ActivityBuilder = {
             saveResponseVariableName: 'name',
             disableFreeInput: false,
             predefinedResponses: [],
+            setStudentActivityComplete: true,
           } as RequestUserInputActivityStep,
           {
             stepId: '3',

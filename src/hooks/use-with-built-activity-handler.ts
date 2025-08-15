@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BuiltActivityHandler } from '../classes/activity-builder-activity/built-activity-handler';
 import { ChatMessageTypes } from '../store/slices/chat';
 import { useWithChat } from '../store/slices/chat/use-with-chat';
@@ -16,6 +16,7 @@ import { ActivityBuilder } from '../components/activity-builder/types';
 import { equals } from '../helpers';
 import { getDocServiceFromLoginService } from '../types';
 import { useAppSelector } from '../store/hooks';
+import { useWithEducationalManagement } from '../store/slices/education-management/use-with-educational-management';
 
 export function useWithBuiltActivityHandler(
   resetActivityCounter: number,
@@ -30,6 +31,11 @@ export function useWithBuiltActivityHandler(
   const { executePromptSteps } = useWithExecutePrompt();
   const { addNewSubscriber, removeAllSubscribers } =
     useWithChatLogSubscribers();
+  const { myData: myEducationalData, updateStudentAssignmentProgress } =
+    useWithEducationalManagement();
+  const viewState = useAppSelector(
+    (state) => state.educationManagement.viewState
+  );
   const [builtActivityHandler, setBuiltActivityHandler] =
     useState<BuiltActivityHandler>();
   const updatesFound = !equals(
@@ -67,6 +73,7 @@ export function useWithBuiltActivityHandler(
         curDocId,
         editDocGoal,
         docService,
+        handleStudentActivityComplete,
         selectedActivityBuilder
       );
       newActivityHandler.initializeActivity();
@@ -94,6 +101,32 @@ export function useWithBuiltActivityHandler(
     newSession();
     builtActivityHandler.resetActivity();
   }, [resetActivityCounter]);
+
+  const handleStudentActivityComplete = useCallback(() => {
+    if (
+      !myEducationalData ||
+      !viewState.selectedCourseId ||
+      !viewState.selectedSectionId ||
+      !viewState.selectedAssignmentId ||
+      !selectedActivityBuilder?._id
+    ) {
+      return;
+    }
+    updateStudentAssignmentProgress(
+      myEducationalData.userId,
+      viewState.selectedCourseId,
+      viewState.selectedSectionId,
+      viewState.selectedAssignmentId,
+      [{ activityId: selectedActivityBuilder._id, complete: true }]
+    );
+  }, [
+    myEducationalData,
+    viewState.selectedCourseId,
+    viewState.selectedSectionId,
+    viewState.selectedAssignmentId,
+    selectedActivityBuilder?._id,
+    updateStudentAssignmentProgress,
+  ]);
 
   function sendMessageHelper(msg: ChatMessageTypes, clearChat?: boolean) {
     sendMessage(msg, clearChat || false, curDocId);

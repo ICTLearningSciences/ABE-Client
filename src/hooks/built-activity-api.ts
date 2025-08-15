@@ -34,6 +34,7 @@ export const fullBuiltActivityQueryData = `
                               stepType
                               jumpToStepId
                               message
+                              setStudentActivityComplete
                           }
 
                           ... on RequestUserInputActivityStepType {
@@ -51,6 +52,7 @@ export const fullBuiltActivityQueryData = `
                                   isArray
                                   responseWeight
                               }
+                              setStudentActivityComplete
                           }
 
                           ... on PromptActivityStepType{
@@ -66,9 +68,10 @@ export const fullBuiltActivityQueryData = `
                               jsonResponseData
                               customSystemRole
                               webSearch
+                              setStudentActivityComplete
                           }
 
-                                                    ... on ConditionalActivityStepType {
+                          ... on ConditionalActivityStepType {
                               stepId
                               stepType
                               jumpToStepId

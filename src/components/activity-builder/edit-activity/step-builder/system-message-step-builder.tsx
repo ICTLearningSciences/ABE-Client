@@ -9,7 +9,7 @@ import { v4 as uuid } from 'uuid';
 import { IconButton } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { RoundedBorderDiv, TopLeftText } from '../../../../styled-components';
-import { InputField } from '../../shared/input-components';
+import { CheckBoxInput, InputField } from '../../shared/input-components';
 import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
 import {
   SystemMessageActivityStep,
@@ -149,7 +149,13 @@ export function SystemMessageStepBuilder(props: {
             updateField('message', e);
           }}
         />
-
+        <CheckBoxInput
+          label="Set Student Activity Complete?"
+          value={step.setStudentActivityComplete ?? false}
+          onChange={(e) => {
+            updateField('setStudentActivityComplete', e);
+          }}
+        />
         <JumpToAlternateStep
           step={step}
           flowsList={props.flowsList}

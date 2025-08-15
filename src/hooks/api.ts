@@ -105,7 +105,11 @@ export function throwErrorsInAxiosResponse(res: AxiosResponse): void {
     throw new Error(`http request failed: ${res.data}`);
   }
   if (res.data.errors) {
-    throw new Error(`errors in response: ${JSON.stringify(res.data.errors)}`);
+    if (Array.isArray(res.data.errors) && res.data.errors.length > 0) {
+      throw new Error(`${res.data.errors[0].message}`);
+    } else {
+      throw new Error(`${JSON.stringify(res.data.errors)}`);
+    }
   }
 }
 
@@ -631,6 +635,7 @@ export const userDataQuery = `
     code
     createdAt
   }
+  educationalRole
 `;
 export async function refreshAccessToken(): Promise<UserAccessToken> {
   return execGql<UserAccessToken>(

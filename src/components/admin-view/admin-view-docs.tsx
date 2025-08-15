@@ -10,18 +10,20 @@ import { ColumnCenterDiv } from '../../styled-components';
 import SelectCreateDocs from '../user-view/select-create-docs';
 import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
-import { URL_PARAM_NEW_DOC } from '../../constants';
-import { useWithState } from '../../exported-files';
 import ExampleGoogleDocModal from '../user-view/example-google-docs-modal';
-import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
+import { useWithUsersDocs as useWithUsersDocsHook } from '../../hooks/use-with-users-docs';
+
 export interface AdminViewUserGoogleDocsProps {
   useWithUsersDocs: UseWithUsersDocs;
 }
 
-export default function ViewUserGoogleDocs(
-  props: AdminViewUserGoogleDocsProps
-): JSX.Element {
-  const { useWithUsersDocs } = props;
+export default function ViewUserGoogleDocs(props: {
+  goToDoc: (docId: string, newDoc?: boolean) => void;
+  onHistoryClicked: (docId: string) => void;
+}): JSX.Element {
+  const { goToDoc, onHistoryClicked } = props;
+  const useWithUsersDocs = useWithUsersDocsHook();
+
   const {
     googleDocs,
     copyDocs,
@@ -34,19 +36,8 @@ export default function ViewUserGoogleDocs(
     setSortBy,
     docsLoading,
   } = useWithUsersDocs;
-  const { updateCurrentDocId } = useWithState();
-  const navigate = useNavigateWithParams();
   const userRole = useAppSelector((state) => state.login.userRole);
   const [exampleDocsOpen, setExampleDocsOpen] = React.useState(false);
-
-  function goToDoc(docId: string, newDoc?: boolean) {
-    updateCurrentDocId(docId);
-    navigate(`/docs/${docId}?${newDoc ? `${URL_PARAM_NEW_DOC}=true` : ''}`);
-  }
-
-  function previewUrlBuilder(docId: string) {
-    return `https://docs.google.com/document/d/${docId}/view`;
-  }
 
   return (
     <ColumnCenterDiv
@@ -68,7 +59,7 @@ export default function ViewUserGoogleDocs(
         setSortBy={setSortBy}
         sortBy={sortBy}
         goToDoc={goToDoc}
-        onHistoryClicked={(docId: string) => navigate(`/docs/history/${docId}`)}
+        onHistoryClicked={onHistoryClicked}
         setExampleDocsOpen={setExampleDocsOpen}
         sx={{
           width: '75%',
@@ -91,7 +82,6 @@ export default function ViewUserGoogleDocs(
           });
         }}
         goToDoc={goToDoc}
-        previewUrlBuilder={previewUrlBuilder}
       />
     </ColumnCenterDiv>
   );

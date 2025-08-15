@@ -18,10 +18,6 @@ import {
   storeUserDocResponse,
 } from '../fixtures/intentions/google-docs-intentions';
 import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
-import { analyzeHookResponse } from '../fixtures/stronger-hook-activity/analyze-hook-response';
-import { audienceEmotionsResponse } from '../fixtures/stronger-hook-activity/audience-emotion-response';
-import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
-import { entityFoundResponse } from '../fixtures/stronger-hook-activity/entity-found-response';
 import { updateUserInfoResponse } from '../fixtures/update-user-info';
 import { testUser } from '../fixtures/user-data';
 import { ACCESS_TOKEN_KEY } from './local-storage';
@@ -38,7 +34,7 @@ import {
   testGoogleDocId,
 } from './types';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
-
+import { createNewInstructorResponse, createNewStudentResponse, fetchAssignmentsResponseEmpty, fetchCoursesResponseEmpty, fetchSectionsResponseEmpty, fetchStudentsResponseEmpty } from '../fixtures/educational-management';
 
 export type CypressGlobal = Cypress.cy & CyEventEmitter;
 
@@ -77,7 +73,7 @@ interface StaticResponse {
   throttleKbps?: number;
 }
 
-interface MockGraphQLQuery {
+export interface MockGraphQLQuery {
   query: string;
   data: any | any[];
   params?: { statusCode?: number, delayMs?: number };
@@ -227,6 +223,15 @@ export function cyMockDefault(
     mockGQL('CopyBuiltActivity', {copyBuiltActivity:createActivityBuilder(testUser._id, 'Copied Activity', 'copied-activity', ActivityBuilderVisibility.EDITABLE)}, {delayMs:1000}),
     mockGQL('DeleteBuiltActivity', {deleteBuiltActivity: ""}),
     mockGQL('UpdateUserInfo', updateUserInfoResponse("123")),
+        // Educational Management - Fetch Operations
+        mockGQL('FetchCourses', fetchCoursesResponseEmpty),
+        mockGQL('FetchSections', fetchSectionsResponseEmpty),
+        mockGQL('FetchAssignments', fetchAssignmentsResponseEmpty),
+        mockGQL('FetchStudentsInMyCourses', fetchStudentsResponseEmpty),
+        
+        // User Data
+        mockGQL('CreateNewInstructor', createNewInstructorResponse),
+        mockGQL('CreateNewStudent', createNewStudentResponse),
   ]);
 }
 

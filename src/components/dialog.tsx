@@ -13,6 +13,7 @@ import {
   Button,
   CircularProgress,
   DialogActions,
+  Backdrop,
 } from '@mui/material';
 import { RowDiv } from '../styled-components';
 
@@ -167,5 +168,17 @@ export function SingleNotificationDialog(props: {
         <Button onClick={onClose}>Close</Button>
       </DialogActions>
     </Dialog>
+  );
+}
+
+export function LoadingDialog(props: { isLoading: boolean }): JSX.Element {
+  const { isLoading } = props;
+  return (
+    <Backdrop
+      open={isLoading}
+      sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+    >
+      <CircularProgress color="inherit" />
+    </Backdrop>
   );
 }

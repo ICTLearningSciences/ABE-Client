@@ -77,6 +77,7 @@ export interface ActivityBuilderStep {
   stepId: string;
   stepType: ActivityBuilderStepType;
   jumpToStepId?: string;
+  setStudentActivityComplete?: boolean;
 }
 
 export type ActivityBuilderStepTypes =

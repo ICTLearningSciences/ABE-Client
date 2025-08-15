@@ -23,10 +23,17 @@ import {
   AuthProviderProps,
   AuthProvider as CognitoAuthProvider,
 } from 'react-oidc-context';
+import CourseManagement from './pages/instructor/course-management';
+import {
+  courseManagementUrl,
+  studentCoursesUrl,
+} from './pages/instructor/course-management';
+import { EducationalRole } from './types';
 
 function MainApp() {
-  const mainAppHeight = '88vh';
+  const MAIN_APP_HEIGHT = '94vh';
   const useLogin = useWithLogin();
+
   const router = createBrowserRouter([
     {
       path: '/',
@@ -36,7 +43,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: mainAppHeight,
+              height: MAIN_APP_HEIGHT,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -55,7 +62,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: mainAppHeight,
+              height: MAIN_APP_HEIGHT,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -74,7 +81,7 @@ function MainApp() {
           <div
             style={{
               width: '100%',
-              height: mainAppHeight,
+              height: MAIN_APP_HEIGHT,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -88,6 +95,44 @@ function MainApp() {
     {
       path: '/docs/history/:docId',
       element: <DocHistoryContainer useLogin={useLogin} />,
+    },
+    {
+      path: courseManagementUrl,
+      element: (
+        <>
+          <Header useLogin={useLogin} />
+          <div
+            style={{
+              width: '100%',
+              height: MAIN_APP_HEIGHT,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <CourseManagement userRole={EducationalRole.INSTRUCTOR} />
+          </div>
+        </>
+      ),
+    },
+    {
+      path: studentCoursesUrl,
+      element: (
+        <>
+          <Header useLogin={useLogin} />
+          <div
+            style={{
+              width: '100%',
+              height: MAIN_APP_HEIGHT,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <CourseManagement userRole={EducationalRole.STUDENT} />
+          </div>
+        </>
+      ),
     },
   ]);
   const { ConfigLoader, configLoaded } = useConfigLoader();

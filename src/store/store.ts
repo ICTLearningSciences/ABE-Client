@@ -11,6 +11,7 @@ import chatReducer from './slices/chat';
 import stateReducer from './slices/state';
 import configReducer from './slices/config';
 import docGoalsActivitiesReducer from './slices/doc-goals-activities';
+import educationManagementReducer from './slices/education-management';
 import * as Sentry from '@sentry/react';
 
 const sentryEnhancer = Sentry.createReduxEnhancer({
@@ -30,6 +31,7 @@ export const store = configureStore({
     state: stateReducer,
     config: configReducer,
     docGoalsActivities: docGoalsActivitiesReducer,
+    educationManagement: educationManagementReducer,
   },
   enhancers: (defaultEhancers) => defaultEhancers.concat(sentryEnhancer),
 });

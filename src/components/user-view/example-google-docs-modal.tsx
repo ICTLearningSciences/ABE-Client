@@ -43,17 +43,9 @@ export default function ExampleGoogleDocModal(props: {
   close: () => void;
   goToDoc: (docId: string) => void;
   viewingAsAdmin: boolean;
-  previewUrlBuilder: (docId: string) => string;
 }): JSX.Element {
   const [selectedGoogleDoc, setSelectedGoogleDoc] = React.useState<string>('');
-  const {
-    open,
-    close,
-    adminDocs,
-    onCreateDoc,
-    viewingAsAdmin,
-    previewUrlBuilder,
-  } = props;
+  const { open, close, adminDocs, onCreateDoc, viewingAsAdmin } = props;
   const [openNewDocModal, setOpenNewDocModal] = React.useState(false);
   const [previewDocId, setPreviewDocId] = React.useState<string>('');
   const { classes } = useStyles();
@@ -69,6 +61,10 @@ export default function ExampleGoogleDocModal(props: {
     boxShadow: 24,
     p: 4,
   };
+
+  function previewUrlBuilder(docId: string) {
+    return `https://docs.google.com/document/d/${docId}/view`;
+  }
 
   useEffect(() => {
     if (!open) {

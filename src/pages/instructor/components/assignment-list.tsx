@@ -1,0 +1,148 @@
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+import React from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  CircularProgress,
+  Stack,
+  Chip,
+} from '@mui/material';
+import { Assignment } from '../../../store/slices/education-management/types';
+
+interface AssignmentListProps {
+  assignments: Assignment[];
+  onAssignmentSelect: (assignmentId: string) => void;
+  selectedAssignmentId?: string;
+  isLoading?: boolean;
+  sectionAssignments?: { assignmentId: string; mandatory: boolean }[];
+}
+
+const AssignmentList: React.FC<AssignmentListProps> = ({
+  assignments,
+  onAssignmentSelect,
+  selectedAssignmentId,
+  isLoading = false,
+  sectionAssignments = [],
+}) => {
+  if (isLoading) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 5 }}>
+        <CircularProgress size={40} sx={{ color: '#1B6A9C' }} />
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+          Loading assignments...
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (assignments.length === 0) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 5 }}>
+        <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
+          📝
+        </Typography>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ lineHeight: 1.5 }}
+        >
+          No assignments yet
+          <br />
+          Create your first assignment to engage students
+        </Typography>
+      </Box>
+    );
+  }
+
+  const getAssignmentMandatory = (assignmentId: string): boolean => {
+    const sectionAssignment = sectionAssignments.find(
+      (sa) => sa.assignmentId === assignmentId
+    );
+    return sectionAssignment?.mandatory ?? false;
+  };
+
+  return (
+    <Box sx={{ width: '100%', maxWidth: 800 }}>
+      <Grid container spacing={2}>
+        {assignments.map((assignment) => (
+          <Grid item xs={12} sm={6} key={assignment._id}>
+            <Card
+              variant="outlined"
+              sx={{
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                border:
+                  selectedAssignmentId === assignment._id
+                    ? '2px solid #1B6A9C'
+                    : '2px solid transparent',
+                backgroundColor:
+                  selectedAssignmentId === assignment._id ? '#e3f2fd' : 'white',
+                boxShadow: selectedAssignmentId === assignment._id ? 2 : 1,
+                '&:hover': {
+                  borderColor: '#1B6A9C',
+                  boxShadow: 3,
+                },
+              }}
+              onClick={() => onAssignmentSelect(assignment._id)}
+            >
+              <CardContent sx={{ p: 2.5 }}>
+                <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
+                  <Typography sx={{ fontSize: '24px', mr: 1.5 }}>📝</Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: '#1B6A9C',
+                      fontWeight: 600,
+                      fontSize: '1.125rem',
+                    }}
+                  >
+                    {assignment.title}
+                  </Typography>
+                </Stack>
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1.5, lineHeight: 1.4 }}
+                >
+                  {assignment.description}
+                </Typography>
+
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography variant="caption" color="text.disabled">
+                    {assignment.activityIds.length} activit
+                    {assignment.activityIds.length !== 1 ? 'ies' : 'y'}
+                  </Typography>
+                  <Chip
+                    label={
+                      getAssignmentMandatory(assignment._id)
+                        ? 'Required'
+                        : 'Optional'
+                    }
+                    size="small"
+                    color={
+                      getAssignmentMandatory(assignment._id)
+                        ? 'primary'
+                        : 'secondary'
+                    }
+                    sx={{ fontSize: '10px' }}
+                  />
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  );
+};
+
+export default AssignmentList;

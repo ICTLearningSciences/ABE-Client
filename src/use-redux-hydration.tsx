@@ -4,22 +4,33 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { loadUserDocs } from './store/slices/state';
 import { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
+import { useWithEducationalManagement } from './store/slices/education-management/use-with-educational-management';
+import { LoginStatus } from './store/slices/login';
 
 export async function useReduxHydration() {
-  const userId = useAppSelector((state) => state.login.user?._id);
+  const userData = useAppSelector((state) => state.login.user);
+  const loginStatus = useAppSelector((state) => state.login.loginStatus);
   const dispatch = useAppDispatch();
   const { loadActivities, loadDocGoals, loadBuiltActivities } =
     useWithDocGoalsActivities();
+  const { loadAllEducationalDataWithUserData } = useWithEducationalManagement();
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userData || hydrated || loginStatus !== LoginStatus.AUTHENTICATED)
+      return;
+    setHydrated(true);
+    const { _id: userId, educationalRole } = userData;
     dispatch(loadUserDocs({ userId }));
     loadActivities();
     loadBuiltActivities();
     loadDocGoals();
-  }, [userId]);
+    if (educationalRole) {
+      loadAllEducationalDataWithUserData(userId, educationalRole);
+    }
+  }, [loginStatus]);
 }

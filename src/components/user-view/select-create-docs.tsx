@@ -65,7 +65,6 @@ export default function SelectCreateDocs(props: {
   const googleDocs = viewingArchived ? archivedDocs : unarchivedDocs;
   const [docToDelete, setDocToDelete] = React.useState<UserDoc>();
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
-
   function SortIndicator(props: { field: string }) {
     const { field } = props;
     const isActive = sortBy.field === field;
