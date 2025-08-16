@@ -133,7 +133,7 @@ export interface UseWithEducationalManagement {
   loadUserEducationalData: (
     forUserId: string,
     educationalRole: EducationalRole
-  ) => void;
+  ) => Promise<StudentData | Instructor>;
   allSectionsStudentsProgress: AllSectionsStudentsProgress;
   shareCourseWithInstructor: (
     instructorId: string,
@@ -374,14 +374,14 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return students.filter((s) => s.enrolledSections.includes(sectionId));
   }
 
-  function loadUserEducationalData(
+  async function loadUserEducationalData(
     forUserId: string,
     educationalRole: EducationalRole
   ) {
     if (educationalRole === EducationalRole.INSTRUCTOR) {
-      dispatch(_loadInstructorData(forUserId));
+      return await dispatch(_loadInstructorData(forUserId)).unwrap();
     } else if (educationalRole === EducationalRole.STUDENT) {
-      dispatch(_loadStudentData(forUserId));
+      return await dispatch(_loadStudentData(forUserId)).unwrap();
     } else {
       throw new Error('Invalid educational role');
     }

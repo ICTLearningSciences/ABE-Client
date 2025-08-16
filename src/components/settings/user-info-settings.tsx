@@ -13,7 +13,6 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import { formatISODateToReadable } from '../../helpers';
 import { EditableText } from '../activity-builder/shared/input-components';
 import GoToEducationDashboardButton from './go-to-education-dashboard-button';
-import { EducationalRole } from '../../types';
 
 export function UserInfoSettings(): JSX.Element {
   const { state, updateUserInfo } = useWithLogin();
@@ -142,23 +141,16 @@ export function UserInfoSettings(): JSX.Element {
         </Paper>
       )}
 
-      {/* Education Dashboard Section */}
-      {(educationalRole || educationalRole === EducationalRole.INSTRUCTOR) && (
+      {educationalRole && state.user?._id && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
             Education Dashboard
           </Typography>
           <Stack spacing={2}>
-            {educationalRole && (
-              <GoToEducationDashboardButton educationalRole={educationalRole} />
-            )}
-            {/* For testing purposes */}
-            {educationalRole &&
-              educationalRole === EducationalRole.INSTRUCTOR && (
-                <GoToEducationDashboardButton
-                  educationalRole={EducationalRole.STUDENT}
-                />
-              )}
+            <GoToEducationDashboardButton
+              userId={state.user._id}
+              educationalRole={educationalRole}
+            />
           </Stack>
         </Paper>
       )}
