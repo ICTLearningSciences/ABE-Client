@@ -411,9 +411,9 @@ function roleDisplayText(userRole: UserRole) {
 
 export function roleSwitch(cy: CypressGlobal, targetNewRole: UserRole){
   cy.get("[data-cy=profile-button]").click();
-  cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText(UserRole.USER))
-  cy.get("[data-cy=role-switch]").click();
-  cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText(targetNewRole))
+  cy.get("[data-cy=role-switch]").scrollIntoView().should("contain.text", roleDisplayText(UserRole.USER))
+  cy.get("[data-cy=role-switch]").scrollIntoView().click();
+  cy.get("[data-cy=role-switch]").scrollIntoView().should("contain.text", roleDisplayText(targetNewRole))
   // click center of screen to close drawer
   cy.get("body").click(0, 0);
 }
