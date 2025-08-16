@@ -26,6 +26,7 @@ import withAuthorizationOnly from '../../hooks/wrap-with-authorization-only';
 import { ActivityView } from './components/activity-view';
 import { useAppSelector } from '../../store/hooks';
 import { LoadingDialog } from '../../components/dialog';
+import { JoinUrlSection } from './components/join-url-section';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -138,7 +139,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       loginState.user._id,
       sectionCode
     );
-    await educationManagement.loadAllEducationalData(loginState.user._id);
     setIsJoinSectionModalOpen(false);
   };
 
@@ -482,6 +482,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         onSubmit={handleJoinSection}
         isLoading={educationManagement.isSectionModifying}
       />
+      <JoinUrlSection />
       <LoadingDialog isLoading={isLoading} />
     </Box>
   );

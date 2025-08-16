@@ -114,6 +114,7 @@ export interface UseWithEducationalManagement {
   myData: StudentData | Instructor | undefined;
   viewState: CourseManagementState;
   isLoading: boolean;
+  sectionsLoadState: LoadStatus;
   isCourseModifying: boolean;
   courseModificationFailed: boolean;
   isSectionModifying: boolean;
@@ -302,9 +303,11 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     targetUserId: string,
     sectionCode: string
   ) {
-    return await dispatch(
+    const res = await dispatch(
       _enrollInSection({ targetUserId, sectionCode })
     ).unwrap();
+    await loadAllEducationalData(targetUserId);
+    return res as StudentData;
   }
 
   async function removeStudentFromSection(
@@ -604,6 +607,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       assignmentsLoadingState === LoadStatus.LOADING ||
       sectionsLoadingState === LoadStatus.LOADING ||
       studentsLoadingState === LoadStatus.LOADING,
+    sectionsLoadState: sectionsLoadingState,
     isCourseModifying: courseModificationStatus === LoadStatus.LOADING,
     courseModificationFailed: courseModificationStatus === LoadStatus.FAILED,
     isSectionModifying: sectionModificationStatus === LoadStatus.LOADING,
