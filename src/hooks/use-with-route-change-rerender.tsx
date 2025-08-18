@@ -10,7 +10,7 @@ export function useWithRouteChangeRerender(): {
   stateCounter: number;
   path: string;
 } {
-  const path = window !== undefined ? window.location.pathname : '';
+  const path = typeof window !== 'undefined' ? window.location.pathname : '';
   const [stateCounter, setStateCounter] = useState(0);
 
   useEffect(() => {

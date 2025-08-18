@@ -4,9 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { cyMockDefault, roleSwitch } from "../helpers/functions";
+import { cyMockDefault, roleSwitch, visitMainPageSettled } from "../helpers/functions";
 import { UserRole } from "../helpers/types";
-
 
 
 describe('role viewing', () => {
@@ -14,7 +13,7 @@ describe('role viewing', () => {
       cyMockDefault(cy, {
         userRole: UserRole.ADMIN
       });
-      cy.visit("/")
+      visitMainPageSettled(cy)
       roleSwitch(cy, UserRole.ADMIN)
     })
 
@@ -22,7 +21,7 @@ describe('role viewing', () => {
       cyMockDefault(cy, {
         userRole: UserRole.CONTENT_MANAGER
       });
-      cy.visit("/")
+      visitMainPageSettled(cy)
       roleSwitch(cy, UserRole.CONTENT_MANAGER)
     })
   });
