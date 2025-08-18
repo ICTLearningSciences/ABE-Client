@@ -32,6 +32,11 @@ export function flowIsNotEditable(cy: CypressGlobal){
     })
 }
 
+function visitMainPage(cy: CypressGlobal){
+    cy.visit("/")
+    cy.get("[data-cy=toggle-view-archived]").should("be.visible")
+}
+
 describe('activity builder', () => {
     describe("admins", ()=>{
 
@@ -39,7 +44,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
               userRole: UserRole.ADMIN
             });
-            cy.visit("/")
+            visitMainPage(cy)
             roleSwitch(cy, UserRole.ADMIN)
             cy.get("[data-cy=doc-list-item-Aliens").click()
             cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
@@ -74,8 +79,7 @@ describe('activity builder', () => {
                     ]),
                 ]
               });
-              cy.visit("/")
-              cy.get("[data-cy=toggle-view-archived]").should("be.visible")
+              visitMainPage(cy)
               roleSwitch(cy, UserRole.ADMIN)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
@@ -103,7 +107,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
               });
-              cy.visit("/")
+              visitMainPage(cy)
               roleSwitch(cy, UserRole.CONTENT_MANAGER)
         })
         
@@ -111,7 +115,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
               });
-              cy.visit("/")
+              visitMainPage(cy)
               roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
@@ -132,7 +136,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
               });
-              cy.visit("/")
+              visitMainPage(cy)
               roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-other-user-editable-activity]").should("exist")
@@ -145,7 +149,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
               });
-              cy.visit("/")
+              visitMainPage(cy)
               roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
@@ -167,7 +171,7 @@ describe('activity builder', () => {
                     ]),
                 ]
               });
-              cy.visit("/")
+              visitMainPage(cy)
               roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
@@ -189,7 +193,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
             });
-            cy.visit("/");
+            visitMainPage(cy)
             roleSwitch(cy, UserRole.CONTENT_MANAGER)
             cy.get("[data-cy=doc-list-item-Aliens").click();
             cy.get("[data-cy=activity-item-copied-activity]").should("not.exist");
