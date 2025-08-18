@@ -18,10 +18,6 @@ import { useSearchParams } from 'react-router-dom';
 export const queryParamSectionCode = 'sectionCode';
 
 export function JoinUrlSection() {
-  // 1. On login, check if student, then for sectionCode
-  // 2. Check if user is already in that section (it will be within sections, because onlys pulls ones that the student is in)
-  // 3. If they are not in that section, display modal for joining that section
-  // 4. If accept, then enroll student in that section, done!
   const [urlParams] = useSearchParams();
 
   const {
@@ -39,7 +35,6 @@ export function JoinUrlSection() {
   const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
-    // Wait for everything to be loaded first
     if (
       sectionsLoadState !== LoadStatus.SUCCEEDED ||
       !myData ||
@@ -48,28 +43,23 @@ export function JoinUrlSection() {
     ) {
       return;
     }
-    // Get section code from URL
     const targetSectionCode = urlParams.get(queryParamSectionCode);
     if (!targetSectionCode) {
       return;
     }
-    // Find the target section
     const targetSection = sections.find(
       (section) => section.sectionCode === targetSectionCode
     );
-    // Check if user is already in the section
     const inSection =
       !isInstructorData(myData) &&
       targetSection &&
       myData.enrolledSections.some(
         (sectionId) => sectionId === targetSection._id
       );
-    // remove the section code from the url
     setCheckResults({ inSection: inSection ?? false, targetSectionCode });
   }, [sectionsLoadState, isLoading, myData, urlParams, sections]);
 
   useEffect(() => {
-    // Only check once after everything is loaded
     if (
       checkResults === undefined ||
       !myData ||
