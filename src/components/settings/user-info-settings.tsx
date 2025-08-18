@@ -63,6 +63,14 @@ export function UserInfoSettings(): JSX.Element {
         </Paper>
       )}
 
+      {/* Admin Controls Section */}
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Admin Settings
+        </Typography>
+        <AdminControls />
+      </Paper>
+
       {/* Classroom Code Section */}
       {classroomCode && (
         <Paper
@@ -154,14 +162,6 @@ export function UserInfoSettings(): JSX.Element {
           </Stack>
         </Paper>
       )}
-
-      {/* Admin Controls Section */}
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Admin Settings
-        </Typography>
-        <AdminControls />
-      </Paper>
 
       {/* Survey Section */}
       {surveyUrl && surveyUrlParam && (
