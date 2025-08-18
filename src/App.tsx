@@ -29,10 +29,12 @@ import {
   studentCoursesUrl,
 } from './pages/instructor/course-management';
 import { EducationalRole } from './types';
+import { useWithRouteChangeRerender } from './hooks/use-with-route-change-rerender';
 
 function MainApp() {
   const MAIN_APP_HEIGHT = '94vh';
   const useLogin = useWithLogin();
+  const { stateCounter } = useWithRouteChangeRerender();
 
   const router = createBrowserRouter([
     {
@@ -141,7 +143,7 @@ function MainApp() {
   if (!configLoaded) {
     return <ConfigLoader />;
   }
-  return <RouterProvider router={router} />;
+  return <RouterProvider key={stateCounter} router={router} />;
 }
 
 function App() {

@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { cyMockDefault, CypressGlobal, mockGQL, roleSwitch } from "../helpers/functions";
+import { cyMockDefault, CypressGlobal, mockGQL, roleSwitch, visitMainPageSettled } from "../helpers/functions";
 import { UserRole } from "../helpers/types";
 
 export function stepsAreEditable(cy: CypressGlobal){
@@ -39,7 +39,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
               userRole: UserRole.ADMIN
             });
-            cy.visit("/")
+            visitMainPageSettled(cy)
             roleSwitch(cy, UserRole.ADMIN)
             cy.get("[data-cy=doc-list-item-Aliens").click()
             cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
@@ -74,7 +74,7 @@ describe('activity builder', () => {
                     ]),
                 ]
               });
-              cy.visit("/")
+              visitMainPageSettled(cy)
               roleSwitch(cy, UserRole.ADMIN)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
@@ -102,7 +102,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
               });
-              cy.visit("/")
+              visitMainPageSettled(cy)
               roleSwitch(cy, UserRole.CONTENT_MANAGER)
         })
         
@@ -110,7 +110,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
               });
-              cy.visit("/")
+              visitMainPageSettled(cy)
               roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
@@ -131,7 +131,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
               });
-              cy.visit("/")
+              visitMainPageSettled(cy)
               roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-other-user-editable-activity]").should("exist")
@@ -144,7 +144,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
               });
-              cy.visit("/")
+              visitMainPageSettled(cy)
               roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
@@ -166,7 +166,7 @@ describe('activity builder', () => {
                     ]),
                 ]
               });
-              cy.visit("/")
+              visitMainPageSettled(cy)
               roleSwitch(cy, UserRole.CONTENT_MANAGER)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
@@ -188,7 +188,7 @@ describe('activity builder', () => {
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER
             });
-            cy.visit("/");
+            visitMainPageSettled(cy)
             roleSwitch(cy, UserRole.CONTENT_MANAGER)
             cy.get("[data-cy=doc-list-item-Aliens").click();
             cy.get("[data-cy=activity-item-copied-activity]").should("not.exist");

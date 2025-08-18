@@ -69,3 +69,9 @@ export function isStudentData(
 ): data is StudentData {
   return 'assignmentProgress' in data;
 }
+
+export function isInstructorData(
+  data: StudentData | Instructor
+): data is Instructor {
+  return 'courses' in data;
+}

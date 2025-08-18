@@ -409,6 +409,11 @@ function roleDisplayText(userRole: UserRole) {
   }
 }
 
+export function visitMainPageSettled(cy: CypressGlobal){
+  cy.visit("/")
+  cy.get("[data-cy=toggle-view-archived]").should("be.visible")
+}
+
 export function roleSwitch(cy: CypressGlobal, targetNewRole: UserRole){
   cy.get("[data-cy=profile-button]").click();
   cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText(UserRole.USER))

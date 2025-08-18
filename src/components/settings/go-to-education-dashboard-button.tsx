@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@mui/material';
 import {
   courseManagementUrl,
@@ -12,11 +12,34 @@ import {
 } from '../../pages/instructor/course-management';
 import { EducationalRole } from '../../types';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
+import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 
 export default function GoToEducationDashboardButton(props: {
+  userId: string;
   educationalRole: EducationalRole;
 }) {
   const navigate = useNavigateWithParams();
+  const { loadUserEducationalData, myData } = useWithEducationalManagement();
+  const [loading, setLoading] = useState(false);
+
+  function handleStudentDashboard() {
+    if (myData) {
+      navigate(studentCoursesUrl);
+      return;
+    }
+    setLoading(true);
+    try {
+      loadUserEducationalData(props.userId, props.educationalRole)
+        .then(() => {
+          navigate(studentCoursesUrl);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const currentPath =
     typeof window !== 'undefined' ? window.location.pathname : '';
@@ -29,6 +52,7 @@ export default function GoToEducationDashboardButton(props: {
       <Button
         variant="contained"
         color="primary"
+        disabled={loading}
         onClick={() => {
           navigate('/docs');
         }}
@@ -43,6 +67,7 @@ export default function GoToEducationDashboardButton(props: {
       <Button
         variant="contained"
         color="primary"
+        disabled={loading}
         onClick={() => {
           navigate(courseManagementUrl);
         }}
@@ -55,8 +80,9 @@ export default function GoToEducationDashboardButton(props: {
       <Button
         variant="contained"
         color="primary"
+        disabled={loading}
         onClick={() => {
-          navigate(studentCoursesUrl);
+          handleStudentDashboard();
         }}
       >
         Student Dashboard
