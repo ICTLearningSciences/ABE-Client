@@ -75,6 +75,7 @@ describe('activity builder', () => {
                 ]
               });
               cy.visit("/")
+              cy.get("[data-cy=toggle-view-archived]").should("be.visible")
               roleSwitch(cy, UserRole.ADMIN)
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
