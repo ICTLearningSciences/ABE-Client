@@ -13,6 +13,7 @@ import useInterval from './use-interval';
 import { useState } from 'react';
 import { ChatMessageTypes } from '../store/slices/chat';
 import { TrackedState } from './use-with-google-doc-versions';
+import { useEducationalContext } from '../contexts/EducationalContext';
 
 export function useWithRawTextDocVersions(
   currentActivityId: string,
@@ -23,6 +24,8 @@ export function useWithRawTextDocVersions(
   const sessionId = useAppSelector((state) => state.state.sessionId);
   const { updateDocTitleLocally } = useWithUsersDocs();
   const messages = chatState.chatLogs[curDocId] || [];
+  const educationalContext = useEducationalContext();
+  const selectedAssignmentId = educationalContext?.assignmentId || '';
   const [lastSavedVersion, setLastSavedVersion] = useState<TrackedState>({
     id: '',
     title: '',
@@ -30,6 +33,7 @@ export function useWithRawTextDocVersions(
     numMessages: messages.length,
     sessionId: sessionId,
     activityId: currentActivityId,
+    courseAssignmentId: selectedAssignmentId,
   });
   const sessionIntention = useAppSelector(
     (state) => state.state.sessionIntention
@@ -73,6 +77,7 @@ export function useWithRawTextDocVersions(
       title: title,
       lastModifyingUser: user?.email || '',
       modifiedTime: new Date().toISOString(),
+      courseAssignmentId: selectedAssignmentId,
     };
     await submitDocVersionGQL(newDocData);
   }
@@ -94,6 +99,7 @@ export function useWithRawTextDocVersions(
       numMessages: messages.length,
       sessionId: sessionId,
       activityId: currentActivityId,
+      courseAssignmentId: selectedAssignmentId,
     };
     const stateChanged = !equals(lastSavedVersion, newState);
     if (!stateChanged) return;

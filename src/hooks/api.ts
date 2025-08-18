@@ -247,6 +247,7 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
             intent
             title
             lastModifyingUser
+            courseAssignmentId
             modifiedTime
           }
         }
@@ -865,6 +866,7 @@ const storeDocTimelineMutation = `mutation StoreDocTimeline($docTimeline: DocTim
             intent
             title
             lastModifyingUser
+            courseAssignmentId
           }
           intent
           changeSummary
@@ -948,6 +950,7 @@ query FetchVersionsById($ids: [String!]!) {
           intent
           title
           lastModifyingUser
+          courseAssignmentId
           modifiedTime
           createdAt
           updatedAt
