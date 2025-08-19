@@ -12,7 +12,10 @@ import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
 import ExampleGoogleDocModal from '../user-view/example-google-docs-modal';
 import { useWithUsersDocs as useWithUsersDocsHook } from '../../hooks/use-with-users-docs';
-import { useCourseId } from '../../contexts/EducationalContext';
+import {
+  useAssignmentId,
+  useCourseId,
+} from '../../contexts/EducationalContext';
 
 export interface AdminViewUserGoogleDocsProps {
   useWithUsersDocs: UseWithUsersDocs;
@@ -25,7 +28,7 @@ export default function ViewUserGoogleDocs(props: {
   const { goToDoc, onHistoryClicked } = props;
   const useWithUsersDocs = useWithUsersDocsHook();
   const courseIdFromContext = useCourseId();
-
+  const courseAssignmentIdFromContext = useAssignmentId();
   const {
     googleDocs,
     copyDocs,
@@ -84,6 +87,7 @@ export default function ViewUserGoogleDocs(props: {
             title,
             isAdminDoc,
             courseIdFromContext,
+            courseAssignmentIdFromContext,
             (data) => {
               goToDoc(data.docId, true);
             }

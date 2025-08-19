@@ -41,6 +41,7 @@ export interface UseWithUsersDocs {
     title?: string,
     isAdminDoc?: boolean,
     courseId?: string,
+    courseAssignmentId?: string,
     callback?: (newDocData: NewDocData) => void,
     docService?: DocService
   ) => Promise<void>;
@@ -138,6 +139,7 @@ export function useWithUsersDocs(): UseWithUsersDocs {
     title?: string,
     isAdminDoc?: boolean,
     courseId?: string,
+    courseAssignmentId?: string,
     callback?: (newDocData: NewDocData) => void
   ) {
     setCreationInProgress(true);
@@ -171,7 +173,8 @@ export function useWithUsersDocs(): UseWithUsersDocs {
           docIdToCopyFrom,
           title,
           isAdminDoc,
-          courseId
+          courseId,
+          courseAssignmentId
         );
         if (callback) {
           callback(newDocData);

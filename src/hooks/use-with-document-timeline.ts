@@ -107,11 +107,26 @@ export function addStartPointToTimeline(timeline: GQLDocumentTimeline) {
   return timelineCopy;
 }
 
-export function useWithDocumentTimeline() {
+export type DocumentTimelineHookReturn = {
+  documentTimeline: GQLDocumentTimeline | undefined;
+  curTimelinePoint: GQLTimelinePoint | undefined;
+  loadInProgress: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errorMessage: any | undefined;
+  fetchDocumentTimeline: (
+    userId: string,
+    docId: string,
+    cancelToken?: CancelToken
+  ) => Promise<void>;
+  selectTimelinePoint: (timepoint: GQLTimelinePoint) => void;
+  saveTimelinePoint: (updatedTimelinePoint: GQLTimelinePoint) => Promise<void>;
+};
+
+export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
+  const user = useAppSelector((state) => state.login.user);
   const [state, dispatch] = useReducer(TimelineReducer, initialState);
   const { state: config } = useWithConfig();
   const requestedVersionIds = useRef<Set<string>>(new Set());
-  const user = useAppSelector((state) => state.login.user);
   const docService = getDocServiceFromLoginService(user?.loginService);
   const hydratedGqlTimeline: GQLDocumentTimeline | undefined = useMemo(() => {
     if (!state.data) {

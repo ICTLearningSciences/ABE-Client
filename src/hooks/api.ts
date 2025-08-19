@@ -163,7 +163,8 @@ export async function createNewDoc(
   docId?: string,
   title?: string,
   isAdminDoc?: boolean,
-  courseId?: string
+  courseId?: string,
+  courseAssignmentId?: string
 ): Promise<NewDocData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   if (!accessToken) throw new Error('No access token');
@@ -184,7 +185,9 @@ export async function createNewDoc(
   if (courseId) {
     url = addQueryParam(url, 'courseId', courseId);
   }
-
+  if (courseAssignmentId) {
+    url = addQueryParam(url, 'courseAssignmentId', courseAssignmentId);
+  }
   const res = await axios.post<CreateGoogleDocResponse>(
     url,
     {},
@@ -315,6 +318,7 @@ export async function fetchDocs(userId: string): Promise<UserDoc[]> {
             admin
             service
             archived
+            courseAssignmentId
           }
         }
       `,
@@ -463,6 +467,7 @@ export async function updateDocStorage(
             admin
             service
             archived
+            courseAssignmentId
           }
         }
     `,

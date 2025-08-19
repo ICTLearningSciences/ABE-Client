@@ -21,7 +21,6 @@ import {
   Button,
 } from '@mui/material';
 import {
-  Person as PersonIcon,
   Close as CloseIcon,
   CheckCircle as CheckCircleIcon,
   RadioButtonUnchecked as UncheckedIcon,
@@ -31,12 +30,13 @@ import {
   Section,
   StudentData,
   Assignment,
-} from '../../../store/slices/education-management/types';
+} from '../../../../store/slices/education-management/types';
 import {
   SectionStudentsProgress,
   useWithEducationalManagement,
-} from '../../../store/slices/education-management/use-with-educational-management';
-import { getAssignmentsInSection } from '../helpers';
+} from '../../../../store/slices/education-management/use-with-educational-management';
+import { getAssignmentsInSection } from '../../helpers';
+import { StudentListItem } from './student-list-item';
 
 interface SectionStudentsGradesProps {
   sectionStudentsProgress: SectionStudentsProgress;
@@ -154,58 +154,13 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
               getStudentProgressCounts(studentId);
             const student = studentProgress.studentData;
 
-            return (
-              <ListItem
-                key={student._id}
-                onClick={() => handleStudentClick(student)}
-                sx={{
-                  cursor: 'pointer',
-                  borderRadius: 2,
-                  mb: 1,
-                  border: '1px solid',
-                  borderColor: 'grey.200',
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    borderColor: '#1B6A9C',
-                    backgroundColor: 'rgba(27, 106, 156, 0.04)',
-                  },
-                }}
-              >
-                <ListItemIcon>
-                  <PersonIcon sx={{ color: '#1B6A9C' }} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography
-                      variant="h6"
-                      sx={{ fontWeight: 600, color: 'text.primary' }}
-                    >
-                      {student.name}
-                    </Typography>
-                  }
-                  secondary={
-                    <Typography variant="body2" color="text.secondary">
-                      {student.userId}
-                    </Typography>
-                  }
-                />
-                <Box sx={{ textAlign: 'right' }}>
-                  <Typography
-                    variant="body1"
-                    sx={{ fontWeight: 600, color: '#1B6A9C' }}
-                  >
-                    Required: {requiredCompleted}/
-                    {assignmentsInSection.requiredAssignments.length}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{ fontWeight: 600, color: '#1B6A9C' }}
-                  >
-                    Optional: {optionalCompleted}/
-                    {section.numOptionalAssignmentsRequired || 0}
-                  </Typography>
-                </Box>
-              </ListItem>
+            return StudentListItem(
+              student,
+              requiredCompleted,
+              optionalCompleted,
+              assignmentsInSection,
+              handleStudentClick,
+              section.numOptionalAssignmentsRequired
             );
           }
         )}

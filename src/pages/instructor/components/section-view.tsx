@@ -22,7 +22,7 @@ import { Section } from '../../../store/slices/education-management/types';
 import SectionModal, { SectionModalMode } from './section-modal';
 import DeleteConfirmationModal from './delete-confirmation-modal';
 import SectionContent from './section-content';
-import SectionStudentsGrades from './section-students-grades';
+import SectionStudentsGrades from './section-student-grades/section-students-grades';
 import BannedStudents from './banned-students';
 
 interface SectionViewProps {

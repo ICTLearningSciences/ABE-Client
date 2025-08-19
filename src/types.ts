@@ -151,6 +151,7 @@ export interface UserDoc {
   admin: boolean;
   service: DocService;
   archived: boolean;
+  courseAssignmentId: string;
 }
 
 export interface StoreUserDoc
