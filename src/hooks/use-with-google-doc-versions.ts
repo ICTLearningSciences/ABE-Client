@@ -14,6 +14,7 @@ import { equals, hasHoursPassed } from '../helpers';
 import { useWithUsersDocs } from './use-with-users-docs';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { isAxiosError } from 'axios';
+import { useEducationalContext } from '../contexts/EducationalContext';
 
 export interface TrackedState {
   id: string;
@@ -22,6 +23,7 @@ export interface TrackedState {
   numMessages: number;
   sessionId: string;
   activityId: string;
+  courseAssignmentId: string;
 }
 
 /**
@@ -33,6 +35,8 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
   const { updateMostRecentDocVersion, warnExpiredAccessToken } = useWithState();
   const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const sessionId: string = useAppSelector((state) => state.state.sessionId);
+  const educationalContext = useEducationalContext();
+  const selectedAssignmentId = educationalContext?.assignmentId || '';
   const sessionIntention: Intention | undefined = useAppSelector(
     (state) => state.state.sessionIntention
   );
@@ -58,6 +62,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
     numMessages: messages.length,
     sessionId: sessionId,
     activityId: selectedActivityId,
+    courseAssignmentId: selectedAssignmentId,
   });
 
   async function checkForNewVersion() {
@@ -81,6 +86,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         numMessages: messages.length,
         sessionId: sessionId,
         activityId: selectedActivityId,
+        courseAssignmentId: selectedAssignmentId,
       };
       if (docData.title !== lastSavedVersion.title) {
         updateDocTitleLocally(curDocId, docData.title);
@@ -106,6 +112,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         title: docData.title,
         lastModifyingUser: docData.lastModifyingUser,
         modifiedTime: docData.modifiedTime,
+        courseAssignmentId: selectedAssignmentId,
       };
       await submitDocVersion(newDocData);
     } catch (e) {

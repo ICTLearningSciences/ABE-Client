@@ -465,6 +465,8 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               <ActivityView
                 activityId={viewState.selectedActivityId}
                 assignmentId={viewState.selectedAssignmentId}
+                courseId={viewState.selectedCourseId}
+                sectionId={viewState.selectedSectionId}
               />
             )}
         </Box>

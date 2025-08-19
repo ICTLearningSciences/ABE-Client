@@ -57,6 +57,7 @@ const startPoint: GQLTimelinePoint = {
     activity: '',
     intent: '',
     title: '',
+    courseAssignmentId: '',
     lastModifyingUser: '',
     modifiedTime: '',
     createdAt: '',

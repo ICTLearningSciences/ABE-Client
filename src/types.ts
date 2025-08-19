@@ -129,6 +129,7 @@ export interface DocVersion {
   title: string;
   lastModifyingUser: string;
   modifiedTime: string;
+  courseAssignmentId: string;
 }
 
 export enum UserActions {
@@ -437,6 +438,7 @@ export interface IGDocVersion {
   modifiedTime: string;
   createdAt: string;
   updatedAt: string;
+  courseAssignmentId: string;
 }
 
 export interface GQLDocumentTimeline {
