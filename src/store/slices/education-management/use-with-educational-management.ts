@@ -446,7 +446,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         dispatch(_fetchCourses(forUserId)).unwrap(),
         dispatch(_fetchAssignments(forUserId)).unwrap(),
         dispatch(_fetchSections(forUserId)).unwrap(),
-        dispatch(_fetchStudentsInMyCourses(forUserId)).unwrap(),
+        educationalRole === EducationalRole.INSTRUCTOR
+          ? dispatch(_fetchStudentsInMyCourses(forUserId)).unwrap()
+          : [],
         educationalRole === EducationalRole.INSTRUCTOR
           ? dispatch(_fetchInstructors()).unwrap()
           : [],

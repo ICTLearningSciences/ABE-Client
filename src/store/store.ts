@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { logger } from 'redux-logger';
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import loginReducer from './slices/login';
 import chatReducer from './slices/chat';
 import stateReducer from './slices/state';
@@ -23,16 +23,28 @@ const sentryEnhancer = Sentry.createReduxEnhancer({
   },
 });
 
+// Create the combined reducer
+const appReducer = combineReducers({
+  login: loginReducer,
+  chat: chatReducer,
+  state: stateReducer,
+  config: configReducer,
+  docGoalsActivities: docGoalsActivitiesReducer,
+  educationManagement: educationManagementReducer,
+});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const rootReducer = (state: any, action: any) => {
+  // reset entire redux store on logout
+  if (action.type === 'login/logout/fulfilled') {
+    return appReducer(undefined, action);
+  }
+  return appReducer(state, action);
+};
+
 export const store = configureStore({
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
-  reducer: {
-    login: loginReducer,
-    chat: chatReducer,
-    state: stateReducer,
-    config: configReducer,
-    docGoalsActivities: docGoalsActivitiesReducer,
-    educationManagement: educationManagementReducer,
-  },
+  reducer: rootReducer,
   enhancers: (defaultEhancers) => defaultEhancers.concat(sentryEnhancer),
 });
 
