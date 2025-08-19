@@ -21,6 +21,7 @@ import { TwoOptionDialog } from '../dialog';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { GoogleDocItemRow } from './google-doc-item-row';
+import { useCourseId } from '../../contexts/EducationalContext';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: UserDoc[];
@@ -30,6 +31,7 @@ export default function SelectCreateDocs(props: {
     docIdToCopy?: string,
     title?: string,
     isAdminDoc?: boolean,
+    courseId?: string,
     callback?: (newDocData: NewDocData) => void
   ) => void;
   handleDeleteDoc: (docId: string) => Promise<void>;
@@ -65,6 +67,7 @@ export default function SelectCreateDocs(props: {
   const googleDocs = viewingArchived ? archivedDocs : unarchivedDocs;
   const [docToDelete, setDocToDelete] = React.useState<UserDoc>();
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
+  const courseIdFromContext = useCourseId();
   function SortIndicator(props: { field: string }) {
     const { field } = props;
     const isActive = sortBy.field === field;
@@ -120,10 +123,17 @@ export default function SelectCreateDocs(props: {
               }}
             >
               <Button
+                data-cy="create-doc-button"
                 onClick={() => {
-                  handleCreateDoc(undefined, undefined, undefined, (data) => {
-                    goToDoc(data.docId, true);
-                  });
+                  handleCreateDoc(
+                    undefined,
+                    undefined,
+                    undefined,
+                    courseIdFromContext,
+                    (data) => {
+                      goToDoc(data.docId, true);
+                    }
+                  );
                 }}
                 size="large"
                 style={{

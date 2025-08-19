@@ -43,7 +43,8 @@ import { activityQueryData, promptQueryData } from './api-helpers';
 import { omit } from 'lodash';
 import { OpenAiServiceJobStatusResponseType } from '../ai-services/open-ai-service';
 
-const API_ENDPOINT = process.env.REACT_APP_GOOGLE_API_ENDPOINT || '/docs';
+const API_ENDPOINT =
+  process.env.REACT_APP_GOOGLE_API_ENDPOINT || 'http://localhost:8000/docs';
 const GRAPHQL_ENDPOINT =
   process.env.REACT_APP_GRAPHQL_ENDPOINT || '/graphql/graphql';
 
@@ -161,7 +162,8 @@ export async function createNewDoc(
   userEmail?: string,
   docId?: string,
   title?: string,
-  isAdminDoc?: boolean
+  isAdminDoc?: boolean,
+  courseId?: string
 ): Promise<NewDocData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   if (!accessToken) throw new Error('No access token');
@@ -178,6 +180,9 @@ export async function createNewDoc(
   }
   if (isAdminDoc) {
     url = addQueryParam(url, 'isAdminDoc', isAdminDoc ? 'true' : 'false');
+  }
+  if (courseId) {
+    url = addQueryParam(url, 'courseId', courseId);
   }
 
   const res = await axios.post<CreateGoogleDocResponse>(

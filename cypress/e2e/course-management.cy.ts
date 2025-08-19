@@ -486,4 +486,39 @@ describe('Course Management', () => {
       });
     });
   });
+
+  describe('Doc CRUD Operations', () => {
+    it('passes courseId to createNewDoc', () => {
+      cyMockEducationalManagement(cy, {
+        userRole: UserRole.USER,
+        educationalRole: EducationalRole.STUDENT
+      });
+
+      cy.visit('/course-management');
+
+      // Wait for initial load
+      cy.wait('@RefreshAccessToken');
+      cy.wait('@FetchConfig');
+      cy.wait('@CreateNewStudent');
+      cy.wait('@FetchCourses');
+      cy.wait('@FetchSections');
+      cy.wait('@FetchAssignments');
+      cy.wait('@FetchBuiltActivities');
+      
+      // Navigate to course -> section -> assignment
+      cy.get('[data-cy=tree-item-course-123]').click();
+      cy.get('[data-cy=section-card-section-456]').click();
+      cy.get('[data-cy=assignment-card-assignment-123]').click();
+
+      // Click on the create doc button
+      cy.get("[data-cy=activity-item-my-editable-activity]").click();
+      cy.get("[data-cy=create-doc-button]").click();
+
+      cy.wait('@createNewDoc').then((xhr) => {
+        const data = xhr.request.query;
+        expect(data.courseId).to.exist;
+        expect(data.courseId).to.equal('course-123');
+      });
+    });
+  });
 });

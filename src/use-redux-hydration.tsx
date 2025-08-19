@@ -21,6 +21,12 @@ export async function useReduxHydration() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    if (loginStatus !== LoginStatus.AUTHENTICATED) {
+      setHydrated(false);
+    }
+  }, [loginStatus]);
+
+  useEffect(() => {
     if (!userData || hydrated || loginStatus !== LoginStatus.AUTHENTICATED)
       return;
     setHydrated(true);

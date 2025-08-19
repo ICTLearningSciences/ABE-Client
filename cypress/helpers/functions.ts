@@ -314,6 +314,24 @@ export function cyMockGetDocData(
   });
 }
 
+export function cyMockCreateNewDoc(
+  cy: CypressGlobal,
+  params: {
+    statusCode?: number;
+    response?: any;
+  } = {}
+) {
+  cy.intercept('**/create_google_doc**', (req) => {
+    req.alias = 'createNewDoc';
+    req.reply(
+      staticResponse({
+        statusCode: params.statusCode || 200,
+        body: params.response || {},
+      })
+    );
+  });
+}
+
 export function cyMockGoogleDoc(
   cy: CypressGlobal,
 ) {
