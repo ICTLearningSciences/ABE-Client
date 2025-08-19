@@ -7,6 +7,7 @@ import {
   ListItemText,
   Typography,
   Box,
+  Button,
 } from '@mui/material';
 import { Person as PersonIcon } from '@mui/icons-material';
 
@@ -38,6 +39,9 @@ export function StudentListItem(
       <ListItemIcon>
         <PersonIcon sx={{ color: '#1B6A9C' }} />
       </ListItemIcon>
+      <Button variant="contained" color="primary">
+        View Doc
+      </Button>
       <ListItemText
         primary={
           <Typography

@@ -14,6 +14,7 @@ import {
   Instructor,
   ActivityCompletion,
 } from './types';
+import { Connection, UserDoc } from '../../../types';
 
 // GraphQL query fragment for course data
 export const courseQueryData = `
@@ -456,4 +457,38 @@ export async function modifyStudentBanInSection(
     }
   );
   return res;
+}
+
+export async function fetchStudentsGoogleDocIds(
+  userId: string,
+  courseAssignmentId: string
+): Promise<string[]> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Connection<UserDoc>>(
+    {
+      query: `query FindAllGoogleDocs($limit: Int, $filter: String, $filterObject: Object, $sortAscending: Boolean, $sortBy: String){
+            findAllGoogleDocs(limit: $limit, filter: $filter, filterObject: $filterObject, sortAscending: $sortAscending, sortBy: $sortBy) {
+            edges {
+                node{
+                    user
+                    title
+                    googleDocId
+                    courseAssignmentId
+                  }
+                }
+            }
+        }`,
+      variables: {
+        filterObject: {
+          user: userId,
+          courseAssignmentId: courseAssignmentId,
+        },
+      },
+    },
+    {
+      dataPath: 'findAllGoogleDocs',
+      accessToken,
+    }
+  );
+  return res.edges.map((edge) => edge.node.googleDocId);
 }
