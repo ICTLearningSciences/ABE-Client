@@ -25,6 +25,10 @@ import {
   updateDocTitleLocally as _updateDocTitle,
   setArchiveUserDoc,
 } from '../store/slices/state';
+import {
+  EducationalEvents,
+  educationalEventsEmitter,
+} from '../store/slices/education-management/use-with-educational-events';
 
 export interface SortConfig {
   field: string;
@@ -63,7 +67,6 @@ export function useWithUsersDocs(): UseWithUsersDocs {
     field: 'updatedAt',
     ascend: false,
   });
-
   const setSortBy = (config: SortConfig) => {
     setSortByState((prev) => ({
       field: config.field,
@@ -161,6 +164,10 @@ export function useWithUsersDocs(): UseWithUsersDocs {
           admin: isAdminDoc || false,
           service: DocService.RAW_TEXT,
         });
+        educationalEventsEmitter.emit(
+          EducationalEvents.NEW_DOC_CREATED,
+          newDocData
+        );
         loadUsersDocs();
         if (callback) {
           callback(newDocData);
@@ -175,6 +182,10 @@ export function useWithUsersDocs(): UseWithUsersDocs {
           isAdminDoc,
           courseId,
           courseAssignmentId
+        );
+        educationalEventsEmitter.emit(
+          EducationalEvents.NEW_DOC_CREATED,
+          newDocData
         );
         if (callback) {
           callback(newDocData);

@@ -34,6 +34,7 @@ import {
   ActivityCompletion,
   Instructor,
   AssignmentProgress,
+  isInstructorData,
 } from './types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { EducationalRole } from '../../../types';
@@ -43,6 +44,7 @@ import {
   getStudentSectionProgress,
   StudentSectionProgress,
 } from '../../../pages/instructor/helpers';
+import { ModifyStudentAssignmentProgressActions } from './educational-api';
 
 export interface UseWithEducationalManagement {
   loadCourses: (forUserId: string) => Promise<Course[]>;
@@ -98,12 +100,43 @@ export interface UseWithEducationalManagement {
     courseId: string,
     sectionId: string
   ) => Promise<StudentData>;
-  updateStudentAssignmentProgress: (
+  studentActivityStarted: (
     targetUserId: string,
     courseId: string,
     sectionId: string,
     assignmentId: string,
-    activityCompletions: ActivityCompletion[]
+    activityId: string
+  ) => Promise<StudentData>;
+  studentActivityCompleted: (
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string
+  ) => Promise<StudentData>;
+  studentActivityNewDocCreated: (
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string,
+    docId: string
+  ) => Promise<StudentData>;
+  studentActivityDocPrimaryStatusSet: (
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string,
+    docId: string
+  ) => Promise<StudentData>;
+  studentActivityDocDeleted: (
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string,
+    docId: string
   ) => Promise<StudentData>;
   loadInstructors: () => Promise<Instructor[]>;
   courses: Course[];
@@ -321,12 +354,81 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as StudentData;
   }
 
-  async function updateStudentAssignmentProgress(
+  async function studentActivityStarted(
     targetUserId: string,
     courseId: string,
     sectionId: string,
     assignmentId: string,
-    activityCompletions: ActivityCompletion[]
+    activityId: string
+  ) {
+    if (!myData) {
+      throw new Error('no user educational data found');
+    }
+    if (isInstructorData(myData)) {
+      throw new Error('instructor cannot start activity');
+    }
+    const assignmentProgress = myData.assignmentProgress.find(
+      (a) => a.assignmentId === assignmentId
+    );
+    const activityAlreadyInProgress = Boolean(
+      assignmentProgress?.activityCompletions.some(
+        (ac) => ac.activityId === activityId
+      )
+    );
+    if (activityAlreadyInProgress) {
+      //  if activity already in progress, no-op
+      return myData;
+    }
+    const res = await dispatch(
+      _updateStudentAssignmentProgress({
+        targetUserId,
+        courseId,
+        sectionId,
+        assignmentId,
+        activityId,
+        action: ModifyStudentAssignmentProgressActions.ACTIVITY_STARTED,
+      })
+    );
+    return res.payload as StudentData;
+  }
+
+  async function studentActivityCompleted(
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string
+  ) {
+    if (!myData) {
+      throw new Error('no user educational data found');
+    }
+    if (isInstructorData(myData)) {
+      throw new Error('instructor cannot complete activity');
+    }
+    // if activity already completed, no-op
+    if (haveICompletedActivity(assignmentId, activityId)) {
+      return myData;
+    }
+    const res = await dispatch(
+      _updateStudentAssignmentProgress({
+        targetUserId,
+        courseId,
+        sectionId,
+        assignmentId,
+        activityId,
+        action: ModifyStudentAssignmentProgressActions.ACTIVITY_COMPLETED,
+      })
+    );
+    return res.payload as StudentData;
+  }
+
+  async function studentActivityNewDocCreated(
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string,
+    docId: string
   ) {
     const res = await dispatch(
       _updateStudentAssignmentProgress({
@@ -334,7 +436,73 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         courseId,
         sectionId,
         assignmentId,
-        activityCompletions,
+        activityId,
+        action: ModifyStudentAssignmentProgressActions.NEW_DOC_CREATED,
+        docId,
+      })
+    );
+    return res.payload as StudentData;
+  }
+
+  async function studentActivityDocPrimaryStatusSet(
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string,
+    docId: string
+  ) {
+    if (!myData) {
+      throw new Error('no user educational data found');
+    }
+    if (isInstructorData(myData)) {
+      throw new Error('instructor cannot set doc primary status');
+    }
+    const assignmentProgress = myData.assignmentProgress.find(
+      (a) => a.assignmentId === assignmentId
+    );
+    const activityProgress = assignmentProgress?.activityCompletions.find(
+      (a) => a.activityId === activityId
+    );
+    const docAlreadyPrimary = Boolean(
+      activityProgress?.relevantGoogleDocs.some(
+        (rd) => rd.docId === docId && rd.primaryDocument
+      )
+    );
+    if (docAlreadyPrimary) {
+      return myData;
+    }
+    const res = await dispatch(
+      _updateStudentAssignmentProgress({
+        targetUserId,
+        courseId,
+        sectionId,
+        assignmentId,
+        activityId,
+        action: ModifyStudentAssignmentProgressActions.DOC_PRIMARY_STATUS_SET,
+        docId,
+      })
+    );
+    return res.payload as StudentData;
+  }
+
+  async function studentActivityDocDeleted(
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string,
+    docId: string
+  ) {
+    const res = await dispatch(
+      _updateStudentAssignmentProgress({
+        targetUserId,
+        courseId,
+        sectionId,
+        assignmentId,
+        activityId,
+        action: ModifyStudentAssignmentProgressActions.DOC_DELETED,
+        docId,
       })
     );
     return res.payload as StudentData;
@@ -589,7 +757,11 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     deleteAssignment,
     enrollStudentInSection,
     removeStudentFromSection,
-    updateStudentAssignmentProgress,
+    studentActivityStarted,
+    studentActivityCompleted,
+    studentActivityNewDocCreated,
+    studentActivityDocPrimaryStatusSet,
+    studentActivityDocDeleted,
     loadInstructors,
     viewCourse,
     viewSection,

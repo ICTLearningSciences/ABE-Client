@@ -445,10 +445,11 @@ describe('Course Management', () => {
   });
 
   describe('Activity Progress', () => {
-    it('When a student opens an activity, logs them completing that activity', () => {
+    it('When a student completes an activity, logs them completing that activity', () => {
       cyMockEducationalManagement(cy, {
         userRole: UserRole.USER,
         educationalRole: EducationalRole.STUDENT
+        
       });
       
       cy.visit('/course-management');
@@ -473,16 +474,16 @@ describe('Course Management', () => {
       cy.get('[data-cy=doc-list-item-Aliens]').click();
 
       // Verify the API request is made to update student progress
+      // NOTE: this activity auto completes when the doc is created
       cy.wait('@ModifyStudentAssignmentProgress').then((xhr) => {
         const data = xhr.request.body.variables;
-        expect(data.activityCompletions).to.deep.include({
-          activityId: 'my-editable-activity',
-          complete: true
-        });
-        expect(data.targetUserId).to.exist;
-        expect(data.courseId).to.exist;
-        expect(data.sectionId).to.exist;
-        expect(data.assignmentId).to.exist;
+        console.log(data);
+        expect(data.action).to.equal("ACTIVITY_COMPLETED");
+        expect(data.activityId).to.equal("my-editable-activity");
+        expect(data.assignmentId).to.equal("assignment-123");
+        expect(data.courseId).to.equal("course-123");
+        expect(data.sectionId).to.equal("section-456");
+        expect(data.targetUserId).to.equal("user-123");
       });
     });
   });
@@ -520,5 +521,50 @@ describe('Course Management', () => {
         expect(data.courseId).to.equal('course-123');
       });
     });
+
+    it("emits new doc created event when a student creates a new doc", () => {
+      cyMockEducationalManagement(cy, {
+        userRole: UserRole.USER,
+        educationalRole: EducationalRole.STUDENT
+      });
+
+      cy.visit('/course-management');
+
+      // Wait for initial load
+      cy.wait('@RefreshAccessToken');
+      cy.wait('@FetchConfig');
+      cy.wait('@CreateNewStudent');
+      cy.wait('@FetchCourses');
+      cy.wait('@FetchSections');
+      cy.wait('@FetchAssignments');
+      cy.wait('@FetchBuiltActivities');
+      
+      // Navigate to course -> section -> assignment
+      cy.get('[data-cy=tree-item-course-123]').click();
+      cy.get('[data-cy=section-card-section-456]').click();
+      cy.get('[data-cy=assignment-card-assignment-123]').click();
+
+      // Click on the create doc button
+      cy.get("[data-cy=activity-item-my-editable-activity]").click();
+      cy.get("[data-cy=create-doc-button]").click();
+
+      cy.wait('@createNewDoc').then((xhr) => {
+        const data = xhr.request.query;
+        expect(data.courseId).to.exist;
+        expect(data.courseId).to.equal('course-123');
+      });
+
+      cy.wait("@ModifyStudentAssignmentProgress").then((xhr) => {
+        const data = xhr.request.body.variables;
+        expect(data.action).to.equal("NEW_DOC_CREATED");
+        expect(data.activityId).to.equal("my-editable-activity");
+        expect(data.assignmentId).to.equal("assignment-123");
+        expect(data.courseId).to.equal("course-123");
+        expect(data.docId).to.equal("123");
+        expect(data.sectionId).to.equal("section-456");
+      });
+    });
+
+
   });
 });

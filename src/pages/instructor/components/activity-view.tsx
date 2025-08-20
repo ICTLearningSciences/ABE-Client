@@ -5,15 +5,12 @@ import { useWithEducationalManagement } from '../../../store/slices/education-ma
 import { ColumnDiv } from '../../../styled-components';
 import { Typography, Box } from '@mui/material';
 import { CheckCircle, RadioButtonUnchecked } from '@mui/icons-material';
-import { EducationalProvider } from '../../../contexts/EducationalContext';
 
 export function ActivityView(props: {
   activityId: string;
   assignmentId: string;
-  courseId?: string;
-  sectionId?: string;
 }): JSX.Element {
-  const { activityId, assignmentId, courseId, sectionId } = props;
+  const { activityId, assignmentId } = props;
   const [selectedDocId, setSelectedDocId] = useState<string>();
 
   const educationManagement = useWithEducationalManagement();
@@ -25,85 +22,69 @@ export function ActivityView(props: {
 
   if (!selectedDocId) {
     return (
-      <EducationalProvider
-        initialActivityId={activityId}
-        initialAssignmentId={assignmentId}
-        initialCourseId={courseId}
-        initialSectionId={sectionId}
-      >
-        <ViewUserGoogleDocs
-          goToDoc={(docId: string) => {
-            setSelectedDocId(docId);
-          }}
-          onHistoryClicked={() => {
-            console.log('history clicked');
-          }}
-        />
-      </EducationalProvider>
+      <ViewUserGoogleDocs
+        goToDoc={(docId: string) => {
+          setSelectedDocId(docId);
+        }}
+        onHistoryClicked={() => {
+          console.log('history clicked');
+        }}
+      />
     );
   }
 
   return (
-    <EducationalProvider
-      initialActivityId={activityId}
-      initialAssignmentId={assignmentId}
-      initialCourseId={courseId}
-      initialSectionId={sectionId}
-    >
-      <ColumnDiv
-        style={{ width: '100%', height: '100%', position: 'relative' }}
+    <ColumnDiv style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          p: 2,
+        }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            p: 2,
-          }}
-        >
-          {haveICompletedActivity ? (
-            <>
-              <CheckCircle
-                sx={{
-                  color: 'green',
-                  fontSize: '28px',
-                }}
-              />
-              <Typography
-                variant="body2"
-                sx={{
-                  color: 'green',
-                  fontWeight: 500,
-                }}
-              >
-                Complete
-              </Typography>
-            </>
-          ) : (
-            <>
-              <RadioButtonUnchecked
-                sx={{
-                  color: 'grey.400',
-                  fontSize: '28px',
-                }}
-              />
-              <Typography
-                variant="body2"
-                sx={{
-                  color: 'grey.400',
-                  fontWeight: 500,
-                }}
-              >
-                Incomplete
-              </Typography>
-            </>
-          )}
-        </Box>
-        <DocView docId={selectedDocId} disableActivitySelector={true} />
-      </ColumnDiv>
-    </EducationalProvider>
+        {haveICompletedActivity ? (
+          <>
+            <CheckCircle
+              sx={{
+                color: 'green',
+                fontSize: '28px',
+              }}
+            />
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'green',
+                fontWeight: 500,
+              }}
+            >
+              Complete
+            </Typography>
+          </>
+        ) : (
+          <>
+            <RadioButtonUnchecked
+              sx={{
+                color: 'grey.400',
+                fontSize: '28px',
+              }}
+            />
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'grey.400',
+                fontWeight: 500,
+              }}
+            >
+              Incomplete
+            </Typography>
+          </>
+        )}
+      </Box>
+      <DocView docId={selectedDocId} disableActivitySelector={true} />
+    </ColumnDiv>
   );
 }

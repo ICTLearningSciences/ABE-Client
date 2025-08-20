@@ -326,7 +326,11 @@ export function cyMockCreateNewDoc(
     req.reply(
       staticResponse({
         statusCode: params.statusCode || 200,
-        body: params.response || {},
+        body: params.response || {
+          data: {
+            docId: '123',
+          }
+        },
       })
     );
   });

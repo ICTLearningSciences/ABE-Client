@@ -16,8 +16,8 @@ export const testStudent: StudentData = {
     {
       assignmentId: 'assignment-123',
       activityCompletions: [
-        { activityId: 'my-editable-activity', complete: true },
-        { activityId: 'my-read-only-activity', complete: false }
+        { activityId: 'my-editable-activity', complete: false, relevantGoogleDocs: [] },
+        { activityId: 'my-read-only-activity', complete: false, relevantGoogleDocs: [] }
       ]
     }
   ]
@@ -33,8 +33,8 @@ export const testStudent2: StudentData = {
     {
       assignmentId: 'assignment-123',
       activityCompletions: [
-        { activityId: 'my-editable-activity', complete: true },
-        { activityId: 'my-read-only-activity', complete: true }
+        { activityId: 'my-editable-activity', complete: true, relevantGoogleDocs: [] },
+        { activityId: 'my-read-only-activity', complete: true, relevantGoogleDocs: [] }
       ]
     }
   ]

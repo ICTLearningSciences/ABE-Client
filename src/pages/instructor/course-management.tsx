@@ -27,6 +27,7 @@ import { ActivityView } from './components/activity-view';
 import { useAppSelector } from '../../store/hooks';
 import { LoadingDialog } from '../../components/dialog';
 import { JoinUrlSection } from './components/join-url-section';
+import { useWithEducationalEvents } from '../../store/slices/education-management/use-with-educational-events';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -49,6 +50,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const viewState = useAppSelector(
     (state) => state.educationManagement.viewState
   );
+  useWithEducationalEvents();
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
   const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
   const { builtActivities } = useWithDocGoalsActivities();
@@ -104,6 +106,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
 
   const handleActivitySelect = (activityId: string) => {
     if (
+      !loginState.user?._id ||
       !viewState.selectedCourseId ||
       !viewState.selectedSectionId ||
       !viewState.selectedAssignmentId
@@ -111,6 +114,13 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       console.error('Missing required view state for activity select');
       return;
     }
+    educationManagement.studentActivityStarted(
+      loginState.user._id,
+      viewState.selectedCourseId,
+      viewState.selectedSectionId,
+      viewState.selectedAssignmentId,
+      activityId
+    );
     viewActivity(
       viewState.selectedCourseId,
       viewState.selectedSectionId,
@@ -465,8 +475,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               <ActivityView
                 activityId={viewState.selectedActivityId}
                 assignmentId={viewState.selectedAssignmentId}
-                courseId={viewState.selectedCourseId}
-                sectionId={viewState.selectedSectionId}
               />
             )}
         </Box>

@@ -32,8 +32,8 @@ export const studentWithUpdatedProgress: StudentData = {
     {
       assignmentId: 'assignment-123',
       activityCompletions: [
-        { activityId: 'my-editable-activity', complete: true },
-        { activityId: 'my-read-only-activity', complete: true }
+        { activityId: 'my-editable-activity', complete: true, relevantGoogleDocs: [] },
+        { activityId: 'my-read-only-activity', complete: true, relevantGoogleDocs: [] }
       ]
     }
   ]

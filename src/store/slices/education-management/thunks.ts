@@ -21,8 +21,9 @@ import {
   fetchInstructors as _fetchInstructors,
   modifyStudentBanInSection as _modifyStudentBanInSection,
   BanStudentFromSectionAction,
+  ModifyStudentAssignmentProgressActions,
 } from './educational-api';
-import { Course, Assignment, Section, ActivityCompletion } from './types';
+import { Course, Assignment, Section } from './types';
 
 // Fetch thunks
 export const fetchCourses = createAsyncThunk(
@@ -199,14 +200,18 @@ export const updateStudentAssignmentProgress = createAsyncThunk(
     courseId: string;
     sectionId: string;
     assignmentId: string;
-    activityCompletions: ActivityCompletion[];
+    activityId: string;
+    action: ModifyStudentAssignmentProgressActions;
+    docId?: string;
   }) => {
     return await _modifyStudentAssignmentProgress(
       params.targetUserId,
       params.courseId,
       params.sectionId,
       params.assignmentId,
-      params.activityCompletions
+      params.activityId,
+      params.action,
+      params.docId
     );
   }
 );

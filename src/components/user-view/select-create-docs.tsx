@@ -21,10 +21,6 @@ import { TwoOptionDialog } from '../dialog';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { GoogleDocItemRow } from './google-doc-item-row';
-import {
-  useAssignmentId,
-  useCourseId,
-} from '../../contexts/EducationalContext';
 import { useAppSelector } from '../../store/hooks';
 import { Assignment } from '../../store/slices/education-management/types';
 
@@ -72,8 +68,9 @@ export default function SelectCreateDocs(props: {
   const [viewingArchived, setViewingArchived] = React.useState(false);
   const [docToDelete, setDocToDelete] = React.useState<UserDoc>();
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
-  const courseIdFromContext = useCourseId();
-  const courseAssignmentIdFromContext = useAssignmentId();
+  const viewState = useAppSelector(
+    (state) => state.educationManagement.viewState
+  );
   const assignments = useAppSelector(
     (state) => state.educationManagement.assignments
   );
@@ -81,11 +78,12 @@ export default function SelectCreateDocs(props: {
     archivedDocs || [],
     unarchivedDocs || [],
     viewingArchived,
-    courseAssignmentIdFromContext
+    viewState.selectedAssignmentId
   );
   const title = useMemo(
-    () => getTitle(assignments, viewingArchived, courseAssignmentIdFromContext),
-    [assignments, viewingArchived, courseAssignmentIdFromContext]
+    () =>
+      getTitle(assignments, viewingArchived, viewState.selectedAssignmentId),
+    [assignments, viewingArchived, viewState.selectedAssignmentId]
   );
 
   function getDisplayedDocs(
@@ -183,8 +181,8 @@ export default function SelectCreateDocs(props: {
                     undefined,
                     undefined,
                     undefined,
-                    courseIdFromContext,
-                    courseAssignmentIdFromContext,
+                    viewState.selectedCourseId,
+                    viewState.selectedAssignmentId,
                     (data) => {
                       goToDoc(data.docId, true);
                     }

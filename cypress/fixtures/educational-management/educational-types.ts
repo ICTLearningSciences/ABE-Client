@@ -38,8 +38,14 @@ export interface Course {
     numOptionalAssignmentsRequired: number;
   }
   
+  export interface RelevantGoogleDoc {
+    docId: string;
+    primaryDocument: boolean;
+  }
+  
   export interface ActivityCompletion {
     activityId: string;
+    relevantGoogleDocs: RelevantGoogleDoc[];
     complete: boolean;
   }
   
