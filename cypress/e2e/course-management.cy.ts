@@ -477,7 +477,6 @@ describe('Course Management', () => {
       // NOTE: this activity auto completes when the doc is created
       cy.wait('@ModifyStudentAssignmentProgress').then((xhr) => {
         const data = xhr.request.body.variables;
-        console.log(data);
         expect(data.action).to.equal("ACTIVITY_COMPLETED");
         expect(data.activityId).to.equal("my-editable-activity");
         expect(data.assignmentId).to.equal("assignment-123");
