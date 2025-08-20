@@ -190,6 +190,7 @@ export interface UseWithEducationalManagement {
     assignmentId: string,
     activityId: string
   ) => Promise<void>;
+  viewActivityDocumentTimelines: (studentId: string) => Promise<void>;
   viewDashboard: () => Promise<void>;
   haveICompletedActivity: (assignmentId: string, activityId: string) => boolean;
   banStudentFromSection: (
@@ -707,6 +708,19 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     );
   }
 
+  async function viewActivityDocumentTimelines(studentId: string) {
+    dispatch(
+      setViewState({
+        view: 'activity-document-timelines',
+        selectedCourseId: viewState.selectedCourseId,
+        selectedSectionId: viewState.selectedSectionId,
+        selectedAssignmentId: viewState.selectedAssignmentId,
+        selectedActivityId: viewState.selectedActivityId,
+        selectedStudentId: studentId,
+      })
+    );
+  }
+
   function haveICompletedActivity(assignmentId: string, activityId: string) {
     const studentData = myData as StudentData;
     if (!studentData.assignmentProgress) return false;
@@ -767,6 +781,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     viewSection,
     viewAssignment,
     viewActivity,
+    viewActivityDocumentTimelines,
     viewDashboard,
     haveICompletedActivity,
     courses,

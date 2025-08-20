@@ -28,6 +28,8 @@ import { useAppSelector } from '../../store/hooks';
 import { LoadingDialog } from '../../components/dialog';
 import { JoinUrlSection } from './components/join-url-section';
 import { useWithEducationalEvents } from '../../store/slices/education-management/use-with-educational-events';
+import { useWithDocumentTimeline } from '../../hooks/use-with-document-timeline';
+import { ActivityDocumentTimelines } from './components/activity-document-timelines';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -43,6 +45,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     viewSection,
     viewAssignment,
     viewActivity,
+    viewActivityDocumentTimelines,
     viewDashboard,
     isLoading,
   } = educationManagement;
@@ -54,6 +57,12 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
   const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
   const { builtActivities } = useWithDocGoalsActivities();
+  const {
+    // fetchDocumentTimeline,
+    documentStates,
+    loadInProgress,
+    errorMessage,
+  } = useWithDocumentTimeline();
 
   const isStudent =
     userRole === EducationalRole.STUDENT ||
@@ -62,6 +71,22 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const myInstructorData = useAppSelector(
     (state) => state.educationManagement.instructorData
   );
+
+  const handleViewStudentTimelines = async (studentId: string) => {
+    const targetStudent = educationManagement.students.find(
+      (s) => s.userId === studentId
+    );
+
+    if (!targetStudent) {
+      throw new Error('No student found.');
+    }
+    await viewActivityDocumentTimelines(targetStudent.userId);
+    // try {
+    //    await fetchDocumentTimeline(targetStudent.userId, studentId);
+    // } catch (error) {
+    //   console.error('Failed to fetch document timeline:', error);
+    // }
+  };
 
   const handleCreateCourse = async (courseData: Partial<Course>) => {
     if (
@@ -451,6 +476,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 onSectionDeleted={handleSectionDeleted}
                 onRemoveFromSection={handleRemoveFromSection}
                 isStudentView={isStudent}
+                onViewStudentTimelines={handleViewStudentTimelines}
               />
             )}
 
@@ -475,6 +501,16 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               <ActivityView
                 activityId={viewState.selectedActivityId}
                 assignmentId={viewState.selectedAssignmentId}
+              />
+            )}
+
+          {viewState.view === 'activity-document-timelines' &&
+            viewState.selectedStudentId && (
+              <ActivityDocumentTimelines
+                studentId={viewState.selectedStudentId}
+                documentStates={documentStates}
+                loadInProgress={loadInProgress}
+                errorMessage={errorMessage}
               />
             )}
         </Box>

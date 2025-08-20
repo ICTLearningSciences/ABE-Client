@@ -14,11 +14,18 @@ export enum LoadStatus {
 }
 
 export interface CourseManagementState {
-  view: 'dashboard' | 'course' | 'section' | 'assignment' | 'activity';
+  view:
+    | 'dashboard'
+    | 'course'
+    | 'section'
+    | 'assignment'
+    | 'activity'
+    | 'activity-document-timelines';
   selectedCourseId?: string;
   selectedSectionId?: string;
   selectedAssignmentId?: string;
   selectedActivityId?: string;
+  selectedStudentId?: string;
 }
 
 export interface State {

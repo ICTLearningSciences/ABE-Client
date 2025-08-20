@@ -32,6 +32,7 @@ interface SectionViewProps {
   onSectionDeleted?: (courseId: string) => void;
   onRemoveFromSection?: (courseId: string, sectionId: string) => void;
   isStudentView?: boolean;
+  onViewStudentTimelines?: (studentId: string) => void;
 }
 
 const SectionView: React.FC<SectionViewProps> = ({
@@ -41,6 +42,7 @@ const SectionView: React.FC<SectionViewProps> = ({
   onSectionDeleted,
   onRemoveFromSection,
   isStudentView = false,
+  onViewStudentTimelines,
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -242,6 +244,7 @@ const SectionView: React.FC<SectionViewProps> = ({
               sectionStudentsProgress={currentSectionStudentsProgress}
               section={section}
               assignments={educationManagement.assignments}
+              onViewStudentTimelines={onViewStudentTimelines}
             />
           )}
 
