@@ -6,21 +6,19 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
-import { Button, Tooltip, Box, Typography, Paper, Stack } from '@mui/material';
+import { Button, Box, Typography, Paper, Stack } from '@mui/material';
 import { useWithConfig } from '../../exported-files';
 import { AdminControls } from './admin-controls';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import { formatISODateToReadable } from '../../helpers';
-import { EditableText } from '../activity-builder/shared/input-components';
 import GoToEducationDashboardButton from './go-to-education-dashboard-button';
+import { UserRole } from '../../store/slices/login';
 
 export function UserInfoSettings(): JSX.Element {
-  const { state, updateUserInfo } = useWithLogin();
+  const { state } = useWithLogin();
   const { state: configState } = useWithConfig();
   const userName = state.user?.name;
   const classroomCode = state.user?.classroomCode;
   const educationalRole = state.user?.educationalRole;
-  const previousClassroomCodes = state.user?.previousClassroomCodes;
   const surveyUrl = configState.config?.surveyConfig?.surveyLink;
   const surveyUrlParam = configState.config?.surveyConfig?.surveyQueryParam;
   const surveyClassroomParam =
@@ -64,91 +62,15 @@ export function UserInfoSettings(): JSX.Element {
       )}
 
       {/* Admin Controls Section */}
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Admin Settings
-        </Typography>
-        <AdminControls />
-      </Paper>
-
-      {/* Classroom Code Section */}
-      {classroomCode && (
-        <Paper
-          data-cy="current-classroom-code-paper"
-          elevation={2}
-          sx={{ p: 3 }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Current Classroom
-          </Typography>
-          <Stack spacing={2}>
-            <Box>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Classroom Code
-              </Typography>
-              <EditableText
-                text={classroomCode.code}
-                onSave={async (newText) => {
-                  await updateUserInfo({
-                    classroomCode: newText,
-                  });
-                }}
-              />
-            </Box>
-            <Box>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Created At
-              </Typography>
-              <Typography variant="body1">
-                {formatISODateToReadable(classroomCode.createdAt)}
-              </Typography>
-            </Box>
-          </Stack>
-        </Paper>
-      )}
-
-      {/* Previous Classroom Codes */}
-      {previousClassroomCodes && previousClassroomCodes.length > 0 && (
+      {(state.user?.userRole === UserRole.ADMIN ||
+        state.user?.userRole === UserRole.CONTENT_MANAGER) && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Previous Classrooms
+            Admin Settings
           </Typography>
-          <Tooltip
-            data-cy="previous-classroom-codes-tooltip"
-            title={
-              <Box sx={{ p: 1 }}>
-                {previousClassroomCodes.map((code) => (
-                  <Box key={code.code} sx={{ mb: 1 }}>
-                    <Typography variant="body2" fontWeight="bold">
-                      {code.code}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {formatISODateToReadable(code.createdAt)}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            }
-          >
-            <Typography
-              data-cy="previous-classroom-codes"
-              variant="body2"
-              color="text.secondary"
-              sx={{
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                '&:hover': {
-                  color: 'primary.main',
-                },
-              }}
-            >
-              View {previousClassroomCodes.length} previous classroom code
-              {previousClassroomCodes.length > 1 ? 's' : ''}
-            </Typography>
-          </Tooltip>
+          <AdminControls />
         </Paper>
       )}
-
       {educationalRole && state.user?._id && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>

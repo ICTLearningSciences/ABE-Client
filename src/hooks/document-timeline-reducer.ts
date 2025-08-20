@@ -12,16 +12,22 @@ import {
 } from '../types';
 import { LoadingError, LoadingStatusType } from './generic-loading-reducer';
 
-export interface TimelineState {
+export interface DocumentState {
   status: LoadingStatusType;
-  data?: DehydratedGQLDocumentTimeline;
-  docVersions?: IGDocVersion[];
+  timeline?: DehydratedGQLDocumentTimeline;
   selectedTimepointVersionTime?: string;
   error?: LoadingError;
+  docVersions?: IGDocVersion[];
+}
+
+export interface TimelineState {
+  selectedDocId?: string;
+  documentStates: Record<string, DocumentState>;
 }
 
 export interface TimelineAction {
   type: TimelineActionType;
+  docId?: string;
   dataPayload?: DehydratedGQLDocumentTimeline;
   docVersionsPayload?: IGDocVersion[];
   selectTimepointPayload?: GQLTimelinePoint;
@@ -36,6 +42,7 @@ export enum TimelineActionType {
   PARTIAL_DATA_LOADED = 'PARTIAL_DATA_LOADED',
   SAVE_TIMELINE_POINT = 'SAVE_TIMELINE_POINT',
   SELECT_TIMEPOINT = 'SELECT_TIMEPOINT',
+  SELECT_DOC = 'SELECT_DOC',
 }
 
 export function TimelineReducer(
@@ -44,82 +51,142 @@ export function TimelineReducer(
 ): TimelineState {
   const {
     type,
+    docId,
     dataPayload,
     docVersionsPayload,
     errorPayload,
     selectTimepointPayload,
   } = action;
+
   switch (type) {
     case TimelineActionType.LOADING_STARTED:
-      return {
-        status: LoadingStatusType.LOADING,
-        data: undefined,
-        docVersions: undefined,
-        selectedTimepointVersionTime: undefined,
-        error: undefined,
-      };
-    case TimelineActionType.PARTIAL_DATA_LOADED:
-      return {
-        status: LoadingStatusType.LOADING,
-        data: dataPayload,
-        docVersions: docVersionsPayload
-          ? [...(state.docVersions || []), ...docVersionsPayload]
-          : state.docVersions,
-        selectedTimepointVersionTime:
-          dataPayload &&
-          dataPayload.timelinePoints.length > 0 &&
-          !state.selectedTimepointVersionTime
-            ? dataPayload.timelinePoints[dataPayload.timelinePoints.length - 1]
-                .versionTime
-            : state.selectedTimepointVersionTime,
-        error: undefined,
-      };
-    case TimelineActionType.LOADING_SUCCEEDED:
-      return {
-        status: LoadingStatusType.SUCCESS,
-        data: dataPayload,
-        docVersions: docVersionsPayload
-          ? [...(state.docVersions || []), ...docVersionsPayload]
-          : state.docVersions,
-        selectedTimepointVersionTime:
-          dataPayload &&
-          dataPayload.timelinePoints.length > 0 &&
-          !state.selectedTimepointVersionTime
-            ? dataPayload.timelinePoints[dataPayload.timelinePoints.length - 1]
-                .versionTime
-            : state.selectedTimepointVersionTime,
-        error: undefined,
-      };
-    case TimelineActionType.LOADING_FAILED:
-      return {
-        status: LoadingStatusType.ERROR,
-        error: errorPayload,
-        data: undefined,
-      };
-    case TimelineActionType.SELECT_TIMEPOINT:
+      if (!docId) return state;
       return {
         ...state,
-        selectedTimepointVersionTime: selectTimepointPayload?.versionTime,
+        documentStates: {
+          ...state.documentStates,
+          [docId]: {
+            ...state.documentStates[docId],
+            status: LoadingStatusType.LOADING,
+            error: undefined,
+          },
+        },
       };
-    case TimelineActionType.SAVE_TIMELINE_POINT:
-      if (!action.savedTimelinePoint) {
+    case TimelineActionType.PARTIAL_DATA_LOADED: {
+      if (!docId || !dataPayload) return state;
+      const currentDocState = state.documentStates[docId];
+      return {
+        ...state,
+        documentStates: {
+          ...state.documentStates,
+          [docId]: {
+            ...currentDocState,
+            status: LoadingStatusType.LOADING,
+            timeline: dataPayload,
+            docVersions: docVersionsPayload
+              ? [...(currentDocState.docVersions || []), ...docVersionsPayload]
+              : currentDocState.docVersions,
+            selectedTimepointVersionTime:
+              dataPayload.timelinePoints.length > 0 &&
+              (!currentDocState.selectedTimepointVersionTime ||
+                state.selectedDocId !== docId)
+                ? dataPayload.timelinePoints[
+                    dataPayload.timelinePoints.length - 1
+                  ].versionTime
+                : currentDocState.selectedTimepointVersionTime,
+            error: undefined,
+          },
+        },
+      };
+    }
+    case TimelineActionType.LOADING_SUCCEEDED: {
+      if (!docId || !dataPayload) return state;
+      const docState = state.documentStates[docId] || {};
+      return {
+        ...state,
+        documentStates: {
+          ...state.documentStates,
+          [docId]: {
+            ...docState,
+            status: LoadingStatusType.SUCCESS,
+            timeline: dataPayload,
+            docVersions: docVersionsPayload
+              ? [...(docState.docVersions || []), ...docVersionsPayload]
+              : docState.docVersions,
+            selectedTimepointVersionTime:
+              dataPayload.timelinePoints.length > 0 &&
+              (!docState.selectedTimepointVersionTime ||
+                state.selectedDocId !== docId)
+                ? dataPayload.timelinePoints[
+                    dataPayload.timelinePoints.length - 1
+                  ].versionTime
+                : docState.selectedTimepointVersionTime,
+            error: undefined,
+          },
+        },
+      };
+    }
+    case TimelineActionType.LOADING_FAILED: {
+      if (!docId) return state;
+      return {
+        ...state,
+        documentStates: {
+          ...state.documentStates,
+          [docId]: {
+            ...state.documentStates[docId],
+            status: LoadingStatusType.ERROR,
+            error: errorPayload,
+          },
+        },
+      };
+    }
+    case TimelineActionType.SELECT_TIMEPOINT: {
+      const targetDocId = docId || state.selectedDocId;
+      if (!targetDocId) return state;
+      return {
+        ...state,
+        documentStates: {
+          ...state.documentStates,
+          [targetDocId]: {
+            ...state.documentStates[targetDocId],
+            selectedTimepointVersionTime: selectTimepointPayload?.versionTime,
+          },
+        },
+      };
+    }
+    case TimelineActionType.SAVE_TIMELINE_POINT: {
+      if (!action.savedTimelinePoint || !docId) {
         return state;
       }
+      const currentTimeline = state.documentStates[docId]?.timeline;
+      if (!currentTimeline) return state;
       return {
         ...state,
-        data: state.data
-          ? {
-              ...state.data,
-              timelinePoints: state.data?.timelinePoints.map((tp) =>
+        documentStates: {
+          ...state.documentStates,
+          [docId]: {
+            ...state.documentStates[docId],
+            timeline: {
+              ...currentTimeline,
+              timelinePoints: currentTimeline.timelinePoints.map((tp) =>
                 tp.versionTime === action.savedTimelinePoint?.versionTime
                   ? action.savedTimelinePoint
                   : tp
               ),
-            }
-          : undefined,
-        selectedTimepointVersionTime: action.savedTimelinePoint.versionTime,
+            },
+            selectedTimepointVersionTime: action.savedTimelinePoint.versionTime,
+          },
+        },
       };
+    }
+    case TimelineActionType.SELECT_DOC: {
+      if (!docId) return state;
+      return {
+        ...state,
+        selectedDocId: docId,
+      };
+    }
     default:
-      return { status: LoadingStatusType.NONE };
+      return { documentStates: {} };
   }
 }
