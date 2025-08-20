@@ -103,8 +103,6 @@ export function useWithBuiltActivityHandler(
   }, [resetActivityCounter]);
 
   const handleStudentActivityComplete = useCallback(() => {
-    console.log(myEducationalData);
-    console.log(viewState);
     if (
       !myEducationalData ||
       !viewState.selectedCourseId ||
