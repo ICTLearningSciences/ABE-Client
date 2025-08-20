@@ -40,7 +40,7 @@ export function StudentListItem(
         <PersonIcon sx={{ color: '#1B6A9C' }} />
       </ListItemIcon>
       <Button variant="contained" color="primary">
-        View Doc
+        View Docs
       </Button>
       <ListItemText
         primary={
