@@ -525,7 +525,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               <StudentInfoPage
                 selectedStudent={
                   educationManagement.students.find(
-                    (s) => s._id === viewState.selectedStudentId
+                    (s) => s.userId === viewState.selectedStudentId
                   )!
                 }
                 getStudentProgressCounts={(studentId: string) => {
@@ -562,6 +562,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                     (s) => s._id === viewState.selectedSectionId
                   )!
                 }
+                builtActivities={builtActivities}
                 handleBanStudent={async (studentUserId: string) => {
                   try {
                     await educationManagement.banStudentFromSection(

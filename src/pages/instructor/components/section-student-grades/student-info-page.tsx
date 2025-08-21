@@ -8,24 +8,26 @@ import {
   Section,
   StudentData,
 } from '../../../../store/slices/education-management/types';
+import { ActivityBuilder } from '../../../../components/activity-builder/types';
 import {
   CheckCircle as CheckCircleIcon,
   RadioButtonUnchecked as UncheckedIcon,
   Block as BanIcon,
   Timeline as TimelineIcon,
   ArrowBack as ArrowBackIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import {
   Box,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
   ListItemIcon,
   Stack,
   Chip,
   Divider,
   Button,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material';
 
 export function StudentInfoPage(props: {
@@ -37,6 +39,7 @@ export function StudentInfoPage(props: {
   assignmentsInSection: AssignmentsInSection;
   sectionStudentsProgress: SectionStudentsProgress;
   section: Section;
+  builtActivities: ActivityBuilder[];
   handleBanStudent: (studentUserId: string) => void;
   educationManagement: UseWithEducationalManagement;
   onViewStudentTimelines?: (studentId: string) => void;
@@ -48,11 +51,34 @@ export function StudentInfoPage(props: {
     assignmentsInSection,
     sectionStudentsProgress,
     section,
+    builtActivities,
     handleBanStudent,
     educationManagement,
     onViewStudentTimelines,
     onBackToSection,
   } = props;
+
+  const getActivityTitle = (activityId: string): string => {
+    const activity = builtActivities.find((a) => a._id === activityId);
+    return activity ? activity.title : `Activity ${activityId}`;
+  };
+
+  const getStudentDocIdsForActivity = (
+    assignmentId: string,
+    activityId: string
+  ): string[] => {
+    const assignmentProgress = selectedStudent.assignmentProgress.find(
+      (progress) => progress.assignmentId === assignmentId
+    );
+    if (!assignmentProgress) return [];
+
+    const activityCompletion = assignmentProgress.activityCompletions.find(
+      (completion) => completion.activityId === activityId
+    );
+    if (!activityCompletion) return [];
+
+    return activityCompletion.relevantGoogleDocs.map((doc) => doc.docId);
+  };
   return (
     <Box sx={{ p: 3 }}>
       <Button
@@ -99,7 +125,7 @@ export function StudentInfoPage(props: {
         </Typography>
       </Stack>
 
-      <List sx={{ mb: 3 }}>
+      <Box sx={{ mb: 3 }}>
         {assignmentsInSection.requiredAssignments.map((assignment) => {
           const studentProgress = sectionStudentsProgress[selectedStudent._id];
           const isCompleted =
@@ -107,27 +133,37 @@ export function StudentInfoPage(props: {
             false;
 
           return (
-            <ListItem
+            <Accordion
               key={assignment._id}
               sx={{
-                borderRadius: 2,
                 mb: 1,
                 border: '1px solid',
                 borderColor: isCompleted ? '#4caf50' : 'grey.200',
                 backgroundColor: isCompleted
                   ? 'rgba(76, 175, 80, 0.04)'
                   : 'transparent',
+                borderRadius: '8px !important',
+                '&:before': {
+                  display: 'none',
+                },
               }}
             >
-              <ListItemIcon>
-                {isCompleted ? (
-                  <CheckCircleIcon sx={{ color: '#4caf50' }} />
-                ) : (
-                  <UncheckedIcon sx={{ color: 'grey.400' }} />
-                )}
-              </ListItemIcon>
-              <ListItemText
-                primary={
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                sx={{
+                  '& .MuiAccordionSummary-content': {
+                    alignItems: 'center',
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 40, mr: 1 }}>
+                  {isCompleted ? (
+                    <CheckCircleIcon sx={{ color: '#4caf50' }} />
+                  ) : (
+                    <UncheckedIcon sx={{ color: 'grey.400' }} />
+                  )}
+                </ListItemIcon>
+                <Box sx={{ flex: 1 }}>
                   <Typography
                     variant="body1"
                     sx={{
@@ -137,8 +173,6 @@ export function StudentInfoPage(props: {
                   >
                     {assignment.title}
                   </Typography>
-                }
-                secondary={
                   <Typography
                     variant="body2"
                     color="text.secondary"
@@ -146,21 +180,70 @@ export function StudentInfoPage(props: {
                   >
                     {assignment.description}
                   </Typography>
-                }
-              />
-              <Chip
-                label={isCompleted ? 'Complete' : 'Incomplete'}
-                size="small"
-                sx={{
-                  backgroundColor: isCompleted ? '#4caf50' : 'grey.200',
-                  color: isCompleted ? 'white' : 'text.secondary',
-                  fontWeight: 500,
-                }}
-              />
-            </ListItem>
+                </Box>
+                <Chip
+                  label={isCompleted ? 'Complete' : 'Incomplete'}
+                  size="small"
+                  sx={{
+                    backgroundColor: isCompleted ? '#4caf50' : 'grey.200',
+                    color: isCompleted ? 'white' : 'text.secondary',
+                    fontWeight: 500,
+                    ml: 1,
+                  }}
+                />
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box sx={{ pl: 2 }}>
+                  {assignment.activityIds.map((activityId) => {
+                    const docIds = getStudentDocIdsForActivity(
+                      assignment._id,
+                      activityId
+                    );
+                    return (
+                      <Box key={activityId} sx={{ mb: 2 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, color: '#1B6A9C', mb: 1 }}
+                        >
+                          {getActivityTitle(activityId)}
+                        </Typography>
+                        {docIds.length > 0 ? (
+                          <Box sx={{ pl: 1 }}>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ display: 'block', mb: 0.5 }}
+                            >
+                              Document IDs:
+                            </Typography>
+                            {docIds.map((docId) => (
+                              <Chip
+                                key={docId}
+                                label={docId}
+                                size="small"
+                                variant="outlined"
+                                sx={{ mr: 0.5, mb: 0.5 }}
+                              />
+                            ))}
+                          </Box>
+                        ) : (
+                          <Typography
+                            variant="body2"
+                            color="text.disabled"
+                            sx={{ pl: 1, fontStyle: 'italic' }}
+                          >
+                            No documents for this activity
+                          </Typography>
+                        )}
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </AccordionDetails>
+            </Accordion>
           );
         })}
-      </List>
+      </Box>
 
       {/* Optional Assignments Section */}
       {assignmentsInSection.optionalAssignments.length > 0 && (
@@ -180,7 +263,7 @@ export function StudentInfoPage(props: {
             </Typography>
           </Stack>
 
-          <List>
+          <Box>
             {assignmentsInSection.optionalAssignments.map((assignment) => {
               const studentProgress =
                 sectionStudentsProgress[selectedStudent._id];
@@ -189,27 +272,37 @@ export function StudentInfoPage(props: {
                 false;
 
               return (
-                <ListItem
+                <Accordion
                   key={assignment._id}
                   sx={{
-                    borderRadius: 2,
                     mb: 1,
                     border: '1px solid',
                     borderColor: isCompleted ? '#4caf50' : 'grey.200',
                     backgroundColor: isCompleted
                       ? 'rgba(76, 175, 80, 0.04)'
                       : 'transparent',
+                    borderRadius: '8px !important',
+                    '&:before': {
+                      display: 'none',
+                    },
                   }}
                 >
-                  <ListItemIcon>
-                    {isCompleted ? (
-                      <CheckCircleIcon sx={{ color: '#4caf50' }} />
-                    ) : (
-                      <UncheckedIcon sx={{ color: 'grey.400' }} />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    sx={{
+                      '& .MuiAccordionSummary-content': {
+                        alignItems: 'center',
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40, mr: 1 }}>
+                      {isCompleted ? (
+                        <CheckCircleIcon sx={{ color: '#4caf50' }} />
+                      ) : (
+                        <UncheckedIcon sx={{ color: 'grey.400' }} />
+                      )}
+                    </ListItemIcon>
+                    <Box sx={{ flex: 1 }}>
                       <Typography
                         variant="body1"
                         sx={{
@@ -221,8 +314,6 @@ export function StudentInfoPage(props: {
                       >
                         {assignment.title}
                       </Typography>
-                    }
-                    secondary={
                       <Typography
                         variant="body2"
                         color="text.secondary"
@@ -230,21 +321,70 @@ export function StudentInfoPage(props: {
                       >
                         {assignment.description}
                       </Typography>
-                    }
-                  />
-                  <Chip
-                    label={isCompleted ? 'Complete' : 'Incomplete'}
-                    size="small"
-                    sx={{
-                      backgroundColor: isCompleted ? '#4caf50' : 'grey.200',
-                      color: isCompleted ? 'white' : 'text.secondary',
-                      fontWeight: 500,
-                    }}
-                  />
-                </ListItem>
+                    </Box>
+                    <Chip
+                      label={isCompleted ? 'Complete' : 'Incomplete'}
+                      size="small"
+                      sx={{
+                        backgroundColor: isCompleted ? '#4caf50' : 'grey.200',
+                        color: isCompleted ? 'white' : 'text.secondary',
+                        fontWeight: 500,
+                        ml: 1,
+                      }}
+                    />
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box sx={{ pl: 2 }}>
+                      {assignment.activityIds.map((activityId) => {
+                        const docIds = getStudentDocIdsForActivity(
+                          assignment._id,
+                          activityId
+                        );
+                        return (
+                          <Box key={activityId} sx={{ mb: 2 }}>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ fontWeight: 600, color: '#1B6A9C', mb: 1 }}
+                            >
+                              {getActivityTitle(activityId)}
+                            </Typography>
+                            {docIds.length > 0 ? (
+                              <Box sx={{ pl: 1 }}>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ display: 'block', mb: 0.5 }}
+                                >
+                                  Document IDs:
+                                </Typography>
+                                {docIds.map((docId) => (
+                                  <Chip
+                                    key={docId}
+                                    label={docId}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{ mr: 0.5, mb: 0.5 }}
+                                  />
+                                ))}
+                              </Box>
+                            ) : (
+                              <Typography
+                                variant="body2"
+                                color="text.disabled"
+                                sx={{ pl: 1, fontStyle: 'italic' }}
+                              >
+                                No documents for this activity
+                              </Typography>
+                            )}
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
               );
             })}
-          </List>
+          </Box>
         </>
       )}
 

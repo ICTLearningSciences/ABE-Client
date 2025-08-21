@@ -47,7 +47,7 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
 
   const handleStudentClick = (student: StudentData) => {
     if (onViewStudentInfo) {
-      onViewStudentInfo(student._id);
+      onViewStudentInfo(student.userId);
     }
   };
 
@@ -104,24 +104,27 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
         </Typography>
       </Stack>
 
-      <List sx={{ width: '100%' }}>
-        {Object.entries(sectionStudentsProgress).map(
-          ([studentId, studentProgress]) => {
-            const { requiredCompleted, optionalCompleted } =
-              getStudentProgressCounts(studentId);
-            const student = studentProgress.studentData;
+      <Box sx={{ width: '100%' }}>
+        {/* Traditional Student List */}
+        <List sx={{ mb: 3 }}>
+          {Object.entries(sectionStudentsProgress).map(
+            ([studentId, studentProgress]) => {
+              const { requiredCompleted, optionalCompleted } =
+                getStudentProgressCounts(studentId);
+              const student = studentProgress.studentData;
 
-            return StudentListItem(
-              student,
-              requiredCompleted,
-              optionalCompleted,
-              assignmentsInSection,
-              handleStudentClick,
-              section.numOptionalAssignmentsRequired
-            );
-          }
-        )}
-      </List>
+              return StudentListItem(
+                student,
+                requiredCompleted,
+                optionalCompleted,
+                assignmentsInSection,
+                handleStudentClick,
+                section.numOptionalAssignmentsRequired
+              );
+            }
+          )}
+        </List>
+      </Box>
     </Box>
   );
 };
