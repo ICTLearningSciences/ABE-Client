@@ -14,7 +14,6 @@ import { equals, hasHoursPassed } from '../helpers';
 import { useWithUsersDocs } from './use-with-users-docs';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { isAxiosError } from 'axios';
-import { useEducationalContext } from '../contexts/EducationalContext';
 
 export interface TrackedState {
   id: string;
@@ -35,8 +34,10 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
   const { updateMostRecentDocVersion, warnExpiredAccessToken } = useWithState();
   const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const sessionId: string = useAppSelector((state) => state.state.sessionId);
-  const educationalContext = useEducationalContext();
-  const selectedAssignmentId = educationalContext?.assignmentId || '';
+  const viewState = useAppSelector(
+    (state) => state.educationManagement.viewState
+  );
+  const selectedAssignmentId = viewState.selectedAssignmentId || '';
   const sessionIntention: Intention | undefined = useAppSelector(
     (state) => state.state.sessionIntention
   );

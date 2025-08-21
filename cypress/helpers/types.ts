@@ -176,6 +176,7 @@ export interface UserDoc {
   documentIntention?: Intention;
   currentDayIntention?: Intention;
   assignmentDescription?: string;
+  courseAssignmentId?: string;
   createdAt: string;
   admin: boolean;
   updatedAt: string;

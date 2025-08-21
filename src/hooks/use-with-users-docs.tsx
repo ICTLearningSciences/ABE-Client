@@ -25,6 +25,10 @@ import {
   updateDocTitleLocally as _updateDocTitle,
   setArchiveUserDoc,
 } from '../store/slices/state';
+import {
+  EducationalEvents,
+  educationalEventsEmitter,
+} from '../store/slices/education-management/use-with-educational-events';
 
 export interface SortConfig {
   field: string;
@@ -41,6 +45,7 @@ export interface UseWithUsersDocs {
     title?: string,
     isAdminDoc?: boolean,
     courseId?: string,
+    courseAssignmentId?: string,
     callback?: (newDocData: NewDocData) => void,
     docService?: DocService
   ) => Promise<void>;
@@ -62,7 +67,6 @@ export function useWithUsersDocs(): UseWithUsersDocs {
     field: 'updatedAt',
     ascend: false,
   });
-
   const setSortBy = (config: SortConfig) => {
     setSortByState((prev) => ({
       field: config.field,
@@ -138,6 +142,7 @@ export function useWithUsersDocs(): UseWithUsersDocs {
     title?: string,
     isAdminDoc?: boolean,
     courseId?: string,
+    courseAssignmentId?: string,
     callback?: (newDocData: NewDocData) => void
   ) {
     setCreationInProgress(true);
@@ -159,6 +164,10 @@ export function useWithUsersDocs(): UseWithUsersDocs {
           admin: isAdminDoc || false,
           service: DocService.RAW_TEXT,
         });
+        educationalEventsEmitter.emit(
+          EducationalEvents.NEW_DOC_CREATED,
+          newDocData
+        );
         loadUsersDocs();
         if (callback) {
           callback(newDocData);
@@ -171,7 +180,12 @@ export function useWithUsersDocs(): UseWithUsersDocs {
           docIdToCopyFrom,
           title,
           isAdminDoc,
-          courseId
+          courseId,
+          courseAssignmentId
+        );
+        educationalEventsEmitter.emit(
+          EducationalEvents.NEW_DOC_CREATED,
+          newDocData
         );
         if (callback) {
           callback(newDocData);

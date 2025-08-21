@@ -12,7 +12,6 @@ import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
 import ExampleGoogleDocModal from '../user-view/example-google-docs-modal';
 import { useWithUsersDocs as useWithUsersDocsHook } from '../../hooks/use-with-users-docs';
-import { useCourseId } from '../../contexts/EducationalContext';
 
 export interface AdminViewUserGoogleDocsProps {
   useWithUsersDocs: UseWithUsersDocs;
@@ -24,8 +23,9 @@ export default function ViewUserGoogleDocs(props: {
 }): JSX.Element {
   const { goToDoc, onHistoryClicked } = props;
   const useWithUsersDocs = useWithUsersDocsHook();
-  const courseIdFromContext = useCourseId();
-
+  const viewState = useAppSelector(
+    (state) => state.educationManagement.viewState
+  );
   const {
     googleDocs,
     copyDocs,
@@ -83,7 +83,8 @@ export default function ViewUserGoogleDocs(props: {
             docIdtoCopy,
             title,
             isAdminDoc,
-            courseIdFromContext,
+            viewState.selectedCourseId,
+            viewState.selectedAssignmentId,
             (data) => {
               goToDoc(data.docId, true);
             }

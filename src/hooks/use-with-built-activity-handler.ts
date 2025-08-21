@@ -31,7 +31,7 @@ export function useWithBuiltActivityHandler(
   const { executePromptSteps } = useWithExecutePrompt();
   const { addNewSubscriber, removeAllSubscribers } =
     useWithChatLogSubscribers();
-  const { myData: myEducationalData, updateStudentAssignmentProgress } =
+  const { myData: myEducationalData, studentActivityCompleted } =
     useWithEducationalManagement();
   const viewState = useAppSelector(
     (state) => state.educationManagement.viewState
@@ -112,12 +112,12 @@ export function useWithBuiltActivityHandler(
     ) {
       return;
     }
-    updateStudentAssignmentProgress(
+    studentActivityCompleted(
       myEducationalData.userId,
       viewState.selectedCourseId,
       viewState.selectedSectionId,
       viewState.selectedAssignmentId,
-      [{ activityId: selectedActivityBuilder._id, complete: true }]
+      selectedActivityBuilder._id
     );
   }, [
     myEducationalData,
@@ -125,7 +125,7 @@ export function useWithBuiltActivityHandler(
     viewState.selectedSectionId,
     viewState.selectedAssignmentId,
     selectedActivityBuilder?._id,
-    updateStudentAssignmentProgress,
+    studentActivityCompleted,
   ]);
 
   function sendMessageHelper(msg: ChatMessageTypes, clearChat?: boolean) {

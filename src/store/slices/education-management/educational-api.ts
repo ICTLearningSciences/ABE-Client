@@ -6,14 +6,8 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
 import { execGql } from '../../../hooks/api';
-import {
-  Course,
-  Assignment,
-  Section,
-  StudentData,
-  Instructor,
-  ActivityCompletion,
-} from './types';
+import { Course, Assignment, Section, StudentData, Instructor } from './types';
+import { Connection, UserDoc } from '../../../types';
 
 // GraphQL query fragment for course data
 export const courseQueryData = `
@@ -58,6 +52,10 @@ export const studentDataQueryData = `
     activityCompletions {
       activityId
       complete
+      relevantGoogleDocs {
+        docId
+        primaryDocument
+      }
     }
   }
 `;
@@ -295,20 +293,30 @@ export async function modifySectionEnrollment(
   return res;
 }
 
+export enum ModifyStudentAssignmentProgressActions {
+  ACTIVITY_STARTED = 'ACTIVITY_STARTED', // if activity not in list, add it with complete false
+  ACTIVITY_COMPLETED = 'ACTIVITY_COMPLETED', // if activity in list, set complete to true
+
+  NEW_DOC_CREATED = 'NEW_DOC_CREATED', // if doc not in list, add it with primaryDocument true IF only doc in list, else set primaryDocument to false
+  DOC_PRIMARY_STATUS_SET = 'DOC_PRIMARY_STATUS_SET', // if doc in list, update it with primaryDocument
+  DOC_DELETED = 'DOC_DELETED', // if doc in list, delete it
+}
 // Modify student assignment progress
 export async function modifyStudentAssignmentProgress(
   targetUserId: string,
   courseId: string,
   sectionId: string,
   assignmentId: string,
-  activityCompletions: ActivityCompletion[]
+  activityId: string,
+  action: ModifyStudentAssignmentProgressActions,
+  docId?: string
 ): Promise<StudentData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   const res = await execGql<StudentData>(
     {
       query: `
-        mutation ModifyStudentAssignmentProgress($targetUserId: ID!, $courseId: ID!, $sectionId: ID!, $assignmentId: ID!, $activityCompletions: [ActivityCompletionInputType!]!) {
-          modifyStudentAssignmentProgress(targetUserId: $targetUserId, courseId: $courseId, sectionId: $sectionId, assignmentId: $assignmentId, activityCompletions: $activityCompletions) {
+        mutation ModifyStudentAssignmentProgress($targetUserId: ID!, $courseId: ID!, $sectionId: ID!, $assignmentId: ID!, $activityId: ID!, $action: String!, $docId: String) {
+          modifyStudentAssignmentProgress(targetUserId: $targetUserId, courseId: $courseId, sectionId: $sectionId, assignmentId: $assignmentId, activityId: $activityId, action: $action, docId: $docId) {
             ${studentDataQueryData}
           }
         }
@@ -318,7 +326,9 @@ export async function modifyStudentAssignmentProgress(
         courseId,
         sectionId,
         assignmentId,
-        activityCompletions,
+        activityId,
+        action,
+        docId,
       },
     },
     {
@@ -456,4 +466,38 @@ export async function modifyStudentBanInSection(
     }
   );
   return res;
+}
+
+export async function fetchStudentsGoogleDocIds(
+  userId: string,
+  courseAssignmentId: string
+): Promise<string[]> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<Connection<UserDoc>>(
+    {
+      query: `query FindAllGoogleDocs($limit: Int, $filter: String, $filterObject: Object, $sortAscending: Boolean, $sortBy: String){
+            findAllGoogleDocs(limit: $limit, filter: $filter, filterObject: $filterObject, sortAscending: $sortAscending, sortBy: $sortBy) {
+            edges {
+                node{
+                    user
+                    title
+                    googleDocId
+                    courseAssignmentId
+                  }
+                }
+            }
+        }`,
+      variables: {
+        filterObject: {
+          user: userId,
+          courseAssignmentId: courseAssignmentId,
+        },
+      },
+    },
+    {
+      dataPath: 'findAllGoogleDocs',
+      accessToken,
+    }
+  );
+  return res.edges.map((edge) => edge.node.googleDocId);
 }

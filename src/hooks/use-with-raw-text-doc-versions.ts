@@ -13,7 +13,6 @@ import useInterval from './use-interval';
 import { useState } from 'react';
 import { ChatMessageTypes } from '../store/slices/chat';
 import { TrackedState } from './use-with-google-doc-versions';
-import { useEducationalContext } from '../contexts/EducationalContext';
 
 export function useWithRawTextDocVersions(
   currentActivityId: string,
@@ -24,8 +23,10 @@ export function useWithRawTextDocVersions(
   const sessionId = useAppSelector((state) => state.state.sessionId);
   const { updateDocTitleLocally } = useWithUsersDocs();
   const messages = chatState.chatLogs[curDocId] || [];
-  const educationalContext = useEducationalContext();
-  const selectedAssignmentId = educationalContext?.assignmentId || '';
+  const viewState = useAppSelector(
+    (state) => state.educationManagement.viewState
+  );
+  const selectedAssignmentId = viewState.selectedAssignmentId || '';
   const [lastSavedVersion, setLastSavedVersion] = useState<TrackedState>({
     id: '',
     title: '',

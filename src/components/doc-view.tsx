@@ -12,7 +12,7 @@ import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useWithState } from '../store/slices/state/use-with-state';
 import { URL_PARAM_NEW_DOC } from '../constants';
 import { useNavigateWithParams } from '../hooks/use-navigate-with-params';
-import { useActivityId } from '../contexts/EducationalContext';
+import { useAppSelector } from '../store/hooks';
 
 function DocView(props: {
   docId?: string;
@@ -26,8 +26,12 @@ function DocView(props: {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
 
+  const viewState = useAppSelector(
+    (state) => state.educationManagement.viewState
+  );
+
   const activityFromParams =
-    useActivityId() || queryParams.get('activityId') || '';
+    viewState.selectedActivityId || queryParams.get('activityId') || '';
 
   const goalFromParams = props.goalId || queryParams.get('goalId') || '';
   const googleDocUrl = `https://docs.google.com/document/d/${docId}/edit`;

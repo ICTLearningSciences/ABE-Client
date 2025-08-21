@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Button, CircularProgress } from '@mui/material';
 import { UserDoc, NewDocData, SortConfig } from '../../types';
 import { RowDiv } from '../../styled-components';
@@ -21,7 +21,8 @@ import { TwoOptionDialog } from '../dialog';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { GoogleDocItemRow } from './google-doc-item-row';
-import { useCourseId } from '../../contexts/EducationalContext';
+import { useAppSelector } from '../../store/hooks';
+import { Assignment } from '../../store/slices/education-management/types';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: UserDoc[];
@@ -32,6 +33,7 @@ export default function SelectCreateDocs(props: {
     title?: string,
     isAdminDoc?: boolean,
     courseId?: string,
+    courseAssignmentId?: string,
     callback?: (newDocData: NewDocData) => void
   ) => void;
   handleDeleteDoc: (docId: string) => Promise<void>;
@@ -64,10 +66,60 @@ export default function SelectCreateDocs(props: {
   const archivedDocs = _googleDocs?.filter((doc) => doc.archived);
   const unarchivedDocs = _googleDocs?.filter((doc) => !doc.archived);
   const [viewingArchived, setViewingArchived] = React.useState(false);
-  const googleDocs = viewingArchived ? archivedDocs : unarchivedDocs;
   const [docToDelete, setDocToDelete] = React.useState<UserDoc>();
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
-  const courseIdFromContext = useCourseId();
+  const viewState = useAppSelector(
+    (state) => state.educationManagement.viewState
+  );
+  const assignments = useAppSelector(
+    (state) => state.educationManagement.assignments
+  );
+  const googleDocs = getDisplayedDocs(
+    archivedDocs || [],
+    unarchivedDocs || [],
+    viewingArchived,
+    viewState.selectedAssignmentId
+  );
+  const title = useMemo(
+    () =>
+      getTitle(assignments, viewingArchived, viewState.selectedAssignmentId),
+    [assignments, viewingArchived, viewState.selectedAssignmentId]
+  );
+
+  function getDisplayedDocs(
+    archivedDocs: UserDoc[],
+    unarchivedDocs: UserDoc[],
+    viewingArchived: boolean,
+    courseAssignmentId?: string
+  ): UserDoc[] {
+    if (courseAssignmentId) {
+      return viewingArchived
+        ? archivedDocs.filter(
+            (doc) => doc.courseAssignmentId === courseAssignmentId
+          )
+        : unarchivedDocs.filter(
+            (doc) => doc.courseAssignmentId === courseAssignmentId
+          );
+    }
+    return viewingArchived ? archivedDocs : unarchivedDocs;
+  }
+
+  function getTitle(
+    assignments: Assignment[],
+    viewingArchived: boolean,
+    courseAssignmentId?: string
+  ): string {
+    if (!courseAssignmentId) {
+      return viewingArchived ? 'Archived Docs' : 'Your Docs';
+    }
+    const assignment = assignments.find(
+      (assignment) => assignment._id === courseAssignmentId
+    );
+    return viewingArchived
+      ? 'Archived Docs'
+      : `Assignment Docs: ${assignment?.title || 'Assignment'}`;
+  }
+
   function SortIndicator(props: { field: string }) {
     const { field } = props;
     const isActive = sortBy.field === field;
@@ -129,7 +181,8 @@ export default function SelectCreateDocs(props: {
                     undefined,
                     undefined,
                     undefined,
-                    courseIdFromContext,
+                    viewState.selectedCourseId,
+                    viewState.selectedAssignmentId,
                     (data) => {
                       goToDoc(data.docId, true);
                     }
@@ -157,7 +210,7 @@ export default function SelectCreateDocs(props: {
               )}
             </RowDiv>
           )}
-          <h2>{viewingArchived ? 'Archived' : 'Your'} Docs</h2>
+          <h2>{title}</h2>
           <Button
             data-cy={`toggle-view-archived`}
             style={{
