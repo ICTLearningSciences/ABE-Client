@@ -4,40 +4,31 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Typography, List, Card, Stack } from '@mui/material';
 import {
   Section,
   StudentData,
   Assignment,
 } from '../../../../store/slices/education-management/types';
-import {
-  SectionStudentsProgress,
-  useWithEducationalManagement,
-} from '../../../../store/slices/education-management/use-with-educational-management';
+import { SectionStudentsProgress } from '../../../../store/slices/education-management/use-with-educational-management';
 import { getAssignmentsInSection } from '../../helpers';
 import { StudentListItem } from './student-list-item';
-import { StudentInfoDrawer } from './student-info-drawer';
 
 interface SectionStudentsGradesProps {
   sectionStudentsProgress: SectionStudentsProgress;
   section: Section;
   assignments: Assignment[];
   onViewStudentTimelines?: (studentId: string) => void;
+  onViewStudentInfo?: (studentId: string) => void;
 }
 
 const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
   sectionStudentsProgress,
   section,
   assignments,
-  onViewStudentTimelines,
+  onViewStudentInfo,
 }) => {
-  const educationManagement = useWithEducationalManagement();
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<StudentData | null>(
-    null
-  );
-
   const assignmentsInSection = getAssignmentsInSection(assignments, section);
 
   const getStudentProgressCounts = (studentId: string) => {
@@ -55,25 +46,8 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
   };
 
   const handleStudentClick = (student: StudentData) => {
-    setSelectedStudent(student);
-    setDrawerOpen(true);
-  };
-
-  const handleCloseDrawer = () => {
-    setDrawerOpen(false);
-    setSelectedStudent(null);
-  };
-
-  const handleBanStudent = async (studentUserId: string) => {
-    try {
-      await educationManagement.banStudentFromSection(
-        section._id,
-        studentUserId
-      );
-      setDrawerOpen(false);
-      setSelectedStudent(null);
-    } catch (error) {
-      console.error('Failed to ban student:', error);
+    if (onViewStudentInfo) {
+      onViewStudentInfo(student._id);
     }
   };
 
@@ -148,20 +122,6 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
           }
         )}
       </List>
-      {selectedStudent && (
-        <StudentInfoDrawer
-          selectedStudent={selectedStudent}
-          drawerOpen={drawerOpen}
-          handleCloseDrawer={handleCloseDrawer}
-          getStudentProgressCounts={getStudentProgressCounts}
-          assignmentsInSection={assignmentsInSection}
-          sectionStudentsProgress={sectionStudentsProgress}
-          section={section}
-          handleBanStudent={handleBanStudent}
-          educationManagement={educationManagement}
-          onViewStudentTimelines={onViewStudentTimelines}
-        />
-      )}
     </Box>
   );
 };

@@ -20,6 +20,7 @@ export interface CourseManagementState {
     | 'section'
     | 'assignment'
     | 'activity'
+    | 'student-info'
     | 'activity-document-timelines';
   selectedCourseId?: string;
   selectedSectionId?: string;

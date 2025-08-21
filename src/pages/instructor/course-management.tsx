@@ -18,6 +18,7 @@ import JoinSectionModal from './components/join-section-modal';
 import {
   getCourseManagementTreeData,
   getCourseManagementSectionedTreeData,
+  getAssignmentsInSection,
 } from './helpers';
 import { Course } from '../../store/slices/education-management/types';
 import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
@@ -30,6 +31,7 @@ import { JoinUrlSection } from './components/join-url-section';
 import { useWithEducationalEvents } from '../../store/slices/education-management/use-with-educational-events';
 import { useWithDocumentTimeline } from '../../hooks/use-with-document-timeline';
 import { ActivityDocumentTimelines } from './components/activity-document-timelines';
+import { StudentInfoPage } from './components/section-student-grades/student-info-page';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -46,6 +48,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     viewAssignment,
     viewActivity,
     viewActivityDocumentTimelines,
+    viewStudentInfo,
     viewDashboard,
     isLoading,
   } = educationManagement;
@@ -477,6 +480,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 onRemoveFromSection={handleRemoveFromSection}
                 isStudentView={isStudent}
                 onViewStudentTimelines={handleViewStudentTimelines}
+                onViewStudentInfo={viewStudentInfo}
               />
             )}
 
@@ -511,6 +515,75 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 documentStates={documentStates}
                 loadInProgress={loadInProgress}
                 errorMessage={errorMessage}
+              />
+            )}
+
+          {viewState.view === 'student-info' &&
+            viewState.selectedStudentId &&
+            viewState.selectedSectionId &&
+            viewState.selectedCourseId && (
+              <StudentInfoPage
+                selectedStudent={
+                  educationManagement.students.find(
+                    (s) => s._id === viewState.selectedStudentId
+                  )!
+                }
+                getStudentProgressCounts={(studentId: string) => {
+                  const sectionStudentsProgress =
+                    educationManagement.allSectionsStudentsProgress[
+                      viewState.selectedSectionId!
+                    ];
+                  const studentProgress = sectionStudentsProgress[studentId];
+                  if (!studentProgress)
+                    return { requiredCompleted: 0, optionalCompleted: 0 };
+
+                  const requiredCompleted = Object.values(
+                    studentProgress.requiredAssignmentsProgress
+                  ).filter(Boolean).length;
+                  const optionalCompleted = Object.values(
+                    studentProgress.optionalAssignmentsProgress
+                  ).filter(Boolean).length;
+
+                  return { requiredCompleted, optionalCompleted };
+                }}
+                assignmentsInSection={getAssignmentsInSection(
+                  educationManagement.assignments,
+                  educationManagement.sections.find(
+                    (s) => s._id === viewState.selectedSectionId
+                  )!
+                )}
+                sectionStudentsProgress={
+                  educationManagement.allSectionsStudentsProgress[
+                    viewState.selectedSectionId!
+                  ]
+                }
+                section={
+                  educationManagement.sections.find(
+                    (s) => s._id === viewState.selectedSectionId
+                  )!
+                }
+                handleBanStudent={async (studentUserId: string) => {
+                  try {
+                    await educationManagement.banStudentFromSection(
+                      viewState.selectedSectionId!,
+                      studentUserId
+                    );
+                    handleSectionSelect(
+                      viewState.selectedCourseId!,
+                      viewState.selectedSectionId!
+                    );
+                  } catch (error) {
+                    console.error('Failed to ban student:', error);
+                  }
+                }}
+                educationManagement={educationManagement}
+                onViewStudentTimelines={handleViewStudentTimelines}
+                onBackToSection={() =>
+                  handleSectionSelect(
+                    viewState.selectedCourseId!,
+                    viewState.selectedSectionId!
+                  )
+                }
               />
             )}
         </Box>
