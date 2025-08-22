@@ -27,6 +27,7 @@ export interface CourseManagementState {
   selectedAssignmentId?: string;
   selectedActivityId?: string;
   selectedStudentId?: string;
+  selectedDocId?: string;
 }
 
 export interface State {

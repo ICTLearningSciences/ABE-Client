@@ -5,7 +5,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { Box, Typography, CircularProgress } from '@mui/material';
+import { Box, Typography, CircularProgress, Button } from '@mui/material';
+import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import {
   LoadingError,
   LoadingStatusType,
@@ -24,29 +25,47 @@ interface ActivityDocumentTimelinesProps {
   >;
   loadInProgress: boolean;
   errorMessage?: string;
+  selectedDocId?: string;
+  onBackToStudentInfo?: () => void;
 }
 
 export const ActivityDocumentTimelines: React.FC<
   ActivityDocumentTimelinesProps
-> = ({ studentId, documentStates, loadInProgress, errorMessage }) => {
+> = ({ studentId, documentStates, loadInProgress, errorMessage, selectedDocId, onBackToStudentInfo }) => {
   return (
-    <Box
-      sx={{
-        p: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '400px',
-      }}
-    >
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
-        Document Timelines
-      </Typography>
+    <Box sx={{ p: 3 }}>
+      {onBackToStudentInfo && (
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={onBackToStudentInfo}
+          sx={{ mb: 2, color: 'text.secondary' }}
+        >
+          Back to Student Grades
+        </Button>
+      )}
 
-      <Typography variant="body1" sx={{ mb: 2, color: 'text.secondary' }}>
-        Student ID: {studentId}
-      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '400px',
+        }}
+      >
+        <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+          Document Timelines
+        </Typography>
+
+        <Typography variant="body1" sx={{ mb: 2, color: 'text.secondary' }}>
+          Student ID: {studentId}
+        </Typography>
+
+        {selectedDocId && (
+          <Typography variant="body1" sx={{ mb: 2, color: 'text.primary', fontWeight: 500 }}>
+            Selected Document: {selectedDocId}
+          </Typography>
+        )}
 
       {loadInProgress && (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -94,6 +113,7 @@ export const ActivityDocumentTimelines: React.FC<
             )}
           </Box>
         ))}
+        </Box>
       </Box>
     </Box>
   );

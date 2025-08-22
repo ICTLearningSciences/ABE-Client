@@ -190,7 +190,7 @@ export interface UseWithEducationalManagement {
     assignmentId: string,
     activityId: string
   ) => Promise<void>;
-  viewActivityDocumentTimelines: (studentId: string) => Promise<void>;
+  viewActivityDocumentTimelines: (studentId: string, docId?: string) => Promise<void>;
   viewStudentInfo: (studentId: string) => Promise<void>;
   viewDashboard: () => Promise<void>;
   haveICompletedActivity: (assignmentId: string, activityId: string) => boolean;
@@ -709,7 +709,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     );
   }
 
-  async function viewActivityDocumentTimelines(studentId: string) {
+  async function viewActivityDocumentTimelines(studentId: string, docId?: string) {
     dispatch(
       setViewState({
         view: 'activity-document-timelines',
@@ -718,6 +718,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         selectedAssignmentId: viewState.selectedAssignmentId,
         selectedActivityId: viewState.selectedActivityId,
         selectedStudentId: studentId,
+        selectedDocId: docId,
       })
     );
   }

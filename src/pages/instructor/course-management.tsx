@@ -75,7 +75,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     (state) => state.educationManagement.instructorData
   );
 
-  const handleViewStudentTimelines = async (studentId: string) => {
+  const handleViewStudentTimelines = async (studentId: string, docId?: string) => {
     const targetStudent = educationManagement.students.find(
       (s) => s.userId === studentId
     );
@@ -83,7 +83,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     if (!targetStudent) {
       throw new Error('No student found.');
     }
-    await viewActivityDocumentTimelines(targetStudent.userId);
+    await viewActivityDocumentTimelines(targetStudent.userId, docId);
     // try {
     //    await fetchDocumentTimeline(targetStudent.userId, studentId);
     // } catch (error) {
@@ -515,6 +515,10 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 documentStates={documentStates}
                 loadInProgress={loadInProgress}
                 errorMessage={errorMessage}
+                selectedDocId={viewState.selectedDocId}
+                onBackToStudentInfo={() =>
+                  viewStudentInfo(viewState.selectedStudentId!)
+                }
               />
             )}
 

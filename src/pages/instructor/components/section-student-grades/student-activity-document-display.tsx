@@ -9,8 +9,10 @@ export function StudentActivityDocumentDisplay(props: {
     activityId: string
   ) => string[];
   getActivityTitle: (activityId: string) => string;
+  onDocumentClick?: (docId: string) => void;
+  studentId: string;
 }) {
-  const { assignment, getStudentDocIdsForActivity, getActivityTitle } = props;
+  const { assignment, getStudentDocIdsForActivity, getActivityTitle, onDocumentClick, studentId } = props;
 
   return (
     <AccordionDetails>

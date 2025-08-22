@@ -27,6 +27,8 @@ interface AssignmentsSectionProps {
     activityId: string
   ) => string[];
   getActivityTitle: (activityId: string) => string;
+  onDocumentClick?: (docId: string) => void;
+  studentId: string;
 }
 
 export function AssignmentsSection({
@@ -37,6 +39,8 @@ export function AssignmentsSection({
   getIsCompleted,
   getStudentDocIdsForActivity,
   getActivityTitle,
+  onDocumentClick,
+  studentId,
 }: AssignmentsSectionProps) {
   return (
     <>
@@ -122,6 +126,8 @@ export function AssignmentsSection({
                 assignment={assignment}
                 getStudentDocIdsForActivity={getStudentDocIdsForActivity}
                 getActivityTitle={getActivityTitle}
+                onDocumentClick={onDocumentClick}
+                studentId={studentId}
               />
             </Accordion>
           );

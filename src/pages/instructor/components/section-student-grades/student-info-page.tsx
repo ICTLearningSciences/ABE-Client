@@ -28,7 +28,7 @@ export function StudentInfoPage(props: {
   builtActivities: ActivityBuilder[];
   handleBanStudent: (studentUserId: string) => void;
   educationManagement: UseWithEducationalManagement;
-  onViewStudentTimelines?: (studentId: string) => void;
+  onViewStudentTimelines?: (studentId: string, docId?: string) => void;
   onBackToSection: () => void;
 }) {
   const {
@@ -40,6 +40,7 @@ export function StudentInfoPage(props: {
     builtActivities,
     handleBanStudent,
     educationManagement,
+    onViewStudentTimelines,
     onBackToSection,
   } = props;
 
@@ -63,6 +64,12 @@ export function StudentInfoPage(props: {
     if (!activityCompletion) return [];
 
     return activityCompletion.relevantGoogleDocs.map((doc) => doc.docId);
+  };
+
+  const handleDocumentClick = (docId: string) => {
+    if (onViewStudentTimelines) {
+      onViewStudentTimelines(selectedStudent.userId, docId);
+    }
   };
   return (
     <Box sx={{ p: 3 }}>
@@ -111,6 +118,8 @@ export function StudentInfoPage(props: {
         }}
         getStudentDocIdsForActivity={getStudentDocIdsForActivity}
         getActivityTitle={getActivityTitle}
+        onDocumentClick={handleDocumentClick}
+        studentId={selectedStudent.userId}
       />
 
       {/* Optional Assignments Section */}
@@ -132,6 +141,8 @@ export function StudentInfoPage(props: {
           }}
           getStudentDocIdsForActivity={getStudentDocIdsForActivity}
           getActivityTitle={getActivityTitle}
+          onDocumentClick={handleDocumentClick}
+          studentId={selectedStudent.userId}
         />
       )}
 
