@@ -31,7 +31,14 @@ interface ActivityDocumentTimelinesProps {
 
 export const ActivityDocumentTimelines: React.FC<
   ActivityDocumentTimelinesProps
-> = ({ studentId, documentStates, loadInProgress, errorMessage, selectedDocId, onBackToStudentInfo }) => {
+> = ({
+  studentId,
+  documentStates,
+  loadInProgress,
+  errorMessage,
+  selectedDocId,
+  onBackToStudentInfo,
+}) => {
   return (
     <Box sx={{ p: 3 }}>
       {onBackToStudentInfo && (
@@ -62,57 +69,60 @@ export const ActivityDocumentTimelines: React.FC<
         </Typography>
 
         {selectedDocId && (
-          <Typography variant="body1" sx={{ mb: 2, color: 'text.primary', fontWeight: 500 }}>
+          <Typography
+            variant="body1"
+            sx={{ mb: 2, color: 'text.primary', fontWeight: 500 }}
+          >
             Selected Document: {selectedDocId}
           </Typography>
         )}
 
-      {loadInProgress && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <CircularProgress size={24} />
-          <Typography>Loading document timeline...</Typography>
-        </Box>
-      )}
-
-      {errorMessage && !loadInProgress && (
-        <Typography color="error" sx={{ textAlign: 'center' }}>
-          Error loading timeline: {JSON.stringify(errorMessage)}
-        </Typography>
-      )}
-
-      {!loadInProgress && !errorMessage && (
-        <Typography sx={{ textAlign: 'center', color: 'text.secondary' }}>
-          Timeline loaded successfully
-        </Typography>
-      )}
-
-      <Box sx={{ mt: 4, width: '100%', maxWidth: '600px' }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Document States:
-        </Typography>
-        {Object.entries(documentStates).map(([docId, state]) => (
-          <Box
-            key={docId}
-            sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}
-          >
-            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-              Document: {docId}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Status: {state.status}
-            </Typography>
-            {state.timeline && (
-              <Typography variant="body2" color="text.secondary">
-                Timeline Points: {state.timeline.timelinePoints?.length || 0}
-              </Typography>
-            )}
-            {state.error && (
-              <Typography variant="body2" color="error">
-                Error: {JSON.stringify(state.error)}
-              </Typography>
-            )}
+        {loadInProgress && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <CircularProgress size={24} />
+            <Typography>Loading document timeline...</Typography>
           </Box>
-        ))}
+        )}
+
+        {errorMessage && !loadInProgress && (
+          <Typography color="error" sx={{ textAlign: 'center' }}>
+            Error loading timeline: {JSON.stringify(errorMessage)}
+          </Typography>
+        )}
+
+        {!loadInProgress && !errorMessage && (
+          <Typography sx={{ textAlign: 'center', color: 'text.secondary' }}>
+            Timeline loaded successfully
+          </Typography>
+        )}
+
+        <Box sx={{ mt: 4, width: '100%', maxWidth: '600px' }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Document States:
+          </Typography>
+          {Object.entries(documentStates).map(([docId, state]) => (
+            <Box
+              key={docId}
+              sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}
+            >
+              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                Document: {docId}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Status: {state.status}
+              </Typography>
+              {state.timeline && (
+                <Typography variant="body2" color="text.secondary">
+                  Timeline Points: {state.timeline.timelinePoints?.length || 0}
+                </Typography>
+              )}
+              {state.error && (
+                <Typography variant="body2" color="error">
+                  Error: {JSON.stringify(state.error)}
+                </Typography>
+              )}
+            </Box>
+          ))}
         </Box>
       </Box>
     </Box>

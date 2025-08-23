@@ -61,7 +61,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
   const { builtActivities } = useWithDocGoalsActivities();
   const {
-    // fetchDocumentTimeline,
+    fetchDocumentTimeline,
     documentStates,
     loadInProgress,
     errorMessage,
@@ -75,7 +75,10 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     (state) => state.educationManagement.instructorData
   );
 
-  const handleViewStudentTimelines = async (studentId: string, docId?: string) => {
+  const handleViewStudentTimelines = async (
+    studentId: string,
+    docId?: string
+  ) => {
     const targetStudent = educationManagement.students.find(
       (s) => s.userId === studentId
     );
@@ -84,11 +87,20 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       throw new Error('No student found.');
     }
     await viewActivityDocumentTimelines(targetStudent.userId, docId);
-    // try {
-    //    await fetchDocumentTimeline(targetStudent.userId, studentId);
-    // } catch (error) {
-    //   console.error('Failed to fetch document timeline:', error);
-    // }
+    console.log(
+      'viewing student timelines for student',
+      targetStudent.userId,
+      'with docId',
+      docId
+    );
+    if (docId) {
+      console.log('fetching document timeline for docId', docId);
+      try {
+        await fetchDocumentTimeline(targetStudent.userId, docId);
+      } catch (error) {
+        console.error('Failed to fetch document timeline:', error);
+      }
+    }
   };
 
   const handleCreateCourse = async (courseData: Partial<Course>) => {

@@ -12,7 +12,12 @@ export function StudentActivityDocumentDisplay(props: {
   onDocumentClick?: (docId: string) => void;
   studentId: string;
 }) {
-  const { assignment, getStudentDocIdsForActivity, getActivityTitle, onDocumentClick, studentId } = props;
+  const {
+    assignment,
+    getStudentDocIdsForActivity,
+    getActivityTitle,
+    onDocumentClick,
+  } = props;
 
   return (
     <AccordionDetails>
@@ -46,6 +51,7 @@ export function StudentActivityDocumentDisplay(props: {
                       size="small"
                       variant="outlined"
                       sx={{ mr: 0.5, mb: 0.5 }}
+                      onClick={() => onDocumentClick?.(docId)}
                     />
                   ))}
                 </Box>
