@@ -5,7 +5,16 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { Box, Typography, CircularProgress, Button } from '@mui/material';
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import {
   LoadingError,
@@ -27,6 +36,7 @@ interface ActivityDocumentTimelinesProps {
   errorMessage?: string;
   selectedDocId?: string;
   onBackToStudentInfo?: () => void;
+  onDocumentChange?: (docId: string) => void;
 }
 
 export const ActivityDocumentTimelines: React.FC<
@@ -38,7 +48,11 @@ export const ActivityDocumentTimelines: React.FC<
   errorMessage,
   selectedDocId,
   onBackToStudentInfo,
+  onDocumentChange,
 }) => {
+  const documentIds = Object.keys(documentStates);
+  const currentDocId = selectedDocId || documentIds[0];
+  const currentDocState = documentStates[currentDocId];
   return (
     <Box sx={{ p: 3 }}>
       {onBackToStudentInfo && (
@@ -51,80 +65,111 @@ export const ActivityDocumentTimelines: React.FC<
         </Button>
       )}
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '400px',
-        }}
-      >
-        <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
-          Document Timelines
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" sx={{ mb: 2, fontWeight: 600 }}>
+          Document Timeline
         </Typography>
 
-        <Typography variant="body1" sx={{ mb: 2, color: 'text.secondary' }}>
+        <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
           Student ID: {studentId}
         </Typography>
 
-        {selectedDocId && (
+        {documentIds.length > 1 && (
+          <FormControl sx={{ minWidth: 300, mb: 3 }}>
+            <InputLabel id="document-select-label">Select Document</InputLabel>
+            <Select
+              labelId="document-select-label"
+              value={currentDocId || ''}
+              label="Select Document"
+              onChange={(e) => onDocumentChange?.(e.target.value)}
+            >
+              {documentIds.map((docId) => (
+                <MenuItem key={docId} value={docId}>
+                  {docId}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+
+        {currentDocId && (
           <Typography
             variant="body1"
             sx={{ mb: 2, color: 'text.primary', fontWeight: 500 }}
           >
-            Selected Document: {selectedDocId}
+            Current Document: {currentDocId}
           </Typography>
         )}
-
-        {loadInProgress && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <CircularProgress size={24} />
-            <Typography>Loading document timeline...</Typography>
-          </Box>
-        )}
-
-        {errorMessage && !loadInProgress && (
-          <Typography color="error" sx={{ textAlign: 'center' }}>
-            Error loading timeline: {JSON.stringify(errorMessage)}
-          </Typography>
-        )}
-
-        {!loadInProgress && !errorMessage && (
-          <Typography sx={{ textAlign: 'center', color: 'text.secondary' }}>
-            Timeline loaded successfully
-          </Typography>
-        )}
-
-        <Box sx={{ mt: 4, width: '100%', maxWidth: '600px' }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Document States:
-          </Typography>
-          {Object.entries(documentStates).map(([docId, state]) => (
-            <Box
-              key={docId}
-              sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}
-            >
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                Document: {docId}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Status: {state.status}
-              </Typography>
-              {state.timeline && (
-                <Typography variant="body2" color="text.secondary">
-                  Timeline Points: {state.timeline.timelinePoints?.length || 0}
-                </Typography>
-              )}
-              {state.error && (
-                <Typography variant="body2" color="error">
-                  Error: {JSON.stringify(state.error)}
-                </Typography>
-              )}
-            </Box>
-          ))}
-        </Box>
       </Box>
+
+      {currentDocState && (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '300px',
+          }}
+        >
+          {loadInProgress && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <CircularProgress size={24} />
+              <Typography>Loading document timeline...</Typography>
+            </Box>
+          )}
+
+          {currentDocState.error && !loadInProgress && (
+            <Typography color="error" sx={{ textAlign: 'center', mb: 2 }}>
+              Error loading timeline: {JSON.stringify(currentDocState.error)}
+            </Typography>
+          )}
+
+          {errorMessage && !loadInProgress && (
+            <Typography color="error" sx={{ textAlign: 'center', mb: 2 }}>
+              Error: {errorMessage}
+            </Typography>
+          )}
+
+          <Box sx={{ width: '100%', maxWidth: '600px' }}>
+            <Box sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                Document Status
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Status: {currentDocState.status}
+              </Typography>
+
+              {currentDocState.timeline && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
+                  Timeline Points:{' '}
+                  {currentDocState.timeline.timelinePoints?.length || 0}
+                </Typography>
+              )}
+
+              {!loadInProgress &&
+                !currentDocState.error &&
+                !errorMessage &&
+                currentDocState.status === LoadingStatusType.SUCCESS && (
+                  <Typography sx={{ color: 'success.main', fontWeight: 500 }}>
+                    Timeline loaded successfully
+                  </Typography>
+                )}
+            </Box>
+          </Box>
+        </Box>
+      )}
+
+      {!currentDocState && documentIds.length === 0 && (
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography color="text.secondary">No documents available</Typography>
+        </Box>
+      )}
     </Box>
   );
 };

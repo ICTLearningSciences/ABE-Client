@@ -62,6 +62,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const { builtActivities } = useWithDocGoalsActivities();
   const {
     fetchDocumentTimeline,
+    selectDocument,
     documentStates,
     loadInProgress,
     errorMessage,
@@ -97,6 +98,19 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       console.log('fetching document timeline for docId', docId);
       try {
         await fetchDocumentTimeline(targetStudent.userId, docId);
+      } catch (error) {
+        console.error('Failed to fetch document timeline:', error);
+      }
+    }
+  };
+
+  const handleDocumentChange = async (docId: string) => {
+    selectDocument(docId);
+    const currentStudentId = viewState.selectedStudentId;
+    if (currentStudentId) {
+      try {
+        console.log('fetching document timeline for docId', docId);
+        await fetchDocumentTimeline(currentStudentId, docId);
       } catch (error) {
         console.error('Failed to fetch document timeline:', error);
       }
@@ -531,6 +545,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 onBackToStudentInfo={() =>
                   viewStudentInfo(viewState.selectedStudentId!)
                 }
+                onDocumentChange={handleDocumentChange}
               />
             )}
 

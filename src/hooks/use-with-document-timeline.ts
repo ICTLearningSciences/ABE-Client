@@ -199,33 +199,43 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
     docId: string,
     cancelToken?: CancelToken
   ): Promise<void> {
-    // Check if timeline is already cached
+    // Always select the document first
+    dispatch({ type: TimelineActionType.SELECT_DOC, docId });
+
     const docState = state.documentStates[docId];
-    if (
-      docState?.timeline &&
-      ![
-        LoadingStatusType.LOADING,
-        LoadingStatusType.SUCCESS,
-        LoadingStatusType.SAVING,
-      ].includes(docState.status)
-    ) {
-      dispatch({
-        type: TimelineActionType.LOADING_SUCCEEDED,
+    console.log('docState', docState);
+
+    // If timeline is already loaded successfully, just select it - no need to fetch
+    if (docState?.timeline && docState.status === LoadingStatusType.SUCCESS) {
+      console.log(
+        'Timeline already loaded for docId',
         docId,
-        dataPayload: docState.timeline,
-      });
+        '- just selecting'
+      );
       return;
     }
 
+    // If currently loading or saving, just wait - don't start another fetch
     if (
       docState?.status === LoadingStatusType.LOADING ||
-      !config.config?.defaultAiModel
+      docState?.status === LoadingStatusType.SAVING
     ) {
+      console.log(
+        'Timeline already loading/saving for docId',
+        docId,
+        '- waiting'
+      );
       return;
     }
+
+    // Check if we have the required config to fetch
+    if (!config.config?.defaultAiModel) {
+      console.log('No default AI model configured - cannot fetch timeline');
+      return;
+    }
+    console.log('fetching doc timeline for docId', docId);
     try {
       dispatch({ type: TimelineActionType.LOADING_STARTED, docId });
-      dispatch({ type: TimelineActionType.SELECT_DOC, docId });
       const docTimelineJobId = await asyncRequestDocTimeline(
         userId,
         docId,
@@ -309,9 +319,8 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
 
   function selectDocument(docId: string) {
     dispatch({
-      type: TimelineActionType.SELECT_TIMEPOINT,
+      type: TimelineActionType.SELECT_DOC,
       docId,
-      selectTimepointPayload: undefined,
     });
   }
 
