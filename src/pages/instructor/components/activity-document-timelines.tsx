@@ -119,9 +119,10 @@ export const ActivityDocumentTimelines: React.FC<
       </Box>
     );
   }
+  console.log(currentDocId);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3 }} key={currentDocId}>
       <AssignmentHeader
         documentId={currentDocId}
         studentId={studentId}

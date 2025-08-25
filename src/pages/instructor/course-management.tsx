@@ -66,7 +66,8 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     documentStates,
     loadInProgress,
     errorMessage,
-  } = useWithDocumentTimeline();
+    selectedDocId,
+    } = useWithDocumentTimeline();
 
   const isStudent =
     userRole === EducationalRole.STUDENT ||
@@ -536,13 +537,13 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
 
           {viewState.view === 'activity-document-timelines' &&
             viewState.selectedStudentId &&
-            viewState.selectedDocId && (
+            selectedDocId && (
               <ActivityDocumentTimelines
                 studentId={viewState.selectedStudentId}
                 documentStates={documentStates}
                 loadInProgress={loadInProgress}
                 errorMessage={errorMessage}
-                selectedDocId={viewState.selectedDocId}
+                selectedDocId={selectedDocId}
                 onBackToStudentInfo={() =>
                   viewStudentInfo(viewState.selectedStudentId!)
                 }
