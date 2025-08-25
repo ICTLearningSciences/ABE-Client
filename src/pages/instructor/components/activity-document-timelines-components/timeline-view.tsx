@@ -1,0 +1,175 @@
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+import React from 'react';
+import { Box, Typography, Chip } from '@mui/material';
+import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import { DehydratedGQLTimelinePoint } from '../../../../types';
+
+interface TimelineViewProps {
+  timelinePoints: DehydratedGQLTimelinePoint[];
+  selectedTimelineIndex: number;
+  onTimelinePointSelect: (index: number) => void;
+}
+
+export const TimelineView: React.FC<TimelineViewProps> = ({
+  timelinePoints,
+  selectedTimelineIndex,
+  onTimelinePointSelect,
+}) => {
+  if (!timelinePoints.length) {
+    return null;
+  }
+
+  return (
+    <Box sx={{ mb: 4 }}>
+      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+        Timeline
+      </Typography>
+
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          overflowX: 'auto',
+          pb: 2,
+          '&::-webkit-scrollbar': {
+            height: 8,
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: 'grey.100',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'grey.400',
+            borderRadius: 4,
+          },
+        }}
+      >
+        {timelinePoints.map((point, index) => (
+          <Box
+            key={point.versionId}
+            sx={{ display: 'flex', alignItems: 'center' }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                minWidth: 200,
+                cursor: 'pointer',
+                p: 1,
+                borderRadius: 2,
+                backgroundColor:
+                  index === selectedTimelineIndex
+                    ? 'primary.50'
+                    : 'transparent',
+                '&:hover': {
+                  backgroundColor:
+                    index === selectedTimelineIndex ? 'primary.50' : 'grey.50',
+                },
+              }}
+              onClick={() => onTimelinePointSelect(index)}
+            >
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  backgroundColor:
+                    index === selectedTimelineIndex
+                      ? 'primary.main'
+                      : 'primary.light',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mb: 1,
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <CheckCircleIcon
+                  sx={{
+                    color: 'white',
+                    fontSize: 20,
+                  }}
+                />
+              </Box>
+
+              <Chip
+                label={point.version?.activity || 'Unknown Activity'}
+                size="small"
+                sx={{
+                  mb: 1,
+                  backgroundColor:
+                    index === selectedTimelineIndex
+                      ? 'primary.main'
+                      : 'primary.light',
+                  color: 'white',
+                  fontSize: '0.75rem',
+                  maxWidth: 180,
+                  '& .MuiChip-label': {
+                    px: 1,
+                  },
+                }}
+              />
+
+              <Box sx={{ display: 'flex', gap: 0.5 }}>
+                <Chip
+                  label="+0"
+                  size="small"
+                  sx={{
+                    backgroundColor: 'success.light',
+                    color: 'white',
+                    fontSize: '0.7rem',
+                    height: 20,
+                  }}
+                />
+                <Chip
+                  label="-0"
+                  size="small"
+                  sx={{
+                    backgroundColor: 'error.light',
+                    color: 'white',
+                    fontSize: '0.7rem',
+                    height: 20,
+                  }}
+                />
+              </Box>
+
+              <Typography
+                variant="caption"
+                sx={{
+                  mt: 0.5,
+                  color: 'text.secondary',
+                  textAlign: 'center',
+                  fontSize: '0.7rem',
+                }}
+              >
+                {new Date(point.versionTime).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </Typography>
+            </Box>
+
+            {index < timelinePoints.length - 1 && (
+              <Box
+                sx={{
+                  width: 40,
+                  height: 2,
+                  backgroundColor: 'primary.light',
+                  mx: 1,
+                }}
+              />
+            )}
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
+};

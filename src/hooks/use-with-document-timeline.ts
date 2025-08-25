@@ -26,16 +26,14 @@ import {
   TimelineReducer,
   TimelineState,
 } from './document-timeline-reducer';
-import { LoadingStatusType } from './generic-loading-reducer';
+import { LoadingError, LoadingStatusType } from './generic-loading-reducer';
 import { CancelToken } from 'axios';
 import { pollUntilTrue } from './use-with-synchronous-polling';
 import { useWithConfig } from '../store/slices/config/use-with-config';
 import { useAppSelector } from '../store/hooks';
 
 const initialState: TimelineState = {
-  status: LoadingStatusType.NONE,
-  data: undefined,
-  error: undefined,
+  documentStates: {},
 };
 
 const startPoint: GQLTimelinePoint = {
@@ -110,6 +108,15 @@ export function addStartPointToTimeline(timeline: GQLDocumentTimeline) {
 export type DocumentTimelineHookReturn = {
   documentTimeline: GQLDocumentTimeline | undefined;
   curTimelinePoint: GQLTimelinePoint | undefined;
+  documentStates: Record<
+    string,
+    {
+      timeline?: DehydratedGQLDocumentTimeline;
+      status: LoadingStatusType;
+      error?: LoadingError;
+    }
+  >;
+  selectedDocId: string | undefined;
   loadInProgress: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   errorMessage: any | undefined;
@@ -119,6 +126,7 @@ export type DocumentTimelineHookReturn = {
     cancelToken?: CancelToken
   ) => Promise<void>;
   selectTimelinePoint: (timepoint: GQLTimelinePoint) => void;
+  selectDocument: (docId: string) => void;
   saveTimelinePoint: (updatedTimelinePoint: GQLTimelinePoint) => Promise<void>;
 };
 
@@ -129,13 +137,18 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
   const requestedVersionIds = useRef<Set<string>>(new Set());
   const docService = getDocServiceFromLoginService(user?.loginService);
   const hydratedGqlTimeline: GQLDocumentTimeline | undefined = useMemo(() => {
-    if (!state.data) {
+    if (
+      !state.selectedDocId ||
+      !state.documentStates[state.selectedDocId]?.timeline
+    ) {
       return undefined;
     }
+    const selectedDocState = state.documentStates[state.selectedDocId];
+    const selectedTimeline = selectedDocState.timeline!;
     return {
-      ...state.data,
-      timelinePoints: state.data.timelinePoints.reduce((acc, point) => {
-        const version = state.docVersions?.find(
+      ...selectedTimeline,
+      timelinePoints: selectedTimeline.timelinePoints.reduce((acc, point) => {
+        const version = selectedDocState.docVersions?.find(
           (v) => v._id === point.versionId
         );
         if (version) {
@@ -147,9 +160,10 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
         return acc;
       }, [] as GQLTimelinePoint[]),
     };
-  }, [state.data, state.docVersions]);
+  }, [state.selectedDocId, state.documentStates]);
 
   async function fetchDocVersionsForPartialData(
+    docId: string,
     timeline?: DehydratedGQLDocumentTimeline
   ) {
     if (!timeline) {
@@ -167,12 +181,14 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
       ]);
       dispatch({
         type: TimelineActionType.PARTIAL_DATA_LOADED,
+        docId,
         dataPayload: timeline,
         docVersionsPayload: versions,
       });
     } else {
       dispatch({
         type: TimelineActionType.PARTIAL_DATA_LOADED,
+        docId,
         dataPayload: timeline,
       });
     }
@@ -183,14 +199,43 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
     docId: string,
     cancelToken?: CancelToken
   ): Promise<void> {
-    if (
-      state.status === LoadingStatusType.LOADING ||
-      !config.config?.defaultAiModel
-    ) {
+    // Always select the document first
+    dispatch({ type: TimelineActionType.SELECT_DOC, docId });
+
+    const docState = state.documentStates[docId];
+    console.log('docState', docState);
+
+    // If timeline is already loaded successfully, just select it - no need to fetch
+    if (docState?.timeline && docState.status === LoadingStatusType.SUCCESS) {
+      console.log(
+        'Timeline already loaded for docId',
+        docId,
+        '- just selecting'
+      );
       return;
     }
+
+    // If currently loading or saving, just wait - don't start another fetch
+    if (
+      docState?.status === LoadingStatusType.LOADING ||
+      docState?.status === LoadingStatusType.SAVING
+    ) {
+      console.log(
+        'Timeline already loading/saving for docId',
+        docId,
+        '- waiting'
+      );
+      return;
+    }
+
+    // Check if we have the required config to fetch
+    if (!config.config?.defaultAiModel) {
+      console.log('No default AI model configured - cannot fetch timeline');
+      return;
+    }
+    console.log('fetching doc timeline for docId', docId);
     try {
-      dispatch({ type: TimelineActionType.LOADING_STARTED });
+      dispatch({ type: TimelineActionType.LOADING_STARTED, docId });
       const docTimelineJobId = await asyncRequestDocTimeline(
         userId,
         docId,
@@ -212,7 +257,7 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
             Boolean(res.documentTimeline) &&
             res.documentTimeline
           ) {
-            fetchDocVersionsForPartialData(res.documentTimeline);
+            fetchDocVersionsForPartialData(docId, res.documentTimeline);
           }
           return res.jobStatus === JobStatus.COMPLETE;
         },
@@ -220,9 +265,10 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
         300 * 1000
       );
       const timeline = res.documentTimeline;
-      await fetchDocVersionsForPartialData(timeline);
+      await fetchDocVersionsForPartialData(docId, timeline);
       dispatch({
         type: TimelineActionType.LOADING_SUCCEEDED,
+        docId,
         dataPayload: timeline,
       });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -238,7 +284,7 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
   }
 
   async function saveTimelinePoint(updatedTimelinePoint: GQLTimelinePoint) {
-    if (!hydratedGqlTimeline) {
+    if (!hydratedGqlTimeline || !state.selectedDocId) {
       return;
     }
     try {
@@ -253,6 +299,7 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
       });
       dispatch({
         type: TimelineActionType.SAVE_TIMELINE_POINT,
+        docId: state.selectedDocId,
         savedTimelinePoint: updatedTimelinePoint,
       });
       return;
@@ -265,22 +312,47 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
   function selectTimelinePoint(timepoint: GQLTimelinePoint) {
     dispatch({
       type: TimelineActionType.SELECT_TIMEPOINT,
+      docId: state.selectedDocId,
       selectTimepointPayload: timepoint,
     });
   }
 
+  function selectDocument(docId: string) {
+    dispatch({
+      type: TimelineActionType.SELECT_DOC,
+      docId,
+    });
+  }
+
+  const selectedDocState = state.selectedDocId
+    ? state.documentStates[state.selectedDocId]
+    : undefined;
+
   return {
     documentTimeline: hydratedGqlTimeline,
-    // ? addStartPointToTimeline(state.data)
-    // : undefined,
     curTimelinePoint: hydratedGqlTimeline?.timelinePoints.find(
-      (tp) => tp.versionTime === state.selectedTimepointVersionTime
+      (tp) => tp.versionTime === selectedDocState?.selectedTimepointVersionTime
     ),
-    loadInProgress: state.status === LoadingStatusType.LOADING,
+    documentStates: Object.fromEntries(
+      Object.entries(state.documentStates).map(([docId, docState]) => [
+        docId,
+        {
+          timeline: docState.timeline,
+          status: docState.status,
+          error: docState.error,
+        },
+      ])
+    ),
+    selectedDocId: state.selectedDocId,
+    loadInProgress:
+      selectedDocState?.status === LoadingStatusType.LOADING || false,
     errorMessage:
-      state.status === LoadingStatusType.ERROR ? state.error : undefined,
+      selectedDocState?.status === LoadingStatusType.ERROR
+        ? selectedDocState.error
+        : undefined,
     fetchDocumentTimeline: asyncFetchDocTimeline,
     selectTimelinePoint,
+    selectDocument,
     saveTimelinePoint,
   };
 }

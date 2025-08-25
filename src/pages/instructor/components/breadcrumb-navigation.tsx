@@ -93,6 +93,22 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
       }
     }
 
+    if (viewState.selectedStudentId) {
+      const student = educationManagement.students.find(
+        (s) => s.userId === viewState.selectedStudentId
+      );
+      if (student) {
+        items.push({
+          id: student.userId,
+          title: student.name,
+          icon: '👤',
+          onClick: () => {
+            console.log('student clicked');
+          },
+        });
+      }
+    }
+
     if (
       viewState.selectedActivityId &&
       viewState.selectedCourseId &&
