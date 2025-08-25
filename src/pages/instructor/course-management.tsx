@@ -535,7 +535,8 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
             )}
 
           {viewState.view === 'activity-document-timelines' &&
-            viewState.selectedStudentId && (
+            viewState.selectedStudentId &&
+            viewState.selectedDocId && (
               <ActivityDocumentTimelines
                 studentId={viewState.selectedStudentId}
                 documentStates={documentStates}

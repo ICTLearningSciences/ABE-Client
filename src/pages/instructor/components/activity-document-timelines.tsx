@@ -4,23 +4,18 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import {
-  Box,
-  Typography,
-  CircularProgress,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from '@mui/material';
-import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import React, { useState, useEffect } from 'react';
+import { Box, CircularProgress, Grid, Typography } from '@mui/material';
 import {
   LoadingError,
   LoadingStatusType,
 } from '../../../hooks/generic-loading-reducer';
 import { DehydratedGQLDocumentTimeline } from '../../../types';
+import { AssignmentHeader } from './activity-document-timelines-components/assignment-header';
+import { DocumentSelector } from './activity-document-timelines-components/document-selector';
+import { TimelineView } from './activity-document-timelines-components/timeline-view';
+import { DocumentTextView } from './activity-document-timelines-components/document-text-view';
+import { TabbedInfoPanel } from './activity-document-timelines-components/tabbed-info-panel';
 
 interface ActivityDocumentTimelinesProps {
   studentId: string;
@@ -34,9 +29,9 @@ interface ActivityDocumentTimelinesProps {
   >;
   loadInProgress: boolean;
   errorMessage?: string;
-  selectedDocId?: string;
-  onBackToStudentInfo?: () => void;
-  onDocumentChange?: (docId: string) => void;
+  selectedDocId: string;
+  onBackToStudentInfo: () => void;
+  onDocumentChange: (docId: string) => void;
 }
 
 export const ActivityDocumentTimelines: React.FC<
@@ -51,125 +46,108 @@ export const ActivityDocumentTimelines: React.FC<
   onDocumentChange,
 }) => {
   const documentIds = Object.keys(documentStates);
-  const currentDocId = selectedDocId || documentIds[0];
+  const currentDocId = selectedDocId;
   const currentDocState = documentStates[currentDocId];
+  const [selectedTimelineIndex, setSelectedTimelineIndex] = useState(0);
+
+  const currentTimeline = currentDocState?.timeline;
+  const timelinePoints = currentTimeline?.timelinePoints || [];
+  const currentTimelinePoint = timelinePoints[selectedTimelineIndex] || null;
+
+  useEffect(() => {
+    setSelectedTimelineIndex(0);
+  }, [currentDocId]);
+
+  if (loadInProgress && !currentTimeline) {
+    return (
+      <Box
+        sx={{
+          p: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '400px',
+        }}
+      >
+        <CircularProgress size={32} sx={{ mb: 2 }} />
+        <Typography>Loading document timeline...</Typography>
+      </Box>
+    );
+  }
+
+  if (currentDocState?.error || errorMessage) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <AssignmentHeader
+          documentId={currentDocId}
+          studentId={studentId}
+          onBackToStudentInfo={onBackToStudentInfo}
+        />
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography color="error">
+            Error loading timeline:{' '}
+            {currentDocState?.error
+              ? JSON.stringify(currentDocState.error)
+              : errorMessage}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (!currentTimeline || !timelinePoints.length) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <AssignmentHeader
+          documentId={currentDocId}
+          studentId={studentId}
+          onBackToStudentInfo={onBackToStudentInfo}
+        />
+        <DocumentSelector
+          documentIds={documentIds}
+          selectedDocId={currentDocId}
+          onDocumentChange={onDocumentChange}
+        />
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography color="text.secondary">
+            {documentIds.length === 0
+              ? 'No documents available'
+              : 'No timeline data available for this document'}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ p: 3 }}>
-      {onBackToStudentInfo && (
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={onBackToStudentInfo}
-          sx={{ mb: 2, color: 'text.secondary' }}
-        >
-          Back to Student Grades
-        </Button>
-      )}
+      <AssignmentHeader
+        documentId={currentDocId}
+        studentId={studentId}
+        onBackToStudentInfo={onBackToStudentInfo}
+      />
 
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ mb: 2, fontWeight: 600 }}>
-          Document Timeline
-        </Typography>
+      <DocumentSelector
+        documentIds={documentIds}
+        selectedDocId={currentDocId}
+        onDocumentChange={onDocumentChange}
+      />
 
-        <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
-          Student ID: {studentId}
-        </Typography>
+      <TimelineView
+        timelinePoints={timelinePoints}
+        selectedTimelineIndex={selectedTimelineIndex}
+        onTimelinePointSelect={setSelectedTimelineIndex}
+      />
 
-        {documentIds.length > 1 && (
-          <FormControl sx={{ minWidth: 300, mb: 3 }}>
-            <InputLabel id="document-select-label">Select Document</InputLabel>
-            <Select
-              labelId="document-select-label"
-              value={currentDocId || ''}
-              label="Select Document"
-              onChange={(e) => onDocumentChange?.(e.target.value)}
-            >
-              {documentIds.map((docId) => (
-                <MenuItem key={docId} value={docId}>
-                  {docId}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
-
-        {currentDocId && (
-          <Typography
-            variant="body1"
-            sx={{ mb: 2, color: 'text.primary', fontWeight: 500 }}
-          >
-            Current Document: {currentDocId}
-          </Typography>
-        )}
-      </Box>
-
-      {currentDocState && (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '300px',
-          }}
-        >
-          {loadInProgress && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <CircularProgress size={24} />
-              <Typography>Loading document timeline...</Typography>
-            </Box>
-          )}
-
-          {currentDocState.error && !loadInProgress && (
-            <Typography color="error" sx={{ textAlign: 'center', mb: 2 }}>
-              Error loading timeline: {JSON.stringify(currentDocState.error)}
-            </Typography>
-          )}
-
-          {errorMessage && !loadInProgress && (
-            <Typography color="error" sx={{ textAlign: 'center', mb: 2 }}>
-              Error: {errorMessage}
-            </Typography>
-          )}
-
-          <Box sx={{ width: '100%', maxWidth: '600px' }}>
-            <Box sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Document Status
-              </Typography>
-
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                Status: {currentDocState.status}
-              </Typography>
-
-              {currentDocState.timeline && (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 1 }}
-                >
-                  Timeline Points:{' '}
-                  {currentDocState.timeline.timelinePoints?.length || 0}
-                </Typography>
-              )}
-
-              {!loadInProgress &&
-                !currentDocState.error &&
-                !errorMessage &&
-                currentDocState.status === LoadingStatusType.SUCCESS && (
-                  <Typography sx={{ color: 'success.main', fontWeight: 500 }}>
-                    Timeline loaded successfully
-                  </Typography>
-                )}
-            </Box>
-          </Box>
-        </Box>
-      )}
-
-      {!currentDocState && documentIds.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Typography color="text.secondary">No documents available</Typography>
-        </Box>
-      )}
+      <Grid container spacing={3} sx={{ height: '600px' }}>
+        <Grid item xs={6}>
+          <DocumentTextView timelinePoint={currentTimelinePoint} />
+        </Grid>
+        <Grid item xs={6}>
+          <TabbedInfoPanel timelinePoint={currentTimelinePoint} />
+        </Grid>
+      </Grid>
     </Box>
   );
 };
