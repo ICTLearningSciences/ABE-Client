@@ -20,7 +20,7 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
   onBackToStudentInfo,
 }) => {
   return (
-    <Box sx={{ mb: 3 }}>
+    <Box sx={{ mb: 3, width: '100%' }}>
       {onBackToStudentInfo && (
         <Button
           startIcon={<ArrowBackIcon />}
@@ -33,12 +33,12 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
 
       <Typography
         variant="h6"
-        sx={{ mb: 2, fontWeight: 600, color: '#1976d2' }}
+        sx={{ mb: 2, fontWeight: 600, color: '#1976d2', textAlign: 'center' }}
       >
         Assignment: {documentId}
       </Typography>
 
-      <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+      <Typography variant="body1" sx={{ color: 'text.secondary', textAlign: 'center' }}>
         Review {studentId}&apos;s progress across multiple activities
 
       </Typography>

@@ -32,6 +32,7 @@ import { useWithEducationalEvents } from '../../store/slices/education-managemen
 import { useWithDocumentTimeline } from '../../hooks/use-with-document-timeline';
 import { ActivityDocumentTimelines } from './components/activity-document-timelines';
 import { StudentInfoPage } from './components/section-student-grades/student-info-page';
+import { getStudentDocIds } from '../../helpers';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -76,6 +77,12 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const myInstructorData = useAppSelector(
     (state) => state.educationManagement.instructorData
   );
+
+  const targetStudent = educationManagement.students.find(
+    (s) => s.userId === viewState.selectedStudentId
+  );
+
+  const allStudentDocIds = targetStudent ? getStudentDocIds(targetStudent) : [];
 
   const handleViewStudentTimelines = async (
     studentId: string,
@@ -540,6 +547,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
             selectedDocId && (
               <ActivityDocumentTimelines
                 studentId={viewState.selectedStudentId}
+                studentDocIds={allStudentDocIds}
                 documentStates={documentStates}
                 loadInProgress={loadInProgress}
                 errorMessage={errorMessage}

@@ -23,7 +23,7 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
   }
 
   return (
-    <Box sx={{ mb: 3 }}>
+    <Box sx={{ mb: 3, width: '100%', display: 'flex', justifyContent: 'center' }}>
       <FormControl sx={{ minWidth: 300 }}>
         <InputLabel id="document-select-label">Document</InputLabel>
         <Select

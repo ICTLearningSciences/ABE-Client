@@ -49,14 +49,6 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
         overflow: 'hidden',
       }}
     >
-      <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
-        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-          {timelinePoint.version?.title || 'Document'}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {new Date(timelinePoint.versionTime).toLocaleString()}
-        </Typography>
-      </Box>
 
       <Box
         sx={{

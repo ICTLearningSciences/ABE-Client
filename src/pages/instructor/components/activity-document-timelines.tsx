@@ -19,6 +19,7 @@ import { TabbedInfoPanel } from './activity-document-timelines-components/tabbed
 
 interface ActivityDocumentTimelinesProps {
   studentId: string;
+  studentDocIds: string[];
   documentStates: Record<
     string,
     {
@@ -39,13 +40,14 @@ export const ActivityDocumentTimelines: React.FC<
 > = ({
   studentId,
   documentStates,
+  studentDocIds,
   loadInProgress,
   errorMessage,
   selectedDocId,
   onBackToStudentInfo,
   onDocumentChange,
 }) => {
-  const documentIds = Object.keys(documentStates);
+  const documentIds = studentDocIds;
   const currentDocId = selectedDocId;
   const currentDocState = documentStates[currentDocId];
   const [selectedTimelineIndex, setSelectedTimelineIndex] = useState(0);
@@ -119,10 +121,9 @@ export const ActivityDocumentTimelines: React.FC<
       </Box>
     );
   }
-  console.log(currentDocId);
 
   return (
-    <Box sx={{ p: 3 }} key={currentDocId}>
+    <Box sx={{ p: 3, width: '100%', display: 'flex', flexDirection: 'column' }} key={currentDocId}>
       <AssignmentHeader
         documentId={currentDocId}
         studentId={studentId}
