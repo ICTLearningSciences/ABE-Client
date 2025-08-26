@@ -17,7 +17,10 @@ import {
 import { AssignmentHeader } from './activity-document-timelines-components/assignment-header';
 import { DocumentSelector } from './activity-document-timelines-components/document-selector';
 import { TimelineView } from './activity-document-timelines-components/timeline-view';
-import { DocumentTextView } from './activity-document-timelines-components/document-text-view';
+import {
+  applyTextDiff,
+  DocumentTextView,
+} from './activity-document-timelines-components/document-text-view';
 import { TabbedInfoPanel } from './activity-document-timelines-components/tabbed-info-panel';
 
 interface ActivityDocumentTimelinesProps {
@@ -65,7 +68,20 @@ export const ActivityDocumentTimelines: React.FC<
   }, [currentDocState?.status, getHydratedTimeline, currentDocId]);
 
   const timelinePoints = currentTimeline?.timelinePoints || [];
-  const currentTimelinePoint = timelinePoints[selectedTimelineIndex] || null;
+  const currentTimelinePoint =
+    timelinePoints[selectedTimelineIndex] || undefined;
+  const previousTimelinePoint =
+    timelinePoints[selectedTimelineIndex - 1] || undefined;
+
+  const currentText =
+    currentTimelinePoint?.version?.markdownText ||
+    currentTimelinePoint?.version?.plainText ||
+    '';
+  const previousText =
+    previousTimelinePoint?.version?.markdownText ||
+    previousTimelinePoint?.version?.plainText ||
+    '';
+  const diffContent = applyTextDiff(previousText, currentText);
 
   useEffect(() => {
     setSelectedTimelineIndex(0);
@@ -158,7 +174,11 @@ export const ActivityDocumentTimelines: React.FC<
 
       <Grid container spacing={3} sx={{ height: '600px' }}>
         <Grid item xs={6}>
-          <DocumentTextView timelinePoint={currentTimelinePoint} />
+          <DocumentTextView
+            timelinePoint={currentTimelinePoint}
+            previousTimelinePoint={previousTimelinePoint}
+            diffContent={diffContent}
+          />
         </Grid>
         <Grid item xs={6}>
           <TabbedInfoPanel timelinePoint={currentTimelinePoint} />

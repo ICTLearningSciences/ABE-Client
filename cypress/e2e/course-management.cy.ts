@@ -12,6 +12,7 @@ import { mockGQL } from '../helpers/functions';
 import { createAssignmentResponse, deleteAssignmentResponse, newTestAssignment, updateAssignmentResponse, updatedTestAssignment } from '../fixtures/educational-management/assignment-operations';
 import { fetchCoursesResponseEmpty, fetchCoursesResponseStudent, removeFromSectionResponse, studentAfterRemoval, updatedTestSection, updateTestSectionWithAssignmentsResponse } from '../fixtures/educational-management';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
+import { realExampleDocVersions } from '../fixtures/document-timeline/real-example';
 
 describe('Course Management', () => {
   
@@ -573,24 +574,9 @@ describe('Course Management', () => {
       userRole: UserRole.USER,
       educationalRole: EducationalRole.INSTRUCTOR,
       gqlQueries: [
-        mockGQL('FetchVersionsById', fetchDocVersionsBuilder([
-          {
-            _id: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
-            docId: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
-            plainText: "Test ",
-            markdownText: "Test ",
-            lastChangedId: "",
-            sessionId: "",
-            chatLog: [],
-            activity: "",
-            intent: "",
-            title:"",
-            lastModifyingUser: "",
-            modifiedTime: "",
-            createdAt: "",
-            updatedAt: ""
-          }
-        ])),
+        mockGQL('FetchVersionsById', fetchDocVersionsBuilder(
+          realExampleDocVersions
+        )),
       ]
     });
 

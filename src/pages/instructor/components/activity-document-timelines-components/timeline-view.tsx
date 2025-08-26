@@ -8,6 +8,7 @@ import React from 'react';
 import { Box, Typography, Chip } from '@mui/material';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import { DehydratedGQLTimelinePoint } from '../../../../types';
+import { applyTextDiff } from './document-text-view';
 
 interface TimelineViewProps {
   timelinePoints: DehydratedGQLTimelinePoint[];
@@ -44,11 +45,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
       <Box
         sx={{
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           gap: 2,
           overflowX: 'auto',
-          pb: 2,
+          width: '75vw',
           '&::-webkit-scrollbar': {
             height: 8,
           },
@@ -61,126 +60,137 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           },
         }}
       >
-        {timelinePoints.map((point, index) => (
-          <Box
-            key={point.versionId}
-            sx={{ display: 'flex', alignItems: 'center' }}
-          >
+        {timelinePoints.map((point, index) => {
+          const previousPoint = timelinePoints[index - 1];
+          const diffContent = applyTextDiff(
+            previousPoint?.version?.plainText || '',
+            point.version?.plainText || ''
+          );
+          const charactersRemoved = diffContent.charactersRemoved;
+          const charactersAdded = diffContent.charactersAdded;
+          return (
             <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                minWidth: 200,
-                cursor: 'pointer',
-                p: 1,
-                borderRadius: 2,
-                backgroundColor:
-                  index === selectedTimelineIndex
-                    ? 'primary.50'
-                    : 'transparent',
-                '&:hover': {
-                  backgroundColor:
-                    index === selectedTimelineIndex ? 'primary.50' : 'grey.50',
-                },
-              }}
-              onClick={() => onTimelinePointSelect(index)}
+              key={point.versionId}
+              sx={{ display: 'flex', alignItems: 'center' }}
             >
               <Box
                 sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '50%',
-                  backgroundColor:
-                    index === selectedTimelineIndex
-                      ? 'primary.main'
-                      : 'primary.light',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  mb: 1,
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <CheckCircleIcon
-                  sx={{
-                    color: 'white',
-                    fontSize: 20,
-                  }}
-                />
-              </Box>
-
-              <Chip
-                label={point.version?.activity || 'Unknown Activity'}
-                size="small"
-                sx={{
-                  mb: 1,
+                  minWidth: 200,
+                  cursor: 'pointer',
+                  p: 1,
+                  borderRadius: 2,
                   backgroundColor:
                     index === selectedTimelineIndex
-                      ? 'primary.main'
-                      : 'primary.light',
-                  color: 'white',
-                  fontSize: '0.75rem',
-                  maxWidth: 180,
-                  '& .MuiChip-label': {
-                    px: 1,
+                      ? 'primary.50'
+                      : 'transparent',
+                  '&:hover': {
+                    backgroundColor:
+                      index === selectedTimelineIndex
+                        ? 'primary.50'
+                        : 'grey.50',
                   },
                 }}
-              />
+                onClick={() => onTimelinePointSelect(index)}
+              >
+                <Box
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    backgroundColor:
+                      index === selectedTimelineIndex
+                        ? 'primary.main'
+                        : 'primary.light',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mb: 1,
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <CheckCircleIcon
+                    sx={{
+                      color: 'white',
+                      fontSize: 20,
+                    }}
+                  />
+                </Box>
 
-              <Box sx={{ display: 'flex', gap: 0.5 }}>
                 <Chip
-                  label="+0"
+                  label={point.version?.activity || 'Unknown Activity'}
                   size="small"
                   sx={{
-                    backgroundColor: 'success.light',
+                    mb: 1,
+                    backgroundColor:
+                      index === selectedTimelineIndex
+                        ? 'primary.main'
+                        : 'primary.light',
                     color: 'white',
-                    fontSize: '0.7rem',
-                    height: 20,
+                    fontSize: '0.75rem',
+                    maxWidth: 180,
+                    '& .MuiChip-label': {
+                      px: 1,
+                    },
                   }}
                 />
-                <Chip
-                  label="-0"
-                  size="small"
+
+                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                  <Chip
+                    label={`+${charactersAdded}`}
+                    size="small"
+                    sx={{
+                      backgroundColor: 'success.light',
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      height: 20,
+                    }}
+                  />
+                  <Chip
+                    label={`-${charactersRemoved}`}
+                    size="small"
+                    sx={{
+                      backgroundColor: 'error.light',
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      height: 20,
+                    }}
+                  />
+                </Box>
+
+                <Typography
+                  variant="caption"
                   sx={{
-                    backgroundColor: 'error.light',
-                    color: 'white',
+                    mt: 0.5,
+                    color: 'text.secondary',
+                    textAlign: 'center',
                     fontSize: '0.7rem',
-                    height: 20,
                   }}
-                />
+                >
+                  {new Date(point.versionTime).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </Typography>
               </Box>
 
-              <Typography
-                variant="caption"
-                sx={{
-                  mt: 0.5,
-                  color: 'text.secondary',
-                  textAlign: 'center',
-                  fontSize: '0.7rem',
-                }}
-              >
-                {new Date(point.versionTime).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </Typography>
+              {index < timelinePoints.length - 1 && (
+                <Box
+                  sx={{
+                    width: 40,
+                    height: 2,
+                    backgroundColor: 'primary.light',
+                    mx: 1,
+                  }}
+                />
+              )}
             </Box>
-
-            {index < timelinePoints.length - 1 && (
-              <Box
-                sx={{
-                  width: 40,
-                  height: 2,
-                  backgroundColor: 'primary.light',
-                  mx: 1,
-                }}
-              />
-            )}
-          </Box>
-        ))}
+          );
+        })}
       </Box>
     </Box>
   );

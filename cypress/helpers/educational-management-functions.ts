@@ -46,7 +46,7 @@ import { fetchDocGoalsResponse } from '../fixtures/fetch-doc-goals';
 import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
 import { fetchPromptTemplates } from '../fixtures/fetch-prompt-templates';
 import { fetchInstructorsResponseEmpty } from '../fixtures/educational-management/fetch-instructors';
-import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
+import { realExampleDocumentTimeline } from '../fixtures/document-timeline/real-example';
 
 export interface EducationalMockOptions {
   gqlQueries?: MockGraphQLQuery[] | MockGraphQLQuery;
@@ -77,7 +77,7 @@ export function cyMockEducationalManagement(
   cyMockGoogleDoc(cy);
   cyMockCreateNewDoc(cy);
   cyMockGetDocTimeline(cy, {
-    response: eightHoursBetweenSessions,
+    response: realExampleDocumentTimeline,
   });
 
   // Choose appropriate responses based on role and empty flags

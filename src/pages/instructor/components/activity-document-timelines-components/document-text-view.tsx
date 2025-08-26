@@ -13,6 +13,7 @@ import createPatch from 'textdiff-create';
 interface DocumentTextViewProps {
   timelinePoint: DehydratedGQLTimelinePoint | null;
   previousTimelinePoint?: DehydratedGQLTimelinePoint | null;
+  diffContent: TextDiffResult;
 }
 
 const getWordCount = (text: string | undefined): number => {
@@ -20,14 +21,19 @@ const getWordCount = (text: string | undefined): number => {
   return text.split(' ').filter((word) => word.trim().length > 0).length;
 };
 
-const applyTextDiff = (
+export interface TextDiffResult {
+  diffContent: React.ReactNode[];
+  charactersRemoved: number;
+  charactersAdded: number;
+}
+
+export const applyTextDiff = (
   prevText: string,
   currentText: string
-): React.ReactNode[] => {
+): TextDiffResult => {
   const delta = createPatch(prevText, currentText);
   const result: React.ReactNode[] = [];
   let prevIndex = 0;
-  let currentIndex = 0;
   let key = 0;
 
   for (const operation of delta) {
@@ -37,7 +43,6 @@ const applyTextDiff = (
       const unchangedText = prevText.slice(prevIndex, prevIndex + value);
       result.push(unchangedText);
       prevIndex += value;
-      currentIndex += unchangedText.length;
     } else if (type === -1) {
       const deletedText = prevText.slice(prevIndex, prevIndex + value);
       result.push(
@@ -63,18 +68,24 @@ const applyTextDiff = (
           {insertedText}
         </span>
       );
-      currentIndex += insertedText.length;
     }
   }
 
-  return result;
+  return {
+    diffContent: result,
+    charactersRemoved: delta
+      .filter((operation) => operation[0] === -1)
+      .reduce((acc, operation) => acc + (operation[1] as number), 0),
+    charactersAdded: delta
+      .filter((operation) => operation[0] === 1)
+      .reduce((acc, operation) => acc + (operation[1] as string).length, 0),
+  };
 };
 
 export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
   timelinePoint,
   previousTimelinePoint,
 }) => {
-  console.log(timelinePoint, previousTimelinePoint);
   if (!timelinePoint) {
     return (
       <Box
@@ -186,7 +197,7 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
                       '& span': { fontSize: 'inherit', fontFamily: 'inherit' },
                     }}
                   >
-                    {diffContent}
+                    {diffContent.diffContent}
                   </Typography>
                 );
               } else {
@@ -201,7 +212,7 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
                       '& span': { fontSize: 'inherit', fontFamily: 'inherit' },
                     }}
                   >
-                    {diffContent}
+                    {diffContent.diffContent}
                   </Typography>
                 );
               }
