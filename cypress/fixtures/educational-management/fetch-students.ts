@@ -16,7 +16,12 @@ export const testStudent: StudentData = {
     {
       assignmentId: 'assignment-123',
       activityCompletions: [
-        { activityId: 'my-editable-activity', complete: false, relevantGoogleDocs: [] },
+        { activityId: 'my-editable-activity', complete: false, relevantGoogleDocs: [
+          {
+            primaryDocument: false,
+            docId:"1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"
+          }
+        ] },
         { activityId: 'my-read-only-activity', complete: false, relevantGoogleDocs: [] }
       ]
     }

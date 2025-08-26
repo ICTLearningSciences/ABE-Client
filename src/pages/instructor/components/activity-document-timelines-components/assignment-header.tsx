@@ -38,9 +38,11 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
         Assignment: {documentId}
       </Typography>
 
-      <Typography variant="body1" sx={{ color: 'text.secondary', textAlign: 'center' }}>
+      <Typography
+        variant="body1"
+        sx={{ color: 'text.secondary', textAlign: 'center' }}
+      >
         Review {studentId}&apos;s progress across multiple activities
-
       </Typography>
     </Box>
   );

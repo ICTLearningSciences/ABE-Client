@@ -79,6 +79,7 @@ export function AssignmentsSection({
               }}
             >
               <AccordionSummary
+                data-cy={`${title.replaceAll(' ', '-')}-assignments-section`}
                 expandIcon={<ExpandMoreIcon />}
                 sx={{
                   '& .MuiAccordionSummary-content': {

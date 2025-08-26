@@ -128,6 +128,7 @@ export type DocumentTimelineHookReturn = {
   selectTimelinePoint: (timepoint: GQLTimelinePoint) => void;
   selectDocument: (docId: string) => void;
   saveTimelinePoint: (updatedTimelinePoint: GQLTimelinePoint) => Promise<void>;
+  getHydratedTimeline: (docId: string) => GQLDocumentTimeline | undefined;
 };
 
 export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
@@ -161,6 +162,31 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
       }, [] as GQLTimelinePoint[]),
     };
   }, [state.selectedDocId, state.documentStates]);
+
+  const getHydratedTimeline = useMemo(() => {
+    return (docId: string): GQLDocumentTimeline | undefined => {
+      if (!docId || !state.documentStates[docId]?.timeline) {
+        return undefined;
+      }
+      const docState = state.documentStates[docId];
+      const timeline = docState.timeline!;
+      return {
+        ...timeline,
+        timelinePoints: timeline.timelinePoints.reduce((acc, point) => {
+          const version = docState.docVersions?.find(
+            (v) => v._id === point.versionId
+          );
+          if (version) {
+            acc.push({
+              ...point,
+              version: version,
+            });
+          }
+          return acc;
+        }, [] as GQLTimelinePoint[]),
+      };
+    };
+  }, [state.documentStates]);
 
   async function fetchDocVersionsForPartialData(
     docId: string,
@@ -354,5 +380,6 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
     selectTimelinePoint,
     selectDocument,
     saveTimelinePoint,
+    getHydratedTimeline,
   };
 }

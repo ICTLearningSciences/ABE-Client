@@ -25,16 +25,18 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   }
 
   return (
-    <Box sx={{ 
-      mb: 4, 
-      width: '100%',
-      border: '1px solid',
-      borderColor: 'grey.200',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-      backgroundColor: 'background.paper',
-      padding: 2,
-      boxSizing: 'border-box',
-    }}>
+    <Box
+      sx={{
+        mb: 4,
+        width: '100%',
+        border: '1px solid',
+        borderColor: 'grey.200',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        backgroundColor: 'background.paper',
+        padding: 2,
+        boxSizing: 'border-box',
+      }}
+    >
       <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
         Timeline
       </Typography>

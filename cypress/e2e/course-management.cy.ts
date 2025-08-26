@@ -11,6 +11,7 @@ import { UserRole } from '../helpers/types';
 import { mockGQL } from '../helpers/functions';
 import { createAssignmentResponse, deleteAssignmentResponse, newTestAssignment, updateAssignmentResponse, updatedTestAssignment } from '../fixtures/educational-management/assignment-operations';
 import { fetchCoursesResponseEmpty, fetchCoursesResponseStudent, removeFromSectionResponse, studentAfterRemoval, updatedTestSection, updateTestSectionWithAssignmentsResponse } from '../fixtures/educational-management';
+import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 
 describe('Course Management', () => {
   
@@ -566,4 +567,50 @@ describe('Course Management', () => {
 
 
   });
+
+  it.only("Can view students timeline", ()=>{
+    cyMockEducationalManagement(cy, {
+      userRole: UserRole.USER,
+      educationalRole: EducationalRole.INSTRUCTOR,
+      gqlQueries: [
+        mockGQL('FetchVersionsById', fetchDocVersionsBuilder([
+          {
+            _id: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
+            docId: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
+            plainText: "Test ",
+            markdownText: "Test ",
+            lastChangedId: "",
+            sessionId: "",
+            chatLog: [],
+            activity: "",
+            intent: "",
+            title:"",
+            lastModifyingUser: "",
+            modifiedTime: "",
+            createdAt: "",
+            updatedAt: ""
+          }
+        ])),
+      ]
+    });
+
+    cy.visit('/course-management');
+
+    // Wait for initial load
+    cy.wait('@RefreshAccessToken');
+    cy.wait('@FetchConfig');
+    cy.wait('@CreateNewInstructor');
+    cy.wait('@FetchCourses');
+    cy.wait('@FetchSections');
+    cy.wait('@FetchAssignments');
+    cy.wait('@FetchBuiltActivities');
+
+    // Navigate to course -> section
+    cy.get('[data-cy=tree-item-course-123]').click();
+    cy.get('[data-cy=section-card-section-456]').click();
+    cy.get("[data-cy=students-and-grades]").click()
+    cy.get("[data-cy=student-user-123]").click()
+    cy.get("[data-cy=Required-Assignments-assignments-section]").click()
+    cy.get("[data-cy=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y-doc-select]").click()
+  })
 });

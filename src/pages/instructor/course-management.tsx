@@ -68,7 +68,8 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     loadInProgress,
     errorMessage,
     selectedDocId,
-    } = useWithDocumentTimeline();
+    getHydratedTimeline,
+  } = useWithDocumentTimeline();
 
   const isStudent =
     userRole === EducationalRole.STUDENT ||
@@ -552,6 +553,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 loadInProgress={loadInProgress}
                 errorMessage={errorMessage}
                 selectedDocId={selectedDocId}
+                getHydratedTimeline={getHydratedTimeline}
                 onBackToStudentInfo={() =>
                   viewStudentInfo(viewState.selectedStudentId!)
                 }

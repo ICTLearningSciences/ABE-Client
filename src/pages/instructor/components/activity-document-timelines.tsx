@@ -4,13 +4,16 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Box, CircularProgress, Grid, Typography } from '@mui/material';
 import {
   LoadingError,
   LoadingStatusType,
 } from '../../../hooks/generic-loading-reducer';
-import { DehydratedGQLDocumentTimeline } from '../../../types';
+import {
+  DehydratedGQLDocumentTimeline,
+  GQLDocumentTimeline,
+} from '../../../types';
 import { AssignmentHeader } from './activity-document-timelines-components/assignment-header';
 import { DocumentSelector } from './activity-document-timelines-components/document-selector';
 import { TimelineView } from './activity-document-timelines-components/timeline-view';
@@ -31,6 +34,7 @@ interface ActivityDocumentTimelinesProps {
   loadInProgress: boolean;
   errorMessage?: string;
   selectedDocId: string;
+  getHydratedTimeline: (docId: string) => GQLDocumentTimeline | undefined;
   onBackToStudentInfo: () => void;
   onDocumentChange: (docId: string) => void;
 }
@@ -44,6 +48,7 @@ export const ActivityDocumentTimelines: React.FC<
   loadInProgress,
   errorMessage,
   selectedDocId,
+  getHydratedTimeline,
   onBackToStudentInfo,
   onDocumentChange,
 }) => {
@@ -52,7 +57,13 @@ export const ActivityDocumentTimelines: React.FC<
   const currentDocState = documentStates[currentDocId];
   const [selectedTimelineIndex, setSelectedTimelineIndex] = useState(0);
 
-  const currentTimeline = currentDocState?.timeline;
+  const currentTimeline = useMemo(() => {
+    if (currentDocState?.status === LoadingStatusType.SUCCESS) {
+      return getHydratedTimeline(currentDocId);
+    }
+    return undefined;
+  }, [currentDocState?.status, getHydratedTimeline, currentDocId]);
+
   const timelinePoints = currentTimeline?.timelinePoints || [];
   const currentTimelinePoint = timelinePoints[selectedTimelineIndex] || null;
 
@@ -123,7 +134,10 @@ export const ActivityDocumentTimelines: React.FC<
   }
 
   return (
-    <Box sx={{ p: 3, width: '100%', display: 'flex', flexDirection: 'column' }} key={currentDocId}>
+    <Box
+      sx={{ p: 3, width: '100%', display: 'flex', flexDirection: 'column' }}
+      key={currentDocId}
+    >
       <AssignmentHeader
         documentId={currentDocId}
         studentId={studentId}

@@ -22,6 +22,7 @@ export function StudentListItem(
     <ListItem
       key={student._id}
       onClick={() => handleStudentClick(student)}
+      data-cy={`student-${student.userId}`}
       sx={{
         cursor: 'pointer',
         borderRadius: 2,

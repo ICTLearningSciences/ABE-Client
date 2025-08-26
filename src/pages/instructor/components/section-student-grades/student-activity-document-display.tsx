@@ -47,6 +47,7 @@ export function StudentActivityDocumentDisplay(props: {
                   {docIds.map((docId) => (
                     <Chip
                       key={docId}
+                      data-cy={`${docId}-doc-select`}
                       label={docId}
                       size="small"
                       variant="outlined"

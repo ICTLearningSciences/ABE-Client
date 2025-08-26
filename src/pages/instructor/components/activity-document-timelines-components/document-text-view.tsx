@@ -8,9 +8,11 @@ import React from 'react';
 import { Box, Typography, Paper, Divider } from '@mui/material';
 import { DehydratedGQLTimelinePoint } from '../../../../types';
 import ReactMarkdown from 'react-markdown';
+import createPatch from 'textdiff-create';
 
 interface DocumentTextViewProps {
   timelinePoint: DehydratedGQLTimelinePoint | null;
+  previousTimelinePoint?: DehydratedGQLTimelinePoint | null;
 }
 
 const getWordCount = (text: string | undefined): number => {
@@ -18,9 +20,61 @@ const getWordCount = (text: string | undefined): number => {
   return text.split(' ').filter((word) => word.trim().length > 0).length;
 };
 
+const applyTextDiff = (
+  prevText: string,
+  currentText: string
+): React.ReactNode[] => {
+  const delta = createPatch(prevText, currentText);
+  const result: React.ReactNode[] = [];
+  let prevIndex = 0;
+  let currentIndex = 0;
+  let key = 0;
+
+  for (const operation of delta) {
+    const [type, value] = operation;
+
+    if (type === 0) {
+      const unchangedText = prevText.slice(prevIndex, prevIndex + value);
+      result.push(unchangedText);
+      prevIndex += value;
+      currentIndex += unchangedText.length;
+    } else if (type === -1) {
+      const deletedText = prevText.slice(prevIndex, prevIndex + value);
+      result.push(
+        <span
+          key={`deleted-${key++}`}
+          style={{
+            backgroundColor: '#ffebee',
+            color: '#c62828',
+            textDecoration: 'line-through',
+          }}
+        >
+          {deletedText}
+        </span>
+      );
+      prevIndex += value;
+    } else if (type === 1) {
+      const insertedText = value as string;
+      result.push(
+        <span
+          key={`inserted-${key++}`}
+          style={{ backgroundColor: '#e8f5e8', color: '#2e7d32' }}
+        >
+          {insertedText}
+        </span>
+      );
+      currentIndex += insertedText.length;
+    }
+  }
+
+  return result;
+};
+
 export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
   timelinePoint,
+  previousTimelinePoint,
 }) => {
+  console.log(timelinePoint, previousTimelinePoint);
   if (!timelinePoint) {
     return (
       <Box
@@ -49,7 +103,6 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
         overflow: 'hidden',
       }}
     >
-
       <Box
         sx={{
           flex: 1,
@@ -104,25 +157,78 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
             },
           }}
         >
-          {timelinePoint.version?.markdownText ? (
-            <ReactMarkdown>{timelinePoint.version.markdownText}</ReactMarkdown>
-          ) : timelinePoint.version?.plainText ? (
-            <Typography
-              component="pre"
-              sx={{
-                whiteSpace: 'pre-wrap',
-                fontFamily: 'inherit',
-                fontSize: 'inherit',
-                m: 0,
-              }}
-            >
-              {timelinePoint.version.plainText}
-            </Typography>
-          ) : (
-            <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>
-              No document content available
-            </Typography>
-          )}
+          {(() => {
+            const currentText =
+              timelinePoint.version?.markdownText ||
+              timelinePoint.version?.plainText ||
+              '';
+            const previousText =
+              previousTimelinePoint?.version?.markdownText ||
+              previousTimelinePoint?.version?.plainText ||
+              '';
+
+            if (!currentText) {
+              return (
+                <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                  No document content available
+                </Typography>
+              );
+            }
+
+            if (previousTimelinePoint && previousText) {
+              const diffContent = applyTextDiff(previousText, currentText);
+
+              if (timelinePoint.version?.markdownText) {
+                return (
+                  <Typography
+                    component="div"
+                    sx={{
+                      '& span': { fontSize: 'inherit', fontFamily: 'inherit' },
+                    }}
+                  >
+                    {diffContent}
+                  </Typography>
+                );
+              } else {
+                return (
+                  <Typography
+                    component="pre"
+                    sx={{
+                      whiteSpace: 'pre-wrap',
+                      fontFamily: 'inherit',
+                      fontSize: 'inherit',
+                      m: 0,
+                      '& span': { fontSize: 'inherit', fontFamily: 'inherit' },
+                    }}
+                  >
+                    {diffContent}
+                  </Typography>
+                );
+              }
+            }
+
+            if (timelinePoint.version?.markdownText) {
+              return (
+                <ReactMarkdown>
+                  {timelinePoint.version.markdownText}
+                </ReactMarkdown>
+              );
+            } else {
+              return (
+                <Typography
+                  component="pre"
+                  sx={{
+                    whiteSpace: 'pre-wrap',
+                    fontFamily: 'inherit',
+                    fontSize: 'inherit',
+                    m: 0,
+                  }}
+                >
+                  {currentText}
+                </Typography>
+              );
+            }
+          })()}
         </Box>
       </Box>
     </Paper>
