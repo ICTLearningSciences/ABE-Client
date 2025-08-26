@@ -20,20 +20,19 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
   onBackToStudentInfo,
 }) => {
   return (
-    <Box sx={{ mb: 3, width: '100%' }}>
+    <Box sx={{ width: '100%' }}>
       {onBackToStudentInfo && (
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={onBackToStudentInfo}
-          sx={{ mb: 2, color: 'text.secondary' }}
+          sx={{ color: 'text.secondary' }}
         >
           Back to Student Grades
         </Button>
       )}
 
       <Typography
-        variant="h6"
-        sx={{ mb: 2, fontWeight: 600, color: '#1976d2', textAlign: 'center' }}
+        sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'center' }}
       >
         Assignment: {documentId}
       </Typography>

@@ -579,7 +579,7 @@ describe('Course Management', () => {
         )),
       ]
     });
-
+    cy.viewport(1920, 1080);
     cy.visit('/course-management');
 
     // Wait for initial load

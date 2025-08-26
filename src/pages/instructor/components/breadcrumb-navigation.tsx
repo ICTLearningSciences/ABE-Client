@@ -143,8 +143,8 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
       sx={{
         py: 1.5,
         borderBottom: '1px solid #e9ecef',
-        mb: 3,
       }}
+      data-cy="breadcrumb-navigation"
     >
       <Breadcrumbs
         separator={<NavigateNext fontSize="small" />}

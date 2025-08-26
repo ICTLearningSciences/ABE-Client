@@ -108,16 +108,15 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
   return (
     <Paper
       sx={{
-        height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden',
+        overflow: 'auto',
+        height: '100%',
       }}
     >
       <Box
         sx={{
           flex: 1,
-          overflow: 'auto',
           p: 2,
         }}
       >

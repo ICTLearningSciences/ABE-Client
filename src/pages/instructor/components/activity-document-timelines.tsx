@@ -151,8 +151,10 @@ export const ActivityDocumentTimelines: React.FC<
 
   return (
     <Box
-      sx={{ p: 3, width: '100%', display: 'flex', flexDirection: 'column' }}
+      sx={{ width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}
+      height="100%"
       key={currentDocId}
+      data-cy="activity-document-timelines"
     >
       <AssignmentHeader
         documentId={currentDocId}
@@ -172,15 +174,15 @@ export const ActivityDocumentTimelines: React.FC<
         onTimelinePointSelect={setSelectedTimelineIndex}
       />
 
-      <Grid container spacing={3} sx={{ height: '600px' }}>
-        <Grid item xs={6}>
+      <Grid container spacing={3} sx={{ flex: 1, mb: 1 }} height="60%">
+        <Grid item xs={6} style={{ height: '100%' }}>
           <DocumentTextView
             timelinePoint={currentTimelinePoint}
             previousTimelinePoint={previousTimelinePoint}
             diffContent={diffContent}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={6} style={{ height: '100%' }}>
           <TabbedInfoPanel timelinePoint={currentTimelinePoint} />
         </Grid>
       </Grid>

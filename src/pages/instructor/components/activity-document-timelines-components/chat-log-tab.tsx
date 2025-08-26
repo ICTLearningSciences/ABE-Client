@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
 import { ChatItem } from '../../../../types';
+import { Sender } from '../../../../store/slices/chat';
 
 interface ChatLogTabProps {
   chatLog: ChatItem[];
@@ -22,7 +23,16 @@ export const ChatLogTab: React.FC<ChatLogTabProps> = ({ chatLog }) => {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1,
+        overflow: 'auto',
+        height: '100%',
+      }}
+      data-cy="chat-log-tab"
+    >
       <Typography variant="body2" sx={{ mb: 2, fontWeight: 500 }}>
         {chatLog.length} messages
       </Typography>
@@ -31,21 +41,24 @@ export const ChatLogTab: React.FC<ChatLogTabProps> = ({ chatLog }) => {
         <Box
           key={index}
           sx={{
-            alignSelf: item.sender === 'user' ? 'flex-end' : 'flex-start',
+            alignSelf: item.sender === Sender.USER ? 'flex-end' : 'flex-start',
             maxWidth: '80%',
-            mb: 1,
           }}
         >
           <Paper
             sx={{
               p: 1.5,
               backgroundColor:
-                item.sender === 'user' ? 'primary.main' : 'grey.100',
-              color: item.sender === 'user' ? 'white' : 'text.primary',
+                item.sender === Sender.USER ? 'primary.main' : 'grey.100',
+              color: item.sender === Sender.USER ? 'white' : 'text.primary',
               borderRadius: 2,
+              overflow: 'auto',
             }}
           >
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+            <Typography
+              variant="body2"
+              sx={{ whiteSpace: 'pre-wrap', overflow: 'auto' }}
+            >
               {item.message}
             </Typography>
           </Paper>

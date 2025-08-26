@@ -298,6 +298,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       }}
     >
+      {/* Sidebar */}
       <Paper
         elevation={0}
         sx={{
@@ -423,12 +424,15 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         </Box>
       </Paper>
 
+      {/* Main content */}
       <Box
         sx={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
+          height: '100%',
         }}
+        data-cy="course-management-main-content-outer"
       >
         <BreadcrumbNavigation
           educationManagement={educationManagement}
@@ -445,8 +449,9 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
             alignItems: 'flex-start',
             justifyContent: 'center',
             overflow: 'auto',
-            minHeight: 0,
+            height: '100%',
           }}
+          data-cy="course-management-main-content-inner"
         >
           {viewState.view === 'dashboard' && (
             <Box
@@ -632,6 +637,8 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
             )}
         </Box>
       </Box>
+
+      {/* Modals */}
       <CourseModal
         isOpen={isCourseModalOpen}
         onClose={handleCloseCourseModal}

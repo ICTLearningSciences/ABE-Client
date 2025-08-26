@@ -31,9 +31,12 @@ function TabPanel(props: TabPanelProps) {
       id={`info-tabpanel-${index}`}
       aria-labelledby={`info-tab-${index}`}
       {...other}
+      style={{ height: '100%' }}
     >
       {value === index && (
-        <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>{children}</Box>
+        <Box sx={{ p: 2, pt: 0, height: '100%', overflow: 'auto' }}>
+          {children}
+        </Box>
       )}
     </div>
   );
@@ -89,7 +92,7 @@ export const TabbedInfoPanel: React.FC<TabbedInfoPanelProps> = ({
         <Tab label="AI Change Summary" />
       </Tabs>
 
-      <Box sx={{ flex: 1, overflow: 'hidden' }}>
+      <Box sx={{ flex: 1, overflow: 'hidden', height: '100%' }}>
         <TabPanel value={tabValue} index={0}>
           <ChatLogTab chatLog={timelinePoint.version?.chatLog || []} />
         </TabPanel>

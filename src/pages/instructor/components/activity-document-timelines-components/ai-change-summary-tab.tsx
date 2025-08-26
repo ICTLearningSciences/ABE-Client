@@ -28,6 +28,7 @@ export const AiChangeSummaryTab: React.FC<AiChangeSummaryTabProps> = ({
       sx={{
         whiteSpace: 'pre-wrap',
         lineHeight: 1.6,
+        padding: 0,
       }}
     >
       {changeSummary}
