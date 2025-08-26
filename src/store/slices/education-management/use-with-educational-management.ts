@@ -178,19 +178,10 @@ export interface UseWithEducationalManagement {
     courseId: string
   ) => Promise<Instructor>;
   viewCourse: (courseId: string) => Promise<void>;
-  viewSection: (courseId: string, sectionId: string) => Promise<void>;
-  viewAssignment: (
-    courseId: string,
-    sectionId: string,
-    assignmentId: string
-  ) => Promise<void>;
-  viewActivity: (
-    courseId: string,
-    sectionId: string,
-    assignmentId: string,
-    activityId: string
-  ) => Promise<void>;
-  viewActivityDocumentTimelines: (
+  viewSection: (sectionId: string) => Promise<void>;
+  viewAssignment: (assignmentId: string) => Promise<void>;
+  viewActivity: (activityId: string) => Promise<void>;
+  viewAssignmentDocumentTimelines: (
     studentId: string,
     docId?: string
   ) => Promise<void>;
@@ -261,6 +252,10 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   );
   const viewState = useAppSelector(
     (state) => state.educationManagement.viewState
+  );
+
+  const activities = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivities
   );
 
   async function loadCourses(forUserId: string) {
@@ -670,49 +665,53 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     dispatch(setViewState({ view: 'course', selectedCourseId: courseId }));
   }
 
-  async function viewSection(courseId: string, sectionId: string) {
+  async function viewSection(sectionId: string) {
+    if (!viewState.selectedCourseId) {
+      throw new Error('No course selected in viewSection');
+    }
     dispatch(
       setViewState({
         view: 'section',
-        selectedCourseId: courseId,
+        selectedCourseId: viewState.selectedCourseId,
         selectedSectionId: sectionId,
       })
     );
   }
 
-  async function viewAssignment(
-    courseId: string,
-    sectionId: string,
-    assignmentId: string
-  ) {
+  async function viewAssignment(assignmentId: string) {
+    if (!viewState.selectedCourseId || !viewState.selectedSectionId) {
+      throw new Error('No course or section selected');
+    }
     dispatch(
       setViewState({
         view: 'assignment',
-        selectedCourseId: courseId,
-        selectedSectionId: sectionId,
+        selectedCourseId: viewState.selectedCourseId,
+        selectedSectionId: viewState.selectedSectionId,
         selectedAssignmentId: assignmentId,
       })
     );
   }
 
-  async function viewActivity(
-    courseId: string,
-    sectionId: string,
-    assignmentId: string,
-    activityId: string
-  ) {
+  async function viewActivity(activityId: string) {
+    if (
+      !viewState.selectedCourseId ||
+      !viewState.selectedSectionId ||
+      !viewState.selectedAssignmentId
+    ) {
+      throw new Error('No course, section, or assignment selected');
+    }
     dispatch(
       setViewState({
         view: 'activity',
-        selectedCourseId: courseId,
-        selectedSectionId: sectionId,
-        selectedAssignmentId: assignmentId,
+        selectedCourseId: viewState.selectedCourseId,
+        selectedSectionId: viewState.selectedSectionId,
+        selectedAssignmentId: viewState.selectedAssignmentId,
         selectedActivityId: activityId,
       })
     );
   }
 
-  async function viewActivityDocumentTimelines(
+  async function viewAssignmentDocumentTimelines(
     studentId: string,
     docId?: string
   ) {
@@ -730,12 +729,18 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   }
 
   async function viewStudentInfo(studentId: string) {
+    const targetStudent = students.find((s) => s.userId === studentId);
+    if (!targetStudent) {
+      throw new Error('Student not found');
+    }
     dispatch(
       setViewState({
         view: 'student-info',
         selectedCourseId: viewState.selectedCourseId,
         selectedSectionId: viewState.selectedSectionId,
-        selectedStudentId: studentId,
+        selectedAssignmentId: viewState.selectedAssignmentId,
+        selectedActivityId: viewState.selectedActivityId,
+        selectedStudentId: targetStudent.userId,
       })
     );
   }
@@ -772,6 +777,38 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as Section;
   }
 
+  const hydratedViewState = useMemo(() => {
+    const hydratedViewState = {
+      ...viewState,
+    };
+    if (viewState.selectedCourseId) {
+      hydratedViewState.selectedCourse = courses.find(
+        (c) => c._id === viewState.selectedCourseId
+      );
+    }
+    if (viewState.selectedSectionId) {
+      hydratedViewState.selectedSection = sections.find(
+        (s) => s._id === viewState.selectedSectionId
+      );
+    }
+    if (viewState.selectedAssignmentId) {
+      hydratedViewState.selectedAssignment = assignments.find(
+        (a) => a._id === viewState.selectedAssignmentId
+      );
+    }
+    if (viewState.selectedActivityId) {
+      hydratedViewState.selectedActivity = activities.find(
+        (a) => a._id === viewState.selectedActivityId
+      );
+    }
+    if (viewState.selectedStudentId) {
+      hydratedViewState.selectedStudent = students.find(
+        (s) => s.userId === viewState.selectedStudentId
+      );
+    }
+    return hydratedViewState;
+  }, [viewState, courses, sections, assignments, activities, students]);
+
   return {
     loadCourses,
     loadAssignments,
@@ -800,7 +837,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     viewSection,
     viewAssignment,
     viewActivity,
-    viewActivityDocumentTimelines,
+    viewAssignmentDocumentTimelines,
     viewStudentInfo,
     viewDashboard,
     haveICompletedActivity,
@@ -810,7 +847,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     students,
     instructors,
     myData,
-    viewState,
+    viewState: hydratedViewState,
     isLoading:
       coursesLoadingState === LoadStatus.LOADING ||
       assignmentsLoadingState === LoadStatus.LOADING ||

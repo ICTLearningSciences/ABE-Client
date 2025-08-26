@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import React, { useState } from 'react';
 import { Box, Typography, Paper, Divider, Button } from '@mui/material';
 import { DehydratedGQLTimelinePoint } from '../../../../types';
-import { TextDiffResult } from '../activity-document-timelines';
+import { TextDiffResult } from '../assignment-document-timelines';
 import { RowDiv } from '../../../../styled-components';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';

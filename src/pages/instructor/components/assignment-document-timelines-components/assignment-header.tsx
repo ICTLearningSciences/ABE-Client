@@ -9,14 +9,14 @@ import { Box, Typography, Button } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 
 interface AssignmentHeaderProps {
-  documentId: string;
-  studentId: string;
+  assignmentTitle: string;
+  studentName: string;
   onBackToStudentInfo?: () => void;
 }
 
 export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
-  documentId,
-  studentId,
+  assignmentTitle,
+  studentName,
   onBackToStudentInfo,
 }) => {
   return (
@@ -41,14 +41,16 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
         sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'center' }}
       >
         Student:{' '}
-        <span style={{ fontWeight: 400, color: 'black' }}>{studentId}</span>
+        <span style={{ fontWeight: 400, color: 'black' }}>{studentName}</span>
       </Typography>
 
       <Typography
         sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'center' }}
       >
         Assignment:{' '}
-        <span style={{ fontWeight: 400, color: 'black' }}>{documentId}</span>
+        <span style={{ fontWeight: 400, color: 'black' }}>
+          {assignmentTitle}
+        </span>
       </Typography>
     </Box>
   );

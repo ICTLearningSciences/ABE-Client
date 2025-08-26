@@ -31,7 +31,7 @@ interface AssignmentViewProps {
   courseId: string;
   builtActivities: ActivityBuilder[];
   sectionId?: string;
-  onAssignmentDeleted?: (courseId: string, sectionId: string) => void;
+  onAssignmentDeleted?: (sectionId: string) => void;
   isStudentView?: boolean;
   onActivitySelect: (activityId: string) => void;
 }
@@ -134,7 +134,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
     try {
       await educationManagement.deleteAssignment(courseId, assignmentId);
       if (sectionId) {
-        onAssignmentDeleted?.(courseId, sectionId);
+        onAssignmentDeleted?.(sectionId);
       }
     } catch (error) {
       console.error('Failed to delete assignment:', error);

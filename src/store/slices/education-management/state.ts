@@ -4,6 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { ActivityBuilder } from '../../../components/activity-builder/types';
 import { Course, Assignment, Section, StudentData, Instructor } from './types';
 
 export enum LoadStatus {
@@ -23,11 +24,17 @@ export interface CourseManagementState {
     | 'student-info'
     | 'activity-document-timelines';
   selectedCourseId?: string;
+  selectedCourse?: Course;
   selectedSectionId?: string;
+  selectedSection?: Section;
   selectedAssignmentId?: string;
+  selectedAssignment?: Assignment;
   selectedActivityId?: string;
+  selectedActivity?: ActivityBuilder;
   selectedStudentId?: string;
+  selectedStudent?: StudentData;
   selectedDocId?: string;
+  // selectedDoc?: Doc;
 }
 
 export interface State {

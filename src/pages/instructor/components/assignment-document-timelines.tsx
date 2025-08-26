@@ -14,12 +14,16 @@ import {
   DehydratedGQLDocumentTimeline,
   GQLDocumentTimeline,
 } from '../../../types';
-import { AssignmentHeader } from './activity-document-timelines-components/assignment-header';
-import { DocumentSelector } from './activity-document-timelines-components/document-selector';
-import { TimelineView } from './activity-document-timelines-components/timeline-view';
-import { DocumentTextView } from './activity-document-timelines-components/document-text-view';
-import { TabbedInfoPanel } from './activity-document-timelines-components/tabbed-info-panel';
+import { AssignmentHeader } from './assignment-document-timelines-components/assignment-header';
+import { DocumentSelector } from './assignment-document-timelines-components/document-selector';
+import { TimelineView } from './assignment-document-timelines-components/timeline-view';
+import { DocumentTextView } from './assignment-document-timelines-components/document-text-view';
+import { TabbedInfoPanel } from './assignment-document-timelines-components/tabbed-info-panel';
 import createPatch from 'textdiff-create';
+import {
+  Assignment,
+  StudentData,
+} from '../../../store/slices/education-management/types';
 
 export interface TextDiffResult {
   diffContent: React.ReactNode[];
@@ -82,8 +86,9 @@ export const applyTextDiff = (
   };
 };
 
-interface ActivityDocumentTimelinesProps {
-  studentId: string;
+interface AssignmentDocumentTimelinesProps {
+  student: StudentData;
+  assignment: Assignment;
   studentDocIds: string[];
   documentStates: Record<
     string,
@@ -101,10 +106,11 @@ interface ActivityDocumentTimelinesProps {
   onDocumentChange: (docId: string) => void;
 }
 
-export const ActivityDocumentTimelines: React.FC<
-  ActivityDocumentTimelinesProps
+export const AssignmentDocumentTimelines: React.FC<
+  AssignmentDocumentTimelinesProps
 > = ({
-  studentId,
+  student,
+  assignment,
   documentStates,
   studentDocIds,
   loadInProgress,
@@ -115,16 +121,15 @@ export const ActivityDocumentTimelines: React.FC<
   onDocumentChange,
 }) => {
   const documentIds = studentDocIds;
-  const currentDocId = selectedDocId;
-  const currentDocState = documentStates[currentDocId];
+  const currentDocState = documentStates[selectedDocId];
   const [selectedTimelineIndex, setSelectedTimelineIndex] = useState(0);
 
   const currentTimeline = useMemo(() => {
     if (currentDocState?.status === LoadingStatusType.SUCCESS) {
-      return getHydratedTimeline(currentDocId);
+      return getHydratedTimeline(selectedDocId);
     }
     return undefined;
-  }, [currentDocState?.status, getHydratedTimeline, currentDocId]);
+  }, [currentDocState?.status, getHydratedTimeline, selectedDocId]);
 
   const timelinePoints = currentTimeline?.timelinePoints || [];
   const currentTimelinePoint =
@@ -144,7 +149,7 @@ export const ActivityDocumentTimelines: React.FC<
 
   useEffect(() => {
     setSelectedTimelineIndex(0);
-  }, [currentDocId]);
+  }, [selectedDocId]);
 
   if (loadInProgress && !currentTimeline) {
     return (
@@ -168,8 +173,8 @@ export const ActivityDocumentTimelines: React.FC<
     return (
       <Box sx={{ p: 3 }}>
         <AssignmentHeader
-          documentId={currentDocId}
-          studentId={studentId}
+          assignmentTitle={currentTimelinePoint?.version?.title}
+          studentName={student.name}
           onBackToStudentInfo={onBackToStudentInfo}
         />
         <Box sx={{ textAlign: 'center', py: 4 }}>
@@ -188,13 +193,13 @@ export const ActivityDocumentTimelines: React.FC<
     return (
       <Box sx={{ p: 3 }}>
         <AssignmentHeader
-          documentId={currentDocId}
-          studentId={studentId}
+          assignmentTitle={assignment.title}
+          studentName={student.name}
           onBackToStudentInfo={onBackToStudentInfo}
         />
         <DocumentSelector
           documentIds={documentIds}
-          selectedDocId={currentDocId}
+          selectedDocId={selectedDocId}
           onDocumentChange={onDocumentChange}
         />
         <Box sx={{ textAlign: 'center', py: 4 }}>
@@ -212,18 +217,18 @@ export const ActivityDocumentTimelines: React.FC<
     <Box
       sx={{ width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}
       height="100%"
-      key={currentDocId}
+      key={selectedDocId}
       data-cy="activity-document-timelines"
     >
       <AssignmentHeader
-        documentId={currentDocId}
-        studentId={studentId}
+        assignmentTitle={assignment.title}
+        studentName={student.name}
         onBackToStudentInfo={onBackToStudentInfo}
       />
 
       <DocumentSelector
         documentIds={documentIds}
-        selectedDocId={currentDocId}
+        selectedDocId={selectedDocId}
         onDocumentChange={onDocumentChange}
       />
 
