@@ -27,7 +27,7 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
           onClick={onBackToStudentInfo}
           sx={{ color: 'text.secondary' }}
         >
-          Back to Student Grades
+          Back
         </Button>
       )}
 

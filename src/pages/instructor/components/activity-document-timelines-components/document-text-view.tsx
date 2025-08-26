@@ -4,16 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Box, Typography, Paper, Divider } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Paper, Divider, Button } from '@mui/material';
 import { DehydratedGQLTimelinePoint } from '../../../../types';
-import ReactMarkdown from 'react-markdown';
-import createPatch from 'textdiff-create';
+import { TextDiffResult } from '../activity-document-timelines';
+import { RowDiv } from '../../../../styled-components';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 interface DocumentTextViewProps {
   timelinePoint: DehydratedGQLTimelinePoint | null;
-  previousTimelinePoint?: DehydratedGQLTimelinePoint | null;
-  diffContent: TextDiffResult;
+  diffContent?: TextDiffResult;
 }
 
 const getWordCount = (text: string | undefined): number => {
@@ -21,71 +22,15 @@ const getWordCount = (text: string | undefined): number => {
   return text.split(' ').filter((word) => word.trim().length > 0).length;
 };
 
-export interface TextDiffResult {
-  diffContent: React.ReactNode[];
-  charactersRemoved: number;
-  charactersAdded: number;
-}
-
-export const applyTextDiff = (
-  prevText: string,
-  currentText: string
-): TextDiffResult => {
-  const delta = createPatch(prevText, currentText);
-  const result: React.ReactNode[] = [];
-  let prevIndex = 0;
-  let key = 0;
-
-  for (const operation of delta) {
-    const [type, value] = operation;
-
-    if (type === 0) {
-      const unchangedText = prevText.slice(prevIndex, prevIndex + value);
-      result.push(unchangedText);
-      prevIndex += value;
-    } else if (type === -1) {
-      const deletedText = prevText.slice(prevIndex, prevIndex + value);
-      result.push(
-        <span
-          key={`deleted-${key++}`}
-          style={{
-            backgroundColor: '#ffebee',
-            color: '#c62828',
-            textDecoration: 'line-through',
-          }}
-        >
-          {deletedText}
-        </span>
-      );
-      prevIndex += value;
-    } else if (type === 1) {
-      const insertedText = value as string;
-      result.push(
-        <span
-          key={`inserted-${key++}`}
-          style={{ backgroundColor: '#e8f5e8', color: '#2e7d32' }}
-        >
-          {insertedText}
-        </span>
-      );
-    }
-  }
-
-  return {
-    diffContent: result,
-    charactersRemoved: delta
-      .filter((operation) => operation[0] === -1)
-      .reduce((acc, operation) => acc + (operation[1] as number), 0),
-    charactersAdded: delta
-      .filter((operation) => operation[0] === 1)
-      .reduce((acc, operation) => acc + (operation[1] as string).length, 0),
-  };
-};
-
 export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
   timelinePoint,
-  previousTimelinePoint,
+  diffContent,
 }) => {
+  const [viewChanges, setViewChanges] = useState(false);
+  const currentText =
+    timelinePoint?.version?.markdownText ||
+    timelinePoint?.version?.plainText ||
+    '';
   if (!timelinePoint) {
     return (
       <Box
@@ -120,9 +65,21 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
           p: 2,
         }}
       >
-        <Typography variant="body2" sx={{ mb: 2, fontWeight: 500 }}>
-          {wordCount} words
-        </Typography>
+        <RowDiv
+          style={{
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+            {wordCount} words
+          </Typography>
+          <Button onClick={() => setViewChanges(!viewChanges)}>
+            {viewChanges ? <VisibilityOffIcon /> : <VisibilityIcon />}{' '}
+            {viewChanges ? 'View Original' : 'View Changes'}
+          </Button>
+        </RowDiv>
 
         <Divider sx={{ mb: 2 }} />
 
@@ -168,15 +125,6 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
           }}
         >
           {(() => {
-            const currentText =
-              timelinePoint.version?.markdownText ||
-              timelinePoint.version?.plainText ||
-              '';
-            const previousText =
-              previousTimelinePoint?.version?.markdownText ||
-              previousTimelinePoint?.version?.plainText ||
-              '';
-
             if (!currentText) {
               return (
                 <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>
@@ -185,45 +133,7 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
               );
             }
 
-            if (previousTimelinePoint && previousText) {
-              const diffContent = applyTextDiff(previousText, currentText);
-
-              if (timelinePoint.version?.markdownText) {
-                return (
-                  <Typography
-                    component="div"
-                    sx={{
-                      '& span': { fontSize: 'inherit', fontFamily: 'inherit' },
-                    }}
-                  >
-                    {diffContent.diffContent}
-                  </Typography>
-                );
-              } else {
-                return (
-                  <Typography
-                    component="pre"
-                    sx={{
-                      whiteSpace: 'pre-wrap',
-                      fontFamily: 'inherit',
-                      fontSize: 'inherit',
-                      m: 0,
-                      '& span': { fontSize: 'inherit', fontFamily: 'inherit' },
-                    }}
-                  >
-                    {diffContent.diffContent}
-                  </Typography>
-                );
-              }
-            }
-
-            if (timelinePoint.version?.markdownText) {
-              return (
-                <ReactMarkdown>
-                  {timelinePoint.version.markdownText}
-                </ReactMarkdown>
-              );
-            } else {
+            if (viewChanges && diffContent) {
               return (
                 <Typography
                   component="pre"
@@ -232,12 +142,26 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
                     fontFamily: 'inherit',
                     fontSize: 'inherit',
                     m: 0,
+                    '& span': { fontSize: 'inherit', fontFamily: 'inherit' },
                   }}
                 >
-                  {currentText}
+                  {diffContent.diffContent}
                 </Typography>
               );
             }
+            return (
+              <Typography
+                component="pre"
+                sx={{
+                  whiteSpace: 'pre-wrap',
+                  fontFamily: 'inherit',
+                  fontSize: 'inherit',
+                  m: 0,
+                }}
+              >
+                {currentText}
+              </Typography>
+            );
           })()}
         </Box>
       </Box>

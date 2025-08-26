@@ -8,7 +8,7 @@ import React from 'react';
 import { Box, Typography, Chip } from '@mui/material';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import { DehydratedGQLTimelinePoint } from '../../../../types';
-import { applyTextDiff } from './document-text-view';
+import { applyTextDiff } from '../activity-document-timelines';
 
 interface TimelineViewProps {
   timelinePoints: DehydratedGQLTimelinePoint[];

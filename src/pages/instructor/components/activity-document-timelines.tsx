@@ -17,11 +17,70 @@ import {
 import { AssignmentHeader } from './activity-document-timelines-components/assignment-header';
 import { DocumentSelector } from './activity-document-timelines-components/document-selector';
 import { TimelineView } from './activity-document-timelines-components/timeline-view';
-import {
-  applyTextDiff,
-  DocumentTextView,
-} from './activity-document-timelines-components/document-text-view';
+import { DocumentTextView } from './activity-document-timelines-components/document-text-view';
 import { TabbedInfoPanel } from './activity-document-timelines-components/tabbed-info-panel';
+import createPatch from 'textdiff-create';
+
+export interface TextDiffResult {
+  diffContent: React.ReactNode[];
+  charactersRemoved: number;
+  charactersAdded: number;
+}
+
+export const applyTextDiff = (
+  prevText: string,
+  currentText: string
+): TextDiffResult => {
+  const delta = createPatch(prevText, currentText);
+  const result: React.ReactNode[] = [];
+  let prevIndex = 0;
+  let key = 0;
+
+  for (const operation of delta) {
+    const [type, value] = operation;
+
+    if (type === 0) {
+      const unchangedText = prevText.slice(prevIndex, prevIndex + value);
+      result.push(unchangedText);
+      prevIndex += value;
+    } else if (type === -1) {
+      const deletedText = prevText.slice(prevIndex, prevIndex + value);
+      result.push(
+        <span
+          key={`deleted-${key++}`}
+          style={{
+            backgroundColor: '#ffebee',
+            color: '#c62828',
+            textDecoration: 'line-through',
+          }}
+        >
+          {deletedText}
+        </span>
+      );
+      prevIndex += value;
+    } else if (type === 1) {
+      const insertedText = value as string;
+      result.push(
+        <span
+          key={`inserted-${key++}`}
+          style={{ backgroundColor: '#e8f5e8', color: '#2e7d32' }}
+        >
+          {insertedText}
+        </span>
+      );
+    }
+  }
+
+  return {
+    diffContent: result,
+    charactersRemoved: delta
+      .filter((operation) => operation[0] === -1)
+      .reduce((acc, operation) => acc + (operation[1] as number), 0),
+    charactersAdded: delta
+      .filter((operation) => operation[0] === 1)
+      .reduce((acc, operation) => acc + (operation[1] as string).length, 0),
+  };
+};
 
 interface ActivityDocumentTimelinesProps {
   studentId: string;
@@ -178,7 +237,6 @@ export const ActivityDocumentTimelines: React.FC<
         <Grid item xs={6} style={{ height: '100%' }}>
           <DocumentTextView
             timelinePoint={currentTimelinePoint}
-            previousTimelinePoint={previousTimelinePoint}
             diffContent={diffContent}
           />
         </Grid>
