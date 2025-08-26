@@ -20,28 +20,35 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
   onBackToStudentInfo,
 }) => {
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box
+      sx={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+      }}
+    >
       {onBackToStudentInfo && (
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={onBackToStudentInfo}
-          sx={{ color: 'text.secondary' }}
+          sx={{ color: 'text.secondary', alignSelf: 'flex-start' }}
         >
           Back
         </Button>
       )}
+      <Typography
+        sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'center' }}
+      >
+        Student:{' '}
+        <span style={{ fontWeight: 400, color: 'black' }}>{studentId}</span>
+      </Typography>
 
       <Typography
         sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'center' }}
       >
-        Assignment: {documentId}
-      </Typography>
-
-      <Typography
-        variant="body1"
-        sx={{ color: 'text.secondary', textAlign: 'center' }}
-      >
-        Review {studentId}&apos;s progress across multiple activities
+        Assignment:{' '}
+        <span style={{ fontWeight: 400, color: 'black' }}>{documentId}</span>
       </Typography>
     </Box>
   );

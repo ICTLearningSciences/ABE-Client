@@ -112,6 +112,24 @@ export const realExampleDocumentTimeline: DehydratedGQLDocumentTimeline = {
     ]
 };
 
+export const realExampleDocumentTimeline2: DehydratedGQLDocumentTimeline = {
+    "docId": "1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fB",
+    "user": "653972706e601e65dbc3acea",
+    "timelinePoints": [
+        {
+            "type": TimelinePointType.START,
+            "versionTime": "2025-01-28T20:23:54.054Z",
+            "reverseOutlineStatus": AiGenerationStatus.COMPLETED,
+            "changeSummaryStatus": AiGenerationStatus.COMPLETED,
+            "changeSummary": "",
+            "reverseOutline": "",
+            "relatedFeedback": "",
+            "intent": "",
+            "versionId": "67993cda3fe3b06d728a490d"
+        },
+    ]
+};
+
 export const realExampleDocVersions: IGDocVersion[] = [
     {
             "_id": "67997ace6707f79a2d12d151",
@@ -1399,6 +1417,33 @@ export const realExampleDocVersions: IGDocVersion[] = [
             "createdAt": "2025-01-28T20:23:54.054Z",
             "updatedAt": "2025-01-28T20:23:54.054Z"
     }
+]
+
+export const realExampleDocVersions2: IGDocVersion[] = [
+    {
+            "_id": "67993cda3fe3b06d728a490d",
+            "docId": "1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fA",
+            "plainText": "Test 2",
+            "markdownText":"",
+            "lastChangedId": "ALBJ4LuYkI71jwxWaoqpEkGyNjaCCt4-uMs-WvP0AEXMiZEfnlL68uZwnaLhLtj_fsFeIwmQqSklHMIxmYaZ01I",
+            "sessionId": "02b2f19a-d79c-4879-80be-447bb7c63a97",
+            "sessionIntention": undefined,
+            "dayIntention": undefined,
+            "documentIntention": undefined,
+            "chatLog": [
+                {
+                    "sender": "SYSTEM",
+                    "message": "Feel free to ask me any questions about your essay."
+                }
+            ],
+            "activity": "",
+            "intent": "",
+            "title": "California Wildfires 2",
+            "lastModifyingUser": "ashiel408@gmail.com",
+            "modifiedTime": "2025-01-28T20:27:47.564Z",
+            "createdAt": "2025-01-29T00:48:14.545Z",
+            "updatedAt": "2025-01-29T00:48:14.545Z"
+        },
 ]
 
 export const realExampleDocVersionsConnection: Connection<IGDocVersion> = {

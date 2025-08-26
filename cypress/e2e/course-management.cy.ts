@@ -8,11 +8,11 @@ The full terms of this copyright and license should always be found in the root 
 import { cyMockEducationalManagement } from '../helpers/educational-management-functions';
 import { EducationalRole } from '../fixtures/educational-management/educational-types';
 import { UserRole } from '../helpers/types';
-import { mockGQL } from '../helpers/functions';
+import { cyMockGetDocTimeline, mockGQL } from '../helpers/functions';
 import { createAssignmentResponse, deleteAssignmentResponse, newTestAssignment, updateAssignmentResponse, updatedTestAssignment } from '../fixtures/educational-management/assignment-operations';
 import { fetchCoursesResponseEmpty, fetchCoursesResponseStudent, removeFromSectionResponse, studentAfterRemoval, updatedTestSection, updateTestSectionWithAssignmentsResponse } from '../fixtures/educational-management';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
-import { realExampleDocVersions } from '../fixtures/document-timeline/real-example';
+import { realExampleDocumentTimeline2, realExampleDocVersions, realExampleDocVersions2 } from '../fixtures/document-timeline/real-example';
 
 describe('Course Management', () => {
   
@@ -574,9 +574,11 @@ describe('Course Management', () => {
       userRole: UserRole.USER,
       educationalRole: EducationalRole.INSTRUCTOR,
       gqlQueries: [
-        mockGQL('FetchVersionsById', fetchDocVersionsBuilder(
-          realExampleDocVersions
-        )),
+        mockGQL('FetchVersionsById', [
+          fetchDocVersionsBuilder(realExampleDocVersions),
+          fetchDocVersionsBuilder(realExampleDocVersions2)
+        ]
+      ),
       ]
     });
     cy.viewport(1920, 1080);
@@ -598,5 +600,15 @@ describe('Course Management', () => {
     cy.get("[data-cy=student-user-123]").click()
     cy.get("[data-cy=Required-Assignments-assignments-section]").click()
     cy.get("[data-cy=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y-doc-select]").click()
+
+    // TODO: test that doc is visible
+
+    // Mock the second doc timeline
+    cyMockGetDocTimeline(cy, {
+      response: realExampleDocumentTimeline2,
+    });
+
+    // TODO: test that doc is visible
+
   })
 });

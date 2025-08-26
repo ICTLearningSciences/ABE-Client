@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
+import { FormControl, Select, MenuItem, Box, Typography } from '@mui/material';
 
 interface DocumentSelectorProps {
   documentIds: string[];
@@ -18,20 +18,34 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
   selectedDocId,
   onDocumentChange,
 }) => {
-  if (documentIds.length <= 1) {
+  if (documentIds.length === 0) {
     return null;
   }
 
   return (
     <Box
-      sx={{ mb: 3, width: '100%', display: 'flex', justifyContent: 'center' }}
+      sx={{
+        mt: 1,
+        display: 'flex',
+        flexDirection: 'row',
+        textAlign: 'center',
+        alignItems: 'center',
+      }}
     >
+      <Typography
+        sx={{
+          fontWeight: 600,
+          color: '#1976d2',
+          textAlign: 'center',
+          height: 'fit-content',
+        }}
+      >
+        Document:
+      </Typography>
       <FormControl sx={{ minWidth: 300 }}>
-        <InputLabel id="document-select-label">Document</InputLabel>
         <Select
           labelId="document-select-label"
           value={selectedDocId || ''}
-          label="Document"
           onChange={(e) => onDocumentChange(e.target.value)}
           sx={{
             '& .MuiOutlinedInput-root': {
