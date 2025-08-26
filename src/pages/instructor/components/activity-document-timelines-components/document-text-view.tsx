@@ -52,20 +52,24 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
 
   return (
     <Paper
+      data-cy="text-view-container"
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'auto',
         height: '100%',
+        overflow: 'hidden',
       }}
     >
       <Box
+        data-cy="text-view-content"
         sx={{
           flex: 1,
           p: 2,
+          overflow: 'hidden',
         }}
       >
         <RowDiv
+          data-cy="text-view-header"
           style={{
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -84,44 +88,9 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
         <Divider sx={{ mb: 2 }} />
 
         <Box
-          sx={{
-            '& h1, & h2, & h3, & h4, & h5, & h6': {
-              mt: 2,
-              mb: 1,
-              fontWeight: 600,
-            },
-            '& p': {
-              mb: 1,
-              lineHeight: 1.6,
-            },
-            '& ul, & ol': {
-              pl: 2,
-              mb: 1,
-            },
-            '& li': {
-              mb: 0.5,
-            },
-            '& blockquote': {
-              pl: 2,
-              borderLeft: '4px solid',
-              borderColor: 'primary.main',
-              bgcolor: 'grey.50',
-              py: 1,
-              mb: 1,
-            },
-            '& code': {
-              bgcolor: 'grey.100',
-              px: 1,
-              borderRadius: 1,
-              fontFamily: 'monospace',
-            },
-            '& pre': {
-              bgcolor: 'grey.100',
-              p: 1,
-              borderRadius: 1,
-              overflow: 'auto',
-              mb: 1,
-            },
+          style={{
+            overflow: 'hidden',
+            height: '100%',
           }}
         >
           {(() => {
@@ -136,13 +105,15 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
             if (viewChanges && diffContent) {
               return (
                 <Typography
+                  data-cy="text-content"
                   component="pre"
-                  sx={{
+                  style={{
                     whiteSpace: 'pre-wrap',
                     fontFamily: 'inherit',
                     fontSize: 'inherit',
-                    m: 0,
-                    '& span': { fontSize: 'inherit', fontFamily: 'inherit' },
+                    margin: 0,
+                    overflow: 'auto',
+                    height: '100%',
                   }}
                 >
                   {diffContent.diffContent}
@@ -151,12 +122,15 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
             }
             return (
               <Typography
+                data-cy="text-content"
                 component="pre"
-                sx={{
+                style={{
                   whiteSpace: 'pre-wrap',
                   fontFamily: 'inherit',
                   fontSize: 'inherit',
-                  m: 0,
+                  margin: 0,
+                  overflow: 'auto',
+                  height: '100%',
                 }}
               >
                 {currentText}
