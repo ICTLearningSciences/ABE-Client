@@ -153,13 +153,9 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       console.error('User is not an instructor');
       return;
     }
-    try {
-      const newCourse = await educationManagement.createCourse(courseData);
-      viewCourse(newCourse._id);
-      setIsCourseModalOpen(false);
-    } catch (error) {
-      console.error('Failed to create course:', error);
-    }
+    const newCourse = await educationManagement.createCourse(courseData);
+    viewCourse(newCourse._id);
+    setIsCourseModalOpen(false);
   };
 
   const handleOpenCourseModal = () => {

@@ -15,9 +15,11 @@ import {
   IconButton,
   Typography,
   Box,
+  Alert,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { Course } from '../../../store/slices/education-management/types';
+import { extractErrorMessageFromError } from '../../../helpers';
 
 export enum CourseModalMode {
   CREATE = 'create',
@@ -27,7 +29,7 @@ export enum CourseModalMode {
 interface CourseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (courseData: Partial<Course>) => void;
+  onSubmit: (courseData: Partial<Course>) => Promise<void>;
   mode: CourseModalMode;
   initialData?: Course;
   isLoading?: boolean;
@@ -46,6 +48,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
     description: '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [requestError, setRequestError] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
@@ -95,10 +98,15 @@ const CourseModal: React.FC<CourseModalProps> = ({
       submitData._id = initialData._id;
     }
 
-    onSubmit(submitData);
+    onSubmit(submitData).catch((error) => {
+      setRequestError(
+        extractErrorMessageFromError(error) || 'Failed to join section'
+      );
+    });
   };
 
   const handleInputChange = (field: string, value: string) => {
+    setRequestError('');
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -215,6 +223,11 @@ const CourseModal: React.FC<CourseModalProps> = ({
           />
         </Box>
       </DialogContent>
+      {requestError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {requestError}
+        </Alert>
+      )}
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button

@@ -66,12 +66,8 @@ const SectionView: React.FC<SectionViewProps> = ({
   }, [sectionTab]);
 
   const handleEditSection = async (sectionData: Partial<Section>) => {
-    try {
-      await educationManagement.updateSection(courseId, sectionData);
-      setShowEditModal(false);
-    } catch (error) {
-      console.error('Failed to update section:', error);
-    }
+    await educationManagement.updateSection(courseId, sectionData);
+    setShowEditModal(false);
   };
 
   function viewStudentInfo(studentId: string) {

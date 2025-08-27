@@ -74,12 +74,15 @@ export interface UseWithEducationalManagement {
   createSection: (
     courseId: string,
     sectionData?: Partial<Section>
-  ) => Promise<Section>;
+  ) => Promise<{ courseId: string; newSection: Section }>;
   updateSection: (
     courseId: string,
     sectionData: Partial<Section>
   ) => Promise<Section>;
-  deleteSection: (courseId: string, sectionId: string) => Promise<Section>;
+  deleteSection: (
+    courseId: string,
+    sectionId: string
+  ) => Promise<{ courseId: string; sectionId: string }>;
   createAssignment: (
     courseId: string,
     assignmentData?: Partial<Assignment>
@@ -297,42 +300,42 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     courseId: string,
     sectionData?: Partial<Section>
   ) {
-    const res = await dispatch(_createSection({ courseId, sectionData }));
-    return res.payload as Section;
+    return await dispatch(_createSection({ courseId, sectionData })).unwrap();
   }
 
   async function updateSection(
     courseId: string,
     sectionData: Partial<Section>
   ) {
-    const res = await dispatch(_updateSection({ courseId, sectionData }));
-    return res.payload as Section;
+    return await dispatch(_updateSection({ courseId, sectionData })).unwrap();
   }
 
   async function deleteSection(courseId: string, sectionId: string) {
-    const res = await dispatch(_deleteSection({ courseId, sectionId }));
-    return res.payload as Section;
+    return await dispatch(_deleteSection({ courseId, sectionId })).unwrap();
   }
 
   async function createAssignment(
     courseId: string,
     assignmentData?: Partial<Assignment>
   ) {
-    const res = await dispatch(_createAssignment({ courseId, assignmentData }));
-    return res.payload as Assignment;
+    return await dispatch(
+      _createAssignment({ courseId, assignmentData })
+    ).unwrap();
   }
 
   async function updateAssignment(
     courseId: string,
     assignmentData: Partial<Assignment>
   ) {
-    const res = await dispatch(_updateAssignment({ courseId, assignmentData }));
-    return res.payload as Assignment;
+    return await dispatch(
+      _updateAssignment({ courseId, assignmentData })
+    ).unwrap();
   }
 
   async function deleteAssignment(courseId: string, assignmentId: string) {
-    const res = await dispatch(_deleteAssignment({ courseId, assignmentId }));
-    return res.payload as Assignment;
+    return await dispatch(
+      _deleteAssignment({ courseId, assignmentId })
+    ).unwrap();
   }
 
   async function enrollStudentInSection(

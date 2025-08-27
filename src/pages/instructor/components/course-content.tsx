@@ -39,12 +39,8 @@ const CourseContent: React.FC<CourseContentProps> = ({
   );
 
   const handleAddSection = async (sectionData: Partial<Section>) => {
-    try {
-      await educationManagement.createSection(courseId, sectionData);
-      setShowSectionModal(false);
-    } catch (error) {
-      console.error('Failed to create section:', error);
-    }
+    await educationManagement.createSection(courseId, sectionData);
+    setShowSectionModal(false);
   };
 
   const handleOpenSectionModal = () => {
