@@ -158,68 +158,6 @@ export const AssignmentDocumentTimelines: React.FC<
     setSelectedTimelineIndex(0);
   }, [selectedDocId]);
 
-  if (loadInProgress && !currentTimeline) {
-    return (
-      <Box
-        sx={{
-          p: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '400px',
-        }}
-      >
-        <CircularProgress size={32} sx={{ mb: 2 }} />
-        <Typography>Loading document timeline...</Typography>
-      </Box>
-    );
-  }
-
-  if (currentDocState?.error || errorMessage) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <AssignmentHeader
-          assignmentTitle={currentTimelinePoint?.version?.title}
-          studentName={student.name}
-          onBackToStudentInfo={onBackToStudentInfo}
-        />
-        <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Typography color="error">
-            Error loading timeline:{' '}
-            {currentDocState?.error
-              ? JSON.stringify(currentDocState.error)
-              : errorMessage}
-          </Typography>
-        </Box>
-      </Box>
-    );
-  }
-
-  if (!currentTimeline || !timelinePoints.length) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <AssignmentHeader
-          assignmentTitle={assignment.title}
-          studentName={student.name}
-          onBackToStudentInfo={onBackToStudentInfo}
-        />
-        <DocumentSelector
-          docData={studentAssignmentDocs}
-          selectedDocId={selectedDocId}
-          onDocumentChange={onDocumentChange}
-        />
-        <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Typography color="text.secondary">
-            {documentIds.length === 0
-              ? 'No documents available'
-              : 'No timeline data available for this document'}
-          </Typography>
-        </Box>
-      </Box>
-    );
-  }
-
   return (
     <Box
       sx={{ width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}
@@ -243,26 +181,49 @@ export const AssignmentDocumentTimelines: React.FC<
         <AssignmentGrader student={student} assignment={assignment} />
       </Box>
 
-      <TimelineView
-        timelinePoints={timelinePoints}
-        selectedTimelineIndex={selectedTimelineIndex}
-        onTimelinePointSelect={setSelectedTimelineIndex}
-      />
+      {errorMessage && (
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography color="error">{errorMessage}</Typography>
+        </Box>
+      )}
 
-      <Grid container spacing={3} sx={{ flex: 1, mb: 1 }} height="60%">
-        <Grid item xs={6} style={{ height: '100%' }}>
-          <DocumentTextView
-            timelinePoint={currentTimelinePoint}
-            diffContent={diffContent}
+      {loadInProgress ? (
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <CircularProgress size={32} sx={{ mb: 2 }} />
+          <Typography>Loading document timeline...</Typography>
+        </Box>
+      ) : !currentTimeline ? (
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography color="text.secondary">
+            {documentIds.length === 0
+              ? 'No documents available'
+              : 'No timeline data available for this document'}
+          </Typography>
+        </Box>
+      ) : (
+        <>
+          <TimelineView
+            timelinePoints={timelinePoints}
+            selectedTimelineIndex={selectedTimelineIndex}
+            onTimelinePointSelect={setSelectedTimelineIndex}
           />
-        </Grid>
-        <Grid item xs={6} style={{ height: '100%' }}>
-          <TabbedInfoPanel
-            timelinePoint={currentTimelinePoint}
-            studentName={student.name}
-          />
-        </Grid>
-      </Grid>
+
+          <Grid container spacing={3} sx={{ flex: 1, mb: 1 }} height="60%">
+            <Grid item xs={6} style={{ height: '100%' }}>
+              <DocumentTextView
+                timelinePoint={currentTimelinePoint}
+                diffContent={diffContent}
+              />
+            </Grid>
+            <Grid item xs={6} style={{ height: '100%' }}>
+              <TabbedInfoPanel
+                timelinePoint={currentTimelinePoint}
+                studentName={student.name}
+              />
+            </Grid>
+          </Grid>
+        </>
+      )}
     </Box>
   );
 };
