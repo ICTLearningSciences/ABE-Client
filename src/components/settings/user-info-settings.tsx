@@ -71,7 +71,7 @@ export function UserInfoSettings(): JSX.Element {
           <AdminControls />
         </Paper>
       )}
-      {educationalRole && state.user?._id && (
+      {state.user?._id && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
             Education Dashboard
