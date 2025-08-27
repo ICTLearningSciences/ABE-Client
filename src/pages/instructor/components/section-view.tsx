@@ -171,6 +171,7 @@ const SectionView: React.FC<SectionViewProps> = ({
                   variant="outlined"
                   sx={{ fontSize: '11px' }}
                 />
+                {/* TODO: add section add URL copy button here */}
               </Stack>
             </Box>
 

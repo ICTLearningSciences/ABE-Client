@@ -5,10 +5,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Box, Typography, Button, Paper } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
-import CollapsibleTree, { TreeSection } from './components/collapsible-tree';
+import { TreeSection } from './components/collapsible-tree';
 import CourseView from './components/course-view';
 import SectionView from './components/section-view';
 import AssignmentView from './components/assignment-view/assignment-view';
@@ -34,6 +34,7 @@ import { AssignmentDocumentTimelines } from './components/assignment-document-ti
 import { StudentInfoPage } from './components/section-student-grades/student-info-page';
 import { getStudentDocIds } from '../../helpers';
 import { LoginStatus } from '../../store/slices/login';
+import { CourseManagementSidebar } from './components/course-management-sidebar';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -308,130 +309,15 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       }}
     >
       {/* Sidebar */}
-      <Paper
-        elevation={0}
-        sx={{
-          width: '300px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '8px 0 0 8px',
-          borderRight: '1px solid #e9ecef',
-          padding: '24px 16px',
-        }}
-      >
-        <Box sx={{ mb: 3 }}>
-          <Typography
-            variant="h5"
-            data-cy="course-management-title"
-            sx={{
-              mb: 1,
-              color: '#1B6A9C',
-              fontWeight: 600,
-            }}
-          >
-            {isStudent ? 'My Courses' : 'Course Management'}
-          </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            data-cy="course-management-description"
-          >
-            {isStudent
-              ? 'View your enrolled courses, sections, and assignments'
-              : 'Manage your courses, sections, and assignments'}
-          </Typography>
-        </Box>
-
-        {isStudent ? (
-          <Button
-            onClick={handleOpenJoinSectionModal}
-            disabled={educationManagement.isSectionModifying}
-            variant="contained"
-            fullWidth
-            data-cy="join-section-button"
-            sx={{
-              mb: 3,
-              backgroundColor: '#1B6A9C',
-              '&:hover': {
-                backgroundColor: '#145a87',
-              },
-              '&:disabled': {
-                backgroundColor: '#1B6A9C',
-                opacity: 0.6,
-              },
-            }}
-          >
-            + Join Section
-          </Button>
-        ) : (
-          <Button
-            onClick={handleOpenCourseModal}
-            disabled={educationManagement.isCourseModifying}
-            variant="contained"
-            fullWidth
-            data-cy="new-course-button"
-            sx={{
-              mb: 3,
-              backgroundColor: '#1B6A9C',
-              '&:hover': {
-                backgroundColor: '#145a87',
-              },
-              '&:disabled': {
-                backgroundColor: '#1B6A9C',
-                opacity: 0.6,
-              },
-            }}
-          >
-            + New Course
-          </Button>
-        )}
-
-        <Box>
-          {treeSections.length === 0 ||
-          treeSections.every((section) => section.items.length === 0) ? (
-            <Box
-              sx={{
-                textAlign: 'center',
-                py: 5,
-                px: 2.5,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: '48px',
-                  color: '#dee2e6',
-                  mb: 2,
-                }}
-              >
-                📚
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ lineHeight: 1.5 }}
-              >
-                {isStudent ? (
-                  <>
-                    No courses yet
-                    <br />
-                    Join your first section to get started
-                  </>
-                ) : (
-                  <>
-                    No courses yet
-                    <br />
-                    Create your first course to get started
-                  </>
-                )}
-              </Typography>
-            </Box>
-          ) : (
-            <CollapsibleTree
-              sections={treeSections}
-              selectedId={getSelectedId()}
-            />
-          )}
-        </Box>
-      </Paper>
+      <CourseManagementSidebar
+        isStudent={isStudent}
+        treeSections={treeSections}
+        selectedId={getSelectedId()}
+        isSectionModifying={educationManagement.isSectionModifying}
+        isCourseModifying={educationManagement.isCourseModifying}
+        onOpenJoinSectionModal={handleOpenJoinSectionModal}
+        onOpenCourseModal={handleOpenCourseModal}
+      />
 
       {/* Main content */}
       <Box
