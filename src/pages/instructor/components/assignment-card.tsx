@@ -8,6 +8,8 @@ import React from 'react';
 import { Card, CardContent, Typography, Stack } from '@mui/material';
 import { Assignment } from '../../../store/slices/education-management/types';
 import { ColumnDiv } from '../../../styled-components';
+import { useAppSelector } from '../../../store/hooks';
+import { EducationalRole } from '../../../types';
 
 interface AssignmentCardProps {
   assignment: Assignment;
@@ -27,6 +29,8 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
   assignmentGrade,
   isCompleted,
 }) => {
+  const myRole = useAppSelector((state) => state.login.user?.educationalRole);
+  const isStudent = myRole === EducationalRole.STUDENT;
   return (
     <Card
       variant="outlined"
@@ -74,20 +78,22 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
             top: 20,
           }}
         >
-          {isCompleted && assignmentGrade ? (
-            <Typography variant="body2">
-              <span style={{ fontWeight: 600 }}>Grade:</span>{' '}
-              {assignmentGrade.grade}/5
-            </Typography>
-          ) : isCompleted ? (
-            <Typography variant="body2" color="text.secondary">
-              Waiting for grade
-            </Typography>
-          ) : (
-            <Typography variant="body2" color="darkred" fontWeight={600}>
-              Incomplete
-            </Typography>
-          )}
+          {isStudent ? (
+            isCompleted && assignmentGrade ? (
+              <Typography variant="body2">
+                <span style={{ fontWeight: 600 }}>Grade:</span>{' '}
+                {assignmentGrade.grade}/5
+              </Typography>
+            ) : isCompleted ? (
+              <Typography variant="body2" color="text.secondary">
+                Waiting for grade
+              </Typography>
+            ) : (
+              <Typography variant="body2" color="darkred" fontWeight={600}>
+                Incomplete
+              </Typography>
+            )
+          ) : null}
         </ColumnDiv>
       </CardContent>
     </Card>

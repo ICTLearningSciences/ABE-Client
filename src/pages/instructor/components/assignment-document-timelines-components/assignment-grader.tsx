@@ -49,12 +49,7 @@ export function AssignmentGrader({
   };
 
   return (
-    <Box
-      style={{
-        position: 'absolute',
-        right: 40,
-      }}
-    >
+    <Box>
       {assignmentGrade ? (
         <Box sx={{ mb: 2 }} data-cy="graded-assignment">
           <Typography variant="body2" color="textSecondary">
@@ -78,7 +73,7 @@ export function AssignmentGrader({
         disabled={isLoading}
         data-cy="grade-assignment-button"
       >
-        Grade Assignment
+        Grade
       </Button>
 
       <Modal open={isModalOpen} aria-labelledby="grade-assignment-modal">

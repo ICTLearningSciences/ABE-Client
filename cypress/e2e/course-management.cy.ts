@@ -629,8 +629,9 @@ describe('Course Management', () => {
       cy.get('[data-cy=section-card-section-456]').click();
       cy.get("[data-cy=students-and-grades]").click()
       cy.get("[data-cy=student-user-123]").click()
-      cy.get("[data-cy=Required-Assignments-assignments-section]").click()
-      cy.get("[data-cy=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y-doc-select]").click()
+      cy.get("[data-cy=assignments-section-assignment-123]").within(() => {
+        cy.get("[data-cy=review-documents-button]").click()
+      })
   
       // Header Visible
       cy.get("[data-cy=activity-document-timelines]").should("be.visible")
@@ -696,8 +697,9 @@ describe('Course Management', () => {
     cy.get('[data-cy=section-card-section-456]').click();
     cy.get("[data-cy=students-and-grades]").click()
     cy.get("[data-cy=student-user-123]").click()
-    cy.get("[data-cy=Required-Assignments-assignments-section]").click()
-    cy.get("[data-cy=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y-doc-select]").click()
+    cy.get("[data-cy=assignments-section-assignment-123]").within(() => {
+      cy.get("[data-cy=review-documents-button]").click()
+    })
 
 
     // Mock the second doc timeline
@@ -706,12 +708,12 @@ describe('Course Management', () => {
     });
 
     cy.get("[data-cy=document-select]").click()
-    cy.get("[data-value=1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fB]").click()
+    cy.get("[data-value=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y]").click()
 
     cy.get("[data-cy=text-view-content]").should("contain.text", "Test 2")
     })
 
-    it.only("Can grade student assignment", ()=>{
+    it("Can grade student assignment", ()=>{
       cyMockEducationalManagement(cy, {
         userRole: UserRole.USER,
         educationalRole: EducationalRole.INSTRUCTOR,
@@ -739,8 +741,9 @@ describe('Course Management', () => {
       cy.get('[data-cy=section-card-section-456]').click();
       cy.get("[data-cy=students-and-grades]").click()
       cy.get("[data-cy=student-user-123]").click()
-      cy.get("[data-cy=Required-Assignments-assignments-section]").click()
-      cy.get("[data-cy=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y-doc-select]").click()
+      cy.get("[data-cy=assignments-section-assignment-123]").within(() => {
+        cy.get("[data-cy=review-documents-button]").click()
+      })
 
       cy.get("[data-cy=not-graded-assignment]").should("exist").should("be.visible")
       cy.get("[data-cy=grade-assignment-button]").click()

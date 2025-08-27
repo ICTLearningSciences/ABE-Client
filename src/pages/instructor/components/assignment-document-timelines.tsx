@@ -239,7 +239,9 @@ export const AssignmentDocumentTimelines: React.FC<
         onDocumentChange={onDocumentChange}
       />
 
-      <AssignmentGrader student={student} assignment={assignment} />
+      <Box sx={{ position: 'absolute', right: 20 }}>
+        <AssignmentGrader student={student} assignment={assignment} />
+      </Box>
 
       <TimelineView
         timelinePoints={timelinePoints}

@@ -612,7 +612,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                     (s) => s._id === viewState.selectedSectionId
                   )!
                 }
-                builtActivities={builtActivities}
                 handleBanStudent={async (studentUserId: string) => {
                   try {
                     await educationManagement.banStudentFromSection(

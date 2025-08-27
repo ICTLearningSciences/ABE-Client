@@ -12,13 +12,22 @@ import {
   Chip,
   Accordion,
   AccordionSummary,
+  Button,
 } from '@mui/material';
-import { StudentActivityDocumentDisplay } from './student-activity-document-display';
 import {
   Assignment,
-  RelevantGoogleDoc,
+  isInstructorData,
+  isStudentData,
   StudentData,
 } from '../../../../store/slices/education-management/types';
+import { AssignmentDocsDisplay } from './assignment-docs-display';
+import { getStudentAssignmentDocs } from '../../../../helpers';
+import { useWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
+
+export interface AssignmentGrade {
+  grade: number;
+  comment: string;
+}
 
 interface AssignmentsSectionProps {
   title: string;
@@ -26,9 +35,7 @@ interface AssignmentsSectionProps {
   completedCount: number;
   totalCount: number;
   getIsCompleted: (assignment: Assignment) => boolean;
-  getStudentDocDataForAssignment: (assignmentId: string) => RelevantGoogleDoc[];
-  getActivityTitle: (activityId: string) => string;
-  onDocumentClick?: (assignmentId: string, docId: string) => void;
+  onGoToAssignmentTimeline: (assignmentId: string) => void;
   student: StudentData;
 }
 
@@ -38,12 +45,10 @@ export function AssignmentsSection({
   completedCount,
   totalCount,
   getIsCompleted,
-  getStudentDocDataForAssignment,
-  getActivityTitle,
-  onDocumentClick,
+  onGoToAssignmentTimeline,
   student,
 }: AssignmentsSectionProps) {
-  const { userId: studentId } = student;
+  const { myData } = useWithEducationalManagement();
 
   const getAssignmentGrade = useMemo(() => {
     return (assignment: Assignment) => {
@@ -53,6 +58,79 @@ export function AssignmentsSection({
       return assignmentProgress?.instructorGrade;
     };
   }, [student]);
+
+  const getAssignmentDocs = useMemo(() => {
+    return (assignment: Assignment) => {
+      return getStudentAssignmentDocs(student, assignment._id);
+    };
+  }, [student, assignments]);
+
+  function getGradeDisplay(
+    assignment: Assignment,
+    isCompleted: boolean,
+    assignmentGrade?: AssignmentGrade
+  ) {
+    if (!myData) {
+      return null;
+    }
+    if (isInstructorData(myData)) {
+      return (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '10%',
+          }}
+        >
+          {assignmentGrade && (
+            <Typography variant="body2">
+              <span style={{ fontWeight: 'bold' }}>Grade:</span>{' '}
+              {assignmentGrade.grade}/5
+            </Typography>
+          )}
+
+          <Button
+            variant="contained"
+            onClick={() => onGoToAssignmentTimeline(assignment._id)}
+            data-cy="review-documents-button"
+          >
+            Grade Assignment
+          </Button>
+        </Box>
+      );
+    }
+    if (isStudentData(myData)) {
+      return assignmentGrade && isCompleted ? (
+        <Box
+          sx={{
+            width: '10%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="body2">
+            <span style={{ fontWeight: 'bold' }}>Grade:</span>{' '}
+            {assignmentGrade.grade}/5
+          </Typography>
+        </Box>
+      ) : !isCompleted ? null : (
+        <Box
+          sx={{
+            width: '10%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="body2">
+            <span style={{ fontWeight: 'bold' }}>Not Graded</span>
+          </Typography>
+        </Box>
+      );
+    }
+  }
 
   return (
     <>
@@ -74,10 +152,17 @@ export function AssignmentsSection({
         {assignments.map((assignment) => {
           const isCompleted = getIsCompleted(assignment);
           const assignmentGrade = getAssignmentGrade(assignment);
-
+          const docData = getAssignmentDocs(assignment);
           return (
             <div
-              style={{ width: '100%', display: 'flex', flexDirection: 'row' }}
+              style={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                gap: 20,
+              }}
+              data-cy={`assignments-section-${assignment._id}`}
               key={assignment._id}
             >
               <Accordion
@@ -141,44 +226,9 @@ export function AssignmentsSection({
                     }}
                   />
                 </AccordionSummary>
-                <StudentActivityDocumentDisplay
-                  assignment={assignment}
-                  getStudentDocDataForAssignment={
-                    getStudentDocDataForAssignment
-                  }
-                  getActivityTitle={getActivityTitle}
-                  onDocumentClick={onDocumentClick}
-                  studentId={studentId}
-                />
+                <AssignmentDocsDisplay assignmentDocs={docData} />
               </Accordion>
-              {assignmentGrade && isCompleted ? (
-                <Box
-                  sx={{
-                    width: '10%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Typography variant="body2">
-                    <span style={{ fontWeight: 'bold' }}>Grade:</span>{' '}
-                    {assignmentGrade.grade}/5
-                  </Typography>
-                </Box>
-              ) : !isCompleted ? null : (
-                <Box
-                  sx={{
-                    width: '10%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Typography variant="body2">
-                    <span style={{ fontWeight: 'bold' }}>Not Graded</span>
-                  </Typography>
-                </Box>
-              )}
+              {getGradeDisplay(assignment, isCompleted, assignmentGrade)}
             </div>
           );
         })}
