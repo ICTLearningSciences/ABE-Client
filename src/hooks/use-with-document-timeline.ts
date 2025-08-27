@@ -294,6 +294,7 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
     } catch (e: any) {
       dispatch({
         type: TimelineActionType.LOADING_FAILED,
+        docId,
         errorPayload: {
           error: e,
           message: JSON.stringify(e.message),
