@@ -25,6 +25,7 @@ import SectionContent from './section-content';
 import SectionStudentsGrades from './section-student-grades/section-students-grades';
 import BannedStudents from './banned-students';
 import { addQueryParamToUrl, removeQueryParamFromUrl } from '../../../helpers';
+import CopyUrlButton from '../../../components/shared/copy-url-button';
 
 interface SectionViewProps {
   sectionId: string;
@@ -171,7 +172,10 @@ const SectionView: React.FC<SectionViewProps> = ({
                   variant="outlined"
                   sx={{ fontSize: '11px' }}
                 />
-                {/* TODO: add section add URL copy button here */}
+                <CopyUrlButton
+                  copyUrl={`${window.location.origin}?sectionCode=${section.sectionCode}`}
+                  tooltip="Copy Section Join URL"
+                />
               </Stack>
             </Box>
 

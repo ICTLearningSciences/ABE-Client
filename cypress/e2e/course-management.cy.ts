@@ -300,7 +300,6 @@ describe('Course Management', () => {
       cy.get('[data-cy=add-assignment-button]').should('be.visible').click();
       cy.get('[data-cy=assignment-modal]').should('be.visible');
 
-      // TODO: input new assignment title, description, and activity into the assignment modal and submit new assignment
       cy.get('[data-cy=assignment-modal-title-input]').type('Test Assignment');
       cy.get('[data-cy=assignment-modal-description-input]').type('This is a test assignment description');
       cy.get('[data-cy=assignment-modal-submit-button]').click();
