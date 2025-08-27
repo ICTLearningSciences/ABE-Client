@@ -39,6 +39,7 @@ import {
   // Student ban/unban thunks
   banStudentFromSection,
   unbanStudentFromSection,
+  gradeStudentAssignment,
 } from './thunks';
 
 export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
@@ -437,5 +438,15 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
     })
     .addCase(updateStudentAssignmentProgress.rejected, (state) => {
       state.enrollmentModificationStatus = LoadStatus.FAILED;
+    })
+
+    // grading student assignment reducers
+    .addCase(gradeStudentAssignment.fulfilled, (state, action) => {
+      const studentIndex = state.students.findIndex(
+        (s) => s.userId === action.payload.userId
+      );
+      if (studentIndex >= 0) {
+        state.students[studentIndex] = action.payload;
+      }
     });
 };

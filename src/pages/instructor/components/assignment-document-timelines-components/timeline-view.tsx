@@ -36,6 +36,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
   return (
     <Box
+      data-cy="activity-document-timeline-notches"
       sx={{
         mb: 2,
         width: '100%',
@@ -81,6 +82,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           const activityTitle = getActivityTitle(point.version?.activity || '');
           return (
             <Box
+              data-cy={`activity-document-timeline-notch-${index}`}
               key={point.versionId}
               sx={{ display: 'flex', alignItems: 'center' }}
             >

@@ -25,6 +25,7 @@ import {
   setViewState,
   banStudentFromSection as _banStudentFromSection,
   unbanStudentFromSection as _unbanStudentFromSection,
+  gradeStudentAssignment as _gradeStudentAssignment,
 } from '.';
 import {
   Course,
@@ -122,14 +123,7 @@ export interface UseWithEducationalManagement {
     activityId: string,
     docId: string
   ) => Promise<StudentData>;
-  studentActivityDocPrimaryStatusSet: (
-    targetUserId: string,
-    courseId: string,
-    sectionId: string,
-    assignmentId: string,
-    activityId: string,
-    docId: string
-  ) => Promise<StudentData>;
+  studentActivityDocPrimaryStatusSet: (docId: string) => Promise<StudentData>;
   studentActivityDocDeleted: (
     targetUserId: string,
     courseId: string,
@@ -198,6 +192,10 @@ export interface UseWithEducationalManagement {
     studentId: string
   ) => Promise<Section>;
   updateSelectedDocId: (docId: string) => Promise<void>;
+  gradeStudentAssignment: (
+    grade: number,
+    comment: string
+  ) => Promise<StudentData>;
 }
 
 export interface SectionStudentsProgress {
@@ -233,6 +231,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   );
   const enrollmentModificationStatus = useAppSelector(
     (state) => state.educationManagement.enrollmentModificationStatus
+  );
+  const educationalDataLoadStatus = useAppSelector(
+    (state) => state.educationManagement.educationalDataLoadStatus
   );
   const courses = useAppSelector((state) => state.educationManagement.courses);
   const assignments = useAppSelector(
@@ -446,25 +447,26 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as StudentData;
   }
 
-  async function studentActivityDocPrimaryStatusSet(
-    targetUserId: string,
-    courseId: string,
-    sectionId: string,
-    assignmentId: string,
-    activityId: string,
-    docId: string
-  ) {
+  async function studentActivityDocPrimaryStatusSet(docId: string) {
+    if (
+      !viewState.selectedCourseId ||
+      !viewState.selectedSectionId ||
+      !viewState.selectedAssignmentId ||
+      !viewState.selectedActivityId
+    ) {
+      throw new Error('No course, section, assignment, activity selected');
+    }
     if (!myData) {
       throw new Error('no user educational data found');
     }
     if (isInstructorData(myData)) {
-      throw new Error('instructor cannot set doc primary status');
+      throw new Error('only students can set doc primary status');
     }
     const assignmentProgress = myData.assignmentProgress.find(
-      (a) => a.assignmentId === assignmentId
+      (a) => a.assignmentId === viewState.selectedAssignmentId
     );
     const activityProgress = assignmentProgress?.activityCompletions.find(
-      (a) => a.activityId === activityId
+      (a) => a.activityId === viewState.selectedActivityId
     );
     const docAlreadyPrimary = Boolean(
       activityProgress?.relevantGoogleDocs.some(
@@ -476,11 +478,11 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     }
     const res = await dispatch(
       _updateStudentAssignmentProgress({
-        targetUserId,
-        courseId,
-        sectionId,
-        assignmentId,
-        activityId,
+        targetUserId: myData.userId,
+        courseId: viewState.selectedCourseId,
+        sectionId: viewState.selectedSectionId,
+        assignmentId: viewState.selectedAssignmentId,
+        activityId: viewState.selectedActivityId,
         action: ModifyStudentAssignmentProgressActions.DOC_PRIMARY_STATUS_SET,
         docId,
       })
@@ -508,6 +510,20 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       })
     );
     return res.payload as StudentData;
+  }
+
+  async function gradeStudentAssignment(grade: number, comment: string) {
+    if (!viewState.selectedStudentId || !viewState.selectedAssignmentId) {
+      throw new Error('No student or assignment selected');
+    }
+    return await dispatch(
+      _gradeStudentAssignment({
+        studentId: viewState.selectedStudentId,
+        assignmentId: viewState.selectedAssignmentId,
+        grade,
+        comment,
+      })
+    ).unwrap();
   }
 
   async function addAssignmentToSection(
@@ -585,11 +601,14 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     }, [students, sections, assignments]);
 
   async function loadAllEducationalData(forUserId: string) {
+    const isInstructor = myData && isInstructorData(myData);
     const [courses, assignments, sections, students] = await Promise.all([
       dispatch(_fetchCourses(forUserId)).unwrap(),
       dispatch(_fetchAssignments(forUserId)).unwrap(),
       dispatch(_fetchSections(forUserId)).unwrap(),
-      dispatch(_fetchStudentsInMyCourses(forUserId)).unwrap(),
+      isInstructor
+        ? dispatch(_fetchStudentsInMyCourses(forUserId)).unwrap()
+        : [],
     ]);
 
     return {
@@ -868,6 +887,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     viewStudentInfo,
     viewDashboard,
     haveICompletedActivity,
+    gradeStudentAssignment,
     courses,
     assignments,
     sections,
@@ -879,7 +899,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       coursesLoadingState === LoadStatus.LOADING ||
       assignmentsLoadingState === LoadStatus.LOADING ||
       sectionsLoadingState === LoadStatus.LOADING ||
-      studentsLoadingState === LoadStatus.LOADING,
+      studentsLoadingState === LoadStatus.LOADING ||
+      educationalDataLoadStatus === LoadStatus.LOADING,
     sectionsLoadState: sectionsLoadingState,
     isCourseModifying: courseModificationStatus === LoadStatus.LOADING,
     courseModificationFailed: courseModificationStatus === LoadStatus.FAILED,

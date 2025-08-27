@@ -22,7 +22,13 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { GoogleDocItemRow } from './google-doc-item-row';
 import { useAppSelector } from '../../store/hooks';
-import { Assignment } from '../../store/slices/education-management/types';
+import {
+  Assignment,
+  isStudentData,
+  StudentData,
+} from '../../store/slices/education-management/types';
+import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
+import { getStudentActivityDocs } from '../../helpers';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: UserDoc[];
@@ -68,9 +74,19 @@ export default function SelectCreateDocs(props: {
   const [viewingArchived, setViewingArchived] = React.useState(false);
   const [docToDelete, setDocToDelete] = React.useState<UserDoc>();
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
-  const viewState = useAppSelector(
-    (state) => state.educationManagement.viewState
-  );
+  const [loadInProgress, setLoadInProgress] = React.useState(false);
+  const { viewState, myData, studentActivityDocPrimaryStatusSet } =
+    useWithEducationalManagement();
+  const isStudent = myData ? isStudentData(myData) : false;
+  const studentActivityDocs =
+    isStudent && viewState.selectedActivityId
+      ? getStudentActivityDocs(
+          myData as StudentData,
+          viewState.selectedActivityId
+        )
+      : [];
+  const primaryDocId = studentActivityDocs.find((d) => d.primaryDocument)
+    ?.docId;
   const assignments = useAppSelector(
     (state) => state.educationManagement.assignments
   );
@@ -159,6 +175,7 @@ export default function SelectCreateDocs(props: {
           width: '100%',
         }}
       >
+        {/* Header */}
         <RowDiv
           style={{
             position: 'relative',
@@ -170,8 +187,8 @@ export default function SelectCreateDocs(props: {
           {!viewingArchived && (
             <RowDiv
               style={{
-                position: 'absolute',
-                left: 0,
+                width: '20%',
+                gap: '10px',
               }}
             >
               <Button
@@ -188,12 +205,11 @@ export default function SelectCreateDocs(props: {
                     }
                   );
                 }}
-                size="large"
+                size="small"
                 style={{
                   fontWeight: 'bold',
-                  marginRight: '10px',
                 }}
-                variant="outlined"
+                variant="contained"
               >
                 + New
               </Button>
@@ -210,13 +226,10 @@ export default function SelectCreateDocs(props: {
               )}
             </RowDiv>
           )}
-          <h2>{title}</h2>
+          <h2 style={{ width: '60%', textAlign: 'center' }}>{title}</h2>
           <Button
+            style={{ width: '20%' }}
             data-cy={`toggle-view-archived`}
-            style={{
-              position: 'absolute',
-              right: 0,
-            }}
             onClick={() => {
               setViewingArchived(!viewingArchived);
             }}
@@ -224,6 +237,8 @@ export default function SelectCreateDocs(props: {
             {viewingArchived ? 'View Active' : 'View Archived'}
           </Button>
         </RowDiv>
+
+        {/* Table */}
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -264,6 +279,11 @@ export default function SelectCreateDocs(props: {
                     <SortIndicator field="updatedAt" />
                   </RowDiv>
                 </TableCell>
+                {isStudent && (
+                  <TableCell style={{ width: '50px' }}>
+                    Main Document?
+                  </TableCell>
+                )}
                 <TableCell style={{ width: '50px' }}></TableCell>
               </TableRow>
             </TableHead>
@@ -293,6 +313,17 @@ export default function SelectCreateDocs(props: {
                   onDeleteClick={() => {
                     setDocToDelete(doc);
                   }}
+                  onPrimaryDocSet={async () => {
+                    setLoadInProgress(true);
+                    try {
+                      await studentActivityDocPrimaryStatusSet(doc.googleDocId);
+                    } finally {
+                      setLoadInProgress(false);
+                    }
+                  }}
+                  loadInProgress={loadInProgress}
+                  isPrimaryDoc={doc.googleDocId === primaryDocId}
+                  isStudent={isStudent}
                 />
               ))}
             </TableBody>

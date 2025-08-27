@@ -6,19 +6,20 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { FormControl, Select, MenuItem, Box, Typography } from '@mui/material';
+import { RelevantGoogleDoc } from '../../../../store/slices/education-management/types';
 
 interface DocumentSelectorProps {
-  documentIds: string[];
+  docData: RelevantGoogleDoc[];
   selectedDocId: string;
   onDocumentChange: (docId: string) => void;
 }
 
 export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
-  documentIds,
+  docData,
   selectedDocId,
   onDocumentChange,
 }) => {
-  if (documentIds.length === 0) {
+  if (docData.length === 0) {
     return null;
   }
 
@@ -33,7 +34,7 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
       }}
     >
       <Typography
-        sx={{
+        style={{
           fontWeight: 600,
           color: '#1976d2',
           textAlign: 'center',
@@ -44,6 +45,7 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
       </Typography>
       <FormControl sx={{ minWidth: 300 }}>
         <Select
+          data-cy="document-select"
           labelId="document-select-label"
           value={selectedDocId || ''}
           onChange={(e) => onDocumentChange(e.target.value)}
@@ -58,9 +60,12 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
             },
           }}
         >
-          {documentIds.map((docId) => (
-            <MenuItem key={docId} value={docId}>
-              Document {docId}
+          {docData.map((doc) => (
+            <MenuItem key={doc.docId} value={doc.docId}>
+              {doc.primaryDocument ? (
+                <span style={{ fontWeight: 600 }}>Main Document: </span>
+              ) : null}{' '}
+              <span> </span> {doc.docData.title || 'Untitled'}
             </MenuItem>
           ))}
         </Select>

@@ -89,9 +89,12 @@ export const TabbedInfoPanel: React.FC<TabbedInfoPanelProps> = ({
           },
         }}
       >
-        <Tab label="Chat Log" />
-        <Tab label="AI Outline" />
-        <Tab label="AI Change Summary" />
+        <Tab label="Chat Log" data-cy="chat-log-tab-selector" />
+        <Tab label="AI Outline" data-cy="ai-outline-tab-selector" />
+        <Tab
+          label="AI Change Summary"
+          data-cy="ai-change-summary-tab-selector"
+        />
       </Tabs>
 
       <Box sx={{ flex: 1, overflow: 'hidden', height: '100%' }}>

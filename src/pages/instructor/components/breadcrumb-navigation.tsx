@@ -149,6 +149,7 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
           <Box
             key={item.id}
             onClick={item.onClick}
+            data-cy={`breadcrumb-item-${item.id}`}
             sx={{
               display: 'flex',
               alignItems: 'center',

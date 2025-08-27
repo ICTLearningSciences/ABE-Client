@@ -8,7 +8,10 @@ import React, { useState, useMemo } from 'react';
 import { Box, Typography, Button, Card, Grid, Stack } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import { Assignment } from '../../../store/slices/education-management/types';
+import {
+  Assignment,
+  isStudentData,
+} from '../../../store/slices/education-management/types';
 import AssignmentModal, { AssignmentModalMode } from './assignment-modal';
 import AssignmentCard from './assignment-card';
 import OptionalRequirements from './optional-requirements';
@@ -76,6 +79,29 @@ const SectionContent: React.FC<SectionContentProps> = ({
     }
   };
 
+  const getAssignmentGrade = useMemo(() => {
+    return (assignmentId: string) => {
+      const myData = educationManagement.myData;
+      if (!myData || !isStudentData(myData)) return undefined;
+      const assignmentProgress = myData.assignmentProgress.find(
+        (ap) => ap.assignmentId === assignmentId
+      );
+      return assignmentProgress?.instructorGrade || undefined;
+    };
+  }, [educationManagement.myData]);
+
+  const getIsCompleted = useMemo(() => {
+    return (assignmentId: string) => {
+      const myData = educationManagement.myData;
+      if (!myData || !isStudentData(myData)) return false;
+      return (
+        myData.assignmentProgress
+          .find((ap) => ap.assignmentId === assignmentId)
+          ?.activityCompletions.every((ac) => ac.complete) || false
+      );
+    };
+  }, [educationManagement.myData]);
+
   const handleOpenAssignmentModal = () => {
     setShowAssignmentModal(true);
   };
@@ -100,6 +126,12 @@ const SectionContent: React.FC<SectionContentProps> = ({
   const renderAssignmentList = (
     assignments: Assignment[],
     title: string,
+    getAssignmentGrade: (assignmentId: string) =>
+      | {
+          grade: number;
+          comment: string;
+        }
+      | undefined,
     options: {
       showCompletionCounter?: boolean;
       completedCount?: number;
@@ -156,6 +188,8 @@ const SectionContent: React.FC<SectionContentProps> = ({
               <AssignmentCard
                 assignment={assignment}
                 onClick={onAssignmentSelect}
+                assignmentGrade={getAssignmentGrade(assignment._id)}
+                isCompleted={getIsCompleted(assignment._id)}
               />
             </Grid>
           ))}
@@ -170,24 +204,6 @@ const SectionContent: React.FC<SectionContentProps> = ({
 
   return (
     <Box>
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 2.5 }}
-      >
-        <Typography
-          variant="h5"
-          sx={{ fontWeight: 600, color: 'text.primary' }}
-        >
-          Assignments
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {section.assignments.length} assignment
-          {section.assignments.length !== 1 ? 's' : ''}
-        </Typography>
-      </Stack>
-
       {!isStudentView && (
         <Button
           variant="contained"
@@ -235,13 +251,15 @@ const SectionContent: React.FC<SectionContentProps> = ({
           {/* Required Assignments */}
           {renderAssignmentList(
             assignmentsInSection.requiredAssignments,
-            'Required Assignments'
+            'Required Assignments',
+            getAssignmentGrade
           )}
 
           {/* Optional Assignments */}
           {renderAssignmentList(
             assignmentsInSection.optionalAssignments,
             'Optional Assignments',
+            getAssignmentGrade,
             {
               showCompletionCounter: isStudentView,
               completedCount: mySectionProgress

@@ -4,35 +4,28 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Typography } from '@mui/material';
+import { StudentData } from './educational-types';
+import { testStudent } from './fetch-students';
 
-interface AiChangeSummaryTabProps {
-  changeSummary: string;
+export const gradeStudentAssignment: StudentData = {
+    ...testStudent,
+  assignmentProgress: [
+    ...testStudent.assignmentProgress.map(ap=>{
+        return {
+            ...ap,
+            instructorGrade: {
+                grade: 5,
+                comment: 'Great job!'
+            }
+        }
+    })
+  ]
+};
+
+export interface GradeStudentAssignmentResponse {
+  gradeStudentAssignment: StudentData;
 }
 
-export const AiChangeSummaryTab: React.FC<AiChangeSummaryTabProps> = ({
-  changeSummary,
-}) => {
-  if (!changeSummary) {
-    return (
-      <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>
-        No AI change summary available
-      </Typography>
-    );
-  }
-
-  return (
-    <Typography
-      data-cy="ai-change-summary-container"
-      variant="body2"
-      sx={{
-        whiteSpace: 'pre-wrap',
-        lineHeight: 1.6,
-        padding: 0,
-      }}
-    >
-      {changeSummary}
-    </Typography>
-  );
+export const gradeStudentAssignmentResponse: GradeStudentAssignmentResponse = {
+  gradeStudentAssignment: gradeStudentAssignment
 };

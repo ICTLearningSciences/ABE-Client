@@ -31,6 +31,9 @@ export interface Section {
 export interface RelevantGoogleDoc {
   docId: string;
   primaryDocument: boolean;
+  docData: {
+    title: string;
+  };
 }
 
 export interface ActivityCompletion {
@@ -41,6 +44,10 @@ export interface ActivityCompletion {
 
 export interface AssignmentProgress {
   assignmentId: string;
+  instructorGrade?: {
+    grade: number;
+    comment: string;
+  };
   activityCompletions: ActivityCompletion[];
 }
 

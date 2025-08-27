@@ -47,6 +47,7 @@ import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
 import { fetchPromptTemplates } from '../fixtures/fetch-prompt-templates';
 import { fetchInstructorsResponseEmpty } from '../fixtures/educational-management/fetch-instructors';
 import { realExampleDocumentTimeline } from '../fixtures/document-timeline/real-example';
+import { gradeStudentAssignmentResponse } from '../fixtures/educational-management/grade-student-assignment';
 
 export interface EducationalMockOptions {
   gqlQueries?: MockGraphQLQuery[] | MockGraphQLQuery;
@@ -126,6 +127,9 @@ export function cyMockEducationalManagement(
     // User Data
     mockGQL('CreateNewInstructor', userDataResponse),
     mockGQL('CreateNewStudent', userDataResponse),
+
+    // Grade Student Assignment
+    mockGQL('GradeStudentAssignment', gradeStudentAssignmentResponse),
     
     // Course Operations
     mockGQL('AddOrUpdateCourse', [

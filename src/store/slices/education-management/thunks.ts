@@ -22,6 +22,7 @@ import {
   modifyStudentBanInSection as _modifyStudentBanInSection,
   BanStudentFromSectionAction,
   ModifyStudentAssignmentProgressActions,
+  gradeStudentAssignment as _gradeStudentAssignment,
 } from './educational-api';
 import { Course, Assignment, Section } from './types';
 
@@ -58,6 +59,23 @@ export const fetchInstructors = createAsyncThunk(
   'educationManagement/fetchInstructors',
   async () => {
     return await _fetchInstructors();
+  }
+);
+
+export const gradeStudentAssignment = createAsyncThunk(
+  'educationManagement/gradeStudentAssignment',
+  async (params: {
+    studentId: string;
+    assignmentId: string;
+    grade: number;
+    comment: string;
+  }) => {
+    return await _gradeStudentAssignment(
+      params.studentId,
+      params.assignmentId,
+      params.grade,
+      params.comment
+    );
   }
 );
 

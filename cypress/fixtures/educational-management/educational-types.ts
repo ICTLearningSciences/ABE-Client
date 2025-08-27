@@ -41,19 +41,26 @@ export interface Course {
   export interface RelevantGoogleDoc {
     docId: string;
     primaryDocument: boolean;
+    docData: {
+      title: string;
+    }
   }
   
   export interface ActivityCompletion {
     activityId: string;
     relevantGoogleDocs: RelevantGoogleDoc[];
     complete: boolean;
+    
   }
   
   export interface AssignmentProgress {
     assignmentId: string;
+    instructorGrade?: {
+      grade: number;
+      comment: string;
+    },
     activityCompletions: ActivityCompletion[];
   }
-  
   export interface StudentData {
     _id: string;
     userId: string;

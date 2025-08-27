@@ -39,6 +39,7 @@ export interface UpdateUserInfo {
   name?: string;
   email?: string;
   classroomCode?: string;
+  educationalRole?: EducationalRole;
 }
 
 export enum EducationalRole {

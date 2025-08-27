@@ -49,12 +49,19 @@ export const studentDataQueryData = `
   name
   assignmentProgress {
     assignmentId
+    instructorGrade { 
+      grade
+      comment
+    }
     activityCompletions {
       activityId
       complete
       relevantGoogleDocs {
         docId
         primaryDocument
+        docData {
+          title
+        }
       }
     }
   }
@@ -500,4 +507,35 @@ export async function fetchStudentsGoogleDocIds(
     }
   );
   return res.edges.map((edge) => edge.node.googleDocId);
+}
+
+export async function gradeStudentAssignment(
+  targetUserId: string,
+  assignmentId: string,
+  grade: number,
+  comment: string
+): Promise<StudentData> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const res = await execGql<StudentData>(
+    {
+      query: `
+mutation GradeStudentAssignment($studentId: String!, $assignmentId: String!, $grade: Int!, $comment: String) {
+          gradeStudentAssignment(studentId: $studentId, assignmentId: $assignmentId, grade: $grade, comment: $comment) {
+            ${studentDataQueryData}
+          }
+        }
+      `,
+      variables: {
+        studentId: targetUserId,
+        assignmentId,
+        grade,
+        comment,
+      },
+    },
+    {
+      dataPath: 'gradeStudentAssignment',
+      accessToken,
+    }
+  );
+  return res;
 }

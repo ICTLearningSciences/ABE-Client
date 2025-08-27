@@ -42,7 +42,7 @@ export const AiOutlineTab: React.FC<AiOutlineTabProps> = ({
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: 2 }} data-cy="ai-outline-container">
       {/* Thesis Statement Section */}
       <Box sx={{ mb: 3 }}>
         <Typography

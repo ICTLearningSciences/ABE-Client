@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Box, Typography, Button, Paper } from '@mui/material';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
@@ -33,6 +33,7 @@ import { useWithDocumentTimeline } from '../../hooks/use-with-document-timeline'
 import { AssignmentDocumentTimelines } from './components/assignment-document-timelines';
 import { StudentInfoPage } from './components/section-student-grades/student-info-page';
 import { getStudentDocIds } from '../../helpers';
+import { LoginStatus } from '../../store/slices/login';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -54,8 +55,10 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     updateSelectedDocId,
     isLoading,
     viewState,
+    myData,
+    loadUserEducationalData,
   } = educationManagement;
-  const { state: loginState } = useWithLogin();
+  const { state: loginState, updateUserInfo } = useWithLogin();
   useWithEducationalEvents();
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
   const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
@@ -67,6 +70,27 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     errorMessage,
     getHydratedTimeline,
   } = useWithDocumentTimeline();
+  const alreadyLoadedDataRef = useRef(false);
+
+  useEffect(() => {
+    const alreadyHaveEducationalData =
+      Boolean(loginState.user?.educationalRole) || myData;
+    if (
+      loginState.loginStatus !== LoginStatus.AUTHENTICATED ||
+      !loginState.user ||
+      alreadyHaveEducationalData ||
+      isLoading ||
+      alreadyLoadedDataRef.current
+    ) {
+      return;
+    }
+    alreadyLoadedDataRef.current = true;
+    updateUserInfo({ educationalRole: EducationalRole.STUDENT }).then(
+      (user) => {
+        loadUserEducationalData(user._id, EducationalRole.STUDENT);
+      }
+    );
+  }, [loginState.loginStatus, myData, isLoading]);
 
   const isStudent =
     userRole === EducationalRole.STUDENT ||

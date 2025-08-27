@@ -7,6 +7,7 @@ import {
 import {
   Section,
   StudentData,
+  RelevantGoogleDoc,
 } from '../../../../store/slices/education-management/types';
 import { ActivityBuilder } from '../../../../components/activity-builder/types';
 import {
@@ -53,10 +54,10 @@ export function StudentInfoPage(props: {
     return activity ? activity.title : `Activity ${activityId}`;
   };
 
-  const getStudentDocIdsForActivity = (
+  const getStudentDocDataForActivity = (
     assignmentId: string,
     activityId: string
-  ): string[] => {
+  ): RelevantGoogleDoc[] => {
     const assignmentProgress = selectedStudent.assignmentProgress.find(
       (progress) => progress.assignmentId === assignmentId
     );
@@ -67,7 +68,10 @@ export function StudentInfoPage(props: {
     );
     if (!activityCompletion) return [];
 
-    return activityCompletion.relevantGoogleDocs.map((doc) => doc.docId);
+    // sort without mutating in place
+    return [...activityCompletion.relevantGoogleDocs].sort((a) =>
+      a.primaryDocument ? -1 : 1
+    );
   };
 
   const handleDocumentClick = (assignmentId: string, docId: string) => {
@@ -76,7 +80,7 @@ export function StudentInfoPage(props: {
     }
   };
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, width: '80%' }}>
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={onBackToSection}
@@ -120,10 +124,10 @@ export function StudentInfoPage(props: {
             false
           );
         }}
-        getStudentDocIdsForActivity={getStudentDocIdsForActivity}
+        getStudentDocDataForActivity={getStudentDocDataForActivity}
         getActivityTitle={getActivityTitle}
         onDocumentClick={handleDocumentClick}
-        studentId={selectedStudent.userId}
+        student={selectedStudent}
       />
 
       {/* Optional Assignments Section */}
@@ -143,10 +147,10 @@ export function StudentInfoPage(props: {
               false
             );
           }}
-          getStudentDocIdsForActivity={getStudentDocIdsForActivity}
+          getStudentDocDataForActivity={getStudentDocDataForActivity}
           getActivityTitle={getActivityTitle}
           onDocumentClick={handleDocumentClick}
-          studentId={selectedStudent.userId}
+          student={selectedStudent}
         />
       )}
 
