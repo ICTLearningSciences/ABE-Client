@@ -18,6 +18,7 @@ import JoinSectionModal from './components/join-section-modal';
 import {
   getCourseManagementTreeData,
   getCourseManagementSectionedTreeData,
+  getAssignmentsInSection,
 } from './helpers';
 import { Course } from '../../store/slices/education-management/types';
 import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
@@ -28,6 +29,10 @@ import { useAppSelector } from '../../store/hooks';
 import { LoadingDialog } from '../../components/dialog';
 import { JoinUrlSection } from './components/join-url-section';
 import { useWithEducationalEvents } from '../../store/slices/education-management/use-with-educational-events';
+import { useWithDocumentTimeline } from '../../hooks/use-with-document-timeline';
+import { AssignmentDocumentTimelines } from './components/assignment-document-timelines';
+import { StudentInfoPage } from './components/section-student-grades/student-info-page';
+import { getStudentDocIds } from '../../helpers';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -43,17 +48,25 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     viewSection,
     viewAssignment,
     viewActivity,
+    viewAssignmentDocumentTimelines,
+    viewStudentInfo,
     viewDashboard,
+    updateSelectedDocId,
     isLoading,
+    viewState,
   } = educationManagement;
   const { state: loginState } = useWithLogin();
-  const viewState = useAppSelector(
-    (state) => state.educationManagement.viewState
-  );
   useWithEducationalEvents();
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
   const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
   const { builtActivities } = useWithDocGoalsActivities();
+  const {
+    fetchDocumentTimeline,
+    documentStates,
+    loadInProgress,
+    errorMessage,
+    getHydratedTimeline,
+  } = useWithDocumentTimeline();
 
   const isStudent =
     userRole === EducationalRole.STUDENT ||
@@ -62,6 +75,50 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const myInstructorData = useAppSelector(
     (state) => state.educationManagement.instructorData
   );
+
+  const targetStudent = educationManagement.students.find(
+    (s) => s.userId === viewState.selectedStudentId
+  );
+
+  const allStudentDocIds = targetStudent ? getStudentDocIds(targetStudent) : [];
+
+  const handleViewStudentTimelines = async (
+    studentId: string,
+    assignmentId: string,
+    docId?: string
+  ) => {
+    const targetStudent = educationManagement.students.find(
+      (s) => s.userId === studentId
+    );
+
+    if (!targetStudent) {
+      throw new Error('No student found.');
+    }
+    await viewAssignmentDocumentTimelines(
+      targetStudent.userId,
+      assignmentId,
+      docId
+    );
+    if (docId) {
+      try {
+        await fetchDocumentTimeline(targetStudent.userId, docId);
+      } catch (error) {
+        console.error('Failed to fetch document timeline:', error);
+      }
+    }
+  };
+
+  const handleDocumentChange = async (docId: string) => {
+    await updateSelectedDocId(docId);
+    const currentStudentId = viewState.selectedStudentId;
+    if (currentStudentId) {
+      try {
+        await fetchDocumentTimeline(currentStudentId, docId);
+      } catch (error) {
+        console.error('Failed to fetch document timeline:', error);
+      }
+    }
+  };
 
   const handleCreateCourse = async (courseData: Partial<Course>) => {
     if (
@@ -92,16 +149,12 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     viewCourse(courseId);
   };
 
-  const handleSectionSelect = (courseId: string, sectionId: string) => {
-    viewSection(courseId, sectionId);
+  const handleSectionSelect = (sectionId: string) => {
+    viewSection(sectionId);
   };
 
-  const handleAssignmentSelect = (
-    courseId: string,
-    sectionId: string,
-    assignmentId: string
-  ) => {
-    viewAssignment(courseId, sectionId, assignmentId);
+  const handleAssignmentSelect = (assignmentId: string) => {
+    viewAssignment(assignmentId);
   };
 
   const handleActivitySelect = (activityId: string) => {
@@ -121,12 +174,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       viewState.selectedAssignmentId,
       activityId
     );
-    viewActivity(
-      viewState.selectedCourseId,
-      viewState.selectedSectionId,
-      viewState.selectedAssignmentId,
-      activityId
-    );
+    viewActivity(activityId);
   };
 
   const handleCourseDeleted = () => {
@@ -137,8 +185,8 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     viewCourse(courseId);
   };
 
-  const handleAssignmentDeleted = (courseId: string, sectionId: string) => {
-    viewSection(courseId, sectionId);
+  const handleAssignmentDeleted = (sectionId: string) => {
+    viewSection(sectionId);
   };
 
   const handleJoinSection = async (sectionCode: string) => {
@@ -235,6 +283,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       }}
     >
+      {/* Sidebar */}
       <Paper
         elevation={0}
         sx={{
@@ -360,12 +409,15 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         </Box>
       </Paper>
 
+      {/* Main content */}
       <Box
         sx={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
+          height: '100%',
         }}
+        data-cy="course-management-main-content-outer"
       >
         <BreadcrumbNavigation
           educationManagement={educationManagement}
@@ -382,8 +434,9 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
             alignItems: 'flex-start',
             justifyContent: 'center',
             overflow: 'auto',
-            minHeight: 0,
+            height: '100%',
           }}
+          data-cy="course-management-main-content-inner"
         >
           {viewState.view === 'dashboard' && (
             <Box
@@ -427,9 +480,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
           {viewState.view === 'course' && viewState.selectedCourseId && (
             <CourseView
               courseId={viewState.selectedCourseId}
-              onSectionSelect={(sectionId) =>
-                handleSectionSelect(viewState.selectedCourseId!, sectionId)
-              }
+              onSectionSelect={handleSectionSelect}
               onCourseDeleted={handleCourseDeleted}
               isStudentView={isStudent}
             />
@@ -441,16 +492,11 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               <SectionView
                 courseId={viewState.selectedCourseId}
                 sectionId={viewState.selectedSectionId}
-                onAssignmentSelect={(assignmentId) =>
-                  handleAssignmentSelect(
-                    viewState.selectedCourseId!,
-                    viewState.selectedSectionId!,
-                    assignmentId
-                  )
-                }
+                onAssignmentSelect={handleAssignmentSelect}
                 onSectionDeleted={handleSectionDeleted}
                 onRemoveFromSection={handleRemoveFromSection}
                 isStudentView={isStudent}
+                onViewStudentInfo={viewStudentInfo}
               />
             )}
 
@@ -477,8 +523,94 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 assignmentId={viewState.selectedAssignmentId}
               />
             )}
+
+          {viewState.view === 'activity-document-timelines' &&
+            viewState.selectedStudentId &&
+            viewState.selectedAssignmentId &&
+            viewState.selectedDocId && (
+              <AssignmentDocumentTimelines
+                student={viewState.selectedStudent!}
+                assignment={viewState.selectedAssignment!}
+                studentDocIds={allStudentDocIds}
+                documentStates={documentStates}
+                loadInProgress={loadInProgress}
+                errorMessage={errorMessage}
+                selectedDocId={viewState.selectedDocId!}
+                getHydratedTimeline={getHydratedTimeline}
+                onBackToStudentInfo={() =>
+                  viewStudentInfo(viewState.selectedStudentId!)
+                }
+                onDocumentChange={handleDocumentChange}
+              />
+            )}
+
+          {viewState.view === 'student-info' &&
+            viewState.selectedStudentId &&
+            viewState.selectedSectionId &&
+            viewState.selectedCourseId && (
+              <StudentInfoPage
+                selectedStudent={
+                  educationManagement.students.find(
+                    (s) => s.userId === viewState.selectedStudentId
+                  )!
+                }
+                getStudentProgressCounts={(studentId: string) => {
+                  const sectionStudentsProgress =
+                    educationManagement.allSectionsStudentsProgress[
+                      viewState.selectedSectionId!
+                    ];
+                  const studentProgress = sectionStudentsProgress[studentId];
+                  if (!studentProgress)
+                    return { requiredCompleted: 0, optionalCompleted: 0 };
+
+                  const requiredCompleted = Object.values(
+                    studentProgress.requiredAssignmentsProgress
+                  ).filter(Boolean).length;
+                  const optionalCompleted = Object.values(
+                    studentProgress.optionalAssignmentsProgress
+                  ).filter(Boolean).length;
+
+                  return { requiredCompleted, optionalCompleted };
+                }}
+                assignmentsInSection={getAssignmentsInSection(
+                  educationManagement.assignments,
+                  educationManagement.sections.find(
+                    (s) => s._id === viewState.selectedSectionId
+                  )!
+                )}
+                sectionStudentsProgress={
+                  educationManagement.allSectionsStudentsProgress[
+                    viewState.selectedSectionId!
+                  ]
+                }
+                section={
+                  educationManagement.sections.find(
+                    (s) => s._id === viewState.selectedSectionId
+                  )!
+                }
+                builtActivities={builtActivities}
+                handleBanStudent={async (studentUserId: string) => {
+                  try {
+                    await educationManagement.banStudentFromSection(
+                      viewState.selectedSectionId!,
+                      studentUserId
+                    );
+                    handleSectionSelect(viewState.selectedSectionId!);
+                  } catch (error) {
+                    console.error('Failed to ban student:', error);
+                  }
+                }}
+                educationManagement={educationManagement}
+                onViewStudentTimelines={handleViewStudentTimelines}
+                onBackToSection={() =>
+                  handleSectionSelect(viewState.selectedSectionId!)
+                }
+              />
+            )}
         </Box>
       </Box>
+
+      {/* Modals */}
       <CourseModal
         isOpen={isCourseModalOpen}
         onClose={handleCloseCourseModal}

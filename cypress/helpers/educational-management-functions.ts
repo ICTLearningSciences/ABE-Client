@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { CypressGlobal, cySetup, cyMockLogin, cyInterceptGraphQL, mockGQL, cyMockGoogleDoc, cyMockCreateNewDoc } from './functions';
+import { CypressGlobal, cySetup, cyMockLogin, cyInterceptGraphQL, mockGQL, cyMockGoogleDoc, cyMockCreateNewDoc, cyMockGetDocTimeline } from './functions';
 import { DocService, UserRole } from './types';
 import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
 import { fetchConfigResponse } from '../fixtures/fetch-config';
@@ -46,6 +46,7 @@ import { fetchDocGoalsResponse } from '../fixtures/fetch-doc-goals';
 import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
 import { fetchPromptTemplates } from '../fixtures/fetch-prompt-templates';
 import { fetchInstructorsResponseEmpty } from '../fixtures/educational-management/fetch-instructors';
+import { realExampleDocumentTimeline } from '../fixtures/document-timeline/real-example';
 
 export interface EducationalMockOptions {
   gqlQueries?: MockGraphQLQuery[] | MockGraphQLQuery;
@@ -75,6 +76,9 @@ export function cyMockEducationalManagement(
   cyMockLogin(cy);
   cyMockGoogleDoc(cy);
   cyMockCreateNewDoc(cy);
+  cyMockGetDocTimeline(cy, {
+    response: realExampleDocumentTimeline,
+  });
 
   // Choose appropriate responses based on role and empty flags
   const coursesResponse = emptyCourses 

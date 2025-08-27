@@ -10,7 +10,7 @@ import {
   IActivity,
 } from './components/activity-builder/types';
 import { DisplayIcons } from './helpers/display-icon-helper';
-import { ChatMessageTypes, UserInputType } from './store/slices/chat';
+import { ChatMessageTypes, Sender, UserInputType } from './store/slices/chat';
 import { LoginService, UserRole } from './store/slices/login';
 
 export interface Connection<T> {
@@ -417,7 +417,7 @@ export interface DehydratedGQLTimelinePoint
 }
 
 export interface ChatItem {
-  sender: string;
+  sender: Sender;
   message: string;
 }
 
@@ -456,4 +456,22 @@ export interface DehydratedGQLDocumentTimeline
 export interface SortConfig {
   field: string;
   ascend: boolean;
+}
+
+export interface ReverseOutline {
+  'Thesis Statement': string;
+  'Supporting Claims': string[];
+  'Evidence Given for Each Claim': Record<string, string[]>[];
+  /**
+   * {
+   *  'Claim A': string;
+   *  'Claim A Evidence': string[];
+   * }
+   *
+   * {
+   *  'Claim B': string;
+   *  'Claim B Evidence': string[];
+   * }
+   * ...
+   */
 }

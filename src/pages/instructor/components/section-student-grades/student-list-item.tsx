@@ -7,7 +7,6 @@ import {
   ListItemText,
   Typography,
   Box,
-  Button,
 } from '@mui/material';
 import { Person as PersonIcon } from '@mui/icons-material';
 
@@ -23,6 +22,7 @@ export function StudentListItem(
     <ListItem
       key={student._id}
       onClick={() => handleStudentClick(student)}
+      data-cy={`student-${student.userId}`}
       sx={{
         cursor: 'pointer',
         borderRadius: 2,
@@ -39,9 +39,6 @@ export function StudentListItem(
       <ListItemIcon>
         <PersonIcon sx={{ color: '#1B6A9C' }} />
       </ListItemIcon>
-      <Button variant="contained" color="primary">
-        View Doc
-      </Button>
       <ListItemText
         primary={
           <Typography

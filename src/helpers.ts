@@ -19,6 +19,10 @@ import {
   ActivityBuilderVisibility,
 } from './components/activity-builder/types';
 import { UserRole } from './store/slices/login';
+import {
+  AssignmentProgress,
+  StudentData,
+} from './store/slices/education-management';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function extractErrorMessageFromError(err: any | unknown): string {
   if (err?.response?.data) {
@@ -275,4 +279,23 @@ export function removeQueryParamFromUrl(paramName: string): void {
     window.location.pathname +
     (urlParams.toString() ? `?${urlParams.toString()}` : '');
   window.history.replaceState({}, '', newUrl);
+}
+
+export function getStudentDocIds(student: StudentData): string[] {
+  return student.assignmentProgress.reduce(
+    (acc: string[], curr: AssignmentProgress) => {
+      if (
+        curr.activityCompletions.flatMap((c) => c.relevantGoogleDocs).length > 0
+      ) {
+        return [
+          ...acc,
+          ...curr.activityCompletions.flatMap((c) =>
+            c.relevantGoogleDocs.map((d) => d.docId)
+          ),
+        ];
+      }
+      return acc;
+    },
+    [] as string[]
+  );
 }

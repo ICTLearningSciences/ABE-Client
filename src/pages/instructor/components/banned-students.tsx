@@ -59,7 +59,7 @@ const BannedStudents: React.FC<BannedStudentsProps> = ({
           variant="h5"
           sx={{ fontWeight: 600, color: 'text.primary', mb: 3 }}
         >
-          Banned Students
+          Blocked Students
         </Typography>
         <Card
           variant="outlined"
@@ -75,10 +75,10 @@ const BannedStudents: React.FC<BannedStudentsProps> = ({
             🚫
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-            No banned students
+            No blocked students
           </Typography>
           <Typography variant="body2" color="text.disabled">
-            Students who are banned from this section will appear here
+            Students who are blocked from this section will appear here
           </Typography>
         </Card>
       </Box>
@@ -97,10 +97,10 @@ const BannedStudents: React.FC<BannedStudentsProps> = ({
           variant="h5"
           sx={{ fontWeight: 600, color: 'text.primary' }}
         >
-          Banned Students
+          Blocked Students
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {bannedStudents.length} banned student
+          {bannedStudents.length} blocked student
           {bannedStudents.length !== 1 ? 's' : ''}
         </Typography>
       </Stack>
