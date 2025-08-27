@@ -281,7 +281,7 @@ export default function SelectCreateDocs(props: {
                 </TableCell>
                 {isStudent && (
                   <TableCell style={{ width: '50px' }}>
-                    Primary Document?
+                    Main Document?
                   </TableCell>
                 )}
                 <TableCell style={{ width: '50px' }}></TableCell>

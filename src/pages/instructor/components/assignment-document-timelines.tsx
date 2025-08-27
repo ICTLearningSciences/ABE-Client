@@ -24,6 +24,7 @@ import {
   Assignment,
   StudentData,
 } from '../../../store/slices/education-management/types';
+import { getStudentAssignmentDocs } from '../../../helpers';
 
 export interface TextDiffResult {
   diffContent: React.ReactNode[];
@@ -124,6 +125,11 @@ export const AssignmentDocumentTimelines: React.FC<
   const currentDocState = documentStates[selectedDocId];
   const [selectedTimelineIndex, setSelectedTimelineIndex] = useState(0);
 
+  const studentAssignmentDocs = useMemo(
+    () => getStudentAssignmentDocs(student, assignment._id),
+    [student, assignment._id]
+  );
+
   const currentTimeline = useMemo(() => {
     if (currentDocState?.status === LoadingStatusType.SUCCESS) {
       return getHydratedTimeline(selectedDocId);
@@ -198,7 +204,7 @@ export const AssignmentDocumentTimelines: React.FC<
           onBackToStudentInfo={onBackToStudentInfo}
         />
         <DocumentSelector
-          documentIds={documentIds}
+          docData={studentAssignmentDocs}
           selectedDocId={selectedDocId}
           onDocumentChange={onDocumentChange}
         />
@@ -227,7 +233,7 @@ export const AssignmentDocumentTimelines: React.FC<
       />
 
       <DocumentSelector
-        documentIds={documentIds}
+        docData={studentAssignmentDocs}
         selectedDocId={selectedDocId}
         onDocumentChange={onDocumentChange}
       />

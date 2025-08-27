@@ -55,6 +55,9 @@ export const studentDataQueryData = `
       relevantGoogleDocs {
         docId
         primaryDocument
+        docData {
+          title
+        }
       }
     }
   }

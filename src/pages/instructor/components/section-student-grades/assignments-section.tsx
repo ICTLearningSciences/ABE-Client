@@ -14,7 +14,10 @@ import {
   AccordionSummary,
 } from '@mui/material';
 import { StudentActivityDocumentDisplay } from './student-activity-document-display';
-import { Assignment } from '../../../../store/slices/education-management/types';
+import {
+  Assignment,
+  RelevantGoogleDoc,
+} from '../../../../store/slices/education-management/types';
 
 interface AssignmentsSectionProps {
   title: string;
@@ -22,10 +25,10 @@ interface AssignmentsSectionProps {
   completedCount: number;
   totalCount: number;
   getIsCompleted: (assignment: Assignment) => boolean;
-  getStudentDocIdsForActivity: (
+  getStudentDocDataForActivity: (
     assignmentId: string,
     activityId: string
-  ) => string[];
+  ) => RelevantGoogleDoc[];
   getActivityTitle: (activityId: string) => string;
   onDocumentClick?: (assignmentId: string, docId: string) => void;
   studentId: string;
@@ -37,7 +40,7 @@ export function AssignmentsSection({
   completedCount,
   totalCount,
   getIsCompleted,
-  getStudentDocIdsForActivity,
+  getStudentDocDataForActivity,
   getActivityTitle,
   onDocumentClick,
   studentId,
@@ -125,7 +128,7 @@ export function AssignmentsSection({
               </AccordionSummary>
               <StudentActivityDocumentDisplay
                 assignment={assignment}
-                getStudentDocIdsForActivity={getStudentDocIdsForActivity}
+                getStudentDocDataForActivity={getStudentDocDataForActivity}
                 getActivityTitle={getActivityTitle}
                 onDocumentClick={onDocumentClick}
                 studentId={studentId}

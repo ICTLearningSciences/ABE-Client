@@ -31,6 +31,9 @@ export interface Section {
 export interface RelevantGoogleDoc {
   docId: string;
   primaryDocument: boolean;
+  docData: {
+    title: string;
+  };
 }
 
 export interface ActivityCompletion {

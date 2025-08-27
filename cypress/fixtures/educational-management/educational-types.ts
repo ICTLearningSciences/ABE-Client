@@ -41,6 +41,9 @@ export interface Course {
   export interface RelevantGoogleDoc {
     docId: string;
     primaryDocument: boolean;
+    docData: {
+      title: string;
+    }
   }
   
   export interface ActivityCompletion {

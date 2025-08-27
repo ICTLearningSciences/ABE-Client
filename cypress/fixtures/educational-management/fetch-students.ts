@@ -19,11 +19,17 @@ export const testStudent: StudentData = {
         { activityId: 'my-editable-activity', complete: false, relevantGoogleDocs: [
           {
             primaryDocument: false,
-            docId:"1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"
+            docId:"1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
+            docData: {
+              title: "Test 1"
+            }
           },
           {
-            primaryDocument: false,
-            docId:"1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fB"
+            primaryDocument: true,
+            docId:"1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fB",
+            docData: {
+              title: "Test 2"
+            }
           }
         ] },
         { activityId: 'my-read-only-activity', complete: false, relevantGoogleDocs: [] }

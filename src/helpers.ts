@@ -311,7 +311,26 @@ export function getStudentActivityDocs(
   if (!targetAssignmentProgress) {
     return [];
   }
-  return targetAssignmentProgress.activityCompletions.flatMap(
-    (ac) => ac.relevantGoogleDocs
+  return [
+    ...targetAssignmentProgress.activityCompletions.flatMap(
+      (ac) => ac.relevantGoogleDocs
+    ),
+  ].sort((a) => (a.primaryDocument ? -1 : 1));
+}
+
+export function getStudentAssignmentDocs(
+  student: StudentData,
+  assignmentId: string
+): RelevantGoogleDoc[] {
+  const targetAssignmentProgress = student.assignmentProgress.find(
+    (a) => a.assignmentId === assignmentId
   );
+  if (!targetAssignmentProgress) {
+    return [];
+  }
+  return [
+    ...targetAssignmentProgress.activityCompletions.flatMap(
+      (ac) => ac.relevantGoogleDocs
+    ),
+  ].sort((a) => (a.primaryDocument ? -1 : 1));
 }

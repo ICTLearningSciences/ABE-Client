@@ -1,29 +1,45 @@
 import React from 'react';
 import { AccordionDetails, Box, Chip, Typography } from '@mui/material';
-import { Assignment } from '../../../../store/slices/education-management/types';
+import {
+  Assignment,
+  RelevantGoogleDoc,
+} from '../../../../store/slices/education-management/types';
+import { ColumnDiv } from '../../../../styled-components';
 
 export function StudentActivityDocumentDisplay(props: {
   assignment: Assignment;
-  getStudentDocIdsForActivity: (
+  getStudentDocDataForActivity: (
     assignmentId: string,
     activityId: string
-  ) => string[];
+  ) => RelevantGoogleDoc[];
   getActivityTitle: (activityId: string) => string;
   onDocumentClick?: (assignmentId: string, docId: string) => void;
   studentId: string;
 }) {
   const {
     assignment,
-    getStudentDocIdsForActivity,
+    getStudentDocDataForActivity,
     getActivityTitle,
     onDocumentClick,
   } = props;
+
+  function getDocLabel(doc: RelevantGoogleDoc): React.ReactNode {
+    return (
+      <span>
+        <span style={{ fontWeight: doc.primaryDocument ? 600 : 400 }}>
+          {doc.primaryDocument ? 'Main Document: ' : ''}
+        </span>
+        <span> </span>
+        {doc.docData.title || "Untitled"}
+      </span>
+    );
+  }
 
   return (
     <AccordionDetails>
       <Box sx={{ pl: 2 }}>
         {assignment.activityIds.map((activityId) => {
-          const docIds = getStudentDocIdsForActivity(
+          const docData = getStudentDocDataForActivity(
             assignment._id,
             activityId
           );
@@ -35,26 +51,30 @@ export function StudentActivityDocumentDisplay(props: {
               >
                 {getActivityTitle(activityId)}
               </Typography>
-              {docIds.length > 0 ? (
+              {docData.length > 0 ? (
                 <Box sx={{ pl: 1 }}>
                   <Typography
                     variant="caption"
                     color="text.secondary"
                     sx={{ display: 'block', mb: 0.5 }}
                   >
-                    Document IDs:
+                    Documents
                   </Typography>
-                  {docIds.map((docId) => (
-                    <Chip
-                      key={docId}
-                      data-cy={`${docId}-doc-select`}
-                      label={docId}
-                      size="small"
-                      variant="outlined"
-                      sx={{ mr: 0.5, mb: 0.5 }}
-                      onClick={() => onDocumentClick?.(assignment._id, docId)}
-                    />
-                  ))}
+                  <ColumnDiv>
+                    {docData.map((doc) => (
+                      <Chip
+                        key={doc.docId}
+                        data-cy={`${doc.docId}-doc-select`}
+                        label={getDocLabel(doc)}
+                        size="small"
+                        variant="outlined"
+                        sx={{ mr: 0.5, mb: 0.5 }}
+                        onClick={() =>
+                          onDocumentClick?.(assignment._id, doc.docId)
+                        }
+                      />
+                    ))}
+                  </ColumnDiv>
                 </Box>
               ) : (
                 <Typography
