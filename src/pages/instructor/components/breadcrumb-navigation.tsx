@@ -22,12 +22,8 @@ interface BreadcrumbNavigationProps {
   educationManagement: UseWithEducationalManagement;
   viewState: CourseManagementState;
   handleCourseSelect: (courseId: string) => void;
-  handleSectionSelect: (courseId: string, sectionId: string) => void;
-  handleAssignmentSelect: (
-    courseId: string,
-    sectionId: string,
-    assignmentId: string
-  ) => void;
+  handleSectionSelect: (sectionId: string) => void;
+  handleAssignmentSelect: (assignmentId: string) => void;
 }
 
 const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
@@ -64,8 +60,7 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
           id: section._id,
           title: section.title,
           icon: '📑',
-          onClick: () =>
-            handleSectionSelect(viewState.selectedCourseId!, section._id),
+          onClick: () => handleSectionSelect(section._id),
         });
       }
     }
@@ -83,12 +78,7 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
           id: assignment._id,
           title: assignment.title,
           icon: '📝',
-          onClick: () =>
-            handleAssignmentSelect(
-              viewState.selectedCourseId!,
-              viewState.selectedSectionId!,
-              assignment._id
-            ),
+          onClick: () => handleAssignmentSelect(assignment._id),
         });
       }
     }

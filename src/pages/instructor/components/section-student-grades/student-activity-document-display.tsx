@@ -9,7 +9,7 @@ export function StudentActivityDocumentDisplay(props: {
     activityId: string
   ) => string[];
   getActivityTitle: (activityId: string) => string;
-  onDocumentClick?: (docId: string) => void;
+  onDocumentClick?: (assignmentId: string, docId: string) => void;
   studentId: string;
 }) {
   const {
@@ -52,7 +52,7 @@ export function StudentActivityDocumentDisplay(props: {
                       size="small"
                       variant="outlined"
                       sx={{ mr: 0.5, mb: 0.5 }}
-                      onClick={() => onDocumentClick?.(docId)}
+                      onClick={() => onDocumentClick?.(assignment._id, docId)}
                     />
                   ))}
                 </Box>

@@ -229,7 +229,6 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
     dispatch({ type: TimelineActionType.SELECT_DOC, docId });
 
     const docState = state.documentStates[docId];
-    console.log('docState', docState);
 
     // If timeline is already loaded successfully, just select it - no need to fetch
     if (docState?.timeline && docState.status === LoadingStatusType.SUCCESS) {
@@ -246,11 +245,6 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
       docState?.status === LoadingStatusType.LOADING ||
       docState?.status === LoadingStatusType.SAVING
     ) {
-      console.log(
-        'Timeline already loading/saving for docId',
-        docId,
-        '- waiting'
-      );
       return;
     }
 
@@ -259,7 +253,6 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
       console.log('No default AI model configured - cannot fetch timeline');
       return;
     }
-    console.log('fetching doc timeline for docId', docId);
     try {
       dispatch({ type: TimelineActionType.LOADING_STARTED, docId });
       const docTimelineJobId = await asyncRequestDocTimeline(

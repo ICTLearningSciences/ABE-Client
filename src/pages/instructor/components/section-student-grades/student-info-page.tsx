@@ -28,7 +28,11 @@ export function StudentInfoPage(props: {
   builtActivities: ActivityBuilder[];
   handleBanStudent: (studentUserId: string) => void;
   educationManagement: UseWithEducationalManagement;
-  onViewStudentTimelines?: (studentId: string, docId?: string) => void;
+  onViewStudentTimelines?: (
+    studentId: string,
+    assignmentId: string,
+    docId?: string
+  ) => void;
   onBackToSection: () => void;
 }) {
   const {
@@ -66,9 +70,9 @@ export function StudentInfoPage(props: {
     return activityCompletion.relevantGoogleDocs.map((doc) => doc.docId);
   };
 
-  const handleDocumentClick = (docId: string) => {
+  const handleDocumentClick = (assignmentId: string, docId: string) => {
     if (onViewStudentTimelines) {
-      onViewStudentTimelines(selectedStudent.userId, docId);
+      onViewStudentTimelines(selectedStudent.userId, assignmentId, docId);
     }
   };
   return (

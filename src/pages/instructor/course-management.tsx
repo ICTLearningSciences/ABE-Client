@@ -51,6 +51,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     viewAssignmentDocumentTimelines,
     viewStudentInfo,
     viewDashboard,
+    updateSelectedDocId,
     isLoading,
     viewState,
   } = educationManagement;
@@ -61,7 +62,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const { builtActivities } = useWithDocGoalsActivities();
   const {
     fetchDocumentTimeline,
-    selectDocument,
     documentStates,
     loadInProgress,
     errorMessage,
@@ -84,6 +84,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
 
   const handleViewStudentTimelines = async (
     studentId: string,
+    assignmentId: string,
     docId?: string
   ) => {
     const targetStudent = educationManagement.students.find(
@@ -93,15 +94,12 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     if (!targetStudent) {
       throw new Error('No student found.');
     }
-    await viewAssignmentDocumentTimelines(targetStudent.userId, docId);
-    console.log(
-      'viewing student timelines for student',
+    await viewAssignmentDocumentTimelines(
       targetStudent.userId,
-      'with docId',
+      assignmentId,
       docId
     );
     if (docId) {
-      console.log('fetching document timeline for docId', docId);
       try {
         await fetchDocumentTimeline(targetStudent.userId, docId);
       } catch (error) {
@@ -111,11 +109,10 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   };
 
   const handleDocumentChange = async (docId: string) => {
-    selectDocument(docId);
+    await updateSelectedDocId(docId);
     const currentStudentId = viewState.selectedStudentId;
     if (currentStudentId) {
       try {
-        console.log('fetching document timeline for docId', docId);
         await fetchDocumentTimeline(currentStudentId, docId);
       } catch (error) {
         console.error('Failed to fetch document timeline:', error);
@@ -499,7 +496,6 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 onSectionDeleted={handleSectionDeleted}
                 onRemoveFromSection={handleRemoveFromSection}
                 isStudentView={isStudent}
-                onViewStudentTimelines={handleViewStudentTimelines}
                 onViewStudentInfo={viewStudentInfo}
               />
             )}

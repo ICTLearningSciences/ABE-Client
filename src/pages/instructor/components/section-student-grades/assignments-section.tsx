@@ -27,7 +27,7 @@ interface AssignmentsSectionProps {
     activityId: string
   ) => string[];
   getActivityTitle: (activityId: string) => string;
-  onDocumentClick?: (docId: string) => void;
+  onDocumentClick?: (assignmentId: string, docId: string) => void;
   studentId: string;
 }
 

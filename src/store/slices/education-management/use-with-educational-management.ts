@@ -183,6 +183,7 @@ export interface UseWithEducationalManagement {
   viewActivity: (activityId: string) => Promise<void>;
   viewAssignmentDocumentTimelines: (
     studentId: string,
+    assignmentId: string,
     docId?: string
   ) => Promise<void>;
   viewStudentInfo: (studentId: string) => Promise<void>;
@@ -196,6 +197,7 @@ export interface UseWithEducationalManagement {
     sectionId: string,
     studentId: string
   ) => Promise<Section>;
+  updateSelectedDocId: (docId: string) => Promise<void>;
 }
 
 export interface SectionStudentsProgress {
@@ -713,16 +715,40 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
 
   async function viewAssignmentDocumentTimelines(
     studentId: string,
+    assignmentId: string,
     docId?: string
   ) {
+    if (!viewState.selectedCourseId || !viewState.selectedSectionId) {
+      throw new Error('No course or section selected');
+    }
+    dispatch(
+      setViewState({
+        view: 'activity-document-timelines',
+        selectedCourseId: viewState.selectedCourseId,
+        selectedSectionId: viewState.selectedSectionId,
+        selectedAssignmentId: assignmentId,
+        selectedStudentId: studentId,
+        selectedDocId: docId,
+      })
+    );
+  }
+
+  async function updateSelectedDocId(docId: string) {
+    if (
+      !viewState.selectedCourseId ||
+      !viewState.selectedSectionId ||
+      !viewState.selectedAssignmentId ||
+      !viewState.selectedStudentId
+    ) {
+      throw new Error('No course, section, assignment, or student selected');
+    }
     dispatch(
       setViewState({
         view: 'activity-document-timelines',
         selectedCourseId: viewState.selectedCourseId,
         selectedSectionId: viewState.selectedSectionId,
         selectedAssignmentId: viewState.selectedAssignmentId,
-        selectedActivityId: viewState.selectedActivityId,
-        selectedStudentId: studentId,
+        selectedStudentId: viewState.selectedStudentId,
         selectedDocId: docId,
       })
     );
@@ -838,6 +864,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     viewAssignment,
     viewActivity,
     viewAssignmentDocumentTimelines,
+    updateSelectedDocId,
     viewStudentInfo,
     viewDashboard,
     haveICompletedActivity,

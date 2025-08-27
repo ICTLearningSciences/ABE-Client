@@ -19,7 +19,6 @@ interface SectionStudentsGradesProps {
   sectionStudentsProgress: SectionStudentsProgress;
   section: Section;
   assignments: Assignment[];
-  onViewStudentTimelines?: (studentId: string) => void;
   onViewStudentInfo?: (studentId: string) => void;
 }
 
