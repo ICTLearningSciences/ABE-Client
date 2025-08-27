@@ -684,46 +684,74 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   }
 
   async function viewSection(sectionId: string) {
-    if (!viewState.selectedCourseId) {
-      throw new Error('No course selected in viewSection');
+    const course =
+      viewState.selectedCourseId ||
+      courses.find((c) => c.sectionIds.includes(sectionId))?._id;
+    if (!course) {
+      throw new Error('No course found for section');
     }
     dispatch(
       setViewState({
         view: 'section',
-        selectedCourseId: viewState.selectedCourseId,
+        selectedCourseId: course,
         selectedSectionId: sectionId,
       })
     );
   }
 
   async function viewAssignment(assignmentId: string) {
-    if (!viewState.selectedCourseId || !viewState.selectedSectionId) {
-      throw new Error('No course or section selected');
+    const sectionId =
+      viewState.selectedSectionId ||
+      sections.find((s) =>
+        s.assignments.some((a) => a.assignmentId === assignmentId)
+      )?._id;
+    if (!sectionId) {
+      throw new Error('No section found for assignment');
     }
+    const courseId =
+      viewState.selectedCourseId ||
+      courses.find((c) => c.sectionIds.includes(sectionId))?._id;
+    if (!courseId) {
+      throw new Error('No course found for section');
+    }
+
     dispatch(
       setViewState({
         view: 'assignment',
-        selectedCourseId: viewState.selectedCourseId,
-        selectedSectionId: viewState.selectedSectionId,
+        selectedCourseId: courseId,
+        selectedSectionId: sectionId,
         selectedAssignmentId: assignmentId,
       })
     );
   }
 
   async function viewActivity(activityId: string) {
-    if (
-      !viewState.selectedCourseId ||
-      !viewState.selectedSectionId ||
-      !viewState.selectedAssignmentId
-    ) {
-      throw new Error('No course, section, or assignment selected');
+    const assignmentId =
+      viewState.selectedAssignmentId ||
+      assignments.find((a) => a.activityIds.includes(activityId))?._id;
+    if (!assignmentId) {
+      throw new Error('No assignment found for activity');
+    }
+    const sectionId =
+      viewState.selectedSectionId ||
+      sections.find((s) =>
+        s.assignments.some((a) => a.assignmentId === assignmentId)
+      )?._id;
+    if (!sectionId) {
+      throw new Error('No section found for assignment');
+    }
+    const courseId =
+      viewState.selectedCourseId ||
+      courses.find((c) => c.sectionIds.includes(sectionId))?._id;
+    if (!courseId) {
+      throw new Error('No course found for section');
     }
     dispatch(
       setViewState({
         view: 'activity',
-        selectedCourseId: viewState.selectedCourseId,
-        selectedSectionId: viewState.selectedSectionId,
-        selectedAssignmentId: viewState.selectedAssignmentId,
+        selectedCourseId: courseId,
+        selectedSectionId: sectionId,
+        selectedAssignmentId: assignmentId,
         selectedActivityId: activityId,
       })
     );
@@ -734,14 +762,25 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     assignmentId: string,
     docId?: string
   ) {
-    if (!viewState.selectedCourseId || !viewState.selectedSectionId) {
-      throw new Error('No course or section selected');
+    const sectionId =
+      viewState.selectedSectionId ||
+      sections.find((s) =>
+        s.assignments.some((a) => a.assignmentId === assignmentId)
+      )?._id;
+    if (!sectionId) {
+      throw new Error('No section found for assignment');
+    }
+    const courseId =
+      viewState.selectedCourseId ||
+      courses.find((c) => c.sectionIds.includes(sectionId))?._id;
+    if (!courseId) {
+      throw new Error('No course found for section');
     }
     dispatch(
       setViewState({
         view: 'activity-document-timelines',
-        selectedCourseId: viewState.selectedCourseId,
-        selectedSectionId: viewState.selectedSectionId,
+        selectedCourseId: courseId,
+        selectedSectionId: sectionId,
         selectedAssignmentId: assignmentId,
         selectedStudentId: studentId,
         selectedDocId: docId,

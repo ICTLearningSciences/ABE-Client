@@ -43,12 +43,8 @@ export const getAssignmentsForSection = (
 export function getCourseManagementTreeData(
   educationManagement: UseWithEducationalManagement,
   handleCourseSelect: (courseId: string) => void,
-  handleSectionSelect: (courseId: string, sectionId: string) => void,
-  handleAssignmentSelect: (
-    courseId: string,
-    sectionId: string,
-    assignmentId: string
-  ) => void
+  handleSectionSelect: (sectionId: string) => void,
+  handleAssignmentSelect: (assignmentId: string) => void
 ): TreeItem[] {
   return educationManagement.courses.map(
     (course): TreeItem => ({
@@ -61,7 +57,7 @@ export function getCourseManagementTreeData(
           id: section._id,
           icon: '📑',
           title: section.title,
-          onClick: () => handleSectionSelect(course._id, section._id),
+          onClick: () => handleSectionSelect(section._id),
           subItems: getAssignmentsForSection(
             educationManagement,
             section._id
@@ -70,8 +66,7 @@ export function getCourseManagementTreeData(
               id: assignment._id,
               icon: '📝',
               title: assignment.title,
-              onClick: () =>
-                handleAssignmentSelect(course._id, section._id, assignment._id),
+              onClick: () => handleAssignmentSelect(assignment._id),
             })
           ),
         })
@@ -83,12 +78,8 @@ export function getCourseManagementTreeData(
 export function getCourseManagementSectionedTreeData(
   educationManagement: UseWithEducationalManagement,
   handleCourseSelect: (courseId: string) => void,
-  handleSectionSelect: (courseId: string, sectionId: string) => void,
-  handleAssignmentSelect: (
-    courseId: string,
-    sectionId: string,
-    assignmentId: string
-  ) => void,
+  handleSectionSelect: (sectionId: string) => void,
+  handleAssignmentSelect: (assignmentId: string) => void,
   currentInstructor?: Instructor
 ): TreeSection[] {
   if (!currentInstructor) {
@@ -105,7 +96,7 @@ export function getCourseManagementSectionedTreeData(
         id: section._id,
         icon: '📑',
         title: section.title,
-        onClick: () => handleSectionSelect(course._id, section._id),
+        onClick: () => handleSectionSelect(section._id),
         subItems: getAssignmentsForSection(
           educationManagement,
           section._id
@@ -114,8 +105,7 @@ export function getCourseManagementSectionedTreeData(
             id: assignment._id,
             icon: '📝',
             title: assignment.title,
-            onClick: () =>
-              handleAssignmentSelect(course._id, section._id, assignment._id),
+            onClick: () => handleAssignmentSelect(assignment._id),
           })
         ),
       })

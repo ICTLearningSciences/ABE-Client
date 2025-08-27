@@ -286,6 +286,9 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     educationManagement.sections,
     educationManagement.assignments,
     educationManagement.instructors,
+    handleCourseSelect,
+    handleSectionSelect,
+    handleAssignmentSelect,
     myInstructorData,
     isStudent,
   ]);
