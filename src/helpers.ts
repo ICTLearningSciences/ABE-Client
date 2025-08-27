@@ -265,6 +265,21 @@ export function userCanEditActivity(
   );
 }
 
+export function addQueryParamToUrl(
+  paramName: string,
+  paramValue: string
+): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  const urlParams = new URLSearchParams(window.location.search);
+  urlParams.set(paramName, paramValue);
+  const newUrl =
+    window.location.pathname +
+    (urlParams.toString() ? `?${urlParams.toString()}` : '');
+  window.history.replaceState({}, '', newUrl);
+}
+
 export function removeQueryParamFromUrl(paramName: string): void {
   if (typeof window === 'undefined') {
     return;

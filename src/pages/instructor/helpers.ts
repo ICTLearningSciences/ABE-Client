@@ -165,18 +165,30 @@ export interface CompletedAssignmentDict {
 }
 
 export function isAssignmentComplete(
+  assignment: Assignment,
   assignmentProgress: AssignmentProgress
 ): boolean {
-  return assignmentProgress.activityCompletions.every((ac) => ac.complete);
+  const relevantActivityCompletions =
+    assignmentProgress.activityCompletions.filter((ac) =>
+      assignment.activityIds.includes(ac.activityId)
+    );
+  return relevantActivityCompletions.every((ac) => ac.complete);
 }
 
 export function getCompletedAssignmentDictForStudent(
+  assignments: Assignment[],
   studentData?: StudentData
 ): CompletedAssignmentDict {
   if (!studentData) return {};
   return studentData.assignmentProgress.reduce(
     (acc: CompletedAssignmentDict, progress: AssignmentProgress) => {
-      acc[progress.assignmentId] = isAssignmentComplete(progress);
+      const assignment = assignments.find(
+        (a) => a._id === progress.assignmentId
+      );
+      if (!assignment) {
+        return acc;
+      }
+      acc[progress.assignmentId] = isAssignmentComplete(assignment, progress);
       return acc;
     },
     {}
@@ -242,7 +254,7 @@ export function getStudentSectionProgress(
         (ap) => ap.assignmentId === assignment._id
       );
       acc[assignment._id] = assignmentProgress
-        ? isAssignmentComplete(assignmentProgress)
+        ? isAssignmentComplete(assignment, assignmentProgress)
         : false;
       return acc;
     },
@@ -254,7 +266,7 @@ export function getStudentSectionProgress(
         (ap) => ap.assignmentId === assignment._id
       );
       acc[assignment._id] = assignmentProgress
-        ? isAssignmentComplete(assignmentProgress)
+        ? isAssignmentComplete(assignment, assignmentProgress)
         : false;
       return acc;
     },

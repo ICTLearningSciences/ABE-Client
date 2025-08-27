@@ -149,7 +149,7 @@ const BannedStudents: React.FC<BannedStudentsProps> = ({
                 fontWeight: 600,
               }}
             >
-              UNBAN
+              Unblock
             </Button>
           </ListItem>
         ))}

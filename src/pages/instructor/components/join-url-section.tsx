@@ -14,6 +14,7 @@ import {
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { removeQueryParamFromUrl } from '../../../helpers';
 
 export const queryParamSectionCode = 'sectionCode';
 
@@ -47,6 +48,7 @@ export function JoinUrlSection() {
     if (!targetSectionCode) {
       return;
     }
+    removeQueryParamFromUrl(queryParamSectionCode);
     const targetSection = sections.find(
       (section) => section.sectionCode === targetSectionCode
     );
@@ -151,7 +153,7 @@ export function JoinUrlSection() {
             </Typography>
             <Box component="ul" sx={{ pl: 2, m: 0 }}>
               <Typography component="li" variant="body2" color="text.secondary">
-                Course materials and assignments
+                Course assignments
               </Typography>
               <Typography component="li" variant="body2" color="text.secondary">
                 Interactive learning activities

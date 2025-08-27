@@ -35,9 +35,19 @@ const appReducer = combineReducers({
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rootReducer = (state: any, action: any) => {
-  // reset entire redux store on logout
   if (action.type === 'login/logout/fulfilled') {
-    return appReducer(undefined, action);
+    // preserve just config on logout
+    return appReducer(
+      {
+        ...state,
+        login: loginReducer(undefined, action),
+        chat: chatReducer(undefined, action),
+        docGoalsActivities: docGoalsActivitiesReducer(undefined, action),
+        educationManagement: educationManagementReducer(undefined, action),
+        state: stateReducer(undefined, action),
+      },
+      action
+    );
   }
   return appReducer(state, action);
 };

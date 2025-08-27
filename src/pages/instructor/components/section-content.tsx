@@ -91,16 +91,21 @@ const SectionContent: React.FC<SectionContentProps> = ({
   }, [educationManagement.myData]);
 
   const getIsCompleted = useMemo(() => {
-    return (assignmentId: string) => {
+    return (assignment: Assignment) => {
       const myData = educationManagement.myData;
       if (!myData || !isStudentData(myData)) return false;
-      return (
-        myData.assignmentProgress
-          .find((ap) => ap.assignmentId === assignmentId)
-          ?.activityCompletions.every((ac) => ac.complete) || false
+      const assignmentActivites = assignment.activityIds;
+      const relevantAssignmentProgress = myData.assignmentProgress.find(
+        (ap) => ap.assignmentId === assignment._id
       );
+      if (!relevantAssignmentProgress) return false;
+      const relevantActivityCompletions =
+        relevantAssignmentProgress.activityCompletions.filter((ac) =>
+          assignmentActivites.includes(ac.activityId)
+        );
+      return relevantActivityCompletions.every((ac) => ac.complete);
     };
-  }, [educationManagement.myData]);
+  }, [educationManagement.myData, assignmentsInSection]);
 
   const handleOpenAssignmentModal = () => {
     setShowAssignmentModal(true);
@@ -189,7 +194,7 @@ const SectionContent: React.FC<SectionContentProps> = ({
                 assignment={assignment}
                 onClick={onAssignmentSelect}
                 assignmentGrade={getAssignmentGrade(assignment._id)}
-                isCompleted={getIsCompleted(assignment._id)}
+                isCompleted={getIsCompleted(assignment)}
               />
             </Grid>
           ))}

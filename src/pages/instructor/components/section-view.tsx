@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -24,6 +24,7 @@ import DeleteConfirmationModal from './delete-confirmation-modal';
 import SectionContent from './section-content';
 import SectionStudentsGrades from './section-student-grades/section-students-grades';
 import BannedStudents from './banned-students';
+import { addQueryParamToUrl, removeQueryParamFromUrl } from '../../../helpers';
 
 interface SectionViewProps {
   sectionId: string;
@@ -34,6 +35,8 @@ interface SectionViewProps {
   isStudentView?: boolean;
   onViewStudentInfo?: (studentId: string) => void;
 }
+
+export const queryParamSectionTab = 'sectionTab';
 
 const SectionView: React.FC<SectionViewProps> = ({
   sectionId,
@@ -46,10 +49,21 @@ const SectionView: React.FC<SectionViewProps> = ({
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedTab, setSelectedTab] = useState(0);
+  const urlParams = new URLSearchParams(window.location.search);
+  const sectionTab = urlParams.get(queryParamSectionTab);
+  const [selectedTab, setSelectedTab] = useState(
+    sectionTab ? parseInt(sectionTab) : 0
+  );
   const section = educationManagement.getSectionForSectionId(sectionId);
   const currentSectionStudentsProgress =
     educationManagement.allSectionsStudentsProgress[sectionId] || {};
+
+  useEffect(() => {
+    if (sectionTab) {
+      removeQueryParamFromUrl(queryParamSectionTab);
+    }
+  }, [sectionTab]);
+
   const handleEditSection = async (sectionData: Partial<Section>) => {
     try {
       await educationManagement.updateSection(courseId, sectionData);
@@ -58,6 +72,11 @@ const SectionView: React.FC<SectionViewProps> = ({
       console.error('Failed to update section:', error);
     }
   };
+
+  function viewStudentInfo(studentId: string) {
+    addQueryParamToUrl(queryParamSectionTab, selectedTab.toString());
+    onViewStudentInfo?.(studentId);
+  }
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -244,7 +263,7 @@ const SectionView: React.FC<SectionViewProps> = ({
               sectionStudentsProgress={currentSectionStudentsProgress}
               section={section}
               assignments={educationManagement.assignments}
-              onViewStudentInfo={onViewStudentInfo}
+              onViewStudentInfo={viewStudentInfo}
             />
           )}
 

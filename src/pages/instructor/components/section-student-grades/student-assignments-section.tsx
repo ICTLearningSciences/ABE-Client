@@ -39,7 +39,7 @@ interface AssignmentsSectionProps {
   student: StudentData;
 }
 
-export function AssignmentsSection({
+export function StudentAssignmentsSection({
   title,
   assignments,
   completedCount,
@@ -78,6 +78,7 @@ export function AssignmentsSection({
         <Box
           sx={{
             display: 'flex',
+            flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
             width: '10%',
@@ -95,7 +96,7 @@ export function AssignmentsSection({
             onClick={() => onGoToAssignmentTimeline(assignment._id)}
             data-cy="review-documents-button"
           >
-            Grade Assignment
+            Grade
           </Button>
         </Box>
       );

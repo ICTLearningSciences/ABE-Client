@@ -13,7 +13,7 @@ import {
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { Box, Typography, Stack, Divider, Button } from '@mui/material';
-import { AssignmentsSection } from './assignments-section';
+import { StudentAssignmentsSection } from './student-assignments-section';
 import { getStudentAssignmentDocs } from '../../../../helpers';
 
 export function StudentInfoPage(props: {
@@ -65,7 +65,7 @@ export function StudentInfoPage(props: {
         onClick={onBackToSection}
         sx={{ mb: 2, color: 'text.secondary' }}
       >
-        Back to Section
+        Back to Students
       </Button>
       <Stack
         direction="row"
@@ -89,7 +89,7 @@ export function StudentInfoPage(props: {
       <Divider sx={{ mb: 3 }} />
 
       {/* Required Assignments Section */}
-      <AssignmentsSection
+      <StudentAssignmentsSection
         title="Required Assignments"
         assignments={assignmentsInSection.requiredAssignments}
         completedCount={
@@ -109,7 +109,7 @@ export function StudentInfoPage(props: {
 
       {/* Optional Assignments Section */}
       {assignmentsInSection.optionalAssignments.length > 0 && (
-        <AssignmentsSection
+        <StudentAssignmentsSection
           title="Optional Assignments"
           assignments={assignmentsInSection.optionalAssignments}
           completedCount={

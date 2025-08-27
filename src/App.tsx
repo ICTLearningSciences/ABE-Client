@@ -36,12 +36,19 @@ function MainApp() {
   const useLogin = useWithLogin();
   const { stateCounter } = useWithRouteChangeRerender();
 
+  const homeNavPath =
+    useLogin.state.user?.educationalRole === EducationalRole.INSTRUCTOR
+      ? courseManagementUrl
+      : useLogin.state.user?.educationalRole === EducationalRole.STUDENT
+      ? studentCoursesUrl
+      : '/docs';
+
   const router = createBrowserRouter([
     {
       path: '/',
       element: (
         <>
-          <Header useLogin={useLogin} />
+          <Header useLogin={useLogin} homeNavPath={homeNavPath} />
           <div
             style={{
               width: '100%',
@@ -60,7 +67,7 @@ function MainApp() {
       path: '/docs',
       element: (
         <>
-          <Header useLogin={useLogin} />
+          <Header useLogin={useLogin} homeNavPath={homeNavPath} />
           <div
             style={{
               width: '100%',
@@ -79,7 +86,7 @@ function MainApp() {
       path: '/docs/:docId',
       element: (
         <>
-          <Header useLogin={useLogin} />
+          <Header useLogin={useLogin} homeNavPath={homeNavPath} />
           <div
             style={{
               width: '100%',
@@ -102,7 +109,7 @@ function MainApp() {
       path: courseManagementUrl,
       element: (
         <>
-          <Header useLogin={useLogin} />
+          <Header useLogin={useLogin} homeNavPath={homeNavPath} />
           <div
             style={{
               width: '100%',
@@ -121,7 +128,7 @@ function MainApp() {
       path: studentCoursesUrl,
       element: (
         <>
-          <Header useLogin={useLogin} />
+          <Header useLogin={useLogin} homeNavPath={homeNavPath} />
           <div
             style={{
               width: '100%',
