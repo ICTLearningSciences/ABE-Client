@@ -175,6 +175,7 @@ export default function SelectCreateDocs(props: {
           width: '100%',
         }}
       >
+        {/* Header */}
         <RowDiv
           style={{
             position: 'relative',
@@ -186,8 +187,8 @@ export default function SelectCreateDocs(props: {
           {!viewingArchived && (
             <RowDiv
               style={{
-                position: 'absolute',
-                left: 0,
+                width: '20%',
+                gap: '10px',
               }}
             >
               <Button
@@ -204,12 +205,11 @@ export default function SelectCreateDocs(props: {
                     }
                   );
                 }}
-                size="large"
+                size="small"
                 style={{
                   fontWeight: 'bold',
-                  marginRight: '10px',
                 }}
-                variant="outlined"
+                variant="contained"
               >
                 + New
               </Button>
@@ -226,13 +226,10 @@ export default function SelectCreateDocs(props: {
               )}
             </RowDiv>
           )}
-          <h2>{title}</h2>
+          <h2 style={{ width: '60%', textAlign: 'center' }}>{title}</h2>
           <Button
+            style={{ width: '20%' }}
             data-cy={`toggle-view-archived`}
-            style={{
-              position: 'absolute',
-              right: 0,
-            }}
             onClick={() => {
               setViewingArchived(!viewingArchived);
             }}
@@ -240,6 +237,8 @@ export default function SelectCreateDocs(props: {
             {viewingArchived ? 'View Active' : 'View Archived'}
           </Button>
         </RowDiv>
+
+        {/* Table */}
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
