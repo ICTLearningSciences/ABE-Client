@@ -9,6 +9,7 @@ import { Box, Typography, Chip } from '@mui/material';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import { DehydratedGQLTimelinePoint } from '../../../../types';
 import { applyTextDiff } from '../assignment-document-timelines';
+import { useAppSelector } from '../../../../store/hooks';
 
 interface TimelineViewProps {
   timelinePoints: DehydratedGQLTimelinePoint[];
@@ -23,6 +24,14 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 }) => {
   if (!timelinePoints.length) {
     return null;
+  }
+  const activities = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivities
+  );
+
+  function getActivityTitle(activityId: string) {
+    const activity = activities.find((a) => a._id === activityId);
+    return activity?.title || 'Unknown Activity';
   }
 
   return (
@@ -69,6 +78,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           );
           const charactersRemoved = diffContent.charactersRemoved;
           const charactersAdded = diffContent.charactersAdded;
+          const activityTitle = getActivityTitle(point.version?.activity || '');
           return (
             <Box
               key={point.versionId}
@@ -121,7 +131,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                 </Box>
 
                 <Chip
-                  label={point.version?.activity || 'Unknown Activity'}
+                  label={activityTitle}
                   size="small"
                   sx={{
                     mb: 1,

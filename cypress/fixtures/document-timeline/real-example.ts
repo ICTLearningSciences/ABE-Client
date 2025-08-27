@@ -147,7 +147,7 @@ export const realExampleDocVersions: IGDocVersion[] = [
                     "message": "Feel free to ask me any questions about your essay."
                 }
             ],
-            "activity": "",
+            "activity": "my-editable-activity",
             "intent": "",
             "title": "California Wildfires 2",
             "lastModifyingUser": "ashiel408@gmail.com",
@@ -366,7 +366,7 @@ export const realExampleDocVersions: IGDocVersion[] = [
                     "message": "Okay, would you like to revise and then have me analyze it again? Or would you like to work on another activity?"
                 }
             ],
-            "activity": "658230f699045156193339ac",
+            "activity": "my-editable-activity",
             "intent": "",
             "title": "California Wildfires 2",
             "lastModifyingUser": "ashiel408@gmail.com",
@@ -577,7 +577,7 @@ export const realExampleDocVersions: IGDocVersion[] = [
                     "message": "Ready"
                 }
             ],
-            "activity": "658230f699045156193339ac",
+            "activity": "my-editable-activity",
             "intent": "",
             "title": "California Wildfires 2",
             "lastModifyingUser": "ashiel408@gmail.com",
@@ -784,7 +784,7 @@ export const realExampleDocVersions: IGDocVersion[] = [
                     "message": "Let me know when you're done revising so I can look at it again."
                 }
             ],
-            "activity": "658230f699045156193339ac",
+            "activity": "my-editable-activity",
             "intent": "",
             "title": "California Wildfires 2",
             "lastModifyingUser": "ashiel408@gmail.com",
@@ -876,7 +876,7 @@ export const realExampleDocVersions: IGDocVersion[] = [
                     "message": "I'd like to talk about how the president of the US can help the crisis"
                 }
             ],
-            "activity": "658230f699045156193339ac",
+            "activity": "my-editable-activity",
             "intent": "",
             "title": "California Wildfires 2",
             "lastModifyingUser": "ashiel408@gmail.com",
@@ -1019,7 +1019,7 @@ export const realExampleDocVersions: IGDocVersion[] = [
                     "message": "Now we will pick a critic for your paper. Please describe your critic below, or pick one of the suggested options."
                 }
             ],
-            "activity": "6619c3fe9965e7b71fd2f215",
+            "activity": "my-editable-activity",
             "intent": "",
             "title": "California Wildfires 2",
             "lastModifyingUser": "ashiel408@gmail.com",
@@ -1162,7 +1162,7 @@ export const realExampleDocVersions: IGDocVersion[] = [
                     "message": "Now we will pick a critic for your paper. Please describe your critic below, or pick one of the suggested options."
                 }
             ],
-            "activity": "6619c3fe9965e7b71fd2f215",
+            "activity": "my-editable-activity",
             "intent": "",
             "title": "California Wildfires 2",
             "lastModifyingUser": "ashiel408@gmail.com",
@@ -1297,7 +1297,7 @@ export const realExampleDocVersions: IGDocVersion[] = [
                     "message": "Ready"
                 }
             ],
-            "activity": "6619c3fe9965e7b71fd2f215",
+            "activity": "my-editable-activity",
             "intent": "",
             "title": "California Wildfires 2",
             "lastModifyingUser": "ashiel408@gmail.com",
@@ -1409,7 +1409,7 @@ export const realExampleDocVersions: IGDocVersion[] = [
                     "message": "To better address the perspectives of Indigenous communities and their contributions to wildfire management, I recommend revising the section where you discuss controlled burns. Currently, you mention them as an underutilized practice due to regulations but could enhance your argument by incorporating the historical significance and effectiveness of these practices within Indigenous land management systems.\n\nHere’s a suggested revision:\n\n**Original Section:**\n“Controlled burns, once a vital part of indigenous land management, are still underutilized due to excessive regulations and red tape.”\n\n**Revised Section:**\n“Controlled burns are a vital part of Indigenous land stewardship, demonstrating an understanding of the land developed over thousands of years. These culturally significant practices not only help to prevent wildfires but also promote ecosystem health by maintaining biodiversity. Unfortunately, they are often underutilized due to excessive regulations and bureaucratic barriers. Integrating Indigenous knowledge and practices into modern wildfire management strategies could lead to more effective prevention and recovery efforts.”\n\nThis revision emphasizes the importance of Indigenous practices and suggests a collaborative approach to fire management that honors their expertise, creating a more inclusive argument."
                 }
             ],
-            "activity": "6619c3fe9965e7b71fd2f215",
+            "activity": "my-editable-activity",
             "intent": "",
             "title": "California Wildfires 2",
             "lastModifyingUser": "ashiel408@gmail.com",
@@ -1436,7 +1436,7 @@ export const realExampleDocVersions2: IGDocVersion[] = [
                     "message": "Feel free to ask me any questions about your essay."
                 }
             ],
-            "activity": "",
+            "activity": "my-editable-activity",
             "intent": "",
             "title": "California Wildfires 2",
             "lastModifyingUser": "ashiel408@gmail.com",

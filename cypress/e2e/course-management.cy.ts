@@ -569,7 +569,7 @@ describe('Course Management', () => {
 
   });
 
-  it.only("Can view students timeline", ()=>{
+  it("Can view students timeline", ()=>{
     cyMockEducationalManagement(cy, {
       userRole: UserRole.USER,
       educationalRole: EducationalRole.INSTRUCTOR,
