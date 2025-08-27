@@ -15,6 +15,19 @@ export const createNewStudentResponse: CreateNewStudentResponse = {
   createNewStudent: testStudent
 };
 
+export const createNewStudentWithIncompleteActivityResponse: CreateNewStudentResponse = {
+  createNewStudent: {
+    ...testStudent,
+    assignmentProgress: testStudent.assignmentProgress.map(ap => ({
+      ...ap,
+      activityCompletions: ap.activityCompletions.map(ac => ({
+        ...ac,
+        complete: false
+      }))
+    }))
+  }
+};
+
 export const createNewStudentEmptyResponse: CreateNewStudentResponse = {
   createNewStudent: testStudentEmpty
 };

@@ -49,10 +49,6 @@ export const ChatLogTab: React.FC<ChatLogTabProps> = ({
       }}
       data-cy="chat-log-tab"
     >
-      <Typography variant="body2" sx={{ mb: 2, fontWeight: 500 }}>
-        {chatLog.length} messages
-      </Typography>
-
       {chatLog.map((item, index) => {
         const { icon: SenderIcon, label } = getSenderInfo(
           item.sender,
@@ -104,7 +100,7 @@ export const ChatLogTab: React.FC<ChatLogTabProps> = ({
               sx={{
                 p: 1.5,
                 backgroundColor:
-                  item.sender === Sender.USER ? 'primary.main' : 'grey.100',
+                  item.sender === Sender.USER ? 'primary.light' : 'grey.100',
                 color: item.sender === Sender.USER ? 'white' : 'text.primary',
                 borderRadius: 2,
                 overflow: 'auto',

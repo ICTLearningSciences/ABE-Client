@@ -10,7 +10,7 @@ import { EducationalRole } from '../fixtures/educational-management/educational-
 import { UserRole } from '../helpers/types';
 import { cyMockGetDocTimeline, mockGQL } from '../helpers/functions';
 import { createAssignmentResponse, deleteAssignmentResponse, newTestAssignment, updateAssignmentResponse, updatedTestAssignment } from '../fixtures/educational-management/assignment-operations';
-import { fetchCoursesResponseEmpty, fetchCoursesResponseStudent, removeFromSectionResponse, studentAfterRemoval, updatedTestSection, updateTestSectionWithAssignmentsResponse } from '../fixtures/educational-management';
+import { createNewStudentResponse, createNewStudentWithIncompleteActivityResponse, fetchCoursesResponseEmpty, fetchCoursesResponseStudent, removeFromSectionResponse, studentAfterRemoval, updatedTestSection, updateTestSectionWithAssignmentsResponse } from '../fixtures/educational-management';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 import { realExampleDocumentTimeline2, realExampleDocVersions, realExampleDocVersions2 } from '../fixtures/document-timeline/real-example';
 
@@ -449,8 +449,10 @@ describe('Course Management', () => {
     it('When a student completes an activity, logs them completing that activity', () => {
       cyMockEducationalManagement(cy, {
         userRole: UserRole.USER,
-        educationalRole: EducationalRole.STUDENT
-        
+        educationalRole: EducationalRole.STUDENT,
+        gqlQueries: [
+          mockGQL('CreateNewStudent', createNewStudentWithIncompleteActivityResponse),
+        ]
       });
       
       cy.visit('/course-management');

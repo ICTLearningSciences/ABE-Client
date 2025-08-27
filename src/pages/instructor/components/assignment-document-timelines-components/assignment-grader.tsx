@@ -49,7 +49,13 @@ export function AssignmentGrader({
   };
 
   return (
-    <Box>
+    <Box
+      style={{
+        border: '2px dashed #000',
+        borderRadius: 2,
+        padding: 10,
+      }}
+    >
       {assignmentGrade ? (
         <Box sx={{ mb: 2 }} data-cy="graded-assignment">
           <Typography variant="body2" color="textSecondary">
@@ -60,7 +66,7 @@ export function AssignmentGrader({
         <Typography
           variant="body2"
           color="textSecondary"
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, fontWeight: 600 }}
           data-cy="not-graded-assignment"
         >
           Not graded

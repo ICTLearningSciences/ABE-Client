@@ -32,8 +32,8 @@ export const testStudent: StudentData = {
         }
       ],
       activityCompletions: [
-        { activityId: 'my-editable-activity', complete: false },
-        { activityId: 'my-read-only-activity', complete: false }
+        { activityId: 'my-editable-activity', complete: true },
+        { activityId: 'my-read-only-activity', complete: true }
       ]
     }
   ]

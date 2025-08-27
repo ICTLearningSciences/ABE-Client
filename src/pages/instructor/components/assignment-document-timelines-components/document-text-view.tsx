@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React, { useState } from 'react';
-import { Box, Typography, Paper, Divider, Button } from '@mui/material';
+import { Box, Typography, Paper, Button } from '@mui/material';
 import { DehydratedGQLTimelinePoint } from '../../../../types';
 import { TextDiffResult } from '../assignment-document-timelines';
 import { RowDiv } from '../../../../styled-components';
@@ -64,8 +64,9 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
         data-cy="text-view-content"
         sx={{
           flex: 1,
-          p: 2,
           overflow: 'hidden',
+          pl: 1,
+          pr: 1,
         }}
       >
         <RowDiv
@@ -74,6 +75,7 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
             justifyContent: 'space-between',
             alignItems: 'center',
             textAlign: 'center',
+            height: '8%',
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -85,12 +87,10 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
           </Button>
         </RowDiv>
 
-        <Divider sx={{ mb: 2 }} />
-
         <Box
           style={{
             overflow: 'hidden',
-            height: '100%',
+            height: '92%',
           }}
         >
           {(() => {

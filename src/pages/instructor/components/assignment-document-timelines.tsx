@@ -160,7 +160,13 @@ export const AssignmentDocumentTimelines: React.FC<
 
   return (
     <Box
-      sx={{ width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}
+      sx={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        position: 'relative',
+      }}
       height="100%"
       key={selectedDocId}
       data-cy="activity-document-timelines"
@@ -177,7 +183,7 @@ export const AssignmentDocumentTimelines: React.FC<
         onDocumentChange={onDocumentChange}
       />
 
-      <Box sx={{ position: 'absolute', right: 20 }}>
+      <Box sx={{ position: 'absolute', right: 50, top: 20 }}>
         <AssignmentGrader student={student} assignment={assignment} />
       </Box>
 

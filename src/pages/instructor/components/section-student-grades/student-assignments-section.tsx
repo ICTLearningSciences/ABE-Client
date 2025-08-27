@@ -74,6 +74,10 @@ export function StudentAssignmentsSection({
       return null;
     }
     if (isInstructorData(myData)) {
+      if (!isCompleted) {
+        return null;
+      }
+
       return (
         <Box
           sx={{
@@ -82,12 +86,22 @@ export function StudentAssignmentsSection({
             justifyContent: 'center',
             alignItems: 'center',
             width: '10%',
+            border: '2px dashed #000',
+            borderRadius: 2,
           }}
         >
-          {assignmentGrade && (
+          {assignmentGrade ? (
             <Typography variant="body2">
-              <span style={{ fontWeight: 'bold' }}>Grade:</span>{' '}
+              <span style={{ fontWeight: 'bold', color: 'darkgreen' }}>
+                Grade:
+              </span>{' '}
               {assignmentGrade.grade}/5
+            </Typography>
+          ) : (
+            <Typography variant="body2">
+              <span style={{ fontWeight: 'bold', color: 'darkred' }}>
+                Not Graded
+              </span>
             </Typography>
           )}
 
