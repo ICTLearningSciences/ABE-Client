@@ -21,6 +21,7 @@ import {
 import { UserRole } from './store/slices/login';
 import {
   AssignmentProgress,
+  RelevantGoogleDoc,
   StudentData,
 } from './store/slices/education-management';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -297,5 +298,20 @@ export function getStudentDocIds(student: StudentData): string[] {
       return acc;
     },
     [] as string[]
+  );
+}
+
+export function getStudentActivityDocs(
+  student: StudentData,
+  activityId: string
+): RelevantGoogleDoc[] {
+  const targetAssignmentProgress = student.assignmentProgress.find((a) =>
+    a.activityCompletions.some((ac) => ac.activityId === activityId)
+  );
+  if (!targetAssignmentProgress) {
+    return [];
+  }
+  return targetAssignmentProgress.activityCompletions.flatMap(
+    (ac) => ac.relevantGoogleDocs
   );
 }

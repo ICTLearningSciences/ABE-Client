@@ -44,6 +44,7 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
       </Typography>
       <FormControl sx={{ minWidth: 300 }}>
         <Select
+          data-cy="document-select"
           labelId="document-select-label"
           value={selectedDocId || ''}
           onChange={(e) => onDocumentChange(e.target.value)}

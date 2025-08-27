@@ -21,6 +21,7 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
 }) => {
   return (
     <Box
+      data-cy="assignment-header"
       sx={{
         width: '100%',
         display: 'flex',

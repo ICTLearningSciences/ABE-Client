@@ -122,14 +122,7 @@ export interface UseWithEducationalManagement {
     activityId: string,
     docId: string
   ) => Promise<StudentData>;
-  studentActivityDocPrimaryStatusSet: (
-    targetUserId: string,
-    courseId: string,
-    sectionId: string,
-    assignmentId: string,
-    activityId: string,
-    docId: string
-  ) => Promise<StudentData>;
+  studentActivityDocPrimaryStatusSet: (docId: string) => Promise<StudentData>;
   studentActivityDocDeleted: (
     targetUserId: string,
     courseId: string,
@@ -446,25 +439,27 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as StudentData;
   }
 
-  async function studentActivityDocPrimaryStatusSet(
-    targetUserId: string,
-    courseId: string,
-    sectionId: string,
-    assignmentId: string,
-    activityId: string,
-    docId: string
-  ) {
+  async function studentActivityDocPrimaryStatusSet(docId: string) {
+    console.log(viewState);
+    if (
+      !viewState.selectedCourseId ||
+      !viewState.selectedSectionId ||
+      !viewState.selectedAssignmentId ||
+      !viewState.selectedActivityId
+    ) {
+      throw new Error('No course, section, assignment, activity selected');
+    }
     if (!myData) {
       throw new Error('no user educational data found');
     }
     if (isInstructorData(myData)) {
-      throw new Error('instructor cannot set doc primary status');
+      throw new Error('only students can set doc primary status');
     }
     const assignmentProgress = myData.assignmentProgress.find(
-      (a) => a.assignmentId === assignmentId
+      (a) => a.assignmentId === viewState.selectedAssignmentId
     );
     const activityProgress = assignmentProgress?.activityCompletions.find(
-      (a) => a.activityId === activityId
+      (a) => a.activityId === viewState.selectedActivityId
     );
     const docAlreadyPrimary = Boolean(
       activityProgress?.relevantGoogleDocs.some(
@@ -476,11 +471,11 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     }
     const res = await dispatch(
       _updateStudentAssignmentProgress({
-        targetUserId,
-        courseId,
-        sectionId,
-        assignmentId,
-        activityId,
+        targetUserId: myData.userId,
+        courseId: viewState.selectedCourseId,
+        sectionId: viewState.selectedSectionId,
+        assignmentId: viewState.selectedAssignmentId,
+        activityId: viewState.selectedActivityId,
         action: ModifyStudentAssignmentProgressActions.DOC_PRIMARY_STATUS_SET,
         docId,
       })

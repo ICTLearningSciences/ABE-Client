@@ -10,6 +10,7 @@ import {
   Tooltip,
   TableCell,
   CircularProgress,
+  Checkbox,
 } from '@mui/material';
 import { UserDoc } from '../../types';
 import { RowDiv } from '../../styled-components';
@@ -33,6 +34,10 @@ interface GoogleDocItemRowProps {
   onArchiveClick: () => Promise<void>;
   onUnarchiveClick: () => Promise<void>;
   onDeleteClick: () => void;
+  isStudent: boolean;
+  onPrimaryDocSet: () => Promise<void>;
+  isPrimaryDoc: boolean;
+  loadInProgress: boolean;
 }
 
 export function GoogleDocItemRow({
@@ -44,6 +49,10 @@ export function GoogleDocItemRow({
   onArchiveClick,
   onUnarchiveClick,
   onDeleteClick,
+  isStudent,
+  onPrimaryDocSet,
+  isPrimaryDoc,
+  loadInProgress,
 }: GoogleDocItemRowProps): JSX.Element {
   const [archivingInProgress, setArchivingInProgress] = React.useState(false);
 
@@ -89,6 +98,16 @@ export function GoogleDocItemRow({
       <TableCell style={{ textAlign: 'center' }}>
         {formatISODateToReadable(doc.updatedAt)}
       </TableCell>
+      {isStudent && (
+        <TableCell style={{ textAlign: 'center' }}>
+          <Checkbox
+            data-cy={`primary-doc-checkbox-${doc.title.replaceAll(' ', '-')}`}
+            checked={isPrimaryDoc}
+            disabled={loadInProgress}
+            onChange={onPrimaryDocSet}
+          />
+        </TableCell>
+      )}
       <TableCell
         style={{
           display: 'flex',

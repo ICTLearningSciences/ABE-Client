@@ -32,7 +32,7 @@ export const studentWithUpdatedProgress: StudentData = {
     {
       assignmentId: 'assignment-123',
       activityCompletions: [
-        { activityId: 'my-editable-activity', complete: true, relevantGoogleDocs: [] },
+        { activityId: 'my-editable-activity', complete: true, relevantGoogleDocs: [{docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y', primaryDocument: true}] },
         { activityId: 'my-read-only-activity', complete: true, relevantGoogleDocs: [] }
       ]
     }

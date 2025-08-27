@@ -566,10 +566,108 @@ describe('Course Management', () => {
       });
     });
 
+    it("can set primary doc", () => {
+      cyMockEducationalManagement(cy, {
+        userRole: UserRole.USER,
+        educationalRole: EducationalRole.STUDENT
+      });
 
+      cy.visit('/course-management');
+
+      // Wait for initial load
+      cy.wait('@RefreshAccessToken');
+      cy.wait('@FetchConfig');
+      cy.wait('@CreateNewStudent');
+      cy.wait('@FetchCourses');
+      cy.wait('@FetchSections');
+      cy.wait('@FetchAssignments');
+      cy.wait('@FetchBuiltActivities');
+      
+      // Navigate to course -> section -> assignment
+      cy.get('[data-cy=tree-item-course-123]').click();
+      cy.get('[data-cy=section-card-section-456]').click();
+      cy.get('[data-cy=assignment-card-assignment-123]').click();
+
+
+      // Click on the checkbox
+      cy.get("[data-cy=activity-item-my-editable-activity]").click();
+      cy.get("[data-cy=primary-doc-checkbox-Aliens]").should("not.have.class", "Mui-checked")
+      cy.get("[data-cy=primary-doc-checkbox-Aliens]").click()
+
+      cy.get("[data-cy=primary-doc-checkbox-Aliens]").should("have.class", "Mui-checked")
+    })
   });
 
-  it("Can view students timeline", ()=>{
+
+  describe("Student Timeline", () => {
+    it("Can view students timeline", ()=>{
+      cyMockEducationalManagement(cy, {
+        userRole: UserRole.USER,
+        educationalRole: EducationalRole.INSTRUCTOR,
+        gqlQueries: [
+          mockGQL('FetchVersionsById', [
+            fetchDocVersionsBuilder(realExampleDocVersions),
+            fetchDocVersionsBuilder(realExampleDocVersions2)
+          ]
+        ),
+        ]
+      });
+      cy.viewport(1920, 1080);
+      cy.visit('/course-management');
+  
+      // Wait for initial load
+      cy.wait('@RefreshAccessToken');
+      cy.wait('@FetchConfig');
+      cy.wait('@CreateNewInstructor');
+      cy.wait('@FetchCourses');
+      cy.wait('@FetchSections');
+      cy.wait('@FetchAssignments');
+      cy.wait('@FetchBuiltActivities');
+  
+      // Navigate to course -> section
+      cy.get('[data-cy=tree-item-course-123]').click();
+      cy.get('[data-cy=section-card-section-456]').click();
+      cy.get("[data-cy=students-and-grades]").click()
+      cy.get("[data-cy=student-user-123]").click()
+      cy.get("[data-cy=Required-Assignments-assignments-section]").click()
+      cy.get("[data-cy=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y-doc-select]").click()
+  
+      // Header Visible
+      cy.get("[data-cy=activity-document-timelines]").should("be.visible")
+      cy.get("[data-cy=assignment-header]").should("be.visible")
+      cy.get("[data-cy=assignment-header]").should("contain.text", "Student: John Doe")
+      cy.get("[data-cy=assignment-header]").should("contain.text", "Assignment: Programming Fundamentals Quiz")
+
+      // Timeline Notches Visible
+      cy.get("[data-cy=activity-document-timeline-notches]").should("be.visible")
+      cy.get("[data-cy=activity-document-timeline-notch-0]").should("be.visible")
+      cy.get("[data-cy=activity-document-timeline-notch-0]").should("contain.text", "My Editable Activity")
+      cy.get("[data-cy=activity-document-timeline-notch-1]").should("contain.text", "+407")
+      cy.get("[data-cy=activity-document-timeline-notch-8]").should("exist")
+
+      // Document Text Visible
+      cy.get("[data-cy=text-view-container]").should("be.visible")
+      cy.get("[data-cy=text-view-content]").should("contain.text", "California Wildfires: A Crisis of Leadership and Policy")
+
+      // Chat Log, AI Outline, AI Change Summary Visible
+      cy.get("[data-cy=chat-log-tab-selector]").click()
+      cy.get("[data-cy=chat-log-tab]").should("be.visible")
+      cy.get("[data-cy=ai-outline-tab-selector]").click()
+      cy.get("[data-cy=ai-outline-container]").should("be.visible")
+      cy.get("[data-cy=ai-change-summary-tab-selector]").click()
+      cy.get("[data-cy=ai-change-summary-container]").should("be.visible")
+
+      // Switching Notches Changes content
+      cy.get("[data-cy=text-view-content]").should("not.contain.text", "These culturally significant practices")
+      cy.get("[data-cy=ai-outline-tab-selector]").click()
+      cy.get("[data-cy=ai-outline-container]").should("not.contain.text", "Federal response to wildfires is insufficient")
+      cy.get("[data-cy=activity-document-timeline-notch-1]").click()
+      cy.get("[data-cy=text-view-content]").should("contain.text", "These culturally significant practices")
+      cy.get("[data-cy=ai-outline-container]").should("contain.text", "Federal response to wildfires is insufficient")
+  
+    })
+
+    it("can switch between docs", () => {
     cyMockEducationalManagement(cy, {
       userRole: UserRole.USER,
       educationalRole: EducationalRole.INSTRUCTOR,
@@ -601,14 +699,18 @@ describe('Course Management', () => {
     cy.get("[data-cy=Required-Assignments-assignments-section]").click()
     cy.get("[data-cy=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y-doc-select]").click()
 
-    // TODO: test that doc is visible
 
     // Mock the second doc timeline
     cyMockGetDocTimeline(cy, {
       response: realExampleDocumentTimeline2,
     });
 
-    // TODO: test that doc is visible
+    cy.get("[data-cy=document-select]").click()
+    cy.get("[data-value=1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fB]").click()
 
-  })
+    cy.get("[data-cy=text-view-content]").should("contain.text", "Test 2")
+
+    // TODO: test that doc is visible
+    })
+  });
 });

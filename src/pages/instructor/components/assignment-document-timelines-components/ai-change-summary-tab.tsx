@@ -24,6 +24,7 @@ export const AiChangeSummaryTab: React.FC<AiChangeSummaryTabProps> = ({
 
   return (
     <Typography
+      data-cy="ai-change-summary-container"
       variant="body2"
       sx={{
         whiteSpace: 'pre-wrap',

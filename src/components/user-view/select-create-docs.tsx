@@ -22,7 +22,13 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { GoogleDocItemRow } from './google-doc-item-row';
 import { useAppSelector } from '../../store/hooks';
-import { Assignment } from '../../store/slices/education-management/types';
+import {
+  Assignment,
+  isStudentData,
+  StudentData,
+} from '../../store/slices/education-management/types';
+import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
+import { getStudentActivityDocs } from '../../helpers';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: UserDoc[];
@@ -68,9 +74,19 @@ export default function SelectCreateDocs(props: {
   const [viewingArchived, setViewingArchived] = React.useState(false);
   const [docToDelete, setDocToDelete] = React.useState<UserDoc>();
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
-  const viewState = useAppSelector(
-    (state) => state.educationManagement.viewState
-  );
+  const [loadInProgress, setLoadInProgress] = React.useState(false);
+  const { viewState, myData, studentActivityDocPrimaryStatusSet } =
+    useWithEducationalManagement();
+  const isStudent = myData ? isStudentData(myData) : false;
+  const studentActivityDocs =
+    isStudent && viewState.selectedActivityId
+      ? getStudentActivityDocs(
+          myData as StudentData,
+          viewState.selectedActivityId
+        )
+      : [];
+  const primaryDocId = studentActivityDocs.find((d) => d.primaryDocument)
+    ?.docId;
   const assignments = useAppSelector(
     (state) => state.educationManagement.assignments
   );
@@ -264,6 +280,11 @@ export default function SelectCreateDocs(props: {
                     <SortIndicator field="updatedAt" />
                   </RowDiv>
                 </TableCell>
+                {isStudent && (
+                  <TableCell style={{ width: '50px' }}>
+                    Primary Document?
+                  </TableCell>
+                )}
                 <TableCell style={{ width: '50px' }}></TableCell>
               </TableRow>
             </TableHead>
@@ -293,6 +314,17 @@ export default function SelectCreateDocs(props: {
                   onDeleteClick={() => {
                     setDocToDelete(doc);
                   }}
+                  onPrimaryDocSet={async () => {
+                    setLoadInProgress(true);
+                    try {
+                      await studentActivityDocPrimaryStatusSet(doc.googleDocId);
+                    } finally {
+                      setLoadInProgress(false);
+                    }
+                  }}
+                  loadInProgress={loadInProgress}
+                  isPrimaryDoc={doc.googleDocId === primaryDocId}
+                  isStudent={isStudent}
                 />
               ))}
             </TableBody>
