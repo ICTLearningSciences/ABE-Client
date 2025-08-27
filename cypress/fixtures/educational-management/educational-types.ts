@@ -50,13 +50,17 @@ export interface Course {
     activityId: string;
     relevantGoogleDocs: RelevantGoogleDoc[];
     complete: boolean;
+    
   }
   
   export interface AssignmentProgress {
     assignmentId: string;
+    instructorGrade?: {
+      grade: number;
+      comment: string;
+    },
     activityCompletions: ActivityCompletion[];
   }
-  
   export interface StudentData {
     _id: string;
     userId: string;

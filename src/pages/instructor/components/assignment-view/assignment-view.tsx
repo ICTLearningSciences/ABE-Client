@@ -75,14 +75,28 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
         (progress) => progress.assignmentId === assignmentId
       );
     if (!assignmentProgress) return {};
-    return assignmentProgress.activityCompletions.reduce(
-      (acc, completion) => {
-        acc[completion.activityId] = completion.complete;
+    return assignment.activityIds.reduce(
+      (acc, activityId) => {
+        const completion = assignmentProgress.activityCompletions.find(
+          (completion) => completion.activityId === activityId
+        );
+        acc[activityId] = completion?.complete ?? false;
         return acc;
       },
       {} as Record<string, boolean>
     );
   }, [assignment, educationManagement.myData]);
+
+  const assignmentGrade = useMemo(() => {
+    if (
+      !educationManagement.myData ||
+      !isStudentData(educationManagement.myData)
+    )
+      return undefined;
+    return educationManagement.myData.assignmentProgress.find(
+      (progress) => progress.assignmentId === assignmentId
+    )?.instructorGrade;
+  }, [assignmentId, educationManagement.myData]);
 
   const isAssignmentComplete = useMemo(() => {
     if (!activityIdToCompletionStatus) return false;
@@ -216,11 +230,12 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                     sx={{ fontSize: '10px' }}
                   />
                 )}
-                <Typography variant="caption" color="text.disabled">
-                  {assignment.activityIds.length} activit
-                  {assignment.activityIds.length !== 1 ? 'ies' : 'y'}
-                </Typography>
               </Stack>
+              {assignmentGrade && (
+                <Typography variant="body2" color="text.secondary">
+                  Grade: {assignmentGrade.grade}/5
+                </Typography>
+              )}
             </Box>
 
             {!isStudentView && (

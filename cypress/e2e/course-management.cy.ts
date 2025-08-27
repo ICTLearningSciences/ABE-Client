@@ -709,8 +709,55 @@ describe('Course Management', () => {
     cy.get("[data-value=1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fB]").click()
 
     cy.get("[data-cy=text-view-content]").should("contain.text", "Test 2")
+    })
 
-    // TODO: test that doc is visible
+    it.only("Can grade student assignment", ()=>{
+      cyMockEducationalManagement(cy, {
+        userRole: UserRole.USER,
+        educationalRole: EducationalRole.INSTRUCTOR,
+        gqlQueries: [
+          mockGQL('FetchVersionsById', [
+            fetchDocVersionsBuilder(realExampleDocVersions),
+          ]
+        ),
+        ]
+      });
+      cy.viewport(1920, 1080);
+      cy.visit('/course-management');
+  
+      // Wait for initial load
+      cy.wait('@RefreshAccessToken');
+      cy.wait('@FetchConfig');
+      cy.wait('@CreateNewInstructor');
+      cy.wait('@FetchCourses');
+      cy.wait('@FetchSections');
+      cy.wait('@FetchAssignments');
+      cy.wait('@FetchBuiltActivities');
+  
+      // Navigate to students document
+      cy.get('[data-cy=tree-item-course-123]').click();
+      cy.get('[data-cy=section-card-section-456]').click();
+      cy.get("[data-cy=students-and-grades]").click()
+      cy.get("[data-cy=student-user-123]").click()
+      cy.get("[data-cy=Required-Assignments-assignments-section]").click()
+      cy.get("[data-cy=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y-doc-select]").click()
+
+      cy.get("[data-cy=not-graded-assignment]").should("exist").should("be.visible")
+      cy.get("[data-cy=grade-assignment-button]").click()
+
+      cy.get("[data-cy=grade-comment-input]").type("Great job!")
+      cy.get("[data-cy=grade-assignment-submit-button]").click()
+
+      cy.get("[data-cy=not-graded-assignment]").should("not.exist")
+      cy.get("[data-cy=graded-assignment]").should("exist")
+      cy.get("[data-cy=graded-assignment]").should("contain.text", "Great job!")
+      
+     
+      // check grade shows in students and grades
+      cy.get("[data-cy=breadcrumb-item-section-456]").click()
+      cy.get("[data-cy=students-and-grades]").click()
+      cy.get("[data-cy=student-user-123]").click()
+  
     })
   });
 });

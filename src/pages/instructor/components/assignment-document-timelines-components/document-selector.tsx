@@ -65,7 +65,7 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
               {doc.primaryDocument ? (
                 <span style={{ fontWeight: 600 }}>Main Document: </span>
               ) : null}{' '}
-              <span> </span> {doc.docData.title}
+              <span> </span> {doc.docData.title || 'Untitled'}
             </MenuItem>
           ))}
         </Select>

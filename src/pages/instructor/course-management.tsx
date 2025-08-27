@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Box, Typography, Button, Paper } from '@mui/material';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
@@ -70,6 +70,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     errorMessage,
     getHydratedTimeline,
   } = useWithDocumentTimeline();
+  const alreadyLoadedDataRef = useRef(false);
 
   useEffect(() => {
     const alreadyHaveEducationalData =
@@ -78,16 +79,18 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       loginState.loginStatus !== LoginStatus.AUTHENTICATED ||
       !loginState.user ||
       alreadyHaveEducationalData ||
-      isLoading
+      isLoading ||
+      alreadyLoadedDataRef.current
     ) {
       return;
     }
+    alreadyLoadedDataRef.current = true;
     updateUserInfo({ educationalRole: EducationalRole.STUDENT }).then(
       (user) => {
         loadUserEducationalData(user._id, EducationalRole.STUDENT);
       }
     );
-  }, [loginState.user?._id, myData, isLoading]);
+  }, [loginState.loginStatus, myData, isLoading]);
 
   const isStudent =
     userRole === EducationalRole.STUDENT ||

@@ -25,6 +25,7 @@ import {
   setViewState,
   banStudentFromSection as _banStudentFromSection,
   unbanStudentFromSection as _unbanStudentFromSection,
+  gradeStudentAssignment as _gradeStudentAssignment,
 } from '.';
 import {
   Course,
@@ -191,6 +192,10 @@ export interface UseWithEducationalManagement {
     studentId: string
   ) => Promise<Section>;
   updateSelectedDocId: (docId: string) => Promise<void>;
+  gradeStudentAssignment: (
+    grade: number,
+    comment: string
+  ) => Promise<StudentData>;
 }
 
 export interface SectionStudentsProgress {
@@ -443,7 +448,6 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   }
 
   async function studentActivityDocPrimaryStatusSet(docId: string) {
-    console.log(viewState);
     if (
       !viewState.selectedCourseId ||
       !viewState.selectedSectionId ||
@@ -506,6 +510,20 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       })
     );
     return res.payload as StudentData;
+  }
+
+  async function gradeStudentAssignment(grade: number, comment: string) {
+    if (!viewState.selectedStudentId || !viewState.selectedAssignmentId) {
+      throw new Error('No student or assignment selected');
+    }
+    return await dispatch(
+      _gradeStudentAssignment({
+        studentId: viewState.selectedStudentId,
+        assignmentId: viewState.selectedAssignmentId,
+        grade,
+        comment,
+      })
+    ).unwrap();
   }
 
   async function addAssignmentToSection(
@@ -869,6 +887,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     viewStudentInfo,
     viewDashboard,
     haveICompletedActivity,
+    gradeStudentAssignment,
     courses,
     assignments,
     sections,

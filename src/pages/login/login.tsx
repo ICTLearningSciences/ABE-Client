@@ -17,14 +17,12 @@ import {
   courseManagementUrl,
   studentCoursesUrl,
 } from '../instructor/course-management';
-import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
-  const { loginWithGoogle, state: loginState, updateUserInfo } = useLogin;
+  const { loginWithGoogle, state: loginState } = useLogin;
   const navigate = useNavigateWithParams();
   const config = useAppSelector((state) => state.config);
   const { loginWithAmazonCognito } = useLogin;
-  const { loadUserEducationalData } = useWithEducationalManagement();
   const orgName = config.config?.orgName || 'ABE';
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
@@ -42,14 +40,9 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
       'isStudent'
     );
     if (
-      user &&
       (sectionCodeFromUrl || isStudentFromUrl) &&
       user?.educationalRole !== EducationalRole.INSTRUCTOR
     ) {
-      if (user.educationalRole !== EducationalRole.STUDENT) {
-        await updateUserInfo({ educationalRole: EducationalRole.STUDENT });
-      }
-      await loadUserEducationalData(user?._id, EducationalRole.STUDENT);
       navigate(studentCoursesUrl);
       return;
     }

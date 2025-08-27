@@ -127,7 +127,7 @@ export function StudentInfoPage(props: {
         getStudentDocDataForActivity={getStudentDocDataForActivity}
         getActivityTitle={getActivityTitle}
         onDocumentClick={handleDocumentClick}
-        studentId={selectedStudent.userId}
+        student={selectedStudent}
       />
 
       {/* Optional Assignments Section */}
@@ -150,7 +150,7 @@ export function StudentInfoPage(props: {
           getStudentDocDataForActivity={getStudentDocDataForActivity}
           getActivityTitle={getActivityTitle}
           onDocumentClick={handleDocumentClick}
-          studentId={selectedStudent.userId}
+          student={selectedStudent}
         />
       )}
 

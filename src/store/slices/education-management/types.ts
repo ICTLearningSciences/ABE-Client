@@ -44,6 +44,10 @@ export interface ActivityCompletion {
 
 export interface AssignmentProgress {
   assignmentId: string;
+  instructorGrade?: {
+    grade: number;
+    comment: string;
+  };
   activityCompletions: ActivityCompletion[];
 }
 

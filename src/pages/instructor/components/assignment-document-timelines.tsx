@@ -25,6 +25,7 @@ import {
   StudentData,
 } from '../../../store/slices/education-management/types';
 import { getStudentAssignmentDocs } from '../../../helpers';
+import { AssignmentGrader } from './assignment-document-timelines-components/assignment-grader';
 
 export interface TextDiffResult {
   diffContent: React.ReactNode[];
@@ -237,6 +238,8 @@ export const AssignmentDocumentTimelines: React.FC<
         selectedDocId={selectedDocId}
         onDocumentChange={onDocumentChange}
       />
+
+      <AssignmentGrader student={student} assignment={assignment} />
 
       <TimelineView
         timelinePoints={timelinePoints}
