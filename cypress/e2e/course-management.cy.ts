@@ -711,7 +711,7 @@ describe('Course Management', () => {
     cy.get("[data-cy=text-view-content]").should("contain.text", "Test 2")
     })
 
-    it.only("Can grade student assignment", ()=>{
+    it("Can grade student assignment", ()=>{
       cyMockEducationalManagement(cy, {
         userRole: UserRole.USER,
         educationalRole: EducationalRole.INSTRUCTOR,
@@ -750,13 +750,8 @@ describe('Course Management', () => {
 
       cy.get("[data-cy=not-graded-assignment]").should("not.exist")
       cy.get("[data-cy=graded-assignment]").should("exist")
-      cy.get("[data-cy=graded-assignment]").should("contain.text", "Great job!")
+      cy.get("[data-cy=graded-assignment]").should("contain.text", "5/5")
       
-     
-      // check grade shows in students and grades
-      cy.get("[data-cy=breadcrumb-item-section-456]").click()
-      cy.get("[data-cy=students-and-grades]").click()
-      cy.get("[data-cy=student-user-123]").click()
   
     })
   });

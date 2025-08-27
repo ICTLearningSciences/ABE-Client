@@ -7,15 +7,25 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { Card, CardContent, Typography, Stack } from '@mui/material';
 import { Assignment } from '../../../store/slices/education-management/types';
+import { ColumnDiv } from '../../../styled-components';
 
 interface AssignmentCardProps {
   assignment: Assignment;
   onClick: (assignmentId: string) => void;
+  assignmentGrade:
+    | {
+        grade: number;
+        comment: string;
+      }
+    | undefined;
+  isCompleted: boolean;
 }
 
 const AssignmentCard: React.FC<AssignmentCardProps> = ({
   assignment,
   onClick,
+  assignmentGrade,
+  isCompleted,
 }) => {
   return (
     <Card
@@ -31,7 +41,11 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
       }}
       onClick={() => onClick(assignment._id)}
     >
-      <CardContent>
+      <CardContent
+        style={{
+          position: 'relative',
+        }}
+      >
         <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
           <Typography sx={{ fontSize: '20px', mr: 1.5 }}>📝</Typography>
           <Typography
@@ -53,6 +67,28 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
         >
           {assignment.description}
         </Typography>
+        <ColumnDiv
+          style={{
+            position: 'absolute',
+            right: 20,
+            top: 20,
+          }}
+        >
+          {isCompleted && assignmentGrade ? (
+            <Typography variant="body2">
+              <span style={{ fontWeight: 600 }}>Grade:</span>{' '}
+              {assignmentGrade.grade}/5
+            </Typography>
+          ) : isCompleted ? (
+            <Typography variant="body2" color="text.secondary">
+              Waiting for grade
+            </Typography>
+          ) : (
+            <Typography variant="body2" color="darkred" fontWeight={600}>
+              Incomplete
+            </Typography>
+          )}
+        </ColumnDiv>
       </CardContent>
     </Card>
   );

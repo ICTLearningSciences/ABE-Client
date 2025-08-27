@@ -33,7 +33,6 @@ export function AssignmentGrader({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const isGraded = assignmentGrade !== undefined;
 
   const handleGrade = async () => {
     setIsLoading(true);
@@ -56,7 +55,7 @@ export function AssignmentGrader({
         right: 40,
       }}
     >
-      {isGraded ? (
+      {assignmentGrade ? (
         <Box sx={{ mb: 2 }} data-cy="graded-assignment">
           <Typography variant="body2" color="textSecondary">
             Grade: {assignmentGrade.grade}/5
