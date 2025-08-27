@@ -80,7 +80,7 @@ export function StudentInfoPage(props: {
     }
   };
   return (
-    <Box sx={{ p: 3, width: '80%',}}>
+    <Box sx={{ p: 3, width: '80%' }}>
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={onBackToSection}

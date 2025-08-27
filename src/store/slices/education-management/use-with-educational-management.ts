@@ -227,6 +227,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   const enrollmentModificationStatus = useAppSelector(
     (state) => state.educationManagement.enrollmentModificationStatus
   );
+  const educationalDataLoadStatus = useAppSelector(
+    (state) => state.educationManagement.educationalDataLoadStatus
+  );
   const courses = useAppSelector((state) => state.educationManagement.courses);
   const assignments = useAppSelector(
     (state) => state.educationManagement.assignments
@@ -580,11 +583,14 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     }, [students, sections, assignments]);
 
   async function loadAllEducationalData(forUserId: string) {
+    const isInstructor = myData && isInstructorData(myData);
     const [courses, assignments, sections, students] = await Promise.all([
       dispatch(_fetchCourses(forUserId)).unwrap(),
       dispatch(_fetchAssignments(forUserId)).unwrap(),
       dispatch(_fetchSections(forUserId)).unwrap(),
-      dispatch(_fetchStudentsInMyCourses(forUserId)).unwrap(),
+      isInstructor
+        ? dispatch(_fetchStudentsInMyCourses(forUserId)).unwrap()
+        : [],
     ]);
 
     return {
@@ -874,7 +880,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       coursesLoadingState === LoadStatus.LOADING ||
       assignmentsLoadingState === LoadStatus.LOADING ||
       sectionsLoadingState === LoadStatus.LOADING ||
-      studentsLoadingState === LoadStatus.LOADING,
+      studentsLoadingState === LoadStatus.LOADING ||
+      educationalDataLoadStatus === LoadStatus.LOADING,
     sectionsLoadState: sectionsLoadingState,
     isCourseModifying: courseModificationStatus === LoadStatus.LOADING,
     courseModificationFailed: courseModificationStatus === LoadStatus.FAILED,

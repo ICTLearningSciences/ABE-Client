@@ -12,33 +12,53 @@ import { useAppSelector } from '../../store/hooks';
 import { LoginUI } from './login-ui';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 import { useAuth } from 'react-oidc-context';
-import { EducationalRole } from '../../types';
+import { EducationalRole, User } from '../../types';
 import {
   courseManagementUrl,
   studentCoursesUrl,
 } from '../instructor/course-management';
+import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
-  const { loginWithGoogle, state: loginState } = useLogin;
+  const { loginWithGoogle, state: loginState, updateUserInfo } = useLogin;
   const navigate = useNavigateWithParams();
   const config = useAppSelector((state) => state.config);
   const { loginWithAmazonCognito } = useLogin;
+  const { loadUserEducationalData } = useWithEducationalManagement();
   const orgName = config.config?.orgName || 'ABE';
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       loginWithGoogle(tokenResponse.access_token).then((user) => {
-        handleLoginNavigate(user?.user.educationalRole);
+        handleLoginNavigate(user?.user);
       });
     },
   });
 
-  function handleLoginNavigate(educationalRole?: EducationalRole) {
-    if (!educationalRole) {
+  async function handleLoginNavigate(user?: User) {
+    const sectionCodeFromUrl = new URLSearchParams(window.location.search).get(
+      'sectionCode'
+    );
+    const isStudentFromUrl = new URLSearchParams(window.location.search).get(
+      'isStudent'
+    );
+    if (
+      user &&
+      (sectionCodeFromUrl || isStudentFromUrl) &&
+      user?.educationalRole !== EducationalRole.INSTRUCTOR
+    ) {
+      if (user.educationalRole !== EducationalRole.STUDENT) {
+        await updateUserInfo({ educationalRole: EducationalRole.STUDENT });
+      }
+      await loadUserEducationalData(user?._id, EducationalRole.STUDENT);
+      navigate(studentCoursesUrl);
+      return;
+    }
+    if (!user?.educationalRole) {
       navigate('/docs');
     }
-    if (educationalRole === EducationalRole.STUDENT) {
+    if (user?.educationalRole === EducationalRole.STUDENT) {
       navigate(studentCoursesUrl);
-    } else if (educationalRole === EducationalRole.INSTRUCTOR) {
+    } else if (user?.educationalRole === EducationalRole.INSTRUCTOR) {
       navigate(courseManagementUrl);
     }
   }
@@ -53,7 +73,7 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
 
   useEffect(() => {
     if (loginState.loginStatus === LoginStatus.AUTHENTICATED) {
-      handleLoginNavigate(loginState.user?.educationalRole);
+      handleLoginNavigate(loginState.user);
     }
   }, [loginState.loginStatus]);
 

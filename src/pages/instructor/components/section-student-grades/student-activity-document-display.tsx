@@ -30,7 +30,7 @@ export function StudentActivityDocumentDisplay(props: {
           {doc.primaryDocument ? 'Main Document: ' : ''}
         </span>
         <span> </span>
-        {doc.docData.title || "Untitled"}
+        {doc.docData.title || 'Untitled'}
       </span>
     );
   }
