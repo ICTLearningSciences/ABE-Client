@@ -246,7 +246,10 @@ export const AssignmentDocumentTimelines: React.FC<
           />
         </Grid>
         <Grid item xs={6} style={{ height: '100%' }}>
-          <TabbedInfoPanel timelinePoint={currentTimelinePoint} />
+          <TabbedInfoPanel
+            timelinePoint={currentTimelinePoint}
+            studentName={student.name}
+          />
         </Grid>
       </Grid>
     </Box>

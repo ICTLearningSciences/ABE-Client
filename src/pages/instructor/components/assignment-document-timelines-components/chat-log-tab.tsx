@@ -6,14 +6,30 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
+import { SmartToy, Person } from '@mui/icons-material';
 import { ChatItem } from '../../../../types';
 import { Sender } from '../../../../store/slices/chat';
 
 interface ChatLogTabProps {
   chatLog: ChatItem[];
+  studentName: string;
 }
 
-export const ChatLogTab: React.FC<ChatLogTabProps> = ({ chatLog }) => {
+const getSenderInfo = (sender: Sender, studentName: string) => {
+  switch (sender) {
+    case Sender.SYSTEM:
+      return { icon: SmartToy, label: 'AI' };
+    case Sender.USER:
+      return { icon: Person, label: studentName };
+    default:
+      return { icon: Person, label: studentName };
+  }
+};
+
+export const ChatLogTab: React.FC<ChatLogTabProps> = ({
+  chatLog,
+  studentName,
+}) => {
   if (!chatLog?.length) {
     return (
       <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>
@@ -37,33 +53,73 @@ export const ChatLogTab: React.FC<ChatLogTabProps> = ({ chatLog }) => {
         {chatLog.length} messages
       </Typography>
 
-      {chatLog.map((item, index) => (
-        <Box
-          key={index}
-          sx={{
-            alignSelf: item.sender === Sender.USER ? 'flex-end' : 'flex-start',
-            maxWidth: '80%',
-          }}
-        >
-          <Paper
+      {chatLog.map((item, index) => {
+        const { icon: SenderIcon, label } = getSenderInfo(
+          item.sender,
+          studentName
+        );
+
+        return (
+          <Box
+            key={index}
             sx={{
-              p: 1.5,
-              backgroundColor:
-                item.sender === Sender.USER ? 'primary.main' : 'grey.100',
-              color: item.sender === Sender.USER ? 'white' : 'text.primary',
-              borderRadius: 2,
-              overflow: 'auto',
+              alignSelf:
+                item.sender === Sender.USER ? 'flex-end' : 'flex-start',
+              maxWidth: '80%',
             }}
           >
-            <Typography
-              variant="body2"
-              sx={{ whiteSpace: 'pre-wrap', overflow: 'auto' }}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                mb: 0.5,
+                justifyContent:
+                  item.sender === Sender.USER ? 'flex-end' : 'flex-start',
+              }}
             >
-              {item.message}
-            </Typography>
-          </Paper>
-        </Box>
-      ))}
+              <SenderIcon
+                sx={{
+                  fontSize: 16,
+                  color:
+                    item.sender === Sender.USER
+                      ? 'primary.main'
+                      : 'text.secondary',
+                }}
+              />
+              <Typography
+                variant="caption"
+                sx={{
+                  color:
+                    item.sender === Sender.USER
+                      ? 'primary.main'
+                      : 'text.secondary',
+                  fontWeight: 500,
+                }}
+              >
+                {label}
+              </Typography>
+            </Box>
+            <Paper
+              sx={{
+                p: 1.5,
+                backgroundColor:
+                  item.sender === Sender.USER ? 'primary.main' : 'grey.100',
+                color: item.sender === Sender.USER ? 'white' : 'text.primary',
+                borderRadius: 2,
+                overflow: 'auto',
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{ whiteSpace: 'pre-wrap', overflow: 'auto' }}
+              >
+                {item.message}
+              </Typography>
+            </Paper>
+          </Box>
+        );
+      })}
     </Box>
   );
 };

@@ -13,6 +13,7 @@ import { AiChangeSummaryTab } from './ai-change-summary-tab';
 
 interface TabbedInfoPanelProps {
   timelinePoint: DehydratedGQLTimelinePoint | null;
+  studentName: string;
 }
 
 interface TabPanelProps {
@@ -44,6 +45,7 @@ function TabPanel(props: TabPanelProps) {
 
 export const TabbedInfoPanel: React.FC<TabbedInfoPanelProps> = ({
   timelinePoint,
+  studentName,
 }) => {
   const [tabValue, setTabValue] = useState(0);
 
@@ -94,7 +96,10 @@ export const TabbedInfoPanel: React.FC<TabbedInfoPanelProps> = ({
 
       <Box sx={{ flex: 1, overflow: 'hidden', height: '100%' }}>
         <TabPanel value={tabValue} index={0}>
-          <ChatLogTab chatLog={timelinePoint.version?.chatLog || []} />
+          <ChatLogTab
+            chatLog={timelinePoint.version?.chatLog || []}
+            studentName={studentName}
+          />
         </TabPanel>
 
         <TabPanel value={tabValue} index={1}>

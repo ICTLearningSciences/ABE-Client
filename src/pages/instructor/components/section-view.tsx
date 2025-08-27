@@ -227,7 +227,7 @@ const SectionView: React.FC<SectionViewProps> = ({
           >
             <Tab label="Section Content" />
             <Tab label="Students and Grades" data-cy="students-and-grades" />
-            <Tab label="Banned Students" />
+            <Tab label="Blocked Students" />
           </Tabs>
 
           {selectedTab === 0 && (
