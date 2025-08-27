@@ -8,17 +8,14 @@ import { ColumnDiv } from '../../../../styled-components';
 
 export function StudentActivityDocumentDisplay(props: {
   assignment: Assignment;
-  getStudentDocDataForActivity: (
-    assignmentId: string,
-    activityId: string
-  ) => RelevantGoogleDoc[];
+  getStudentDocDataForAssignment: (assignmentId: string) => RelevantGoogleDoc[];
   getActivityTitle: (activityId: string) => string;
   onDocumentClick?: (assignmentId: string, docId: string) => void;
   studentId: string;
 }) {
   const {
     assignment,
-    getStudentDocDataForActivity,
+    getStudentDocDataForAssignment,
     getActivityTitle,
     onDocumentClick,
   } = props;
@@ -39,10 +36,7 @@ export function StudentActivityDocumentDisplay(props: {
     <AccordionDetails>
       <Box sx={{ pl: 2 }}>
         {assignment.activityIds.map((activityId) => {
-          const docData = getStudentDocDataForActivity(
-            assignment._id,
-            activityId
-          );
+          const docData = getStudentDocDataForAssignment(assignment._id);
           return (
             <Box key={activityId} sx={{ mb: 2 }}>
               <Typography

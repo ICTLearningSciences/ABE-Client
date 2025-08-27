@@ -53,16 +53,16 @@ export const studentDataQueryData = `
       grade
       comment
     }
-    activityCompletions {
-      activityId
-      complete
-      relevantGoogleDocs {
+    relevantGoogleDocs {
         docId
         primaryDocument
         docData {
           title
         }
       }
+    activityCompletions {
+      activityId
+      complete
     }
   }
 `;

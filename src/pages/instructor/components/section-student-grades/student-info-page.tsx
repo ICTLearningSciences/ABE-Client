@@ -54,22 +54,15 @@ export function StudentInfoPage(props: {
     return activity ? activity.title : `Activity ${activityId}`;
   };
 
-  const getStudentDocDataForActivity = (
-    assignmentId: string,
-    activityId: string
+  const getStudentDocDataForAssignment = (
+    assignmentId: string
   ): RelevantGoogleDoc[] => {
     const assignmentProgress = selectedStudent.assignmentProgress.find(
       (progress) => progress.assignmentId === assignmentId
     );
     if (!assignmentProgress) return [];
 
-    const activityCompletion = assignmentProgress.activityCompletions.find(
-      (completion) => completion.activityId === activityId
-    );
-    if (!activityCompletion) return [];
-
-    // sort without mutating in place
-    return [...activityCompletion.relevantGoogleDocs].sort((a) =>
+    return [...assignmentProgress.relevantGoogleDocs].sort((a) =>
       a.primaryDocument ? -1 : 1
     );
   };
@@ -124,7 +117,7 @@ export function StudentInfoPage(props: {
             false
           );
         }}
-        getStudentDocDataForActivity={getStudentDocDataForActivity}
+        getStudentDocDataForAssignment={getStudentDocDataForAssignment}
         getActivityTitle={getActivityTitle}
         onDocumentClick={handleDocumentClick}
         student={selectedStudent}
@@ -147,7 +140,7 @@ export function StudentInfoPage(props: {
               false
             );
           }}
-          getStudentDocDataForActivity={getStudentDocDataForActivity}
+          getStudentDocDataForAssignment={getStudentDocDataForAssignment}
           getActivityTitle={getActivityTitle}
           onDocumentClick={handleDocumentClick}
           student={selectedStudent}

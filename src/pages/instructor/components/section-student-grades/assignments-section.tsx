@@ -26,10 +26,7 @@ interface AssignmentsSectionProps {
   completedCount: number;
   totalCount: number;
   getIsCompleted: (assignment: Assignment) => boolean;
-  getStudentDocDataForActivity: (
-    assignmentId: string,
-    activityId: string
-  ) => RelevantGoogleDoc[];
+  getStudentDocDataForAssignment: (assignmentId: string) => RelevantGoogleDoc[];
   getActivityTitle: (activityId: string) => string;
   onDocumentClick?: (assignmentId: string, docId: string) => void;
   student: StudentData;
@@ -41,7 +38,7 @@ export function AssignmentsSection({
   completedCount,
   totalCount,
   getIsCompleted,
-  getStudentDocDataForActivity,
+  getStudentDocDataForAssignment,
   getActivityTitle,
   onDocumentClick,
   student,
@@ -146,7 +143,9 @@ export function AssignmentsSection({
                 </AccordionSummary>
                 <StudentActivityDocumentDisplay
                   assignment={assignment}
-                  getStudentDocDataForActivity={getStudentDocDataForActivity}
+                  getStudentDocDataForAssignment={
+                    getStudentDocDataForAssignment
+                  }
                   getActivityTitle={getActivityTitle}
                   onDocumentClick={onDocumentClick}
                   studentId={studentId}

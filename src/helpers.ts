@@ -285,37 +285,13 @@ export function removeQueryParamFromUrl(paramName: string): void {
 export function getStudentDocIds(student: StudentData): string[] {
   return student.assignmentProgress.reduce(
     (acc: string[], curr: AssignmentProgress) => {
-      if (
-        curr.activityCompletions.flatMap((c) => c.relevantGoogleDocs).length > 0
-      ) {
-        return [
-          ...acc,
-          ...curr.activityCompletions.flatMap((c) =>
-            c.relevantGoogleDocs.map((d) => d.docId)
-          ),
-        ];
+      if (curr.relevantGoogleDocs.length > 0) {
+        return [...acc, ...curr.relevantGoogleDocs.map((d) => d.docId)];
       }
       return acc;
     },
     [] as string[]
   );
-}
-
-export function getStudentActivityDocs(
-  student: StudentData,
-  activityId: string
-): RelevantGoogleDoc[] {
-  const targetAssignmentProgress = student.assignmentProgress.find((a) =>
-    a.activityCompletions.some((ac) => ac.activityId === activityId)
-  );
-  if (!targetAssignmentProgress) {
-    return [];
-  }
-  return [
-    ...targetAssignmentProgress.activityCompletions.flatMap(
-      (ac) => ac.relevantGoogleDocs
-    ),
-  ].sort((a) => (a.primaryDocument ? -1 : 1));
 }
 
 export function getStudentAssignmentDocs(
@@ -328,9 +304,7 @@ export function getStudentAssignmentDocs(
   if (!targetAssignmentProgress) {
     return [];
   }
-  return [
-    ...targetAssignmentProgress.activityCompletions.flatMap(
-      (ac) => ac.relevantGoogleDocs
-    ),
-  ].sort((a) => (a.primaryDocument ? -1 : 1));
+  return [...targetAssignmentProgress.relevantGoogleDocs].sort((a) =>
+    a.primaryDocument ? -1 : 1
+  );
 }

@@ -465,11 +465,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     const assignmentProgress = myData.assignmentProgress.find(
       (a) => a.assignmentId === viewState.selectedAssignmentId
     );
-    const activityProgress = assignmentProgress?.activityCompletions.find(
-      (a) => a.activityId === viewState.selectedActivityId
-    );
     const docAlreadyPrimary = Boolean(
-      activityProgress?.relevantGoogleDocs.some(
+      assignmentProgress?.relevantGoogleDocs.some(
         (rd) => rd.docId === docId && rd.primaryDocument
       )
     );

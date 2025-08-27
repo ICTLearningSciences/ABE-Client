@@ -15,24 +15,25 @@ export const testStudent: StudentData = {
   assignmentProgress: [
     {
       assignmentId: 'assignment-123',
-      activityCompletions: [
-        { activityId: 'my-editable-activity', complete: false, relevantGoogleDocs: [
-          {
-            primaryDocument: false,
-            docId:"1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
-            docData: {
-              title: "Test 1"
-            }
-          },
-          {
-            primaryDocument: true,
-            docId:"1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fB",
-            docData: {
-              title: "Test 2"
-            }
+      relevantGoogleDocs: [
+        {
+          primaryDocument: false,
+          docId:"1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
+          docData: {
+            title: "Test 1"
           }
-        ] },
-        { activityId: 'my-read-only-activity', complete: false, relevantGoogleDocs: [] }
+        },
+        {
+          primaryDocument: true,
+          docId:"1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fB",
+          docData: {
+            title: "Test 2"
+          }
+        }
+      ],
+      activityCompletions: [
+        { activityId: 'my-editable-activity', complete: false },
+        { activityId: 'my-read-only-activity', complete: false }
       ]
     }
   ]
@@ -47,9 +48,10 @@ export const testStudent2: StudentData = {
   assignmentProgress: [
     {
       assignmentId: 'assignment-123',
+      relevantGoogleDocs: [],
       activityCompletions: [
-        { activityId: 'my-editable-activity', complete: true, relevantGoogleDocs: [] },
-        { activityId: 'my-read-only-activity', complete: true, relevantGoogleDocs: [] }
+        { activityId: 'my-editable-activity', complete: true },
+        { activityId: 'my-read-only-activity', complete: true }
       ]
     }
   ]
