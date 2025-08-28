@@ -105,13 +105,16 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
     );
   }, [activityIdToCompletionStatus]);
 
-  const handleEditAssignment = async (assignmentData: Partial<Assignment>) => {
-    try {
-      await educationManagement.updateAssignment(courseId, assignmentData);
-      setShowEditModal(false);
-    } catch (error) {
-      console.error('Failed to update assignment:', error);
-    }
+  const handleEditAssignment = async (
+    assignmentData: Partial<Assignment>,
+    mandatory: boolean
+  ) => {
+    await educationManagement.updateAssignmentMandatory(
+      assignmentId,
+      mandatory
+    );
+    await educationManagement.updateAssignment(courseId, assignmentData);
+    setShowEditModal(false);
   };
 
   const handleAddActivity = async (activityId: string) => {
@@ -280,13 +283,13 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
         activityIdToCompletionStatus={activityIdToCompletionStatus}
       />
 
-      {!isStudentView && (
+      {!isStudentView && section && (
         <AssignmentModal
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
           onSubmit={handleEditAssignment}
           mode={AssignmentModalMode.EDIT}
-          sectionId={sectionId}
+          section={section}
           initialData={assignment}
           isLoading={educationManagement.isAssignmentModifying}
         />

@@ -19,7 +19,10 @@ import {
   Checkbox,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-import { Assignment } from '../../../store/slices/education-management/types';
+import {
+  Assignment,
+  Section,
+} from '../../../store/slices/education-management/types';
 
 export enum AssignmentModalMode {
   CREATE = 'create',
@@ -29,11 +32,10 @@ export enum AssignmentModalMode {
 interface AssignmentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (assignmentData: Partial<Assignment>, mandatory?: boolean) => void;
+  onSubmit: (assignmentData: Partial<Assignment>, mandatory: boolean) => void;
   mode: AssignmentModalMode;
-  sectionId?: string;
+  section: Section;
   initialData?: Assignment;
-  initialMandatory?: boolean;
   isLoading?: boolean;
 }
 
@@ -42,17 +44,21 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   onClose,
   onSubmit,
   mode,
-  sectionId,
+  section,
   initialData,
-  initialMandatory = true,
   isLoading = false,
 }) => {
   const [formData, setFormData] = useState<Partial<Assignment>>({
     title: '',
     description: '',
   });
-  const [mandatory, setMandatory] = useState<boolean>(true);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const _initialMandatory = section.assignments.find(
+    (a) => a.assignmentId === initialData?._id
+  )?.mandatory;
+  const initialMandatory =
+    _initialMandatory !== undefined ? _initialMandatory : true;
+  const [mandatory, setMandatory] = useState<boolean>(initialMandatory);
 
   useEffect(() => {
     if (isOpen) {
@@ -229,7 +235,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             data-cy="assignment-modal-description-input"
           />
 
-          {sectionId && (
+          {section && (
             <FormControlLabel
               control={
                 <Checkbox

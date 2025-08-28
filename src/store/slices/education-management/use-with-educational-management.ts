@@ -199,6 +199,10 @@ export interface UseWithEducationalManagement {
     grade: number,
     comment: string
   ) => Promise<StudentData>;
+  updateAssignmentMandatory: (
+    assignmentId: string,
+    mandatory: boolean
+  ) => Promise<Section>;
 }
 
 export interface SectionStudentsProgress {
@@ -523,6 +527,29 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         grade,
         comment,
       })
+    ).unwrap();
+  }
+  async function updateAssignmentMandatory(
+    assignmentId: string,
+    mandatory: boolean
+  ) {
+    const section = sections.find((s) =>
+      s.assignments.some((a) => a.assignmentId === assignmentId)
+    );
+    if (!section) {
+      throw new Error('Section not found');
+    }
+    const courseId = courses.find((c) => c.sectionIds.includes(section._id))
+      ?._id;
+    if (!courseId) {
+      throw new Error('Course not found');
+    }
+    const newAssignments = section.assignments.map((a) =>
+      a.assignmentId === assignmentId ? { ...a, mandatory } : a
+    );
+    const newSection = { ...section, assignments: newAssignments };
+    return await dispatch(
+      _updateSection({ courseId, sectionData: newSection })
     ).unwrap();
   }
 
@@ -908,6 +935,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     deleteSection,
     createAssignment,
     updateAssignment,
+    updateAssignmentMandatory,
     deleteAssignment,
     enrollStudentInSection,
     removeStudentFromSection,

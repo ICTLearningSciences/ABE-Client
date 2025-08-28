@@ -283,7 +283,7 @@ const SectionContent: React.FC<SectionContentProps> = ({
         onClose={handleCloseAssignmentModal}
         onSubmit={handleAddAssignment}
         mode={AssignmentModalMode.CREATE}
-        sectionId={sectionId}
+        section={section}
         isLoading={educationManagement.isAssignmentModifying}
       />
     </Box>
