@@ -66,6 +66,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
   const { educationReadyActivities: builtActivities } =
     useWithDocGoalsActivities();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const {
     fetchDocumentTimeline,
     documentStates,
@@ -318,6 +319,8 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         isCourseModifying={educationManagement.isCourseModifying}
         onOpenJoinSectionModal={handleOpenJoinSectionModal}
         onOpenCourseModal={handleOpenCourseModal}
+        isSidebarCollapsed={isSidebarCollapsed}
+        setIsSidebarCollapsed={setIsSidebarCollapsed}
       />
 
       {/* Main content */}
@@ -452,6 +455,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                   viewStudentInfo(viewState.selectedStudentId!)
                 }
                 onDocumentChange={handleDocumentChange}
+                isSidebarCollapsed={isSidebarCollapsed}
               />
             )}
 

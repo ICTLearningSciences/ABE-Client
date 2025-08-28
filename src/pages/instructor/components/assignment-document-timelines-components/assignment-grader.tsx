@@ -52,12 +52,15 @@ export function AssignmentGrader({
     <Box
       style={{
         border: '2px dashed #000',
-        borderRadius: 2,
-        padding: 10,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 2,
       }}
     >
       {assignmentGrade ? (
-        <Box sx={{ mb: 2 }} data-cy="graded-assignment">
+        <Box data-cy="graded-assignment">
           <Typography variant="body2" color="darkgreen">
             Grade: {assignmentGrade.grade}/5
           </Typography>
