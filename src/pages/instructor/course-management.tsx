@@ -35,6 +35,7 @@ import { StudentInfoPage } from './components/section-student-grades/student-inf
 import { getStudentDocIds } from '../../helpers';
 import { LoginStatus } from '../../store/slices/login';
 import { CourseManagementSidebar } from './components/course-management-sidebar';
+import { ErrorToast } from '../../components/shared/error-toast';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -534,6 +535,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       />
       <JoinUrlSection />
       <LoadingDialog isLoading={isLoading} />
+      <ErrorToast />
     </Box>
   );
 };

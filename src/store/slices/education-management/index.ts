@@ -21,10 +21,14 @@ export const educationManagementSlice = createSlice({
     setViewState: (state, action: PayloadAction<CourseManagementState>) => {
       state.viewState = action.payload;
     },
+    clearErrorMessage: (state) => {
+      state.errorMessage = undefined;
+    },
   },
   extraReducers: buildExtraReducers,
 });
 
-export const { setViewState } = educationManagementSlice.actions;
+export const { setViewState, clearErrorMessage } =
+  educationManagementSlice.actions;
 
 export default educationManagementSlice.reducer;

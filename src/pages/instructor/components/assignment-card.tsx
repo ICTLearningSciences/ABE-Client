@@ -81,7 +81,9 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
           {isStudent ? (
             isCompleted && assignmentGrade ? (
               <Typography variant="body2">
-                <span style={{ fontWeight: 600 }}>Grade:</span>{' '}
+                <span style={{ fontWeight: 600, color: 'darkgreen' }}>
+                  Grade:
+                </span>{' '}
                 {assignmentGrade.grade}/5
               </Typography>
             ) : isCompleted ? (

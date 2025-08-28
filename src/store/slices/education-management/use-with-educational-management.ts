@@ -26,6 +26,7 @@ import {
   banStudentFromSection as _banStudentFromSection,
   unbanStudentFromSection as _unbanStudentFromSection,
   gradeStudentAssignment as _gradeStudentAssignment,
+  clearErrorMessage as _clearErrorMessage,
 } from '.';
 import {
   Course,
@@ -136,6 +137,7 @@ export interface UseWithEducationalManagement {
     docId: string
   ) => Promise<StudentData>;
   loadInstructors: () => Promise<Instructor[]>;
+  errorMessage?: string;
   courses: Course[];
   assignments: Assignment[];
   sections: Section[];
@@ -203,6 +205,7 @@ export interface UseWithEducationalManagement {
     assignmentId: string,
     mandatory: boolean
   ) => Promise<Section>;
+  clearErrorMessage: () => void;
 }
 
 export interface SectionStudentsProgress {
@@ -241,6 +244,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   );
   const educationalDataLoadStatus = useAppSelector(
     (state) => state.educationManagement.educationalDataLoadStatus
+  );
+  const errorMessage = useAppSelector(
+    (state) => state.educationManagement.errorMessage
   );
   const courses = useAppSelector((state) => state.educationManagement.courses);
   const assignments = useAppSelector(
@@ -920,6 +926,10 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return hydratedViewState;
   }, [viewState, courses, sections, assignments, activities, students]);
 
+  function clearErrorMessage() {
+    dispatch(_clearErrorMessage());
+  }
+
   return {
     loadCourses,
     loadAssignments,
@@ -979,6 +989,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     isEnrollmentModifying: enrollmentModificationStatus === LoadStatus.LOADING,
     enrollmentModificationFailed:
       enrollmentModificationStatus === LoadStatus.FAILED,
+    errorMessage,
+    clearErrorMessage,
     allSectionsStudentsProgress,
     addAssignmentToSection,
     getSectionForSectionId,

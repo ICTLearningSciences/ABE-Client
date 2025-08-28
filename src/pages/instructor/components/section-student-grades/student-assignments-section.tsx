@@ -126,7 +126,9 @@ export function StudentAssignmentsSection({
           }}
         >
           <Typography variant="body2">
-            <span style={{ fontWeight: 'bold' }}>Grade:</span>{' '}
+            <span style={{ fontWeight: 'bold', color: 'darkgreen' }}>
+              Grade:
+            </span>{' '}
             {assignmentGrade.grade}/5
           </Typography>
         </Box>

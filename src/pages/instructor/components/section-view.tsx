@@ -18,7 +18,10 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon, ExitToApp as ExitIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import { Section } from '../../../store/slices/education-management/types';
+import {
+  isInstructorData,
+  Section,
+} from '../../../store/slices/education-management/types';
 import SectionModal, { SectionModalMode } from './section-modal';
 import DeleteConfirmationModal from './delete-confirmation-modal';
 import SectionContent from './section-content';
@@ -58,6 +61,9 @@ const SectionView: React.FC<SectionViewProps> = ({
   const section = educationManagement.getSectionForSectionId(sectionId);
   const currentSectionStudentsProgress =
     educationManagement.allSectionsStudentsProgress[sectionId] || {};
+  const isInstructor = educationManagement.myData
+    ? isInstructorData(educationManagement.myData)
+    : false;
 
   useEffect(() => {
     if (sectionTab) {
@@ -168,10 +174,12 @@ const SectionView: React.FC<SectionViewProps> = ({
                   variant="outlined"
                   sx={{ fontSize: '11px' }}
                 />
-                <CopyUrlButton
-                  copyUrl={`${window.location.origin}?sectionCode=${section.sectionCode}`}
-                  tooltip="Copy Section Join URL"
-                />
+                {isInstructor && (
+                  <CopyUrlButton
+                    copyUrl={`${window.location.origin}?sectionCode=${section.sectionCode}`}
+                    tooltip="Copy Section Join URL"
+                  />
+                )}
               </Stack>
             </Box>
 

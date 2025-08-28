@@ -74,10 +74,9 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
       educationManagement.myData.assignmentProgress.find(
         (progress) => progress.assignmentId === assignmentId
       );
-    if (!assignmentProgress) return {};
     return assignment.activityIds.reduce(
       (acc, activityId) => {
-        const completion = assignmentProgress.activityCompletions.find(
+        const completion = assignmentProgress?.activityCompletions.find(
           (completion) => completion.activityId === activityId
         );
         acc[activityId] = completion?.complete ?? false;
@@ -235,7 +234,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                 )}
               </Stack>
               {assignmentGrade && (
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="darkgreen">
                   Grade: {assignmentGrade.grade}/5
                 </Typography>
               )}

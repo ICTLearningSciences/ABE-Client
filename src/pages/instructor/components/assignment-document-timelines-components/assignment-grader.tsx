@@ -58,7 +58,7 @@ export function AssignmentGrader({
     >
       {assignmentGrade ? (
         <Box sx={{ mb: 2 }} data-cy="graded-assignment">
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant="body2" color="darkgreen">
             Grade: {assignmentGrade.grade}/5
           </Typography>
         </Box>

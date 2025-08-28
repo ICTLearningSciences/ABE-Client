@@ -67,7 +67,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         ].enrolledSections.filter((s) => s !== action.payload.section._id);
       }
     })
-    .addCase(banStudentFromSection.rejected, (state) => {
+    .addCase(banStudentFromSection.rejected, (state, action) => {
+      state.errorMessage = `Failed to ban student from section: ${action.error.message}`;
       state.sectionModificationStatus = LoadStatus.FAILED;
     })
 
@@ -83,7 +84,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         state.sections[sectionIndex] = action.payload.section;
       }
     })
-    .addCase(unbanStudentFromSection.rejected, (state) => {
+    .addCase(unbanStudentFromSection.rejected, (state, action) => {
+      state.errorMessage = `Failed to unban student from section: ${action.error.message}`;
       state.sectionModificationStatus = LoadStatus.FAILED;
     });
 
@@ -118,7 +120,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         state.instructors.push(action.payload);
       }
     })
-    .addCase(shareCourseWithInstructor.rejected, (state) => {
+    .addCase(shareCourseWithInstructor.rejected, (state, action) => {
+      state.errorMessage = `Failed to share course with instructor: ${action.error.message}`;
       state.courseModificationStatus = LoadStatus.FAILED;
     })
 
@@ -138,7 +141,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         state.instructors.push(action.payload);
       }
     })
-    .addCase(unshareCourseWithInstructor.rejected, (state) => {
+    .addCase(unshareCourseWithInstructor.rejected, (state, action) => {
+      state.errorMessage = `Failed to unshare course with instructor: ${action.error.message}`;
       state.courseModificationStatus = LoadStatus.FAILED;
     });
 
@@ -151,7 +155,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
       state.educationalDataLoadStatus = LoadStatus.SUCCEEDED;
       state.instructorData = action.payload;
     })
-    .addCase(loadInstructorData.rejected, (state) => {
+    .addCase(loadInstructorData.rejected, (state, action) => {
+      state.errorMessage = `Failed to load instructor data: ${action.error.message}`;
       state.educationalDataLoadStatus = LoadStatus.FAILED;
     })
 
@@ -162,7 +167,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
       state.educationalDataLoadStatus = LoadStatus.SUCCEEDED;
       state.studentData = action.payload;
     })
-    .addCase(loadStudentData.rejected, (state) => {
+    .addCase(loadStudentData.rejected, (state, action) => {
+      state.errorMessage = `Failed to load student data: ${action.error.message}`;
       state.educationalDataLoadStatus = LoadStatus.FAILED;
     });
 
@@ -175,7 +181,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
       state.courses = action.payload;
       state.coursesLoadStatus = LoadStatus.SUCCEEDED;
     })
-    .addCase(fetchCourses.rejected, (state) => {
+    .addCase(fetchCourses.rejected, (state, action) => {
+      state.errorMessage = `Failed to fetch courses: ${action.error.message}`;
       state.coursesLoadStatus = LoadStatus.FAILED;
     })
 
@@ -186,7 +193,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
       state.assignments = action.payload;
       state.assignmentsLoadStatus = LoadStatus.SUCCEEDED;
     })
-    .addCase(fetchAssignments.rejected, (state) => {
+    .addCase(fetchAssignments.rejected, (state, action) => {
+      state.errorMessage = `Failed to fetch assignments: ${action.error.message}`;
       state.assignmentsLoadStatus = LoadStatus.FAILED;
     })
 
@@ -197,7 +205,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
       state.sections = action.payload;
       state.sectionsLoadStatus = LoadStatus.SUCCEEDED;
     })
-    .addCase(fetchSections.rejected, (state) => {
+    .addCase(fetchSections.rejected, (state, action) => {
+      state.errorMessage = `Failed to fetch sections: ${action.error.message}`;
       state.sectionsLoadStatus = LoadStatus.FAILED;
     })
 
@@ -208,7 +217,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
       state.students = action.payload;
       state.studentsLoadStatus = LoadStatus.SUCCEEDED;
     })
-    .addCase(fetchStudentsInMyCourses.rejected, (state) => {
+    .addCase(fetchStudentsInMyCourses.rejected, (state, action) => {
+      state.errorMessage = `Failed to fetch students in my courses: ${action.error.message}`;
       state.studentsLoadStatus = LoadStatus.FAILED;
     });
 
@@ -229,7 +239,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         });
       }
     })
-    .addCase(createCourse.rejected, (state) => {
+    .addCase(createCourse.rejected, (state, action) => {
+      state.errorMessage = `Failed to create course: ${action.error.message}`;
       state.courseModificationStatus = LoadStatus.FAILED;
     })
 
@@ -246,7 +257,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         state.courses[courseIndex] = action.payload;
       }
     })
-    .addCase(updateCourse.rejected, (state) => {
+    .addCase(updateCourse.rejected, (state, action) => {
+      state.errorMessage = `Failed to update course: ${action.error.message}`;
       state.courseModificationStatus = LoadStatus.FAILED;
     })
 
@@ -258,7 +270,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
       // Remove the course from the list
       state.courses = state.courses.filter((c) => c._id !== action.payload._id);
     })
-    .addCase(deleteCourse.rejected, (state) => {
+    .addCase(deleteCourse.rejected, (state, action) => {
+      state.errorMessage = `Failed to delete course: ${action.error.message}`;
       state.courseModificationStatus = LoadStatus.FAILED;
     });
 
@@ -280,7 +293,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         );
       }
     })
-    .addCase(createSection.rejected, (state) => {
+    .addCase(createSection.rejected, (state, action) => {
+      state.errorMessage = `Failed to create section: ${action.error.message}`;
       state.sectionModificationStatus = LoadStatus.FAILED;
     })
 
@@ -297,7 +311,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         state.sections[sectionIndex] = action.payload;
       }
     })
-    .addCase(updateSection.rejected, (state) => {
+    .addCase(updateSection.rejected, (state, action) => {
+      state.errorMessage = `Failed to update section: ${action.error.message}`;
       state.sectionModificationStatus = LoadStatus.FAILED;
     })
 
@@ -319,7 +334,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         ].sectionIds.filter((id) => id !== action.payload.sectionId);
       }
     })
-    .addCase(deleteSection.rejected, (state) => {
+    .addCase(deleteSection.rejected, (state, action) => {
+      state.errorMessage = `Failed to delete section: ${action.error.message}`;
       state.sectionModificationStatus = LoadStatus.FAILED;
     });
 
@@ -333,7 +349,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
       // Add the new assignment to the list
       state.assignments.push(action.payload);
     })
-    .addCase(createAssignment.rejected, (state) => {
+    .addCase(createAssignment.rejected, (state, action) => {
+      state.errorMessage = `Failed to create assignment: ${action.error.message}`;
       state.assignmentModificationStatus = LoadStatus.FAILED;
     })
 
@@ -350,7 +367,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         state.assignments[assignmentIndex] = action.payload;
       }
     })
-    .addCase(updateAssignment.rejected, (state) => {
+    .addCase(updateAssignment.rejected, (state, action) => {
+      state.errorMessage = `Failed to update assignment: ${action.error.message}`;
       state.assignmentModificationStatus = LoadStatus.FAILED;
     })
 
@@ -371,7 +389,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         ),
       }));
     })
-    .addCase(deleteAssignment.rejected, (state) => {
+    .addCase(deleteAssignment.rejected, (state, action) => {
+      state.errorMessage = `Failed to delete assignment: ${action.error.message}`;
       state.assignmentModificationStatus = LoadStatus.FAILED;
     });
 
@@ -396,7 +415,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         state.studentData = action.payload;
       }
     })
-    .addCase(enrollInSection.rejected, (state) => {
+    .addCase(enrollInSection.rejected, (state, action) => {
+      state.errorMessage = `Failed to enroll in section: ${action.error.message}`;
       state.enrollmentModificationStatus = LoadStatus.FAILED;
     })
 
@@ -416,7 +436,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         state.studentData = action.payload;
       }
     })
-    .addCase(removeFromSection.rejected, (state) => {
+    .addCase(removeFromSection.rejected, (state, action) => {
+      state.errorMessage = `Failed to remove from section: ${action.error.message}`;
       state.enrollmentModificationStatus = LoadStatus.FAILED;
     })
 
@@ -436,7 +457,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
         state.studentData = action.payload;
       }
     })
-    .addCase(updateStudentAssignmentProgress.rejected, (state) => {
+    .addCase(updateStudentAssignmentProgress.rejected, (state, action) => {
+      state.errorMessage = `Failed to update student assignment progress: ${action.error.message}`;
       state.enrollmentModificationStatus = LoadStatus.FAILED;
     })
 
@@ -448,5 +470,8 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
       if (studentIndex >= 0) {
         state.students[studentIndex] = action.payload;
       }
+    })
+    .addCase(gradeStudentAssignment.rejected, (state, action) => {
+      state.errorMessage = `Failed to grade student assignment: ${action.error.message}`;
     });
 };
