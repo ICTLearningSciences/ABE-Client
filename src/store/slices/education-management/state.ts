@@ -56,6 +56,7 @@ export interface State {
   instructors: Instructor[];
   instructorsLoadStatus: LoadStatus;
   viewState: CourseManagementState;
+  errorMessage?: string;
 }
 
 export const initialState: State = {
@@ -79,4 +80,5 @@ export const initialState: State = {
   viewState: {
     view: 'dashboard',
   },
+  errorMessage: undefined,
 };

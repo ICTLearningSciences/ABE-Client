@@ -175,6 +175,9 @@ const AssignmentActivitiesDisplay: React.FC<
         <Grid container spacing={2}>
           {assignment.activityIds.map((activityId) => {
             const activity = builtActivities.find((a) => a._id === activityId);
+            if (!activity) {
+              return null;
+            }
             const isComplete = activityIdToCompletionStatus[activityId];
             return (
               <Grid item xs={12} key={activityId}>

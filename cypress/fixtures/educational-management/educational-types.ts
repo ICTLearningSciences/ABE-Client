@@ -48,13 +48,13 @@ export interface Course {
   
   export interface ActivityCompletion {
     activityId: string;
-    relevantGoogleDocs: RelevantGoogleDoc[];
     complete: boolean;
     
   }
   
   export interface AssignmentProgress {
     assignmentId: string;
+    relevantGoogleDocs: RelevantGoogleDoc[];
     instructorGrade?: {
       grade: number;
       comment: string;

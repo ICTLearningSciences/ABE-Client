@@ -36,6 +36,7 @@ export interface UseWithDocGoalsActivities {
   docGoals: DocGoal[];
   getActivityById: (id: string) => ActivityTypes | undefined;
   isLoading: boolean;
+  educationReadyActivities: ActivityBuilder[];
 }
 
 export function useWithDocGoalsActivities(): UseWithDocGoalsActivities {
@@ -146,5 +147,8 @@ export function useWithDocGoalsActivities(): UseWithDocGoalsActivities {
       docGoalsLoadingState === LoadStatus.LOADING ||
       builtActivitiesLoadingState === LoadStatus.LOADING ||
       activitiesLoadingState === LoadStatus.LOADING,
+    educationReadyActivities: builtActivities.filter((a) =>
+      a.flowsList.some((f) => f.steps.some((s) => s.setStudentActivityComplete))
+    ),
   };
 }

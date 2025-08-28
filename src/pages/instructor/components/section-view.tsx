@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -18,12 +18,17 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon, ExitToApp as ExitIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import { Section } from '../../../store/slices/education-management/types';
+import {
+  isInstructorData,
+  Section,
+} from '../../../store/slices/education-management/types';
 import SectionModal, { SectionModalMode } from './section-modal';
 import DeleteConfirmationModal from './delete-confirmation-modal';
 import SectionContent from './section-content';
 import SectionStudentsGrades from './section-student-grades/section-students-grades';
 import BannedStudents from './banned-students';
+import { addQueryParamToUrl, removeQueryParamFromUrl } from '../../../helpers';
+import CopyUrlButton from '../../../components/shared/copy-url-button';
 
 interface SectionViewProps {
   sectionId: string;
@@ -34,6 +39,8 @@ interface SectionViewProps {
   isStudentView?: boolean;
   onViewStudentInfo?: (studentId: string) => void;
 }
+
+export const queryParamSectionTab = 'sectionTab';
 
 const SectionView: React.FC<SectionViewProps> = ({
   sectionId,
@@ -46,18 +53,33 @@ const SectionView: React.FC<SectionViewProps> = ({
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedTab, setSelectedTab] = useState(0);
+  const urlParams = new URLSearchParams(window.location.search);
+  const sectionTab = urlParams.get(queryParamSectionTab);
+  const [selectedTab, setSelectedTab] = useState(
+    sectionTab ? parseInt(sectionTab) : 0
+  );
   const section = educationManagement.getSectionForSectionId(sectionId);
   const currentSectionStudentsProgress =
     educationManagement.allSectionsStudentsProgress[sectionId] || {};
-  const handleEditSection = async (sectionData: Partial<Section>) => {
-    try {
-      await educationManagement.updateSection(courseId, sectionData);
-      setShowEditModal(false);
-    } catch (error) {
-      console.error('Failed to update section:', error);
+  const isInstructor = educationManagement.myData
+    ? isInstructorData(educationManagement.myData)
+    : false;
+
+  useEffect(() => {
+    if (sectionTab) {
+      removeQueryParamFromUrl(queryParamSectionTab);
     }
+  }, [sectionTab]);
+
+  const handleEditSection = async (sectionData: Partial<Section>) => {
+    await educationManagement.updateSection(courseId, sectionData);
+    setShowEditModal(false);
   };
+
+  function viewStudentInfo(studentId: string) {
+    addQueryParamToUrl(queryParamSectionTab, selectedTab.toString());
+    onViewStudentInfo?.(studentId);
+  }
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -152,6 +174,12 @@ const SectionView: React.FC<SectionViewProps> = ({
                   variant="outlined"
                   sx={{ fontSize: '11px' }}
                 />
+                {isInstructor && (
+                  <CopyUrlButton
+                    copyUrl={`${window.location.origin}?sectionCode=${section.sectionCode}`}
+                    tooltip="Copy Section Join URL"
+                  />
+                )}
               </Stack>
             </Box>
 
@@ -244,7 +272,7 @@ const SectionView: React.FC<SectionViewProps> = ({
               sectionStudentsProgress={currentSectionStudentsProgress}
               section={section}
               assignments={educationManagement.assignments}
-              onViewStudentInfo={onViewStudentInfo}
+              onViewStudentInfo={viewStudentInfo}
             />
           )}
 

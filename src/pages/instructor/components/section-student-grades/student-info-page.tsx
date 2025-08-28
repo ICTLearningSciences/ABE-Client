@@ -7,15 +7,14 @@ import {
 import {
   Section,
   StudentData,
-  RelevantGoogleDoc,
 } from '../../../../store/slices/education-management/types';
-import { ActivityBuilder } from '../../../../components/activity-builder/types';
 import {
   Block as BanIcon,
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { Box, Typography, Stack, Divider, Button } from '@mui/material';
-import { AssignmentsSection } from './assignments-section';
+import { StudentAssignmentsSection } from './student-assignments-section';
+import { getStudentAssignmentDocs } from '../../../../helpers';
 
 export function StudentInfoPage(props: {
   selectedStudent: StudentData;
@@ -26,10 +25,9 @@ export function StudentInfoPage(props: {
   assignmentsInSection: AssignmentsInSection;
   sectionStudentsProgress: SectionStudentsProgress;
   section: Section;
-  builtActivities: ActivityBuilder[];
   handleBanStudent: (studentUserId: string) => void;
   educationManagement: UseWithEducationalManagement;
-  onViewStudentTimelines?: (
+  onViewStudentTimelines: (
     studentId: string,
     assignmentId: string,
     docId?: string
@@ -42,42 +40,23 @@ export function StudentInfoPage(props: {
     assignmentsInSection,
     sectionStudentsProgress,
     section,
-    builtActivities,
     handleBanStudent,
     educationManagement,
     onViewStudentTimelines,
     onBackToSection,
   } = props;
 
-  const getActivityTitle = (activityId: string): string => {
-    const activity = builtActivities.find((a) => a._id === activityId);
-    return activity ? activity.title : `Activity ${activityId}`;
-  };
-
-  const getStudentDocDataForActivity = (
-    assignmentId: string,
-    activityId: string
-  ): RelevantGoogleDoc[] => {
-    const assignmentProgress = selectedStudent.assignmentProgress.find(
-      (progress) => progress.assignmentId === assignmentId
-    );
-    if (!assignmentProgress) return [];
-
-    const activityCompletion = assignmentProgress.activityCompletions.find(
-      (completion) => completion.activityId === activityId
-    );
-    if (!activityCompletion) return [];
-
-    // sort without mutating in place
-    return [...activityCompletion.relevantGoogleDocs].sort((a) =>
-      a.primaryDocument ? -1 : 1
-    );
-  };
-
-  const handleDocumentClick = (assignmentId: string, docId: string) => {
-    if (onViewStudentTimelines) {
-      onViewStudentTimelines(selectedStudent.userId, assignmentId, docId);
+  const goToAssignmentTimeline = (assignmentId: string) => {
+    const docs = getStudentAssignmentDocs(selectedStudent, assignmentId);
+    if (!docs.length) {
+      return;
     }
+    const primaryDoc = docs.find((d) => d.primaryDocument) || docs[0];
+    onViewStudentTimelines(
+      selectedStudent.userId,
+      assignmentId,
+      primaryDoc.docId
+    );
   };
   return (
     <Box sx={{ p: 3, width: '80%' }}>
@@ -86,7 +65,7 @@ export function StudentInfoPage(props: {
         onClick={onBackToSection}
         sx={{ mb: 2, color: 'text.secondary' }}
       >
-        Back to Section
+        Back to Students
       </Button>
       <Stack
         direction="row"
@@ -110,7 +89,7 @@ export function StudentInfoPage(props: {
       <Divider sx={{ mb: 3 }} />
 
       {/* Required Assignments Section */}
-      <AssignmentsSection
+      <StudentAssignmentsSection
         title="Required Assignments"
         assignments={assignmentsInSection.requiredAssignments}
         completedCount={
@@ -124,15 +103,13 @@ export function StudentInfoPage(props: {
             false
           );
         }}
-        getStudentDocDataForActivity={getStudentDocDataForActivity}
-        getActivityTitle={getActivityTitle}
-        onDocumentClick={handleDocumentClick}
+        onGoToAssignmentTimeline={goToAssignmentTimeline}
         student={selectedStudent}
       />
 
       {/* Optional Assignments Section */}
       {assignmentsInSection.optionalAssignments.length > 0 && (
-        <AssignmentsSection
+        <StudentAssignmentsSection
           title="Optional Assignments"
           assignments={assignmentsInSection.optionalAssignments}
           completedCount={
@@ -147,9 +124,7 @@ export function StudentInfoPage(props: {
               false
             );
           }}
-          getStudentDocDataForActivity={getStudentDocDataForActivity}
-          getActivityTitle={getActivityTitle}
-          onDocumentClick={handleDocumentClick}
+          onGoToAssignmentTimeline={goToAssignmentTimeline}
           student={selectedStudent}
         />
       )}
@@ -180,7 +155,7 @@ export function StudentInfoPage(props: {
             px: 3,
           }}
         >
-          BAN STUDENT
+          BLOCK STUDENT
         </Button>
       </Box>
     </Box>

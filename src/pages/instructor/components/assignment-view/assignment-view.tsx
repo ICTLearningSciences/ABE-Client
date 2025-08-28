@@ -74,10 +74,9 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
       educationManagement.myData.assignmentProgress.find(
         (progress) => progress.assignmentId === assignmentId
       );
-    if (!assignmentProgress) return {};
     return assignment.activityIds.reduce(
       (acc, activityId) => {
-        const completion = assignmentProgress.activityCompletions.find(
+        const completion = assignmentProgress?.activityCompletions.find(
           (completion) => completion.activityId === activityId
         );
         acc[activityId] = completion?.complete ?? false;
@@ -105,13 +104,16 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
     );
   }, [activityIdToCompletionStatus]);
 
-  const handleEditAssignment = async (assignmentData: Partial<Assignment>) => {
-    try {
-      await educationManagement.updateAssignment(courseId, assignmentData);
-      setShowEditModal(false);
-    } catch (error) {
-      console.error('Failed to update assignment:', error);
-    }
+  const handleEditAssignment = async (
+    assignmentData: Partial<Assignment>,
+    mandatory: boolean
+  ) => {
+    await educationManagement.updateAssignmentMandatory(
+      assignmentId,
+      mandatory
+    );
+    await educationManagement.updateAssignment(courseId, assignmentData);
+    setShowEditModal(false);
   };
 
   const handleAddActivity = async (activityId: string) => {
@@ -232,7 +234,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                 )}
               </Stack>
               {assignmentGrade && (
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="darkgreen">
                   Grade: {assignmentGrade.grade}/5
                 </Typography>
               )}
@@ -280,13 +282,13 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
         activityIdToCompletionStatus={activityIdToCompletionStatus}
       />
 
-      {!isStudentView && (
+      {!isStudentView && section && (
         <AssignmentModal
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
           onSubmit={handleEditAssignment}
           mode={AssignmentModalMode.EDIT}
-          sectionId={sectionId}
+          section={section}
           initialData={assignment}
           isLoading={educationManagement.isAssignmentModifying}
         />

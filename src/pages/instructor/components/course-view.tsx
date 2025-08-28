@@ -54,21 +54,13 @@ const CourseView: React.FC<CourseViewProps> = ({
   );
 
   const handleEditCourse = async (courseData: Partial<Course>) => {
-    try {
-      await educationManagement.updateCourse(courseData);
-      setShowEditModal(false);
-    } catch (error) {
-      console.error('Failed to update course:', error);
-    }
+    await educationManagement.updateCourse(courseData);
+    setShowEditModal(false);
   };
 
   const handleDeleteCourse = async () => {
-    try {
-      await educationManagement.deleteCourse(courseId);
-      onCourseDeleted?.();
-    } catch (error) {
-      console.error('Failed to delete course:', error);
-    }
+    await educationManagement.deleteCourse(courseId);
+    onCourseDeleted?.();
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {

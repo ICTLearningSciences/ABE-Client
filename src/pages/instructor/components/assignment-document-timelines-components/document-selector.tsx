@@ -31,6 +31,7 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
         flexDirection: 'row',
         textAlign: 'center',
         alignItems: 'center',
+        height: 'fit-content',
       }}
     >
       <Typography
@@ -43,7 +44,12 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
       >
         Document:
       </Typography>
-      <FormControl sx={{ minWidth: 300 }}>
+      <FormControl
+        sx={{ minWidth: 300, padding: 0, height: 'fit-content' }}
+        style={{
+          padding: 0,
+        }}
+      >
         <Select
           data-cy="document-select"
           labelId="document-select-label"
@@ -55,9 +61,13 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
                 borderColor: '#1976d2',
               },
             },
+            '& .MuiSelect-select': {
+              padding: 0,
+            },
             '& .MuiInputLabel-root.Mui-focused': {
               color: '#1976d2',
             },
+            padding: 0,
           }}
         >
           {docData.map((doc) => (

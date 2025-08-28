@@ -43,12 +43,8 @@ export const getAssignmentsForSection = (
 export function getCourseManagementTreeData(
   educationManagement: UseWithEducationalManagement,
   handleCourseSelect: (courseId: string) => void,
-  handleSectionSelect: (courseId: string, sectionId: string) => void,
-  handleAssignmentSelect: (
-    courseId: string,
-    sectionId: string,
-    assignmentId: string
-  ) => void
+  handleSectionSelect: (sectionId: string) => void,
+  handleAssignmentSelect: (assignmentId: string) => void
 ): TreeItem[] {
   return educationManagement.courses.map(
     (course): TreeItem => ({
@@ -61,7 +57,7 @@ export function getCourseManagementTreeData(
           id: section._id,
           icon: '📑',
           title: section.title,
-          onClick: () => handleSectionSelect(course._id, section._id),
+          onClick: () => handleSectionSelect(section._id),
           subItems: getAssignmentsForSection(
             educationManagement,
             section._id
@@ -70,8 +66,7 @@ export function getCourseManagementTreeData(
               id: assignment._id,
               icon: '📝',
               title: assignment.title,
-              onClick: () =>
-                handleAssignmentSelect(course._id, section._id, assignment._id),
+              onClick: () => handleAssignmentSelect(assignment._id),
             })
           ),
         })
@@ -83,12 +78,8 @@ export function getCourseManagementTreeData(
 export function getCourseManagementSectionedTreeData(
   educationManagement: UseWithEducationalManagement,
   handleCourseSelect: (courseId: string) => void,
-  handleSectionSelect: (courseId: string, sectionId: string) => void,
-  handleAssignmentSelect: (
-    courseId: string,
-    sectionId: string,
-    assignmentId: string
-  ) => void,
+  handleSectionSelect: (sectionId: string) => void,
+  handleAssignmentSelect: (assignmentId: string) => void,
   currentInstructor?: Instructor
 ): TreeSection[] {
   if (!currentInstructor) {
@@ -105,7 +96,7 @@ export function getCourseManagementSectionedTreeData(
         id: section._id,
         icon: '📑',
         title: section.title,
-        onClick: () => handleSectionSelect(course._id, section._id),
+        onClick: () => handleSectionSelect(section._id),
         subItems: getAssignmentsForSection(
           educationManagement,
           section._id
@@ -114,8 +105,7 @@ export function getCourseManagementSectionedTreeData(
             id: assignment._id,
             icon: '📝',
             title: assignment.title,
-            onClick: () =>
-              handleAssignmentSelect(course._id, section._id, assignment._id),
+            onClick: () => handleAssignmentSelect(assignment._id),
           })
         ),
       })
@@ -165,18 +155,30 @@ export interface CompletedAssignmentDict {
 }
 
 export function isAssignmentComplete(
+  assignment: Assignment,
   assignmentProgress: AssignmentProgress
 ): boolean {
-  return assignmentProgress.activityCompletions.every((ac) => ac.complete);
+  const relevantActivityCompletions =
+    assignmentProgress.activityCompletions.filter((ac) =>
+      assignment.activityIds.includes(ac.activityId)
+    );
+  return relevantActivityCompletions.every((ac) => ac.complete);
 }
 
 export function getCompletedAssignmentDictForStudent(
+  assignments: Assignment[],
   studentData?: StudentData
 ): CompletedAssignmentDict {
   if (!studentData) return {};
   return studentData.assignmentProgress.reduce(
     (acc: CompletedAssignmentDict, progress: AssignmentProgress) => {
-      acc[progress.assignmentId] = isAssignmentComplete(progress);
+      const assignment = assignments.find(
+        (a) => a._id === progress.assignmentId
+      );
+      if (!assignment) {
+        return acc;
+      }
+      acc[progress.assignmentId] = isAssignmentComplete(assignment, progress);
       return acc;
     },
     {}
@@ -242,7 +244,7 @@ export function getStudentSectionProgress(
         (ap) => ap.assignmentId === assignment._id
       );
       acc[assignment._id] = assignmentProgress
-        ? isAssignmentComplete(assignmentProgress)
+        ? isAssignmentComplete(assignment, assignmentProgress)
         : false;
       return acc;
     },
@@ -254,7 +256,7 @@ export function getStudentSectionProgress(
         (ap) => ap.assignmentId === assignment._id
       );
       acc[assignment._id] = assignmentProgress
-        ? isAssignmentComplete(assignmentProgress)
+        ? isAssignmentComplete(assignment, assignmentProgress)
         : false;
       return acc;
     },

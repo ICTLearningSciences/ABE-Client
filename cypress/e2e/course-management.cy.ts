@@ -10,7 +10,7 @@ import { EducationalRole } from '../fixtures/educational-management/educational-
 import { UserRole } from '../helpers/types';
 import { cyMockGetDocTimeline, mockGQL } from '../helpers/functions';
 import { createAssignmentResponse, deleteAssignmentResponse, newTestAssignment, updateAssignmentResponse, updatedTestAssignment } from '../fixtures/educational-management/assignment-operations';
-import { fetchCoursesResponseEmpty, fetchCoursesResponseStudent, removeFromSectionResponse, studentAfterRemoval, updatedTestSection, updateTestSectionWithAssignmentsResponse } from '../fixtures/educational-management';
+import { createNewStudentResponse, createNewStudentWithIncompleteActivityResponse, fetchCoursesResponseEmpty, fetchCoursesResponseStudent, removeFromSectionResponse, studentAfterRemoval, updatedTestSection, updateTestSectionWithAssignmentsResponse } from '../fixtures/educational-management';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 import { realExampleDocumentTimeline2, realExampleDocVersions, realExampleDocVersions2 } from '../fixtures/document-timeline/real-example';
 
@@ -300,7 +300,6 @@ describe('Course Management', () => {
       cy.get('[data-cy=add-assignment-button]').should('be.visible').click();
       cy.get('[data-cy=assignment-modal]').should('be.visible');
 
-      // TODO: input new assignment title, description, and activity into the assignment modal and submit new assignment
       cy.get('[data-cy=assignment-modal-title-input]').type('Test Assignment');
       cy.get('[data-cy=assignment-modal-description-input]').type('This is a test assignment description');
       cy.get('[data-cy=assignment-modal-submit-button]').click();
@@ -450,8 +449,10 @@ describe('Course Management', () => {
     it('When a student completes an activity, logs them completing that activity', () => {
       cyMockEducationalManagement(cy, {
         userRole: UserRole.USER,
-        educationalRole: EducationalRole.STUDENT
-        
+        educationalRole: EducationalRole.STUDENT,
+        gqlQueries: [
+          mockGQL('CreateNewStudent', createNewStudentWithIncompleteActivityResponse),
+        ]
       });
       
       cy.visit('/course-management');
@@ -629,8 +630,9 @@ describe('Course Management', () => {
       cy.get('[data-cy=section-card-section-456]').click();
       cy.get("[data-cy=students-and-grades]").click()
       cy.get("[data-cy=student-user-123]").click()
-      cy.get("[data-cy=Required-Assignments-assignments-section]").click()
-      cy.get("[data-cy=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y-doc-select]").click()
+      cy.get("[data-cy=assignments-section-assignment-123]").within(() => {
+        cy.get("[data-cy=review-documents-button]").click()
+      })
   
       // Header Visible
       cy.get("[data-cy=activity-document-timelines]").should("be.visible")
@@ -696,8 +698,9 @@ describe('Course Management', () => {
     cy.get('[data-cy=section-card-section-456]').click();
     cy.get("[data-cy=students-and-grades]").click()
     cy.get("[data-cy=student-user-123]").click()
-    cy.get("[data-cy=Required-Assignments-assignments-section]").click()
-    cy.get("[data-cy=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y-doc-select]").click()
+    cy.get("[data-cy=assignments-section-assignment-123]").within(() => {
+      cy.get("[data-cy=review-documents-button]").click()
+    })
 
 
     // Mock the second doc timeline
@@ -706,7 +709,7 @@ describe('Course Management', () => {
     });
 
     cy.get("[data-cy=document-select]").click()
-    cy.get("[data-value=1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fB]").click()
+    cy.get("[data-value=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y]").click()
 
     cy.get("[data-cy=text-view-content]").should("contain.text", "Test 2")
     })
@@ -739,8 +742,9 @@ describe('Course Management', () => {
       cy.get('[data-cy=section-card-section-456]').click();
       cy.get("[data-cy=students-and-grades]").click()
       cy.get("[data-cy=student-user-123]").click()
-      cy.get("[data-cy=Required-Assignments-assignments-section]").click()
-      cy.get("[data-cy=1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y-doc-select]").click()
+      cy.get("[data-cy=assignments-section-assignment-123]").within(() => {
+        cy.get("[data-cy=review-documents-button]").click()
+      })
 
       cy.get("[data-cy=not-graded-assignment]").should("exist").should("be.visible")
       cy.get("[data-cy=grade-assignment-button]").click()

@@ -15,9 +15,11 @@ import {
   IconButton,
   Typography,
   Box,
+  Alert,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { Section } from '../../../store/slices/education-management/types';
+import { extractErrorMessageFromError } from '../../../helpers';
 
 export enum SectionModalMode {
   CREATE = 'create',
@@ -27,7 +29,7 @@ export enum SectionModalMode {
 interface SectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (sectionData: Partial<Section>) => void;
+  onSubmit: (sectionData: Partial<Section>) => Promise<void>;
   mode: SectionModalMode;
   initialData?: Section;
   isLoading?: boolean;
@@ -48,6 +50,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
     numOptionalAssignmentsRequired: 0,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [requestError, setRequestError] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
@@ -117,10 +120,15 @@ const SectionModal: React.FC<SectionModalProps> = ({
       submitData._id = initialData._id;
     }
 
-    onSubmit(submitData);
+    onSubmit(submitData).catch((error) => {
+      setRequestError(
+        extractErrorMessageFromError(error) || 'Failed to join section'
+      );
+    });
   };
 
   const handleInputChange = (field: string, value: string | number) => {
+    setRequestError('');
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -184,7 +192,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
             fullWidth
             required
             label="Title"
-            placeholder="e.g., Getting Started"
+            placeholder="e.g., Section 1A"
             value={formData.title || ''}
             onChange={(e) => handleInputChange('title', e.target.value)}
             error={!!errors.title}
@@ -267,6 +275,11 @@ const SectionModal: React.FC<SectionModalProps> = ({
           />
         </Box>
       </DialogContent>
+      {requestError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {requestError}
+        </Alert>
+      )}
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button

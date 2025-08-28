@@ -23,8 +23,11 @@ import PersonIcon from '@mui/icons-material/Person';
 import { UserInfoSettings } from '../settings/user-info-settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { CuiHeader } from './cui-header';
-export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
-  const { useLogin } = props;
+export default function Header(props: {
+  useLogin: UseWithLogin;
+  homeNavPath: string;
+}): JSX.Element {
+  const { useLogin, homeNavPath } = props;
   const { logout } = useLogin;
   const loginStatus = useAppSelector((state) => state.login.loginStatus);
   const loggedIn = loginStatus === LoginStatus.AUTHENTICATED;
@@ -109,7 +112,7 @@ export default function Header(props: { useLogin: UseWithLogin }): JSX.Element {
             <IconButton
               data-cy="home-button"
               onClick={() => {
-                navigate('/docs');
+                navigate(homeNavPath);
               }}
               color="primary"
             >

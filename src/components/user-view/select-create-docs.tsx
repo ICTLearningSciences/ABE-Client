@@ -28,7 +28,7 @@ import {
   StudentData,
 } from '../../store/slices/education-management/types';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
-import { getStudentActivityDocs } from '../../helpers';
+import { getStudentAssignmentDocs } from '../../helpers';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: UserDoc[];
@@ -77,15 +77,17 @@ export default function SelectCreateDocs(props: {
   const [loadInProgress, setLoadInProgress] = React.useState(false);
   const { viewState, myData, studentActivityDocPrimaryStatusSet } =
     useWithEducationalManagement();
-  const isStudent = myData ? isStudentData(myData) : false;
-  const studentActivityDocs =
-    isStudent && viewState.selectedActivityId
-      ? getStudentActivityDocs(
+  const isStudent = myData
+    ? Boolean(isStudentData(myData) && viewState.selectedActivityId)
+    : false;
+  const studentAssignmentDocs =
+    isStudent && viewState.selectedAssignmentId
+      ? getStudentAssignmentDocs(
           myData as StudentData,
-          viewState.selectedActivityId
+          viewState.selectedAssignmentId
         )
       : [];
-  const primaryDocId = studentActivityDocs.find((d) => d.primaryDocument)
+  const primaryDocId = studentAssignmentDocs.find((d) => d.primaryDocument)
     ?.docId;
   const assignments = useAppSelector(
     (state) => state.educationManagement.assignments

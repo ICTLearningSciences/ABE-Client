@@ -26,6 +26,7 @@ import {
   banStudentFromSection as _banStudentFromSection,
   unbanStudentFromSection as _unbanStudentFromSection,
   gradeStudentAssignment as _gradeStudentAssignment,
+  clearErrorMessage as _clearErrorMessage,
 } from '.';
 import {
   Course,
@@ -74,12 +75,15 @@ export interface UseWithEducationalManagement {
   createSection: (
     courseId: string,
     sectionData?: Partial<Section>
-  ) => Promise<Section>;
+  ) => Promise<{ courseId: string; newSection: Section }>;
   updateSection: (
     courseId: string,
     sectionData: Partial<Section>
   ) => Promise<Section>;
-  deleteSection: (courseId: string, sectionId: string) => Promise<Section>;
+  deleteSection: (
+    courseId: string,
+    sectionId: string
+  ) => Promise<{ courseId: string; sectionId: string }>;
   createAssignment: (
     courseId: string,
     assignmentData?: Partial<Assignment>
@@ -133,6 +137,7 @@ export interface UseWithEducationalManagement {
     docId: string
   ) => Promise<StudentData>;
   loadInstructors: () => Promise<Instructor[]>;
+  errorMessage?: string;
   courses: Course[];
   assignments: Assignment[];
   sections: Section[];
@@ -196,6 +201,11 @@ export interface UseWithEducationalManagement {
     grade: number,
     comment: string
   ) => Promise<StudentData>;
+  updateAssignmentMandatory: (
+    assignmentId: string,
+    mandatory: boolean
+  ) => Promise<Section>;
+  clearErrorMessage: () => void;
 }
 
 export interface SectionStudentsProgress {
@@ -234,6 +244,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   );
   const educationalDataLoadStatus = useAppSelector(
     (state) => state.educationManagement.educationalDataLoadStatus
+  );
+  const errorMessage = useAppSelector(
+    (state) => state.educationManagement.errorMessage
   );
   const courses = useAppSelector((state) => state.educationManagement.courses);
   const assignments = useAppSelector(
@@ -297,42 +310,42 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     courseId: string,
     sectionData?: Partial<Section>
   ) {
-    const res = await dispatch(_createSection({ courseId, sectionData }));
-    return res.payload as Section;
+    return await dispatch(_createSection({ courseId, sectionData })).unwrap();
   }
 
   async function updateSection(
     courseId: string,
     sectionData: Partial<Section>
   ) {
-    const res = await dispatch(_updateSection({ courseId, sectionData }));
-    return res.payload as Section;
+    return await dispatch(_updateSection({ courseId, sectionData })).unwrap();
   }
 
   async function deleteSection(courseId: string, sectionId: string) {
-    const res = await dispatch(_deleteSection({ courseId, sectionId }));
-    return res.payload as Section;
+    return await dispatch(_deleteSection({ courseId, sectionId })).unwrap();
   }
 
   async function createAssignment(
     courseId: string,
     assignmentData?: Partial<Assignment>
   ) {
-    const res = await dispatch(_createAssignment({ courseId, assignmentData }));
-    return res.payload as Assignment;
+    return await dispatch(
+      _createAssignment({ courseId, assignmentData })
+    ).unwrap();
   }
 
   async function updateAssignment(
     courseId: string,
     assignmentData: Partial<Assignment>
   ) {
-    const res = await dispatch(_updateAssignment({ courseId, assignmentData }));
-    return res.payload as Assignment;
+    return await dispatch(
+      _updateAssignment({ courseId, assignmentData })
+    ).unwrap();
   }
 
   async function deleteAssignment(courseId: string, assignmentId: string) {
-    const res = await dispatch(_deleteAssignment({ courseId, assignmentId }));
-    return res.payload as Assignment;
+    return await dispatch(
+      _deleteAssignment({ courseId, assignmentId })
+    ).unwrap();
   }
 
   async function enrollStudentInSection(
@@ -465,11 +478,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     const assignmentProgress = myData.assignmentProgress.find(
       (a) => a.assignmentId === viewState.selectedAssignmentId
     );
-    const activityProgress = assignmentProgress?.activityCompletions.find(
-      (a) => a.activityId === viewState.selectedActivityId
-    );
     const docAlreadyPrimary = Boolean(
-      activityProgress?.relevantGoogleDocs.some(
+      assignmentProgress?.relevantGoogleDocs.some(
         (rd) => rd.docId === docId && rd.primaryDocument
       )
     );
@@ -523,6 +533,29 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         grade,
         comment,
       })
+    ).unwrap();
+  }
+  async function updateAssignmentMandatory(
+    assignmentId: string,
+    mandatory: boolean
+  ) {
+    const section = sections.find((s) =>
+      s.assignments.some((a) => a.assignmentId === assignmentId)
+    );
+    if (!section) {
+      throw new Error('Section not found');
+    }
+    const courseId = courses.find((c) => c.sectionIds.includes(section._id))
+      ?._id;
+    if (!courseId) {
+      throw new Error('Course not found');
+    }
+    const newAssignments = section.assignments.map((a) =>
+      a.assignmentId === assignmentId ? { ...a, mandatory } : a
+    );
+    const newSection = { ...section, assignments: newAssignments };
+    return await dispatch(
+      _updateSection({ courseId, sectionData: newSection })
     ).unwrap();
   }
 
@@ -687,46 +720,74 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   }
 
   async function viewSection(sectionId: string) {
-    if (!viewState.selectedCourseId) {
-      throw new Error('No course selected in viewSection');
+    const course =
+      viewState.selectedCourseId ||
+      courses.find((c) => c.sectionIds.includes(sectionId))?._id;
+    if (!course) {
+      throw new Error('No course found for section');
     }
     dispatch(
       setViewState({
         view: 'section',
-        selectedCourseId: viewState.selectedCourseId,
+        selectedCourseId: course,
         selectedSectionId: sectionId,
       })
     );
   }
 
   async function viewAssignment(assignmentId: string) {
-    if (!viewState.selectedCourseId || !viewState.selectedSectionId) {
-      throw new Error('No course or section selected');
+    const sectionId =
+      viewState.selectedSectionId ||
+      sections.find((s) =>
+        s.assignments.some((a) => a.assignmentId === assignmentId)
+      )?._id;
+    if (!sectionId) {
+      throw new Error('No section found for assignment');
     }
+    const courseId =
+      viewState.selectedCourseId ||
+      courses.find((c) => c.sectionIds.includes(sectionId))?._id;
+    if (!courseId) {
+      throw new Error('No course found for section');
+    }
+
     dispatch(
       setViewState({
         view: 'assignment',
-        selectedCourseId: viewState.selectedCourseId,
-        selectedSectionId: viewState.selectedSectionId,
+        selectedCourseId: courseId,
+        selectedSectionId: sectionId,
         selectedAssignmentId: assignmentId,
       })
     );
   }
 
   async function viewActivity(activityId: string) {
-    if (
-      !viewState.selectedCourseId ||
-      !viewState.selectedSectionId ||
-      !viewState.selectedAssignmentId
-    ) {
-      throw new Error('No course, section, or assignment selected');
+    const assignmentId =
+      viewState.selectedAssignmentId ||
+      assignments.find((a) => a.activityIds.includes(activityId))?._id;
+    if (!assignmentId) {
+      throw new Error('No assignment found for activity');
+    }
+    const sectionId =
+      viewState.selectedSectionId ||
+      sections.find((s) =>
+        s.assignments.some((a) => a.assignmentId === assignmentId)
+      )?._id;
+    if (!sectionId) {
+      throw new Error('No section found for assignment');
+    }
+    const courseId =
+      viewState.selectedCourseId ||
+      courses.find((c) => c.sectionIds.includes(sectionId))?._id;
+    if (!courseId) {
+      throw new Error('No course found for section');
     }
     dispatch(
       setViewState({
         view: 'activity',
-        selectedCourseId: viewState.selectedCourseId,
-        selectedSectionId: viewState.selectedSectionId,
-        selectedAssignmentId: viewState.selectedAssignmentId,
+        selectedCourseId: courseId,
+        selectedSectionId: sectionId,
+        selectedAssignmentId: assignmentId,
         selectedActivityId: activityId,
       })
     );
@@ -737,14 +798,25 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     assignmentId: string,
     docId?: string
   ) {
-    if (!viewState.selectedCourseId || !viewState.selectedSectionId) {
-      throw new Error('No course or section selected');
+    const sectionId =
+      viewState.selectedSectionId ||
+      sections.find((s) =>
+        s.assignments.some((a) => a.assignmentId === assignmentId)
+      )?._id;
+    if (!sectionId) {
+      throw new Error('No section found for assignment');
+    }
+    const courseId =
+      viewState.selectedCourseId ||
+      courses.find((c) => c.sectionIds.includes(sectionId))?._id;
+    if (!courseId) {
+      throw new Error('No course found for section');
     }
     dispatch(
       setViewState({
         view: 'activity-document-timelines',
-        selectedCourseId: viewState.selectedCourseId,
-        selectedSectionId: viewState.selectedSectionId,
+        selectedCourseId: courseId,
+        selectedSectionId: sectionId,
         selectedAssignmentId: assignmentId,
         selectedStudentId: studentId,
         selectedDocId: docId,
@@ -854,6 +926,10 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return hydratedViewState;
   }, [viewState, courses, sections, assignments, activities, students]);
 
+  function clearErrorMessage() {
+    dispatch(_clearErrorMessage());
+  }
+
   return {
     loadCourses,
     loadAssignments,
@@ -869,6 +945,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     deleteSection,
     createAssignment,
     updateAssignment,
+    updateAssignmentMandatory,
     deleteAssignment,
     enrollStudentInSection,
     removeStudentFromSection,
@@ -912,6 +989,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     isEnrollmentModifying: enrollmentModificationStatus === LoadStatus.LOADING,
     enrollmentModificationFailed:
       enrollmentModificationStatus === LoadStatus.FAILED,
+    errorMessage,
+    clearErrorMessage,
     allSectionsStudentsProgress,
     addAssignmentToSection,
     getSectionForSectionId,

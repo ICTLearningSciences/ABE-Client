@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import { Box, Typography, Chip } from '@mui/material';
-import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import { DehydratedGQLTimelinePoint } from '../../../../types';
 import { applyTextDiff } from '../assignment-document-timelines';
 import { useAppSelector } from '../../../../store/hooks';
@@ -49,10 +48,6 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
         boxSizing: 'border-box',
       }}
     >
-      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-        Timeline
-      </Typography>
-
       <Box
         sx={{
           display: 'flex',
@@ -95,6 +90,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                   cursor: 'pointer',
                   p: 1,
                   borderRadius: 2,
+                  opacity: index === selectedTimelineIndex ? 1 : 0.5,
                   backgroundColor:
                     index === selectedTimelineIndex
                       ? 'primary.50'
@@ -108,30 +104,6 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                 }}
                 onClick={() => onTimelinePointSelect(index)}
               >
-                <Box
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    backgroundColor:
-                      index === selectedTimelineIndex
-                        ? 'primary.main'
-                        : 'primary.light',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mb: 1,
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  <CheckCircleIcon
-                    sx={{
-                      color: 'white',
-                      fontSize: 20,
-                    }}
-                  />
-                </Box>
-
                 <Chip
                   label={activityTitle}
                   size="small"
