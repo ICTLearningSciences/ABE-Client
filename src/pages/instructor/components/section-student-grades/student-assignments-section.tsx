@@ -86,8 +86,6 @@ export function StudentAssignmentsSection({
             justifyContent: 'center',
             alignItems: 'center',
             width: '10%',
-            border: '2px dashed #000',
-            borderRadius: 2,
           }}
         >
           {assignmentGrade ? (
@@ -177,7 +175,7 @@ export function StudentAssignmentsSection({
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-                gap: 20,
+                alignItems: 'center',
               }}
               data-cy={`assignments-section-${assignment._id}`}
               key={assignment._id}
@@ -186,7 +184,6 @@ export function StudentAssignmentsSection({
                 key={assignment._id}
                 sx={{
                   width: '90%',
-                  mb: 1,
                   border: '1px solid',
                   borderColor: isCompleted ? '#4caf50' : 'grey.200',
                   backgroundColor: isCompleted

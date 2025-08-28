@@ -192,7 +192,7 @@ const SectionModal: React.FC<SectionModalProps> = ({
             fullWidth
             required
             label="Title"
-            placeholder="e.g., Getting Started"
+            placeholder="e.g., Section 1A"
             value={formData.title || ''}
             onChange={(e) => handleInputChange('title', e.target.value)}
             error={!!errors.title}

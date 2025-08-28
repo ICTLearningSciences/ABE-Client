@@ -64,7 +64,8 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   useWithEducationalEvents();
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
   const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
-  const { builtActivities } = useWithDocGoalsActivities();
+  const { educationReadyActivities: builtActivities } =
+    useWithDocGoalsActivities();
   const {
     fetchDocumentTimeline,
     documentStates,
