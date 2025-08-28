@@ -15,7 +15,6 @@ import {
   GQLDocumentTimeline,
 } from '../../../types';
 import { AssignmentHeader } from './assignment-document-timelines-components/assignment-header';
-import { DocumentSelector } from './assignment-document-timelines-components/document-selector';
 import { TimelineView } from './assignment-document-timelines-components/timeline-view';
 import { DocumentTextView } from './assignment-document-timelines-components/document-text-view';
 import { TabbedInfoPanel } from './assignment-document-timelines-components/tabbed-info-panel';
@@ -25,7 +24,6 @@ import {
   StudentData,
 } from '../../../store/slices/education-management/types';
 import { getStudentAssignmentDocs } from '../../../helpers';
-import { AssignmentGrader } from './assignment-document-timelines-components/assignment-grader';
 
 export interface TextDiffResult {
   diffContent: React.ReactNode[];
@@ -106,6 +104,7 @@ interface AssignmentDocumentTimelinesProps {
   getHydratedTimeline: (docId: string) => GQLDocumentTimeline | undefined;
   onBackToStudentInfo: () => void;
   onDocumentChange: (docId: string) => void;
+  isSidebarCollapsed: boolean;
 }
 
 export const AssignmentDocumentTimelines: React.FC<
@@ -121,6 +120,7 @@ export const AssignmentDocumentTimelines: React.FC<
   getHydratedTimeline,
   onBackToStudentInfo,
   onDocumentChange,
+  isSidebarCollapsed,
 }) => {
   const documentIds = studentDocIds;
   const currentDocState = documentStates[selectedDocId];
@@ -164,7 +164,6 @@ export const AssignmentDocumentTimelines: React.FC<
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        flex: 1,
         position: 'relative',
       }}
       height="100%"
@@ -172,20 +171,19 @@ export const AssignmentDocumentTimelines: React.FC<
       data-cy="activity-document-timelines"
     >
       <AssignmentHeader
-        assignmentTitle={assignment.title}
-        studentName={student.name}
+        assignment={assignment}
+        student={student}
         onBackToStudentInfo={onBackToStudentInfo}
-      />
-
-      <DocumentSelector
         docData={studentAssignmentDocs}
         selectedDocId={selectedDocId}
         onDocumentChange={onDocumentChange}
       />
-
-      <Box sx={{ position: 'absolute', right: 50, top: 20 }}>
-        <AssignmentGrader student={student} assignment={assignment} />
-      </Box>
+      <TimelineView
+        timelinePoints={timelinePoints}
+        selectedTimelineIndex={selectedTimelineIndex}
+        onTimelinePointSelect={setSelectedTimelineIndex}
+        isSidebarCollapsed={isSidebarCollapsed}
+      />
 
       {errorMessage && (
         <Box sx={{ textAlign: 'center', py: 4 }}>
@@ -208,12 +206,6 @@ export const AssignmentDocumentTimelines: React.FC<
         </Box>
       ) : (
         <>
-          <TimelineView
-            timelinePoints={timelinePoints}
-            selectedTimelineIndex={selectedTimelineIndex}
-            onTimelinePointSelect={setSelectedTimelineIndex}
-          />
-
           <Grid container spacing={3} sx={{ flex: 1, mb: 1 }} height="60%">
             <Grid item xs={6} style={{ height: '100%' }}>
               <DocumentTextView

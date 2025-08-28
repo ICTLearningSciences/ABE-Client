@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Typography, Button, Paper, IconButton } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import CollapsibleTree, { TreeSection } from './collapsible-tree';
@@ -17,6 +17,8 @@ interface CourseManagementSidebarProps {
   isCourseModifying: boolean;
   onOpenJoinSectionModal: () => void;
   onOpenCourseModal: () => void;
+  isSidebarCollapsed: boolean;
+  setIsSidebarCollapsed: (isSidebarCollapsed: boolean) => void;
 }
 
 export const CourseManagementSidebar: React.FC<
@@ -29,14 +31,14 @@ export const CourseManagementSidebar: React.FC<
   isCourseModifying,
   onOpenJoinSectionModal,
   onOpenCourseModal,
+  isSidebarCollapsed,
+  setIsSidebarCollapsed,
 }) => {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
   return (
     <Paper
       elevation={0}
       sx={{
-        width: isSidebarCollapsed ? '48px' : '300px',
+        width: isSidebarCollapsed ? '1vw' : '15vw',
         backgroundColor: '#f8f9fa',
         borderRadius: '8px 0 0 8px',
         borderRight: '1px solid #e9ecef',

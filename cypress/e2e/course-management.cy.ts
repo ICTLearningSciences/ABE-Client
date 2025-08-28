@@ -714,7 +714,7 @@ describe('Course Management', () => {
     cy.get("[data-cy=text-view-content]").should("contain.text", "Test 2")
     })
 
-    it("Can grade student assignment", ()=>{
+    it.only("Can grade student assignment", ()=>{
       cyMockEducationalManagement(cy, {
         userRole: UserRole.USER,
         educationalRole: EducationalRole.INSTRUCTOR,

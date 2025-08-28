@@ -14,12 +14,14 @@ interface TimelineViewProps {
   timelinePoints: DehydratedGQLTimelinePoint[];
   selectedTimelineIndex: number;
   onTimelinePointSelect: (index: number) => void;
+  isSidebarCollapsed: boolean;
 }
 
 export const TimelineView: React.FC<TimelineViewProps> = ({
   timelinePoints,
   selectedTimelineIndex,
   onTimelinePointSelect,
+  isSidebarCollapsed,
 }) => {
   if (!timelinePoints.length) {
     return null;
@@ -38,145 +40,125 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
       data-cy="activity-document-timeline-notches"
       sx={{
         mb: 2,
-        width: '100%',
-        border: '1px solid',
-        borderColor: 'grey.200',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
         backgroundColor: 'background.paper',
         padding: 2,
         pb: 1,
-        boxSizing: 'border-box',
+        maxWidth: isSidebarCollapsed ? '95vw' : '82vw',
+        display: 'flex',
+        flexDirection: 'row',
+        overflowX: 'scroll',
+        whiteSpace: 'nowrap',
+        gap: 10,
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 2,
-          overflowX: 'auto',
-          width: '75vw',
-          '&::-webkit-scrollbar': {
-            height: 8,
-          },
-          '&::-webkit-scrollbar-track': {
-            backgroundColor: 'grey.100',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'grey.400',
-            borderRadius: 4,
-          },
-        }}
-      >
-        {timelinePoints.map((point, index) => {
-          const previousPoint = timelinePoints[index - 1];
-          const diffContent = applyTextDiff(
-            previousPoint?.version?.plainText || '',
-            point.version?.plainText || ''
-          );
-          const charactersRemoved = diffContent.charactersRemoved;
-          const charactersAdded = diffContent.charactersAdded;
-          const activityTitle = getActivityTitle(point.version?.activity || '');
-          return (
+      {timelinePoints.map((point, index) => {
+        const previousPoint = timelinePoints[index - 1];
+        const diffContent = applyTextDiff(
+          previousPoint?.version?.plainText || '',
+          point.version?.plainText || ''
+        );
+        const charactersRemoved = diffContent.charactersRemoved;
+        const charactersAdded = diffContent.charactersAdded;
+        const activityTitle = getActivityTitle(point.version?.activity || '');
+        return (
+          <Box
+            data-cy={`activity-document-timeline-notch-${index}`}
+            key={point.versionId}
+            sx={{ display: 'flex', alignItems: 'center' }}
+          >
             <Box
-              data-cy={`activity-document-timeline-notch-${index}`}
-              key={point.versionId}
-              sx={{ display: 'flex', alignItems: 'center' }}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                minWidth: 200,
+                cursor: 'pointer',
+                p: 1,
+                borderRadius: 2,
+                opacity: index === selectedTimelineIndex ? 1 : 0.5,
+                backgroundColor:
+                  index === selectedTimelineIndex
+                    ? 'primary.50'
+                    : 'transparent',
+                '&:hover': {
+                  backgroundColor:
+                    index === selectedTimelineIndex ? 'primary.50' : 'grey.50',
+                },
+              }}
+              onClick={() => onTimelinePointSelect(index)}
             >
-              <Box
+              <Chip
+                label={activityTitle}
+                size="small"
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  minWidth: 200,
-                  cursor: 'pointer',
-                  p: 1,
-                  borderRadius: 2,
-                  opacity: index === selectedTimelineIndex ? 1 : 0.5,
+                  mb: 1,
                   backgroundColor:
                     index === selectedTimelineIndex
-                      ? 'primary.50'
-                      : 'transparent',
-                  '&:hover': {
-                    backgroundColor:
-                      index === selectedTimelineIndex
-                        ? 'primary.50'
-                        : 'grey.50',
+                      ? 'primary.main'
+                      : 'primary.light',
+                  color: 'white',
+                  fontSize: '0.75rem',
+                  maxWidth: 180,
+                  '& .MuiChip-label': {
+                    px: 1,
                   },
                 }}
-                onClick={() => onTimelinePointSelect(index)}
-              >
+              />
+
+              <Box sx={{ display: 'flex', gap: 0.5 }}>
                 <Chip
-                  label={activityTitle}
+                  label={`+${charactersAdded}`}
                   size="small"
                   sx={{
-                    mb: 1,
-                    backgroundColor:
-                      index === selectedTimelineIndex
-                        ? 'primary.main'
-                        : 'primary.light',
+                    backgroundColor: 'success.light',
                     color: 'white',
-                    fontSize: '0.75rem',
-                    maxWidth: 180,
-                    '& .MuiChip-label': {
-                      px: 1,
-                    },
+                    fontSize: '0.7rem',
+                    height: 20,
                   }}
                 />
-
-                <Box sx={{ display: 'flex', gap: 0.5 }}>
-                  <Chip
-                    label={`+${charactersAdded}`}
-                    size="small"
-                    sx={{
-                      backgroundColor: 'success.light',
-                      color: 'white',
-                      fontSize: '0.7rem',
-                      height: 20,
-                    }}
-                  />
-                  <Chip
-                    label={`-${charactersRemoved}`}
-                    size="small"
-                    sx={{
-                      backgroundColor: 'error.light',
-                      color: 'white',
-                      fontSize: '0.7rem',
-                      height: 20,
-                    }}
-                  />
-                </Box>
-
-                <Typography
-                  variant="caption"
+                <Chip
+                  label={`-${charactersRemoved}`}
+                  size="small"
                   sx={{
-                    mt: 0.5,
-                    color: 'text.secondary',
-                    textAlign: 'center',
+                    backgroundColor: 'error.light',
+                    color: 'white',
                     fontSize: '0.7rem',
+                    height: 20,
                   }}
-                >
-                  {new Date(point.versionTime).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </Typography>
+                />
               </Box>
 
-              {index < timelinePoints.length - 1 && (
-                <Box
-                  sx={{
-                    width: 40,
-                    height: 2,
-                    backgroundColor: 'primary.light',
-                    mx: 1,
-                  }}
-                />
-              )}
+              <Typography
+                variant="caption"
+                sx={{
+                  mt: 0.5,
+                  color: 'text.secondary',
+                  textAlign: 'center',
+                  fontSize: '0.7rem',
+                }}
+              >
+                {new Date(point.versionTime).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </Typography>
             </Box>
-          );
-        })}
-      </Box>
+
+            {index < timelinePoints.length - 1 && (
+              <Box
+                sx={{
+                  width: 40,
+                  height: 2,
+                  backgroundColor: 'primary.light',
+                  mx: 1,
+                }}
+              />
+            )}
+          </Box>
+        );
+      })}
     </Box>
   );
 };

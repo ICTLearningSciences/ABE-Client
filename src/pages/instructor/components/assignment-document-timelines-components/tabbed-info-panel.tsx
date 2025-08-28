@@ -71,7 +71,15 @@ export const TabbedInfoPanel: React.FC<TabbedInfoPanelProps> = ({
   }
 
   return (
-    <Paper sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Paper
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        border: '1px solid',
+        borderColor: 'grey.200',
+      }}
+    >
       <Tabs
         value={tabValue}
         onChange={handleTabChange}

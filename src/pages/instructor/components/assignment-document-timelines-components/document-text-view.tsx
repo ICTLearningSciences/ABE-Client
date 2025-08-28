@@ -67,6 +67,9 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
           overflow: 'hidden',
           pl: 1,
           pr: 1,
+          border: '1px solid',
+          borderColor: 'grey.200',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
         }}
       >
         <RowDiv

@@ -7,18 +7,34 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import { DocumentSelector } from './document-selector';
+import {
+  Assignment,
+  RelevantGoogleDoc,
+  StudentData,
+} from '../../../../store/slices/education-management/types';
+import { RowDiv } from '../../../../styled-components';
+import { AssignmentGrader } from './assignment-grader';
 
 interface AssignmentHeaderProps {
-  assignmentTitle: string;
-  studentName: string;
+  student: StudentData;
+  assignment: Assignment;
   onBackToStudentInfo?: () => void;
+  docData?: RelevantGoogleDoc[];
+  selectedDocId?: string;
+  onDocumentChange?: (docId: string) => void;
 }
 
 export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
-  assignmentTitle,
-  studentName,
+  student,
+  assignment,
   onBackToStudentInfo,
+  docData,
+  selectedDocId,
+  onDocumentChange,
 }) => {
+  const { name: studentName } = student;
+  const { title: assignmentTitle } = assignment;
   return (
     <Box
       data-cy="assignment-header"
@@ -38,21 +54,79 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
           Back
         </Button>
       )}
-      <Typography
-        sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'center' }}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          width: '100%',
+          columnGap: 1,
+          alignItems: 'center',
+        }}
       >
-        Student:{' '}
-        <span style={{ fontWeight: 400, color: 'black' }}>{studentName}</span>
-      </Typography>
+        <RowDiv
+          style={{
+            flex: 1,
+            gap: 5,
+            textAlign: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Typography
+            sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'right' }}
+          >
+            Student:
+          </Typography>
+          <Typography sx={{ fontWeight: 400, color: 'black' }}>
+            {studentName}
+          </Typography>
+        </RowDiv>
 
-      <Typography
-        sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'center' }}
-      >
-        Assignment:{' '}
-        <span style={{ fontWeight: 400, color: 'black' }}>
-          {assignmentTitle}
-        </span>
-      </Typography>
+        <RowDiv
+          style={{
+            flex: 1,
+            gap: 5,
+            textAlign: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Typography
+            sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'right' }}
+          >
+            Assignment:
+          </Typography>
+          <Typography sx={{ fontWeight: 400, color: 'black' }}>
+            {assignmentTitle}
+          </Typography>
+        </RowDiv>
+
+        <RowDiv
+          style={{
+            flex: 1,
+            gap: 5,
+            textAlign: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {docData && docData.length > 0 && onDocumentChange && (
+            <>
+              <Typography
+                sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'right' }}
+              >
+                Document:
+              </Typography>
+              <DocumentSelector
+                docData={docData}
+                selectedDocId={selectedDocId || ''}
+                onDocumentChange={onDocumentChange}
+              />
+            </>
+          )}
+        </RowDiv>
+
+        <Box sx={{ flex: 0.3 }}>
+          <AssignmentGrader student={student} assignment={assignment} />
+        </Box>
+      </Box>
     </Box>
   );
 };
