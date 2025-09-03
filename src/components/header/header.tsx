@@ -23,6 +23,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { UserInfoSettings } from '../settings/user-info-settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { CuiHeader } from './cui-header';
+import { PrivacyPolicyDisplay } from '../privacy-policy-display';
 export default function Header(props: {
   useLogin: UseWithLogin;
   homeNavPath: string;
@@ -83,6 +84,7 @@ export default function Header(props: {
           >
             Logout <LogoutIcon style={{ marginLeft: 10 }} />
           </Button>
+          <PrivacyPolicyDisplay />
         </div>
       </Drawer>
       <header

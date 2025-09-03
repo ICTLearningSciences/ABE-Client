@@ -273,6 +273,7 @@ export interface Config {
   loginScreenTitle?: string;
   surveyConfig?: SurveyConfig;
   bannerConfig?: BannerConfig;
+  privacyPolicy?: string;
 }
 
 export interface BannerConfig {

@@ -518,6 +518,7 @@ export async function fetchConfig(subdomain?: string): Promise<Config> {
         query FetchConfig($subdomain: String){
           fetchConfig(subdomain: $subdomain) {
             aiSystemPrompt
+            privacyPolicy
             displayedGoalActivities{
               goal
               activities{

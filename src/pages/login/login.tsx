@@ -17,6 +17,7 @@ import {
   courseManagementUrl,
   studentCoursesUrl,
 } from '../instructor/course-management';
+import { PrivacyPolicyDisplay } from '../../components/privacy-policy-display';
 export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
   const { useLogin } = props;
   const { loginWithGoogle, state: loginState } = useLogin;
@@ -85,6 +86,14 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
         loginText="Sign in with Google"
         orgName={orgName}
       />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '0',
+        }}
+      >
+        <PrivacyPolicyDisplay />
+      </div>
     </div>
   );
 }
