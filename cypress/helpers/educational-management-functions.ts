@@ -34,8 +34,8 @@ import {
   deleteAssignmentResponse,
   enrollInSectionResponse,
   removeFromSectionResponse,
-  updateStudentProgressResponse,
 } from '../fixtures/educational-management';
+import { updateStudentProgressResponse } from '../fixtures/educational-management/assignment-progress-operations';
 import { fetchBuiltActivitiesResponse } from '../fixtures/fetch-built-activities';
 import { EducationalRole } from '../fixtures/educational-management/educational-types';
 import { MockGraphQLQuery } from './functions';

@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Box,
   Typography,
@@ -18,15 +18,25 @@ import {
   Select,
   MenuItem,
   IconButton,
+  Modal,
 } from '@mui/material';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import {
   Add as AddIcon,
   CheckCircle,
   RadioButtonUnchecked,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { ActivityBuilder } from '../../../components/activity-builder/types';
-import { Assignment } from '../../../store/slices/education-management/types';
+import {
+  Assignment,
+  isStudentData,
+} from '../../../store/slices/education-management/types';
+import { LLMSelector } from './assignment-view/llm-selector';
+import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
+import { AiServiceModel } from '../../../types';
+import { getStudentActivityCompletionData } from '../helpers';
+import { RowDiv } from '../../../styled-components';
 
 interface AssignmentActivitiesDisplayProps {
   assignment: Assignment;
@@ -54,7 +64,24 @@ const AssignmentActivitiesDisplay: React.FC<
   activityIdToCompletionStatus,
 }) => {
   const [selectedActivityId, setSelectedActivityId] = useState<string>('');
-
+  const { myData, studentActivityDefaultLLMSet, viewState } =
+    useWithEducationalManagement();
+  const [llmChangeLoading, setLlmChangeLoading] = useState(false);
+  const [llmModalOpen, setLlmModalOpen] = useState(false);
+  const [selectedActivityForLLM, setSelectedActivityForLLM] =
+    useState<string>('');
+  const selectedActivityForLLMDefaultLLM = useMemo(
+    () =>
+      myData && isStudentData(myData)
+        ? getStudentActivityCompletionData(
+            myData,
+            assignment._id,
+            selectedActivityForLLM
+          )?.defaultLLM
+        : undefined,
+    [selectedActivityForLLM, myData, assignment._id]
+  );
+  const isStudent = Boolean(myData && isStudentData(myData));
   const handleAddActivity = async () => {
     if (!selectedActivityId) return;
 
@@ -73,6 +100,37 @@ const AssignmentActivitiesDisplay: React.FC<
       console.error('Failed to remove activity from assignment:', error);
     }
   };
+
+  async function handleLLMChange(defaultLLM: AiServiceModel) {
+    if (!myData || !isStudentData(myData) || !selectedActivityForLLM) return;
+    setLlmChangeLoading(true);
+    try {
+      if (
+        !viewState.selectedCourseId ||
+        !viewState.selectedSectionId ||
+        !viewState.selectedAssignmentId
+      )
+        throw new Error('View state not found');
+      await studentActivityDefaultLLMSet(
+        myData.userId,
+        viewState.selectedCourseId,
+        viewState.selectedSectionId,
+        viewState.selectedAssignmentId,
+        selectedActivityForLLM,
+        defaultLLM
+      );
+      setLlmModalOpen(false);
+    } catch (error) {
+      console.error('Failed to change activity default LLM:', error);
+    } finally {
+      setLlmChangeLoading(false);
+    }
+  }
+
+  function handleOpenLLMModal(activityId: string) {
+    setSelectedActivityForLLM(activityId);
+    setLlmModalOpen(true);
+  }
 
   return (
     <Box>
@@ -205,28 +263,38 @@ const AssignmentActivitiesDisplay: React.FC<
                       >
                         {activity?.title || `Activity ${activityId}`}
                       </Typography>
-                      {isComplete && isStudentView && <CheckCircle sx={{ color: 'green' }} />}
-                      {!isComplete && isStudentView && (
-                        <RadioButtonUnchecked sx={{ color: 'grey' }} />
-                      )}
-                      {!isStudentView && (
-                        <IconButton
-                          onClick={() => handleRemoveActivity(activityId)}
-                          disabled={isAssignmentModifying}
-                          sx={{
-                            color: '#d32f2f',
-                            '&:hover': {
-                              backgroundColor: '#ffebee',
-                            },
-                            '&:disabled': {
-                              color: 'grey.400',
-                            },
-                          }}
-                          size="small"
-                        >
-                          <RemoveCircleIcon />
-                        </IconButton>
-                      )}
+                      <RowDiv>
+                        {isComplete && isStudentView && (
+                          <CheckCircle sx={{ color: 'green' }} />
+                        )}
+                        {!isComplete && isStudentView && (
+                          <RadioButtonUnchecked sx={{ color: 'grey' }} />
+                        )}
+                        {!isStudentView && (
+                          <IconButton
+                            onClick={() => handleRemoveActivity(activityId)}
+                            disabled={isAssignmentModifying}
+                            size="small"
+                          >
+                            <RemoveCircleIcon />
+                          </IconButton>
+                        )}
+
+                        {isStudent && (
+                          <IconButton
+                            onClick={() => handleOpenLLMModal(activityId)}
+                            sx={{
+                              '&:hover': {
+                                color: 'primary.main',
+                              },
+                            }}
+                            size="small"
+                            data-cy={`llm-settings-button-${activityId}`}
+                          >
+                            <SettingsIcon />
+                          </IconButton>
+                        )}
+                      </RowDiv>
                     </Stack>
                   </CardContent>
                 </Card>
@@ -235,6 +303,45 @@ const AssignmentActivitiesDisplay: React.FC<
           })}
         </Grid>
       )}
+
+      {/* LLM Settings Modal */}
+      <Modal
+        open={llmModalOpen}
+        onClose={() => setLlmModalOpen(false)}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Box
+          sx={{
+            backgroundColor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            minWidth: 300,
+            maxWidth: 500,
+          }}
+        >
+          {selectedActivityForLLM && (
+            <LLMSelector
+              selectedLLM={selectedActivityForLLMDefaultLLM}
+              handleLLMChange={handleLLMChange}
+              loading={llmChangeLoading}
+            />
+          )}
+          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+            <Button
+              data-cy="llm-settings-modal-close-button"
+              onClick={() => setLlmModalOpen(false)}
+              disabled={llmChangeLoading}
+            >
+              Close
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Box>
   );
 };

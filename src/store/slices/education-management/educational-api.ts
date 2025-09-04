@@ -332,7 +332,7 @@ export async function modifyStudentAssignmentProgress(
   const res = await execGql<StudentData>(
     {
       query: `
-        mutation ModifyStudentAssignmentProgress($targetUserId: ID!, $courseId: ID!, $sectionId: ID!, $assignmentId: ID!, $activityId: ID!, $action: String!, $docId: String, $defaultLLM: AiServiceModelInputType) {
+        mutation ModifyStudentAssignmentProgress($targetUserId: ID!, $courseId: ID!, $sectionId: ID!, $assignmentId: ID!, $activityId: ID!, $action: String!, $docId: String, $defaultLLM: AiModelServiceInputType) {
           modifyStudentAssignmentProgress(targetUserId: $targetUserId, courseId: $courseId, sectionId: $sectionId, assignmentId: $assignmentId, activityId: $activityId, action: $action, docId: $docId, defaultLLM: $defaultLLM) {
             ${studentDataQueryData}
           }

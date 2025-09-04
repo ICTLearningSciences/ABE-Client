@@ -14,6 +14,7 @@ import { createNewStudentResponse, createNewStudentWithIncompleteActivityRespons
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 import { realExampleDocumentTimeline2, realExampleDocVersions, realExampleDocVersions2 } from '../fixtures/document-timeline/real-example';
 import { openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
+import { studentWithUpdatedActivityDefaultLLM, updateStudentProgressResponse } from '../fixtures/educational-management/assignment-progress-operations';
 
 describe('Course Management', () => {
   
@@ -552,6 +553,70 @@ describe('Course Management', () => {
         expect(aiStep.targetAiServiceModel.model).to.equal("gpt-4")
       });
       
+    });
+
+    it("student can set default LLM for an activity, overrides course default LLM", () => {
+      // What I need is to perform a modify assignment progress action that returns with the student activity updated with the selected LLM
+      cyMockEducationalManagement(cy, {
+        userRole: UserRole.USER,
+        educationalRole: EducationalRole.STUDENT,
+        gqlQueries: [
+          mockGQL('CreateNewStudent', createNewStudentWithIncompleteActivityResponse),
+          mockGQL('ModifyStudentAssignmentProgress', [
+            studentWithUpdatedActivityDefaultLLM({
+              serviceName: 'OPEN_AI',
+              model: 'gpt-4-turbo-preview'
+            })
+          ])
+        ]
+      });
+      cyMockGetDocData(cy, {
+        plainText: "This is a test doc",
+        markdownText: "This is a test doc",
+        title: "Test Doc",
+        lastChangedId: "123",
+        lastModifyingUser: "user-123",
+      });
+
+      cyMockOpenAiCall(cy, {
+        response: openAiTextResponse("The capital of France is Paris"),
+      });
+      
+      cy.visit('/course-management');
+      
+      // Wait for initial load
+      cy.wait('@RefreshAccessToken');
+      cy.wait('@FetchConfig');
+      cy.wait('@CreateNewStudent');
+      cy.wait('@FetchCourses');
+      cy.wait('@FetchSections');
+      cy.wait('@FetchAssignments');
+      cy.wait('@FetchBuiltActivities');
+      
+      // Navigate to course -> section -> assignment
+      cy.get('[data-cy=tree-item-course-123]').click();
+      cy.get('[data-cy=section-card-section-456]').click();
+      cy.get('[data-cy=assignment-card-assignment-123]').click();
+      cy.get('[data-cy=llm-settings-button-my-editable-activity]').click();
+      cy.get('[data-cy=assignment-modal-default-llm-select]').click();
+      cy.get('[role="option"]').first().click();
+      cy.get('[data-cy=llm-settings-modal-close-button]').click();
+      
+      // // Click on an activity
+      cy.get('[data-cy=activity-item-my-editable-activity]').click();
+      
+      cy.get('[data-cy=doc-list-item-Aliens]').click();
+
+      cy.get("[data-cy=chat-input]").type("What is the capital of France?");
+      cy.get("[data-cy=chat-input]").type("{enter}");
+
+      cy.wait('@openAiStartCall').then((xhr) => {
+        const aiSteps = xhr.request.body.aiPromptSteps
+        const aiStep = aiSteps[0]
+        expect(aiStep.targetAiServiceModel).to.exist
+        expect(aiStep.targetAiServiceModel.serviceName).to.equal("OPEN_AI")
+        expect(aiStep.targetAiServiceModel.model).to.equal("gpt-4-turbo-preview")
+      });
     });
   });
 

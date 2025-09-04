@@ -416,18 +416,26 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     return res.payload as StudentData;
   }
 
-
-  async function studentActivityDefaultLLMSet(    targetUserId: string,
+  async function studentActivityDefaultLLMSet(
+    targetUserId: string,
     courseId: string,
     sectionId: string,
     assignmentId: string,
     activityId: string,
-    defaultLLM: AiServiceModel) {
+    defaultLLM: AiServiceModel
+  ) {
     const res = await dispatch(
-      _updateStudentAssignmentProgress({ targetUserId, courseId, sectionId, assignmentId, activityId, action: ModifyStudentAssignmentProgressActions.DEFAULT_LLM_SET, defaultLLM })
+      _updateStudentAssignmentProgress({
+        targetUserId,
+        courseId,
+        sectionId,
+        assignmentId,
+        activityId,
+        action: ModifyStudentAssignmentProgressActions.DEFAULT_LLM_SET,
+        defaultLLM,
+      })
     );
     return res.payload as StudentData;
-
   }
 
   async function studentActivityCompleted(

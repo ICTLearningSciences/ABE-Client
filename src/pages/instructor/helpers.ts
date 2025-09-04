@@ -12,6 +12,7 @@ import {
   CourseOwnership,
   Instructor,
   Course,
+  ActivityCompletion,
 } from '../../store/slices/education-management/types';
 import { UseWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { TreeItem, TreeSection } from './components/collapsible-tree';
@@ -267,4 +268,18 @@ export function getStudentSectionProgress(
     requiredAssignmentsProgress,
     optionalAssignmentsProgress,
   };
+}
+
+export function getStudentActivityCompletionData(
+  studentData: StudentData,
+  assignmentId: string,
+  activityId: string
+): ActivityCompletion | undefined {
+  const assignmentProgress = studentData.assignmentProgress.find(
+    (ap) => ap.assignmentId === assignmentId
+  );
+  const activityCompletion = assignmentProgress?.activityCompletions.find(
+    (ap) => ap.activityId === activityId
+  );
+  return activityCompletion;
 }

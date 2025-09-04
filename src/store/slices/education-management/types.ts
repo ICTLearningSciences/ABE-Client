@@ -1,4 +1,4 @@
-import { AiServiceModel } from "../../../types";
+import { AiServiceModel } from '../../../types';
 
 export interface Course {
   _id: string;

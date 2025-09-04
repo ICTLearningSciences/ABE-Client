@@ -241,7 +241,9 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                 {(assignment.defaultLLM || globalDefaultAiServiceModel) && (
                   <Chip
                     data-cy="assignment-view-default-llm-chip"
-                    label={`Default LLM: ${aiServiceModelToString(assignment.defaultLLM || globalDefaultAiServiceModel)}`}
+                    label={`Default LLM: ${aiServiceModelToString(
+                      assignment.defaultLLM || globalDefaultAiServiceModel
+                    )}`}
                     size="small"
                     color="primary"
                     sx={{ fontSize: '10px' }}

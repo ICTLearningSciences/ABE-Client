@@ -17,20 +17,19 @@ import {
   Box,
   FormControlLabel,
   Checkbox,
-  FormLabel,
-  Select,
-  FormControl,
-  MenuItem,
   Collapse,
 } from '@mui/material';
-import { Close as CloseIcon, ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon } from '@mui/icons-material';
+import {
+  Close as CloseIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+} from '@mui/icons-material';
 import {
   Assignment,
   Section,
 } from '../../../store/slices/education-management/types';
-import { useWithConfig } from '../../../exported-files';
-import { aiServiceModelStringParse, aiServiceModelToString } from '../../../helpers';
-import { useAppSelector } from '../../../store/hooks';
+import { LLMSelector } from './assignment-view/llm-selector';
+import { AiServiceModel } from '../../../types';
 
 export enum AssignmentModalMode {
   CREATE = 'create',
@@ -56,15 +55,11 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   initialData,
   isLoading = false,
 }) => {
-  const {availableAiServiceModels} = useWithConfig();
   const [formData, setFormData] = useState<Partial<Assignment>>({
     title: '',
     description: '',
-    defaultLLM: undefined
+    defaultLLM: undefined,
   });
-  const globalDefaultAiServiceModel = useAppSelector(
-    (state) => state.config.config?.defaultAiModel
-  );
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const _initialMandatory = section.assignments.find(
     (a) => a.assignmentId === initialData?._id
@@ -148,10 +143,10 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
     }
   };
 
-  const handleDefaultLLMChange = (value: string) => {
+  const handleDefaultLLMChange = (defaultLLM: AiServiceModel) => {
     setFormData((prev) => ({
       ...prev,
-      defaultLLM: aiServiceModelStringParse(value),
+      defaultLLM: defaultLLM,
     }));
   };
 
@@ -194,11 +189,13 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent style={{
-        display:"flex",
-        flexDirection:"column",
-        gap:2
-      }}>
+      <DialogContent
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {mode === AssignmentModalMode.CREATE
             ? 'Create a new assignment with activities and learning objectives. You can add activities later.'
@@ -290,7 +287,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
           )}
 
           <Button
-          fullWidth
+            fullWidth
             variant="text"
             onClick={() => setShowAdvanced(!showAdvanced)}
             startIcon={showAdvanced ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -306,26 +303,11 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
           </Button>
 
           <Collapse in={showAdvanced}>
-            <FormControl fullWidth sx={{ mt: 1 }}>
-              <FormLabel>Default LLM</FormLabel>
-              <Select
-                value={formData.defaultLLM ? aiServiceModelToString(formData.defaultLLM) : globalDefaultAiServiceModel ? aiServiceModelToString(globalDefaultAiServiceModel) : ''}
-                onChange={(e) => handleDefaultLLMChange(e.target.value)}
-                data-cy="assignment-modal-default-llm-select"
-              >
-                {availableAiServiceModels.map((service) => {
-                  return service.models.map((model) => {
-                    const serviceString = aiServiceModelToString({
-                      serviceName: service.serviceName,
-                      model: model,
-                    });
-                    return <MenuItem key={serviceString} value={serviceString}>
-                      {serviceString}
-                    </MenuItem>
-                });
-                })}
-              </Select>
-            </FormControl>
+            <LLMSelector
+              selectedLLM={formData.defaultLLM}
+              handleLLMChange={handleDefaultLLMChange}
+              loading={isLoading}
+            />
           </Collapse>
         </Box>
       </DialogContent>
