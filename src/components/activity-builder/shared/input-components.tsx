@@ -61,11 +61,13 @@ export function CheckBoxInput(props: {
   onChange: (value: boolean) => void;
   disabled?: boolean;
   tooltip?: string;
+  labelPlacement?: 'top' | 'bottom' | 'start' | 'end';
 }): JSX.Element {
   return (
     <RowDiv>
       <FormControlLabel
         label={props.label}
+        labelPlacement={props.labelPlacement || 'end'}
         style={{
           margin: 0,
         }}

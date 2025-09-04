@@ -13,6 +13,7 @@ export interface Assignment {
   title: string;
   description: string;
   activityIds: string[];
+  activityOrder: string[];
   defaultLLM: AiServiceModel;
 }
 
@@ -28,6 +29,7 @@ export interface Section {
   description: string;
   bannedStudentUserIds: string[];
   assignments: SectionAssignment[];
+  assignmentOrder: string[];
   numOptionalAssignmentsRequired: number;
 }
 

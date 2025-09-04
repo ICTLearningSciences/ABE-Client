@@ -10,23 +10,15 @@ import {
   Typography,
   Button,
   Card,
-  CardContent,
   Grid,
   Stack,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  IconButton,
   Modal,
 } from '@mui/material';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import {
-  Add as AddIcon,
-  CheckCircle,
-  RadioButtonUnchecked,
-  Settings as SettingsIcon,
-} from '@mui/icons-material';
+import { Add as AddIcon } from '@mui/icons-material';
 import { ActivityBuilder } from '../../../components/activity-builder/types';
 import {
   Assignment,
@@ -35,8 +27,8 @@ import {
 import { LLMSelector } from './assignment-view/llm-selector';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { AiServiceModel } from '../../../types';
-import { getStudentActivityCompletionData } from '../helpers';
-import { RowDiv } from '../../../styled-components';
+import { getStudentActivityCompletionData, reorderArray } from '../helpers';
+import { AssignmentActivityListItem } from './assignment-view/assignment-activity-list-item';
 
 interface AssignmentActivitiesDisplayProps {
   assignment: Assignment;
@@ -64,7 +56,7 @@ const AssignmentActivitiesDisplay: React.FC<
   activityIdToCompletionStatus,
 }) => {
   const [selectedActivityId, setSelectedActivityId] = useState<string>('');
-  const { myData, studentActivityDefaultLLMSet, viewState } =
+  const { myData, studentActivityDefaultLLMSet, viewState, updateAssignment } =
     useWithEducationalManagement();
   const [llmChangeLoading, setLlmChangeLoading] = useState(false);
   const [llmModalOpen, setLlmModalOpen] = useState(false);
@@ -81,7 +73,7 @@ const AssignmentActivitiesDisplay: React.FC<
         : undefined,
     [selectedActivityForLLM, myData, assignment._id]
   );
-  const isStudent = Boolean(myData && isStudentData(myData));
+
   const handleAddActivity = async () => {
     if (!selectedActivityId) return;
 
@@ -124,6 +116,26 @@ const AssignmentActivitiesDisplay: React.FC<
       console.error('Failed to change activity default LLM:', error);
     } finally {
       setLlmChangeLoading(false);
+    }
+  }
+
+  async function handleActivityOrderChange(
+    activityId: string,
+    upOrDown: 'up' | 'down'
+  ) {
+    if (!viewState.selectedCourseId || !assignment._id) return;
+    const newActivityOrder = reorderArray(
+      assignment.activityOrder,
+      activityId,
+      upOrDown
+    );
+    try {
+      await updateAssignment(viewState.selectedCourseId, {
+        _id: assignment._id,
+        activityOrder: newActivityOrder,
+      });
+    } catch (error) {
+      console.error('Failed to change activity order:', error);
     }
   }
 
@@ -231,74 +243,28 @@ const AssignmentActivitiesDisplay: React.FC<
         </Card>
       ) : (
         <Grid container spacing={2}>
-          {assignment.activityIds.map((activityId) => {
+          {assignment.activityOrder.map((activityId, index) => {
             const activity = builtActivities.find((a) => a._id === activityId);
             if (!activity) {
               return null;
             }
             const isComplete = activityIdToCompletionStatus[activityId];
+            const isFirst = index === 0;
+            const isLast = index === assignment.activityOrder.length - 1;
             return (
-              <Grid item xs={12} key={activityId}>
-                <Card variant="outlined">
-                  <CardContent>
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      justifyContent="space-between"
-                    >
-                      <Typography
-                        variant="h6"
-                        onClick={() => onActivitySelect(activityId)}
-                        data-cy={`activity-item-${activityId}`}
-                        sx={{
-                          color: '#1B6A9C',
-                          fontWeight: 600,
-                          fontSize: '1rem',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            textDecoration: 'underline',
-                            color: '#145a87',
-                          },
-                        }}
-                      >
-                        {activity?.title || `Activity ${activityId}`}
-                      </Typography>
-                      <RowDiv>
-                        {isComplete && isStudentView && (
-                          <CheckCircle sx={{ color: 'green' }} />
-                        )}
-                        {!isComplete && isStudentView && (
-                          <RadioButtonUnchecked sx={{ color: 'grey' }} />
-                        )}
-                        {!isStudentView && (
-                          <IconButton
-                            onClick={() => handleRemoveActivity(activityId)}
-                            disabled={isAssignmentModifying}
-                            size="small"
-                          >
-                            <RemoveCircleIcon />
-                          </IconButton>
-                        )}
-
-                        {isStudent && (
-                          <IconButton
-                            onClick={() => handleOpenLLMModal(activityId)}
-                            sx={{
-                              '&:hover': {
-                                color: 'primary.main',
-                              },
-                            }}
-                            size="small"
-                            data-cy={`llm-settings-button-${activityId}`}
-                          >
-                            <SettingsIcon />
-                          </IconButton>
-                        )}
-                      </RowDiv>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Grid>
+              <AssignmentActivityListItem
+                key={activity._id}
+                activity={activity}
+                onActivitySelect={onActivitySelect}
+                onRemoveActivity={handleRemoveActivity}
+                onOpenLLMModal={handleOpenLLMModal}
+                onActivityOrderChange={handleActivityOrderChange}
+                isComplete={isComplete}
+                isStudentView={isStudentView}
+                isAssignmentModifying={isAssignmentModifying}
+                isFirst={isFirst}
+                isLast={isLast}
+              />
             );
           })}
         </Grid>

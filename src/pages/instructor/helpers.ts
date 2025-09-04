@@ -283,3 +283,42 @@ export function getStudentActivityCompletionData(
   );
   return activityCompletion;
 }
+
+export function getAssignmentsDataInSection(
+  assignments: Assignment[],
+  section?: Section
+): Assignment[] {
+  if (!section) {
+    return [];
+  }
+  return section.assignments.reduce((acc, sa) => {
+    const assignment = assignments.find((a) => a._id === sa.assignmentId);
+    if (assignment) {
+      acc.push(assignment);
+    }
+    return acc;
+  }, [] as Assignment[]);
+}
+
+export function reorderArray<T>(
+  array: T[],
+  itemId: T,
+  direction: 'up' | 'down'
+): T[] {
+  const currentIndex = array.indexOf(itemId);
+  if (currentIndex === -1) return array;
+
+  const newArray = [...array];
+  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+  if (targetIndex < 0 || targetIndex >= newArray.length) {
+    return array;
+  }
+
+  [newArray[currentIndex], newArray[targetIndex]] = [
+    newArray[targetIndex],
+    newArray[currentIndex],
+  ];
+
+  return newArray;
+}

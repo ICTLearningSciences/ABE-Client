@@ -24,6 +24,7 @@ export const assignmentQueryData = `
   title
   description
   activityIds
+  activityOrder
   defaultLLM{
     serviceName
     model
@@ -37,6 +38,7 @@ export const sectionQueryData = `
   sectionCode
   description
   bannedStudentUserIds
+  assignmentOrder
   assignments {
     assignmentId
     mandatory
