@@ -10,21 +10,33 @@ export const testAssignment: Assignment = {
   _id: 'assignment-123',
   title: 'Programming Fundamentals Quiz',
   description: 'A quiz covering basic programming concepts including variables, loops, and functions.',
-  activityIds: ['my-editable-activity', 'my-read-only-activity']
+  activityIds: ['my-editable-activity', 'my-read-only-activity'],
+  defaultLLM: {
+    serviceName: 'OPEN_AI',
+    model: 'gpt-4'
+  }
 };
 
 export const testAssignment2: Assignment = {
   _id: 'assignment-456',
   title: 'Data Structures Project',
   description: 'Implement various data structures in your chosen programming language.',
-  activityIds: ['my-editable-activity']
+  activityIds: ['my-editable-activity'],
+  defaultLLM: {
+    serviceName: 'OPEN_AI',
+    model: 'gpt-4'
+  }
 };
 
 export const testAssignment3: Assignment = {
   _id: 'assignment-789',
   title: 'Algorithm Analysis',
   description: 'Analyze the time and space complexity of different algorithms.',
-  activityIds: ['my-read-only-activity']
+  activityIds: ['my-read-only-activity'],
+  defaultLLM: {
+    serviceName: 'OPEN_AI',
+    model: 'gpt-4'
+  }
 };
 
 export interface FetchAssignmentsResponse {

@@ -16,13 +16,20 @@ export interface Course {
     courseCode: string;
     sectionIds: string[];
   }
-  
+
+  export interface AiServiceModel {
+    serviceName: string;
+    model: string;
+  }
+
   export interface Assignment {
     _id: string;
     title: string;
     description: string;
     activityIds: string[];
+    defaultLLM?: AiServiceModel;
   }
+
   
   export interface SectionAssignment {
     assignmentId: string;
@@ -49,7 +56,7 @@ export interface Course {
   export interface ActivityCompletion {
     activityId: string;
     complete: boolean;
-    
+    defaultLLM?: AiServiceModel;
   }
   
   export interface AssignmentProgress {

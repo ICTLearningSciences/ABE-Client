@@ -76,7 +76,7 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
           >
             Student:
           </Typography>
-          <Typography sx={{ fontWeight: 400, color: 'black' }}>
+          <Typography data-cy="assignment-header-student-name" sx={{ fontWeight: 400, color: 'black' }}>
             {studentName}
           </Typography>
         </RowDiv>
@@ -94,7 +94,7 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
           >
             Assignment:
           </Typography>
-          <Typography sx={{ fontWeight: 400, color: 'black' }}>
+          <Typography data-cy="assignment-header-assignment-title" sx={{ fontWeight: 400, color: 'black' }}>
             {assignmentTitle}
           </Typography>
         </RowDiv>

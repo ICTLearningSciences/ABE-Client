@@ -10,14 +10,22 @@ export const newTestAssignment: Assignment = {
   _id: 'new-assignment-123',
   title: 'New Test Assignment',
   description: 'A newly created test assignment.',
-  activityIds: []
+  activityIds: [],
+  defaultLLM: {
+    serviceName: 'OPEN_AI',
+    model: 'gpt-4'
+  }
 };
 
 export const updatedTestAssignment: Assignment = {
   ...newTestAssignment,
   title: 'Updated Assignment Title',
   description: 'An updated assignment description.',
-  activityIds: ['my-editable-activity', 'my-read-only-activity']
+  activityIds: ['my-editable-activity', 'my-read-only-activity'],
+  defaultLLM: {
+    serviceName: 'OPEN_AI',
+    model: 'gpt-4'
+  }
 };
 
 export interface AddOrUpdateAssignmentResponse {

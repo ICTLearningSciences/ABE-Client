@@ -205,8 +205,8 @@ const AssignmentActivitiesDisplay: React.FC<
                       >
                         {activity?.title || `Activity ${activityId}`}
                       </Typography>
-                      {isComplete && <CheckCircle sx={{ color: 'green' }} />}
-                      {!isComplete && (
+                      {isComplete && isStudentView && <CheckCircle sx={{ color: 'green' }} />}
+                      {!isComplete && isStudentView && (
                         <RadioButtonUnchecked sx={{ color: 'grey' }} />
                       )}
                       {!isStudentView && (

@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
 import { execGql } from '../../../hooks/api';
 import { Course, Assignment, Section, StudentData, Instructor } from './types';
-import { Connection, UserDoc } from '../../../types';
+import { AiServiceModel, Connection, UserDoc } from '../../../types';
 
 // GraphQL query fragment for course data
 export const courseQueryData = `
@@ -24,6 +24,10 @@ export const assignmentQueryData = `
   title
   description
   activityIds
+  defaultLLM{
+    serviceName
+    model
+  }
 `;
 
 // GraphQL query fragment for section data
@@ -63,6 +67,10 @@ export const studentDataQueryData = `
     activityCompletions {
       activityId
       complete
+      defaultLLM{
+        serviceName
+        model
+      }
     }
   }
 `;
@@ -307,6 +315,7 @@ export enum ModifyStudentAssignmentProgressActions {
   NEW_DOC_CREATED = 'NEW_DOC_CREATED', // if doc not in list, add it with primaryDocument true IF only doc in list, else set primaryDocument to false
   DOC_PRIMARY_STATUS_SET = 'DOC_PRIMARY_STATUS_SET', // if doc in list, update it with primaryDocument
   DOC_DELETED = 'DOC_DELETED', // if doc in list, delete it
+  DEFAULT_LLM_SET = 'DEFAULT_LLM_SET', // if activity in list, set defaultLLM
 }
 // Modify student assignment progress
 export async function modifyStudentAssignmentProgress(
@@ -316,14 +325,15 @@ export async function modifyStudentAssignmentProgress(
   assignmentId: string,
   activityId: string,
   action: ModifyStudentAssignmentProgressActions,
-  docId?: string
+  docId?: string,
+  defaultLLM?: AiServiceModel
 ): Promise<StudentData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   const res = await execGql<StudentData>(
     {
       query: `
-        mutation ModifyStudentAssignmentProgress($targetUserId: ID!, $courseId: ID!, $sectionId: ID!, $assignmentId: ID!, $activityId: ID!, $action: String!, $docId: String) {
-          modifyStudentAssignmentProgress(targetUserId: $targetUserId, courseId: $courseId, sectionId: $sectionId, assignmentId: $assignmentId, activityId: $activityId, action: $action, docId: $docId) {
+        mutation ModifyStudentAssignmentProgress($targetUserId: ID!, $courseId: ID!, $sectionId: ID!, $assignmentId: ID!, $activityId: ID!, $action: String!, $docId: String, $defaultLLM: AiServiceModelInputType) {
+          modifyStudentAssignmentProgress(targetUserId: $targetUserId, courseId: $courseId, sectionId: $sectionId, assignmentId: $assignmentId, activityId: $activityId, action: $action, docId: $docId, defaultLLM: $defaultLLM) {
             ${studentDataQueryData}
           }
         }
@@ -336,6 +346,7 @@ export async function modifyStudentAssignmentProgress(
         activityId,
         action,
         docId,
+        defaultLLM,
       },
     },
     {

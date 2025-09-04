@@ -39,7 +39,7 @@ import {
   isInstructorData,
 } from './types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { EducationalRole } from '../../../types';
+import { AiServiceModel, EducationalRole } from '../../../types';
 import { useMemo } from 'react';
 import {
   getAssignmentsInSection,
@@ -126,6 +126,14 @@ export interface UseWithEducationalManagement {
     assignmentId: string,
     activityId: string,
     docId: string
+  ) => Promise<StudentData>;
+  studentActivityDefaultLLMSet: (
+    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string,
+    defaultLLM: AiServiceModel
   ) => Promise<StudentData>;
   studentActivityDocPrimaryStatusSet: (docId: string) => Promise<StudentData>;
   studentActivityDocDeleted: (
@@ -406,6 +414,20 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       })
     );
     return res.payload as StudentData;
+  }
+
+
+  async function studentActivityDefaultLLMSet(    targetUserId: string,
+    courseId: string,
+    sectionId: string,
+    assignmentId: string,
+    activityId: string,
+    defaultLLM: AiServiceModel) {
+    const res = await dispatch(
+      _updateStudentAssignmentProgress({ targetUserId, courseId, sectionId, assignmentId, activityId, action: ModifyStudentAssignmentProgressActions.DEFAULT_LLM_SET, defaultLLM })
+    );
+    return res.payload as StudentData;
+
   }
 
   async function studentActivityCompleted(
@@ -954,6 +976,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     studentActivityNewDocCreated,
     studentActivityDocPrimaryStatusSet,
     studentActivityDocDeleted,
+    studentActivityDefaultLLMSet,
     loadInstructors,
     viewCourse,
     viewSection,

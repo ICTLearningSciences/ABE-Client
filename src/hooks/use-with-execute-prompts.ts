@@ -11,6 +11,7 @@ import { asyncPromptExecute } from './use-with-synchronous-polling';
 import { useState } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { useWithConfig } from '../store/slices/config/use-with-config';
+import { useWithEducationalManagement } from '../store/slices/education-management/use-with-educational-management';
 export function useWithExecutePrompt() {
   const userId: string | undefined = useAppSelector(
     (state) => state.login.user?._id
@@ -32,6 +33,8 @@ export function useWithExecutePrompt() {
   const localAiServiceModelOverride = useAppSelector(
     (state) => state.state.overrideAiServiceModel
   );
+  const {viewState} = useWithEducationalManagement();
+  const assignmentDefaultAiServiceModel = viewState.selectedAssignment?.defaultLLM;
 
   /**
    * Process to ENSURE only available models are used in prompt steps
@@ -41,6 +44,7 @@ export function useWithExecutePrompt() {
   ): AiPromptStep[] {
     return promptSteps.map((step) => {
       step.targetAiServiceModel =
+        assignmentDefaultAiServiceModel ||
         localAiServiceModelOverride ||
         configAiServiceModelOverride ||
         step.targetAiServiceModel;
