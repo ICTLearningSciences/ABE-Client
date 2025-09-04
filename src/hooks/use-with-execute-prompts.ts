@@ -50,7 +50,7 @@ export function useWithExecutePrompt() {
         : undefined,
     [myData, viewState.selectedAssignmentId, selectedActivityId]
   );
-  console.log(studentOverrideAiServiceModel);
+
   /**
    * Process to ENSURE only available models are used in prompt steps
    */
