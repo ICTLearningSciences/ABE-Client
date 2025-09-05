@@ -8,9 +8,12 @@ import axios, { CancelTokenSource } from 'axios';
 import { AiServicesResponseTypes } from '../ai-services/ai-service-types';
 import { AiPromptStep, getDocServiceFromLoginService } from '../types';
 import { asyncPromptExecute } from './use-with-synchronous-polling';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { useWithConfig } from '../store/slices/config/use-with-config';
+import { useWithEducationalManagement } from '../store/slices/education-management/use-with-educational-management';
+import { getStudentActivityCompletionData } from '../pages/instructor/helpers';
+import { isStudentData } from '../store/slices/education-management';
 export function useWithExecutePrompt() {
   const userId: string | undefined = useAppSelector(
     (state) => state.login.user?._id
@@ -32,6 +35,21 @@ export function useWithExecutePrompt() {
   const localAiServiceModelOverride = useAppSelector(
     (state) => state.state.overrideAiServiceModel
   );
+  const { viewState, myData } = useWithEducationalManagement();
+  const assignmentDefaultAiServiceModel =
+    viewState.selectedAssignment?.defaultLLM;
+  const selectedActivityId = viewState.selectedActivityId;
+  const studentOverrideAiServiceModel = useMemo(
+    () =>
+      myData && isStudentData(myData)
+        ? getStudentActivityCompletionData(
+            myData,
+            viewState.selectedAssignmentId || '',
+            selectedActivityId || ''
+          )?.defaultLLM
+        : undefined,
+    [myData, viewState.selectedAssignmentId, selectedActivityId]
+  );
 
   /**
    * Process to ENSURE only available models are used in prompt steps
@@ -41,6 +59,8 @@ export function useWithExecutePrompt() {
   ): AiPromptStep[] {
     return promptSteps.map((step) => {
       step.targetAiServiceModel =
+        studentOverrideAiServiceModel ||
+        assignmentDefaultAiServiceModel ||
         localAiServiceModelOverride ||
         configAiServiceModelOverride ||
         step.targetAiServiceModel;

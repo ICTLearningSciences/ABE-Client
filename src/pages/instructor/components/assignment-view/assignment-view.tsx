@@ -25,6 +25,8 @@ import DeleteConfirmationModal from '../delete-confirmation-modal';
 import AssignmentActivitiesDisplay from '../assignment-activities-display';
 import { ActivityBuilder } from '../../../../components/activity-builder/types';
 import { AssignmentCompleteStatus } from './assignment-complete-status';
+import { aiServiceModelToString } from '../../../../helpers';
+import { useAppSelector } from '../../../../store/hooks';
 
 interface AssignmentViewProps {
   assignmentId: string;
@@ -61,6 +63,10 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
 
   const availableActivities = builtActivities.filter(
     (activity) => !assignment?.activityIds.includes(activity._id)
+  );
+
+  const globalDefaultAiServiceModel = useAppSelector(
+    (state) => state.config.config?.defaultAiModel
   );
 
   const activityIdToCompletionStatus = useMemo(() => {
@@ -220,7 +226,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
               <Stack
                 direction="column"
                 spacing={1}
-                alignItems="center"
+                alignItems="flex-start"
                 sx={{ mb: 1 }}
                 width="fit-content"
               >
@@ -229,6 +235,17 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
                     label={isMandatory ? 'Required' : 'Optional'}
                     size="small"
                     color={isMandatory ? 'primary' : 'secondary'}
+                    sx={{ fontSize: '10px' }}
+                  />
+                )}
+                {(assignment.defaultLLM || globalDefaultAiServiceModel) && (
+                  <Chip
+                    data-cy="assignment-view-default-llm-chip"
+                    label={`Default LLM: ${aiServiceModelToString(
+                      assignment.defaultLLM || globalDefaultAiServiceModel
+                    )}`}
+                    size="small"
+                    color="primary"
                     sx={{ fontSize: '10px' }}
                   />
                 )}

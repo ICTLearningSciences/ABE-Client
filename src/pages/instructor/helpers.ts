@@ -12,6 +12,7 @@ import {
   CourseOwnership,
   Instructor,
   Course,
+  ActivityCompletion,
 } from '../../store/slices/education-management/types';
 import { UseWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { TreeItem, TreeSection } from './components/collapsible-tree';
@@ -267,4 +268,57 @@ export function getStudentSectionProgress(
     requiredAssignmentsProgress,
     optionalAssignmentsProgress,
   };
+}
+
+export function getStudentActivityCompletionData(
+  studentData: StudentData,
+  assignmentId: string,
+  activityId: string
+): ActivityCompletion | undefined {
+  const assignmentProgress = studentData.assignmentProgress.find(
+    (ap) => ap.assignmentId === assignmentId
+  );
+  const activityCompletion = assignmentProgress?.activityCompletions.find(
+    (ap) => ap.activityId === activityId
+  );
+  return activityCompletion;
+}
+
+export function getAssignmentsDataInSection(
+  assignments: Assignment[],
+  section?: Section
+): Assignment[] {
+  if (!section) {
+    return [];
+  }
+  return section.assignments.reduce((acc, sa) => {
+    const assignment = assignments.find((a) => a._id === sa.assignmentId);
+    if (assignment) {
+      acc.push(assignment);
+    }
+    return acc;
+  }, [] as Assignment[]);
+}
+
+export function reorderArray<T>(
+  array: T[],
+  itemId: T,
+  direction: 'up' | 'down'
+): T[] {
+  const currentIndex = array.indexOf(itemId);
+  if (currentIndex === -1) return array;
+
+  const newArray = [...array];
+  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+  if (targetIndex < 0 || targetIndex >= newArray.length) {
+    return array;
+  }
+
+  [newArray[currentIndex], newArray[targetIndex]] = [
+    newArray[targetIndex],
+    newArray[currentIndex],
+  ];
+
+  return newArray;
 }

@@ -17,12 +17,19 @@ import {
   Box,
   FormControlLabel,
   Checkbox,
+  Collapse,
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import {
+  Close as CloseIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+} from '@mui/icons-material';
 import {
   Assignment,
   Section,
 } from '../../../store/slices/education-management/types';
+import { LLMSelector } from './assignment-view/llm-selector';
+import { AiServiceModel } from '../../../types';
 
 export enum AssignmentModalMode {
   CREATE = 'create',
@@ -51,6 +58,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   const [formData, setFormData] = useState<Partial<Assignment>>({
     title: '',
     description: '',
+    defaultLLM: undefined,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const _initialMandatory = section.assignments.find(
@@ -59,6 +67,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   const initialMandatory =
     _initialMandatory !== undefined ? _initialMandatory : true;
   const [mandatory, setMandatory] = useState<boolean>(initialMandatory);
+  const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -66,16 +75,19 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         setFormData({
           title: initialData.title || '',
           description: initialData.description || '',
+          defaultLLM: initialData.defaultLLM || undefined,
         });
         setMandatory(initialMandatory);
       } else {
         setFormData({
           title: '',
           description: '',
+          defaultLLM: undefined,
         });
         setMandatory(initialMandatory);
       }
       setErrors({});
+      setShowAdvanced(false);
     }
   }, [isOpen, mode, initialData, initialMandatory]);
 
@@ -106,6 +118,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
       description: formData.description?.trim() || '',
       activityIds:
         mode === AssignmentModalMode.EDIT ? initialData?.activityIds || [] : [],
+      defaultLLM: formData.defaultLLM || undefined,
     };
 
     if (mode === AssignmentModalMode.EDIT && initialData) {
@@ -128,6 +141,13 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         [field]: '',
       }));
     }
+  };
+
+  const handleDefaultLLMChange = (defaultLLM: AiServiceModel) => {
+    setFormData((prev) => ({
+      ...prev,
+      defaultLLM: defaultLLM,
+    }));
   };
 
   return (
@@ -169,7 +189,13 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {mode === AssignmentModalMode.CREATE
             ? 'Create a new assignment with activities and learning objectives. You can add activities later.'
@@ -259,6 +285,30 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
               data-cy="assignment-modal-mandatory-checkbox"
             />
           )}
+
+          <Button
+            fullWidth
+            variant="text"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            startIcon={showAdvanced ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            sx={{
+              color: '#1B6A9C',
+              textTransform: 'none',
+              justifyContent: 'flex-start',
+              mb: 1,
+            }}
+            data-cy="assignment-modal-advanced-toggle"
+          >
+            Advanced Options
+          </Button>
+
+          <Collapse in={showAdvanced}>
+            <LLMSelector
+              selectedLLM={formData.defaultLLM}
+              handleLLMChange={handleDefaultLLMChange}
+              loading={isLoading}
+            />
+          </Collapse>
         </Box>
       </DialogContent>
 

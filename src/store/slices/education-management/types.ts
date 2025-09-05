@@ -1,3 +1,5 @@
+import { AiServiceModel } from '../../../types';
+
 export interface Course {
   _id: string;
   title: string;
@@ -11,6 +13,8 @@ export interface Assignment {
   title: string;
   description: string;
   activityIds: string[];
+  activityOrder: string[];
+  defaultLLM: AiServiceModel;
 }
 
 export interface SectionAssignment {
@@ -25,6 +29,7 @@ export interface Section {
   description: string;
   bannedStudentUserIds: string[];
   assignments: SectionAssignment[];
+  assignmentOrder: string[];
   numOptionalAssignmentsRequired: number;
 }
 
@@ -39,6 +44,7 @@ export interface RelevantGoogleDoc {
 export interface ActivityCompletion {
   activityId: string;
   complete: boolean;
+  defaultLLM?: AiServiceModel;
 }
 
 export interface AssignmentProgress {

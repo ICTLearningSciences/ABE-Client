@@ -25,6 +25,7 @@ import {
   gradeStudentAssignment as _gradeStudentAssignment,
 } from './educational-api';
 import { Course, Assignment, Section } from './types';
+import { AiServiceModel } from '../../../types';
 
 // Fetch thunks
 export const fetchCourses = createAsyncThunk(
@@ -221,6 +222,7 @@ export const updateStudentAssignmentProgress = createAsyncThunk(
     activityId: string;
     action: ModifyStudentAssignmentProgressActions;
     docId?: string;
+    defaultLLM?: AiServiceModel;
   }) => {
     return await _modifyStudentAssignmentProgress(
       params.targetUserId,
@@ -229,7 +231,8 @@ export const updateStudentAssignmentProgress = createAsyncThunk(
       params.assignmentId,
       params.activityId,
       params.action,
-      params.docId
+      params.docId,
+      params.defaultLLM
     );
   }
 );

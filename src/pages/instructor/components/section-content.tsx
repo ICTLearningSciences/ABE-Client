@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React, { useState, useMemo } from 'react';
-import { Box, Typography, Button, Card, Grid, Stack } from '@mui/material';
+import { Box, Typography, Button, Card } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import {
@@ -13,11 +13,10 @@ import {
   isStudentData,
 } from '../../../store/slices/education-management/types';
 import AssignmentModal, { AssignmentModalMode } from './assignment-modal';
-import AssignmentCard from './assignment-card';
-import OptionalRequirements from './optional-requirements';
-import { getAssignmentsInSection } from '../helpers';
+import { getAssignmentsDataInSection } from '../helpers';
 import { useAppSelector } from '../../../store/hooks';
 import { EducationalRole } from '../../../types';
+import { SectionAssignmentList } from './section-assignments/section-assignment-list';
 
 interface SectionContentProps {
   sectionId: string;
@@ -34,11 +33,10 @@ const SectionContent: React.FC<SectionContentProps> = ({
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
-  const [optionalAssignmentsRequired, setOptionalAssignmentsRequired] =
-    useState(0);
+
   const section = educationManagement.sections.find((s) => s._id === sectionId);
   const assignmentsInSection = useMemo(
-    () => getAssignmentsInSection(educationManagement.assignments, section),
+    () => getAssignmentsDataInSection(educationManagement.assignments, section),
     [educationManagement.assignments, section]
   );
   const userData = useAppSelector((state) => state.login.user);
@@ -48,15 +46,6 @@ const SectionContent: React.FC<SectionContentProps> = ({
     userData && userData.educationalRole === EducationalRole.STUDENT
       ? sectionStudentsProgress[userData._id]
       : null;
-
-  // Initialize the optional assignments required value
-  React.useEffect(() => {
-    if (section) {
-      setOptionalAssignmentsRequired(
-        section.numOptionalAssignmentsRequired || 0
-      );
-    }
-  }, [section]);
 
   const handleAddAssignment = async (
     assignmentData: Partial<Assignment>,
@@ -90,117 +79,12 @@ const SectionContent: React.FC<SectionContentProps> = ({
     };
   }, [educationManagement.myData]);
 
-  const getIsCompleted = useMemo(() => {
-    return (assignment: Assignment) => {
-      const myData = educationManagement.myData;
-      if (!myData || !isStudentData(myData)) return false;
-      const assignmentActivites = assignment.activityIds;
-      const relevantAssignmentProgress = myData.assignmentProgress.find(
-        (ap) => ap.assignmentId === assignment._id
-      );
-      if (!relevantAssignmentProgress) return false;
-      const relevantActivityCompletions =
-        relevantAssignmentProgress.activityCompletions.filter((ac) =>
-          assignmentActivites.includes(ac.activityId)
-        );
-      return relevantActivityCompletions.every((ac) => ac.complete);
-    };
-  }, [educationManagement.myData, assignmentsInSection]);
-
   const handleOpenAssignmentModal = () => {
     setShowAssignmentModal(true);
   };
 
   const handleCloseAssignmentModal = () => {
     setShowAssignmentModal(false);
-  };
-
-  const handleOptionalRequiredChange = async (value: number) => {
-    if (!section) return;
-    try {
-      await educationManagement.updateSection(courseId, {
-        _id: sectionId,
-        numOptionalAssignmentsRequired: value,
-      });
-      setOptionalAssignmentsRequired(value);
-    } catch (error) {
-      console.error('Failed to update optional assignments required:', error);
-    }
-  };
-
-  const renderAssignmentList = (
-    assignments: Assignment[],
-    title: string,
-    getAssignmentGrade: (assignmentId: string) =>
-      | {
-          grade: number;
-          comment: string;
-        }
-      | undefined,
-    options: {
-      showCompletionCounter?: boolean;
-      completedCount?: number;
-      showOptionalRequirements?: boolean;
-    } = {}
-  ) => {
-    if (assignments.length === 0) return null;
-
-    const {
-      showCompletionCounter = false,
-      completedCount = 0,
-      showOptionalRequirements = false,
-    } = options;
-
-    return (
-      <Box sx={{ mb: 4 }}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ mb: 2 }}
-        >
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 600, color: 'text.primary' }}
-          >
-            {title}
-          </Typography>
-          {showCompletionCounter ? (
-            <Typography variant="body2" color="text.secondary">
-              {completedCount}/{assignments.length} completed
-            </Typography>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              {assignments.length} assignment
-              {assignments.length !== 1 ? 's' : ''}
-            </Typography>
-          )}
-        </Stack>
-
-        {showOptionalRequirements && (
-          <OptionalRequirements
-            isStudentView={isStudentView}
-            optionalAssignmentsRequired={optionalAssignmentsRequired}
-            totalOptionalAssignments={assignments.length}
-            onRequiredChange={setOptionalAssignmentsRequired}
-            onRequiredUpdate={handleOptionalRequiredChange}
-          />
-        )}
-
-        <Grid container spacing={2}>
-          {assignments.map((assignment) => (
-            <Grid item xs={12} key={assignment._id}>
-              <AssignmentCard
-                assignment={assignment}
-                onClick={onAssignmentSelect}
-                assignmentGrade={getAssignmentGrade(assignment._id)}
-                isCompleted={getIsCompleted(assignment)}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    );
   };
 
   if (!section) {
@@ -252,30 +136,26 @@ const SectionContent: React.FC<SectionContentProps> = ({
           </Typography>
         </Card>
       ) : (
-        <>
-          {/* Required Assignments */}
-          {renderAssignmentList(
-            assignmentsInSection.requiredAssignments,
-            'Required Assignments',
-            getAssignmentGrade
-          )}
-
-          {/* Optional Assignments */}
-          {renderAssignmentList(
-            assignmentsInSection.optionalAssignments,
-            'Optional Assignments',
-            getAssignmentGrade,
-            {
-              showCompletionCounter: isStudentView,
-              completedCount: mySectionProgress
-                ? Object.values(
-                    mySectionProgress.optionalAssignmentsProgress
-                  ).filter((complete) => complete).length
-                : 0,
-              showOptionalRequirements: true,
-            }
-          )}
-        </>
+        <SectionAssignmentList
+          assignments={assignmentsInSection}
+          title="Assignments"
+          getAssignmentGrade={getAssignmentGrade}
+          options={{
+            showCompletionCounter: isStudentView,
+            completedCount: mySectionProgress
+              ? Object.values(
+                  mySectionProgress.requiredAssignmentsProgress
+                ).filter((complete) => complete).length
+              : 0,
+            showOptionalRequirements: true,
+          }}
+          section={section}
+          courseId={courseId}
+          sectionId={sectionId}
+          isStudentView={isStudentView}
+          onAssignmentSelect={onAssignmentSelect}
+          educationManagement={educationManagement}
+        />
       )}
 
       <AssignmentModal

@@ -55,7 +55,3 @@ export const enrollInSectionResponse: ModifySectionEnrollmentResponse = {
 export const removeFromSectionResponse: ModifySectionEnrollmentResponse = {
   modifySectionEnrollment: studentAfterRemoval
 };
-
-export const updateStudentProgressResponse: ModifyStudentAssignmentProgressResponse = {
-  modifyStudentAssignmentProgress: studentWithUpdatedProgress
-};
