@@ -12,6 +12,7 @@ export const newTestSection: Section = {
   sectionCode: 'TEST123',
   description: 'A newly created test section.',
   assignments: [],
+  assignmentOrder: [],
   numOptionalAssignmentsRequired: 0
 };
 
@@ -24,6 +25,7 @@ export const updatedTestSection: Section = {
     { assignmentId: 'assignment-123', mandatory: true },
     { assignmentId: 'assignment-456', mandatory: false }
   ],
+  assignmentOrder: ['assignment-123', 'assignment-456'],
   numOptionalAssignmentsRequired: 1
 };
 
@@ -49,6 +51,10 @@ export function updateTestSectionWithAssignmentsResponse(assignments: Assignment
         assignmentId: assignment._id,
         mandatory: true
       }))
+    ],
+    assignmentOrder: [
+      ...updatedTestSection.assignmentOrder,
+      ...assignments.map(assignment => assignment._id)
     ]
   }
 }
@@ -64,6 +70,7 @@ export const deleteSectionResponse: AddOrUpdateSectionResponse = {
       { assignmentId: 'assignment-123', mandatory: true },
       { assignmentId: 'assignment-456', mandatory: false }
     ],
+    assignmentOrder: ['assignment-123', 'assignment-456'],
     numOptionalAssignmentsRequired: 1
   }
 };

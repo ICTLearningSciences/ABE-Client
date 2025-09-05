@@ -27,6 +27,7 @@ export interface Course {
     title: string;
     description: string;
     activityIds: string[];
+    activityOrder: string[];
     defaultLLM?: AiServiceModel;
   }
 
@@ -42,6 +43,7 @@ export interface Course {
     sectionCode: string;
     description: string;
     assignments: SectionAssignment[];
+    assignmentOrder: string[];
     numOptionalAssignmentsRequired: number;
   }
   

@@ -11,6 +11,7 @@ export const newTestAssignment: Assignment = {
   title: 'New Test Assignment',
   description: 'A newly created test assignment.',
   activityIds: [],
+  activityOrder: [],
   defaultLLM: {
     serviceName: 'OPEN_AI',
     model: 'gpt-4'
@@ -22,6 +23,7 @@ export const updatedTestAssignment: Assignment = {
   title: 'Updated Assignment Title',
   description: 'An updated assignment description.',
   activityIds: ['my-editable-activity', 'my-read-only-activity'],
+  activityOrder: ['my-editable-activity', 'my-read-only-activity'],
   defaultLLM: {
     serviceName: 'OPEN_AI',
     model: 'gpt-4'

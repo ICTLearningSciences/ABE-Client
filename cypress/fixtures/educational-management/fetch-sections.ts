@@ -15,6 +15,7 @@ export const testSection: Section = {
     { assignmentId: 'assignment-123', mandatory: true },
     { assignmentId: 'assignment-456', mandatory: false }
   ],
+  assignmentOrder: ['assignment-123', 'assignment-456'],
   numOptionalAssignmentsRequired: 1
 };
 
@@ -26,6 +27,7 @@ export const testSection2: Section = {
   assignments: [
     { assignmentId: 'assignment-123', mandatory: true }
   ],
+  assignmentOrder: ['assignment-123'],
   numOptionalAssignmentsRequired: 0
 };
 
@@ -37,6 +39,7 @@ export const testSection3: Section = {
   assignments: [
     { assignmentId: 'assignment-789', mandatory: true }
   ],
+  assignmentOrder: ['assignment-789'],
   numOptionalAssignmentsRequired: 0
 };
 
