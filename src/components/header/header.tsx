@@ -122,7 +122,7 @@ export default function Header(props: {
             >
               {courseNavPath && (
                 <IconButton
-                  data-cy="home-button"
+                  data-cy="educational-home-button"
                   onClick={() => {
                     navigate(courseNavPath);
                   }}
@@ -132,7 +132,7 @@ export default function Header(props: {
                 </IconButton>
               )}
               <IconButton
-                data-cy="home-button"
+                data-cy="doc-home-button"
                 onClick={() => {
                   navigate(freeDocEditingNavPath);
                 }}
