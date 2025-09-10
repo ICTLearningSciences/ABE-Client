@@ -12,7 +12,11 @@ function DocHistoryContainer(props: { useLogin: UseWithLogin }): JSX.Element {
   const navigate = useNavigateWithParams();
   return (
     <>
-      <Header useLogin={useLogin} homeNavPath="/docs" />
+      <Header
+        useLogin={useLogin}
+        courseNavPath="/docs"
+        freeDocEditingNavPath="/docs"
+      />
       <div
         style={{
           width: '100%',

@@ -36,19 +36,25 @@ function MainApp() {
   const useLogin = useWithLogin();
   const { stateCounter } = useWithRouteChangeRerender();
 
-  const homeNavPath =
+  const courseNavPath =
     useLogin.state.user?.educationalRole === EducationalRole.INSTRUCTOR
       ? courseManagementUrl
       : useLogin.state.user?.educationalRole === EducationalRole.STUDENT
       ? studentCoursesUrl
-      : '/docs';
+      : '';
+
+  const freeDocEditingNavPath = '/docs';
 
   const router = createBrowserRouter([
     {
       path: '/',
       element: (
         <>
-          <Header useLogin={useLogin} homeNavPath={homeNavPath} />
+          <Header
+            useLogin={useLogin}
+            courseNavPath={courseNavPath}
+            freeDocEditingNavPath={freeDocEditingNavPath}
+          />
           <div
             style={{
               width: '100%',
@@ -67,7 +73,11 @@ function MainApp() {
       path: '/docs',
       element: (
         <>
-          <Header useLogin={useLogin} homeNavPath={homeNavPath} />
+          <Header
+            useLogin={useLogin}
+            courseNavPath={courseNavPath}
+            freeDocEditingNavPath={freeDocEditingNavPath}
+          />
           <div
             style={{
               width: '100%',
@@ -86,7 +96,11 @@ function MainApp() {
       path: '/docs/:docId',
       element: (
         <>
-          <Header useLogin={useLogin} homeNavPath={homeNavPath} />
+          <Header
+            useLogin={useLogin}
+            courseNavPath={courseManagementUrl}
+            freeDocEditingNavPath={freeDocEditingNavPath}
+          />
           <div
             style={{
               width: '100%',
@@ -109,7 +123,11 @@ function MainApp() {
       path: courseManagementUrl,
       element: (
         <>
-          <Header useLogin={useLogin} homeNavPath={homeNavPath} />
+          <Header
+            useLogin={useLogin}
+            courseNavPath={courseNavPath}
+            freeDocEditingNavPath={freeDocEditingNavPath}
+          />
           <div
             style={{
               width: '100%',
@@ -128,7 +146,11 @@ function MainApp() {
       path: studentCoursesUrl,
       element: (
         <>
-          <Header useLogin={useLogin} homeNavPath={homeNavPath} />
+          <Header
+            useLogin={useLogin}
+            courseNavPath={courseNavPath}
+            freeDocEditingNavPath={freeDocEditingNavPath}
+          />
           <div
             style={{
               width: '100%',
