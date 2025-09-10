@@ -34,12 +34,13 @@ interface AssignmentActivitiesDisplayProps {
   assignment: Assignment;
   builtActivities: ActivityBuilder[];
   availableActivities: ActivityBuilder[];
-  isStudentView?: boolean;
+  isStudentView: boolean;
   isAssignmentModifying?: boolean;
   onAddActivity: (activityId: string) => Promise<void>;
   onRemoveActivity: (activityId: string) => Promise<void>;
   onActivitySelect: (activityId: string) => void;
   activityIdToCompletionStatus: Record<string, boolean>;
+  onViewDocumentTimeline: (studentId: string, assignmentId: string) => void;
 }
 
 const AssignmentActivitiesDisplay: React.FC<
@@ -48,12 +49,13 @@ const AssignmentActivitiesDisplay: React.FC<
   assignment,
   builtActivities,
   availableActivities,
-  isStudentView = false,
+  isStudentView,
   isAssignmentModifying = false,
   onAddActivity,
   onRemoveActivity,
   onActivitySelect,
   activityIdToCompletionStatus,
+  onViewDocumentTimeline,
 }) => {
   const [selectedActivityId, setSelectedActivityId] = useState<string>('');
   const { myData, studentActivityDefaultLLMSet, viewState, updateAssignment } =
@@ -163,6 +165,20 @@ const AssignmentActivitiesDisplay: React.FC<
           {assignment.activityIds.length !== 1 ? 'ies' : 'y'}
         </Typography>
       </Stack>
+
+      {/* View Document Timeline Button */}
+      {isStudentView && (
+        <Button
+          variant="contained"
+          disabled={!myData || !myData.userId}
+          onClick={() => {
+            if (!myData || !myData.userId) return;
+            onViewDocumentTimeline(myData.userId, assignment._id);
+          }}
+        >
+          View Document Timeline
+        </Button>
+      )}
 
       {/* Add Activity Section */}
       {!isStudentView && (

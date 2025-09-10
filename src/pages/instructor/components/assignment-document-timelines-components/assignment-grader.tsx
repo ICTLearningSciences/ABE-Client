@@ -11,6 +11,7 @@ import {
 import { useWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
 import {
   Assignment,
+  isInstructorData,
   StudentData,
 } from '../../../../store/slices/education-management';
 import { extractErrorMessageFromError } from '../../../../helpers';
@@ -24,7 +25,7 @@ export function AssignmentGrader({
   student,
   assignment,
 }: AssignmentGraderProps) {
-  const { gradeStudentAssignment } = useWithEducationalManagement();
+  const { gradeStudentAssignment, myData } = useWithEducationalManagement();
   const assignmentGrade = student.assignmentProgress.find(
     (a) => a.assignmentId === assignment._id
   )?.instructorGrade;
@@ -76,14 +77,16 @@ export function AssignmentGrader({
         </Typography>
       )}
 
-      <Button
-        variant="contained"
-        onClick={() => setIsModalOpen(true)}
-        disabled={isLoading}
-        data-cy="grade-assignment-button"
-      >
-        Grade
-      </Button>
+      {myData && isInstructorData(myData) && (
+        <Button
+          variant="contained"
+          onClick={() => setIsModalOpen(true)}
+          disabled={isLoading}
+          data-cy="grade-assignment-button"
+        >
+          Grade
+        </Button>
+      )}
 
       <Modal open={isModalOpen} aria-labelledby="grade-assignment-modal">
         <Box

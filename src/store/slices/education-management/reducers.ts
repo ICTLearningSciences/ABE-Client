@@ -166,6 +166,7 @@ export const buildExtraReducers = (builder: ActionReducerMapBuilder<State>) => {
     .addCase(loadStudentData.fulfilled, (state, action) => {
       state.educationalDataLoadStatus = LoadStatus.SUCCEEDED;
       state.studentData = action.payload;
+      state.students = [...state.students, action.payload];
     })
     .addCase(loadStudentData.rejected, (state, action) => {
       state.errorMessage = `Failed to load student data: ${action.error.message}`;

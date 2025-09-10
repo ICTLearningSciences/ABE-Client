@@ -14,7 +14,6 @@ import {
 } from '@mui/icons-material';
 import { Box, Typography, Stack, Divider, Button } from '@mui/material';
 import { StudentAssignmentsSection } from './student-assignments-section';
-import { getStudentAssignmentDocs } from '../../../../helpers';
 
 export function StudentInfoPage(props: {
   selectedStudent: StudentData;
@@ -27,11 +26,7 @@ export function StudentInfoPage(props: {
   section: Section;
   handleBanStudent: (studentUserId: string) => void;
   educationManagement: UseWithEducationalManagement;
-  onViewStudentTimelines: (
-    studentId: string,
-    assignmentId: string,
-    docId?: string
-  ) => void;
+  onViewStudentTimelines: (studentId: string, assignmentId: string) => void;
   onBackToSection: () => void;
 }) {
   const {
@@ -47,16 +42,7 @@ export function StudentInfoPage(props: {
   } = props;
 
   const goToAssignmentTimeline = (assignmentId: string) => {
-    const docs = getStudentAssignmentDocs(selectedStudent, assignmentId);
-    if (!docs.length) {
-      return;
-    }
-    const primaryDoc = docs.find((d) => d.primaryDocument) || docs[0];
-    onViewStudentTimelines(
-      selectedStudent.userId,
-      assignmentId,
-      primaryDoc.docId
-    );
+    onViewStudentTimelines(selectedStudent.userId, assignmentId);
   };
   return (
     <Box sx={{ p: 3, width: '80%' }}>
@@ -93,11 +79,12 @@ export function StudentInfoPage(props: {
         title="Required Assignments"
         assignments={assignmentsInSection.requiredAssignments}
         completedCount={
-          getStudentProgressCounts(selectedStudent._id).requiredCompleted
+          getStudentProgressCounts(selectedStudent.userId).requiredCompleted
         }
         totalCount={assignmentsInSection.requiredAssignments.length}
         getIsCompleted={(assignment) => {
-          const studentProgress = sectionStudentsProgress[selectedStudent._id];
+          const studentProgress =
+            sectionStudentsProgress[selectedStudent.userId];
           return (
             studentProgress?.requiredAssignmentsProgress[assignment._id] ||
             false
@@ -113,12 +100,12 @@ export function StudentInfoPage(props: {
           title="Optional Assignments"
           assignments={assignmentsInSection.optionalAssignments}
           completedCount={
-            getStudentProgressCounts(selectedStudent._id).optionalCompleted
+            getStudentProgressCounts(selectedStudent.userId).optionalCompleted
           }
           totalCount={section.numOptionalAssignmentsRequired || 0}
           getIsCompleted={(assignment) => {
             const studentProgress =
-              sectionStudentsProgress[selectedStudent._id];
+              sectionStudentsProgress[selectedStudent.userId];
             return (
               studentProgress?.optionalAssignmentsProgress[assignment._id] ||
               false

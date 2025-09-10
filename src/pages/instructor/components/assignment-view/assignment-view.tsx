@@ -36,6 +36,7 @@ interface AssignmentViewProps {
   onAssignmentDeleted?: (sectionId: string) => void;
   isStudentView?: boolean;
   onActivitySelect: (activityId: string) => void;
+  onViewDocumentTimeline: (studentId: string, assignmentId: string) => void;
 }
 
 const AssignmentView: React.FC<AssignmentViewProps> = ({
@@ -46,6 +47,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   onAssignmentDeleted,
   isStudentView = false,
   onActivitySelect,
+  onViewDocumentTimeline,
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -297,6 +299,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
         onRemoveActivity={handleRemoveActivity}
         onActivitySelect={onActivitySelect}
         activityIdToCompletionStatus={activityIdToCompletionStatus}
+        onViewDocumentTimeline={onViewDocumentTimeline}
       />
 
       {!isStudentView && section && (

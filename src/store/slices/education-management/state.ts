@@ -14,15 +14,18 @@ export enum LoadStatus {
   FAILED,
 }
 
+export type CourseViews =
+  | 'dashboard'
+  | 'course'
+  | 'section'
+  | 'assignment'
+  | 'activity'
+  | 'student-info'
+  | 'activity-document-timelines';
+
 export interface CourseManagementState {
-  view:
-    | 'dashboard'
-    | 'course'
-    | 'section'
-    | 'assignment'
-    | 'activity'
-    | 'student-info'
-    | 'activity-document-timelines';
+  view: CourseViews;
+  previousView?: CourseViews;
   selectedCourseId?: string;
   selectedCourse?: Course;
   selectedSectionId?: string;
@@ -79,6 +82,7 @@ export const initialState: State = {
   instructorsLoadStatus: LoadStatus.NONE,
   viewState: {
     view: 'dashboard',
+    previousView: undefined,
   },
   errorMessage: undefined,
 };

@@ -37,6 +37,7 @@ import {
   Instructor,
   AssignmentProgress,
   isInstructorData,
+  isStudentData,
 } from './types';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { AiServiceModel, EducationalRole } from '../../../types';
@@ -214,6 +215,7 @@ export interface UseWithEducationalManagement {
     mandatory: boolean
   ) => Promise<Section>;
   clearErrorMessage: () => void;
+  goToPreviousView: () => void;
 }
 
 export interface SectionStudentsProgress {
@@ -642,12 +644,16 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   const allSectionsStudentsProgress: AllSectionsStudentsProgress =
     useMemo(() => {
       const allSectionsStudentsProgress: AllSectionsStudentsProgress = {};
+      const inclusiveStudentsList = [...students];
+      if (myData && isStudentData(myData)) {
+        inclusiveStudentsList.push(myData);
+      }
       for (const section of sections) {
         const assignmentsInSection = getAssignmentsInSection(
           assignments,
           section
         );
-        allSectionsStudentsProgress[section._id] = students
+        allSectionsStudentsProgress[section._id] = inclusiveStudentsList
           .filter((student) => student.enrolledSections.includes(section._id))
           .reduce(
             (acc, student) => {
@@ -661,7 +667,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
           );
       }
       return allSectionsStudentsProgress;
-    }, [students, sections, assignments]);
+    }, [students, sections, assignments, myData]);
 
   async function loadAllEducationalData(forUserId: string) {
     const isInstructor = myData && isInstructorData(myData);
@@ -892,6 +898,38 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     );
   }
 
+  function goToPreviousView() {
+    switch (viewState.previousView) {
+      case 'dashboard':
+        viewDashboard();
+        break;
+      case 'course':
+        viewCourse(viewState.selectedCourseId!);
+        break;
+      case 'section':
+        viewSection(viewState.selectedSectionId!);
+        break;
+      case 'assignment':
+        viewAssignment(viewState.selectedAssignmentId!);
+        break;
+      case 'activity':
+        viewActivity(viewState.selectedActivityId!);
+        break;
+      case 'student-info':
+        viewStudentInfo(viewState.selectedStudentId!);
+        break;
+      case 'activity-document-timelines':
+        viewAssignmentDocumentTimelines(
+          viewState.selectedStudentId!,
+          viewState.selectedAssignmentId!,
+          viewState.selectedDocId
+        );
+        break;
+      default:
+        throw new Error('Invalid previous view');
+    }
+  }
+
   function haveICompletedActivity(assignmentId: string, activityId: string) {
     const studentData = myData as StudentData;
     if (!studentData.assignmentProgress) return false;
@@ -949,9 +987,18 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       );
     }
     if (viewState.selectedStudentId) {
-      hydratedViewState.selectedStudent = students.find(
+      const student = students.find(
         (s) => s.userId === viewState.selectedStudentId
       );
+      if (student) {
+        hydratedViewState.selectedStudent = student;
+      } else if (
+        myData &&
+        isStudentData(myData) &&
+        myData.userId === viewState.selectedStudentId
+      ) {
+        hydratedViewState.selectedStudent = myData;
+      }
     }
     return hydratedViewState;
   }, [viewState, courses, sections, assignments, activities, students]);
@@ -996,6 +1043,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     viewDashboard,
     haveICompletedActivity,
     gradeStudentAssignment,
+    goToPreviousView,
     courses,
     assignments,
     sections,

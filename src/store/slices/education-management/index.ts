@@ -19,7 +19,9 @@ export const educationManagementSlice = createSlice({
   initialState,
   reducers: {
     setViewState: (state, action: PayloadAction<CourseManagementState>) => {
+      const previousView = state.viewState.view;
       state.viewState = action.payload;
+      state.viewState.previousView = previousView;
     },
     clearErrorMessage: (state) => {
       state.errorMessage = undefined;

@@ -161,14 +161,14 @@ export function SectionAssignmentList(props: {
               alignItems: 'flex-end',
             }}
           >
-            {assignmentCompletionData.numMandatory && (
+            {Boolean(assignmentCompletionData.numMandatory) && (
               <Typography variant="body2" color="text.primary">
                 Required Assignments completed:{' '}
                 {assignmentCompletionData.numMandatoryCompleted}/
                 {assignmentCompletionData.numMandatory}
               </Typography>
             )}
-            {assignmentCompletionData.numOptional && (
+            {Boolean(assignmentCompletionData.numOptional) && (
               <Typography variant="body2" color="text.secondary">
                 Optional Assignments completed:{' '}
                 {assignmentCompletionData.numOptionalCompleted}/
