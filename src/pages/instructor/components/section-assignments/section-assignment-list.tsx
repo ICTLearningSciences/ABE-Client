@@ -1,7 +1,6 @@
 import { Box, Stack } from '@mui/material';
 import {
   Assignment,
-  isStudentData,
   Section,
 } from '../../../../store/slices/education-management/types';
 import { Typography } from '@mui/material';
@@ -45,6 +44,11 @@ export function SectionAssignmentList(props: {
     onAssignmentSelect,
     educationManagement,
   } = props;
+  const myId = educationManagement.myData?.userId;
+  const studentAssignmentProgress = useMemo(() => {
+    if (!myId) return undefined;
+    return educationManagement.allSectionsStudentsProgress[sectionId][myId];
+  }, [educationManagement.allSectionsStudentsProgress, sectionId, myId]);
   const [optionalAssignmentsRequired, setOptionalAssignmentsRequired] =
     useState(0);
   const numOptionalAssignments = useMemo(
@@ -52,6 +56,36 @@ export function SectionAssignmentList(props: {
     [section]
   );
   const [updateInProgress, setUpdateInProgress] = useState(false);
+
+  const getIsCompleted = useMemo(() => {
+    return (assignment: Assignment) => {
+      const assignmentProgress =
+        studentAssignmentProgress?.requiredAssignmentsProgress[assignment._id];
+      return assignmentProgress ?? false;
+    };
+  }, [educationManagement.myData, assignments]);
+
+  // track number of mandatory, and how many are completed
+  const assignmentCompletionData = useMemo(() => {
+    const numMandatory = Object.keys(
+      studentAssignmentProgress?.requiredAssignmentsProgress ?? {}
+    ).length;
+    const numMandatoryCompleted = Object.values(
+      studentAssignmentProgress?.requiredAssignmentsProgress ?? {}
+    ).filter((isCompleted) => isCompleted).length;
+    const numOptional = Object.keys(
+      studentAssignmentProgress?.optionalAssignmentsProgress ?? {}
+    ).length;
+    const numOptionalCompleted = Object.values(
+      studentAssignmentProgress?.optionalAssignmentsProgress ?? {}
+    ).filter((isCompleted) => isCompleted).length;
+    return {
+      numMandatory,
+      numMandatoryCompleted,
+      numOptional,
+      numOptionalCompleted,
+    };
+  }, [studentAssignmentProgress]);
 
   useEffect(() => {
     if (section) {
@@ -61,23 +95,6 @@ export function SectionAssignmentList(props: {
     }
   }, [section]);
   if (assignments.length === 0) return null;
-
-  const getIsCompleted = useMemo(() => {
-    return (assignment: Assignment) => {
-      const myData = educationManagement.myData;
-      if (!myData || !isStudentData(myData)) return false;
-      const assignmentActivites = assignment.activityIds;
-      const relevantAssignmentProgress = myData.assignmentProgress.find(
-        (ap) => ap.assignmentId === assignment._id
-      );
-      if (!relevantAssignmentProgress) return false;
-      const relevantActivityCompletions =
-        relevantAssignmentProgress.activityCompletions.filter((ac) =>
-          assignmentActivites.includes(ac.activityId)
-        );
-      return relevantActivityCompletions.every((ac) => ac.complete);
-    };
-  }, [educationManagement.myData, assignments]);
 
   const handleOptionalRequiredChange = async (value: number) => {
     if (!section) return;
@@ -117,11 +134,8 @@ export function SectionAssignmentList(props: {
     }
   };
 
-  const {
-    showCompletionCounter = false,
-    completedCount = 0,
-    showOptionalRequirements = false,
-  } = options;
+  const { showCompletionCounter = false, showOptionalRequirements = false } =
+    options;
 
   return (
     <Box sx={{ mb: 4 }}>
@@ -138,8 +152,29 @@ export function SectionAssignmentList(props: {
           {title}
         </Typography>
         {showCompletionCounter ? (
-          <Typography variant="body2" color="text.secondary">
-            {completedCount}/{assignments.length} completed
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+            }}
+          >
+            {assignmentCompletionData.numMandatory && (
+              <Typography variant="body2" color="text.primary">
+                Required Assignments completed:{' '}
+                {assignmentCompletionData.numMandatoryCompleted}/
+                {assignmentCompletionData.numMandatory}
+              </Typography>
+            )}
+            {assignmentCompletionData.numOptional && (
+              <Typography variant="body2" color="text.secondary">
+                Optional Assignments completed:{' '}
+                {assignmentCompletionData.numOptionalCompleted}/
+                {assignmentCompletionData.numOptional}
+              </Typography>
+            )}
           </Typography>
         ) : (
           <Typography variant="body2" color="text.secondary">

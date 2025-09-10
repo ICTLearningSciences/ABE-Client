@@ -651,7 +651,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
           .filter((student) => student.enrolledSections.includes(section._id))
           .reduce(
             (acc, student) => {
-              acc[student._id] = getStudentSectionProgress(
+              acc[student.userId] = getStudentSectionProgress(
                 student,
                 assignmentsInSection
               );

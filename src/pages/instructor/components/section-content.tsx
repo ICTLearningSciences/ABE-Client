@@ -14,8 +14,6 @@ import {
 } from '../../../store/slices/education-management/types';
 import AssignmentModal, { AssignmentModalMode } from './assignment-modal';
 import { getAssignmentsDataInSection } from '../helpers';
-import { useAppSelector } from '../../../store/hooks';
-import { EducationalRole } from '../../../types';
 import { SectionAssignmentList } from './section-assignments/section-assignment-list';
 
 interface SectionContentProps {
@@ -39,13 +37,6 @@ const SectionContent: React.FC<SectionContentProps> = ({
     () => getAssignmentsDataInSection(educationManagement.assignments, section),
     [educationManagement.assignments, section]
   );
-  const userData = useAppSelector((state) => state.login.user);
-  const sectionStudentsProgress =
-    educationManagement.allSectionsStudentsProgress[sectionId] || {};
-  const mySectionProgress =
-    userData && userData.educationalRole === EducationalRole.STUDENT
-      ? sectionStudentsProgress[userData._id]
-      : null;
 
   const handleAddAssignment = async (
     assignmentData: Partial<Assignment>,
@@ -142,11 +133,6 @@ const SectionContent: React.FC<SectionContentProps> = ({
           getAssignmentGrade={getAssignmentGrade}
           options={{
             showCompletionCounter: isStudentView,
-            completedCount: mySectionProgress
-              ? Object.values(
-                  mySectionProgress.requiredAssignmentsProgress
-                ).filter((complete) => complete).length
-              : 0,
             showOptionalRequirements: true,
           }}
           section={section}
