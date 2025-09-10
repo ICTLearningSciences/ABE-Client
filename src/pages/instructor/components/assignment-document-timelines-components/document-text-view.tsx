@@ -86,7 +86,7 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
           </Typography>
           <Button onClick={() => setViewChanges(!viewChanges)}>
             {viewChanges ? <VisibilityOffIcon /> : <VisibilityIcon />}{' '}
-            {viewChanges ? 'View Original' : 'View Changes'}
+            {viewChanges ? 'Hide Changes' : 'View Changes'}
           </Button>
         </RowDiv>
 

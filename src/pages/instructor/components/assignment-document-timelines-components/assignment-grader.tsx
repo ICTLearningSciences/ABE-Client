@@ -73,7 +73,7 @@ export function AssignmentGrader({
           sx={{ mb: 2, fontWeight: 600 }}
           data-cy="not-graded-assignment"
         >
-          Not graded
+          No Review
         </Typography>
       )}
 
@@ -84,7 +84,7 @@ export function AssignmentGrader({
           disabled={isLoading}
           data-cy="grade-assignment-button"
         >
-          Grade
+          Review
         </Button>
       )}
 
@@ -109,7 +109,7 @@ export function AssignmentGrader({
             gutterBottom
             textAlign="center"
           >
-            Grade Assignment
+            Review Assignment
           </Typography>
 
           <Stack spacing={3}>
@@ -160,7 +160,7 @@ export function AssignmentGrader({
                 disabled={isLoading}
                 data-cy="grade-assignment-submit-button"
               >
-                {isLoading ? 'Grading...' : 'Submit Grade'}
+                {isLoading ? 'Submitting...' : 'Submit Review'}
               </Button>
             </Stack>
           </Stack>

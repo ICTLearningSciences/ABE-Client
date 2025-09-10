@@ -163,6 +163,9 @@ export function isAssignmentComplete(
     assignmentProgress.activityCompletions.filter((ac) =>
       assignment.activityIds.includes(ac.activityId)
     );
+  if (relevantActivityCompletions.length !== assignment.activityIds.length) {
+    return false;
+  }
   return relevantActivityCompletions.every((ac) => ac.complete);
 }
 
