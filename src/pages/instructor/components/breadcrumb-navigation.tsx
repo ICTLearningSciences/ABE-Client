@@ -21,6 +21,7 @@ export interface BreadcrumbItem {
 interface BreadcrumbNavigationProps {
   educationManagement: UseWithEducationalManagement;
   viewState: CourseManagementState;
+  handleDashboardSelect: () => void;
   handleCourseSelect: (courseId: string) => void;
   handleSectionSelect: (sectionId: string) => void;
   handleAssignmentSelect: (assignmentId: string) => void;
@@ -29,13 +30,21 @@ interface BreadcrumbNavigationProps {
 const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
   educationManagement,
   viewState,
+  handleDashboardSelect,
   handleCourseSelect,
   handleSectionSelect,
   handleAssignmentSelect,
 }) => {
   const { getActivityById } = useWithDocGoalsActivities();
   const items: BreadcrumbItem[] = useMemo(() => {
-    const items: BreadcrumbItem[] = [];
+    const items: BreadcrumbItem[] = [
+      {
+        id: 'dashboard',
+        title: 'Courses',
+        icon: '🏫',
+        onClick: () => handleDashboardSelect(),
+      },
+    ];
 
     if (viewState.selectedCourseId) {
       const course = educationManagement.courses.find(
@@ -44,7 +53,7 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
       if (course) {
         items.push({
           id: course._id,
-          title: course.title,
+          title: `Course: ${course.title}`,
           icon: '📚',
           onClick: () => handleCourseSelect(course._id),
         });
@@ -58,7 +67,7 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
       if (section) {
         items.push({
           id: section._id,
-          title: section.title,
+          title: `Section: ${section.title}`,
           icon: '📑',
           onClick: () => handleSectionSelect(section._id),
         });
@@ -76,7 +85,7 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
       if (assignment) {
         items.push({
           id: assignment._id,
-          title: assignment.title,
+          title: `Assignment: ${assignment.title}`,
           icon: '📝',
           onClick: () => handleAssignmentSelect(assignment._id),
         });
@@ -90,7 +99,7 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
       if (student) {
         items.push({
           id: student.userId,
-          title: student.name,
+          title: `Student: ${student.name}`,
           icon: '👤',
           onClick: () => {
             console.log('student clicked');
@@ -108,7 +117,7 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
       const activity = getActivityById(viewState.selectedActivityId);
       items.push({
         id: viewState.selectedActivityId,
-        title: activity?.title || 'Activity',
+        title: `Activity: ${activity?.title || 'Activity'}`,
         icon: '📝',
         onClick: () => {
           console.log('activity clicked');

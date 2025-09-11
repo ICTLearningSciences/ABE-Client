@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { useWithLogin } from '../../store/slices/login/use-with-login';
 import { TreeSection } from './components/collapsible-tree';
@@ -39,6 +39,7 @@ import { getStudentAssignmentDocs, getStudentDocIds } from '../../helpers';
 import { LoginStatus } from '../../store/slices/login';
 import { CourseManagementSidebar } from './components/course-management-sidebar';
 import { ErrorToast } from '../../components/shared/error-toast';
+import { DashboardMain } from './course-management/dashboard/dashboard-main';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -343,6 +344,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         <BreadcrumbNavigation
           educationManagement={educationManagement}
           viewState={viewState}
+          handleDashboardSelect={viewDashboard}
           handleCourseSelect={handleCourseSelect}
           handleSectionSelect={handleSectionSelect}
           handleAssignmentSelect={handleAssignmentSelect}
@@ -360,42 +362,13 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
           data-cy="course-management-main-content-inner"
         >
           {viewState.view === 'dashboard' && (
-            <Box
-              sx={{
-                textAlign: 'center',
-                maxWidth: '400px',
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: '64px',
-                  color: '#dee2e6',
-                  mb: 3,
-                }}
-              >
-                📖
-              </Typography>
-              <Typography
-                variant="h4"
-                data-cy="course-management-main-title"
-                sx={{
-                  mb: 2,
-                  color: 'text.primary',
-                  fontWeight: 600,
-                }}
-              >
-                {isStudent ? 'My Courses' : 'Course Management'}
-              </Typography>
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                sx={{ lineHeight: 1.5 }}
-              >
-                {isStudent
-                  ? 'Select a course, section, or assignment from the sidebar to view its details and access your learning materials.'
-                  : 'Select a course, section, or assignment from the sidebar to view and edit its details. You can also create new items using the buttons in the sidebar.'}
-              </Typography>
-            </Box>
+            <DashboardMain
+              courses={educationManagement.courses}
+              isStudent={isStudent}
+              onCourseSelect={handleCourseSelect}
+              handleOpenCourseModal={handleOpenCourseModal}
+              handleOpenJoinSectionModal={handleOpenJoinSectionModal}
+            />
           )}
 
           {viewState.view === 'course' && viewState.selectedCourseId && (

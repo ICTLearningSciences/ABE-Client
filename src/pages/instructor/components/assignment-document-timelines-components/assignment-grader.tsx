@@ -57,7 +57,8 @@ export function AssignmentGrader({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 2,
+        padding: 1,
+        margin: 2,
       }}
     >
       {assignmentGrade ? (
