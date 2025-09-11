@@ -11,6 +11,7 @@ import {
 import { useWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
 import {
   Assignment,
+  isInstructorData,
   StudentData,
 } from '../../../../store/slices/education-management';
 import { extractErrorMessageFromError } from '../../../../helpers';
@@ -24,7 +25,7 @@ export function AssignmentGrader({
   student,
   assignment,
 }: AssignmentGraderProps) {
-  const { gradeStudentAssignment } = useWithEducationalManagement();
+  const { gradeStudentAssignment, myData } = useWithEducationalManagement();
   const assignmentGrade = student.assignmentProgress.find(
     (a) => a.assignmentId === assignment._id
   )?.instructorGrade;
@@ -56,7 +57,8 @@ export function AssignmentGrader({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 2,
+        padding: 1,
+        margin: 2,
       }}
     >
       {assignmentGrade ? (
@@ -72,18 +74,20 @@ export function AssignmentGrader({
           sx={{ mb: 2, fontWeight: 600 }}
           data-cy="not-graded-assignment"
         >
-          Not graded
+          No Review
         </Typography>
       )}
 
-      <Button
-        variant="contained"
-        onClick={() => setIsModalOpen(true)}
-        disabled={isLoading}
-        data-cy="grade-assignment-button"
-      >
-        Grade
-      </Button>
+      {myData && isInstructorData(myData) && (
+        <Button
+          variant="contained"
+          onClick={() => setIsModalOpen(true)}
+          disabled={isLoading}
+          data-cy="grade-assignment-button"
+        >
+          Review
+        </Button>
+      )}
 
       <Modal open={isModalOpen} aria-labelledby="grade-assignment-modal">
         <Box
@@ -106,7 +110,7 @@ export function AssignmentGrader({
             gutterBottom
             textAlign="center"
           >
-            Grade Assignment
+            Review Assignment
           </Typography>
 
           <Stack spacing={3}>
@@ -157,7 +161,7 @@ export function AssignmentGrader({
                 disabled={isLoading}
                 data-cy="grade-assignment-submit-button"
               >
-                {isLoading ? 'Grading...' : 'Submit Grade'}
+                {isLoading ? 'Submitting...' : 'Submit Review'}
               </Button>
             </Stack>
           </Stack>

@@ -135,6 +135,20 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
               )
             ) : null}
           </ColumnDiv>
+          {isStudent && (
+            <Typography
+              variant="body2"
+              fontWeight={isAssignmentMandatory ? 600 : 400}
+              color={isAssignmentMandatory ? 'text.primary' : 'text.secondary'}
+              style={{
+                position: 'absolute',
+                right: 20,
+                bottom: 20,
+              }}
+            >
+              {isAssignmentMandatory ? 'Required' : 'Optional'}
+            </Typography>
+          )}
         </CardContent>
       </Card>
       {!isStudent && onAssignmentOrderChange && (
@@ -163,16 +177,17 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
           </IconButton>
         </RowDiv>
       )}
-
-      <CheckBoxInput
-        label="Required?"
-        labelPlacement="top"
-        value={isAssignmentMandatory}
-        disabled={updateInProgress}
-        onChange={(e) => {
-          onMandatoryChange(assignment._id, e);
-        }}
-      />
+      {!isStudent && (
+        <CheckBoxInput
+          label="Required?"
+          labelPlacement="top"
+          value={isAssignmentMandatory}
+          disabled={updateInProgress || isStudent}
+          onChange={(e) => {
+            onMandatoryChange(assignment._id, e);
+          }}
+        />
+      )}
     </RowDiv>
   );
 };

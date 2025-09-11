@@ -196,7 +196,7 @@ describe('collectin user intentions', () => {
       clickNextIntentionModal(cy);
       didDocDataGetSaved(cy, 'test');
       goToMyEditableActivity(cy);
-      cy.get('[data-cy=home-button]').click();
+      cy.get('[data-cy=doc-home-button]').click();
       cy.get('[data-cy=doc-list-item-Aliens]').click();
       isOnSelectGoalScreen(cy);
       isBackButtonDisabled(cy);
@@ -478,7 +478,7 @@ describe('collectin user intentions', () => {
       cy.visit(`/docs/${testGoogleDocId}`);
       goToMyEditableActivity(cy);
       checkNumberSessionIds(cy, 1);
-      cy.get('[data-cy=home-button]').click();
+      cy.get('[data-cy=doc-home-button]').click();
       cy.get('[data-cy=doc-list-item-Aliens-2]').click();
       goToMyEditableActivity(cy);
       checkNumberSessionIds(cy, 2);

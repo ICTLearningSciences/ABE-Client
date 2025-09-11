@@ -18,7 +18,10 @@ import {
   MenuItem,
   Modal,
 } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  TextSnippet as ViewDocumentTimelineIcon,
+} from '@mui/icons-material';
 import { ActivityBuilder } from '../../../components/activity-builder/types';
 import {
   Assignment,
@@ -34,12 +37,13 @@ interface AssignmentActivitiesDisplayProps {
   assignment: Assignment;
   builtActivities: ActivityBuilder[];
   availableActivities: ActivityBuilder[];
-  isStudentView?: boolean;
+  isStudentView: boolean;
   isAssignmentModifying?: boolean;
   onAddActivity: (activityId: string) => Promise<void>;
   onRemoveActivity: (activityId: string) => Promise<void>;
   onActivitySelect: (activityId: string) => void;
   activityIdToCompletionStatus: Record<string, boolean>;
+  onViewDocumentTimeline: (studentId: string, assignmentId: string) => void;
 }
 
 const AssignmentActivitiesDisplay: React.FC<
@@ -48,12 +52,13 @@ const AssignmentActivitiesDisplay: React.FC<
   assignment,
   builtActivities,
   availableActivities,
-  isStudentView = false,
+  isStudentView,
   isAssignmentModifying = false,
   onAddActivity,
   onRemoveActivity,
   onActivitySelect,
   activityIdToCompletionStatus,
+  onViewDocumentTimeline,
 }) => {
   const [selectedActivityId, setSelectedActivityId] = useState<string>('');
   const { myData, studentActivityDefaultLLMSet, viewState, updateAssignment } =
@@ -62,6 +67,11 @@ const AssignmentActivitiesDisplay: React.FC<
   const [llmModalOpen, setLlmModalOpen] = useState(false);
   const [selectedActivityForLLM, setSelectedActivityForLLM] =
     useState<string>('');
+  const hasRelevantGoogleDocs =
+    myData &&
+    isStudentData(myData) &&
+    (myData.assignmentProgress.find((a) => a.assignmentId === assignment._id)
+      ?.relevantGoogleDocs.length || 0) > 0;
   const selectedActivityForLLMDefaultLLM = useMemo(
     () =>
       myData && isStudentData(myData)
@@ -73,7 +83,6 @@ const AssignmentActivitiesDisplay: React.FC<
         : undefined,
     [selectedActivityForLLM, myData, assignment._id]
   );
-
   const handleAddActivity = async () => {
     if (!selectedActivityId) return;
 
@@ -163,6 +172,30 @@ const AssignmentActivitiesDisplay: React.FC<
           {assignment.activityIds.length !== 1 ? 'ies' : 'y'}
         </Typography>
       </Stack>
+
+      {/* View Document Timeline Button */}
+      {isStudentView && (
+        <Button
+          variant="contained"
+          disabled={
+            !myData ||
+            !myData.userId ||
+            !isStudentData(myData) ||
+            !hasRelevantGoogleDocs
+          }
+          style={{
+            marginBottom: 10,
+            textTransform: 'none',
+          }}
+          onClick={() => {
+            if (!myData || !myData.userId) return;
+            onViewDocumentTimeline(myData.userId, assignment._id);
+          }}
+        >
+          <ViewDocumentTimelineIcon />
+          View Document Timeline
+        </Button>
+      )}
 
       {/* Add Activity Section */}
       {!isStudentView && (

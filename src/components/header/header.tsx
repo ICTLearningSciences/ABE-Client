@@ -24,11 +24,15 @@ import { UserInfoSettings } from '../settings/user-info-settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { CuiHeader } from './cui-header';
 import { PrivacyPolicyDisplay } from '../privacy-policy-display';
+import SchoolIcon from '@mui/icons-material/School';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import { RowDiv } from '../../styled-components';
 export default function Header(props: {
   useLogin: UseWithLogin;
-  homeNavPath: string;
+  courseNavPath: string;
+  freeDocEditingNavPath: string;
 }): JSX.Element {
-  const { useLogin, homeNavPath } = props;
+  const { useLogin, courseNavPath, freeDocEditingNavPath } = props;
   const { logout } = useLogin;
   const loginStatus = useAppSelector((state) => state.login.loginStatus);
   const loggedIn = loginStatus === LoginStatus.AUTHENTICATED;
@@ -111,15 +115,32 @@ export default function Header(props: {
           }}
         >
           {loggedIn && (
-            <IconButton
-              data-cy="home-button"
-              onClick={() => {
-                navigate(homeNavPath);
+            <RowDiv
+              style={{
+                gap: 20,
               }}
-              color="primary"
             >
-              <Home />
-            </IconButton>
+              {courseNavPath && (
+                <IconButton
+                  data-cy="educational-home-button"
+                  onClick={() => {
+                    navigate(courseNavPath);
+                  }}
+                  color="primary"
+                >
+                  <SchoolIcon />
+                </IconButton>
+              )}
+              <IconButton
+                data-cy="doc-home-button"
+                onClick={() => {
+                  navigate(freeDocEditingNavPath);
+                }}
+                color="primary"
+              >
+                {courseNavPath ? <TextSnippetIcon /> : <Home />}
+              </IconButton>
+            </RowDiv>
           )}
         </div>
         <HeaderTitle />
