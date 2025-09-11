@@ -61,12 +61,8 @@ const AssignmentActivitiesDisplay: React.FC<
   onViewDocumentTimeline,
 }) => {
   const [selectedActivityId, setSelectedActivityId] = useState<string>('');
-  const {
-    myData,
-    studentActivityDefaultLLMSet,
-    viewState,
-    updateAssignment,
-  } = useWithEducationalManagement();
+  const { myData, studentActivityDefaultLLMSet, viewState, updateAssignment } =
+    useWithEducationalManagement();
   const [llmChangeLoading, setLlmChangeLoading] = useState(false);
   const [llmModalOpen, setLlmModalOpen] = useState(false);
   const [selectedActivityForLLM, setSelectedActivityForLLM] =
