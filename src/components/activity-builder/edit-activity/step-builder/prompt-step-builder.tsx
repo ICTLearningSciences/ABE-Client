@@ -36,7 +36,6 @@ import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
 import { AiServicesResponseTypes } from '../../../../ai-services/ai-service-types';
 import ViewPreviousRunModal from '../../../admin-view/view-previous-run-modal';
 import { recursivelyConvertExpectedDataToAiPromptString } from '../../helpers';
-import { useWithExecutePrompt } from '../../../../hooks/use-with-execute-prompts';
 import { TextDialog } from '../../../dialog';
 import ViewPreviousRunsModal from '../../../admin-view/view-previous-runs-modal';
 import { JsonResponseDataUpdater } from './json-response-data-builder';
@@ -46,6 +45,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
 import { InfoTooltip } from '../../../info-tooltip';
+import { useActivityBuilderContext } from '../../activity-builder-context';
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
     clientId: uuid(),
@@ -126,7 +126,7 @@ export function PromptStepBuilder(props: {
   const currentFLow = flowsList.find((f) => {
     return f.steps.find((s) => s.stepId === step.stepId);
   });
-  const { executePromptSteps } = useWithExecutePrompt();
+  const { executePromptSteps } = useActivityBuilderContext();
   const [viewRunResults, setViewRunResults] =
     React.useState<AiServicesResponseTypes>();
   const [previousRunResults, setPreviousRunResults] = React.useState<
@@ -426,6 +426,9 @@ export function PromptStepBuilder(props: {
         recursivelyConvertExpectedDataToAiPromptString(step.jsonResponseData);
     }
     try {
+      if (!executePromptSteps) {
+        throw new Error('Execute prompt steps function is not available');
+      }
       const _response = await executePromptSteps(aiPromptSteps);
       setViewRunResults(_response);
       setPreviousRunResults([...previousRunResults, _response]);

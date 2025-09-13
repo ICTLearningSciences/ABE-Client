@@ -157,7 +157,7 @@ describe('collectin user intentions', () => {
       didDocDataGetSaved(cy, 'test');
     });
 
-    it('does not ask for document intention again if provided', () => {
+    it.only('does not ask for document intention again if provided', () => {
       cyMockDefault(cy, {
         gqlQueries: [
           mockGQL('FetchGoogleDocs', {

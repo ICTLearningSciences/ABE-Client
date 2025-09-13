@@ -6,19 +6,15 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React, { useState } from 'react';
 import { ColumnDiv, RowDiv } from '../../styled-components';
-import {
-  ActivityBuilder as ActivityBuilderType,
-  ActivityBuilderVisibility,
-} from './types';
+import { ActivityBuilder as ActivityBuilderType } from './types';
 import { Button, CircularProgress, IconButton } from '@mui/material';
 import { isActivityRunnable } from './helpers';
 import PreviewIcon from '@mui/icons-material/Preview';
 import EditIcon from '@mui/icons-material/Edit';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { useAppSelector } from '../../store/hooks';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { UserRole } from '../../store/slices/login';
 import { TwoOptionDialog } from '../dialog';
+import { useActivityBuilderContext } from './activity-builder-context';
 export function ExistingActivityItem(props: {
   activity: ActivityBuilderType;
   goToActivity: () => void;
@@ -135,15 +131,15 @@ export function ExistingActivities(props: {
     onCreateActivity,
     deleteBuiltActivity,
   } = props;
-  const user = useAppSelector((state) => state.login.user);
+  const activityContext = useActivityBuilderContext();
   if (!activities.length) {
     return <></>;
   }
   const myActivities = activities.filter(
-    (activity) => activity.user === user?._id
+    (activity) => activity.user === activityContext.userId
   );
   const otherActivities = activities.filter(
-    (activity) => activity.user !== user?._id
+    (activity) => activity.user !== activityContext.userId
   );
 
   return (
@@ -211,11 +207,8 @@ export function ExistingActivities(props: {
               props.goToActivity(activity);
             }}
             deleteBuiltActivity={deleteBuiltActivity}
-            canEditActivity={
-              user?.userRole === UserRole.ADMIN ||
-              activity.visibility === ActivityBuilderVisibility.EDITABLE
-            }
-            canDeleteActivity={user?.userRole === UserRole.ADMIN}
+            canEditActivity={activityContext.canEditActivity(activity)}
+            canDeleteActivity={activityContext.canDeleteActivity(activity)}
           />
         );
       })}
