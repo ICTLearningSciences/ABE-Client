@@ -56,6 +56,15 @@ export function EditGoogleDoc(props: {
   const viewingAdmin =
     viewingRole === UserRole.ADMIN || viewingRole === UserRole.CONTENT_MANAGER;
   const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
+  const {
+    builtActivities,
+    addOrUpdateBuiltActivity,
+    addNewLocalBuiltActivity,
+    copyBuiltActivity,
+    deleteBuiltActivity,
+  } = useWithDocGoalsActivities();
+  const { activityVersions, loadActivityVersions } = useWithActivityVersions();
+  const { executePromptSteps } = useWithExecutePrompt();
 
   function goToActivityPreview(activity: ActivityTypes) {
     setPreviewingActivity(true);
@@ -82,15 +91,6 @@ export function EditGoogleDoc(props: {
     previewingActivity && goalActivityState?.selectedActivity
       ? goalActivityState?.selectedActivity
       : undefined;
-  const {
-    builtActivities,
-    addOrUpdateBuiltActivity,
-    addNewLocalBuiltActivity,
-    copyBuiltActivity,
-    deleteBuiltActivity,
-  } = useWithDocGoalsActivities();
-  const { activityVersions, loadActivityVersions } = useWithActivityVersions();
-  const { executePromptSteps } = useWithExecutePrompt();
   return (
     <div style={{ height: '100%', display: 'flex', flexGrow: 1 }}>
       {!viewingAdmin && (
