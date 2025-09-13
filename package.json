@@ -1,6 +1,6 @@
 {
   "name": "abe-client",
-  "version": "1.0.82",
+  "version": "1.0.83",
   "main": "build/src/exported-files.js",
   "types": "build/src/exported-files.d.ts",
   "private": false,

@@ -137,8 +137,11 @@ export function EditGoogleDoc(props: {
                     activity.visibility === ActivityBuilderVisibility.EDITABLE
                   );
                 }}
-                canDeleteActivity={() => {
-                  return user?.userRole === UserRole.ADMIN;
+                canDeleteActivity={(activity) => {
+                  return (
+                    user?.userRole === UserRole.ADMIN ||
+                    activity.user === user?._id
+                  );
                 }}
                 curActivity={
                   curActivity && isActivityBuilder(curActivity)
