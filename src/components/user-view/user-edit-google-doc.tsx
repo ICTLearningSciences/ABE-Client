@@ -56,13 +56,14 @@ export function EditGoogleDoc(props: {
   const viewingAdmin =
     viewingRole === UserRole.ADMIN || viewingRole === UserRole.CONTENT_MANAGER;
   const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
+  const config = useAppSelector((state) => state.config).config;
   const {
     builtActivities,
     addOrUpdateBuiltActivity,
     addNewLocalBuiltActivity,
     copyBuiltActivity,
     deleteBuiltActivity,
-  } = useWithDocGoalsActivities();
+  } = useWithDocGoalsActivities(user?._id || '', config);
   const { activityVersions, loadActivityVersions } = useWithActivityVersions();
   const { executePromptSteps } = useWithExecutePrompt();
 

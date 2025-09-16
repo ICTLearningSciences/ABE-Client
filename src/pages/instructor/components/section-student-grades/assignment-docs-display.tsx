@@ -61,6 +61,9 @@ export function AssignmentDocsDisplay(props: {
                 label={getDocLabel(doc)}
                 variant="outlined"
                 onClick={() => {
+                  if (typeof window === 'undefined') {
+                    return;
+                  }
                   window.open(
                     `https://docs.google.com/document/d/${doc.docId}/edit`,
                     '_blank'

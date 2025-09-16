@@ -7,13 +7,15 @@ module.exports = {
     filename: 'exported-files.js',
     path: path.resolve(__dirname, 'build/src'),
     libraryTarget: 'umd',
-    clean: true
+    clean: true,
+    globalObject: 'typeof self !== \'undefined\' ? self : this'
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
   externals: {
-    react: 'react'
+    react: 'react',
+    'react-dom': 'react-dom'
   },
   module: {
     rules: [

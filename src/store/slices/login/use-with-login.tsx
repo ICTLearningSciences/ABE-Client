@@ -56,6 +56,9 @@ export function useWithLogin(): UseWithLogin {
     if (loginStatus !== loginActions.LoginStatus.AUTHENTICATED) {
       return;
     }
+    if (typeof window === 'undefined') {
+      return;
+    }
     const urlParams = new URLSearchParams(window.location.search);
     const classroomCodeUrlParam = urlParams.get('classroomCode');
     const classroomCodeLocalStorage = localStorageGet(CLASSROOM_CODE_KEY);
@@ -125,7 +128,7 @@ export function useWithLogin(): UseWithLogin {
 
   async function logout() {
     await dispatch(loginActions.logout());
-    if (awsCognitoAuth.isAuthenticated) {
+    if (awsCognitoAuth.isAuthenticated && typeof window !== 'undefined') {
       try {
         await awsCognitoAuth.signoutRedirect({
           extraQueryParams: {

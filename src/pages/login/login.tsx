@@ -34,6 +34,9 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
   });
 
   async function handleLoginNavigate(user?: User) {
+    if (typeof window === 'undefined') {
+      return;
+    }
     const sectionCodeFromUrl = new URLSearchParams(window.location.search).get(
       'sectionCode'
     );

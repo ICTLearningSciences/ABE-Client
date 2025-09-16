@@ -132,9 +132,6 @@ export function ExistingActivities(props: {
     deleteBuiltActivity,
   } = props;
   const activityContext = useActivityBuilderContext();
-  if (!activities.length) {
-    return <></>;
-  }
   const myActivities = activities.filter(
     (activity) => activity.user === activityContext.userId
   );

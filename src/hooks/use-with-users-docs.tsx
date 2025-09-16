@@ -120,6 +120,9 @@ export function useWithUsersDocs(): UseWithUsersDocs {
     React.useState<boolean>(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
     const queryParameters = new URLSearchParams(window.location.search);
     const targetDocId = queryParameters.get('docId');
     if (targetDocId) {

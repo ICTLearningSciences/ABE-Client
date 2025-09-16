@@ -80,6 +80,11 @@ export interface MockGraphQLQuery {
 }
 
 function staticResponse(s: StaticResponse): StaticResponse {
+  if(typeof window === 'undefined') {
+    return {
+      ...s,
+    };
+  }
   return {
     ...{
       headers: {

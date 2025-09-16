@@ -16,6 +16,7 @@ import {
 import {
   ActivityGQL,
   ActivityTypes,
+  Config,
   DocGoal,
   DocGoalGQl,
 } from '../../../types';
@@ -39,12 +40,15 @@ export interface UseWithDocGoalsActivities {
   educationReadyActivities: ActivityBuilder[];
 }
 
-export function useWithDocGoalsActivities(): UseWithDocGoalsActivities {
+export function useWithDocGoalsActivities(
+  userId: string,
+  config?: Config,
+  storeVersion = true
+): UseWithDocGoalsActivities {
   const dispatch = useAppDispatch();
   const activitiesLoadingState = useAppSelector(
     (state) => state.docGoalsActivities.activitiesLoadStatus
   );
-  const userId = useAppSelector((state) => state.login.user?._id) || '';
   const docGoalsLoadingState = useAppSelector(
     (state) => state.docGoalsActivities.docGoalsLoadStatus
   );
@@ -60,8 +64,7 @@ export function useWithDocGoalsActivities(): UseWithDocGoalsActivities {
   const docGoalsGql = useAppSelector(
     (state) => state.docGoalsActivities.docGoals
   );
-  const config = useAppSelector((state) => state.config);
-  const displayedGoalActivities = config.config?.displayedGoalActivities || [];
+  const displayedGoalActivities = config?.displayedGoalActivities || [];
 
   const getBuiltActivityById = (id: string): ActivityBuilder | undefined => {
     return builtActivities.find((a) => a._id === id);
@@ -117,7 +120,9 @@ export function useWithDocGoalsActivities(): UseWithDocGoalsActivities {
   async function addOrUpdateBuiltActivity(
     activity: ActivityBuilder
   ): Promise<ActivityBuilder> {
-    dispatch(storeActivityVersionForActivity(activity));
+    if (storeVersion) {
+      dispatch(storeActivityVersionForActivity(activity));
+    }
     const res = await dispatch(_addOrUpdateBuiltActivity(activity));
     return res.payload as ActivityBuilder;
   }

@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import { useWithDocGoalsActivities } from '../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { DocGoal, ActivityTypes } from '../types';
 import { useState } from 'react';
+import { useAppSelector } from '../store/hooks';
 
 export interface CurrentGoalAndActivity {
   selectedGoal?: DocGoal;
@@ -26,7 +27,12 @@ export interface UseWithCurrentGoalActivity {
 }
 
 export function useWithCurrentGoalActivity(): UseWithCurrentGoalActivity {
-  const { docGoals, isLoading } = useWithDocGoalsActivities();
+  const user = useAppSelector((state) => state.login.user);
+  const config = useAppSelector((state) => state.config).config;
+  const { docGoals, isLoading } = useWithDocGoalsActivities(
+    user?._id || '',
+    config
+  );
 
   const [goalActivityState, setGoalActivityState] =
     useState<CurrentGoalAndActivity>();
