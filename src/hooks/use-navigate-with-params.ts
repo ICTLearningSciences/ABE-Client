@@ -8,11 +8,12 @@ import { useNavigate } from 'react-router-dom';
 
 export function useNavigateWithParams() {
   const navigate = useNavigate();
-  const search = window.location.search;
+  const search = typeof window === 'undefined' ? '' : window.location.search;
   const searchParams = new URLSearchParams(search);
 
   const navigateWithParams = (path: string, options = {}) => {
     // Build the new URL with all existing parameters
+    const origin = typeof window === 'undefined' ? '' : window.location.origin;
     const url = new URL(path, origin);
     searchParams.forEach((value, key) => {
       url.searchParams.set(key, value);

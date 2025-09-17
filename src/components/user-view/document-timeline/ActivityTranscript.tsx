@@ -13,6 +13,7 @@ import {
   Text3,
   Text3NoIndent,
 } from '../../../styles/content-revision-styles';
+import { useAppSelector } from '../../../store/hooks';
 
 interface ActivityTranscriptProps {
   chatLog: ChatItem[];
@@ -67,6 +68,8 @@ const ChatMessage = (props: ChatMessageProps) => {
 specific activity. Here's a breakdown of what it does: */
 function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
   const { chatLog, activityId } = props;
+  const user = useAppSelector((state) => state.login.user);
+  const config = useAppSelector((state) => state.config).config;
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
   );
@@ -81,7 +84,10 @@ function ActivityTranscript(props: ActivityTranscriptProps): JSX.Element {
 
   const open = Boolean(anchorEl);
 
-  const { getActivityById } = useWithDocGoalsActivities();
+  const { getActivityById } = useWithDocGoalsActivities(
+    user?._id || '',
+    config
+  );
   const activity = getActivityById(activityId);
   const activityTitle = activity?.title || '';
   return (

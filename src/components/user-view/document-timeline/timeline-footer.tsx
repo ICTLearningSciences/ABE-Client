@@ -34,6 +34,7 @@ import {
   TimelineItemTest,
   TimelineTestContainer,
 } from '../../../styles/timeline-styles';
+import { useAppSelector } from '../../../store/hooks';
 
 /* The `TimeLineCard` component is a functional component that takes in a prop `timelinePoint` of type
 `GQLTimelinePoint`. Inside the component, it retrieves the `getActivitById` function from the
@@ -41,7 +42,12 @@ import {
 timeline point's version. */
 const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
   const { timelinePoint } = props;
-  const { getActivityById } = useWithDocGoalsActivities();
+  const user = useAppSelector((state) => state.login.user);
+  const config = useAppSelector((state) => state.config).config;
+  const { getActivityById } = useWithDocGoalsActivities(
+    user?._id || '',
+    config
+  );
   const { getCurrentDoc } = useWithUsersDocs();
   const { docId } = useParams<Record<string, string>>();
 
@@ -105,13 +111,14 @@ export default function TimelineFooter(props: {
   }, [footerTimelineRef]);
 
   const currentVersionIndex = timelinePoints.length - 1;
+  const innerWidth = typeof window === 'undefined' ? 0 : window.innerWidth;
 
   return (
     <TimelineTestContainer
       data-cy="timeline-footer-wrapper"
       ref={footerTimelineRef}
       style={{
-        width: footerTimelineRef.current?.scrollWidth || window.innerWidth,
+        width: footerTimelineRef.current?.scrollWidth || innerWidth,
       }}
     >
       <GlobalStyles />
@@ -120,10 +127,7 @@ export default function TimelineFooter(props: {
         connector={<ColorlibConnector />}
         sx={StepperSx}
         style={{
-          width:
-            footerTimelineRef.current?.scrollWidth ||
-            window.innerWidth ||
-            '100%',
+          width: footerTimelineRef.current?.scrollWidth || innerWidth || '100%',
         }}
       >
         {timelinePoints.map((timelinePoint, i) => {

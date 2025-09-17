@@ -53,7 +53,10 @@ const SectionView: React.FC<SectionViewProps> = ({
 }) => {
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
-  const urlParams = new URLSearchParams(window.location.search);
+  const urlParams =
+    typeof window === 'undefined'
+      ? new URLSearchParams()
+      : new URLSearchParams(window.location.search);
   const sectionTab = urlParams.get(queryParamSectionTab);
   const [selectedTab, setSelectedTab] = useState(
     sectionTab ? parseInt(sectionTab) : 0
@@ -176,7 +179,11 @@ const SectionView: React.FC<SectionViewProps> = ({
                 />
                 {isInstructor && (
                   <CopyUrlButton
-                    copyUrl={`${window.location.origin}?sectionCode=${section.sectionCode}`}
+                    copyUrl={`${
+                      typeof window === 'undefined'
+                        ? ''
+                        : window.location.origin
+                    }?sectionCode=${section.sectionCode}`}
                     tooltip="Copy Section Join URL"
                   />
                 )}

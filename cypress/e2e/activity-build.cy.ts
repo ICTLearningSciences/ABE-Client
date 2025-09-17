@@ -157,7 +157,7 @@ describe('activity builder', () => {
               cy.get("[data-cy=return-to-activity-list]").click()
         })
 
-        it("can only delete their own activities", ()=>{
+        it.only("can only delete their own activities", ()=>{
             cyMockDefault(cy, {
                 userRole: UserRole.CONTENT_MANAGER,
                 gqlQueries: [

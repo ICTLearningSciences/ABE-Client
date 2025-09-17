@@ -13,12 +13,18 @@ import { UserRole } from '../../store/slices/login';
 import { useWithState } from '../../store/slices/state/use-with-state';
 import { ActivityTypes } from '../../types';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
-import { isActivityBuilder } from '../activity-builder/types';
+import {
+  ActivityBuilderVisibility,
+  isActivityBuilder,
+} from '../activity-builder/types';
 import { ChatActivity } from './chat-activity';
 import { SingleNotificationDialog } from '../dialog';
 import { UserDocumentDisplay } from './user-document-display';
 import { ColumnCenterDiv, ColumnDiv } from '../../styled-components';
 import { ActivityBuilderPage } from '../activity-builder/activity-builder-page';
+import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
+import { useWithActivityVersions } from '../../hooks/use-with-activity-versions';
+import { useWithExecutePrompt } from '../../hooks/use-with-execute-prompts';
 
 export function EditGoogleDoc(props: {
   docId: string;
@@ -45,10 +51,21 @@ export function EditGoogleDoc(props: {
 
   const { width: windowWidth } = useWithWindowSize();
   const { updateViewingUserRole, state } = useWithState();
+  const user = useAppSelector((state) => state.login.user);
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const viewingAdmin =
     viewingRole === UserRole.ADMIN || viewingRole === UserRole.CONTENT_MANAGER;
   const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
+  const config = useAppSelector((state) => state.config).config;
+  const {
+    builtActivities,
+    addOrUpdateBuiltActivity,
+    addNewLocalBuiltActivity,
+    copyBuiltActivity,
+    deleteBuiltActivity,
+  } = useWithDocGoalsActivities(user?._id || '', config);
+  const { activityVersions, loadActivityVersions } = useWithActivityVersions();
+  const { executePromptSteps } = useWithExecutePrompt();
 
   function goToActivityPreview(activity: ActivityTypes) {
     setPreviewingActivity(true);
@@ -109,12 +126,33 @@ export function EditGoogleDoc(props: {
               }}
             >
               <ActivityBuilderPage
+                builtActivities={builtActivities}
+                addOrUpdateBuiltActivity={addOrUpdateBuiltActivity}
+                addNewLocalBuiltActivity={addNewLocalBuiltActivity}
+                copyBuiltActivity={copyBuiltActivity}
+                deleteBuiltActivity={deleteBuiltActivity}
+                canEditActivity={(activity) => {
+                  return (
+                    activity.user === user?._id ||
+                    user?.userRole === UserRole.ADMIN ||
+                    activity.visibility === ActivityBuilderVisibility.EDITABLE
+                  );
+                }}
+                canDeleteActivity={(activity) => {
+                  return (
+                    user?.userRole === UserRole.ADMIN ||
+                    activity.user === user?._id
+                  );
+                }}
                 curActivity={
                   curActivity && isActivityBuilder(curActivity)
                     ? curActivity
                     : undefined
                 }
                 goToActivity={goToActivityPreview}
+                activityVersions={activityVersions}
+                loadActivityVersions={loadActivityVersions}
+                executePromptSteps={executePromptSteps}
               />
             </ColumnDiv>
           </ColumnCenterDiv>

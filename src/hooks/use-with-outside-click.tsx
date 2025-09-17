@@ -19,6 +19,10 @@ const useOutsideClick = ({ ref, onOutsideClick }: UseOutsideClickProps) => {
   };
 
   useEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
     const handleClick = (event: MouseEvent) => {
       handleClickOutside(event);
     };

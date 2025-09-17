@@ -180,7 +180,7 @@ function App() {
   const cognitoAuthConfig: AuthProviderProps = {
     authority: process.env.REACT_APP_COGNITO_AUTHORITY || '',
     client_id: process.env.REACT_APP_COGNITO_CLIENT_ID || '',
-    redirect_uri: window.location.origin,
+    redirect_uri: typeof window === 'undefined' ? '' : window.location.origin,
     response_type: 'code',
     scope: 'email openid phone',
   };

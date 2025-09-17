@@ -25,6 +25,9 @@ export function UserInfoSettings(): JSX.Element {
     configState.config?.surveyConfig?.surveyClassroomParam;
 
   function takeSurvey() {
+    if (typeof window === 'undefined') {
+      return;
+    }
     if (surveyUrl) {
       const url = new URL(surveyUrl);
       if (state.user?._id && surveyUrlParam) {

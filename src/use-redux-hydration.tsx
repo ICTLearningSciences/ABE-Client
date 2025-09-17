@@ -14,9 +14,10 @@ import { LoginStatus } from './store/slices/login';
 export async function useReduxHydration() {
   const userData = useAppSelector((state) => state.login.user);
   const loginStatus = useAppSelector((state) => state.login.loginStatus);
+  const config = useAppSelector((state) => state.config).config;
   const dispatch = useAppDispatch();
   const { loadActivities, loadDocGoals, loadBuiltActivities } =
-    useWithDocGoalsActivities();
+    useWithDocGoalsActivities(userData?._id || '', config);
   const { loadAllEducationalDataWithUserData } = useWithEducationalManagement();
   const [hydrated, setHydrated] = useState(false);
 

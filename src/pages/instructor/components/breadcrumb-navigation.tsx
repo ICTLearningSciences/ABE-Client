@@ -10,6 +10,7 @@ import { NavigateNext } from '@mui/icons-material';
 import { UseWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { CourseManagementState } from '../../../store/slices/education-management';
+import { useAppSelector } from '../../../store/hooks';
 
 export interface BreadcrumbItem {
   id: string;
@@ -35,7 +36,12 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
   handleSectionSelect,
   handleAssignmentSelect,
 }) => {
-  const { getActivityById } = useWithDocGoalsActivities();
+  const user = useAppSelector((state) => state.login.user);
+  const config = useAppSelector((state) => state.config).config;
+  const { getActivityById } = useWithDocGoalsActivities(
+    user?._id || '',
+    config
+  );
   const items: BreadcrumbItem[] = useMemo(() => {
     const items: BreadcrumbItem[] = [
       {

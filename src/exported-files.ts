@@ -4,6 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import docGoalsActivitiesReducer from './store/slices/doc-goals-activities';
 export { default as SelectCreateDocs } from './components/user-view/select-create-docs';
 export { store } from './store/store';
 export { Provider } from 'react-redux';
@@ -11,6 +12,7 @@ export { Provider } from 'react-redux';
 export { useWithLogin } from './store/slices/login/use-with-login';
 export { useWithChat } from './store/slices/chat/use-with-chat';
 export { useWithConfig } from './store/slices/config/use-with-config';
+export { docGoalsActivitiesReducer }; // store slice
 export { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
 export { useWithSpfxLogin } from './store/slices/login/use-with-spfx-login';
 export { useWithState } from './store/slices/state/use-with-state';
@@ -24,3 +26,6 @@ export { useConfigLoader } from './components/config-loading/use-config-loader';
 export { DocumentTimelinePage } from './components/user-view/document-timeline';
 export { LoginUI } from './pages/login/login-ui';
 export * from './hooks/api';
+
+export { ActivityBuilderPage } from './components/activity-builder/activity-builder-page';
+export * from './components/activity-builder/types';
