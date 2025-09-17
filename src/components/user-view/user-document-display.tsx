@@ -21,12 +21,16 @@ export function GoogleDocDisplay(props: {
   currentActivityId: string;
 }): JSX.Element {
   const { docUrl, currentActivityId } = props;
+  const loggedInEmail = useAppSelector((state) => state.login.user?.email);
+  const params = new URL(docUrl);
+  loggedInEmail && params.searchParams.set('authuser', loggedInEmail);
+  const docUrlWithParams = params.toString();
   useWithStoreDocVersions(currentActivityId);
   return (
     <iframe
       width={'98%'}
       height={'98%'}
-      src={docUrl}
+      src={docUrlWithParams}
       data-cy="google-doc-iframe"
     />
   );
