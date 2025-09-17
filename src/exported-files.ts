@@ -24,6 +24,7 @@ export { useWithCurrentGoalActivity } from './hooks/use-with-current-goal-activi
 export { ChatActivity } from './components/user-view/chat-activity';
 export { useConfigLoader } from './components/config-loading/use-config-loader';
 export { DocumentTimelinePage } from './components/user-view/document-timeline';
+export { useWithRawTextDocVersions } from './hooks/use-with-raw-text-doc-versions';
 export { LoginUI } from './pages/login/login-ui';
 export * from './hooks/api';
 
