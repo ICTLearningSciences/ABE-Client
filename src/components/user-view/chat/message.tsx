@@ -11,6 +11,7 @@ import { UserRole } from '../../../store/slices/login';
 import { useEffect, useState } from 'react';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import { StyledFadingText } from './message-styles';
+import ReactMarkdown from 'react-markdown';
 
 const baseMessageStyle: React.CSSProperties = {
   borderRadius: '1rem',
@@ -119,7 +120,9 @@ export default function Message(props: {
         color: textColor,
       }}
     >
-      {message.displayType === MessageDisplayType.TEXT && message.message}
+      <ReactMarkdown components={{ p: 'span' }}>
+        {message.displayType === MessageDisplayType.TEXT ? message.message : ''}
+      </ReactMarkdown>
       {message.displayType === MessageDisplayType.PENDING_MESSAGE && (
         <FadingText
           strings={['Reading...', 'Analyzing...', 'Getting opinionated...']}

@@ -63,6 +63,7 @@ export function EditGoogleDoc(props: {
     addNewLocalBuiltActivity,
     copyBuiltActivity,
     deleteBuiltActivity,
+    educationReadyActivities,
   } = useWithDocGoalsActivities(user?._id || '', config);
   const { activityVersions, loadActivityVersions } = useWithActivityVersions();
   const { executePromptSteps } = useWithExecutePrompt();
@@ -127,6 +128,11 @@ export function EditGoogleDoc(props: {
             >
               <ActivityBuilderPage
                 builtActivities={builtActivities}
+                isActivityEducationReady={(activityId: string) => {
+                  return educationReadyActivities.some(
+                    (a) => a._id === activityId
+                  );
+                }}
                 addOrUpdateBuiltActivity={addOrUpdateBuiltActivity}
                 addNewLocalBuiltActivity={addNewLocalBuiltActivity}
                 copyBuiltActivity={copyBuiltActivity}
