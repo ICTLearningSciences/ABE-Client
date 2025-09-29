@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import React, { useState } from 'react';
 import {
   Button,
+  Divider,
   Drawer,
   IconButton,
   ThemeProvider,
@@ -39,6 +40,8 @@ export default function Header(props: {
   const navigate = useNavigateWithParams();
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
+  const defaultPath = courseNavPath || freeDocEditingNavPath;
+  const curPath = typeof window !== 'undefined' ? window.location.pathname : '';
   const theme = createTheme({
     palette: {
       primary: {
@@ -47,6 +50,61 @@ export default function Header(props: {
     },
   });
   const [profileOpen, setProfileOpen] = useState(false);
+  const buttonDisplayType = courseNavPath ? 'DOC_AND_COURSE' : 'DOC_ONLY';
+
+  function docOnlyDisplay() {
+    return (
+      <IconButton
+        data-cy="doc-home-button"
+        onClick={() => {
+          navigate(defaultPath);
+        }}
+      >
+        <Home />
+      </IconButton>
+    );
+  }
+
+  function homeAndCourseDisplay() {
+    return (
+      <RowDiv style={{ gap: 20 }}>
+        <IconButton
+          data-cy="default-home-button"
+          onClick={() => {
+            navigate(defaultPath);
+          }}
+          color="primary"
+        >
+          {' '}
+          <Home />{' '}
+        </IconButton>
+
+        <Divider orientation="vertical" variant="middle" flexItem />
+
+        <IconButton
+          data-cy="educational-home-button"
+          onClick={() => {
+            navigate(courseNavPath);
+          }}
+          color="primary"
+          disabled={curPath === courseNavPath}
+        >
+          <SchoolIcon />
+        </IconButton>
+        <IconButton
+          data-cy="doc-home-button"
+          onClick={() => {
+            navigate(freeDocEditingNavPath);
+          }}
+          color="primary"
+          disabled={curPath === freeDocEditingNavPath}
+        >
+          <TextSnippetIcon />
+        </IconButton>
+      </RowDiv>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CuiHeader />
@@ -120,26 +178,8 @@ export default function Header(props: {
                 gap: 20,
               }}
             >
-              {courseNavPath && (
-                <IconButton
-                  data-cy="educational-home-button"
-                  onClick={() => {
-                    navigate(courseNavPath);
-                  }}
-                  color="primary"
-                >
-                  <SchoolIcon />
-                </IconButton>
-              )}
-              <IconButton
-                data-cy="doc-home-button"
-                onClick={() => {
-                  navigate(freeDocEditingNavPath);
-                }}
-                color="primary"
-              >
-                {courseNavPath ? <TextSnippetIcon /> : <Home />}
-              </IconButton>
+              {buttonDisplayType === 'DOC_AND_COURSE' && homeAndCourseDisplay()}
+              {buttonDisplayType === 'DOC_ONLY' && docOnlyDisplay()}
             </RowDiv>
           )}
         </div>
