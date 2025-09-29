@@ -17,6 +17,7 @@ import {
   Select,
   MenuItem,
   Modal,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -32,6 +33,8 @@ import { useWithEducationalManagement } from '../../../store/slices/education-ma
 import { AiServiceModel } from '../../../types';
 import { getStudentActivityCompletionData, reorderArray } from '../helpers';
 import { AssignmentActivityListItem } from './assignment-view/assignment-activity-list-item';
+import { RowDiv } from '../../../styled-components';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 
 interface AssignmentActivitiesDisplayProps {
   assignment: Assignment;
@@ -46,12 +49,17 @@ interface AssignmentActivitiesDisplayProps {
   onViewDocumentTimeline: (studentId: string, assignmentId: string) => void;
 }
 
+const ViewActivitiesSetting = {
+  ALL: 'all activities',
+  MINE: 'my activities only',
+};
+
 const AssignmentActivitiesDisplay: React.FC<
   AssignmentActivitiesDisplayProps
 > = ({
   assignment,
   builtActivities,
-  availableActivities,
+  availableActivities: _availableActivities,
   isStudentView,
   isAssignmentModifying = false,
   onAddActivity,
@@ -72,6 +80,17 @@ const AssignmentActivitiesDisplay: React.FC<
     isStudentData(myData) &&
     (myData.assignmentProgress.find((a) => a.assignmentId === assignment._id)
       ?.relevantGoogleDocs.length || 0) > 0;
+  const [viewActivitiesSetting, setViewActivitiesSetting] = useState<string>(
+    ViewActivitiesSetting.ALL
+  );
+  const availableActivities = useMemo(() => {
+    if (viewActivitiesSetting === ViewActivitiesSetting.ALL) {
+      return _availableActivities;
+    }
+    return _availableActivities.filter(
+      (activity) => activity.user === myData?.userId
+    );
+  }, [viewActivitiesSetting, _availableActivities, myData]);
   const selectedActivityForLLMDefaultLLM = useMemo(
     () =>
       myData && isStudentData(myData)
@@ -200,13 +219,54 @@ const AssignmentActivitiesDisplay: React.FC<
       {/* Add Activity Section */}
       {!isStudentView && (
         <Card variant="outlined" sx={{ mb: 3, p: 2.5 }}>
-          <Typography variant="h6" sx={{ mb: 2, color: 'text.primary' }}>
-            Add Activity
-          </Typography>
+          <RowDiv
+            style={{
+              marginBottom: '20px',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{ color: 'text.primary' }}
+              textAlign={'center'}
+            >
+              Add Activity
+            </Typography>
+
+            <RowDiv>
+              <FilterAltIcon />
+
+              <Button
+                onClick={() =>
+                  setViewActivitiesSetting(ViewActivitiesSetting.ALL)
+                }
+                disabled={viewActivitiesSetting === ViewActivitiesSetting.ALL}
+              >
+                {ViewActivitiesSetting.ALL}
+              </Button>
+              <Divider
+                orientation="vertical"
+                style={{ color: 'black' }}
+                variant="middle"
+                flexItem
+              />
+              <Button
+                onClick={() =>
+                  setViewActivitiesSetting(ViewActivitiesSetting.MINE)
+                }
+                disabled={viewActivitiesSetting === ViewActivitiesSetting.MINE}
+              >
+                {ViewActivitiesSetting.MINE}
+              </Button>
+            </RowDiv>
+          </RowDiv>
 
           {availableActivities.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
-              No more activities available to add to this assignment.
+              No more activities available to add to this assignment.{' '}
+              {viewActivitiesSetting === ViewActivitiesSetting.MINE
+                ? 'Try setting the view activities setting to ALL ACTIVITIES.'
+                : ''}
             </Typography>
           ) : (
             <Stack direction="row" spacing={2} alignItems="center">

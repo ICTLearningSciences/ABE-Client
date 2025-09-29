@@ -29,6 +29,7 @@ import {
 } from '../../store/slices/education-management/types';
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { getStudentAssignmentDocs } from '../../helpers';
+import { useEducationalSetting } from '../../contexts/educational-setting-context';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: UserDoc[];
@@ -75,6 +76,7 @@ export default function SelectCreateDocs(props: {
   const [docToDelete, setDocToDelete] = React.useState<UserDoc>();
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
   const [loadInProgress, setLoadInProgress] = React.useState(false);
+  const { isEducationalSetting } = useEducationalSetting();
   const { viewState, myData, studentActivityDocPrimaryStatusSet } =
     useWithEducationalManagement();
   const isStudent = myData
@@ -96,21 +98,33 @@ export default function SelectCreateDocs(props: {
     archivedDocs || [],
     unarchivedDocs || [],
     viewingArchived,
+    isEducationalSetting,
     viewState.selectedAssignmentId
   );
   const title = useMemo(
     () =>
-      getTitle(assignments, viewingArchived, viewState.selectedAssignmentId),
-    [assignments, viewingArchived, viewState.selectedAssignmentId]
+      getTitle(
+        assignments,
+        viewingArchived,
+        isEducationalSetting,
+        viewState.selectedAssignmentId
+      ),
+    [
+      assignments,
+      viewingArchived,
+      isEducationalSetting,
+      viewState.selectedAssignmentId,
+    ]
   );
 
   function getDisplayedDocs(
     archivedDocs: UserDoc[],
     unarchivedDocs: UserDoc[],
     viewingArchived: boolean,
+    isEducationalSetting: boolean,
     courseAssignmentId?: string
   ): UserDoc[] {
-    if (courseAssignmentId) {
+    if (courseAssignmentId && isEducationalSetting) {
       return viewingArchived
         ? archivedDocs.filter(
             (doc) => doc.courseAssignmentId === courseAssignmentId
@@ -125,9 +139,10 @@ export default function SelectCreateDocs(props: {
   function getTitle(
     assignments: Assignment[],
     viewingArchived: boolean,
+    isEducationalSetting: boolean,
     courseAssignmentId?: string
   ): string {
-    if (!courseAssignmentId) {
+    if (!courseAssignmentId || !isEducationalSetting) {
       return viewingArchived ? 'Archived Docs' : 'Your Docs';
     }
     const assignment = assignments.find(

@@ -29,6 +29,7 @@ export function ActivityView(props: {
         onHistoryClicked={() => {
           console.log('history clicked');
         }}
+        isEducationalSetting={true}
       />
     );
   }
