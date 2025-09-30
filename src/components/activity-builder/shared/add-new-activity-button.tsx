@@ -8,7 +8,8 @@ import CloseIcon from '@mui/icons-material/Close';
 
 export type AddNewActivityStepType =
   | ActivityBuilderStepType
-  | 'EDIT_DOC_PROMPT';
+  | 'EDIT_DOC_PROMPT'
+  | 'END_ACTIVITY_MESSAGE';
 
 export function AddNewActivityButton(props: {
   insertNewActivityStep: (stepType: AddNewActivityStepType) => void;
@@ -16,6 +17,7 @@ export function AddNewActivityButton(props: {
   const options = [
     ...Object.values(ActivityBuilderStepType),
     'EDIT_DOC_PROMPT',
+    'END_ACTIVITY_MESSAGE',
   ];
   const [displayOptions, setDisplayOptions] = useState<boolean>(false);
   return (
