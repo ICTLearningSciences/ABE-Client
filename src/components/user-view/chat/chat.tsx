@@ -37,6 +37,8 @@ import { isActivityBuilder } from '../../activity-builder/types';
 import { createGlobalStyle } from 'styled-components';
 import { useWithConfig } from '../../../store/slices/config/use-with-config';
 import { ChatMessageTypes } from '../../../store/slices/chat';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 export const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
@@ -99,6 +101,7 @@ export function Chat(props: {
   const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
     : '';
+  const [displayMarkdown, setDisplayMarkdown] = useState(true);
 
   useEffect(() => {
     setSystemRole(systemRole);
@@ -135,7 +138,14 @@ export function Chat(props: {
               borderRadius: '1rem',
             }}
           >
-            <ChatHeader>
+            <ChatHeader
+              style={{
+                position: 'relative',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
               <ChatHeaderGenerator
                 incrementActivityCounter={() => {
                   setResetActivityCounter(resetActivityCounter + 1);
@@ -145,12 +155,26 @@ export function Chat(props: {
                 selectedActivity={selectedActivity}
                 disableActivitySelector={disableActivitySelector}
               />
+              <Button
+                onClick={() => setDisplayMarkdown(!displayMarkdown)}
+                style={{
+                  position: 'absolute',
+                  right: '0px',
+                  fontSize: '12px',
+                  gap: '5px',
+                  opacity: displayMarkdown ? 1 : 0.3,
+                }}
+              >
+                {displayMarkdown ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                {displayMarkdown ? 'Hide Markdown' : 'Show Markdown'}
+              </Button>
             </ChatHeader>
             <ChatMessagesContainer
               sendMessage={sendNewMessage}
               coachResponsePending={coachResponsePending}
               curDocId={curDocId}
               setAiInfoToDisplay={setAiInfoToDisplay}
+              displayMarkdown={displayMarkdown}
             />
             <ChatInput
               sendMessage={sendNewMessage}
