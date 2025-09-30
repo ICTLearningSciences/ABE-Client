@@ -37,8 +37,6 @@ import { isActivityBuilder } from '../../activity-builder/types';
 import { createGlobalStyle } from 'styled-components';
 import { useWithConfig } from '../../../store/slices/config/use-with-config';
 import { ChatMessageTypes } from '../../../store/slices/chat';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 
 export const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
@@ -130,7 +128,7 @@ export function Chat(props: {
             style={{
               display: 'flex',
               flexDirection: 'column',
-              height: '92%',
+              height: '100%',
               width: '90%',
               justifyContent: 'space-around',
               alignItems: 'center',
@@ -154,20 +152,9 @@ export function Chat(props: {
                 selectedGoal={selectedGoal}
                 selectedActivity={selectedActivity}
                 disableActivitySelector={disableActivitySelector}
+                displayMarkdown={displayMarkdown}
+                setDisplayMarkdown={setDisplayMarkdown}
               />
-              <Button
-                onClick={() => setDisplayMarkdown(!displayMarkdown)}
-                style={{
-                  position: 'absolute',
-                  right: '0px',
-                  fontSize: '12px',
-                  gap: '5px',
-                  opacity: displayMarkdown ? 1 : 0.3,
-                }}
-              >
-                {displayMarkdown ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                {displayMarkdown ? 'Hide Markdown' : 'Show Markdown'}
-              </Button>
             </ChatHeader>
             <ChatMessagesContainer
               sendMessage={sendNewMessage}
