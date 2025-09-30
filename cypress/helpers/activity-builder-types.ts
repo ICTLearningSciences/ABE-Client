@@ -137,10 +137,15 @@ export interface PredefinedResponse {
   responseWeight?: string;
 }
 
+export enum RequestUserInputSpecialType {
+  END_ACTIVITY = 'END_ACTIVITY',
+}
+
 export interface RequestUserInputActivityStep extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.REQUEST_USER_INPUT;
   message: string;
   saveAsIntention: boolean;
+  specialType?: RequestUserInputSpecialType;
   saveResponseVariableName: string;
   disableFreeInput: boolean;
   predefinedResponses: PredefinedResponse[];

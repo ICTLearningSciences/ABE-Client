@@ -44,6 +44,7 @@ export const fullBuiltActivityQueryData = `
                               message
                               saveAsIntention
                               saveResponseVariableName
+                              specialType
                               disableFreeInput
                               predefinedResponses{
                                   clientId

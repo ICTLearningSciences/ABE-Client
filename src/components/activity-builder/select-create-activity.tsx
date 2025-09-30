@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import React, { useState } from 'react';
 import { ColumnDiv, RowDiv } from '../../styled-components';
 import { ActivityBuilder as ActivityBuilderType } from './types';
-import { Button, CircularProgress, IconButton } from '@mui/material';
+import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
 import { isActivityRunnable } from './helpers';
 import PreviewIcon from '@mui/icons-material/Preview';
 import EditIcon from '@mui/icons-material/Edit';
@@ -15,6 +15,10 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { TwoOptionDialog } from '../dialog';
 import { useActivityBuilderContext } from './activity-builder-context';
+import SchoolIcon from '@mui/icons-material/School';
+import { useAppSelector } from '../../store/hooks';
+import { EducationalRole } from '../../types';
+import { UserRole } from '../../store/slices/login';
 export function ExistingActivityItem(props: {
   activity: ActivityBuilderType;
   goToActivity: () => void;
@@ -23,6 +27,8 @@ export function ExistingActivityItem(props: {
   deleteBuiltActivity: (activityId: string) => Promise<void>;
   canEditActivity: boolean;
   canDeleteActivity: boolean;
+  isInstructor: boolean;
+  educationReady: boolean;
 }) {
   const {
     activity,
@@ -32,6 +38,8 @@ export function ExistingActivityItem(props: {
     deleteBuiltActivity,
     canEditActivity,
     canDeleteActivity,
+    isInstructor,
+    educationReady,
   } = props;
   const [copying, setCopying] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -45,11 +53,22 @@ export function ExistingActivityItem(props: {
         borderBottom: '1px solid black',
       }}
     >
-      <h3>{activity.title}</h3>
-      <RowDiv>
+      <RowDiv style={{ gap: 10 }}>
+        <h3>{activity.title}</h3>
+      </RowDiv>
+      <RowDiv style={{ gap: 10 }}>
+        {isInstructor && educationReady && (
+          <Tooltip title="Ready to Assign">
+            <SchoolIcon style={{ marginRight: 20 }} />
+          </Tooltip>
+        )}
+        {isInstructor && !educationReady && (
+          <Tooltip title="NOT READY TO ASSIGN: No student completion step found for this activity.">
+            <SchoolIcon style={{ marginRight: 20, opacity: 0.3 }} />
+          </Tooltip>
+        )}
         <Button
           data-cy={`preview-button-${activity._id}`}
-          style={{ marginRight: 10 }}
           disabled={!isActivityRunnable(activity)}
           onClick={goToActivity}
           startIcon={<PreviewIcon />}
@@ -58,7 +77,6 @@ export function ExistingActivityItem(props: {
           Preview
         </Button>
         <Button
-          style={{ marginRight: 10 }}
           disabled={copying}
           onClick={() => {
             setCopying(true);
@@ -123,6 +141,8 @@ export function ExistingActivities(props: {
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
   deleteBuiltActivity: (activityId: string) => Promise<void>;
   onCreateActivity: () => void;
+  isInstructor: boolean;
+  isActivityEducationReady: (activityId: string) => boolean;
 }): JSX.Element {
   const {
     activities,
@@ -130,6 +150,8 @@ export function ExistingActivities(props: {
     copyActivity,
     onCreateActivity,
     deleteBuiltActivity,
+    isInstructor,
+    isActivityEducationReady,
   } = props;
   const activityContext = useActivityBuilderContext();
   const myActivities = activities.filter(
@@ -168,6 +190,8 @@ export function ExistingActivities(props: {
             deleteBuiltActivity={deleteBuiltActivity}
             canEditActivity={true}
             canDeleteActivity={true}
+            isInstructor={isInstructor}
+            educationReady={isActivityEducationReady(activity._id)}
           />
         );
       })}
@@ -206,6 +230,8 @@ export function ExistingActivities(props: {
             deleteBuiltActivity={deleteBuiltActivity}
             canEditActivity={activityContext.canEditActivity(activity)}
             canDeleteActivity={activityContext.canDeleteActivity(activity)}
+            isInstructor={isInstructor}
+            educationReady={isActivityEducationReady(activity._id)}
           />
         );
       })}
@@ -216,6 +242,7 @@ export function ExistingActivities(props: {
 export function SelectCreateActivity(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   builtActivities: ActivityBuilderType[];
+  isActivityEducationReady: (activityId: string) => boolean;
   onEditActivity: (activity: ActivityBuilderType) => void;
   onCreateActivity: () => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
@@ -223,12 +250,20 @@ export function SelectCreateActivity(props: {
 }): JSX.Element {
   const {
     builtActivities,
+    isActivityEducationReady,
     onEditActivity,
     onCreateActivity,
     goToActivity,
     copyActivity,
     deleteBuiltActivity,
   } = props;
+  const userRole = useAppSelector((state) => state.login.userRole);
+  const educationalRole = useAppSelector(
+    (state) => state.login.user?.educationalRole
+  );
+  const isInstructor =
+    userRole === UserRole.ADMIN ||
+    educationalRole === EducationalRole.INSTRUCTOR;
   return (
     <ColumnDiv
       style={{
@@ -247,6 +282,8 @@ export function SelectCreateActivity(props: {
         copyActivity={copyActivity}
         deleteBuiltActivity={deleteBuiltActivity}
         onCreateActivity={onCreateActivity}
+        isInstructor={isInstructor}
+        isActivityEducationReady={isActivityEducationReady}
       />
     </ColumnDiv>
   );

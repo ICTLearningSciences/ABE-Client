@@ -12,6 +12,7 @@ import { useAppSelector } from '../../store/hooks';
 import { UserRole } from '../../store/slices/login';
 import ExampleGoogleDocModal from '../user-view/example-google-docs-modal';
 import { useWithUsersDocs as useWithUsersDocsHook } from '../../hooks/use-with-users-docs';
+import { EducationalSettingProvider } from '../../contexts/educational-setting-context';
 
 export interface AdminViewUserGoogleDocsProps {
   useWithUsersDocs: UseWithUsersDocs;
@@ -20,8 +21,9 @@ export interface AdminViewUserGoogleDocsProps {
 export default function ViewUserGoogleDocs(props: {
   goToDoc: (docId: string, newDoc?: boolean) => void;
   onHistoryClicked: (docId: string) => void;
+  isEducationalSetting: boolean;
 }): JSX.Element {
-  const { goToDoc, onHistoryClicked } = props;
+  const { goToDoc, onHistoryClicked, isEducationalSetting } = props;
   const useWithUsersDocs = useWithUsersDocsHook();
   const viewState = useAppSelector(
     (state) => state.educationManagement.viewState
@@ -42,56 +44,58 @@ export default function ViewUserGoogleDocs(props: {
   const [exampleDocsOpen, setExampleDocsOpen] = React.useState(false);
 
   return (
-    <ColumnCenterDiv
-      style={{
-        width: '100%',
-        height: '100%',
-        overflowY: 'auto',
-      }}
-    >
-      <SelectCreateDocs
-        handleDeleteDoc={handleDeleteDoc}
-        googleDocs={googleDocs}
-        docsLoading={docsLoading}
-        copyDocs={copyDocs}
-        creationInProgress={creationInProgress}
-        handleCreateDoc={handleCreateDoc}
-        archiveDoc={archiveDoc}
-        unarchiveDoc={unarchiveDoc}
-        setSortBy={setSortBy}
-        sortBy={sortBy}
-        goToDoc={goToDoc}
-        onHistoryClicked={onHistoryClicked}
-        setExampleDocsOpen={setExampleDocsOpen}
-        sx={{
-          width: '75%',
+    <EducationalSettingProvider isEducationalSetting={isEducationalSetting}>
+      <ColumnCenterDiv
+        style={{
+          width: '100%',
+          height: '100%',
+          overflowY: 'auto',
         }}
-      />
-      <ExampleGoogleDocModal
-        viewingAsAdmin={userRole === UserRole.ADMIN}
-        open={exampleDocsOpen}
-        close={() => {
-          setExampleDocsOpen(false);
-        }}
-        adminDocs={copyDocs}
-        onCreateDoc={(
-          docIdtoCopy?: string,
-          title?: string,
-          isAdminDoc?: boolean
-        ) => {
-          handleCreateDoc(
-            docIdtoCopy,
-            title,
-            isAdminDoc,
-            viewState.selectedCourseId,
-            viewState.selectedAssignmentId,
-            (data) => {
-              goToDoc(data.docId, true);
-            }
-          );
-        }}
-        goToDoc={goToDoc}
-      />
-    </ColumnCenterDiv>
+      >
+        <SelectCreateDocs
+          handleDeleteDoc={handleDeleteDoc}
+          googleDocs={googleDocs}
+          docsLoading={docsLoading}
+          copyDocs={copyDocs}
+          creationInProgress={creationInProgress}
+          handleCreateDoc={handleCreateDoc}
+          archiveDoc={archiveDoc}
+          unarchiveDoc={unarchiveDoc}
+          setSortBy={setSortBy}
+          sortBy={sortBy}
+          goToDoc={goToDoc}
+          onHistoryClicked={onHistoryClicked}
+          setExampleDocsOpen={setExampleDocsOpen}
+          sx={{
+            width: '75%',
+          }}
+        />
+        <ExampleGoogleDocModal
+          viewingAsAdmin={userRole === UserRole.ADMIN}
+          open={exampleDocsOpen}
+          close={() => {
+            setExampleDocsOpen(false);
+          }}
+          adminDocs={copyDocs}
+          onCreateDoc={(
+            docIdtoCopy?: string,
+            title?: string,
+            isAdminDoc?: boolean
+          ) => {
+            handleCreateDoc(
+              docIdtoCopy,
+              title,
+              isAdminDoc,
+              viewState.selectedCourseId,
+              viewState.selectedAssignmentId,
+              (data) => {
+                goToDoc(data.docId, true);
+              }
+            );
+          }}
+          goToDoc={goToDoc}
+        />
+      </ColumnCenterDiv>
+    </EducationalSettingProvider>
   );
 }

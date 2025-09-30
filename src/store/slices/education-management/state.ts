@@ -82,7 +82,7 @@ export const initialState: State = {
   instructorsLoadStatus: LoadStatus.NONE,
   viewState: {
     view: 'dashboard',
-    previousView: undefined,
+    previousView: 'dashboard',
   },
   errorMessage: undefined,
 };

@@ -11,6 +11,7 @@ import { UserRole } from '../../../store/slices/login';
 import { useEffect, useState } from 'react';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import { StyledFadingText } from './message-styles';
+import ReactMarkdown from 'react-markdown';
 
 const baseMessageStyle: React.CSSProperties = {
   borderRadius: '1rem',
@@ -90,10 +91,11 @@ export default function Message(props: {
   message: ChatMessageTypes;
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
   messageIndex: number;
+  displayMarkdown: boolean;
 }): JSX.Element {
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
-  const { message, setAiInfoToDisplay, messageIndex } = props;
+  const { message, setAiInfoToDisplay, messageIndex, displayMarkdown } = props;
   const backgroundColor =
     message.sender === Sender.USER
       ? colorTheme.chatUserBubbleColor
@@ -119,7 +121,20 @@ export default function Message(props: {
         color: textColor,
       }}
     >
-      {message.displayType === MessageDisplayType.TEXT && message.message}
+      {displayMarkdown && (
+        <ReactMarkdown components={{ p: 'span' }}>
+          {message.displayType === MessageDisplayType.TEXT
+            ? message.message
+            : ''}
+        </ReactMarkdown>
+      )}
+      {!displayMarkdown && (
+        <span>
+          {message.displayType === MessageDisplayType.TEXT
+            ? message.message
+            : ''}
+        </span>
+      )}
       {message.displayType === MessageDisplayType.PENDING_MESSAGE && (
         <FadingText
           strings={['Reading...', 'Analyzing...', 'Getting opinionated...']}

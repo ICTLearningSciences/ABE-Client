@@ -32,7 +32,11 @@ function AdminView(): JSX.Element {
   }
 
   return (
-    <ViewUserGoogleDocs goToDoc={goToDoc} onHistoryClicked={onHistoryClicked} />
+    <ViewUserGoogleDocs
+      goToDoc={goToDoc}
+      onHistoryClicked={onHistoryClicked}
+      isEducationalSetting={false}
+    />
   );
 }
 

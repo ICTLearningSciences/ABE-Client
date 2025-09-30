@@ -57,6 +57,7 @@ function getDefaultUserResponseHandleState(): UserResponseHandleState {
   };
 }
 export const EDIT_DOC_GOAL_MESSAGE = 'New Activity';
+export const GO_HOME_BUTTON_MESSAGE = 'Return to Home';
 export const DOC_TEXT_KEY = 'doc_text';
 export const DOC_NUM_WORDS_KEY = 'doc_num_words';
 
@@ -82,6 +83,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   docId: string;
   docService: DocService;
   handleStudentActivityComplete: () => void;
+  onGoHome: () => void;
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
       !this.builtActivityData ||
@@ -158,6 +160,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     editDocGoal: () => void,
     docService: DocService,
     handleStudentActivityComplete: () => void,
+    onGoHome: () => void,
     builtActivityData?: ActivityBuilder
   ) {
     this.docId = docId;
@@ -174,6 +177,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.setResponsePending = setResponsePending;
     this.editDocGoal = editDocGoal;
     this.handleStudentActivityComplete = handleStudentActivityComplete;
+    this.onGoHome = onGoHome;
     this.setBuiltActivityData = this.setBuiltActivityData.bind(this);
     this.initializeActivity = this.initializeActivity.bind(this);
     this.resetActivity = this.resetActivity.bind(this);
@@ -442,8 +446,12 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     if (this.curStep.stepType !== ActivityBuilderStepType.REQUEST_USER_INPUT) {
       return;
     }
+    console.log('message', message);
     if (message === EDIT_DOC_GOAL_MESSAGE) {
       this.editDocGoal();
+    }
+    if (message === GO_HOME_BUTTON_MESSAGE) {
+      this.onGoHome();
     }
     const userInputStep = this.curStep as RequestUserInputActivityStep;
     if (userInputStep.saveAsIntention) {

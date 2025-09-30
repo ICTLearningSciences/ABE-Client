@@ -11,15 +11,20 @@ import {
 import { useWithChat } from '../../../store/slices/chat/use-with-chat';
 import Message from './message';
 import { v4 as uuidv4 } from 'uuid';
-
 export function ChatMessagesContainer(props: {
   coachResponsePending: boolean;
   curDocId: string;
   setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
   sendMessage: (message: ChatMessageTypes) => void;
+  displayMarkdown: boolean;
 }): JSX.Element {
-  const { coachResponsePending, curDocId, setAiInfoToDisplay, sendMessage } =
-    props;
+  const {
+    coachResponsePending,
+    curDocId,
+    setAiInfoToDisplay,
+    sendMessage,
+    displayMarkdown,
+  } = props;
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
   const { state } = useWithChat();
@@ -91,6 +96,7 @@ export function ChatMessagesContainer(props: {
               message={message}
               setAiInfoToDisplay={setAiInfoToDisplay}
               messageIndex={index}
+              displayMarkdown={displayMarkdown}
             />
             {message.mcqChoices && index === chatMessages.length - 1 && (
               <div
@@ -137,7 +143,7 @@ export function ChatMessagesContainer(props: {
       }
     );
     setMessageElements(_newMessageElements);
-  }, [chatMessages.length, mostRecentChatId]);
+  }, [chatMessages.length, mostRecentChatId, displayMarkdown]);
 
   return (
     <div
@@ -155,6 +161,7 @@ export function ChatMessagesContainer(props: {
         overflowX: 'hidden',
         overflowY: 'auto',
         border: '1px solid black',
+        position: 'relative',
       }}
     >
       {messageElements}

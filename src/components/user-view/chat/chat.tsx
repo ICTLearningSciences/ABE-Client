@@ -99,6 +99,7 @@ export function Chat(props: {
   const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
     : '';
+  const [displayMarkdown, setDisplayMarkdown] = useState(true);
 
   useEffect(() => {
     setSystemRole(systemRole);
@@ -127,7 +128,7 @@ export function Chat(props: {
             style={{
               display: 'flex',
               flexDirection: 'column',
-              height: '92%',
+              height: '100%',
               width: '90%',
               justifyContent: 'space-around',
               alignItems: 'center',
@@ -135,7 +136,14 @@ export function Chat(props: {
               borderRadius: '1rem',
             }}
           >
-            <ChatHeader>
+            <ChatHeader
+              style={{
+                position: 'relative',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
               <ChatHeaderGenerator
                 incrementActivityCounter={() => {
                   setResetActivityCounter(resetActivityCounter + 1);
@@ -144,6 +152,8 @@ export function Chat(props: {
                 selectedGoal={selectedGoal}
                 selectedActivity={selectedActivity}
                 disableActivitySelector={disableActivitySelector}
+                displayMarkdown={displayMarkdown}
+                setDisplayMarkdown={setDisplayMarkdown}
               />
             </ChatHeader>
             <ChatMessagesContainer
@@ -151,6 +161,7 @@ export function Chat(props: {
               coachResponsePending={coachResponsePending}
               curDocId={curDocId}
               setAiInfoToDisplay={setAiInfoToDisplay}
+              displayMarkdown={displayMarkdown}
             />
             <ChatInput
               sendMessage={sendNewMessage}

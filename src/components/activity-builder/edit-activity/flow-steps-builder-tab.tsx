@@ -13,6 +13,7 @@ import {
   FlowItem,
   PromptActivityStep,
   RequestUserInputActivityStep,
+  RequestUserInputSpecialType,
   SystemMessageActivityStep,
 } from '../types';
 import { ColumnDiv } from '../../../styled-components';
@@ -39,6 +40,10 @@ import {
 } from './step-builder/conditional-step-builder';
 import { StepErrors } from '../../../classes/activity-builder-activity/activity-step-error-checker';
 import { AddNewActivityStepType } from '../shared/add-new-activity-button';
+import {
+  EndActivityStepBuilder,
+  getDefaultEndActivityStepBuilder,
+} from './step-builder/end-activity-step-builder';
 
 export function FlowStepsBuilderTab(props: {
   stepsErrors?: StepErrors;
@@ -80,18 +85,32 @@ export function FlowStepsBuilderTab(props: {
           />
         );
       case ActivityBuilderStepType.REQUEST_USER_INPUT:
-        return (
-          <RequestUserInputStepBuilder
-            key={i}
-            stepIndex={i}
-            step={step as RequestUserInputActivityStep}
-            updateLocalActivity={updateLocalActivity}
-            deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
-            flowsList={flowsList}
-            versions={props.getVersionsForStep(step.stepId)}
-            errors={errors}
-          />
-        );
+        if (step.specialType === RequestUserInputSpecialType.END_ACTIVITY) {
+          return (
+            <EndActivityStepBuilder
+              key={i}
+              stepIndex={i}
+              step={step as RequestUserInputActivityStep}
+              updateLocalActivity={updateLocalActivity}
+              deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
+              flowsList={flowsList}
+              versions={props.getVersionsForStep(step.stepId)}
+            />
+          );
+        } else {
+          return (
+            <RequestUserInputStepBuilder
+              key={i}
+              stepIndex={i}
+              step={step as RequestUserInputActivityStep}
+              updateLocalActivity={updateLocalActivity}
+              deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
+              flowsList={flowsList}
+              versions={props.getVersionsForStep(step.stepId)}
+              errors={errors}
+            />
+          );
+        }
       case ActivityBuilderStepType.PROMPT:
         return (
           <PromptStepBuilder
@@ -147,7 +166,10 @@ export function FlowStepsBuilderTab(props: {
         ? getDefaultRequestUserInputBuilder()
         : stepType === ActivityBuilderStepType.CONDITIONAL
         ? getDefaultConditionalStep()
-        : defaultPromptBuilder(stepType === 'EDIT_DOC_PROMPT');
+        : stepType === 'EDIT_DOC_PROMPT'
+        ? defaultPromptBuilder(stepType === 'EDIT_DOC_PROMPT')
+        : // : stepType === 'END_ACTIVITY_MESSAGE'
+          getDefaultEndActivityStepBuilder();
     updateLocalActivity((prevValue) => {
       return {
         ...prevValue,

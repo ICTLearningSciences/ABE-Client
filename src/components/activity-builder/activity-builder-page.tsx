@@ -17,6 +17,7 @@ export function ActivityBuilderPage(props: {
   goToActivity: (activity: ActivityBuilder) => void;
   curActivity?: ActivityBuilder;
   builtActivities: ActivityBuilder[];
+  isActivityEducationReady: (activityId: string) => boolean;
   addOrUpdateBuiltActivity: (
     activity: ActivityBuilder
   ) => Promise<ActivityBuilder>;
@@ -39,6 +40,7 @@ export function ActivityBuilderPage(props: {
     goToActivity,
     curActivity,
     builtActivities,
+    isActivityEducationReady,
     addOrUpdateBuiltActivity,
     addNewLocalBuiltActivity,
     copyBuiltActivity,
@@ -67,6 +69,7 @@ export function ActivityBuilderPage(props: {
           copyActivity={copyBuiltActivity}
           goToActivity={goToActivity}
           builtActivities={builtActivities}
+          isActivityEducationReady={isActivityEducationReady}
           onEditActivity={(activity) => {
             setSelectedActivityClientId(activity.clientId);
           }}
