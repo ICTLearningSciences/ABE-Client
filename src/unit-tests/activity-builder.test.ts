@@ -143,6 +143,9 @@ function prepareActivityBuilder(
     () => {
       console.log('handle student activity complete');
     },
+    () => {
+      console.log('on go home');
+    },
     activityBuilderData
   );
 }

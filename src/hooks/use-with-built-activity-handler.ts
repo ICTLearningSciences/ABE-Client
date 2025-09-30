@@ -17,6 +17,8 @@ import { equals } from '../helpers';
 import { getDocServiceFromLoginService } from '../types';
 import { useAppSelector } from '../store/hooks';
 import { useWithEducationalManagement } from '../store/slices/education-management/use-with-educational-management';
+import { useNavigateWithParams } from './use-navigate-with-params';
+import { useWithPath } from './use-with-path';
 
 export function useWithBuiltActivityHandler(
   resetActivityCounter: number,
@@ -31,11 +33,17 @@ export function useWithBuiltActivityHandler(
   const { executePromptSteps } = useWithExecutePrompt();
   const { addNewSubscriber, removeAllSubscribers } =
     useWithChatLogSubscribers();
-  const { myData: myEducationalData, studentActivityCompleted } =
-    useWithEducationalManagement();
+  const {
+    myData: myEducationalData,
+    studentActivityCompleted,
+    goToPreviousView,
+  } = useWithEducationalManagement();
+  const { defaultHome, isOnCourseManagementPages, isOnStudentCoursesPages } =
+    useWithPath();
   const viewState = useAppSelector(
     (state) => state.educationManagement.viewState
   );
+  const navigate = useNavigateWithParams();
   const [builtActivityHandler, setBuiltActivityHandler] =
     useState<BuiltActivityHandler>();
   const updatesFound = !equals(
@@ -74,6 +82,13 @@ export function useWithBuiltActivityHandler(
         editDocGoal,
         docService,
         handleStudentActivityComplete,
+        () => {
+          if (isOnCourseManagementPages || isOnStudentCoursesPages) {
+            goToPreviousView();
+          } else {
+            navigate(defaultHome);
+          }
+        },
         selectedActivityBuilder
       );
       newActivityHandler.initializeActivity();
@@ -92,6 +107,7 @@ export function useWithBuiltActivityHandler(
     selectedActivityBuilder?._id,
     Boolean(builtActivityHandler),
     updatesFound,
+    defaultHome,
   ]);
 
   useEffect(() => {

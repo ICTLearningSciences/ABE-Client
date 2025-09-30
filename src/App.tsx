@@ -31,6 +31,8 @@ import {
 import { EducationalRole } from './types';
 import { useWithRouteChangeRerender } from './hooks/use-with-route-change-rerender';
 
+export const freeDocEditingNavPath = '/docs';
+
 function MainApp() {
   const MAIN_APP_HEIGHT = '94vh';
   const useLogin = useWithLogin();
@@ -42,8 +44,6 @@ function MainApp() {
       : useLogin.state.user?.educationalRole === EducationalRole.STUDENT
       ? studentCoursesUrl
       : '';
-
-  const freeDocEditingNavPath = '/docs';
 
   const router = createBrowserRouter([
     {
