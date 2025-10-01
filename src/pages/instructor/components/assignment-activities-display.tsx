@@ -91,6 +91,11 @@ const AssignmentActivitiesDisplay: React.FC<
       (activity) => activity.user === myData?.userId
     );
   }, [viewActivitiesSetting, _availableActivities, myData]);
+  const hasOwnActivities = useMemo(() => {
+    return _availableActivities.some(
+      (activity) => activity.user === myData?.userId
+    );
+  }, [_availableActivities, myData]);
   const selectedActivityForLLMDefaultLLM = useMemo(
     () =>
       myData && isStudentData(myData)
@@ -233,32 +238,36 @@ const AssignmentActivitiesDisplay: React.FC<
               Add Activity
             </Typography>
 
-            <RowDiv>
-              <FilterAltIcon />
+            {hasOwnActivities ? (
+              <RowDiv>
+                <FilterAltIcon />
 
-              <Button
-                onClick={() =>
-                  setViewActivitiesSetting(ViewActivitiesSetting.ALL)
-                }
-                disabled={viewActivitiesSetting === ViewActivitiesSetting.ALL}
-              >
-                {ViewActivitiesSetting.ALL}
-              </Button>
-              <Divider
-                orientation="vertical"
-                style={{ color: 'black' }}
-                variant="middle"
-                flexItem
-              />
-              <Button
-                onClick={() =>
-                  setViewActivitiesSetting(ViewActivitiesSetting.MINE)
-                }
-                disabled={viewActivitiesSetting === ViewActivitiesSetting.MINE}
-              >
-                {ViewActivitiesSetting.MINE}
-              </Button>
-            </RowDiv>
+                <Button
+                  onClick={() =>
+                    setViewActivitiesSetting(ViewActivitiesSetting.ALL)
+                  }
+                  disabled={viewActivitiesSetting === ViewActivitiesSetting.ALL}
+                >
+                  {ViewActivitiesSetting.ALL}
+                </Button>
+                <Divider
+                  orientation="vertical"
+                  style={{ color: 'black' }}
+                  variant="middle"
+                  flexItem
+                />
+                <Button
+                  onClick={() =>
+                    setViewActivitiesSetting(ViewActivitiesSetting.MINE)
+                  }
+                  disabled={
+                    viewActivitiesSetting === ViewActivitiesSetting.MINE
+                  }
+                >
+                  {ViewActivitiesSetting.MINE}
+                </Button>
+              </RowDiv>
+            ) : undefined}
           </RowDiv>
 
           {availableActivities.length === 0 ? (

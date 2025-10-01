@@ -112,14 +112,14 @@ export interface UseWithEducationalManagement {
     sectionId: string,
     assignmentId: string,
     activityId: string
-  ) => Promise<StudentData>;
+  ) => Promise<void>;
   studentActivityCompleted: (
     targetUserId: string,
     courseId: string,
     sectionId: string,
     assignmentId: string,
     activityId: string
-  ) => Promise<StudentData>;
+  ) => Promise<void>;
   studentActivityNewDocCreated: (
     targetUserId: string,
     courseId: string,
@@ -127,7 +127,7 @@ export interface UseWithEducationalManagement {
     assignmentId: string,
     activityId: string,
     docId: string
-  ) => Promise<StudentData>;
+  ) => Promise<void>;
   studentActivityDefaultLLMSet: (
     targetUserId: string,
     courseId: string,
@@ -135,8 +135,8 @@ export interface UseWithEducationalManagement {
     assignmentId: string,
     activityId: string,
     defaultLLM: AiServiceModel
-  ) => Promise<StudentData>;
-  studentActivityDocPrimaryStatusSet: (docId: string) => Promise<StudentData>;
+  ) => Promise<void>;
+  studentActivityDocPrimaryStatusSet: (docId: string) => Promise<void>;
   studentActivityDocDeleted: (
     targetUserId: string,
     courseId: string,
@@ -144,7 +144,7 @@ export interface UseWithEducationalManagement {
     assignmentId: string,
     activityId: string,
     docId: string
-  ) => Promise<StudentData>;
+  ) => Promise<void>;
   loadInstructors: () => Promise<Instructor[]>;
   errorMessage?: string;
   courses: Course[];
@@ -391,7 +391,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       throw new Error('no user educational data found');
     }
     if (isInstructorData(myData)) {
-      throw new Error('instructor cannot start activity');
+      // instructor cannot start an activity, no-op
+      return;
     }
     const assignmentProgress = myData.assignmentProgress.find(
       (a) => a.assignmentId === assignmentId
@@ -403,9 +404,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     );
     if (activityAlreadyInProgress) {
       //  if activity already in progress, no-op
-      return myData;
+      return;
     }
-    const res = await dispatch(
+    await dispatch(
       _updateStudentAssignmentProgress({
         targetUserId,
         courseId,
@@ -415,7 +416,6 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         action: ModifyStudentAssignmentProgressActions.ACTIVITY_STARTED,
       })
     );
-    return res.payload as StudentData;
   }
 
   async function studentActivityDefaultLLMSet(
@@ -426,7 +426,11 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     activityId: string,
     defaultLLM: AiServiceModel
   ) {
-    const res = await dispatch(
+    if (myData && isInstructorData(myData)) {
+      // instructor cannot set default LLM, no-op
+      return;
+    }
+    await dispatch(
       _updateStudentAssignmentProgress({
         targetUserId,
         courseId,
@@ -437,7 +441,6 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         defaultLLM,
       })
     );
-    return res.payload as StudentData;
   }
 
   async function studentActivityCompleted(
@@ -451,13 +454,14 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       throw new Error('no user educational data found');
     }
     if (isInstructorData(myData)) {
-      throw new Error('instructor cannot complete activity');
+      // instructor cannot complete activity, no-op
+      return;
     }
     // if activity already completed, no-op
     if (haveICompletedActivity(assignmentId, activityId)) {
-      return myData;
+      return;
     }
-    const res = await dispatch(
+    await dispatch(
       _updateStudentAssignmentProgress({
         targetUserId,
         courseId,
@@ -467,7 +471,6 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         action: ModifyStudentAssignmentProgressActions.ACTIVITY_COMPLETED,
       })
     );
-    return res.payload as StudentData;
   }
 
   async function studentActivityNewDocCreated(
@@ -478,7 +481,11 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     activityId: string,
     docId: string
   ) {
-    const res = await dispatch(
+    if (myData && isInstructorData(myData)) {
+      // instructor cannot create new doc, no-op
+      return;
+    }
+    await dispatch(
       _updateStudentAssignmentProgress({
         targetUserId,
         courseId,
@@ -489,7 +496,6 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         docId,
       })
     );
-    return res.payload as StudentData;
   }
 
   async function studentActivityDocPrimaryStatusSet(docId: string) {
@@ -505,7 +511,8 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       throw new Error('no user educational data found');
     }
     if (isInstructorData(myData)) {
-      throw new Error('only students can set doc primary status');
+      // instructor cannot set doc primary status, no-op
+      return;
     }
     const assignmentProgress = myData.assignmentProgress.find(
       (a) => a.assignmentId === viewState.selectedAssignmentId
@@ -516,9 +523,9 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       )
     );
     if (docAlreadyPrimary) {
-      return myData;
+      return;
     }
-    const res = await dispatch(
+    await dispatch(
       _updateStudentAssignmentProgress({
         targetUserId: myData.userId,
         courseId: viewState.selectedCourseId,
@@ -529,7 +536,6 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         docId,
       })
     );
-    return res.payload as StudentData;
   }
 
   async function studentActivityDocDeleted(
@@ -540,7 +546,11 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
     activityId: string,
     docId: string
   ) {
-    const res = await dispatch(
+    if (myData && isInstructorData(myData)) {
+      // instructor cannot delete doc, no-op
+      return;
+    }
+    await dispatch(
       _updateStudentAssignmentProgress({
         targetUserId,
         courseId,
@@ -551,7 +561,6 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
         docId,
       })
     );
-    return res.payload as StudentData;
   }
 
   async function gradeStudentAssignment(grade: number, comment: string) {
