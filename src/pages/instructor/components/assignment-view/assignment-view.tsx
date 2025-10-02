@@ -23,15 +23,15 @@ import {
 import AssignmentModal, { AssignmentModalMode } from '../assignment-modal';
 import DeleteConfirmationModal from '../delete-confirmation-modal';
 import AssignmentActivitiesDisplay from '../assignment-activities-display';
-import { ActivityBuilder } from '../../../../components/activity-builder/types';
 import { AssignmentCompleteStatus } from './assignment-complete-status';
 import { aiServiceModelToString } from '../../../../helpers';
 import { useAppSelector } from '../../../../store/hooks';
+import { UseWithDocGoalsActivities } from '../../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 
 interface AssignmentViewProps {
   assignmentId: string;
   courseId: string;
-  builtActivities: ActivityBuilder[];
+  docGoalActivities: UseWithDocGoalsActivities;
   sectionId?: string;
   onAssignmentDeleted?: (sectionId: string) => void;
   isStudentView?: boolean;
@@ -43,7 +43,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   assignmentId,
   courseId,
   sectionId,
-  builtActivities,
+  docGoalActivities,
   onAssignmentDeleted,
   isStudentView = false,
   onActivitySelect,
@@ -62,10 +62,6 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
     (sa) => sa.assignmentId === assignmentId
   );
   const isMandatory = sectionAssignment?.mandatory ?? false;
-
-  const availableActivities = builtActivities.filter(
-    (activity) => !assignment?.activityIds.includes(activity._id)
-  );
 
   const globalDefaultAiServiceModel = useAppSelector(
     (state) => state.config.config?.defaultAiModel
@@ -291,8 +287,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
 
       <AssignmentActivitiesDisplay
         assignment={assignment}
-        builtActivities={builtActivities}
-        availableActivities={availableActivities}
+        docGoalActivities={docGoalActivities}
         isStudentView={isStudentView}
         isAssignmentModifying={educationManagement.isAssignmentModifying}
         onAddActivity={handleAddActivity}

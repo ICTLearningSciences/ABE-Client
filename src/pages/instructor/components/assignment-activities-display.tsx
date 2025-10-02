@@ -17,13 +17,11 @@ import {
   Select,
   MenuItem,
   Modal,
-  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
   TextSnippet as ViewDocumentTimelineIcon,
 } from '@mui/icons-material';
-import { ActivityBuilder } from '../../../components/activity-builder/types';
 import {
   Assignment,
   isStudentData,
@@ -34,12 +32,11 @@ import { AiServiceModel } from '../../../types';
 import { getStudentActivityCompletionData, reorderArray } from '../helpers';
 import { AssignmentActivityListItem } from './assignment-view/assignment-activity-list-item';
 import { RowDiv } from '../../../styled-components';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { UseWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 
 interface AssignmentActivitiesDisplayProps {
   assignment: Assignment;
-  builtActivities: ActivityBuilder[];
-  availableActivities: ActivityBuilder[];
+  docGoalActivities: UseWithDocGoalsActivities;
   isStudentView: boolean;
   isAssignmentModifying?: boolean;
   onAddActivity: (activityId: string) => Promise<void>;
@@ -49,17 +46,17 @@ interface AssignmentActivitiesDisplayProps {
   onViewDocumentTimeline: (studentId: string, assignmentId: string) => void;
 }
 
-const ViewActivitiesSetting = {
-  ALL: 'all activities',
-  MINE: 'my activities only',
-};
+export enum ViewActivitiesSetting {
+  STANDARD = 'Standard',
+  ALL = 'All Activities',
+  MINE = 'My Activities Only',
+}
 
 const AssignmentActivitiesDisplay: React.FC<
   AssignmentActivitiesDisplayProps
 > = ({
   assignment,
-  builtActivities,
-  availableActivities: _availableActivities,
+  docGoalActivities,
   isStudentView,
   isAssignmentModifying = false,
   onAddActivity,
@@ -81,21 +78,47 @@ const AssignmentActivitiesDisplay: React.FC<
     (myData.assignmentProgress.find((a) => a.assignmentId === assignment._id)
       ?.relevantGoogleDocs.length || 0) > 0;
   const [viewActivitiesSetting, setViewActivitiesSetting] = useState<string>(
-    ViewActivitiesSetting.ALL
+    ViewActivitiesSetting.STANDARD
   );
-  const availableActivities = useMemo(() => {
+  const {
+    educationReadyActivities,
+    frontPageActivities: _frontPageActivities,
+    builtActivities: allActivities,
+  } = docGoalActivities;
+
+  const frontPageActivities = useMemo(
+    () =>
+      _frontPageActivities.filter((activity) =>
+        educationReadyActivities.some((a) => a._id === activity._id)
+      ),
+    [educationReadyActivities, _frontPageActivities]
+  );
+
+  const unusedActivities = useMemo(
+    () =>
+      educationReadyActivities.filter(
+        (activity) => !assignment?.activityIds.includes(activity._id)
+      ),
+    [educationReadyActivities, assignment]
+  );
+
+  const displayedActivities = useMemo(() => {
+    const myActivities = unusedActivities.filter(
+      (activity) => activity.user === myData?.userId
+    );
     if (viewActivitiesSetting === ViewActivitiesSetting.ALL) {
-      return _availableActivities;
+      return unusedActivities;
     }
-    return _availableActivities.filter(
-      (activity) => activity.user === myData?.userId
+    if (viewActivitiesSetting === ViewActivitiesSetting.MINE) {
+      return myActivities;
+    }
+    // Standard
+    const myActivitiesNotOnFrontPage = myActivities.filter(
+      (activity) => !frontPageActivities.some((a) => a._id === activity._id)
     );
-  }, [viewActivitiesSetting, _availableActivities, myData]);
-  const hasOwnActivities = useMemo(() => {
-    return _availableActivities.some(
-      (activity) => activity.user === myData?.userId
-    );
-  }, [_availableActivities, myData]);
+    return [...frontPageActivities, ...myActivitiesNotOnFrontPage];
+  }, [viewActivitiesSetting, unusedActivities, frontPageActivities, myData]);
+
   const selectedActivityForLLMDefaultLLM = useMemo(
     () =>
       myData && isStudentData(myData)
@@ -238,39 +261,33 @@ const AssignmentActivitiesDisplay: React.FC<
               Add Activity
             </Typography>
 
-            {hasOwnActivities ? (
-              <RowDiv>
-                <FilterAltIcon />
-
-                <Button
-                  onClick={() =>
-                    setViewActivitiesSetting(ViewActivitiesSetting.ALL)
-                  }
-                  disabled={viewActivitiesSetting === ViewActivitiesSetting.ALL}
-                >
+            <FormControl sx={{ minWidth: 200 }} size="small">
+              <InputLabel id="view-activities-setting-label">
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span>Filter</span>
+                </Box>
+              </InputLabel>
+              <Select
+                labelId="view-activities-setting-label"
+                value={viewActivitiesSetting}
+                label="Filter"
+                onChange={(e) => setViewActivitiesSetting(e.target.value)}
+                data-cy="view-activities-setting-dropdown"
+              >
+                <MenuItem value={ViewActivitiesSetting.STANDARD}>
+                  {ViewActivitiesSetting.STANDARD}
+                </MenuItem>
+                <MenuItem value={ViewActivitiesSetting.ALL}>
                   {ViewActivitiesSetting.ALL}
-                </Button>
-                <Divider
-                  orientation="vertical"
-                  style={{ color: 'black' }}
-                  variant="middle"
-                  flexItem
-                />
-                <Button
-                  onClick={() =>
-                    setViewActivitiesSetting(ViewActivitiesSetting.MINE)
-                  }
-                  disabled={
-                    viewActivitiesSetting === ViewActivitiesSetting.MINE
-                  }
-                >
+                </MenuItem>
+                <MenuItem value={ViewActivitiesSetting.MINE}>
                   {ViewActivitiesSetting.MINE}
-                </Button>
-              </RowDiv>
-            ) : undefined}
+                </MenuItem>
+              </Select>
+            </FormControl>
           </RowDiv>
 
-          {availableActivities.length === 0 ? (
+          {displayedActivities.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
               No more activities available to add to this assignment.{' '}
               {viewActivitiesSetting === ViewActivitiesSetting.MINE
@@ -291,7 +308,7 @@ const AssignmentActivitiesDisplay: React.FC<
                   disabled={isAssignmentModifying}
                   data-cy="activity-select-dropdown"
                 >
-                  {availableActivities.map((activity) => (
+                  {displayedActivities.map((activity) => (
                     <MenuItem key={activity._id} value={activity._id}>
                       {activity.title}
                     </MenuItem>
@@ -346,7 +363,7 @@ const AssignmentActivitiesDisplay: React.FC<
       ) : (
         <Grid container spacing={2}>
           {assignment.activityOrder.map((activityId, index) => {
-            const activity = builtActivities.find((a) => a._id === activityId);
+            const activity = allActivities.find((a) => a._id === activityId);
             if (!activity) {
               return null;
             }

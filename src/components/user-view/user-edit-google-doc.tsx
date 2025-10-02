@@ -127,6 +127,7 @@ export function EditGoogleDoc(props: {
               }}
             >
               <ActivityBuilderPage
+                userId={user?._id}
                 builtActivities={builtActivities}
                 isActivityEducationReady={(activityId: string) => {
                   return educationReadyActivities.some(
