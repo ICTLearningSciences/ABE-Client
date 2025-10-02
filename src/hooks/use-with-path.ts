@@ -12,6 +12,7 @@ import { freeDocEditingNavPath } from '../App';
 
 export function useWithPath() {
   const path = typeof window !== 'undefined' ? window.location.pathname : '';
+  const isOnLoginPage = typeof window !== 'undefined' && path == '/';
   const isOnDocsPage =
     typeof window !== 'undefined' && path.includes(freeDocEditingNavPath);
   const isOnCourseManagementPage =
@@ -27,6 +28,7 @@ export function useWithPath() {
     : '/';
   return {
     path,
+    isOnLoginPage,
     isOnDocsPages: isOnDocsPage,
     isOnCourseManagementPages: isOnCourseManagementPage,
     isOnStudentCoursesPages: isOnStudentCoursesPage,

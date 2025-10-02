@@ -11,6 +11,7 @@ import {
   Drawer,
   IconButton,
   ThemeProvider,
+  Tooltip,
   createTheme,
 } from '@mui/material';
 import { UseWithLogin } from '../../store/slices/login/use-with-login';
@@ -28,6 +29,10 @@ import { PrivacyPolicyDisplay } from '../privacy-policy-display';
 import SchoolIcon from '@mui/icons-material/School';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import { RowDiv } from '../../styled-components';
+import { FirefoxCookieWarningDialog } from '../firefox-cookie-warning-dialog';
+import { useWithBrowserDetection } from '../../hooks/use-with-browser-detection';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+
 export default function Header(props: {
   useLogin: UseWithLogin;
   courseNavPath: string;
@@ -51,6 +56,7 @@ export default function Header(props: {
   });
   const [profileOpen, setProfileOpen] = useState(false);
   const buttonDisplayType = courseNavPath ? 'DOC_AND_COURSE' : 'DOC_ONLY';
+  const { warnFirefoxWithGoogleLogin } = useWithBrowserDetection();
 
   function docOnlyDisplay() {
     return (
@@ -183,7 +189,26 @@ export default function Header(props: {
             </RowDiv>
           )}
         </div>
-        <HeaderTitle />
+        <RowDiv
+          style={{
+            gap: 10,
+          }}
+        >
+          <HeaderTitle />
+          {warnFirefoxWithGoogleLogin && (
+            <Tooltip
+              title="The Firefox browser sometimes has third-party cookies disabled
+          by default, which will break features on this site. If you run into
+          any issues, try enabling third-party cookies in your settings or
+          switch to another browser."
+            >
+              <WarningAmberIcon
+                style={{ color: 'red', fontSize: '30px', cursor: 'pointer' }}
+              />
+            </Tooltip>
+          )}
+        </RowDiv>
+
         {loggedIn && (
           <div
             style={{
@@ -208,6 +233,7 @@ export default function Header(props: {
           </div>
         )}
       </header>
+      <FirefoxCookieWarningDialog />
     </ThemeProvider>
   );
 }
