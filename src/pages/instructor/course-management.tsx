@@ -70,8 +70,10 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
   const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
   const config = useAppSelector((state) => state.config).config;
-  const { educationReadyActivities: builtActivities } =
-    useWithDocGoalsActivities(loginState.user?._id || '', config);
+  const docGoalActivities = useWithDocGoalsActivities(
+    loginState.user?._id || '',
+    config
+  );
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const {
     fetchDocumentTimeline,
@@ -403,7 +405,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 courseId={viewState.selectedCourseId}
                 sectionId={viewState.selectedSectionId}
                 assignmentId={viewState.selectedAssignmentId}
-                builtActivities={builtActivities}
+                docGoalActivities={docGoalActivities}
                 onAssignmentDeleted={handleAssignmentDeleted}
                 isStudentView={isStudent}
                 onActivitySelect={handleActivitySelect}

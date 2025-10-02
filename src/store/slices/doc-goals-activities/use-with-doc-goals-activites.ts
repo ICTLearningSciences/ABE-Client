@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   fetchDocGoals as _fetchDocGoals,
   fetchActivities as _fetchActivities,
@@ -35,6 +36,7 @@ export interface UseWithDocGoalsActivities {
   activities: ActivityGQL[];
   builtActivities: ActivityBuilder[];
   docGoals: DocGoal[];
+  frontPageActivities: ActivityBuilder[];
   getActivityById: (id: string) => ActivityTypes | undefined;
   isLoading: boolean;
   educationReadyActivities: ActivityBuilder[];
@@ -136,6 +138,17 @@ export function useWithDocGoalsActivities(
     await dispatch(_deleteBuiltActivity(activityId));
   }
 
+  const frontPageActivities = useMemo(() => {
+    return docGoalsActivities
+      .flatMap((g) => g.builtActivities)
+      .reduce((acc, activity) => {
+        if (!acc.some((a) => a._id === activity._id)) {
+          acc.push(activity);
+        }
+        return acc;
+      }, [] as ActivityBuilder[]);
+  }, [docGoalsActivities]);
+
   return {
     loadDocGoals,
     loadBuiltActivities,
@@ -148,6 +161,7 @@ export function useWithDocGoalsActivities(
     builtActivities,
     activities,
     docGoals: docGoalsActivities,
+    frontPageActivities,
     isLoading:
       docGoalsLoadingState === LoadStatus.LOADING ||
       builtActivitiesLoadingState === LoadStatus.LOADING ||
