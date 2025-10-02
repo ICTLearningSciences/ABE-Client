@@ -13,22 +13,17 @@ import {
   Button,
 } from '@mui/material';
 import { useWithBrowserDetection } from '../hooks/use-with-browser-detection';
-import { useWithPath } from '../hooks/use-with-path';
-import { useAppSelector } from '../store/hooks';
-import { LoginStatus } from '../store/slices/login';
 
 const STORAGE_KEY = 'firefox-cookie-warning-last-shown';
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export function FirefoxCookieWarningDialog(): JSX.Element {
-  const browser = useWithBrowserDetection();
-  const { isOnLoginPage } = useWithPath();
-  const loginStatus = useAppSelector((state) => state.login.loginStatus);
-  const loggedIn = !isOnLoginPage && loginStatus === LoginStatus.AUTHENTICATED;
+  const { warnFirefoxWithGoogleLogin } = useWithBrowserDetection();
+
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (browser !== 'firefox' || !loggedIn) {
+    if (!warnFirefoxWithGoogleLogin) {
       return;
     }
 
@@ -46,7 +41,7 @@ export function FirefoxCookieWarningDialog(): JSX.Element {
     if (timeSinceLastShown >= ONE_DAY_MS) {
       setOpen(true);
     }
-  }, [browser, loggedIn]);
+  }, [warnFirefoxWithGoogleLogin]);
 
   const handleClose = () => {
     setOpen(false);

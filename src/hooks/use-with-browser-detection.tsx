@@ -11,6 +11,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { useMemo } from 'react';
+import { useAppSelector } from '../store/hooks';
+import { LoginService, LoginStatus } from '../store/slices/login';
+import { useWithPath } from './use-with-path';
 
 export type BrowserType =
   | 'chrome'
@@ -20,7 +23,15 @@ export type BrowserType =
   | 'opera'
   | 'unknown';
 
-export function useWithBrowserDetection(): BrowserType {
+export function useWithBrowserDetection() {
+  const loginService = useAppSelector(
+    (state) => state.login.user?.loginService
+  );
+  const loginStatus = useAppSelector((state) => state.login.loginStatus);
+  const googleLogin = loginService === LoginService.GOOGLE;
+  const path = useWithPath();
+  const loggedIn =
+    !path.isOnLoginPage && loginStatus === LoginStatus.AUTHENTICATED;
   const browser = useMemo(() => {
     if (typeof window === 'undefined' || !navigator?.userAgent) {
       return 'unknown';
@@ -46,6 +57,8 @@ export function useWithBrowserDetection(): BrowserType {
 
     return 'unknown';
   }, []);
+  const warnFirefoxWithGoogleLogin =
+    browser === 'firefox' && loggedIn && googleLogin;
 
-  return browser;
+  return { browser, warnFirefoxWithGoogleLogin };
 }
