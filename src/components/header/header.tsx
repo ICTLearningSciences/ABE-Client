@@ -28,6 +28,8 @@ import { PrivacyPolicyDisplay } from '../privacy-policy-display';
 import SchoolIcon from '@mui/icons-material/School';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import { RowDiv } from '../../styled-components';
+import { useWithBrowserDetection } from '../../hooks/use-with-browser-detection';
+import { FirefoxCookieWarningDialog } from '../firefox-cookie-warning-dialog';
 export default function Header(props: {
   useLogin: UseWithLogin;
   courseNavPath: string;
@@ -51,6 +53,8 @@ export default function Header(props: {
   });
   const [profileOpen, setProfileOpen] = useState(false);
   const buttonDisplayType = courseNavPath ? 'DOC_AND_COURSE' : 'DOC_ONLY';
+  const browser = useWithBrowserDetection();
+  const warnFirefox = browser === 'firefox';
 
   function docOnlyDisplay() {
     return (
@@ -208,6 +212,7 @@ export default function Header(props: {
           </div>
         )}
       </header>
+      {warnFirefox && <FirefoxCookieWarningDialog />}
     </ThemeProvider>
   );
 }
