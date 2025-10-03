@@ -345,6 +345,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
+          width: '100%',
         }}
         data-cy="course-management-main-content-outer"
       >
@@ -365,6 +366,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
             justifyContent: 'center',
             overflow: 'auto',
             height: '100%',
+            width: '100%',
           }}
           data-cy="course-management-main-content-inner"
         >
