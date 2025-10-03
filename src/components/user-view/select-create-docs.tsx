@@ -30,6 +30,7 @@ import {
 import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
 import { getStudentAssignmentDocs } from '../../helpers';
 import { useEducationalSetting } from '../../contexts/educational-setting-context';
+import { useWithWindowSize } from '../../hooks/use-with-window-size';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: UserDoc[];
@@ -77,6 +78,7 @@ export default function SelectCreateDocs(props: {
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
   const [loadInProgress, setLoadInProgress] = React.useState(false);
   const { isEducationalSetting } = useEducationalSetting();
+  const { isMobile } = useWithWindowSize();
   const { viewState, myData, studentActivityDocPrimaryStatusSet } =
     useWithEducationalManagement();
   const isStudent = myData
@@ -202,10 +204,15 @@ export default function SelectCreateDocs(props: {
           }}
         >
           {!viewingArchived && (
-            <RowDiv
+            <div
               style={{
                 width: '20%',
-                gap: '10px',
+                display: 'flex',
+                gap: '5px',
+                marginTop: isMobile ? '10px' : '0px',
+                flexDirection: isMobile ? 'column' : 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Button
@@ -222,7 +229,7 @@ export default function SelectCreateDocs(props: {
                     }
                   );
                 }}
-                size="small"
+                size="medium"
                 style={{
                   fontWeight: 'bold',
                 }}
@@ -235,13 +242,18 @@ export default function SelectCreateDocs(props: {
                   onClick={() => {
                     setExampleDocsOpen(true);
                   }}
-                  size="large"
-                  variant="text"
+                  size="small"
+                  variant="outlined"
+                  style={{
+                    width: 'fit-content',
+                    padding: 5,
+                    height: 'fit-content',
+                  }}
                 >
                   Examples
                 </Button>
               )}
-            </RowDiv>
+            </div>
           )}
           <h2 style={{ width: '60%', textAlign: 'center' }}>{title}</h2>
           <Button
@@ -250,14 +262,29 @@ export default function SelectCreateDocs(props: {
             onClick={() => {
               setViewingArchived(!viewingArchived);
             }}
+            variant="outlined"
           >
             {viewingArchived ? 'View Active' : 'View Archived'}
           </Button>
         </RowDiv>
 
         {/* Table */}
-        <TableContainer component={Paper}>
-          <Table>
+        <TableContainer
+          component={Paper}
+          sx={{
+            ...(isMobile && {
+              overflowX: 'auto',
+              maxWidth: '600px',
+            }),
+          }}
+        >
+          <Table
+            sx={{
+              ...(isMobile && {
+                minWidth: '600px',
+              }),
+            }}
+          >
             <TableHead>
               <TableRow>
                 <TableCell style={{ width: '40%' }}>Title</TableCell>
@@ -305,6 +332,7 @@ export default function SelectCreateDocs(props: {
               </TableRow>
             </TableHead>
 
+            {/* Table Body */}
             <TableBody>
               {docsLoading && (
                 <TableRow>

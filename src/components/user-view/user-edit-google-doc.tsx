@@ -49,13 +49,14 @@ export function EditGoogleDoc(props: {
     isLoading: goalsLoading,
   } = useCurrentGoalActivity;
 
-  const { width: windowWidth } = useWithWindowSize();
+  const { width: windowWidth, isMobile } = useWithWindowSize();
   const { updateViewingUserRole, state } = useWithState();
   const user = useAppSelector((state) => state.login.user);
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const viewingAdmin =
     viewingRole === UserRole.ADMIN || viewingRole === UserRole.CONTENT_MANAGER;
   const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
+  const [mobileView, setMobileView] = useState<'chat' | 'document'>('chat');
   const config = useAppSelector((state) => state.config).config;
   const {
     builtActivities,
@@ -82,88 +83,125 @@ export function EditGoogleDoc(props: {
     );
   }
 
-  const smallWindowWidth = windowWidth < 1200;
-  const googleDocWidth = smallWindowWidth ? '60%' : '55%';
-  const chatButtonologyWidth = viewingAdmin
-    ? '100%'
-    : smallWindowWidth
-    ? '40%'
-    : '45%';
-  const curActivity =
-    previewingActivity && goalActivityState?.selectedActivity
-      ? goalActivityState?.selectedActivity
-      : undefined;
-  return (
-    <div style={{ height: '100%', display: 'flex', flexGrow: 1 }}>
-      {!viewingAdmin && (
-        <UserDocumentDisplay
-          docId={docId}
-          docUrl={docUrl}
-          width={googleDocWidth}
-          currentActivityId={goalActivityState?.selectedActivity?._id || ''}
-        />
-      )}
+  // Admin view shows Activity Builder at 100% width
+  if (viewingAdmin) {
+    const curActivity =
+      previewingActivity && goalActivityState?.selectedActivity
+        ? goalActivityState?.selectedActivity
+        : undefined;
 
-      <div
-        style={{
-          width: chatButtonologyWidth,
-          maxWidth: chatButtonologyWidth,
-        }}
-      >
-        {viewingAdmin ? (
-          <ColumnCenterDiv
+    return (
+      <div style={{ height: '100%', display: 'flex', flexGrow: 1 }}>
+        <ColumnCenterDiv
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <ColumnDiv
             style={{
               width: '100%',
               height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
             }}
           >
-            <ColumnDiv
-              style={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
+            <ActivityBuilderPage
+              userId={user?._id}
+              builtActivities={builtActivities}
+              isActivityEducationReady={(activityId: string) => {
+                return educationReadyActivities.some(
+                  (a) => a._id === activityId
+                );
               }}
-            >
-              <ActivityBuilderPage
-                userId={user?._id}
-                builtActivities={builtActivities}
-                isActivityEducationReady={(activityId: string) => {
-                  return educationReadyActivities.some(
-                    (a) => a._id === activityId
-                  );
-                }}
-                addOrUpdateBuiltActivity={addOrUpdateBuiltActivity}
-                addNewLocalBuiltActivity={addNewLocalBuiltActivity}
-                copyBuiltActivity={copyBuiltActivity}
-                deleteBuiltActivity={deleteBuiltActivity}
-                canEditActivity={(activity) => {
-                  return (
-                    activity.user === user?._id ||
-                    user?.userRole === UserRole.ADMIN ||
-                    activity.visibility === ActivityBuilderVisibility.EDITABLE
-                  );
-                }}
-                canDeleteActivity={(activity) => {
-                  return (
-                    user?.userRole === UserRole.ADMIN ||
-                    activity.user === user?._id
-                  );
-                }}
-                curActivity={
-                  curActivity && isActivityBuilder(curActivity)
-                    ? curActivity
-                    : undefined
-                }
-                goToActivity={goToActivityPreview}
-                activityVersions={activityVersions}
-                loadActivityVersions={loadActivityVersions}
-                executePromptSteps={executePromptSteps}
-              />
-            </ColumnDiv>
-          </ColumnCenterDiv>
-        ) : (
+              addOrUpdateBuiltActivity={addOrUpdateBuiltActivity}
+              addNewLocalBuiltActivity={addNewLocalBuiltActivity}
+              copyBuiltActivity={copyBuiltActivity}
+              deleteBuiltActivity={deleteBuiltActivity}
+              canEditActivity={(activity) => {
+                return (
+                  activity.user === user?._id ||
+                  user?.userRole === UserRole.ADMIN ||
+                  activity.visibility === ActivityBuilderVisibility.EDITABLE
+                );
+              }}
+              canDeleteActivity={(activity) => {
+                return (
+                  user?.userRole === UserRole.ADMIN ||
+                  activity.user === user?._id
+                );
+              }}
+              curActivity={
+                curActivity && isActivityBuilder(curActivity)
+                  ? curActivity
+                  : undefined
+              }
+              goToActivity={goToActivityPreview}
+              activityVersions={activityVersions}
+              loadActivityVersions={loadActivityVersions}
+              executePromptSteps={executePromptSteps}
+            />
+          </ColumnDiv>
+        </ColumnCenterDiv>
+        <SingleNotificationDialog
+          open={state.warnExpiredAccessToken}
+          title="Access Token Expired"
+          notification="Your access token has expired. Please refresh the page or log in again."
+        />
+      </div>
+    );
+  }
+
+  // User view - handle mobile vs desktop layout
+  const smallWindowWidth = windowWidth < 1200;
+  const googleDocWidth = isMobile ? '100%' : smallWindowWidth ? '60%' : '55%';
+  const chatWidth = isMobile ? '100%' : smallWindowWidth ? '40%' : '45%';
+
+  return (
+    <div
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        flexGrow: 1,
+      }}
+    >
+      {/* Main content area */}
+      <div
+        style={{
+          display: 'flex',
+          flexGrow: 1,
+          overflow: 'hidden',
+          minHeight: 0,
+        }}
+      >
+        {/* Document Display */}
+        <div
+          style={{
+            width: googleDocWidth,
+            height: '100%',
+            display: isMobile && mobileView !== 'document' ? 'none' : 'flex',
+          }}
+        >
+          <UserDocumentDisplay
+            docId={docId}
+            docUrl={docUrl}
+            width="100%"
+            currentActivityId={goalActivityState?.selectedActivity?._id || ''}
+            setToChatView={() => setMobileView('chat')}
+          />
+        </div>
+
+        {/* Chat Display */}
+        <div
+          style={{
+            width: chatWidth,
+            maxWidth: chatWidth,
+            display: isMobile && mobileView !== 'chat' ? 'none' : 'block',
+          }}
+        >
           <ChatActivity
             activityFromParams={activityFromParams}
             goalFromParams={goalFromParams}
@@ -172,9 +210,11 @@ export function EditGoogleDoc(props: {
             previewingActivity={previewingActivity}
             setPreviewingActivity={setPreviewingActivity}
             disableActivitySelector={disableActivitySelector}
+            setToDocView={() => setMobileView('document')}
           />
-        )}
+        </div>
       </div>
+
       <SingleNotificationDialog
         open={state.warnExpiredAccessToken}
         title="Access Token Expired"

@@ -6,6 +6,7 @@ import { ColumnDiv } from '../../../../styled-components';
 import { CourseListItem } from './course-list-item';
 import { NoCoursesDisplay } from './no-courses-display';
 import { Button } from '@mui/material';
+import { useWithWindowSize } from '../../../../hooks/use-with-window-size';
 export function CoursesListDisplay(props: {
   isStudent: boolean;
   courses: Course[];
@@ -20,6 +21,7 @@ export function CoursesListDisplay(props: {
     handleOpenCourseModal,
     handleOpenJoinSectionModal,
   } = props;
+  const { isMobile } = useWithWindowSize();
 
   if (courses.length === 0) {
     return (
@@ -34,7 +36,7 @@ export function CoursesListDisplay(props: {
     <Paper
       elevation={2}
       sx={{
-        width: '50%',
+        width: isMobile ? '95%' : '50%',
         height: '100%',
         p: 3,
         borderRadius: 2,

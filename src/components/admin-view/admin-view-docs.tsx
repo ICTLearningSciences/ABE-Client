@@ -13,6 +13,7 @@ import { UserRole } from '../../store/slices/login';
 import ExampleGoogleDocModal from '../user-view/example-google-docs-modal';
 import { useWithUsersDocs as useWithUsersDocsHook } from '../../hooks/use-with-users-docs';
 import { EducationalSettingProvider } from '../../contexts/educational-setting-context';
+import { useWithWindowSize } from '../../hooks/use-with-window-size';
 
 export interface AdminViewUserGoogleDocsProps {
   useWithUsersDocs: UseWithUsersDocs;
@@ -42,6 +43,7 @@ export default function ViewUserGoogleDocs(props: {
   } = useWithUsersDocs;
   const userRole = useAppSelector((state) => state.login.userRole);
   const [exampleDocsOpen, setExampleDocsOpen] = React.useState(false);
+  const { isMobile } = useWithWindowSize();
 
   return (
     <EducationalSettingProvider isEducationalSetting={isEducationalSetting}>
@@ -67,7 +69,7 @@ export default function ViewUserGoogleDocs(props: {
           onHistoryClicked={onHistoryClicked}
           setExampleDocsOpen={setExampleDocsOpen}
           sx={{
-            width: '75%',
+            width: isMobile ? '95%' : '75%',
           }}
         />
         <ExampleGoogleDocModal
