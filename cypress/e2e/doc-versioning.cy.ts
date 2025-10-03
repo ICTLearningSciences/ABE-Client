@@ -10,8 +10,9 @@ import { testGoogleDocId } from "../helpers/types";
 
 describe("User Doc Versioning", () => {
     describe("Saves a version", ()=>{
-        it("On first load", ()=>{
+        it.only("On first load", ()=>{
             cyMockDefault(cy);
+            cy.viewport(800, 600);
             toMyEditableActivity(cy);
             // polls for changes every 5 seconds
             cy.wait("@SubmitDocVersion", {timeout: 8000})

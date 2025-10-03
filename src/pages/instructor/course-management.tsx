@@ -40,6 +40,7 @@ import { LoginStatus } from '../../store/slices/login';
 import { CourseManagementSidebar } from './components/course-management-sidebar';
 import { ErrorToast } from '../../components/shared/error-toast';
 import { DashboardMain } from './course-management/dashboard/dashboard-main';
+import { useWithWindowSize } from '../../hooks/use-with-window-size';
 
 export const courseManagementUrl = '/course-management';
 export const studentCoursesUrl = '/student/courses';
@@ -75,6 +76,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     config
   );
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { isMobile } = useWithWindowSize();
   const {
     fetchDocumentTimeline,
     documentStates,
@@ -322,17 +324,19 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       }}
     >
       {/* Sidebar */}
-      <CourseManagementSidebar
-        isStudent={isStudent}
-        treeSections={treeSections}
-        selectedId={getSelectedId()}
-        isSectionModifying={educationManagement.isSectionModifying}
-        isCourseModifying={educationManagement.isCourseModifying}
-        onOpenJoinSectionModal={handleOpenJoinSectionModal}
-        onOpenCourseModal={handleOpenCourseModal}
-        isSidebarCollapsed={isSidebarCollapsed}
-        setIsSidebarCollapsed={setIsSidebarCollapsed}
-      />
+      {!isMobile ? (
+        <CourseManagementSidebar
+          isStudent={isStudent}
+          treeSections={treeSections}
+          selectedId={getSelectedId()}
+          isSectionModifying={educationManagement.isSectionModifying}
+          isCourseModifying={educationManagement.isCourseModifying}
+          onOpenJoinSectionModal={handleOpenJoinSectionModal}
+          onOpenCourseModal={handleOpenCourseModal}
+          isSidebarCollapsed={isSidebarCollapsed}
+          setIsSidebarCollapsed={setIsSidebarCollapsed}
+        />
+      ) : undefined}
 
       {/* Main content */}
       <Box

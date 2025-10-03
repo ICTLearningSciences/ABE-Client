@@ -9,6 +9,8 @@ import { useWithChat } from '../../../store/slices/chat/use-with-chat';
 import DownloadIcon from '@mui/icons-material/Download';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import DescriptionIcon from '@mui/icons-material/Description';
+import { useWithWindowSize } from '../../../hooks/use-with-window-size';
 
 export function ChatHeaderGenerator(props: {
   incrementActivityCounter: () => void;
@@ -18,6 +20,7 @@ export function ChatHeaderGenerator(props: {
   disableActivitySelector?: boolean;
   displayMarkdown: boolean;
   setDisplayMarkdown: (displayMarkdown: boolean) => void;
+  setToDocView: () => void;
 }): JSX.Element {
   const {
     incrementActivityCounter,
@@ -27,11 +30,13 @@ export function ChatHeaderGenerator(props: {
     disableActivitySelector,
     displayMarkdown,
     setDisplayMarkdown,
+    setToDocView,
   } = props;
   const viewingAdvancedOptions = useAppSelector(
     (state) => state.state.viewingAdvancedOptions
   );
   const { downloadChatLog } = useWithChat();
+  const { isMobile, width: screenWidth } = useWithWindowSize();
   let title = selectedGoal?.title || '';
   title += selectedGoal && selectedActivity ? ' - ' : '';
   title += selectedActivity?.title || '';
@@ -47,12 +52,37 @@ export function ChatHeaderGenerator(props: {
           width: '100%',
         }}
       >
-        <span
-          style={{ textAlign: 'center', marginBottom: '10px' }}
-          data-cy="chat-header"
+        <RowDiv
+          style={{
+            width: '100%',
+            justifyContent: 'space-around',
+            marginBottom: '10px',
+          }}
         >
-          {title}
-        </span>
+          <Button
+            onClick={setToDocView}
+            style={{
+              flex: 0.2,
+              display: isMobile ? 'flex' : 'none',
+              fontSize: screenWidth < 500 ? '10px' : '12px',
+            }}
+            variant="contained"
+          >
+            {' '}
+            <DescriptionIcon
+              sx={{ fontSize: screenWidth < 500 ? '16px' : '20px' }}
+            />{' '}
+            Document{' '}
+          </Button>
+          <span
+            style={{ textAlign: 'center', marginBottom: '10px', flex: 1 }}
+            data-cy="chat-header"
+          >
+            {title}
+          </span>
+          <div style={{ flex: 0.2 }}></div>
+        </RowDiv>
+
         <Divider />
         <RowDiv
           style={{
