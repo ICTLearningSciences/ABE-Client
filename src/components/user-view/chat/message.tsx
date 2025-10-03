@@ -122,7 +122,7 @@ export default function Message(props: {
       }}
     >
       {displayMarkdown && (
-        <ReactMarkdown components={{ p: 'span' }}>
+        <ReactMarkdown>
           {message.displayType === MessageDisplayType.TEXT
             ? message.message
             : ''}
