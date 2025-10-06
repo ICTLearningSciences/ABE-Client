@@ -9,11 +9,15 @@ import { HugeRTEEditor } from './raw-text-document/huge-rte';
 import { useWithStoreDocVersions } from '../../hooks/use-with-google-doc-versions';
 import { useAppSelector } from '../../store/hooks';
 import { LoginService } from '../../store/slices/login';
+import { Button } from '@mui/material';
+import ChatIcon from '@mui/icons-material/Chat';
+import { useWithWindowSize } from '../../hooks/use-with-window-size';
 interface UserDocumentDisplayProps {
   docId: string;
   docUrl: string;
   width: string;
   currentActivityId: string;
+  setToChatView: () => void;
 }
 
 export function GoogleDocDisplay(props: {
@@ -39,10 +43,11 @@ export function GoogleDocDisplay(props: {
 export function UserDocumentDisplay(
   props: UserDocumentDisplayProps
 ): JSX.Element {
-  const { docId, docUrl, width, currentActivityId } = props;
+  const { docId, docUrl, width, currentActivityId, setToChatView } = props;
   const loginService = useAppSelector(
     (state) => state.login.user?.loginService
   );
+  const { isMobile } = useWithWindowSize();
 
   // Render appropriate document component based on doc service type
   const renderDocumentComponent = () => {
@@ -73,6 +78,16 @@ export function UserDocumentDisplay(
         width: width,
       }}
     >
+      {isMobile && (
+        <Button
+          onClick={setToChatView}
+          variant="contained"
+          style={{ alignSelf: 'flex-start', margin: 10 }}
+        >
+          {' '}
+          <ChatIcon /> Back to Chat
+        </Button>
+      )}
       {renderDocumentComponent()}
     </div>
   );

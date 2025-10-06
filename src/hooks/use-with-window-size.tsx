@@ -9,10 +9,20 @@ import { useEffect, useState } from 'react';
 interface WindowSize {
   width: number;
   height: number;
+  isMobile: boolean;
 }
+export const mobileBreakpoint = 800;
 
 export function useWithWindowSize(): WindowSize {
-  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+  const initialWindowWidth =
+    typeof window !== 'undefined' ? window.innerWidth : 0;
+  const initialWindowHeight =
+    typeof window !== 'undefined' ? window.innerHeight : 0;
+  const [windowSize, setWindowSize] = useState({
+    width: initialWindowWidth,
+    height: initialWindowHeight,
+  });
+  const isMobile = windowSize.width > 0 && windowSize.width <= mobileBreakpoint;
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -30,5 +40,6 @@ export function useWithWindowSize(): WindowSize {
   return {
     width: windowSize.width,
     height: windowSize.height,
+    isMobile,
   };
 }

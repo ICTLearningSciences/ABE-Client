@@ -5,6 +5,7 @@ import { useWithEducationalManagement } from '../../../store/slices/education-ma
 import { ColumnDiv } from '../../../styled-components';
 import { Typography, Box } from '@mui/material';
 import { CheckCircle, RadioButtonUnchecked } from '@mui/icons-material';
+import { useWithWindowSize } from '../../../hooks/use-with-window-size';
 
 export function ActivityView(props: {
   activityId: string;
@@ -14,6 +15,7 @@ export function ActivityView(props: {
   const [selectedDocId, setSelectedDocId] = useState<string>();
 
   const educationManagement = useWithEducationalManagement();
+  const { isMobile } = useWithWindowSize();
 
   const haveICompletedActivity = educationManagement.haveICompletedActivity(
     assignmentId,
@@ -62,7 +64,7 @@ export function ActivityView(props: {
                 fontWeight: 500,
               }}
             >
-              Complete
+              {isMobile ? '' : 'Complete'}
             </Typography>
           </>
         ) : (
@@ -80,7 +82,7 @@ export function ActivityView(props: {
                 fontWeight: 500,
               }}
             >
-              Incomplete
+              {isMobile ? '' : 'Incomplete'}
             </Typography>
           </>
         )}

@@ -51,12 +51,14 @@ export function Chat(props: {
   editDocGoal: () => void;
   setSelectedActivity: (activity: ActivityGQL) => void;
   disableActivitySelector?: boolean;
+  setToDocView: () => void;
 }) {
   const {
     selectedGoal,
     selectedActivity,
     editDocGoal,
     disableActivitySelector,
+    setToDocView,
   } = props;
   const { sendMessage, state: chatState, setSystemRole } = useWithChat();
   const {
@@ -154,6 +156,7 @@ export function Chat(props: {
                 disableActivitySelector={disableActivitySelector}
                 displayMarkdown={displayMarkdown}
                 setDisplayMarkdown={setDisplayMarkdown}
+                setToDocView={setToDocView}
               />
             </ChatHeader>
             <ChatMessagesContainer

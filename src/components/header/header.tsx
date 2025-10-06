@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 import React, { useState } from 'react';
 import {
   Button,
-  Divider,
   Drawer,
   IconButton,
   ThemeProvider,
@@ -26,12 +25,11 @@ import { UserInfoSettings } from '../settings/user-info-settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { CuiHeader } from './cui-header';
 import { PrivacyPolicyDisplay } from '../privacy-policy-display';
-import SchoolIcon from '@mui/icons-material/School';
-import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import { RowDiv } from '../../styled-components';
 import { FirefoxCookieWarningDialog } from '../firefox-cookie-warning-dialog';
 import { useWithBrowserDetection } from '../../hooks/use-with-browser-detection';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { HomeAndCourseDisplay } from './home-and-course-display';
 
 export default function Header(props: {
   useLogin: UseWithLogin;
@@ -68,46 +66,6 @@ export default function Header(props: {
       >
         <Home />
       </IconButton>
-    );
-  }
-
-  function homeAndCourseDisplay() {
-    return (
-      <RowDiv style={{ gap: 20 }}>
-        <IconButton
-          data-cy="default-home-button"
-          onClick={() => {
-            navigate(defaultPath);
-          }}
-          color="primary"
-        >
-          {' '}
-          <Home />{' '}
-        </IconButton>
-
-        <Divider orientation="vertical" variant="middle" flexItem />
-
-        <IconButton
-          data-cy="educational-home-button"
-          onClick={() => {
-            navigate(courseNavPath);
-          }}
-          color="primary"
-          disabled={curPath === courseNavPath}
-        >
-          <SchoolIcon />
-        </IconButton>
-        <IconButton
-          data-cy="doc-home-button"
-          onClick={() => {
-            navigate(freeDocEditingNavPath);
-          }}
-          color="primary"
-          disabled={curPath === freeDocEditingNavPath}
-        >
-          <TextSnippetIcon />
-        </IconButton>
-      </RowDiv>
     );
   }
 
@@ -184,7 +142,15 @@ export default function Header(props: {
                 gap: 20,
               }}
             >
-              {buttonDisplayType === 'DOC_AND_COURSE' && homeAndCourseDisplay()}
+              {buttonDisplayType === 'DOC_AND_COURSE' && (
+                <HomeAndCourseDisplay
+                  defaultPath={defaultPath}
+                  courseNavPath={courseNavPath}
+                  freeDocEditingNavPath={freeDocEditingNavPath}
+                  curPath={curPath}
+                  navigate={navigate}
+                />
+              )}
               {buttonDisplayType === 'DOC_ONLY' && docOnlyDisplay()}
             </RowDiv>
           )}

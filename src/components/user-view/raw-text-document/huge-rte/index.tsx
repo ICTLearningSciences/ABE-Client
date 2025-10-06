@@ -29,6 +29,7 @@ export function HugeRTEEditor({
   currentActivityId,
 }: RawTextDocumentProps) {
   const [docData, setDocData] = useState<DocData | undefined>();
+  console.log(docData);
   const [initialDocData, setInitialDocData] = useState<DocData | undefined>();
   const [loading, setLoading] = useState<boolean>(!!docId);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -65,6 +66,7 @@ export function HugeRTEEditor({
         const rawText = editor.current?.editor?.getContent({ format: 'text' });
         const mdText = converter.makeMarkdown(htmlText);
         if (docData) {
+          console.log('debouncedUpdate', rawText, mdText);
           setDocData((prevValue) => {
             if (prevValue) {
               return {
@@ -140,6 +142,11 @@ export function HugeRTEEditor({
         plugins={editorConfig.plugins}
         toolbar={editorConfig.toolbar}
         onEditorChange={handleEditorChange}
+        // onInput={(value) => {
+        //   console.log(value)
+        //   console.log(value.target.value);
+        //   handleEditorChange(value.target.value);
+        // }}
       />
     ),
     [initialDocData, editor, handleEditorChange]
