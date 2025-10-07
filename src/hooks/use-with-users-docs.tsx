@@ -166,7 +166,7 @@ export function useWithUsersDocs(): UseWithUsersDocs {
           title: title || 'New Document',
           admin: isAdminDoc || false,
           service: DocService.RAW_TEXT,
-          courseAssignmentId: courseAssignmentId || '',
+          courseAssignmentId: courseAssignmentId || undefined,
         });
         educationalEventsEmitter.emit(
           EducationalEvents.NEW_DOC_CREATED,
