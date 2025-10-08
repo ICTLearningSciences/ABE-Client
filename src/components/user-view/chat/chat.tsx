@@ -101,7 +101,7 @@ export function Chat(props: {
   const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
     : '';
-  const [displayMarkdown, setDisplayMarkdown] = useState(true);
+  const [displayMarkdown, setDisplayMarkdown] = useState(false);
 
   useEffect(() => {
     setSystemRole(systemRole);
