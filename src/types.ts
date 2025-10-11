@@ -189,12 +189,29 @@ export interface PromptConfiguration {
   includeUserInput?: boolean;
 }
 
+export enum NumChatMessagesIncluded {
+  ALL = 'all',
+  LAST_1 = 'last_1',
+  LAST_3 = 'last_3',
+  LAST_5 = 'last_5',
+  LAST_10 = 'last_10',
+}
+
+export const numMessagesToNumber = {
+  [NumChatMessagesIncluded.ALL]: 1000,
+  [NumChatMessagesIncluded.LAST_1]: 1,
+  [NumChatMessagesIncluded.LAST_3]: 3,
+  [NumChatMessagesIncluded.LAST_5]: 5,
+  [NumChatMessagesIncluded.LAST_10]: 10,
+};
+
 export interface AiPromptStep {
   prompts: PromptConfiguration[];
   targetAiServiceModel?: AiServiceModel;
   systemRole?: string;
   outputDataType: PromptOutputTypes;
   includeChatLogContext?: boolean;
+  numChatMessagesIncluded?: NumChatMessagesIncluded;
   responseFormat?: string;
   webSearch?: boolean;
   editDoc?: boolean;

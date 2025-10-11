@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { PromptOutputTypes } from '../types';
+import { NumChatMessagesIncluded, PromptOutputTypes } from '../types';
 import {
   ActivityBuilder,
   ActivityBuilderStepType,
@@ -56,6 +56,7 @@ export const examplePromptActivityStep: PromptActivityStep = {
   includeEssay: false,
   outputDataType: PromptOutputTypes.JSON,
   customSystemRole: 'user',
+  numChatMessagesIncluded: NumChatMessagesIncluded.ALL,
 };
 
 export const examplePromptActivity: ActivityBuilder = {
