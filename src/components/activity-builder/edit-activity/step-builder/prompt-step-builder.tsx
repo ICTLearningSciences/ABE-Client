@@ -25,11 +25,20 @@ import {
 } from '../../shared/input-components';
 import {
   AiPromptStep,
+  NumChatMessagesIncluded,
   PromptConfiguration,
   PromptOutputTypes,
   PromptRoles,
 } from '../../../../types';
-import { Button, CircularProgress, IconButton } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  MenuItem,
+  Select,
+  IconButton,
+  FormControl,
+  InputLabel,
+} from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { v4 as uuid } from 'uuid';
 import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
@@ -66,6 +75,7 @@ export function defaultEditDocPromptBuilder(): PromptActivityStep {
     outputDataType: PromptOutputTypes.TEXT,
     jsonResponseData: [],
     includeChatLogContext: false,
+    numChatMessagesIncluded: NumChatMessagesIncluded.ALL,
     includeEssay: true,
     customSystemRole: '',
     jumpToStepId: '',
@@ -88,6 +98,7 @@ export function defaultPromptBuilder(editDoc?: boolean): PromptActivityStep {
     includeEssay: false,
     customSystemRole: '',
     jumpToStepId: '',
+    numChatMessagesIncluded: NumChatMessagesIncluded.ALL,
   };
 }
 
@@ -641,6 +652,47 @@ export function PromptStepBuilder(props: {
             updateField('includeChatLogContext', e);
           }}
         />
+
+        {/* Add dropdown for numChatMessagesIncluded */}
+        {/* {step.includeChatLogContext && <SelectInputField
+          label="# Chat Messages"
+          
+          value={step.numChatMessagesIncluded || NumChatMessagesIncluded.ALL}
+          options={[...Object.values(NumChatMessagesIncluded)]}
+          onChange={(e) => {
+            updateField('numChatMessagesIncluded', e as NumChatMessagesIncluded);
+          }}
+        />} */}
+
+        {step.includeChatLogContext && (
+          <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+            <InputLabel id={'select-field-label'}>
+              {'# Chat Messages'}
+            </InputLabel>
+            <Select
+              data-cy={`select-field-chat-messages`}
+              labelId="demo-simple-select-standard-label"
+              id="demo-simple-select-standard"
+              value={
+                step.numChatMessagesIncluded || NumChatMessagesIncluded.ALL
+              }
+              onChange={(e) => {
+                updateField(
+                  'numChatMessagesIncluded',
+                  e.target.value as NumChatMessagesIncluded
+                );
+              }}
+              label={'# Chat Messages'}
+            >
+              {[...Object.values(NumChatMessagesIncluded)].map((option, i) => (
+                <MenuItem key={i} value={option}>
+                  {option.charAt(0).toUpperCase() +
+                    option.slice(1).replace('_', ' ')}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
 
         {!step.editDoc && (
           <CheckBoxInput

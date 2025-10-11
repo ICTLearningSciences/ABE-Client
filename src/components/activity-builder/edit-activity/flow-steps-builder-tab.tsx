@@ -168,8 +168,9 @@ export function FlowStepsBuilderTab(props: {
         ? getDefaultConditionalStep()
         : stepType === 'EDIT_DOC_PROMPT'
         ? defaultPromptBuilder(stepType === 'EDIT_DOC_PROMPT')
-        : // : stepType === 'END_ACTIVITY_MESSAGE'
-          getDefaultEndActivityStepBuilder();
+        : stepType === 'END_ACTIVITY_MESSAGE'
+        ? getDefaultEndActivityStepBuilder()
+        : defaultPromptBuilder(false);
     updateLocalActivity((prevValue) => {
       return {
         ...prevValue,

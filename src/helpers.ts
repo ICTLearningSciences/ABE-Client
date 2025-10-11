@@ -231,10 +231,11 @@ export const aiServiceModelStringParse = (
     model,
   };
 };
-export function chatLogToString(chatLog: ChatLog) {
+export function chatLogToString(chatLog: ChatLog, numTotalMessages: number) {
   let chatLogString = '';
-  for (let i = 0; i < chatLog.length; i++) {
-    chatLogString += `${chatLog[i].sender}: ${chatLog[i].message}\n`;
+  const messages = chatLog.slice(-numTotalMessages);
+  for (let i = 0; i < messages.length; i++) {
+    chatLogString += `${messages[i].sender}: ${messages[i].message}\n`;
   }
   return chatLogString;
 }

@@ -27,6 +27,7 @@ import {
   AiPromptStep,
   DocData,
   DocService,
+  numMessagesToNumber,
   PromptConfiguration,
   PromptOutputTypes,
   PromptRoles,
@@ -564,9 +565,13 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     });
 
     if (step.includeChatLogContext) {
+      const numMessages = step.numChatMessagesIncluded
+        ? numMessagesToNumber[step.numChatMessagesIncluded]
+        : 1000;
       aiPromptSteps[0].prompts.push({
         promptText: `Current state of chat log between user and system: ${chatLogToString(
-          this.chatLog
+          this.chatLog,
+          numMessages
         )}`,
         includeEssay: false,
         promptRole: PromptRoles.USER,
