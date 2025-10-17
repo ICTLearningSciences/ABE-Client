@@ -70,14 +70,12 @@ export function StudentAssignmentsSection({
     isCompleted: boolean,
     assignmentGrade?: AssignmentGrade
   ) {
+    const assignmentDocs = getAssignmentDocs(assignment);
+    const hasDocs = assignmentDocs.length > 0;
     if (!myData) {
       return null;
     }
     if (isInstructorData(myData)) {
-      if (!isCompleted) {
-        return null;
-      }
-
       return (
         <Box
           sx={{
@@ -98,15 +96,15 @@ export function StudentAssignmentsSection({
           ) : (
             <Typography variant="body2">
               <span style={{ fontWeight: 'bold', color: 'darkred' }}>
-                Not Graded
+                {!hasDocs ? 'No docs' : 'Not Graded'}
               </span>
             </Typography>
           )}
-
           <Button
             variant="contained"
             onClick={() => onGoToAssignmentTimeline(assignment._id)}
             data-cy="review-documents-button"
+            disabled={!hasDocs}
           >
             Grade
           </Button>
@@ -114,7 +112,7 @@ export function StudentAssignmentsSection({
       );
     }
     if (isStudentData(myData)) {
-      return assignmentGrade && isCompleted ? (
+      return assignmentGrade ? (
         <Box
           sx={{
             width: '10%',
@@ -130,7 +128,7 @@ export function StudentAssignmentsSection({
             {assignmentGrade.grade}/5
           </Typography>
         </Box>
-      ) : !isCompleted ? null : (
+      ) : (
         <Box
           sx={{
             width: '10%',

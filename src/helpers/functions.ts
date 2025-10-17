@@ -4,31 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GQLTimelinePoint, TimelinePointType } from '../types';
+import { GQLTimelinePoint } from '../types';
 
-/**
- * The function `convertTimeLinePointToDocVersion` converts a TimelinePointType enum value to a
- * corresponding string representation.
- * @param {TimelinePointType} type - TimelinePointType
- * @returns An empty string is being returned if the `type` parameter does not match any of the cases
- * in the switch statement.
- */
-export const convertTimeLinePointToDocVersion = (
-  type: TimelinePointType
-): string => {
-  switch (type) {
-    case TimelinePointType.START:
-      return 'Start';
-    case TimelinePointType.MOST_RECENT:
-      return 'Most Recent';
-    case TimelinePointType.NEW_ACTIVITY:
-      return 'New Activity';
-    case TimelinePointType.TIME_DIFFERENCE:
-      return 'Time Difference';
-    default:
-      return '';
-  }
-};
 /**
  * The function `formatTimeDifference` calculates the time difference between the current time and a
  * specified time in seconds, minutes, hours, days, weeks, and months.
