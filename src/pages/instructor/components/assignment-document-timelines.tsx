@@ -23,7 +23,12 @@ import {
   Assignment,
   StudentData,
 } from '../../../store/slices/education-management/types';
-import { getStudentAssignmentDocs } from '../../../helpers';
+import {
+  getStudentAssignmentDocs,
+  getStudentsByAssignmentCompletionStatus,
+} from '../../../helpers';
+import { RootState } from '../../../store/store';
+import { useAppSelector } from '../../../store/hooks';
 
 export interface TextDiffResult {
   diffContent: React.ReactNode[];
@@ -87,6 +92,7 @@ export const applyTextDiff = (
 };
 
 interface AssignmentDocumentTimelinesProps {
+  sectionId: string;
   student: StudentData;
   assignment: Assignment;
   studentDocIds: string[];
@@ -105,12 +111,14 @@ interface AssignmentDocumentTimelinesProps {
   onBackToStudentInfo: () => void;
   onDocumentChange: (docId: string) => void;
   isSidebarCollapsed: boolean;
+  handleViewStudentTimelines: (studentId: string, assignmentId: string) => void;
 }
 
 export const AssignmentDocumentTimelines: React.FC<
   AssignmentDocumentTimelinesProps
 > = ({
   student,
+  sectionId,
   assignment,
   documentStates,
   studentDocIds,
@@ -119,18 +127,29 @@ export const AssignmentDocumentTimelines: React.FC<
   selectedDocId,
   getHydratedTimeline,
   onBackToStudentInfo,
+  handleViewStudentTimelines,
   onDocumentChange,
   isSidebarCollapsed,
 }) => {
   const documentIds = studentDocIds;
   const currentDocState = documentStates[selectedDocId];
   const [selectedTimelineIndex, setSelectedTimelineIndex] = useState(0);
-
+  const allStudents = useAppSelector(
+    (state: RootState) => state.educationManagement.students
+  );
+  const studentsInSection = allStudents.filter((student) =>
+    student.enrolledSections.includes(sectionId)
+  );
+  const studentAssignmentCompletionStatuses =
+    getStudentsByAssignmentCompletionStatus(studentsInSection, assignment);
   const studentAssignmentDocs = useMemo(
     () => getStudentAssignmentDocs(student, assignment._id),
     [student, assignment._id]
   );
-
+  console.log(
+    'studentAssignmentCompletionStatuses',
+    studentAssignmentCompletionStatuses
+  );
   const currentTimeline = useMemo(() => {
     if (currentDocState?.status === LoadingStatusType.SUCCESS) {
       return getHydratedTimeline(selectedDocId);
@@ -171,6 +190,10 @@ export const AssignmentDocumentTimelines: React.FC<
       data-cy="activity-document-timelines"
     >
       <AssignmentHeader
+        studentAssignmentCompletionStatuses={
+          studentAssignmentCompletionStatuses
+        }
+        handleViewStudentTimelines={handleViewStudentTimelines}
         assignment={assignment}
         student={student}
         onBackToStudentInfo={onBackToStudentInfo}

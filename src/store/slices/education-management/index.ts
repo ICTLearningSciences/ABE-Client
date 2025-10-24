@@ -21,6 +21,10 @@ export const educationManagementSlice = createSlice({
     setViewState: (state, action: PayloadAction<CourseManagementState>) => {
       const previousView = state.viewState.view;
       state.viewState = action.payload;
+
+      if (state.viewState.view === previousView) {
+        return;
+      }
       state.viewState.previousView = previousView;
     },
     clearErrorMessage: (state) => {

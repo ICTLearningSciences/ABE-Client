@@ -8,6 +8,7 @@ import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { DocumentSelector } from './document-selector';
+import { StudentSelector } from './student-selector';
 import {
   Assignment,
   RelevantGoogleDoc,
@@ -15,8 +16,11 @@ import {
 } from '../../../../store/slices/education-management/types';
 import { RowDiv } from '../../../../styled-components';
 import { AssignmentGrader } from './assignment-grader';
+import { StudentAssignmentCompletionStatus } from '../../../../helpers';
 
 interface AssignmentHeaderProps {
+  studentAssignmentCompletionStatuses: StudentAssignmentCompletionStatus[];
+  handleViewStudentTimelines: (studentId: string, assignmentId: string) => void;
   student: StudentData;
   assignment: Assignment;
   onBackToStudentInfo?: () => void;
@@ -26,6 +30,8 @@ interface AssignmentHeaderProps {
 }
 
 export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
+  studentAssignmentCompletionStatuses,
+  handleViewStudentTimelines,
   student,
   assignment,
   onBackToStudentInfo,
@@ -33,7 +39,6 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
   selectedDocId,
   onDocumentChange,
 }) => {
-  const { name: studentName } = student;
   const { title: assignmentTitle } = assignment;
   return (
     <Box
@@ -76,12 +81,12 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
           >
             Student:
           </Typography>
-          <Typography
-            data-cy="assignment-header-student-name"
-            sx={{ fontWeight: 400, color: 'black' }}
-          >
-            {studentName}
-          </Typography>
+          <StudentSelector
+            studentStatuses={studentAssignmentCompletionStatuses}
+            currentStudentId={student.userId}
+            assignmentId={assignment._id}
+            onStudentChange={handleViewStudentTimelines}
+          />
         </RowDiv>
 
         <RowDiv
