@@ -61,7 +61,9 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
       }}
     >
       {isStudentViewer ? (
-        <Typography>{myData?.name}</Typography>
+        <Typography data-cy="assignment-header-student-name">
+          {myData?.name}
+        </Typography>
       ) : (
         <Select
           data-cy="student-select"
