@@ -767,7 +767,7 @@ describe('Course Management', () => {
       // Header Visible
       cy.get("[data-cy=activity-document-timelines]").should("be.visible")
       cy.get("[data-cy=assignment-header]").should("be.visible")
-      cy.get("[data-cy=assignment-header-student-name]").should("contain.text", "John Doe")
+      cy.get("[data-cy=student-select]").should("contain.text", "John Doe")
       cy.get("[data-cy=assignment-header-assignment-title]").should("contain.text", "Programming Fundamentals Quiz")
 
       // Timeline Notches Visible

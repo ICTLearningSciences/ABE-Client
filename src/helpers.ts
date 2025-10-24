@@ -20,6 +20,7 @@ import {
 } from './components/activity-builder/types';
 import { UserRole } from './store/slices/login';
 import {
+  Assignment,
   AssignmentProgress,
   RelevantGoogleDoc,
   StudentData,
@@ -323,4 +324,76 @@ export function getStudentAssignmentDocs(
   return [...targetAssignmentProgress.relevantGoogleDocs].sort((a) =>
     a.primaryDocument ? -1 : 1
   );
+}
+
+export enum AssignmentCompletionStatus {
+  ASSIGNMENT_COMPLETE = 'ASSIGNMENT_COMPLETE',
+  IN_PROGRESS = 'IN_PROGRESS',
+  NOT_STARTED = 'NOT_STARTED',
+}
+
+export interface StudentAssignmentCompletionStatus {
+  studentId: string;
+  studentName: string;
+  assignmentId: string;
+  status: AssignmentCompletionStatus;
+  isGraded: boolean;
+}
+
+export function getStudentsByAssignmentCompletionStatus(
+  students: StudentData[],
+  assignment: Assignment
+): StudentAssignmentCompletionStatus[] {
+  return students.map((student) => {
+    const assignmentProgress = student.assignmentProgress.find(
+      (progress) => progress.assignmentId === assignment._id
+    );
+
+    // If no assignment progress exists, student hasn't started
+    if (
+      !assignmentProgress ||
+      assignmentProgress.activityCompletions.length === 0
+    ) {
+      return {
+        studentId: student.userId,
+        studentName: student.name,
+        assignmentId: assignment._id,
+        status: AssignmentCompletionStatus.NOT_STARTED,
+        isGraded: false,
+      };
+    }
+
+    // Check completion status for each activity in the assignment
+    const completionStatuses = assignment.activityIds.map((activityId) => {
+      const activityCompletion = assignmentProgress.activityCompletions.find(
+        (completion) => completion.activityId === activityId
+      );
+      return (
+        (activityCompletion?.complete &&
+          assignmentProgress.relevantGoogleDocs.length > 0) ||
+        false
+      );
+    });
+
+    // Determine overall status
+    const allComplete = completionStatuses.every((isComplete) => isComplete);
+    const someComplete = completionStatuses.some((isComplete) => isComplete);
+
+    let status: AssignmentCompletionStatus;
+    if (allComplete) {
+      status = AssignmentCompletionStatus.ASSIGNMENT_COMPLETE;
+    } else if (someComplete) {
+      status = AssignmentCompletionStatus.IN_PROGRESS;
+    } else {
+      status = AssignmentCompletionStatus.NOT_STARTED;
+    }
+
+    return {
+      studentId: student.userId,
+      studentName: student.name,
+      assignmentId: assignment._id,
+      status,
+      isGraded: Boolean(assignmentProgress.instructorGrade),
+    };
+  });
 }

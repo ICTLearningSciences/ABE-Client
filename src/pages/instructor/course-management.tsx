@@ -133,6 +133,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     }
     const docs = getStudentAssignmentDocs(targetStudent, assignmentId);
     if (!docs.length) {
+      console.error('No documents found for student and assignment.');
       return;
     }
     const primaryDoc = docs.find((d) => d.primaryDocument) || docs[0];
@@ -431,8 +432,10 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
           {viewState.view === 'activity-document-timelines' &&
             viewState.selectedStudent &&
             viewState.selectedAssignment &&
+            viewState.selectedSectionId &&
             viewState.selectedDocId && (
               <AssignmentDocumentTimelines
+                sectionId={viewState.selectedSectionId}
                 student={viewState.selectedStudent}
                 assignment={viewState.selectedAssignment}
                 studentDocIds={allStudentDocIds}
@@ -446,6 +449,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 }}
                 onDocumentChange={handleDocumentChange}
                 isSidebarCollapsed={isSidebarCollapsed}
+                handleViewStudentTimelines={handleViewStudentTimelines}
               />
             )}
 
