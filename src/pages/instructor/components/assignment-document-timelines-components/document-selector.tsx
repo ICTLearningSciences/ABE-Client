@@ -9,7 +9,7 @@ import { FormControl, Select, MenuItem } from '@mui/material';
 import { RelevantGoogleDoc } from '../../../../store/slices/education-management/types';
 
 interface DocumentSelectorProps {
-  docData: RelevantGoogleDoc[];
+  docData?: RelevantGoogleDoc[];
   selectedDocId: string;
   onDocumentChange: (docId: string) => void;
 }
@@ -19,10 +19,6 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
   selectedDocId,
   onDocumentChange,
 }) => {
-  if (docData.length === 0) {
-    return null;
-  }
-
   return (
     <FormControl
       sx={{
@@ -40,6 +36,7 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
         labelId="document-select-label"
         value={selectedDocId || ''}
         onChange={(e) => onDocumentChange(e.target.value)}
+        disabled={!docData || docData.length === 0}
         sx={{
           '& .MuiOutlinedInput-root': {
             '&.Mui-focused fieldset': {
@@ -55,14 +52,16 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
           padding: 0,
         }}
       >
-        {docData.map((doc) => (
-          <MenuItem key={doc.docId} value={doc.docId}>
-            {doc.primaryDocument ? (
-              <span style={{ fontWeight: 600 }}>Main Document: </span>
-            ) : null}{' '}
-            <span> </span> {doc.docData.title || 'Untitled'}
-          </MenuItem>
-        ))}
+        {docData &&
+          docData.length > 0 &&
+          docData.map((doc) => (
+            <MenuItem key={doc.docId} value={doc.docId}>
+              {doc.primaryDocument ? (
+                <span style={{ fontWeight: 600 }}>Main Document: </span>
+              ) : null}{' '}
+              <span> </span> {doc.docData.title || 'Untitled'}
+            </MenuItem>
+          ))}
       </Select>
     </FormControl>
   );

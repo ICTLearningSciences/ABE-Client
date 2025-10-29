@@ -193,7 +193,7 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
             <MenuItem
               key={studentStatus.studentId}
               value={studentStatus.studentId}
-              disabled
+              // disabled
               sx={{
                 opacity: 0.5,
               }}

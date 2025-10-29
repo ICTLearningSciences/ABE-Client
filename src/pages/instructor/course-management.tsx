@@ -132,19 +132,19 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       throw new Error('No student found.');
     }
     const docs = getStudentAssignmentDocs(targetStudent, assignmentId);
-    if (!docs.length) {
-      console.error('No documents found for student and assignment.');
-      return;
-    }
-    const primaryDoc = docs.find((d) => d.primaryDocument) || docs[0];
+    const primaryDoc =
+      docs.find((d) => d.primaryDocument) ||
+      (docs.length > 0 ? docs[0] : undefined);
 
     await viewAssignmentDocumentTimelines(
       targetStudent.userId,
       assignmentId,
-      primaryDoc.docId
+      primaryDoc?.docId
     );
     try {
-      await fetchDocumentTimeline(targetStudent.userId, primaryDoc.docId);
+      if (primaryDoc?.docId) {
+        await fetchDocumentTimeline(targetStudent.userId, primaryDoc.docId);
+      }
     } catch (error) {
       console.error('Failed to fetch document timeline:', error);
     }
@@ -432,8 +432,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
           {viewState.view === 'activity-document-timelines' &&
             viewState.selectedStudent &&
             viewState.selectedAssignment &&
-            viewState.selectedSectionId &&
-            viewState.selectedDocId && (
+            viewState.selectedSectionId && (
               <AssignmentDocumentTimelines
                 sectionId={viewState.selectedSectionId}
                 student={viewState.selectedStudent}
@@ -442,7 +441,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 documentStates={documentStates}
                 loadInProgress={loadInProgress}
                 errorMessage={errorMessage}
-                selectedDocId={viewState.selectedDocId}
+                selectedDocId={viewState.selectedDocId || ''}
                 getHydratedTimeline={getHydratedTimeline}
                 onBackToStudentInfo={() => {
                   goToPreviousView();

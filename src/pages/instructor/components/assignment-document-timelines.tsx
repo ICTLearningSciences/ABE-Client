@@ -29,6 +29,7 @@ import {
 } from '../../../helpers';
 import { RootState } from '../../../store/store';
 import { useAppSelector } from '../../../store/hooks';
+import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
 
 export interface TextDiffResult {
   diffContent: React.ReactNode[];
@@ -132,7 +133,9 @@ export const AssignmentDocumentTimelines: React.FC<
   isSidebarCollapsed,
 }) => {
   const documentIds = studentDocIds;
-  const currentDocState = documentStates[selectedDocId];
+  const currentDocState = selectedDocId
+    ? documentStates[selectedDocId]
+    : undefined;
   const [selectedTimelineIndex, setSelectedTimelineIndex] = useState(0);
   const allStudents = useAppSelector(
     (state: RootState) => state.educationManagement.students
@@ -146,12 +149,26 @@ export const AssignmentDocumentTimelines: React.FC<
     () => getStudentAssignmentDocs(student, assignment._id),
     [student, assignment._id]
   );
+  const { sections, assignments } = useWithEducationalManagement();
+  const section = sections.find((section) => section._id === sectionId);
+  const assignmentsInSection = useMemo(
+    () =>
+      section
+        ? assignments.filter((assignment) =>
+            section.assignments.some((sa) => sa.assignmentId === assignment._id)
+          )
+        : [],
+    [section, assignments]
+  );
   console.log(
     'studentAssignmentCompletionStatuses',
     studentAssignmentCompletionStatuses
   );
   const currentTimeline = useMemo(() => {
-    if (currentDocState?.status === LoadingStatusType.SUCCESS) {
+    if (
+      selectedDocId &&
+      currentDocState?.status === LoadingStatusType.SUCCESS
+    ) {
       return getHydratedTimeline(selectedDocId);
     }
     return undefined;
@@ -195,6 +212,8 @@ export const AssignmentDocumentTimelines: React.FC<
         }
         handleViewStudentTimelines={handleViewStudentTimelines}
         assignment={assignment}
+        assignments={assignmentsInSection}
+        onAssignmentChange={handleViewStudentTimelines}
         student={student}
         onBackToStudentInfo={onBackToStudentInfo}
         docData={studentAssignmentDocs}
@@ -214,7 +233,7 @@ export const AssignmentDocumentTimelines: React.FC<
         </Box>
       )}
 
-      {loadInProgress ? (
+      {loadInProgress && selectedDocId ? (
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <CircularProgress size={32} sx={{ mb: 2 }} />
           <Typography>Loading document timeline...</Typography>
@@ -222,8 +241,8 @@ export const AssignmentDocumentTimelines: React.FC<
       ) : !currentTimeline ? (
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <Typography color="text.secondary">
-            {documentIds.length === 0
-              ? 'No documents available'
+            {documentIds.length === 0 || !selectedDocId
+              ? 'Student has no documents for this assignment'
               : 'No timeline data available for this document'}
           </Typography>
         </Box>

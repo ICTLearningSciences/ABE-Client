@@ -9,6 +9,7 @@ import { Box, Typography, Button } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { DocumentSelector } from './document-selector';
 import { StudentSelector } from './student-selector';
+import { AssignmentSelector } from './assignment-selector';
 import {
   Assignment,
   RelevantGoogleDoc,
@@ -23,6 +24,8 @@ interface AssignmentHeaderProps {
   handleViewStudentTimelines: (studentId: string, assignmentId: string) => void;
   student: StudentData;
   assignment: Assignment;
+  assignments: Assignment[];
+  onAssignmentChange: (studentId: string, assignmentId: string) => void;
   onBackToStudentInfo?: () => void;
   docData?: RelevantGoogleDoc[];
   selectedDocId?: string;
@@ -34,6 +37,8 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
   handleViewStudentTimelines,
   student,
   assignment,
+  assignments,
+  onAssignmentChange,
   onBackToStudentInfo,
   docData,
   selectedDocId,
@@ -102,12 +107,21 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
           >
             Assignment:
           </Typography>
-          <Typography
-            data-cy="assignment-header-assignment-title"
-            sx={{ fontWeight: 400, color: 'black' }}
-          >
-            {assignmentTitle}
-          </Typography>
+          {assignments && assignments.length > 0 && onAssignmentChange ? (
+            <AssignmentSelector
+              assignments={assignments}
+              currentAssignmentId={assignment._id}
+              studentId={student.userId}
+              onAssignmentChange={onAssignmentChange}
+            />
+          ) : (
+            <Typography
+              data-cy="assignment-header-assignment-title"
+              sx={{ fontWeight: 400, color: 'black' }}
+            >
+              {assignmentTitle}
+            </Typography>
+          )}
         </RowDiv>
 
         <RowDiv
@@ -118,7 +132,7 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
             justifyContent: 'center',
           }}
         >
-          {docData && docData.length > 0 && onDocumentChange && (
+          {onDocumentChange && (
             <>
               <Typography
                 sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'right' }}
