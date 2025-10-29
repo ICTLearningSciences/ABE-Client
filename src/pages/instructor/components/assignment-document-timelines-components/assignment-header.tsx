@@ -17,10 +17,14 @@ import {
 } from '../../../../store/slices/education-management/types';
 import { RowDiv } from '../../../../styled-components';
 import { AssignmentGrader } from './assignment-grader';
-import { StudentAssignmentCompletionStatus } from '../../../../helpers';
+import {
+  StudentAssignmentCompletionStatus,
+  AssignmentCompletionStatusForStudent,
+} from '../../../../helpers';
 
 interface AssignmentHeaderProps {
   studentAssignmentCompletionStatuses: StudentAssignmentCompletionStatus[];
+  assignmentCompletionStatuses: AssignmentCompletionStatusForStudent[];
   handleViewStudentTimelines: (studentId: string, assignmentId: string) => void;
   student: StudentData;
   assignment: Assignment;
@@ -34,6 +38,7 @@ interface AssignmentHeaderProps {
 
 export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
   studentAssignmentCompletionStatuses,
+  assignmentCompletionStatuses,
   handleViewStudentTimelines,
   student,
   assignment,
@@ -109,7 +114,7 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
           </Typography>
           {assignments && assignments.length > 0 && onAssignmentChange ? (
             <AssignmentSelector
-              assignments={assignments}
+              assignmentStatuses={assignmentCompletionStatuses}
               currentAssignmentId={assignment._id}
               studentId={student.userId}
               onAssignmentChange={onAssignmentChange}

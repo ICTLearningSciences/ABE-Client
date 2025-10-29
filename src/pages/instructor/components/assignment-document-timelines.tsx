@@ -26,6 +26,7 @@ import {
 import {
   getStudentAssignmentDocs,
   getStudentsByAssignmentCompletionStatus,
+  getAssignmentsByStudentCompletionStatus,
 } from '../../../helpers';
 import { RootState } from '../../../store/store';
 import { useAppSelector } from '../../../store/hooks';
@@ -160,6 +161,11 @@ export const AssignmentDocumentTimelines: React.FC<
         : [],
     [section, assignments]
   );
+  const assignmentCompletionStatuses = useMemo(
+    () =>
+      getAssignmentsByStudentCompletionStatus(student, assignmentsInSection),
+    [student, assignmentsInSection]
+  );
   console.log(
     'studentAssignmentCompletionStatuses',
     studentAssignmentCompletionStatuses
@@ -210,6 +216,7 @@ export const AssignmentDocumentTimelines: React.FC<
         studentAssignmentCompletionStatuses={
           studentAssignmentCompletionStatuses
         }
+        assignmentCompletionStatuses={assignmentCompletionStatuses}
         handleViewStudentTimelines={handleViewStudentTimelines}
         assignment={assignment}
         assignments={assignmentsInSection}

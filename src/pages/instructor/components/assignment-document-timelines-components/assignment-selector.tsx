@@ -11,20 +11,26 @@ import {
   MenuItem,
   ListItemText,
   Typography,
+  ListSubheader,
+  Box,
 } from '@mui/material';
-import { Assignment } from '../../../../store/slices/education-management/types';
+import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import { useWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
 import { isStudentData } from '../../../../store/slices/education-management/types';
+import {
+  AssignmentCompletionStatusForStudent,
+  AssignmentCompletionStatus,
+} from '../../../../helpers';
 
 interface AssignmentSelectorProps {
-  assignments: Assignment[];
+  assignmentStatuses: AssignmentCompletionStatusForStudent[];
   currentAssignmentId: string;
   studentId: string;
   onAssignmentChange: (studentId: string, assignmentId: string) => void;
 }
 
 export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
-  assignments,
+  assignmentStatuses,
   currentAssignmentId,
   studentId,
   onAssignmentChange,
@@ -32,8 +38,19 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
   const { myData } = useWithEducationalManagement();
   const isStudentViewer = myData && isStudentData(myData);
 
-  const currentAssignment = assignments.find(
-    (a) => a._id === currentAssignmentId
+  // Group assignments by completion status
+  const completedAssignments = assignmentStatuses.filter(
+    (a) => a.status === AssignmentCompletionStatus.ASSIGNMENT_COMPLETE
+  );
+  const incompleteAssignments = assignmentStatuses.filter(
+    (a) => a.status === AssignmentCompletionStatus.IN_PROGRESS
+  );
+  const notStartedAssignments = assignmentStatuses.filter(
+    (a) => a.status === AssignmentCompletionStatus.NOT_STARTED
+  );
+
+  const currentAssignment = assignmentStatuses.find(
+    (a) => a.assignmentId === currentAssignmentId
   );
 
   return (
@@ -50,7 +67,7 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
     >
       {isStudentViewer ? (
         <Typography data-cy="assignment-header-assignment-title">
-          {currentAssignment?.title || ''}
+          {currentAssignment?.assignmentTitle || ''}
         </Typography>
       ) : (
         <Select
@@ -73,31 +90,127 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
             padding: 0,
           }}
         >
-          {assignments.map((assignment) => (
+          {/* Completed Assignments */}
+          {completedAssignments.length > 0 && (
+            <ListSubheader sx={{ fontWeight: 600, color: '#1976d2' }}>
+              Completed
+            </ListSubheader>
+          )}
+          {completedAssignments.map((assignmentStatus) => (
             <MenuItem
-              key={assignment._id}
-              value={assignment._id}
+              key={assignmentStatus.assignmentId}
+              value={assignmentStatus.assignmentId}
               sx={{
-                fontWeight: assignment._id === currentAssignmentId ? 600 : 400,
+                fontWeight:
+                  assignmentStatus.assignmentId === currentAssignmentId
+                    ? 600
+                    : 400,
                 backgroundColor:
-                  assignment._id === currentAssignmentId
+                  assignmentStatus.assignmentId === currentAssignmentId
                     ? 'rgba(25, 118, 210, 0.08)'
                     : 'transparent',
                 '&:hover': {
                   backgroundColor:
-                    assignment._id === currentAssignmentId
+                    assignmentStatus.assignmentId === currentAssignmentId
                       ? 'rgba(25, 118, 210, 0.12)'
                       : undefined,
                 },
               }}
             >
-              <ListItemText
-                primary={assignment.title}
-                primaryTypographyProps={{
-                  fontWeight:
-                    assignment._id === currentAssignmentId ? 600 : 400,
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  width: '100%',
                 }}
-              />
+              >
+                <ListItemText
+                  primary={assignmentStatus.assignmentTitle}
+                  primaryTypographyProps={{
+                    fontWeight:
+                      assignmentStatus.assignmentId === currentAssignmentId
+                        ? 600
+                        : 400,
+                  }}
+                />
+                {assignmentStatus.isGraded && (
+                  <CheckCircleIcon
+                    sx={{ color: '#4caf50', fontSize: '1.2rem' }}
+                  />
+                )}
+              </Box>
+            </MenuItem>
+          ))}
+
+          {/* Incomplete Assignments */}
+          {incompleteAssignments.length > 0 && (
+            <ListSubheader sx={{ fontWeight: 600, color: '#1976d2' }}>
+              Incomplete
+            </ListSubheader>
+          )}
+          {incompleteAssignments.map((assignmentStatus) => (
+            <MenuItem
+              key={assignmentStatus.assignmentId}
+              value={assignmentStatus.assignmentId}
+              sx={{
+                fontWeight:
+                  assignmentStatus.assignmentId === currentAssignmentId
+                    ? 600
+                    : 400,
+                backgroundColor:
+                  assignmentStatus.assignmentId === currentAssignmentId
+                    ? 'rgba(25, 118, 210, 0.08)'
+                    : 'transparent',
+                '&:hover': {
+                  backgroundColor:
+                    assignmentStatus.assignmentId === currentAssignmentId
+                      ? 'rgba(25, 118, 210, 0.12)'
+                      : undefined,
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  width: '100%',
+                }}
+              >
+                <ListItemText
+                  primary={assignmentStatus.assignmentTitle}
+                  primaryTypographyProps={{
+                    fontWeight:
+                      assignmentStatus.assignmentId === currentAssignmentId
+                        ? 600
+                        : 400,
+                  }}
+                />
+                {assignmentStatus.isGraded && (
+                  <CheckCircleIcon
+                    sx={{ color: '#4caf50', fontSize: '1.2rem' }}
+                  />
+                )}
+              </Box>
+            </MenuItem>
+          ))}
+
+          {/* Not Started Assignments */}
+          {notStartedAssignments.length > 0 && (
+            <ListSubheader sx={{ fontWeight: 600, color: '#1976d2' }}>
+              Not Started
+            </ListSubheader>
+          )}
+          {notStartedAssignments.map((assignmentStatus) => (
+            <MenuItem
+              key={assignmentStatus.assignmentId}
+              value={assignmentStatus.assignmentId}
+              sx={{
+                opacity: 0.5,
+              }}
+            >
+              <ListItemText primary={assignmentStatus.assignmentTitle} />
             </MenuItem>
           ))}
         </Select>

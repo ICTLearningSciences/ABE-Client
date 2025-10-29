@@ -12,9 +12,7 @@ import {
   ListSubheader,
   ListItemText,
   Typography,
-  Box,
 } from '@mui/material';
-import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import {
   StudentAssignmentCompletionStatus,
   AssignmentCompletionStatus,
@@ -110,27 +108,13 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
                 },
               }}
             >
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  width: '100%',
+              <ListItemText
+                primary={studentStatus.studentName}
+                primaryTypographyProps={{
+                  fontWeight:
+                    studentStatus.studentId === currentStudentId ? 600 : 400,
                 }}
-              >
-                <ListItemText
-                  primary={studentStatus.studentName}
-                  primaryTypographyProps={{
-                    fontWeight:
-                      studentStatus.studentId === currentStudentId ? 600 : 400,
-                  }}
-                />
-                {studentStatus.isGraded && (
-                  <CheckCircleIcon
-                    sx={{ color: '#4caf50', fontSize: '1.2rem' }}
-                  />
-                )}
-              </Box>
+              />
             </MenuItem>
           ))}
 
@@ -159,27 +143,13 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
                 },
               }}
             >
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  width: '100%',
+              <ListItemText
+                primary={studentStatus.studentName}
+                primaryTypographyProps={{
+                  fontWeight:
+                    studentStatus.studentId === currentStudentId ? 600 : 400,
                 }}
-              >
-                <ListItemText
-                  primary={studentStatus.studentName}
-                  primaryTypographyProps={{
-                    fontWeight:
-                      studentStatus.studentId === currentStudentId ? 600 : 400,
-                  }}
-                />
-                {studentStatus.isGraded && (
-                  <CheckCircleIcon
-                    sx={{ color: '#4caf50', fontSize: '1.2rem' }}
-                  />
-                )}
-              </Box>
+              />
             </MenuItem>
           ))}
 
