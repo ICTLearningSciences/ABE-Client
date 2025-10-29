@@ -126,6 +126,7 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
                 }}
               >
                 <ListItemText
+                  data-cy="assignment-header-assignment-title"
                   primary={assignmentStatus.assignmentTitle}
                   primaryTypographyProps={{
                     fontWeight:
