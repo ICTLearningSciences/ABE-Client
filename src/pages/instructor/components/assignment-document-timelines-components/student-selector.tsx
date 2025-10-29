@@ -9,14 +9,10 @@ import {
   FormControl,
   Select,
   MenuItem,
-  ListSubheader,
   ListItemText,
   Typography,
 } from '@mui/material';
-import {
-  StudentAssignmentCompletionStatus,
-  AssignmentCompletionStatus,
-} from '../../../../helpers';
+import { StudentAssignmentCompletionStatus } from '../../../../helpers';
 import { useWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
 import { isStudentData } from '../../../../store/slices/education-management/types';
 
@@ -35,16 +31,6 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
 }) => {
   const { myData } = useWithEducationalManagement();
   const isStudentViewer = myData && isStudentData(myData);
-  // Group students by completion status
-  const completedStudents = studentStatuses.filter(
-    (s) => s.status === AssignmentCompletionStatus.ASSIGNMENT_COMPLETE
-  );
-  const incompleteStudents = studentStatuses.filter(
-    (s) => s.status === AssignmentCompletionStatus.IN_PROGRESS
-  );
-  const notStartedStudents = studentStatuses.filter(
-    (s) => s.status === AssignmentCompletionStatus.NOT_STARTED
-  );
 
   return (
     <FormControl
@@ -83,13 +69,7 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
             padding: 0,
           }}
         >
-          {/* Completed Students */}
-          {completedStudents.length > 0 && (
-            <ListSubheader sx={{ fontWeight: 600, color: '#1976d2' }}>
-              Completed
-            </ListSubheader>
-          )}
-          {completedStudents.map((studentStatus) => (
+          {studentStatuses.map((studentStatus) => (
             <MenuItem
               key={studentStatus.studentId}
               value={studentStatus.studentId}
@@ -115,60 +95,6 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
                     studentStatus.studentId === currentStudentId ? 600 : 400,
                 }}
               />
-            </MenuItem>
-          ))}
-
-          {/* Incomplete Students */}
-          {incompleteStudents.length > 0 && (
-            <ListSubheader sx={{ fontWeight: 600, color: '#1976d2' }}>
-              Incomplete
-            </ListSubheader>
-          )}
-          {incompleteStudents.map((studentStatus) => (
-            <MenuItem
-              key={studentStatus.studentId}
-              value={studentStatus.studentId}
-              sx={{
-                fontWeight:
-                  studentStatus.studentId === currentStudentId ? 600 : 400,
-                backgroundColor:
-                  studentStatus.studentId === currentStudentId
-                    ? 'rgba(25, 118, 210, 0.08)'
-                    : 'transparent',
-                '&:hover': {
-                  backgroundColor:
-                    studentStatus.studentId === currentStudentId
-                      ? 'rgba(25, 118, 210, 0.12)'
-                      : undefined,
-                },
-              }}
-            >
-              <ListItemText
-                primary={studentStatus.studentName}
-                primaryTypographyProps={{
-                  fontWeight:
-                    studentStatus.studentId === currentStudentId ? 600 : 400,
-                }}
-              />
-            </MenuItem>
-          ))}
-
-          {/* Not Started Students (Disabled) */}
-          {notStartedStudents.length > 0 && (
-            <ListSubheader sx={{ fontWeight: 600, color: '#1976d2' }}>
-              Not Started
-            </ListSubheader>
-          )}
-          {notStartedStudents.map((studentStatus) => (
-            <MenuItem
-              key={studentStatus.studentId}
-              value={studentStatus.studentId}
-              // disabled
-              sx={{
-                opacity: 0.5,
-              }}
-            >
-              <ListItemText primary={studentStatus.studentName} />
             </MenuItem>
           ))}
         </Select>
