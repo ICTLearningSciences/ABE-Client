@@ -12,6 +12,9 @@ import { useEffect, useState } from 'react';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import { StyledFadingText } from './message-styles';
 import ReactMarkdown from 'react-markdown';
+import './message.css';
+import remarkBreaks from 'remark-breaks';
+import rehypeRaw from 'rehype-raw';
 
 const baseMessageStyle: React.CSSProperties = {
   borderRadius: '1rem',
@@ -111,7 +114,14 @@ export default function Message(props: {
   }
 
   function formatMessage(message: string) {
-    return message.replace(/\n/g, '\n&nbsp;\n');
+    // Preserve multiple blank lines by converting extra newlines to <br /> tags
+    // \n\n = paragraph break (standard markdown, 1 blank line)
+    // \n\n\n = paragraph break + 1 <br /> (2 blank lines)
+    // \n\n\n\n = paragraph break + 2 <br /> (3 blank lines), etc.
+    return message.replace(/\n{3,}/g, (match) => {
+      const extraNewlines = match.length - 2;
+      return '\n\n' + '<br />'.repeat(extraNewlines);
+    });
   }
 
   return (
@@ -124,9 +134,12 @@ export default function Message(props: {
         backgroundColor: backgroundColor,
         color: textColor,
       }}
+      className="markdown"
     >
       {displayMarkdown && (
         <ReactMarkdown
+          remarkPlugins={[remarkBreaks]}
+          rehypePlugins={[rehypeRaw]}
           components={{
             h1: ({ children }) => (
               <h1
@@ -170,7 +183,7 @@ export default function Message(props: {
           }}
         >
           {message.displayType === MessageDisplayType.TEXT
-            ? formatMessage(message.message)
+            ? formatMessage(message.message).trim()
             : ''}
         </ReactMarkdown>
       )}
