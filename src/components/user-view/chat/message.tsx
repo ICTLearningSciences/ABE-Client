@@ -110,6 +110,10 @@ export default function Message(props: {
     return <></>;
   }
 
+  function formatMessage(message: string) {
+    return message.replace(/\n/g, '\n&nbsp;\n');
+  }
+
   return (
     <div
       id={message.id}
@@ -122,9 +126,51 @@ export default function Message(props: {
       }}
     >
       {displayMarkdown && (
-        <ReactMarkdown>
+        <ReactMarkdown
+          components={{
+            h1: ({ children }) => (
+              <h1
+                style={{ marginTop: '0', marginBottom: '0', lineHeight: '1' }}
+              >
+                {children}
+              </h1>
+            ),
+            h2: ({ children }) => (
+              <h2 style={{ marginTop: '0', marginBottom: '0' }}>{children}</h2>
+            ),
+            h3: ({ children }) => (
+              <h3 style={{ marginTop: '0', marginBottom: '0' }}>{children}</h3>
+            ),
+            h4: ({ children }) => (
+              <h4 style={{ marginTop: '0', marginBottom: '0' }}>{children}</h4>
+            ),
+            h5: ({ children }) => (
+              <h5 style={{ marginTop: '0', marginBottom: '0' }}>{children}</h5>
+            ),
+            h6: ({ children }) => (
+              <h6 style={{ marginTop: '0', marginBottom: '0' }}>{children}</h6>
+            ),
+            p: ({ children }) => (
+              <p style={{ marginTop: '0', marginBottom: '0' }}>{children}</p>
+            ),
+            ul: ({ children }) => (
+              <ul
+                style={{ marginTop: '0', marginBottom: '0', lineHeight: '1' }}
+              >
+                {children}
+              </ul>
+            ),
+            ol: ({ children }) => (
+              <ol
+                style={{ marginTop: '0', marginBottom: '0', lineHeight: '1' }}
+              >
+                {children}
+              </ol>
+            ),
+          }}
+        >
           {message.displayType === MessageDisplayType.TEXT
-            ? message.message
+            ? formatMessage(message.message)
             : ''}
         </ReactMarkdown>
       )}
