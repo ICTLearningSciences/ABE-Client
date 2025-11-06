@@ -164,18 +164,42 @@ export default function Message(props: {
               <h6 style={{ marginTop: '0', marginBottom: '0' }}>{children}</h6>
             ),
             p: ({ children }) => (
-              <p style={{ marginTop: '0', marginBottom: '0' }}>{children}</p>
+              <p style={{ marginTop: '0', marginBottom: '0', lineHeight: '1' }}>
+                {children}
+              </p>
+            ),
+            li: ({ children }) => (
+              <li
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  marginTop: '0',
+                  marginBottom: '0',
+                }}
+              >
+                {children}
+              </li>
             ),
             ul: ({ children }) => (
               <ul
-                style={{ marginTop: '0', marginBottom: '0', lineHeight: '1' }}
+                style={{
+                  marginTop: '0',
+                  marginBottom: '0',
+                  lineHeight: '1',
+                  paddingLeft: '10px',
+                }}
               >
                 {children}
               </ul>
             ),
             ol: ({ children }) => (
               <ol
-                style={{ marginTop: '0', marginBottom: '0', lineHeight: '1' }}
+                style={{
+                  marginTop: '0',
+                  marginBottom: '0',
+                  lineHeight: '1',
+                  paddingLeft: '10px',
+                }}
               >
                 {children}
               </ol>

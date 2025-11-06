@@ -4,4 +4,26 @@
 
 .line-break {
     white-space: pre-wrap;
-  }
+}
+
+.markdown ol {
+    counter-reset: list-counter;
+    list-style-type: none;
+}
+
+.markdown ol li::before {
+    counter-increment: list-counter;
+    content: counter(list-counter) ".";
+    margin-right: 0.5em;
+    flex-shrink: 0;
+}
+
+.markdown ul {
+    list-style-type: none;
+}
+
+.markdown ul li::before {
+    content: "•";
+    margin-right: 0.5em;
+    flex-shrink: 0;
+}
