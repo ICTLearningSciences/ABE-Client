@@ -27,6 +27,8 @@ export function ChatMessagesContainer(props: {
   } = props;
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
+  const [lastScrolledElementId, setLastScrolledElementId] =
+    useState<string>('');
   const { state } = useWithChat();
   const messages = state.chatLogs[curDocId] || [];
   const chatMessages: ChatMessageTypes[] = [
@@ -53,13 +55,17 @@ export function ChatMessagesContainer(props: {
   }
 
   function scrollToMostRecentAiResponse() {
-    const mostRecentAiResponse = getMostRecentAiResponse(chatMessages);
-    if (mostRecentAiResponse) {
+    const mostRecentAiResponse = getMostRecentSystemResponse(chatMessages);
+    if (
+      mostRecentAiResponse &&
+      mostRecentAiResponse.id !== lastScrolledElementId
+    ) {
+      setLastScrolledElementId(mostRecentAiResponse.id);
       scrollToElementById(mostRecentAiResponse.id);
     }
   }
 
-  function getMostRecentAiResponse(
+  function getMostRecentSystemResponse(
     messages: ChatMessageTypes[]
   ): ChatMessageTypes | undefined {
     // first, find the most recent user message, then find the most recent system message after that
@@ -143,7 +149,12 @@ export function ChatMessagesContainer(props: {
       }
     );
     setMessageElements(_newMessageElements);
-  }, [chatMessages.length, mostRecentChatId, displayMarkdown]);
+  }, [
+    chatMessages.length,
+    mostRecentChatId,
+    displayMarkdown,
+    state.lastUpdatedTimestamp,
+  ]);
 
   return (
     <div

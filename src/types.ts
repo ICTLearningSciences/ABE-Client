@@ -215,6 +215,7 @@ export interface AiPromptStep {
   responseFormat?: string;
   webSearch?: boolean;
   editDoc?: boolean;
+  streaming?: boolean;
 }
 
 export enum PromptOutputTypes {

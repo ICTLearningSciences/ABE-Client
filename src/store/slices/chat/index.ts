@@ -60,12 +60,14 @@ export type GoogleDocId = string;
 
 export interface ChatState {
   chatLogs: Record<GoogleDocId, ChatLog>;
+  lastUpdatedTimestamp: string;
   coachResponsePending: boolean;
   systemRole: string;
 }
 
 const initialState: ChatState = {
   chatLogs: {},
+  lastUpdatedTimestamp: new Date().toISOString(),
   coachResponsePending: false,
   systemRole: '',
 };
@@ -100,19 +102,38 @@ export const chatSlice = createSlice({
 
       if (!message) return;
       const messages = state.chatLogs[docId] || [];
-      const mostRecentMessage = state.chatLogs[docId]?.slice(-1)[0];
-      // TODO FIX: This is a hack to prevent duplicate messages from being added to the chat log
-      if (
-        messages.length <= 3 &&
-        message.sender === Sender.SYSTEM &&
-        mostRecentMessage?.message === message.message
-      ) {
-        return;
+
+      // Check if message with this ID already exists
+      const existingMessageIndex = messages.findIndex(
+        (msg) => msg.id === message.id
+      );
+
+      if (existingMessageIndex !== -1) {
+        // Update existing message
+        const updatedMessages = [...messages];
+        updatedMessages[existingMessageIndex] = message;
+        state.chatLogs = {
+          ...state.chatLogs,
+          [docId]: updatedMessages,
+        };
+        state.lastUpdatedTimestamp = new Date().toISOString();
+      } else {
+        // Add new message
+        const mostRecentMessage = state.chatLogs[docId]?.slice(-1)[0];
+        // TODO FIX: This is a hack to prevent duplicate messages from being added to the chat log
+        if (
+          messages.length <= 3 &&
+          message.sender === Sender.SYSTEM &&
+          mostRecentMessage?.message === message.message
+        ) {
+          return;
+        }
+        state.chatLogs = {
+          ...state.chatLogs,
+          [docId]: [...messages, message],
+        };
+        state.lastUpdatedTimestamp = new Date().toISOString();
       }
-      state.chatLogs = {
-        ...state.chatLogs,
-        [docId]: [...(state.chatLogs[docId] || []), message],
-      };
     },
     addMessages: (
       state: ChatState,
@@ -133,6 +154,7 @@ export const chatSlice = createSlice({
         ...state.chatLogs,
         [docId]: [...(state.chatLogs[docId] || []), ...messages],
       };
+      state.lastUpdatedTimestamp = new Date().toISOString();
     },
     clearChat: (state: ChatState, action: PayloadAction<string>) => {
       const docId = action.payload;
@@ -140,6 +162,7 @@ export const chatSlice = createSlice({
         ...state.chatLogs,
         [docId]: [],
       };
+      state.lastUpdatedTimestamp = new Date().toISOString();
     },
     setCoachResponsePending: (
       state: ChatState,

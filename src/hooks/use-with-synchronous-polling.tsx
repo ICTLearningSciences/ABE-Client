@@ -17,7 +17,8 @@ export async function asyncPromptExecute(
   aiPromptSteps: AiPromptStep[],
   userId: string,
   docService: DocService,
-  cancelToken?: CancelToken
+  cancelToken?: CancelToken,
+  onPartialAnswer?: (partialAnswer: string) => void
 ): Promise<AiServicesResponseTypes> {
   const openAiJobId = await asyncOpenAiRequest(
     googleDocId,
@@ -38,7 +39,14 @@ export async function asyncPromptExecute(
       return res.jobStatus === JobStatus.COMPLETE;
     },
     1000,
-    180 * 1000
+    180 * 1000,
+    onPartialAnswer
+      ? (data: AiServicesJobStatusResponseTypes) => {
+          if (data.answer) {
+            onPartialAnswer(data.answer);
+          }
+        }
+      : undefined
   );
   return res.aiServiceResponse;
 }
@@ -47,7 +55,8 @@ export function pollUntilTrue<T>(
   pollFunction: () => Promise<T>,
   endPollCondition: (res: T) => boolean,
   interval: number,
-  timeout = 0
+  timeout = 0,
+  onPartialData?: (data: T) => void
 ) {
   const startTime = Date.now();
 
@@ -55,6 +64,11 @@ export function pollUntilTrue<T>(
     const data: T = await pollFunction();
     if (endPollCondition(data)) {
       return data;
+    }
+
+    // Call the partial data callback if provided
+    if (onPartialData) {
+      onPartialData(data);
     }
 
     if (timeout && Date.now() - startTime > timeout) {
