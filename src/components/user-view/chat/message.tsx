@@ -8,7 +8,7 @@ import {
 } from '../../../store/slices/chat';
 import { useAppSelector } from '../../../store/hooks';
 import { UserRole } from '../../../store/slices/login';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import { StyledFadingText } from './message-styles';
 import ReactMarkdown from 'react-markdown';
@@ -95,10 +95,46 @@ export default function Message(props: {
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
   messageIndex: number;
   displayMarkdown: boolean;
+  onStreamingStateChange?: (isStreaming: boolean, messageId: string) => void;
 }): JSX.Element {
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
-  const { message, setAiInfoToDisplay, messageIndex, displayMarkdown } = props;
+  const {
+    message,
+    setAiInfoToDisplay,
+    messageIndex,
+    displayMarkdown,
+    onStreamingStateChange,
+  } = props;
+
+  // Typewriter effect state
+  const [displayedText, setDisplayedText] = useState('');
+  const [isCurrentlyStreaming, setIsCurrentlyStreaming] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const displayedTextRef = useRef(''); // Track actual displayed text length synchronously
+  const hasStartedStreamingRef = useRef(false); // Track if streaming has started
+
+  // Skip button logic
+  const handleSkip = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+
+      // Immediately show full message
+      const fullMessage = message.message || '';
+      setDisplayedText(fullMessage);
+      displayedTextRef.current = fullMessage;
+      setIsCurrentlyStreaming(false);
+
+      // Notify parent that streaming has stopped
+      if (onStreamingStateChange) {
+        onStreamingStateChange(false, message.id);
+      }
+    }
+  };
+
+  const showSkipButton = isCurrentlyStreaming && message.aiServiceStepData;
+
   const backgroundColor =
     message.sender === Sender.USER
       ? colorTheme.chatUserBubbleColor
@@ -108,6 +144,112 @@ export default function Message(props: {
     message.sender === Sender.USER
       ? colorTheme.chatUserTextColor
       : colorTheme.chatSystemTextColor;
+
+  // Typewriter effect logic
+  useEffect(() => {
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    // If message is from a user or is empty, show it instantly
+    if (message.sender === Sender.USER || !message.message) {
+      const text = message.message || '';
+      setDisplayedText(text);
+      displayedTextRef.current = text;
+      return;
+    }
+
+    // If message has aiServiceStepData and hasn't started streaming, show instantly (from history)
+    if (message.aiServiceStepData && !hasStartedStreamingRef.current) {
+      const text = message.message || '';
+      setDisplayedText(text);
+      displayedTextRef.current = text;
+      return;
+    }
+
+    // Mark as streaming if we're here
+    if (!hasStartedStreamingRef.current) {
+      hasStartedStreamingRef.current = true;
+      // Reset displayedText when streaming starts
+      setDisplayedText('');
+      displayedTextRef.current = '';
+    }
+
+    // Start typewriter animation
+    const targetText = message.message || '';
+    const currentDisplayed = displayedTextRef.current;
+    const currentLength = currentDisplayed.length; // Use ref for accurate current length
+
+    // Check if current displayed text is actually a prefix of the target text
+    // If not, the message content has changed completely (not just appended), so reset
+    if (currentLength > 0 && !targetText.startsWith(currentDisplayed)) {
+      setDisplayedText('');
+      displayedTextRef.current = '';
+      // Don't return here - continue to start animating the new content
+    }
+
+    // If target text is shorter or equal to current, just set it (shouldn't happen but safety check)
+    if (targetText.length <= displayedTextRef.current.length) {
+      setDisplayedText(targetText);
+      displayedTextRef.current = targetText;
+      return;
+    }
+
+    // Get the new portion that needs to be revealed
+    const newPortion = targetText.slice(displayedTextRef.current.length);
+    const words = newPortion.split(/(\s+)/).filter((word) => word.length > 0); // Split by whitespace, keeping the spaces, filter empty strings
+    let wordIndex = 0;
+
+    // Notify parent that streaming has started
+    setIsCurrentlyStreaming(true);
+    if (onStreamingStateChange) {
+      onStreamingStateChange(true, message.id);
+    }
+
+    intervalRef.current = setInterval(() => {
+      if (wordIndex < words.length) {
+        const wordToAdd = words[wordIndex];
+        setDisplayedText((prev) => {
+          const newText = prev + wordToAdd;
+          displayedTextRef.current = newText; // Update ref synchronously
+          return newText;
+        });
+        wordIndex++;
+      } else {
+        // Animation complete
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        setIsCurrentlyStreaming(false);
+        // Notify parent that streaming has stopped
+        if (onStreamingStateChange) {
+          onStreamingStateChange(false, message.id);
+        }
+      }
+    }, 25);
+
+    // Cleanup function
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+        setIsCurrentlyStreaming(false);
+        // Notify parent that streaming has stopped on cleanup
+        if (onStreamingStateChange) {
+          onStreamingStateChange(false, message.id);
+        }
+      }
+    };
+  }, [
+    message.message,
+    message.sender,
+    message.aiServiceStepData,
+    onStreamingStateChange,
+    message.id,
+  ]);
 
   if (message.message === '') {
     return <></>;
@@ -133,9 +275,29 @@ export default function Message(props: {
         alignSelf: alignSelf,
         backgroundColor: backgroundColor,
         color: textColor,
+        position: 'relative',
       }}
       className="markdown"
     >
+      {showSkipButton && (
+        <button
+          onClick={handleSkip}
+          style={{
+            position: 'absolute',
+            top: '-20px',
+            left: '0',
+            background: 'transparent',
+            border: 'none',
+            color: '#666',
+            fontSize: '12px',
+            cursor: 'pointer',
+            padding: '4px 8px',
+            textDecoration: 'underline',
+          }}
+        >
+          skip streaming?
+        </button>
+      )}
       {displayMarkdown && (
         <ReactMarkdown
           remarkPlugins={[remarkBreaks]}
@@ -207,15 +369,13 @@ export default function Message(props: {
           }}
         >
           {message.displayType === MessageDisplayType.TEXT
-            ? formatMessage(message.message).trim()
+            ? formatMessage(displayedText).trim()
             : ''}
         </ReactMarkdown>
       )}
       {!displayMarkdown && (
         <span>
-          {message.displayType === MessageDisplayType.TEXT
-            ? message.message
-            : ''}
+          {message.displayType === MessageDisplayType.TEXT ? displayedText : ''}
         </span>
       )}
       {message.displayType === MessageDisplayType.PENDING_MESSAGE && (

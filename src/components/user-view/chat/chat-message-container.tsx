@@ -17,6 +17,7 @@ export function ChatMessagesContainer(props: {
   setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
   sendMessage: (message: ChatMessageTypes) => void;
   displayMarkdown: boolean;
+  onStreamingStateChange?: (isStreaming: boolean) => void;
 }): JSX.Element {
   const {
     coachResponsePending,
@@ -24,14 +25,18 @@ export function ChatMessagesContainer(props: {
     setAiInfoToDisplay,
     sendMessage,
     displayMarkdown,
+    onStreamingStateChange: parentOnStreamingStateChange,
   } = props;
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
   const [lastScrolledElementId, setLastScrolledElementId] =
     useState<string>('');
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
+    null
+  );
   const { state } = useWithChat();
   const messages = state.chatLogs[curDocId] || [];
-  const chatMessages: ChatMessageTypes[] = [
+  const allMessages: ChatMessageTypes[] = [
     ...messages,
     ...(coachResponsePending
       ? [
@@ -44,6 +49,34 @@ export function ChatMessagesContainer(props: {
         ]
       : []),
   ];
+
+  // Callback for when streaming state changes
+  const handleStreamingStateChange = (
+    isStreaming: boolean,
+    messageId: string
+  ) => {
+    if (isStreaming) {
+      setStreamingMessageId(messageId);
+      // Notify parent
+      if (parentOnStreamingStateChange) {
+        parentOnStreamingStateChange(true);
+      }
+    } else {
+      setStreamingMessageId(null);
+      // Notify parent
+      if (parentOnStreamingStateChange) {
+        parentOnStreamingStateChange(false);
+      }
+    }
+  };
+
+  // Filter messages: if streaming, only show messages up to and including the streaming message
+  const chatMessages: ChatMessageTypes[] = streamingMessageId
+    ? allMessages.slice(
+        0,
+        allMessages.findIndex((m) => m.id === streamingMessageId) + 1
+      )
+    : allMessages;
   const mostRecentChatId =
     chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].id : '';
 
@@ -103,6 +136,7 @@ export function ChatMessagesContainer(props: {
               setAiInfoToDisplay={setAiInfoToDisplay}
               messageIndex={index}
               displayMarkdown={displayMarkdown}
+              onStreamingStateChange={handleStreamingStateChange}
             />
             {message.mcqChoices && index === chatMessages.length - 1 && (
               <div
