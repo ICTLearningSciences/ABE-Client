@@ -542,6 +542,7 @@ describe('Course Management', () => {
       
       cy.get('[data-cy=doc-list-item-Aliens]').click();
 
+      cy.get("[data-cy=send-input-button]").should("be.enabled")
       cy.get("[data-cy=chat-input]").type("What is the capital of France?");
       cy.get("[data-cy=chat-input]").type("{enter}");
 
@@ -606,7 +607,7 @@ describe('Course Management', () => {
       cy.get('[data-cy=activity-item-my-editable-activity]').click();
       
       cy.get('[data-cy=doc-list-item-Aliens]').click();
-
+      cy.get("[data-cy=send-input-button]").should("be.enabled")
       cy.get("[data-cy=chat-input]").type("What is the capital of France?");
       cy.get("[data-cy=chat-input]").type("{enter}");
 

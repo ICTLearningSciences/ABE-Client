@@ -114,10 +114,13 @@ export default function Message(props: {
   const displayedTextRef = useRef(''); // Track actual displayed text length synchronously
   const hasStartedStreamingRef = useRef(false); // Track if streaming has started
 
-  // Skip button logic
-  const handleSkip = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+  // Auto-skip when full message is available
+  useEffect(() => {
+    if (message.aiServiceStepData && isCurrentlyStreaming) {
+      // Full message is available - skip animation and show immediately
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
       intervalRef.current = null;
 
       // Immediately show full message
@@ -131,9 +134,13 @@ export default function Message(props: {
         onStreamingStateChange(false, message.id);
       }
     }
-  };
-
-  const showSkipButton = isCurrentlyStreaming && message.aiServiceStepData;
+  }, [
+    message.aiServiceStepData,
+    isCurrentlyStreaming,
+    message.message,
+    message.id,
+    onStreamingStateChange,
+  ]);
 
   const backgroundColor =
     message.sender === Sender.USER
@@ -275,29 +282,9 @@ export default function Message(props: {
         alignSelf: alignSelf,
         backgroundColor: backgroundColor,
         color: textColor,
-        position: 'relative',
       }}
       className="markdown"
     >
-      {showSkipButton && (
-        <button
-          onClick={handleSkip}
-          style={{
-            position: 'absolute',
-            top: '-20px',
-            left: '0',
-            background: 'transparent',
-            border: 'none',
-            color: '#666',
-            fontSize: '12px',
-            cursor: 'pointer',
-            padding: '4px 8px',
-            textDecoration: 'underline',
-          }}
-        >
-          skip streaming?
-        </button>
-      )}
       {displayMarkdown && (
         <ReactMarkdown
           remarkPlugins={[remarkBreaks]}
