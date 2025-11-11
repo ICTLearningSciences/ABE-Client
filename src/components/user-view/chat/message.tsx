@@ -168,6 +168,14 @@ export default function Message(props: {
       return;
     }
 
+    // Only stream prompt responses - show other messages instantly
+    if (!message.isPromptResponse) {
+      const text = message.message || '';
+      setDisplayedText(text);
+      displayedTextRef.current = text;
+      return;
+    }
+
     // If message has aiServiceStepData and hasn't started streaming, show instantly (from history)
     if (message.aiServiceStepData && !hasStartedStreamingRef.current) {
       const text = message.message || '';

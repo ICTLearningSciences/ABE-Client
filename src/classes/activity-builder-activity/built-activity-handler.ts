@@ -614,6 +614,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
                 message: partialAnswer,
                 sender: Sender.SYSTEM,
                 displayType: MessageDisplayType.TEXT,
+                isPromptResponse: true,
               });
             }
           : undefined
@@ -639,6 +640,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           aiServiceStepData: _response.aiAllStepsData,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
+          isPromptResponse: true,
         });
       }
     };
