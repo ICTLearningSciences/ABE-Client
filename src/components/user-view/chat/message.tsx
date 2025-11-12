@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { Button } from '@mui/material';
 import { DEFAULT_COLOR_THEME } from '../../../constants';
 import {
@@ -95,7 +95,8 @@ export default function Message(props: {
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
   messageIndex: number;
   displayMarkdown: boolean;
-  onStreamingStateChange?: (isStreaming: boolean, messageId: string) => void;
+  onStreamingStateChange?: (isStreaming: boolean, message: ChatMessageTypes) => void;
+  onResize?: (messageId: string) => void;
 }): JSX.Element {
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
@@ -105,6 +106,7 @@ export default function Message(props: {
     messageIndex,
     displayMarkdown,
     onStreamingStateChange,
+    onResize,
   } = props;
 
   // Typewriter effect state
@@ -113,6 +115,23 @@ export default function Message(props: {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const displayedTextRef = useRef(''); // Track actual displayed text length synchronously
   const hasStartedStreamingRef = useRef(false); // Track if streaming has started
+  const messageElementRef = useRef<HTMLDivElement | null>(null);
+
+  // ResizeObserver to track size changes while streaming
+  useLayoutEffect(() => {
+    const element = messageElementRef.current;
+    if (!element || !onResize) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+        onResize(message.id);
+    });
+
+    resizeObserver.observe(element);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isCurrentlyStreaming, onResize, message.id]);
 
   // Auto-skip when full message is available
   useEffect(() => {
@@ -131,14 +150,13 @@ export default function Message(props: {
 
       // Notify parent that streaming has stopped
       if (onStreamingStateChange) {
-        onStreamingStateChange(false, message.id);
+        onStreamingStateChange(false, message);
       }
     }
   }, [
     message.aiServiceStepData,
     isCurrentlyStreaming,
     message.message,
-    message.id,
     onStreamingStateChange,
   ]);
 
@@ -160,68 +178,40 @@ export default function Message(props: {
       intervalRef.current = null;
     }
 
-    // If message is from a user or is empty, show it instantly
-    if (message.sender === Sender.USER || !message.message) {
+    // show message instantly
+    if (
+      message.sender === Sender.USER || //If message is from a user
+      !message.message || //If message is empty
+      !message.isPromptResponse || //If message is not a prompt response
+      (message.aiServiceStepData && !hasStartedStreamingRef.current) //If message has aiServiceStepData and hasn't started streaming, show instantly (from history)
+    ) {
       const text = message.message || '';
       setDisplayedText(text);
       displayedTextRef.current = text;
       return;
     }
 
-    // Only stream prompt responses - show other messages instantly
-    if (!message.isPromptResponse) {
-      const text = message.message || '';
-      setDisplayedText(text);
-      displayedTextRef.current = text;
-      return;
-    }
-
-    // If message has aiServiceStepData and hasn't started streaming, show instantly (from history)
-    if (message.aiServiceStepData && !hasStartedStreamingRef.current) {
-      const text = message.message || '';
-      setDisplayedText(text);
-      displayedTextRef.current = text;
-      return;
-    }
-
-    // Mark as streaming if we're here
+    // If we're here, streaming is starting.
     if (!hasStartedStreamingRef.current) {
       hasStartedStreamingRef.current = true;
       // Reset displayedText when streaming starts
       setDisplayedText('');
       displayedTextRef.current = '';
+      // Notify parent that streaming has started
+      setIsCurrentlyStreaming(true);
+      if (onStreamingStateChange) {
+        onStreamingStateChange(true, message);
+      }
     }
 
     // Start typewriter animation
+    // Streaming in progress.
     const targetText = message.message || '';
-    const currentDisplayed = displayedTextRef.current;
-    const currentLength = currentDisplayed.length; // Use ref for accurate current length
-
-    // Check if current displayed text is actually a prefix of the target text
-    // If not, the message content has changed completely (not just appended), so reset
-    if (currentLength > 0 && !targetText.startsWith(currentDisplayed)) {
-      setDisplayedText('');
-      displayedTextRef.current = '';
-      // Don't return here - continue to start animating the new content
-    }
-
-    // If target text is shorter or equal to current, just set it (shouldn't happen but safety check)
-    if (targetText.length <= displayedTextRef.current.length) {
-      setDisplayedText(targetText);
-      displayedTextRef.current = targetText;
-      return;
-    }
 
     // Get the new portion that needs to be revealed
     const newPortion = targetText.slice(displayedTextRef.current.length);
     const words = newPortion.split(/(\s+)/).filter((word) => word.length > 0); // Split by whitespace, keeping the spaces, filter empty strings
     let wordIndex = 0;
-
-    // Notify parent that streaming has started
-    setIsCurrentlyStreaming(true);
-    if (onStreamingStateChange) {
-      onStreamingStateChange(true, message.id);
-    }
 
     intervalRef.current = setInterval(() => {
       if (wordIndex < words.length) {
@@ -241,7 +231,7 @@ export default function Message(props: {
         setIsCurrentlyStreaming(false);
         // Notify parent that streaming has stopped
         if (onStreamingStateChange) {
-          onStreamingStateChange(false, message.id);
+          onStreamingStateChange(false, message);
         }
       }
     }, 25);
@@ -251,11 +241,6 @@ export default function Message(props: {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
-        setIsCurrentlyStreaming(false);
-        // Notify parent that streaming has stopped on cleanup
-        if (onStreamingStateChange) {
-          onStreamingStateChange(false, message.id);
-        }
       }
     };
   }, [
@@ -283,8 +268,10 @@ export default function Message(props: {
 
   return (
     <div
+      ref={messageElementRef}
       id={message.id}
       data-cy={`message-${messageIndex}`}
+      data-message-id={message.id}
       style={{
         ...baseMessageStyle,
         alignSelf: alignSelf,

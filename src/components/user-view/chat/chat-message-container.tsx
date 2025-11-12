@@ -13,6 +13,13 @@ import { useWithChat } from '../../../store/slices/chat/use-with-chat';
 import Message from './message';
 import { v4 as uuidv4 } from 'uuid';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+
+export enum PinModes{
+  BOTTOM_OF_MESSAGES="BOTTOM_OF_MESSAGES",
+  TOP_OF_STREAMING_MESSAGE="TOP_OF_STREAMING_MESSAGE",
+  NONE="NONE",
+}
+
 export function ChatMessagesContainer(props: {
   coachResponsePending: boolean;
   curDocId: string;
@@ -33,15 +40,15 @@ export function ChatMessagesContainer(props: {
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
     null
   );
-  const [isPinned, setIsPinned] = useState<boolean>(true);
-  const isPinnedRef = useRef<boolean>(true); // Keep ref in sync with state
+  const [pinnedState, setPinnedState] = useState<{
+    mode: PinModes;
+    messageId: string | null;
+  }>({
+    mode: PinModes.BOTTOM_OF_MESSAGES,
+    messageId: null,
+  });
   const isProgrammaticScrollRef = useRef<boolean>(false);
   const userInteractedRef = useRef<boolean>(false);
-
-  // Keep ref in sync with state
-  useEffect(() => {
-    isPinnedRef.current = isPinned;
-  }, [isPinned]);
 
   // IntersectionObserver to track if we're at the bottom
   const { ref: bottomAnchorRef, inView: isAtBottom } = useInView({
@@ -68,20 +75,39 @@ export function ChatMessagesContainer(props: {
   // Callback for when streaming state changes
   const handleStreamingStateChange = (
     isStreaming: boolean,
-    messageId: string
+    message: ChatMessageTypes
   ) => {
+    console.log("handleStreamingStateChange", isStreaming, message);
     if (isStreaming) {
-      setStreamingMessageId(messageId);
+      setStreamingMessageId(message.id);
+      setPinnedState({
+        mode: PinModes.TOP_OF_STREAMING_MESSAGE,
+        messageId: message.id,
+      });
       // Notify parent
       if (parentOnStreamingStateChange) {
         parentOnStreamingStateChange(true);
       }
     } else {
       setStreamingMessageId(null);
-      // Notify parent
       if (parentOnStreamingStateChange) {
         parentOnStreamingStateChange(false);
       }
+    }
+  };
+
+  // Callback for when streaming message resizes
+  const handleStreamingMessageResize = (messageId: string) => {
+    if(userInteractedRef.current){
+      return;
+    }
+    if(pinnedState.mode === PinModes.TOP_OF_STREAMING_MESSAGE && pinnedState.messageId === messageId){
+      console.log("scrolling to streaming message from resize", messageId);
+      scrollToStreamingMessage(messageId);
+    }
+    if(pinnedState.mode === PinModes.BOTTOM_OF_MESSAGES){
+      console.log("scrolling to bottom from resize");
+      scrollToBottom();
     }
   };
 
@@ -92,16 +118,14 @@ export function ChatMessagesContainer(props: {
         allMessages.findIndex((m) => m.id === streamingMessageId) + 1
       )
     : allMessages;
-  const mostRecentChatId =
-    chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].id : '';
 
-  // Track user interactions - only these should change isPinned state
   useEffect(() => {
     const container = messageContainerRef.current;
     if (!container) return;
 
     // Mark that user is interacting when they use scroll-related inputs
     const handleUserInteraction = () => {
+      console.log("userinteraction, setting userInteractedRef to true");
       userInteractedRef.current = true;
     };
 
@@ -117,21 +141,29 @@ export function ChatMessagesContainer(props: {
     };
   }, []);
 
-  // Handle scrolling - but only change isPinned if user actually interacted
-  useEffect(() => {
+  // Handle scrolling - but only change pinnedState if user actually interacted
+  useLayoutEffect(() => {
     const container = messageContainerRef.current;
     if (!container) return;
 
     const handleScroll = () => {
-      // Ignore programmatic scrolls - we initiated those
+      // Ignore programmatic scrolls
       if (isProgrammaticScrollRef.current) {
         isProgrammaticScrollRef.current = false;
         return;
       }
 
-      // Only change isPinned if this scroll came from a user interaction
+      // Only change pinnedState if this scroll came from a user interaction
       if (userInteractedRef.current) {
-        setIsPinned(isAtBottom);
+        const newMode = isAtBottom ? PinModes.BOTTOM_OF_MESSAGES : PinModes.NONE;
+        if(newMode === pinnedState.mode){
+          return;
+        }
+        console.log("userinteracted,setting pinnedState to ", newMode);
+        setPinnedState({
+          mode: newMode,
+          messageId: null,
+        });
         userInteractedRef.current = false; // Reset the flag
       }
     };
@@ -142,18 +174,11 @@ export function ChatMessagesContainer(props: {
     };
   }, [isAtBottom]); // Re-create handler when isAtBottom changes
 
-  function scrollToBottom(smooth = false) {
+  function scrollToBottom() {
     if (messageContainerRef.current) {
       isProgrammaticScrollRef.current = true;
-      if (smooth) {
-        messageContainerRef.current.scrollTo({
-          top: messageContainerRef.current.scrollHeight,
-          behavior: 'smooth',
-        });
-      } else {
         messageContainerRef.current.scrollTop =
           messageContainerRef.current.scrollHeight;
-      }
       // Reset the flag after a brief delay to allow the scroll event to process
       setTimeout(() => {
         isProgrammaticScrollRef.current = false;
@@ -161,39 +186,68 @@ export function ChatMessagesContainer(props: {
     }
   }
 
-  // Scroll to bottom when new messages arrive (if pinned)
-  // Using useLayoutEffect to ensure scroll happens after DOM updates but before paint
-  useLayoutEffect(() => {
-    if (isPinned && messageContainerRef.current) {
-      scrollToBottom();
+  function scrollToStreamingMessage(messageId: string) {
+    if(!messageContainerRef.current){
+      return
     }
-  }, [chatMessages.length, mostRecentChatId, isPinned]);
+    const streamingMessageElement = messageContainerRef.current.querySelector(`[data-message-id="${messageId}"]`);
+    if(streamingMessageElement){
+      streamingMessageElement.scrollIntoView();
+    }
+  }
 
-  // Watch for DOM changes - when content is added/modified and we're pinned, scroll to bottom
-  useEffect(() => {
+  useLayoutEffect(()=>{
     const container = messageContainerRef.current;
     if (!container) return;
-    // Use MutationObserver to watch for any DOM changes in the container
-    const mutationObserver = new MutationObserver(() => {
-      // Content changed - if pinned, scroll to bottom
-      if (isPinnedRef.current) {
+
+    const resizeObserver = new ResizeObserver(() => {
+      console.log("resizeObserver", pinnedState.mode, pinnedState.messageId);
+      if (pinnedState.mode === PinModes.BOTTOM_OF_MESSAGES) {
         scrollToBottom();
+      }
+      if (pinnedState.mode === PinModes.TOP_OF_STREAMING_MESSAGE && pinnedState.messageId) {
+        scrollToStreamingMessage(pinnedState.messageId);
       }
     });
 
-    // Watch for changes to the container's children (added/removed/modified)
+    resizeObserver.observe(container);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [pinnedState.mode, pinnedState.messageId, messages.length]);
+
+  // MutationObserver to track when new children are added
+  useLayoutEffect(() => {
+    const container = messageContainerRef.current;
+    if (!container) return;
+
+    const mutationObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+          console.log("new children added, scrolling to bottom or streaming message", pinnedState.mode, pinnedState.messageId);
+          if(pinnedState.mode === PinModes.BOTTOM_OF_MESSAGES){
+            scrollToBottom();
+          }
+          if(pinnedState.mode === PinModes.TOP_OF_STREAMING_MESSAGE && pinnedState.messageId){
+            scrollToStreamingMessage(pinnedState.messageId);
+          }
+        }
+      });
+    });
+
     mutationObserver.observe(container, {
-      childList: true, // Watch for children being added/removed
-      subtree: true, // Watch all descendants
-      characterData: true, // Watch for text changes (streaming!)
+      childList: true,
+      subtree: false, // Only watch direct children
     });
 
     return () => {
       mutationObserver.disconnect();
     };
-  }, []); // Only set up once
+  }, [pinnedState]);
 
   return (
+    <React.Fragment>
     <div
       ref={messageContainerRef}
       data-cy="messages-container"
@@ -204,7 +258,6 @@ export function ChatMessagesContainer(props: {
         width: '100%',
         maxWidth: '100%',
         justifyContent: 'flex-start',
-        margin: '1rem',
         borderRadius: '1rem',
         overflowX: 'hidden',
         overflowY: 'auto',
@@ -220,6 +273,7 @@ export function ChatMessagesContainer(props: {
             messageIndex={index}
             displayMarkdown={displayMarkdown}
             onStreamingStateChange={handleStreamingStateChange}
+            onResize={handleStreamingMessageResize}
           />
           {message.mcqChoices && index === chatMessages.length - 1 && (
             <div
@@ -263,28 +317,30 @@ export function ChatMessagesContainer(props: {
       ))}
       {/* Invisible anchor element to detect if user is at bottom */}
       <div ref={bottomAnchorRef} style={{ height: 1, marginTop: -1 }} />
-      {!isPinned && (
+    </div>
+    {(pinnedState.mode !== PinModes.BOTTOM_OF_MESSAGES && !isAtBottom) && (
         <Button
           variant="contained"
           onClick={() => {
-            setIsPinned(true);
-            scrollToBottom(true);
+            setPinnedState({
+              mode: PinModes.BOTTOM_OF_MESSAGES,
+              messageId: null,
+            });
+            scrollToBottom();
           }}
           data-cy="scroll-to-bottom-button"
           endIcon={<ArrowDownwardIcon />}
           style={{
-            position: 'sticky',
-            bottom: '20px',
+            position: 'absolute',
+            bottom: 100,
             left: '50%',
             transform: 'translateX(-50%)',
-            zIndex: 1000,
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            marginTop: 'auto',
+            zIndex: 10, // optional to stay above content
           }}
         >
           View Most Recent
         </Button>
       )}
-    </div>
+    </React.Fragment>
   );
 }

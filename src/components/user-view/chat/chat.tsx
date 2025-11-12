@@ -138,6 +138,7 @@ export function Chat(props: {
               alignItems: 'center',
               margin: '1rem',
               borderRadius: '1rem',
+              position: 'relative',
             }}
           >
             <ChatHeader
