@@ -424,7 +424,8 @@ export interface AiJobStatusApiRes {
 
 export interface OpenAiJobStatus {
   jobStatus: JobStatus;
-  aiServiceResponse: AiServiceResponse;
+  aiServiceResponse?: AiServiceResponse;
+  answer?: string;
 }
 
 export interface DocumentTimelineJobStatus {

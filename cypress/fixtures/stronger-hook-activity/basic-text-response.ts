@@ -57,3 +57,13 @@ export const openAiTextResponse = (resText: string, jobStatus?: JobStatus): AiJo
         }
     }
 }
+
+export const openAiTextResponseChunkStreaming = (text: string): AiJobStatusApiRes => {
+    return {
+        response: {
+            aiServiceResponse: undefined,
+            jobStatus: JobStatus.IN_PROGRESS,
+            answer: text
+        }
+    }
+}

@@ -64,23 +64,9 @@ export const myEditableActivity: ActivityBuilder = {
             ],
             includeChatLogContext: false,
             includeEssay: false,
-            outputDataType: PromptOutputTypes.JSON,
+            outputDataType: PromptOutputTypes.TEXT,
             customSystemRole: 'user',
           } as PromptActivityStep,
-          {
-            stepId: "3.2",
-            stepType: ActivityBuilderStepType.CONDITIONAL,
-            jumpToStepId: '',
-            conditionals: [
-                {
-                    stateDataKey: 'nickname1',
-                    checking: Checking.VALUE,
-                    operation: NumericOperations.EQUALS,
-                    expectedValue: '3',
-                    targetStepId: '4',
-                }
-            ],
-          },
           {
             stepId: '4',
             stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,

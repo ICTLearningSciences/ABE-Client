@@ -35,6 +35,7 @@ import {
 } from './types';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 import { createNewInstructorResponse, createNewStudentResponse, fetchAssignmentsResponseEmpty, fetchCoursesResponseEmpty, fetchSectionsResponseEmpty, fetchStudentsResponseEmpty } from '../fixtures/educational-management';
+import { openAiTextResponseChunkStreaming } from '../fixtures/stronger-hook-activity/basic-text-response';
 
 export type CypressGlobal = Cypress.cy & CyEventEmitter;
 
@@ -398,6 +399,46 @@ export function cyMockOpenAiCall(
     );
   });
 }
+
+export function cyMockOpenAiCallStreaming(
+  cy: CypressGlobal,
+  params: {
+    finalResponse: any;
+    answerChunks: string[];
+  }
+) {
+  cy.intercept('**/async_open_ai_doc_question/**', (req) => {
+    req.alias = 'openAiStartCall';
+    req.reply({
+      statusCode: 200,
+      body: { data: asyncStartRequestRes },
+      headers: { 'Content-Type': 'application/json' },
+    });
+  });
+
+  let callIndex = 0;
+  const allResponses = [...params.answerChunks, params.finalResponse];
+
+  cy.intercept('**/async_open_ai_doc_question_status/**', (req) => {
+    req.alias = 'aiServiceResponse';
+
+    const response =
+      callIndex < params.answerChunks.length
+        ? openAiTextResponseChunkStreaming(allResponses[callIndex])
+        : allResponses[callIndex];
+
+    req.reply({
+      statusCode: 200,
+      body: { data: response },
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    callIndex = (callIndex + 1) % allResponses.length;
+  });
+}
+
+
+
 export function sendChatMessage(cy: CypressGlobal, message: string) {
   cy.get('[data-cy=chat-input]').type(message, { delay: 0 });
   cy.get('[data-cy=send-input-button]').click();

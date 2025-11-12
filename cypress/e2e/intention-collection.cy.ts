@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { cyMockOpenAiCall, getDocServiceFromLoginService } from '../helpers/functions';
+import { cyMockOpenAiCall, cyMockOpenAiCallStreaming, getDocServiceFromLoginService } from '../helpers/functions';
 import {
   gDocWithAllIntentions,
   gDocWithExpiredDayIntention,
@@ -21,7 +21,7 @@ import {
   sendChatMessage,
 } from '../helpers/functions';
 import { DocVersion, LoginService, UserRole, testGoogleDocId } from '../helpers/types';
-import { myEditableActivityResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
+import { myEditableActivityResponse, openAiTextResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
 
 function writeDocumentIntention(cy: CypressGlobal, input: string) {
   cy.get('[data-cy=input-document-intention]')
@@ -59,6 +59,12 @@ function clickNextIntentionModal(cy: CypressGlobal) {
 function goToMyEditableActivity(cy: CypressGlobal) {
   cy.get('[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]').click();
   cy.get('[data-cy=activity-display-my-editable-activity]').click();
+  cy.get('[data-cy=doc-goal-modal-next-button]').click();
+}
+
+function goToMyReadOnlyActivity(cy: CypressGlobal) {
+  cy.get('[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]').click();
+  cy.get('[data-cy=activity-display-my-read-only-activity]').click();
   cy.get('[data-cy=doc-goal-modal-next-button]').click();
 }
 
@@ -494,5 +500,29 @@ describe('collectin user intentions', () => {
       cy.get('[data-cy=reset-activity-button]').click();
       checkNumberSessionIds(cy, 3);
     });
+  });
+
+  it.only("collects and saves session intention when asked what they'd like to revise", () => {
+    cyMockDefault(cy);
+    cy.visit(`/docs/${testGoogleDocId}`);
+    cyMockOpenAiCallStreaming(cy, {finalResponse: openAiTextResponse(`Giraffes are the tallest land animals on Earth, easily recognized by their incredibly long necks and distinctive spotted coats. Native to the savannas and open woodlands of sub-Saharan Africa, these gentle giants use their height to reach leaves and buds high up in acacia trees—food that most other herbivores can’t access. Despite their size, giraffes move gracefully, taking long strides that allow them to cover large distances efficiently in search of food and water.
+
+Their long necks, which can reach up to six feet in length, contain the same number of vertebrae as most mammals—just seven—but each vertebra is greatly elongated. This adaptation helps them not only to feed but also to watch for predators like lions from afar. Male giraffes, known as bulls, often engage in a behavior called “necking,” where they swing their necks to deliver powerful blows with their ossicones (horn-like structures) to establish dominance or win mates.
+
+Socially, giraffes live in loose, flexible groups rather than rigid herds. Females, or cows, often stay close to other mothers and their calves for protection, while males may roam alone or in bachelor groups. Giraffes communicate through subtle body language, movements, and even low-frequency sounds that humans can barely hear. Unfortunately, their populations have declined in recent years due to habitat loss and poaching, leading conservationists to take stronger measures to protect these iconic creatures of the African plains.`),
+answerChunks: [
+`Giraffes are the tallest land animals on Earth, easily recognized by their incredibly long necks and distinctive spotted coats. Native to the savannas and open woodlands of sub-Saharan Africa, these gentle giants use their height to reach leaves and buds high up in acacia trees—food that most other herbivores can’t access. Despite their size, giraffes move gracefully, taking long strides that allow them to cover large distances efficiently in search of food and water.`,
+`Giraffes are the tallest land animals on Earth, easily recognized by their incredibly long necks and distinctive spotted coats. Native to the savannas and open woodlands of sub-Saharan Africa, these gentle giants use their height to reach leaves and buds high up in acacia trees—food that most other herbivores can’t access. Despite their size, giraffes move gracefully, taking long strides that allow them to cover large distances efficiently in search of food and water.
+
+Their long necks, which can reach up to six feet in length, contain the same number of vertebrae as most mammals—just seven—but each vertebra is greatly elongated. This adaptation helps them not only to feed but also to watch for predators like lions from afar. Male giraffes, known as bulls, often engage in a behavior called “necking,” where they swing their necks to deliver powerful blows with their ossicones (horn-like structures) to establish dominance or win mates.`,
+`Giraffes are the tallest land animals on Earth, easily recognized by their incredibly long necks and distinctive spotted coats. Native to the savannas and open woodlands of sub-Saharan Africa, these gentle giants use their height to reach leaves and buds high up in acacia trees—food that most other herbivores can’t access. Despite their size, giraffes move gracefully, taking long strides that allow them to cover large distances efficiently in search of food and water.
+
+Their long necks, which can reach up to six feet in length, contain the same number of vertebrae as most mammals—just seven—but each vertebra is greatly elongated. This adaptation helps them not only to feed but also to watch for predators like lions from afar. Male giraffes, known as bulls, often engage in a behavior called “necking,” where they swing their necks to deliver powerful blows with their ossicones (horn-like structures) to establish dominance or win mates.
+
+Socially, giraffes live in loose, flexible groups rather than rigid herds. Females, or cows, often stay close to other mothers and their calves for protection, while males may roam alone or in bachelor groups. Giraffes communicate through subtle body language, movements, and even low-frequency sounds that humans can barely hear. Unfortunately, their populations have declined in recent years due to habitat loss and poaching, leading conservationists to take stronger measures to protect these iconic creatures of the African plains.`
+
+      ]});
+    goToMyReadOnlyActivity(cy);
+    sendChatMessage(cy, 'This is my session intention.');
   });
 });
