@@ -29,14 +29,13 @@ import {
 } from '../../../helpers';
 import ViewPreviousRunModal from '../../admin-view/view-previous-run-modal';
 
-import { ChatMessagesContainer } from './chat-message-container';
-import { ChatInput } from './chat-input';
 import { ChatHeaderGenerator } from './chat-header-generator';
 import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activity-handler';
 import { isActivityBuilder } from '../../activity-builder/types';
 import { createGlobalStyle } from 'styled-components';
 import { useWithConfig } from '../../../store/slices/config/use-with-config';
 import { ChatMessageTypes } from '../../../store/slices/chat';
+import { ChatV2 } from '../chat-v2/chat-v2';
 
 export const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
@@ -89,10 +88,8 @@ export function Chat(props: {
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
   const goalHasActivities =
     selectedGoal?.builtActivities && selectedGoal.builtActivities.length > 0;
-  const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const disableInput =
     coachResponsePending ||
-    isStreaming ||
     Boolean(
       messages?.length > 0 && messages[messages.length - 1].disableUserInput
     );
@@ -136,7 +133,6 @@ export function Chat(props: {
               width: '90%',
               justifyContent: 'space-around',
               alignItems: 'center',
-              margin: '1rem',
               borderRadius: '1rem',
               position: 'relative',
             }}
@@ -145,8 +141,11 @@ export function Chat(props: {
               style={{
                 position: 'relative',
                 width: '100%',
+                height:"20%",
                 display: 'flex',
                 justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
               }}
             >
               <ChatHeaderGenerator
@@ -162,17 +161,13 @@ export function Chat(props: {
                 setToDocView={setToDocView}
               />
             </ChatHeader>
-            <ChatMessagesContainer
-              sendMessage={sendNewMessage}
+            <ChatV2
+              messages={messages || []}
               coachResponsePending={coachResponsePending}
-              curDocId={curDocId}
-              setAiInfoToDisplay={setAiInfoToDisplay}
-              displayMarkdown={displayMarkdown}
-              onStreamingStateChange={setIsStreaming}
-            />
-            <ChatInput
               sendMessage={sendNewMessage}
               disableInput={disableInput}
+              displayMarkdown={displayMarkdown}
+              setAiInfoToDisplay={setAiInfoToDisplay}
             />
             {userIsAdmin && state.viewingAdvancedOptions && (
               <RowDiv>

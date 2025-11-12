@@ -55,15 +55,16 @@ export function ChatHeaderGenerator(props: {
         <RowDiv
           style={{
             width: '100%',
-            justifyContent: 'space-around',
+            display: 'flex',
+            justifyContent: 'center',
             marginBottom: '10px',
           }}
         >
-          <Button
+          {isMobile && <Button
             onClick={setToDocView}
             style={{
               flex: 0.2,
-              display: isMobile ? 'flex' : 'none',
+              display: 'flex',
               fontSize: screenWidth < 500 ? '10px' : '12px',
             }}
             variant="contained"
@@ -73,14 +74,14 @@ export function ChatHeaderGenerator(props: {
               sx={{ fontSize: screenWidth < 500 ? '16px' : '20px' }}
             />{' '}
             Document{' '}
-          </Button>
+          </Button>}
           <span
             style={{ textAlign: 'center', marginBottom: '10px', flex: 1 }}
             data-cy="chat-header"
           >
             {title}
           </span>
-          <div style={{ flex: 0.2 }}></div>
+          {isMobile && <div style={{ flex: 0.2 }}></div>}
         </RowDiv>
 
         <Divider />

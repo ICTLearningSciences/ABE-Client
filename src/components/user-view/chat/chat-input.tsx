@@ -30,7 +30,7 @@ export function ChatInput(props: {
       style={{
         display: 'flex',
         flexDirection: 'row',
-        width: '90%',
+        width: '95%',
         justifyContent: 'space-around',
         alignItems: 'center',
         margin: '10px',
