@@ -8,7 +8,7 @@ import {
 } from '../../../store/slices/chat';
 import { useAppSelector } from '../../../store/hooks';
 import { UserRole } from '../../../store/slices/login';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import { StyledFadingText } from './message-styles';
 import ReactMarkdown from 'react-markdown';
@@ -95,10 +95,53 @@ export default function Message(props: {
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
   messageIndex: number;
   displayMarkdown: boolean;
+  onStreamingStateChange: (
+    isStreaming: boolean,
+    message: ChatMessageTypes
+  ) => void;
 }): JSX.Element {
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
-  const { message, setAiInfoToDisplay, messageIndex, displayMarkdown } = props;
+  const {
+    message,
+    setAiInfoToDisplay,
+    messageIndex,
+    displayMarkdown,
+    onStreamingStateChange,
+  } = props;
+
+  // Typewriter effect state
+  const [displayedText, setDisplayedText] = useState('');
+  const [isCurrentlyStreaming, setIsCurrentlyStreaming] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const displayedTextRef = useRef(''); // Track actual displayed text length synchronously
+  const hasStartedStreamingRef = useRef(false); // Track if streaming has started
+  const messageElementRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-skip when full message is available
+  useEffect(() => {
+    if (message.aiServiceStepData && isCurrentlyStreaming) {
+      // Full message is available - skip animation and show immediately
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      intervalRef.current = null;
+
+      // Immediately show full message
+      const fullMessage = message.message || '';
+      setDisplayedText(fullMessage);
+      displayedTextRef.current = fullMessage;
+      setIsCurrentlyStreaming(false);
+
+      onStreamingStateChange(false, message);
+    }
+  }, [
+    message.aiServiceStepData,
+    isCurrentlyStreaming,
+    message.message,
+    onStreamingStateChange,
+  ]);
+
   const backgroundColor =
     message.sender === Sender.USER
       ? colorTheme.chatUserBubbleColor
@@ -108,6 +151,82 @@ export default function Message(props: {
     message.sender === Sender.USER
       ? colorTheme.chatUserTextColor
       : colorTheme.chatSystemTextColor;
+
+  // Typewriter effect logic
+  useEffect(() => {
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    // show message instantly
+    if (
+      message.sender === Sender.USER || //If message is from a user
+      !message.message || //If message is empty
+      !message.isPromptResponse || //If message is not a prompt response
+      (message.aiServiceStepData && !hasStartedStreamingRef.current) //If message has aiServiceStepData and hasn't started streaming, show instantly (from history)
+    ) {
+      const text = message.message || '';
+      setDisplayedText(text);
+      displayedTextRef.current = text;
+      return;
+    }
+
+    // If we're here, streaming is starting.
+    if (!hasStartedStreamingRef.current) {
+      onStreamingStateChange(true, message);
+      hasStartedStreamingRef.current = true;
+      // Reset displayedText when streaming starts
+      setDisplayedText('');
+      displayedTextRef.current = '';
+      // Notify parent that streaming has started
+      setIsCurrentlyStreaming(true);
+    }
+
+    // Start typewriter animation
+    // Streaming in progress.
+    const targetText = message.message || '';
+
+    // Get the new portion that needs to be revealed
+    const newPortion = targetText.slice(displayedTextRef.current.length);
+    const words = newPortion.split(/(\s+)/).filter((word) => word.length > 0); // Split by whitespace, keeping the spaces, filter empty strings
+    let wordIndex = 0;
+
+    intervalRef.current = setInterval(() => {
+      if (wordIndex < words.length) {
+        const wordToAdd = words[wordIndex];
+        setDisplayedText((prev) => {
+          const newText = prev + wordToAdd;
+          displayedTextRef.current = newText; // Update ref synchronously
+          return newText;
+        });
+        wordIndex++;
+      } else {
+        // Animation complete
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        setIsCurrentlyStreaming(false);
+        onStreamingStateChange(false, message);
+      }
+    }, 25);
+
+    // Cleanup function
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [
+    message.message,
+    message.sender,
+    message.aiServiceStepData,
+    onStreamingStateChange,
+    message.id,
+  ]);
 
   if (message.message === '') {
     return <></>;
@@ -126,8 +245,10 @@ export default function Message(props: {
 
   return (
     <div
+      ref={messageElementRef}
       id={message.id}
       data-cy={`message-${messageIndex}`}
+      data-message-id={message.id}
       style={{
         ...baseMessageStyle,
         alignSelf: alignSelf,
@@ -207,15 +328,13 @@ export default function Message(props: {
           }}
         >
           {message.displayType === MessageDisplayType.TEXT
-            ? formatMessage(message.message).trim()
+            ? formatMessage(displayedText).trim()
             : ''}
         </ReactMarkdown>
       )}
       {!displayMarkdown && (
         <span>
-          {message.displayType === MessageDisplayType.TEXT
-            ? message.message
-            : ''}
+          {message.displayType === MessageDisplayType.TEXT ? displayedText : ''}
         </span>
       )}
       {message.displayType === MessageDisplayType.PENDING_MESSAGE && (

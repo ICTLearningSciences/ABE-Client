@@ -87,7 +87,8 @@ export function useWithExecutePrompt() {
 
   async function executePromptSteps(
     aiPromptSteps: AiPromptStep[],
-    callback?: (response: AiServicesResponseTypes) => void
+    callback?: (response: AiServicesResponseTypes) => void,
+    onPartialAnswer?: (partialAnswer: string) => void
   ) {
     const abortController = new AbortController();
     const source = axios.CancelToken.source();
@@ -103,7 +104,8 @@ export function useWithExecutePrompt() {
       processedAiPromptSteps,
       userId || '',
       docService,
-      source.token
+      source.token,
+      onPartialAnswer
     );
 
     if (callback && !abortController.signal.aborted) callback(res);

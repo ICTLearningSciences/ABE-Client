@@ -89,8 +89,10 @@ export function Chat(props: {
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
   const goalHasActivities =
     selectedGoal?.builtActivities && selectedGoal.builtActivities.length > 0;
+  const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const disableInput =
     coachResponsePending ||
+    isStreaming ||
     Boolean(
       messages?.length > 0 && messages[messages.length - 1].disableUserInput
     );
@@ -120,6 +122,7 @@ export function Chat(props: {
         height: '100%',
         width: '100%',
         alignItems: 'center',
+        overflowX: 'hidden',
       }}
     >
       <GlobalChatStyles />
@@ -134,8 +137,8 @@ export function Chat(props: {
               width: '90%',
               justifyContent: 'space-around',
               alignItems: 'center',
-              margin: '1rem',
               borderRadius: '1rem',
+              position: 'relative',
             }}
           >
             <ChatHeader
@@ -165,6 +168,7 @@ export function Chat(props: {
               curDocId={curDocId}
               setAiInfoToDisplay={setAiInfoToDisplay}
               displayMarkdown={displayMarkdown}
+              onStreamingStateChange={setIsStreaming}
             />
             <ChatInput
               sendMessage={sendNewMessage}

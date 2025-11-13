@@ -75,7 +75,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   setResponsePending: (pending: boolean) => void;
   updateSessionIntention: (intention: string) => void;
   executePrompt: (
-    aiPromptSteps: AiPromptStep[]
+    aiPromptSteps: AiPromptStep[],
+    callback?: (response: AiServicesResponseTypes) => void,
+    onPartialAnswer?: (partialAnswer: string) => void
   ) => Promise<AiServicesResponseTypes>;
   editDocGoal: () => void;
   userResponseHandleState: UserResponseHandleState;
@@ -155,7 +157,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     setResponsePending: (pending: boolean) => void,
     updateSessionIntention: (intention: string) => void,
     executePrompt: (
-      aiPromptSteps: AiPromptStep[]
+      aiPromptSteps: AiPromptStep[],
+      callback?: (response: AiServicesResponseTypes) => void,
+      onPartialAnswer?: (partialAnswer: string) => void
     ) => Promise<AiServicesResponseTypes>,
     docId: string,
     editDocGoal: () => void,
@@ -597,7 +601,24 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
     // handle sending prompt
     const requestFunction = async () => {
-      const _response = await this.executePrompt(aiPromptSteps);
+      const messageId = uuidv4();
+
+      const _response = await this.executePrompt(
+        aiPromptSteps,
+        undefined,
+        step.outputDataType !== PromptOutputTypes.JSON
+          ? (partialAnswer: string) => {
+              // Send partial answer updates with the same ID
+              this.sendMessage({
+                id: messageId,
+                message: partialAnswer,
+                sender: Sender.SYSTEM,
+                displayType: MessageDisplayType.TEXT,
+                isPromptResponse: true,
+              });
+            }
+          : undefined
+      );
       const response = _response.answer;
       if (step.outputDataType === PromptOutputTypes.JSON) {
         if (!isJsonString(response)) {
@@ -612,13 +633,14 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         const resData = JSON.parse(response);
         this.stateData = { ...this.stateData, ...resData };
       } else {
-        // is a text response
+        // send final message with same ID
         this.sendMessage({
-          id: uuidv4(),
+          id: messageId,
           message: response,
           aiServiceStepData: _response.aiAllStepsData,
           sender: Sender.SYSTEM,
           displayType: MessageDisplayType.TEXT,
+          isPromptResponse: true,
         });
       }
     };

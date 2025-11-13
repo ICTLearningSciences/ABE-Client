@@ -34,6 +34,7 @@ import {
   UpdateUserInfo,
   IGDocVersion,
   DocService,
+  PromptOutputTypes,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -757,6 +758,13 @@ export async function asyncOpenAiRequest(
   docService: DocService,
   cancelToken?: CancelToken
 ): Promise<OpenAiJobId> {
+  const updatedAiPromptSteps = aiPromptSteps.map((step) => {
+    return {
+      ...step,
+      streaming:
+        step.streaming || step.outputDataType === PromptOutputTypes.TEXT,
+    };
+  });
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   if (!accessToken) throw new Error('No access token');
   const res = await execHttp<OpenAiJobId>(
@@ -767,7 +775,7 @@ export async function asyncOpenAiRequest(
       dataPath: ['response', 'jobId'],
       axiosConfig: {
         data: {
-          aiPromptSteps: aiPromptSteps,
+          aiPromptSteps: updatedAiPromptSteps,
         },
         cancelToken: cancelToken,
       },
