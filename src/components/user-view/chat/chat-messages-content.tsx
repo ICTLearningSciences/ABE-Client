@@ -18,7 +18,10 @@ export function ChatMessagesContent(props: {
   setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
   sendMessage: (message: ChatMessageTypes) => void;
   displayMarkdown: boolean;
-  onStreamingStateChange: (isStreaming: boolean, message: ChatMessageTypes) => void;
+  onStreamingStateChange: (
+    isStreaming: boolean,
+    message: ChatMessageTypes
+  ) => void;
 }): JSX.Element {
   const {
     messages,

@@ -95,7 +95,10 @@ export default function Message(props: {
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
   messageIndex: number;
   displayMarkdown: boolean;
-  onStreamingStateChange: (isStreaming: boolean, message: ChatMessageTypes) => void;
+  onStreamingStateChange: (
+    isStreaming: boolean,
+    message: ChatMessageTypes
+  ) => void;
 }): JSX.Element {
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
