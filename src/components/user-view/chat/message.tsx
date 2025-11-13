@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React from 'react';
 import { Button } from '@mui/material';
 import { DEFAULT_COLOR_THEME } from '../../../constants';
 import {
@@ -95,8 +95,7 @@ export default function Message(props: {
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
   messageIndex: number;
   displayMarkdown: boolean;
-  onStreamingStateChange?: (isStreaming: boolean, message: ChatMessageTypes) => void;
-  onResize?: (messageId: string) => void;
+  onStreamingStateChange: (isStreaming: boolean, message: ChatMessageTypes) => void;
 }): JSX.Element {
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
@@ -106,7 +105,6 @@ export default function Message(props: {
     messageIndex,
     displayMarkdown,
     onStreamingStateChange,
-    onResize,
   } = props;
 
   // Typewriter effect state
@@ -116,22 +114,6 @@ export default function Message(props: {
   const displayedTextRef = useRef(''); // Track actual displayed text length synchronously
   const hasStartedStreamingRef = useRef(false); // Track if streaming has started
   const messageElementRef = useRef<HTMLDivElement | null>(null);
-
-  // ResizeObserver to track size changes while streaming
-  useLayoutEffect(() => {
-    const element = messageElementRef.current;
-    if (!element || !onResize) return;
-
-    const resizeObserver = new ResizeObserver(() => {
-        onResize(message.id);
-    });
-
-    resizeObserver.observe(element);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [isCurrentlyStreaming, onResize, message.id]);
 
   // Auto-skip when full message is available
   useEffect(() => {
@@ -148,10 +130,7 @@ export default function Message(props: {
       displayedTextRef.current = fullMessage;
       setIsCurrentlyStreaming(false);
 
-      // Notify parent that streaming has stopped
-      if (onStreamingStateChange) {
-        onStreamingStateChange(false, message);
-      }
+      onStreamingStateChange(false, message);
     }
   }, [
     message.aiServiceStepData,
@@ -193,15 +172,13 @@ export default function Message(props: {
 
     // If we're here, streaming is starting.
     if (!hasStartedStreamingRef.current) {
+      onStreamingStateChange(true, message);
       hasStartedStreamingRef.current = true;
       // Reset displayedText when streaming starts
       setDisplayedText('');
       displayedTextRef.current = '';
       // Notify parent that streaming has started
       setIsCurrentlyStreaming(true);
-      if (onStreamingStateChange) {
-        onStreamingStateChange(true, message);
-      }
     }
 
     // Start typewriter animation
@@ -229,10 +206,7 @@ export default function Message(props: {
           intervalRef.current = null;
         }
         setIsCurrentlyStreaming(false);
-        // Notify parent that streaming has stopped
-        if (onStreamingStateChange) {
-          onStreamingStateChange(false, message);
-        }
+        onStreamingStateChange(false, message);
       }
     }, 25);
 
