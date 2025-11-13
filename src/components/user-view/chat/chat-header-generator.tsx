@@ -59,28 +59,35 @@ export function ChatHeaderGenerator(props: {
             marginBottom: '10px',
           }}
         >
-          <Button
-            onClick={setToDocView}
-            style={{
-              flex: 0.2,
-              display: isMobile ? 'flex' : 'none',
-              fontSize: screenWidth < 500 ? '10px' : '12px',
-            }}
-            variant="contained"
-          >
-            {' '}
-            <DescriptionIcon
-              sx={{ fontSize: screenWidth < 500 ? '16px' : '20px' }}
-            />{' '}
-            Document{' '}
-          </Button>
+          {isMobile && (
+            <Button
+              onClick={setToDocView}
+              style={{
+                flex: 0.2,
+                display: 'flex',
+                fontSize: screenWidth < 500 ? '10px' : '12px',
+              }}
+              variant="contained"
+            >
+              {' '}
+              <DescriptionIcon
+                sx={{ fontSize: screenWidth < 500 ? '16px' : '20px' }}
+              />{' '}
+              Document{' '}
+            </Button>
+          )}
           <span
-            style={{ textAlign: 'center', marginBottom: '10px', flex: 1 }}
+            style={{
+              textAlign: 'center',
+              marginBottom: '5px',
+              marginTop: '5px',
+              flex: 1,
+            }}
             data-cy="chat-header"
           >
             {title}
           </span>
-          <div style={{ flex: 0.2 }}></div>
+          {isMobile && <div style={{ flex: 0.2 }}></div>}
         </RowDiv>
 
         <Divider />

@@ -71,6 +71,7 @@ export function ChatMessagesContainer(props: {
           style={{
             display: 'flex',
             flexDirection: 'column',
+            overflowX: 'hidden',
           }}
         >
           <ChatMessagesContent

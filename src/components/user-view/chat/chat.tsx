@@ -122,6 +122,7 @@ export function Chat(props: {
         height: '100%',
         width: '100%',
         alignItems: 'center',
+        overflowX: 'hidden',
       }}
     >
       <GlobalChatStyles />
@@ -136,7 +137,6 @@ export function Chat(props: {
               width: '90%',
               justifyContent: 'space-around',
               alignItems: 'center',
-              margin: '1rem',
               borderRadius: '1rem',
               position: 'relative',
             }}
