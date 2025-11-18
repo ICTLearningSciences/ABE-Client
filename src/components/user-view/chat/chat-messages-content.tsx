@@ -10,6 +10,7 @@ import {
 } from '../../../store/slices/chat';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import Message from './message';
+import { useChildTopIntersection } from './use-with-child-top-intersection';
 
 export function ChatMessagesContent(props: {
   messages: ChatMessageTypes[];
@@ -33,8 +34,52 @@ export function ChatMessagesContent(props: {
     onStreamingStateChange,
   } = props;
 
-  const { scrollToBottom, stopScroll } = useStickToBottomContext();
+  const { scrollToBottom, stopScroll, isAtBottom } = useStickToBottomContext();
   const previousMessagesLengthRef = useRef(messages.length);
+  const scrollContainerRef = useRef<HTMLElement | null>(null);
+  const streamingMessageRef = useRef<HTMLElement | null>(null);
+
+  // Set up refs for intersection detection
+  useEffect(() => {
+    // Get the scroll container (parent of chat-messages-content)
+    const contentElement = document.querySelector('[data-cy="chat-messages-content"]');
+    if (contentElement?.parentElement) {
+      scrollContainerRef.current = contentElement.parentElement as HTMLElement;
+    }else{
+      scrollContainerRef.current = null;
+    }
+
+    // Get the streaming message element
+    if (streamingMessageId) {
+      const streamingMessageElement = document.querySelector(
+        `[data-message-id="${streamingMessageId}"]`
+      ) as HTMLElement;
+      if (streamingMessageElement) {
+        streamingMessageRef.current = streamingMessageElement;
+      }
+    }else{
+      streamingMessageRef.current = null;
+    }
+  }, [streamingMessageId]);
+
+  // Use the custom intersection hook
+  const { hitTop } = useChildTopIntersection(
+    scrollContainerRef,
+    streamingMessageRef,
+    10, // threshold in pixels
+    () => {
+      console.log("user scrolled up");
+      streamingMessageRef.current = null;
+    }
+  );
+
+  // Stop scroll when streaming message hits the top
+  useEffect(() => {
+    if (hitTop && isAtBottom && streamingMessageId) {
+      console.log("🚀 Stopping scroll - message reached top");
+      stopScroll();
+    }
+  }, [hitTop, isAtBottom, streamingMessageId, stopScroll]);
 
   // Detect new user messages and scroll to bottom
   useEffect(() => {

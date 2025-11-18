@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import { ChatMessageTypes } from '../../../store/slices/chat';
 import { useWithChat } from '../../../store/slices/chat/use-with-chat';
@@ -28,18 +27,20 @@ export function ChatMessagesContainer(props: {
   const [streamingMessageId, setStreamingMessageId] = useState<
     string | undefined
   >(undefined);
-
+  console.log('streamingMessageId', streamingMessageId);
   // Callback for when streaming state changes
   const handleStreamingStateChange = (
     isStreaming: boolean,
     message: ChatMessageTypes
   ) => {
+    console.log("stream state changed", isStreaming, message)
     if (isStreaming) {
       setStreamingMessageId(message.id);
       if (parentOnStreamingStateChange) {
         parentOnStreamingStateChange(true);
       }
     } else {
+      
       setStreamingMessageId(undefined);
       if (parentOnStreamingStateChange) {
         parentOnStreamingStateChange(false);
@@ -68,6 +69,7 @@ export function ChatMessagesContainer(props: {
       >
         {/* @ts-expect-error - use-stick-to-bottom types are incompatible with React 18 */}
         <StickToBottom.Content
+          data-cy="chat-messages-content"
           style={{
             display: 'flex',
             flexDirection: 'column',

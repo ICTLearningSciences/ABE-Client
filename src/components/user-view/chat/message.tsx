@@ -112,35 +112,11 @@ export default function Message(props: {
 
   // Typewriter effect state
   const [displayedText, setDisplayedText] = useState('');
-  const [isCurrentlyStreaming, setIsCurrentlyStreaming] = useState(false);
+  const [finishedStreaming, setFinishedStreaming] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const displayedTextRef = useRef(''); // Track actual displayed text length synchronously
   const hasStartedStreamingRef = useRef(false); // Track if streaming has started
   const messageElementRef = useRef<HTMLDivElement | null>(null);
-
-  // Auto-skip when full message is available
-  useEffect(() => {
-    if (message.aiServiceStepData && isCurrentlyStreaming) {
-      // Full message is available - skip animation and show immediately
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      intervalRef.current = null;
-
-      // Immediately show full message
-      const fullMessage = message.message || '';
-      setDisplayedText(fullMessage);
-      displayedTextRef.current = fullMessage;
-      setIsCurrentlyStreaming(false);
-
-      onStreamingStateChange(false, message);
-    }
-  }, [
-    message.aiServiceStepData,
-    isCurrentlyStreaming,
-    message.message,
-    onStreamingStateChange,
-  ]);
 
   const backgroundColor =
     message.sender === Sender.USER
@@ -164,8 +140,8 @@ export default function Message(props: {
     if (
       message.sender === Sender.USER || //If message is from a user
       !message.message || //If message is empty
-      !message.isPromptResponse || //If message is not a prompt response
-      (message.aiServiceStepData && !hasStartedStreamingRef.current) //If message has aiServiceStepData and hasn't started streaming, show instantly (from history)
+      !message.isPromptResponse || 
+      finishedStreaming
     ) {
       const text = message.message || '';
       setDisplayedText(text);
@@ -181,7 +157,7 @@ export default function Message(props: {
       setDisplayedText('');
       displayedTextRef.current = '';
       // Notify parent that streaming has started
-      setIsCurrentlyStreaming(true);
+      setFinishedStreaming(false);
     }
 
     // Start typewriter animation
@@ -208,7 +184,7 @@ export default function Message(props: {
           clearInterval(intervalRef.current);
           intervalRef.current = null;
         }
-        setIsCurrentlyStreaming(false);
+        setFinishedStreaming(true);
         onStreamingStateChange(false, message);
       }
     }, 25);
