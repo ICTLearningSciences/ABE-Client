@@ -575,6 +575,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             message: result.value.message,
             aiServiceStepData: result.value.aiServiceStepData,
             sender: Sender.SYSTEM,
+            systemCustomName:
+              result.value.originalConfiguration.systemCustomName,
             displayType: MessageDisplayType.TEXT,
           });
         }
@@ -593,9 +595,18 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   async executeSinglePromptConfiguration(
     config: SinglePromptConfiguration
   ): Promise<
-    | { type: 'json'; data: StateData }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    | { type: 'text'; message: string; aiServiceStepData: any }
+    | {
+        type: 'json';
+        data: StateData;
+        originalConfiguration: SinglePromptConfiguration;
+      }
+    | {
+        type: 'text';
+        message: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        aiServiceStepData: any;
+        originalConfiguration: SinglePromptConfiguration;
+      }
   > {
     // Build AI prompt steps with replaced data
     const promptText = replaceStoredDataInString(
@@ -657,6 +668,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     return await this.retryPromptExecution(
       aiPromptSteps,
       config.outputDataType,
+      config,
       config.jsonResponseData
     );
   }
@@ -664,11 +676,21 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   async retryPromptExecution(
     aiPromptSteps: AiPromptStep[],
     outputDataType: PromptOutputTypes,
+    originalConfiguration: SinglePromptConfiguration,
     jsonResponseData?: JsonResponseData[]
   ): Promise<
-    | { type: 'json'; data: StateData }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    | { type: 'text'; message: string; aiServiceStepData: any }
+    | {
+        type: 'json';
+        data: StateData;
+        originalConfiguration: SinglePromptConfiguration;
+      }
+    | {
+        type: 'text';
+        message: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        aiServiceStepData: any;
+        originalConfiguration: SinglePromptConfiguration;
+      }
   > {
     let lastError: Error | null = null;
 
@@ -689,13 +711,18 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             }
           }
           const resData = JSON.parse(response);
-          return { type: 'json', data: resData };
+          return {
+            type: 'json',
+            data: resData,
+            originalConfiguration: originalConfiguration,
+          };
         } else {
           // Return text response
           return {
             type: 'text',
             message: response,
             aiServiceStepData: _response.aiAllStepsData,
+            originalConfiguration: originalConfiguration,
           };
         }
       } catch (err) {

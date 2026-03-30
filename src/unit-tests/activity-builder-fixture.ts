@@ -44,6 +44,7 @@ export const examplePromptActivityStep: PromptActivityStep = {
   stepType: ActivityBuilderStepType.PROMPT,
   promptConfigurations: [
     {
+      systemCustomName: '',
       promptText: 'Please generate a nickname for Aaron',
       responseFormat: '',
       jsonResponseData: [

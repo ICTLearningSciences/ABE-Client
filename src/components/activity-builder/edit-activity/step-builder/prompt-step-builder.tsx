@@ -71,6 +71,7 @@ export function getDefaultSinglePromptConfiguration(): SinglePromptConfiguration
     outputDataType: PromptOutputTypes.TEXT,
     jsonResponseData: [],
     includeChatLogContext: false,
+    systemCustomName: '',
     includeEssay: false,
     customSystemRole: '',
     webSearch: false,
@@ -159,6 +160,15 @@ function SinglePromptConfigurationEditor(
         padding: '10px 0',
       }}
     >
+      <InputField
+        label="System Custom Name"
+        value={configuration.systemCustomName}
+        onChange={(e) => {
+          updateConfigField(configIndex, 'systemCustomName', e);
+        }}
+        width="100%"
+      />
+
       <InputField
         label="Prompt Text"
         value={configuration.promptText}

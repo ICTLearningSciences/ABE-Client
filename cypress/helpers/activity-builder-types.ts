@@ -182,6 +182,7 @@ export interface SinglePromptConfigurationGql{
   responseFormat: string;
   editDoc?: boolean;
   includeChatLogContext: boolean;
+  systemCustomName: string;
   includeEssay: boolean;
   outputDataType: PromptOutputTypes;
   jsonResponseData?: string;

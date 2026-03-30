@@ -247,6 +247,7 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
               sender
               message
               displayType
+              systemCustomName
               bulletPoints
             }
             activity

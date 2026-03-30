@@ -66,6 +66,7 @@ export const fullBuiltActivityQueryData = `
                                 responseFormat
                                 editDoc
                                 includeChatLogContext
+                                systemCustomName
                                 includeEssay
                                 outputDataType
                                 jsonResponseData

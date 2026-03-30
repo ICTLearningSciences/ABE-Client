@@ -62,6 +62,7 @@ export interface ChatMessage {
   id: string;
   sender: Sender;
   displayType: MessageDisplayType;
+  systemCustomName?: string;
   aiServiceStepData?: AiServiceStepDataTypes[];
   mcqChoices?: string[];
   selectActivities?: Activity[];
