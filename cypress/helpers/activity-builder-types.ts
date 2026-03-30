@@ -177,8 +177,7 @@ export interface JsonResponseData {
   subData?: JsonResponseData[];
 }
 
-export interface PromptActivityStepGql extends ActivityBuilderStep {
-  stepType: ActivityBuilderStepType.PROMPT;
+export interface SinglePromptConfigurationGql{
   promptText: string;
   responseFormat: string;
   editDoc?: boolean;
@@ -190,9 +189,18 @@ export interface PromptActivityStepGql extends ActivityBuilderStep {
   webSearch?: boolean;
 }
 
-export interface PromptActivityStep
-  extends Omit<PromptActivityStepGql, 'jsonResponseData'> {
+export interface SinglePromptConfiguration extends Omit<SinglePromptConfigurationGql, 'jsonResponseData'>{
   jsonResponseData?: JsonResponseData[];
+}
+
+export interface PromptActivityStepGql extends ActivityBuilderStep {
+  stepType: ActivityBuilderStepType.PROMPT;
+  promptConfigurations: SinglePromptConfigurationGql[];
+}
+
+export interface PromptActivityStep
+  extends Omit<PromptActivityStepGql, 'promptConfigurations'> {
+  promptConfigurations: SinglePromptConfiguration[];
 }
 
 export interface BuiltActivityVersion {

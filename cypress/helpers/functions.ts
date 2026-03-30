@@ -12,7 +12,6 @@ import { createActivityBuilder, fetchBuiltActivitiesResponse } from '../fixtures
 import { fetchConfigResponse } from '../fixtures/fetch-config';
 import { fetchDocGoalsResponse } from '../fixtures/fetch-doc-goals';
 import { fetchGoogleDocsResponse } from '../fixtures/fetch-google-docs';
-import { fetchPromptTemplates } from '../fixtures/fetch-prompt-templates';
 import {
   gDocWithAllIntentions,
   storeUserDocResponse,
@@ -212,7 +211,6 @@ export function cyMockDefault(
     ),
     mockGQL('FetchVersionsById', fetchDocVersionsBuilder(docTimelineVersions)),
     mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.GOOGLE_DOCS)),
-    mockGQL('FetchPrompts', fetchPromptTemplates),
     mockGQL('FetchConfig', fetchConfigResponse),
     mockGQL('FetchDocGoals', fetchDocGoalsResponse),
     mockGQL('FetchSystemPrompts', fetchConfigResponse),

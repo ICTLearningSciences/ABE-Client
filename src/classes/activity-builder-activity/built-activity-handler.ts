@@ -15,6 +15,8 @@ import {
   PredefinedResponse,
   ConditionalActivityStep,
   Checking,
+  SinglePromptConfiguration,
+  JsonResponseData,
 } from '../../components/activity-builder/types';
 import {
   ChatLog,
@@ -27,7 +29,6 @@ import {
   AiPromptStep,
   DocData,
   DocService,
-  numMessagesToNumber,
   PromptConfiguration,
   PromptOutputTypes,
   PromptRoles,
@@ -62,11 +63,13 @@ export const GO_HOME_BUTTON_MESSAGE = 'Return to Home';
 export const DOC_TEXT_KEY = 'doc_text';
 export const DOC_NUM_WORDS_KEY = 'doc_num_words';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type StateData = Record<string, any>;
+
 export class BuiltActivityHandler implements ChatLogSubscriber {
   builtActivityData: ActivityBuilder | undefined;
   curStep: ActivityBuilderStep | undefined;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stateData: Record<string, any>;
+  stateData: StateData;
   chatLog: ChatLog = [];
   errorMessage: string | null = null;
   sendMessage: (msg: ChatMessageTypes) => void;
@@ -536,115 +539,172 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
   async handlePromptStep(step: PromptActivityStep) {
     this.setResponsePending(true);
-    // handle replacing promptText with stored data
-    const promptText = replaceStoredDataInString(
-      step.promptText,
-      this.stateData
-    );
-    // handle replacing responseFormat with stored data
-    const responseFormat = replaceStoredDataInString(
-      step.responseFormat,
-      this.stateData
-    );
-    // handle replacing customSystemRole with stored data
-    const customSystemRole = replaceStoredDataInString(
-      step.customSystemRole,
-      this.stateData
+
+    // Execute all prompt configurations in parallel
+    const promptResults = await Promise.allSettled(
+      step.promptConfigurations.map((config) =>
+        this.executeSinglePromptConfiguration(config)
+      )
     );
 
-    const aiPromptSteps: AiPromptStep[] = [];
+    // Check if any prompts failed
+    const hasFailures = promptResults.some(
+      (result) => result.status === 'rejected'
+    );
 
-    // currently, we only have one prompt step. In the future, this variable will likely be reduced to a single step.
-    aiPromptSteps.push({
-      prompts: [],
-      outputDataType: step.outputDataType,
-      responseFormat,
-      systemRole: customSystemRole,
-      webSearch: step.webSearch || false,
-      editDoc: step.editDoc || false,
-    });
-
-    if (step.includeChatLogContext) {
-      const numMessages = step.numChatMessagesIncluded
-        ? numMessagesToNumber[step.numChatMessagesIncluded]
-        : 1000;
-      aiPromptSteps[0].prompts.push({
-        promptText: `Current state of chat log between user and system: ${chatLogToString(
-          this.chatLog,
-          numMessages
-        )}`,
-        includeEssay: false,
-        promptRole: PromptRoles.USER,
-      });
-    }
-
-    const promptConfig: PromptConfiguration = {
-      promptText,
-      includeEssay: step.includeEssay, // handled by server
-      promptRole: PromptRoles.USER,
-    };
-
-    aiPromptSteps[0].prompts.push(promptConfig);
-    if (
-      step.jsonResponseData &&
-      step.outputDataType === PromptOutputTypes.JSON
-    ) {
-      aiPromptSteps[0].responseFormat =
-        recursivelyConvertExpectedDataToAiPromptString(
-          recursiveUpdateAdditionalInfo(step.jsonResponseData, this.stateData)
-        );
-    }
-
-    // handle sending prompt
-    const requestFunction = async () => {
-      const _response = await this.executePrompt(aiPromptSteps);
-      const response = _response.answer;
-      if (step.outputDataType === PromptOutputTypes.JSON) {
-        if (!isJsonString(response)) {
-          throw new Error('Did not receive valid JSON data');
-        }
-        if (step.jsonResponseData) {
-          if (!receivedExpectedData(step.jsonResponseData, response)) {
-            this.errorMessage = 'Did not receive expected JSON data';
-            throw new Error('Did not receive expected JSON data');
-          }
-        }
-        const resData = JSON.parse(response);
-        this.stateData = { ...this.stateData, ...resData };
-      } else {
-        // is a text response
-        this.sendMessage({
-          id: uuidv4(),
-          message: response,
-          aiServiceStepData: _response.aiAllStepsData,
-          sender: Sender.SYSTEM,
-          displayType: MessageDisplayType.TEXT,
-        });
-      }
-    };
-
-    // try request function 3 times
-    let counter = 0;
-    let success = false;
-    while (counter < 3) {
-      try {
-        await requestFunction();
-        success = true;
-        console.log('breaking');
-        break;
-      } catch (err) {
-        console.log('error', err);
-        counter++;
-      }
-    }
-    if (!success) {
+    if (hasFailures) {
+      // If any prompt failed, fail the entire step
       this.sendErrorMessage('AI Service request failed');
       this.lastFailedStepId = step.stepId;
       this.setResponsePending(false);
       return;
     }
 
+    // All prompts succeeded - process results
+    const jsonResults: StateData = {};
+
+    for (const result of promptResults) {
+      if (result.status === 'fulfilled') {
+        if (result.value.type === 'json') {
+          // Merge JSON results into accumulated object
+          Object.assign(jsonResults, result.value.data);
+        } else if (result.value.type === 'text') {
+          // Send text response as message
+          this.sendMessage({
+            id: uuidv4(),
+            message: result.value.message,
+            aiServiceStepData: result.value.aiServiceStepData,
+            sender: Sender.SYSTEM,
+            displayType: MessageDisplayType.TEXT,
+          });
+        }
+      }
+    }
+
+    // Merge all JSON results into stateData
+    if (Object.keys(jsonResults).length > 0) {
+      this.stateData = { ...this.stateData, ...jsonResults };
+    }
+
     this.setResponsePending(false);
     await this.goToNextStep();
+  }
+
+  async executeSinglePromptConfiguration(
+    config: SinglePromptConfiguration
+  ): Promise<
+    | { type: 'json'; data: StateData }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    | { type: 'text'; message: string; aiServiceStepData: any }
+  > {
+    // Build AI prompt steps with replaced data
+    const promptText = replaceStoredDataInString(
+      config.promptText,
+      this.stateData
+    );
+    const responseFormat = replaceStoredDataInString(
+      config.responseFormat,
+      this.stateData
+    );
+    const customSystemRole = replaceStoredDataInString(
+      config.customSystemRole,
+      this.stateData
+    );
+
+    const aiPromptSteps: AiPromptStep[] = [
+      {
+        prompts: [],
+        outputDataType: config.outputDataType,
+        responseFormat,
+        systemRole: customSystemRole,
+        webSearch: config.webSearch || false,
+        editDoc: config.editDoc || false,
+      },
+    ];
+
+    // Add chat log context if configured
+    if (config.includeChatLogContext) {
+      aiPromptSteps[0].prompts.push({
+        promptText: `Current state of chat log between user and system: ${chatLogToString(
+          this.chatLog,
+          1000
+        )}`,
+        includeEssay: false,
+        promptRole: PromptRoles.USER,
+      });
+    }
+
+    // Add main prompt
+    const promptConfiguration: PromptConfiguration = {
+      promptText,
+      includeEssay: config.includeEssay,
+      promptRole: PromptRoles.USER,
+    };
+    aiPromptSteps[0].prompts.push(promptConfiguration);
+
+    // Handle JSON response format
+    if (
+      config.jsonResponseData &&
+      config.outputDataType === PromptOutputTypes.JSON
+    ) {
+      aiPromptSteps[0].responseFormat =
+        recursivelyConvertExpectedDataToAiPromptString(
+          recursiveUpdateAdditionalInfo(config.jsonResponseData, this.stateData)
+        );
+    }
+
+    // Retry logic: attempt up to 3 times
+    return await this.retryPromptExecution(
+      aiPromptSteps,
+      config.outputDataType,
+      config.jsonResponseData
+    );
+  }
+
+  async retryPromptExecution(
+    aiPromptSteps: AiPromptStep[],
+    outputDataType: PromptOutputTypes,
+    jsonResponseData?: JsonResponseData[]
+  ): Promise<
+    | { type: 'json'; data: StateData }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    | { type: 'text'; message: string; aiServiceStepData: any }
+  > {
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const _response = await this.executePrompt(aiPromptSteps);
+        const response = _response.answer;
+
+        if (outputDataType === PromptOutputTypes.JSON) {
+          // Validate and parse JSON response
+          if (!isJsonString(response)) {
+            throw new Error('Did not receive valid JSON data');
+          }
+          if (jsonResponseData) {
+            if (!receivedExpectedData(jsonResponseData, response)) {
+              this.errorMessage = 'Did not receive expected JSON data';
+              throw new Error('Did not receive expected JSON data');
+            }
+          }
+          const resData = JSON.parse(response);
+          return { type: 'json', data: resData };
+        } else {
+          // Return text response
+          return {
+            type: 'text',
+            message: response,
+            aiServiceStepData: _response.aiAllStepsData,
+          };
+        }
+      } catch (err) {
+        console.log(`Prompt execution attempt ${attempt + 1} failed:`, err);
+        lastError = err as Error;
+      }
+    }
+
+    // All retries exhausted
+    throw lastError || new Error('Prompt execution failed after 3 attempts');
   }
 }

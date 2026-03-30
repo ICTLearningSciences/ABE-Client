@@ -240,10 +240,6 @@ export interface GQLPrompt {
   userInputIsIntention?: boolean;
 }
 
-export interface GQLResPrompts {
-  prompts: GQLPrompt[];
-}
-
 export enum PromptRoles {
   SYSTEM = 'system',
   USER = 'user',

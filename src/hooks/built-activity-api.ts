@@ -60,17 +60,18 @@ export const fullBuiltActivityQueryData = `
                               stepId
                               stepType
                               jumpToStepId
-                              promptText
-                              responseFormat
-                              editDoc
-                              includeChatLogContext
-                              numChatMessagesIncluded
-                              includeEssay
-                              outputDataType
-                              jsonResponseData
-                              customSystemRole
-                              webSearch
                               setStudentActivityComplete
+                              promptConfigurations{
+                                promptText
+                                responseFormat
+                                editDoc
+                                includeChatLogContext
+                                includeEssay
+                                outputDataType
+                                jsonResponseData
+                                customSystemRole
+                                webSearch
+                              }
                           }
 
                           ... on ConditionalActivityStepType {
@@ -104,9 +105,18 @@ export function convertGqlToBuiltActivity(
     flow.steps.forEach((step) => {
       if (step.stepType === ActivityBuilderStepType.PROMPT) {
         const _step: PromptActivityStepGql = step as PromptActivityStepGql;
-        if (typeof _step.jsonResponseData === 'string') {
-          _step.jsonResponseData = JSON.parse(_step.jsonResponseData as string);
-        }
+        // Convert jsonResponseData in each prompt configuration
+        _step.promptConfigurations = _step.promptConfigurations.map(
+          (config) => {
+            if (typeof config.jsonResponseData === 'string') {
+              return {
+                ...config,
+                jsonResponseData: JSON.parse(config.jsonResponseData as string),
+              };
+            }
+            return config;
+          }
+        );
       }
     });
   });
@@ -121,9 +131,18 @@ export function convertBuiltActivityToGql(
     flow.steps.forEach((step) => {
       if (step.stepType === ActivityBuilderStepType.PROMPT) {
         const _step: PromptActivityStepGql = step as PromptActivityStepGql;
-        if (_step.jsonResponseData) {
-          _step.jsonResponseData = JSON.stringify(_step.jsonResponseData);
-        }
+        // Convert jsonResponseData in each prompt configuration
+        _step.promptConfigurations = _step.promptConfigurations.map(
+          (config) => {
+            if (config.jsonResponseData) {
+              return {
+                ...config,
+                jsonResponseData: JSON.stringify(config.jsonResponseData),
+              };
+            }
+            return config;
+          }
+        );
       }
     });
   });

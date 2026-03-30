@@ -52,20 +52,24 @@ export const myEditableActivity: ActivityBuilder = {
           {
             stepId: '3.1',
             stepType: ActivityBuilderStepType.PROMPT,
-            promptText: 'Please generate 3 nicknames for {{name}}',
-            responseFormat: '',
-            jsonResponseData: [
+            promptConfigurations: [
               {
-                clientId: '1',
-                name: 'nickname1',
-                type: 'string',
-                isRequired: true,
+                promptText: 'Please generate 3 nicknames for {{name}}',
+                responseFormat: '',
+                jsonResponseData: [
+                  {
+                    clientId: '1',
+                    name: 'nickname1',
+                    type: 'string',
+                    isRequired: true,
+                  }
+                ],
+                includeChatLogContext: false,
+                includeEssay: false,
+                outputDataType: PromptOutputTypes.JSON,
+                customSystemRole: 'user',
               }
-            ],
-            includeChatLogContext: false,
-            includeEssay: false,
-            outputDataType: PromptOutputTypes.JSON,
-            customSystemRole: 'user',
+            ]
           } as PromptActivityStep,
           {
             stepId: "3.2",
