@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import { RequestUserInputStepBuilder } from "../../../src/components/activity-builder/edit-activity/step-builder/request-user-input-step-builder";
-import { exampleRequestUserInputActivityStep, exampleSystemMessageActivityStep, multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
+import { exampleRequestUserInputActivityStep, multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
 describe("Request User Input Step Builder", ()=>{
     it("should render", ()=>{
         let step = exampleRequestUserInputActivityStep;

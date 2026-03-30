@@ -153,6 +153,7 @@ function SinglePromptConfigurationEditor(
 
   return (
     <div
+      key={configIndex}
       style={{
         display: 'flex',
         flexDirection: 'column',

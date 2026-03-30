@@ -33,6 +33,7 @@ export const fullBuiltActivityQueryData = `
                               stepId
                               stepType
                               jumpToStepId
+                              systemCustomName
                               message
                               setStudentActivityComplete
                           }
@@ -44,6 +45,7 @@ export const fullBuiltActivityQueryData = `
                               message
                               saveAsIntention
                               saveResponseVariableName
+                              systemCustomName
                               specialType
                               disableFreeInput
                               predefinedResponses{

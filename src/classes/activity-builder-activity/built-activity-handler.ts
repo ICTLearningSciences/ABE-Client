@@ -352,6 +352,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       id: uuidv4(),
       message: replaceStoredDataInString(step.message, this.stateData),
       sender: Sender.SYSTEM,
+      systemCustomName: step.systemCustomName,
       displayType: MessageDisplayType.TEXT,
     });
     await this.goToNextStep();
@@ -366,6 +367,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       id: uuidv4(),
       message: replaceStoredDataInString(step.message, this.stateData),
       sender: Sender.SYSTEM,
+      systemCustomName: step.systemCustomName,
       displayType: MessageDisplayType.TEXT,
       disableUserInput: step.disableFreeInput,
       mcqChoices: this.handleExtractMcqChoices(processedPredefinedResponses),
@@ -567,7 +569,15 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       if (result.status === 'fulfilled') {
         if (result.value.type === 'json') {
           // Merge JSON results into accumulated object
-          Object.assign(jsonResults, result.value.data);
+          if (result.value.originalConfiguration.systemCustomName) {
+            jsonResults['named_system_responses'] = {
+              ...(jsonResults['named_system_responses'] || {}),
+              [result.value.originalConfiguration.systemCustomName]:
+                result.value.data,
+            };
+          } else {
+            Object.assign(jsonResults, result.value.data);
+          }
         } else if (result.value.type === 'text') {
           // Send text response as message
           this.sendMessage({

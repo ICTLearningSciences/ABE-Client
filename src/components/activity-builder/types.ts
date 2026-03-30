@@ -90,6 +90,7 @@ export type ActivityBuilderStepTypes =
 export interface SystemMessageActivityStep extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.SYSTEM_MESSAGE;
   message: string;
+  systemCustomName: string;
 }
 
 // LogicOperation
@@ -142,6 +143,7 @@ export interface RequestUserInputActivityStep extends ActivityBuilderStep {
   message: string;
   saveAsIntention: boolean;
   saveResponseVariableName: string;
+  systemCustomName: string;
   specialType?: RequestUserInputSpecialType;
   disableFreeInput: boolean;
   predefinedResponses: PredefinedResponse[];

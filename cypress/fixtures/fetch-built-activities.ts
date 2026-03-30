@@ -39,6 +39,7 @@ export const myEditableActivity: ActivityBuilder = {
             message: 'What is your name?',
             saveAsIntention: true,
             saveResponseVariableName: 'name',
+            systemCustomName: '',
             disableFreeInput: false,
             predefinedResponses: [],
             setStudentActivityComplete: true,
@@ -91,6 +92,7 @@ export const myEditableActivity: ActivityBuilder = {
             message: 'What would you like to do next?',
             saveAsIntention: false,
             saveResponseVariableName: '',
+            systemCustomName: '',
             disableFreeInput: true,
             predefinedResponses: [
               {

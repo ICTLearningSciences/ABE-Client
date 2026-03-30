@@ -20,6 +20,7 @@ export const exampleSystemMessageActivityStep: SystemMessageActivityStep = {
   stepId: '1',
   stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
   message: 'Hello, world!',
+  systemCustomName: '',
 };
 
 export const exampleRequestUserInputActivityStep: RequestUserInputActivityStep =
@@ -30,6 +31,7 @@ export const exampleRequestUserInputActivityStep: RequestUserInputActivityStep =
     saveAsIntention: false,
     saveResponseVariableName: 'name',
     disableFreeInput: false,
+    systemCustomName: '',
     predefinedResponses: [
       {
         clientId: '1',
@@ -99,6 +101,7 @@ export const collectUserNameActivity: ActivityBuilder = {
           stepId: '2',
           stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
           message: 'What is your name?',
+          systemCustomName: '',
           saveAsIntention: false,
           saveResponseVariableName: 'name',
           disableFreeInput: false,
@@ -146,6 +149,7 @@ export const collectIntentionActivity: ActivityBuilder = {
           stepId: '1',
           stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
           message: 'What would you like to do next?',
+          systemCustomName: '',
           saveAsIntention: true,
           saveResponseVariableName: 'intention',
           disableFreeInput: false,
@@ -243,6 +247,7 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
           stepId: '2',
           stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
           message: 'What is your name?',
+          systemCustomName: '',
           saveAsIntention: false,
           saveResponseVariableName: 'name',
           disableFreeInput: false,
@@ -314,6 +319,7 @@ export const multipleFlowActivity: ActivityBuilder = {
           saveAsIntention: false,
           saveResponseVariableName: 'name',
           disableFreeInput: false,
+          systemCustomName: '',
           predefinedResponses: [],
         } as RequestUserInputActivityStep,
         {

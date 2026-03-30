@@ -37,6 +37,7 @@ export function getDefaultEndActivityStepBuilder(): RequestUserInputActivityStep
     stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
     message: '',
     saveResponseVariableName: '',
+    systemCustomName: '',
     saveAsIntention: false,
     disableFreeInput: true,
     setStudentActivityComplete: true,
