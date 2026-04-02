@@ -170,18 +170,29 @@ export class ActivityStepErrorChecker {
     isLastStep: boolean
   ) {
     this.initializeStepErrors(flowId, step.stepId);
-    const keys = getAllContextDataKeys(step.promptText).concat(
-      getAllContextDataKeys(step.customSystemRole)
-    );
 
-    this.sharedStepErrors(step, flowId, existingSteps, isLastStep, keys);
+    // Collect all data keys from all prompt configurations
+    const allKeys: string[] = [];
 
-    if (
-      step.outputDataType === PromptOutputTypes.JSON &&
-      step.jsonResponseData?.length === 0
-    ) {
-      this.errors[flowId][step.stepId].push('No JSON response data is set');
-    }
+    // Validate each prompt configuration
+    step.promptConfigurations.forEach((config, index) => {
+      const configKeys = getAllContextDataKeys(config.promptText).concat(
+        getAllContextDataKeys(config.customSystemRole)
+      );
+      allKeys.push(...configKeys);
+
+      // Check JSON response data for JSON output type
+      if (
+        config.outputDataType === PromptOutputTypes.JSON &&
+        (!config.jsonResponseData || config.jsonResponseData.length === 0)
+      ) {
+        this.errors[flowId][step.stepId].push(
+          `Prompt ${index + 1}: No JSON response data is set`
+        );
+      }
+    });
+
+    this.sharedStepErrors(step, flowId, existingSteps, isLastStep, allKeys);
 
     this.clearEmptyStepErrors(flowId, step.stepId);
   }

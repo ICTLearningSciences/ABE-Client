@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { NumChatMessagesIncluded, PromptOutputTypes } from '../types';
+import { PromptOutputTypes } from '../types';
 import {
   ActivityBuilder,
   ActivityBuilderStepType,
@@ -20,6 +20,7 @@ export const exampleSystemMessageActivityStep: SystemMessageActivityStep = {
   stepId: '1',
   stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
   message: 'Hello, world!',
+  systemCustomName: '',
 };
 
 export const exampleRequestUserInputActivityStep: RequestUserInputActivityStep =
@@ -30,6 +31,7 @@ export const exampleRequestUserInputActivityStep: RequestUserInputActivityStep =
     saveAsIntention: false,
     saveResponseVariableName: 'name',
     disableFreeInput: false,
+    systemCustomName: '',
     predefinedResponses: [
       {
         clientId: '1',
@@ -42,21 +44,25 @@ export const exampleRequestUserInputActivityStep: RequestUserInputActivityStep =
 export const examplePromptActivityStep: PromptActivityStep = {
   stepId: '1',
   stepType: ActivityBuilderStepType.PROMPT,
-  promptText: 'Please generate a nickname for Aaron',
-  responseFormat: '',
-  jsonResponseData: [
+  promptConfigurations: [
     {
-      clientId: '1',
-      name: 'nickname',
-      type: JsonResponseDataType.STRING,
-      isRequired: true,
+      systemCustomName: '',
+      promptText: 'Please generate a nickname for Aaron',
+      responseFormat: '',
+      jsonResponseData: [
+        {
+          clientId: '1',
+          name: 'nickname',
+          type: JsonResponseDataType.STRING,
+          isRequired: true,
+        },
+      ],
+      includeChatLogContext: false,
+      includeEssay: false,
+      outputDataType: PromptOutputTypes.JSON,
+      customSystemRole: 'user',
     },
   ],
-  includeChatLogContext: false,
-  includeEssay: false,
-  outputDataType: PromptOutputTypes.JSON,
-  customSystemRole: 'user',
-  numChatMessagesIncluded: NumChatMessagesIncluded.ALL,
 };
 
 export const examplePromptActivity: ActivityBuilder = {
@@ -95,6 +101,7 @@ export const collectUserNameActivity: ActivityBuilder = {
           stepId: '2',
           stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
           message: 'What is your name?',
+          systemCustomName: '',
           saveAsIntention: false,
           saveResponseVariableName: 'name',
           disableFreeInput: false,
@@ -142,6 +149,7 @@ export const collectIntentionActivity: ActivityBuilder = {
           stepId: '1',
           stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
           message: 'What would you like to do next?',
+          systemCustomName: '',
           saveAsIntention: true,
           saveResponseVariableName: 'intention',
           disableFreeInput: false,
@@ -175,20 +183,24 @@ export const collectAiDataAndDisplayActivity: ActivityBuilder = {
         {
           stepId: '1',
           stepType: ActivityBuilderStepType.PROMPT,
-          promptText: 'Please generate a nickname for Aaron',
-          responseFormat: '',
-          jsonResponseData: [
+          promptConfigurations: [
             {
-              clientId: '1',
-              name: 'nickname',
-              type: 'string',
-              isRequired: true,
+              promptText: 'Please generate a nickname for Aaron',
+              responseFormat: '',
+              jsonResponseData: [
+                {
+                  clientId: '1',
+                  name: 'nickname',
+                  type: 'string',
+                  isRequired: true,
+                },
+              ],
+              includeChatLogContext: false,
+              includeEssay: false,
+              outputDataType: PromptOutputTypes.JSON,
+              customSystemRole: 'user',
             },
           ],
-          includeChatLogContext: false,
-          includeEssay: false,
-          outputDataType: PromptOutputTypes.JSON,
-          customSystemRole: 'user',
         } as PromptActivityStep,
         {
           stepId: '2',
@@ -235,6 +247,7 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
           stepId: '2',
           stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
           message: 'What is your name?',
+          systemCustomName: '',
           saveAsIntention: false,
           saveResponseVariableName: 'name',
           disableFreeInput: false,
@@ -248,21 +261,25 @@ export const sendDataToPromptsActivity: ActivityBuilder = {
         {
           stepId: '4',
           stepType: ActivityBuilderStepType.PROMPT,
-          promptText: 'Please generate a nickname for {{name}}',
-          responseFormat: '',
-          jsonResponseData: [
+          promptConfigurations: [
             {
-              clientId: '1',
-              name: 'nickname',
-              type: JsonResponseDataType.STRING,
-              additionalInfo: 'a nickname generated for the supplied name',
-              isRequired: true,
+              promptText: 'Please generate a nickname for {{name}}',
+              responseFormat: '',
+              jsonResponseData: [
+                {
+                  clientId: '1',
+                  name: 'nickname',
+                  type: JsonResponseDataType.STRING,
+                  additionalInfo: 'a nickname generated for the supplied name',
+                  isRequired: true,
+                },
+              ],
+              includeChatLogContext: true,
+              includeEssay: false,
+              outputDataType: PromptOutputTypes.JSON,
+              customSystemRole: 'user',
             },
           ],
-          includeChatLogContext: true,
-          includeEssay: false,
-          outputDataType: PromptOutputTypes.JSON,
-          customSystemRole: 'user',
         } as PromptActivityStep,
         {
           stepId: '5',
@@ -302,6 +319,7 @@ export const multipleFlowActivity: ActivityBuilder = {
           saveAsIntention: false,
           saveResponseVariableName: 'name',
           disableFreeInput: false,
+          systemCustomName: '',
           predefinedResponses: [],
         } as RequestUserInputActivityStep,
         {
@@ -319,21 +337,25 @@ export const multipleFlowActivity: ActivityBuilder = {
         {
           stepId: '4',
           stepType: ActivityBuilderStepType.PROMPT,
-          promptText: 'Please generate a nickname for {{name}}',
-          responseFormat: '',
-          jsonResponseData: [
+          promptConfigurations: [
             {
-              clientId: '1',
-              name: 'nickname',
-              type: JsonResponseDataType.STRING,
-              additionalInfo: 'a nickname generated for the supplied name',
-              isRequired: true,
+              promptText: 'Please generate a nickname for {{name}}',
+              responseFormat: '',
+              jsonResponseData: [
+                {
+                  clientId: '1',
+                  name: 'nickname',
+                  type: JsonResponseDataType.STRING,
+                  additionalInfo: 'a nickname generated for the supplied name',
+                  isRequired: true,
+                },
+              ],
+              includeChatLogContext: true,
+              includeEssay: false,
+              outputDataType: PromptOutputTypes.JSON,
+              customSystemRole: 'user',
             },
           ],
-          includeChatLogContext: true,
-          includeEssay: false,
-          outputDataType: PromptOutputTypes.JSON,
-          customSystemRole: 'user',
         } as PromptActivityStep,
         {
           stepId: '5',
@@ -369,20 +391,24 @@ export const utilizeListMcqActivity: ActivityBuilder = {
         {
           stepId: '1',
           stepType: ActivityBuilderStepType.PROMPT,
-          promptText: 'Please generate 3 nicknames for Aaron',
-          responseFormat: '',
-          jsonResponseData: [
+          promptConfigurations: [
             {
-              clientId: '1',
-              name: 'nicknames',
-              type: 'array',
-              isRequired: true,
+              promptText: 'Please generate 3 nicknames for Aaron',
+              responseFormat: '',
+              jsonResponseData: [
+                {
+                  clientId: '1',
+                  name: 'nicknames',
+                  type: 'array',
+                  isRequired: true,
+                },
+              ],
+              includeChatLogContext: false,
+              includeEssay: false,
+              outputDataType: PromptOutputTypes.JSON,
+              customSystemRole: 'user',
             },
           ],
-          includeChatLogContext: false,
-          includeEssay: false,
-          outputDataType: PromptOutputTypes.JSON,
-          customSystemRole: 'user',
         } as PromptActivityStep,
         {
           stepId: '2',
@@ -477,39 +503,43 @@ export const weightedResponseWeightsActivity: ActivityBuilder = {
         {
           stepId: '1',
           stepType: ActivityBuilderStepType.PROMPT,
-          promptText: 'Please generate 3 nicknames for Aaron',
-          responseFormat: '',
-          jsonResponseData: [
+          promptConfigurations: [
             {
-              clientId: '1',
-              name: 'nickname1',
-              type: 'string',
-              isRequired: true,
-            },
-            {
-              clientId: '2',
-              name: 'nickname1rating',
-              type: 'string',
-              isRequired: true,
-            },
+              promptText: 'Please generate 3 nicknames for Aaron',
+              responseFormat: '',
+              jsonResponseData: [
+                {
+                  clientId: '1',
+                  name: 'nickname1',
+                  type: 'string',
+                  isRequired: true,
+                },
+                {
+                  clientId: '2',
+                  name: 'nickname1rating',
+                  type: 'string',
+                  isRequired: true,
+                },
 
-            {
-              clientId: '3',
-              name: 'nickname2',
-              type: 'string',
-              isRequired: true,
-            },
-            {
-              clientId: '4',
-              name: 'nickname2rating',
-              type: 'string',
-              isRequired: true,
+                {
+                  clientId: '3',
+                  name: 'nickname2',
+                  type: 'string',
+                  isRequired: true,
+                },
+                {
+                  clientId: '4',
+                  name: 'nickname2rating',
+                  type: 'string',
+                  isRequired: true,
+                },
+              ],
+              includeChatLogContext: false,
+              includeEssay: false,
+              outputDataType: PromptOutputTypes.JSON,
+              customSystemRole: 'user',
             },
           ],
-          includeChatLogContext: false,
-          includeEssay: false,
-          outputDataType: PromptOutputTypes.JSON,
-          customSystemRole: 'user',
         } as PromptActivityStep,
         {
           stepId: '2',
@@ -552,40 +582,44 @@ export const nestedDataActivity: ActivityBuilder = {
         {
           stepId: '1',
           stepType: ActivityBuilderStepType.PROMPT,
-          promptText: 'Please generate 3 nicknames for Aaron',
-          responseFormat: '',
-          jsonResponseData: [
+          promptConfigurations: [
             {
-              clientId: '1',
-              name: 'nicknames',
-              type: 'object',
-              isRequired: true,
-              subData: [
+              promptText: 'Please generate 3 nicknames for Aaron',
+              responseFormat: '',
+              jsonResponseData: [
                 {
-                  clientId: '2',
-                  name: 'nickname1',
-                  type: 'string',
+                  clientId: '1',
+                  name: 'nicknames',
+                  type: 'object',
                   isRequired: true,
-                },
-                {
-                  clientId: '3',
-                  name: 'nickname2',
-                  type: 'string',
-                  isRequired: true,
-                },
-                {
-                  clientId: '4',
-                  name: 'nickname3',
-                  type: 'string',
-                  isRequired: true,
+                  subData: [
+                    {
+                      clientId: '2',
+                      name: 'nickname1',
+                      type: 'string',
+                      isRequired: true,
+                    },
+                    {
+                      clientId: '3',
+                      name: 'nickname2',
+                      type: 'string',
+                      isRequired: true,
+                    },
+                    {
+                      clientId: '4',
+                      name: 'nickname3',
+                      type: 'string',
+                      isRequired: true,
+                    },
+                  ],
                 },
               ],
+              includeChatLogContext: false,
+              includeEssay: false,
+              outputDataType: PromptOutputTypes.JSON,
+              customSystemRole: 'user',
             },
           ],
-          includeChatLogContext: false,
-          includeEssay: false,
-          outputDataType: PromptOutputTypes.JSON,
-          customSystemRole: 'user',
         } as PromptActivityStep,
         {
           stepId: '2',

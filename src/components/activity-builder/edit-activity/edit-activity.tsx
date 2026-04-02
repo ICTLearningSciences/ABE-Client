@@ -47,7 +47,9 @@ export function EditActivity(props: {
             }
           }
           if (step.stepType === ActivityBuilderStepType.PROMPT) {
-            const jsonKeys = step.jsonResponseData?.map((d) => d.name) || [];
+            const jsonKeys = step.promptConfigurations.flatMap(
+              (d) => d.jsonResponseData?.map((d) => d.name) || []
+            );
             acc.push(...jsonKeys);
           }
           return acc;

@@ -529,6 +529,7 @@ test('retries prompt 3 times', async () => {
   );
   activityBuilder.initializeActivity();
   await new Promise((r) => setTimeout(r, 1000));
+  console.log(JSON.stringify(activityBuilderStepAccumulator, null, 2));
   expect(activityBuilderStepAccumulator.stepsExecuted.length).toBe(4);
   expect(activityBuilderStepAccumulator.numTimesPromptExecuted).toBe(3);
   expect(activityBuilderStepAccumulator.stepsExecuted[0].type).toBe(

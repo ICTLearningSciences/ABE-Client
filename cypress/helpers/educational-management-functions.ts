@@ -44,7 +44,6 @@ import { fetchGoogleDocsResponse } from '../fixtures/fetch-google-docs';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 import { fetchDocGoalsResponse } from '../fixtures/fetch-doc-goals';
 import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
-import { fetchPromptTemplates } from '../fixtures/fetch-prompt-templates';
 import { fetchInstructorsResponseEmpty } from '../fixtures/educational-management/fetch-instructors';
 import { realExampleDocumentTimeline } from '../fixtures/document-timeline/real-example';
 import { gradeStudentAssignmentResponse } from '../fixtures/educational-management/grade-student-assignment';
@@ -168,7 +167,6 @@ export function cyMockEducationalManagement(
     //
     mockGQL('FetchVersionsById', fetchDocVersionsBuilder([])),
     mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.GOOGLE_DOCS)),
-    mockGQL('FetchPrompts', fetchPromptTemplates),
     mockGQL('FetchConfig', fetchConfigResponse),
     mockGQL('FetchDocGoals', fetchDocGoalsResponse),
     mockGQL('FetchSystemPrompts', fetchConfigResponse),

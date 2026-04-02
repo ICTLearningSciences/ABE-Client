@@ -136,6 +136,18 @@ export default function Message(props: {
       }}
       className="markdown"
     >
+      {message.systemCustomName && (
+        <div
+          style={{
+            fontWeight: 'bold',
+            marginBottom: '0.5rem',
+            borderBottom: `1px solid ${textColor}40`,
+            paddingBottom: '0.25rem',
+          }}
+        >
+          {message.systemCustomName}
+        </div>
+      )}
       {displayMarkdown && (
         <ReactMarkdown
           remarkPlugins={[remarkBreaks]}

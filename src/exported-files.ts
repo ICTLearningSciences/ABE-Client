@@ -17,7 +17,6 @@ export { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/u
 export { useWithSpfxLogin } from './store/slices/login/use-with-spfx-login';
 export { useWithState } from './store/slices/state/use-with-state';
 export { useWithUsersDocs } from './hooks/use-with-users-docs';
-export { useWithPrompts } from './hooks/use-with-prompts';
 export { useReduxHydration } from './use-redux-hydration';
 export { EditGoogleDoc } from './components/user-view/user-edit-google-doc';
 export { useWithCurrentGoalActivity } from './hooks/use-with-current-goal-activity';

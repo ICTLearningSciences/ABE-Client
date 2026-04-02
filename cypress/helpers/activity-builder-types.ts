@@ -94,6 +94,7 @@ export type ActivityBuilderStepTypes =
 export interface SystemMessageActivityStep extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.SYSTEM_MESSAGE;
   message: string;
+  systemCustomName: string;
 }
 
 // LogicOperation
@@ -145,6 +146,7 @@ export interface RequestUserInputActivityStep extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.REQUEST_USER_INPUT;
   message: string;
   saveAsIntention: boolean;
+  systemCustomName: string;
   specialType?: RequestUserInputSpecialType;
   saveResponseVariableName: string;
   disableFreeInput: boolean;
@@ -177,12 +179,12 @@ export interface JsonResponseData {
   subData?: JsonResponseData[];
 }
 
-export interface PromptActivityStepGql extends ActivityBuilderStep {
-  stepType: ActivityBuilderStepType.PROMPT;
+export interface SinglePromptConfigurationGql{
   promptText: string;
   responseFormat: string;
   editDoc?: boolean;
   includeChatLogContext: boolean;
+  systemCustomName: string;
   includeEssay: boolean;
   outputDataType: PromptOutputTypes;
   jsonResponseData?: string;
@@ -190,9 +192,18 @@ export interface PromptActivityStepGql extends ActivityBuilderStep {
   webSearch?: boolean;
 }
 
-export interface PromptActivityStep
-  extends Omit<PromptActivityStepGql, 'jsonResponseData'> {
+export interface SinglePromptConfiguration extends Omit<SinglePromptConfigurationGql, 'jsonResponseData'>{
   jsonResponseData?: JsonResponseData[];
+}
+
+export interface PromptActivityStepGql extends ActivityBuilderStep {
+  stepType: ActivityBuilderStepType.PROMPT;
+  promptConfigurations: SinglePromptConfigurationGql[];
+}
+
+export interface PromptActivityStep
+  extends Omit<PromptActivityStepGql, 'promptConfigurations'> {
+  promptConfigurations: SinglePromptConfiguration[];
 }
 
 export interface BuiltActivityVersion {

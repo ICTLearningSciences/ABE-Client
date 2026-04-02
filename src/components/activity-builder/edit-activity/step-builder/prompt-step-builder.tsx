@@ -12,6 +12,7 @@ import {
   JsonResponseData,
   JsonResponseDataType,
   PromptActivityStep,
+  SinglePromptConfiguration,
 } from '../../types';
 import {
   RoundedBorderDiv,
@@ -25,7 +26,6 @@ import {
 } from '../../shared/input-components';
 import {
   AiPromptStep,
-  NumChatMessagesIncluded,
   PromptConfiguration,
   PromptOutputTypes,
   PromptRoles,
@@ -33,13 +33,12 @@ import {
 import {
   Button,
   CircularProgress,
-  MenuItem,
-  Select,
   IconButton,
-  FormControl,
-  InputLabel,
+  Tabs,
+  Tab,
+  Box,
 } from '@mui/material';
-import { Delete } from '@mui/icons-material';
+import { Delete, Add } from '@mui/icons-material';
 import { v4 as uuid } from 'uuid';
 import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
 import { AiServicesResponseTypes } from '../../../../ai-services/ai-service-types';
@@ -53,7 +52,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
-import { InfoTooltip } from '../../../info-tooltip';
 import { useActivityBuilderContext } from '../../activity-builder-context';
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
@@ -65,19 +63,32 @@ export function getEmptyJsonResponseData(): JsonResponseData {
   };
 }
 
+export function getDefaultSinglePromptConfiguration(): SinglePromptConfiguration {
+  return {
+    promptText: '',
+    responseFormat: '',
+    editDoc: false,
+    outputDataType: PromptOutputTypes.TEXT,
+    jsonResponseData: [],
+    includeChatLogContext: false,
+    systemCustomName: '',
+    includeEssay: false,
+    customSystemRole: '',
+    webSearch: false,
+  };
+}
+
 export function defaultEditDocPromptBuilder(): PromptActivityStep {
   return {
     stepId: uuid(),
     stepType: ActivityBuilderStepType.PROMPT,
-    promptText: '',
-    responseFormat: '',
-    editDoc: true,
-    outputDataType: PromptOutputTypes.TEXT,
-    jsonResponseData: [],
-    includeChatLogContext: false,
-    numChatMessagesIncluded: NumChatMessagesIncluded.ALL,
-    includeEssay: true,
-    customSystemRole: '',
+    promptConfigurations: [
+      {
+        ...getDefaultSinglePromptConfiguration(),
+        editDoc: false, // editDoc is deprecated, always false
+        includeEssay: true,
+      },
+    ],
     jumpToStepId: '',
   };
 }
@@ -89,16 +100,8 @@ export function defaultPromptBuilder(editDoc?: boolean): PromptActivityStep {
   return {
     stepId: uuid(),
     stepType: ActivityBuilderStepType.PROMPT,
-    promptText: '',
-    responseFormat: '',
-    editDoc: false,
-    outputDataType: PromptOutputTypes.TEXT,
-    jsonResponseData: [],
-    includeChatLogContext: false,
-    includeEssay: false,
-    customSystemRole: '',
+    promptConfigurations: [getDefaultSinglePromptConfiguration()],
     jumpToStepId: '',
-    numChatMessagesIncluded: NumChatMessagesIncluded.ALL,
   };
 }
 
@@ -106,6 +109,162 @@ export enum ViewingInputType {
   PROMPT_TEXT = 'PROMPT_TEXT',
   RESPONSE_FORMAT = 'RESPONSE_FORMAT',
   NONE = 'NONE',
+}
+
+interface SinglePromptConfigurationEditorProps {
+  configuration: SinglePromptConfiguration;
+  configIndex: number;
+  updateConfigField: (
+    configIndex: number,
+    field: string,
+    value: string | boolean | JsonResponseData[]
+  ) => void;
+  editJsonResponseData: (
+    configIndex: number,
+    clientId: string,
+    field: string,
+    value: string | boolean,
+    parentJsonResponseDataIds: string[]
+  ) => void;
+  addNewJsonResponseData: (
+    configIndex: number,
+    parentJsonResponseDataIds: string[]
+  ) => void;
+  deleteJsonResponseData: (
+    configIndex: number,
+    clientId: string,
+    parentJsonResponseDataIds: string[]
+  ) => void;
+}
+
+function SinglePromptConfigurationEditor(
+  props: SinglePromptConfigurationEditorProps
+): JSX.Element {
+  const {
+    configuration,
+    configIndex,
+    updateConfigField,
+    editJsonResponseData,
+    addNewJsonResponseData,
+    deleteJsonResponseData,
+  } = props;
+  const [viewingInputType, setViewingInputType] =
+    React.useState<ViewingInputType>(ViewingInputType.PROMPT_TEXT);
+
+  return (
+    <div
+      key={configIndex}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        padding: '10px 0',
+      }}
+    >
+      <InputField
+        label="System Custom Name"
+        value={configuration.systemCustomName}
+        onChange={(e) => {
+          updateConfigField(configIndex, 'systemCustomName', e);
+        }}
+        width="100%"
+      />
+
+      <InputField
+        label="Prompt Text"
+        value={configuration.promptText}
+        onFocus={() => {
+          setViewingInputType(ViewingInputType.PROMPT_TEXT);
+        }}
+        maxRows={viewingInputType === ViewingInputType.PROMPT_TEXT ? 20 : 3}
+        onChange={(e) => {
+          updateConfigField(configIndex, 'promptText', e);
+        }}
+        width="100%"
+      />
+
+      <SelectInputField
+        label="Output Data Type"
+        value={configuration.outputDataType}
+        options={[...Object.values(PromptOutputTypes)]}
+        onChange={(e) => {
+          updateConfigField(configIndex, 'outputDataType', e);
+        }}
+      />
+
+      {configuration.outputDataType === PromptOutputTypes.TEXT && (
+        <InputField
+          label="Text Response Format"
+          value={configuration.responseFormat}
+          onFocus={() => {
+            setViewingInputType(ViewingInputType.RESPONSE_FORMAT);
+          }}
+          maxRows={
+            viewingInputType === ViewingInputType.RESPONSE_FORMAT ? 20 : 3
+          }
+          onChange={(e) => {
+            updateConfigField(configIndex, 'responseFormat', e);
+          }}
+          width="100%"
+        />
+      )}
+
+      {configuration.outputDataType === PromptOutputTypes.JSON && (
+        <JsonResponseDataUpdater
+          jsonResponseData={configuration.jsonResponseData || []}
+          editDataField={(clientId, field, value, parentIds) => {
+            editJsonResponseData(
+              configIndex,
+              clientId,
+              field,
+              value,
+              parentIds
+            );
+          }}
+          addNewJsonResponseData={(parentIds) => {
+            addNewJsonResponseData(configIndex, parentIds);
+          }}
+          deleteJsonResponseData={(clientId, parentIds) => {
+            deleteJsonResponseData(configIndex, clientId, parentIds);
+          }}
+          parentJsonResponseDataIds={[]}
+        />
+      )}
+
+      <CheckBoxInput
+        label="Include Chat History"
+        value={configuration.includeChatLogContext}
+        onChange={(e) => {
+          updateConfigField(configIndex, 'includeChatLogContext', e);
+        }}
+      />
+
+      <CheckBoxInput
+        label="Include Essay"
+        value={configuration.includeEssay}
+        onChange={(e) => {
+          updateConfigField(configIndex, 'includeEssay', e);
+        }}
+      />
+
+      <CheckBoxInput
+        label="Enable Web Search"
+        value={configuration.webSearch || false}
+        onChange={(e) => {
+          updateConfigField(configIndex, 'webSearch', e);
+        }}
+      />
+
+      <InputField
+        label="Custom System Role"
+        value={configuration.customSystemRole}
+        onChange={(e) => {
+          updateConfigField(configIndex, 'customSystemRole', e);
+        }}
+        width="100%"
+      />
+    </div>
+  );
 }
 
 export function PromptStepBuilder(props: {
@@ -149,8 +308,15 @@ export function PromptStepBuilder(props: {
   const [executeInProgress, setExecuteInProgress] =
     React.useState<boolean>(false);
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
-  const [viewingInputType, setViewingInputType] =
-    React.useState<ViewingInputType>(ViewingInputType.PROMPT_TEXT);
+  const [selectedConfigIndex, setSelectedConfigIndex] =
+    React.useState<number>(0);
+
+  // Ensure selectedConfigIndex stays valid
+  React.useEffect(() => {
+    if (selectedConfigIndex >= step.promptConfigurations.length) {
+      setSelectedConfigIndex(Math.max(0, step.promptConfigurations.length - 1));
+    }
+  }, [step.promptConfigurations.length, selectedConfigIndex]);
 
   function updateField(
     field: string,
@@ -175,6 +341,100 @@ export function PromptStepBuilder(props: {
         }),
       };
     });
+  }
+
+  function updateConfigField(
+    configIndex: number,
+    field: string,
+    value: string | boolean | JsonResponseData[]
+  ) {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                const promptStep = s as PromptActivityStep;
+                const updatedConfigurations = [
+                  ...promptStep.promptConfigurations,
+                ];
+                updatedConfigurations[configIndex] = {
+                  ...updatedConfigurations[configIndex],
+                  [field]: value,
+                };
+                return {
+                  ...s,
+                  promptConfigurations: updatedConfigurations,
+                };
+              }
+              return s;
+            }),
+          };
+        }),
+      };
+    });
+  }
+
+  function addNewPromptConfiguration() {
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                const promptStep = s as PromptActivityStep;
+                return {
+                  ...s,
+                  promptConfigurations: [
+                    ...promptStep.promptConfigurations,
+                    getDefaultSinglePromptConfiguration(),
+                  ],
+                };
+              }
+              return s;
+            }),
+          };
+        }),
+      };
+    });
+    // Switch to the newly added tab
+    setSelectedConfigIndex(step.promptConfigurations.length);
+  }
+
+  function removePromptConfiguration(configIndex: number) {
+    if (step.promptConfigurations.length <= 1) {
+      return; // Can't remove the last configuration
+    }
+    updateLocalActivity((prevValue) => {
+      return {
+        ...prevValue,
+        flowsList: prevValue.flowsList.map((f) => {
+          return {
+            ...f,
+            steps: f.steps.map((s) => {
+              if (s.stepId === step.stepId) {
+                const promptStep = s as PromptActivityStep;
+                return {
+                  ...s,
+                  promptConfigurations: promptStep.promptConfigurations.filter(
+                    (_, index) => index !== configIndex
+                  ),
+                };
+              }
+              return s;
+            }),
+          };
+        }),
+      };
+    });
+    // Adjust selected tab if needed
+    if (selectedConfigIndex >= configIndex && selectedConfigIndex > 0) {
+      setSelectedConfigIndex(selectedConfigIndex - 1);
+    }
   }
 
   const [rerender, setRerender] = React.useState(0);
@@ -282,6 +542,7 @@ export function PromptStepBuilder(props: {
   }
 
   function editJsonResponseData(
+    configIndex: number,
     clientId: string,
     field: string,
     value: string | boolean,
@@ -295,42 +556,40 @@ export function PromptStepBuilder(props: {
             ...f,
             steps: f.steps.map((s) => {
               if (s.stepId === step.stepId) {
-                const responseData =
-                  (s as PromptActivityStep).jsonResponseData || [];
-                // if no parentJsonResponseData is provided, then just update the steps base json response data (look for or add to list)
-                if (!parentJsonResponseDataIds?.length) {
-                  const index = responseData.findIndex(
-                    (jrd) => jrd.clientId === clientId
-                  );
-                  if (index >= 0) {
-                    return {
-                      ...s,
-                      jsonResponseData: responseData.map((jrd) => {
-                        if (jrd.clientId === clientId) {
-                          return {
-                            ...jrd,
-                            [field]: value,
-                          };
-                        }
-                        return jrd;
-                      }),
-                    };
-                  } else {
-                    throw new Error('JsonResponseData not found');
-                  }
-                } else {
-                  // if there is a parentJsonResponseData, recursives update fields by looking for objects, and looking into their subData to update
-                  return {
-                    ...s,
-                    jsonResponseData: recursiveUpdateNestedJsonResponseData(
+                const promptStep = s as PromptActivityStep;
+                const config = promptStep.promptConfigurations[configIndex];
+                const responseData = config.jsonResponseData || [];
+
+                const updatedResponseData = !parentJsonResponseDataIds?.length
+                  ? responseData.map((jrd) => {
+                      if (jrd.clientId === clientId) {
+                        return {
+                          ...jrd,
+                          [field]: value,
+                        };
+                      }
+                      return jrd;
+                    })
+                  : recursiveUpdateNestedJsonResponseData(
                       clientId,
                       field,
                       value,
                       responseData,
                       parentJsonResponseDataIds
-                    ),
-                  };
-                }
+                    );
+
+                const updatedConfigurations = [
+                  ...promptStep.promptConfigurations,
+                ];
+                updatedConfigurations[configIndex] = {
+                  ...updatedConfigurations[configIndex],
+                  jsonResponseData: updatedResponseData,
+                };
+
+                return {
+                  ...s,
+                  promptConfigurations: updatedConfigurations,
+                };
               }
               return s;
             }),
@@ -340,7 +599,10 @@ export function PromptStepBuilder(props: {
     });
   }
 
-  function addNewJsonResponseData(parentJsonResponseDataIds: string[]) {
+  function addNewJsonResponseData(
+    configIndex: number,
+    parentJsonResponseDataIds: string[]
+  ) {
     updateLocalActivity((prevValue) => {
       return {
         ...prevValue,
@@ -349,23 +611,29 @@ export function PromptStepBuilder(props: {
             ...f,
             steps: f.steps.map((s) => {
               if (s.stepId === step.stepId) {
-                if (!parentJsonResponseDataIds?.length) {
-                  return {
-                    ...s,
-                    jsonResponseData: [
-                      ...((s as PromptActivityStep).jsonResponseData || []),
-                      getEmptyJsonResponseData(),
-                    ],
-                  };
-                } else {
-                  return {
-                    ...s,
-                    jsonResponseData: recursiveAddNewJsonResponseData(
+                const promptStep = s as PromptActivityStep;
+                const config = promptStep.promptConfigurations[configIndex];
+                const responseData = config.jsonResponseData || [];
+
+                const updatedResponseData = !parentJsonResponseDataIds?.length
+                  ? [...responseData, getEmptyJsonResponseData()]
+                  : recursiveAddNewJsonResponseData(
                       parentJsonResponseDataIds,
-                      (s as PromptActivityStep).jsonResponseData || []
-                    ),
-                  };
-                }
+                      responseData
+                    );
+
+                const updatedConfigurations = [
+                  ...promptStep.promptConfigurations,
+                ];
+                updatedConfigurations[configIndex] = {
+                  ...updatedConfigurations[configIndex],
+                  jsonResponseData: updatedResponseData,
+                };
+
+                return {
+                  ...s,
+                  promptConfigurations: updatedConfigurations,
+                };
               }
               return s;
             }),
@@ -376,6 +644,7 @@ export function PromptStepBuilder(props: {
   }
 
   function deleteJsonResponseData(
+    configIndex: number,
     clientId: string,
     parentJsonResponseDataIds: string[]
   ) {
@@ -387,25 +656,30 @@ export function PromptStepBuilder(props: {
             ...f,
             steps: f.steps.map((s) => {
               if (s.stepId === step.stepId) {
-                const responseData =
-                  (s as PromptActivityStep).jsonResponseData || [];
-                if (!parentJsonResponseDataIds?.length) {
-                  return {
-                    ...s,
-                    jsonResponseData: responseData.filter(
-                      (jrd) => jrd.clientId !== clientId
-                    ),
-                  };
-                } else {
-                  return {
-                    ...s,
-                    jsonResponseData: recursiveDeleteJsonResponseData(
+                const promptStep = s as PromptActivityStep;
+                const config = promptStep.promptConfigurations[configIndex];
+                const responseData = config.jsonResponseData || [];
+
+                const updatedResponseData = !parentJsonResponseDataIds?.length
+                  ? responseData.filter((jrd) => jrd.clientId !== clientId)
+                  : recursiveDeleteJsonResponseData(
                       clientId,
                       responseData,
                       parentJsonResponseDataIds
-                    ),
-                  };
-                }
+                    );
+
+                const updatedConfigurations = [
+                  ...promptStep.promptConfigurations,
+                ];
+                updatedConfigurations[configIndex] = {
+                  ...updatedConfigurations[configIndex],
+                  jsonResponseData: updatedResponseData,
+                };
+
+                return {
+                  ...s,
+                  promptConfigurations: updatedConfigurations,
+                };
               }
               return s;
             }),
@@ -417,24 +691,25 @@ export function PromptStepBuilder(props: {
 
   async function executePromptTest() {
     setExecuteInProgress(true);
+    const config = step.promptConfigurations[selectedConfigIndex];
     const aiPromptSteps: AiPromptStep[] = [];
     aiPromptSteps.push({
       prompts: [],
-      outputDataType: step.outputDataType,
-      responseFormat: step.responseFormat,
-      editDoc: step.editDoc || false,
-      systemRole: step.customSystemRole,
-      webSearch: step.webSearch || false,
+      outputDataType: config.outputDataType,
+      responseFormat: config.responseFormat,
+      editDoc: config.editDoc || false,
+      systemRole: config.customSystemRole,
+      webSearch: config.webSearch || false,
     });
     const promptConfig: PromptConfiguration = {
-      promptText: step.promptText,
-      includeEssay: step.includeEssay, // handled by server
+      promptText: config.promptText,
+      includeEssay: config.includeEssay,
       promptRole: PromptRoles.USER,
     };
     aiPromptSteps[0].prompts.push(promptConfig);
-    if (step.jsonResponseData?.length) {
+    if (config.jsonResponseData?.length) {
       aiPromptSteps[0].responseFormat +=
-        recursivelyConvertExpectedDataToAiPromptString(step.jsonResponseData);
+        recursivelyConvertExpectedDataToAiPromptString(config.jsonResponseData);
     }
     try {
       if (!executePromptSteps) {
@@ -584,142 +859,65 @@ export function PromptStepBuilder(props: {
       >
         <Delete />
       </IconButton>
-      <h4 style={{ alignSelf: 'center' }}>
-        {step.editDoc ? 'Edit Document Prompt' : 'Prompt'}
-        {step.editDoc ? (
-          <InfoTooltip title="This will enable the LLM to edit the text of the document. You will not be able to modify the response format for this type of prompt. Currently supported operations are: adding, removing, replacing, and highlighting text." />
-        ) : undefined}
-      </h4>
+      <h4 style={{ alignSelf: 'center' }}>Prompt Step</h4>
       {errors && errors.length > 0 && (
         <span style={{ color: 'red', textAlign: 'center' }}>
           {errors.join(', ')}
         </span>
       )}
       <Collapse in={!collapsed}>
-        <InputField
-          label="Prompt Text"
-          value={step.promptText}
-          onFocus={() => {
-            setViewingInputType(ViewingInputType.PROMPT_TEXT);
+        {/* Tabs for multiple prompt configurations */}
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+            display: 'flex',
+            alignItems: 'center',
           }}
-          maxRows={viewingInputType === ViewingInputType.PROMPT_TEXT ? 20 : 3}
-          onChange={(e) => {
-            updateField('promptText', e);
-          }}
-          width="100%"
-        />
-        {!step.editDoc && (
-          <SelectInputField
-            label="Output Data Type"
-            value={step.outputDataType}
-            options={[...Object.values(PromptOutputTypes)]}
-            onChange={(e) => {
-              updateField('outputDataType', e);
-            }}
-          />
-        )}
-        {step.outputDataType === PromptOutputTypes.TEXT && !step.editDoc ? (
-          <InputField
-            label="Text Response Format"
-            value={step.responseFormat}
-            onFocus={() => {
-              setViewingInputType(ViewingInputType.RESPONSE_FORMAT);
-            }}
-            maxRows={
-              viewingInputType === ViewingInputType.RESPONSE_FORMAT ? 20 : 3
-            }
-            onChange={(e) => {
-              updateField('responseFormat', e);
-            }}
-            width="100%"
-          />
-        ) : undefined}
+        >
+          <Tabs
+            value={selectedConfigIndex}
+            onChange={(_, newValue) => setSelectedConfigIndex(newValue)}
+            variant="scrollable"
+            scrollButtons="auto"
+          >
+            {step.promptConfigurations.map((_, index) => (
+              <Tab
+                key={index}
+                label={`Prompt ${index + 1}`}
+                data-cy={`prompt-config-tab-${index}`}
+              />
+            ))}
+          </Tabs>
+          <IconButton
+            onClick={addNewPromptConfiguration}
+            size="small"
+            style={{ marginLeft: 'auto' }}
+            data-cy="add-prompt-config-button"
+          >
+            <Add />
+          </IconButton>
+          {step.promptConfigurations.length > 1 && (
+            <IconButton
+              onClick={() => removePromptConfiguration(selectedConfigIndex)}
+              size="small"
+              color="error"
+              data-cy="remove-prompt-config-button"
+            >
+              <Delete />
+            </IconButton>
+          )}
+        </Box>
 
-        {step.outputDataType === PromptOutputTypes.JSON && (
-          <JsonResponseDataUpdater
-            jsonResponseData={step.jsonResponseData || []}
-            editDataField={editJsonResponseData}
+        {/* Current configuration editor */}
+        {step.promptConfigurations[selectedConfigIndex] && (
+          <SinglePromptConfigurationEditor
+            configuration={step.promptConfigurations[selectedConfigIndex]}
+            configIndex={selectedConfigIndex}
+            updateConfigField={updateConfigField}
+            editJsonResponseData={editJsonResponseData}
             addNewJsonResponseData={addNewJsonResponseData}
             deleteJsonResponseData={deleteJsonResponseData}
-            parentJsonResponseDataIds={[]}
-          />
-        )}
-
-        <CheckBoxInput
-          label="Include Chat History"
-          value={step.includeChatLogContext}
-          onChange={(e) => {
-            updateField('includeChatLogContext', e);
-          }}
-        />
-
-        {/* Add dropdown for numChatMessagesIncluded */}
-        {/* {step.includeChatLogContext && <SelectInputField
-          label="# Chat Messages"
-          
-          value={step.numChatMessagesIncluded || NumChatMessagesIncluded.ALL}
-          options={[...Object.values(NumChatMessagesIncluded)]}
-          onChange={(e) => {
-            updateField('numChatMessagesIncluded', e as NumChatMessagesIncluded);
-          }}
-        />} */}
-
-        {step.includeChatLogContext && (
-          <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel id={'select-field-label'}>
-              {'# Chat Messages'}
-            </InputLabel>
-            <Select
-              data-cy={`select-field-chat-messages`}
-              labelId="demo-simple-select-standard-label"
-              id="demo-simple-select-standard"
-              value={
-                step.numChatMessagesIncluded || NumChatMessagesIncluded.ALL
-              }
-              onChange={(e) => {
-                updateField(
-                  'numChatMessagesIncluded',
-                  e.target.value as NumChatMessagesIncluded
-                );
-              }}
-              label={'# Chat Messages'}
-            >
-              {[...Object.values(NumChatMessagesIncluded)].map((option, i) => (
-                <MenuItem key={i} value={option}>
-                  {option.charAt(0).toUpperCase() +
-                    option.slice(1).replace('_', ' ')}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
-
-        {!step.editDoc && (
-          <CheckBoxInput
-            label="Include Essay"
-            value={step.includeEssay}
-            onChange={(e) => {
-              updateField('includeEssay', e);
-            }}
-          />
-        )}
-
-        <CheckBoxInput
-          label="Enable Web Search"
-          value={step.webSearch || false}
-          onChange={(e) => {
-            updateField('webSearch', e);
-          }}
-        />
-
-        {!step.editDoc && (
-          <InputField
-            label="Custom System Role"
-            value={step.customSystemRole}
-            onChange={(e) => {
-              updateField('customSystemRole', e);
-            }}
-            width="100%"
           />
         )}
 

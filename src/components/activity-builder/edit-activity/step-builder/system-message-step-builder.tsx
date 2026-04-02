@@ -28,6 +28,7 @@ export function getDefaultSystemMessage(): SystemMessageActivityStep {
     stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
     message: '',
     jumpToStepId: '',
+    systemCustomName: '',
   };
 }
 export function SystemMessageStepBuilder(props: {
@@ -142,6 +143,13 @@ export function SystemMessageStepBuilder(props: {
         />
       </div>
       <Collapse in={!collapsed}>
+        <InputField
+          label="System Custom Name"
+          value={step.systemCustomName}
+          onChange={(e) => {
+            updateField('systemCustomName', e);
+          }}
+        />
         <InputField
           label="Message"
           value={step.message}

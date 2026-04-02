@@ -19,8 +19,6 @@ import {
   NewDocData,
   UserAccessToken,
   UserActions,
-  GQLPrompt,
-  GQLResPrompts,
   Config,
   Connection,
   AiPromptStep,
@@ -39,7 +37,7 @@ import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
 import { addQueryParam } from '../helpers';
 import { isBulletPointMessage } from '../store/slices/chat/helpers';
-import { activityQueryData, promptQueryData } from './api-helpers';
+import { activityQueryData } from './api-helpers';
 import { omit } from 'lodash';
 import { OpenAiServiceJobStatusResponseType } from '../ai-services/open-ai-service';
 
@@ -249,6 +247,7 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
               sender
               message
               displayType
+              systemCustomName
               bulletPoints
             }
             activity
@@ -329,25 +328,6 @@ export async function fetchDocs(userId: string): Promise<UserDoc[]> {
   return res.data.data.fetchGoogleDocs;
 }
 
-export async function fetchPrompts(): Promise<GQLResPrompts> {
-  const data = await execGql<GQLPrompt[]>(
-    {
-      query: `
-      query FetchPrompts {
-        fetchPrompts {
-                  ${promptQueryData}
-                }
-            }
-    `,
-    },
-    // login responds with set-cookie, w/o withCredentials it doesnt get stored
-    {
-      dataPath: 'fetchPrompts',
-    }
-  );
-  return { prompts: data };
-}
-
 export async function deleteUserDoc(
   docId: string,
   userId: string
@@ -375,56 +355,6 @@ export async function deleteUserDoc(
     }
   );
   return data;
-}
-
-export async function storePrompts(
-  prompts: GQLResPrompts
-): Promise<GQLResPrompts> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
-  const data = await execGql<GQLPrompt[]>(
-    {
-      query: `
-      mutation StorePrompts($prompts: [PromptInputType]!) {
-        storePrompts(prompts: $prompts) {
-            ${promptQueryData}
-          }
-     }
-    `,
-      variables: {
-        prompts: prompts.prompts,
-      },
-    },
-    // login responds with set-cookie, w/o withCredentials it doesnt get stored
-    {
-      dataPath: 'storePrompts',
-    }
-  );
-  return { prompts: data };
-}
-
-export async function storePrompt(prompt: GQLPrompt): Promise<GQLPrompt> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
-  const savedPrompt = await execGql<GQLPrompt>(
-    {
-      query: `
-      mutation StorePrompt($prompt: PromptInputType!) {
-        storePrompt(prompt: $prompt) {
-            ${promptQueryData}
-          }
-     }
-    `,
-      variables: {
-        prompt: prompt,
-      },
-    },
-    // login responds with set-cookie, w/o withCredentials it doesnt get stored
-    {
-      dataPath: 'storePrompt',
-    }
-  );
-  return savedPrompt;
 }
 
 export async function updateDocStorage(

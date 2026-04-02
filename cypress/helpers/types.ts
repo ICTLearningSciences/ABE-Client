@@ -62,6 +62,7 @@ export interface ChatMessage {
   id: string;
   sender: Sender;
   displayType: MessageDisplayType;
+  systemCustomName?: string;
   aiServiceStepData?: AiServiceStepDataTypes[];
   mcqChoices?: string[];
   selectActivities?: Activity[];
@@ -238,10 +239,6 @@ export interface GQLPrompt {
   aiPromptSteps: AiPromptStep[];
   title: string;
   userInputIsIntention?: boolean;
-}
-
-export interface GQLResPrompts {
-  prompts: GQLPrompt[];
 }
 
 export enum PromptRoles {

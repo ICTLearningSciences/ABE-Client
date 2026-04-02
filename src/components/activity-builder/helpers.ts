@@ -155,6 +155,8 @@ export function replaceStoredDataInString(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stateData: Record<string, any>
 ): string {
+  console.log('looking for string', str);
+  console.log('in stateData', stateData);
   try {
     // replace all instances of {{key.data...}} in str with stored data[key][data...]
     const regex = /{{(.*?)}}/g;

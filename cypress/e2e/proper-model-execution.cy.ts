@@ -5,7 +5,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { fetchConfigResponse } from "../fixtures/fetch-config";
-import { FetchPromptsResponse, fetchPromptTemplates } from "../fixtures/fetch-prompt-templates";
 import { openAiTextResponse } from "../fixtures/stronger-hook-activity/basic-text-response";
 import { cyMockDefault, cyMockOpenAiCall, CypressGlobal, mockGQL, roleSwitch } from "../helpers/functions";
 import { AiPromptStep, AiServiceModel, AiServiceNames, testGoogleDocId, UserRole } from "../helpers/types";
@@ -18,22 +17,6 @@ function confirmModelInAiRequest(model: AiServiceModel){
             expect(step.targetAiServiceModel).to.deep.equal(model)
         })
     })
-}
-
-function setPromptsTargetModel(model?: AiServiceModel): FetchPromptsResponse{
-    return {
-        fetchPrompts: fetchPromptTemplates.fetchPrompts.map((prompt)=>{
-            return {
-                ...prompt,
-                aiPromptSteps: prompt.aiPromptSteps.map((step)=>{
-                    return {
-                        ...step,
-                        targetAiServiceModel: model
-                    }
-                })
-            }
-        })
-    }
 }
 
 function toPromptEditing(cy: CypressGlobal){
@@ -69,7 +52,6 @@ describe("prompt requests use proper model execution", ()=>{
                         }
                     }
                 }),
-                mockGQL('FetchPrompts', setPromptsTargetModel(undefined)),
             ]
         });
         cyMockOpenAiCall(cy, {response: openAiTextResponse("Hello"), statusCode: 200})
@@ -96,7 +78,6 @@ describe("prompt requests use proper model execution", ()=>{
                             }
                         }
                     }),
-                    mockGQL('FetchPrompts', setPromptsTargetModel(undefined)),
                 ]
             });
             cyMockOpenAiCall(cy, {response: openAiTextResponse("Hello"), statusCode: 200})
@@ -119,7 +100,6 @@ describe("prompt requests use proper model execution", ()=>{
                                         defaultAiModel: undefined
                                     }
                                 }),
-                                mockGQL('FetchPrompts', setPromptsTargetModel(undefined)),
                             ]
                         });
             cyMockOpenAiCall(cy, {response: openAiTextResponse("Hello"), statusCode: 200})
@@ -148,7 +128,6 @@ describe("prompt requests use proper model execution", ()=>{
                                         }
                                     }
                                 }),
-                                mockGQL('FetchPrompts', setPromptsTargetModel(undefined)),
                             ]
                         });
                         cyMockOpenAiCall(cy, {response: openAiTextResponse("Hello"), statusCode: 200})
@@ -173,7 +152,6 @@ describe("prompt requests use proper model execution", ()=>{
                             aiServiceModelConfigs: []
                         }
                     }),
-                    mockGQL('FetchPrompts', setPromptsTargetModel(undefined)),
                 ]
             });
             toPromptEditing(cy);
@@ -196,10 +174,6 @@ describe("prompt requests use proper model execution", ()=>{
                             }
                         }
                     }),
-                    mockGQL('FetchPrompts', setPromptsTargetModel({
-                        serviceName: AiServiceNames.OPEN_AI,
-                        model: "test-model"
-                    })),
                 ]
             });
             cyMockOpenAiCall(cy, {response: openAiTextResponse("Hello"), statusCode: 200})
