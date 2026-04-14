@@ -179,6 +179,12 @@ export interface JsonResponseData {
   subData?: JsonResponseData[];
 }
 
+export interface RagStoreConfiguration {
+  ragQuery: string;
+  topN: number;
+  filters?: Record<string, string | string[]>;
+}
+
 export interface SinglePromptConfigurationGql{
   promptText: string;
   responseFormat: string;
@@ -190,6 +196,7 @@ export interface SinglePromptConfigurationGql{
   jsonResponseData?: string;
   customSystemRole: string;
   webSearch?: boolean;
+  ragConfiguration?: RagStoreConfiguration;
 }
 
 export interface SinglePromptConfiguration extends Omit<SinglePromptConfigurationGql, 'jsonResponseData'>{

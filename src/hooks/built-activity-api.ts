@@ -74,6 +74,11 @@ export const fullBuiltActivityQueryData = `
                                 jsonResponseData
                                 customSystemRole
                                 webSearch
+                                ragConfiguration{
+                                  ragQuery
+                                  topN
+                                  filters
+                                }
                               }
                           }
 

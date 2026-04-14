@@ -29,6 +29,7 @@ import {
   PromptConfiguration,
   PromptOutputTypes,
   PromptRoles,
+  RagStoreConfiguration,
 } from '../../../../types';
 import {
   Button,
@@ -53,6 +54,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
 import { useActivityBuilderContext } from '../../activity-builder-context';
+import { RagStoreConfigurationEditor } from './rag-store-configuration-editor';
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
     clientId: uuid(),
@@ -75,6 +77,7 @@ export function getDefaultSinglePromptConfiguration(): SinglePromptConfiguration
     includeEssay: false,
     customSystemRole: '',
     webSearch: false,
+    ragConfiguration: undefined,
   };
 }
 
@@ -117,7 +120,12 @@ interface SinglePromptConfigurationEditorProps {
   updateConfigField: (
     configIndex: number,
     field: string,
-    value: string | boolean | JsonResponseData[]
+    value:
+      | string
+      | boolean
+      | JsonResponseData[]
+      | RagStoreConfiguration
+      | undefined
   ) => void;
   editJsonResponseData: (
     configIndex: number,
@@ -255,6 +263,13 @@ function SinglePromptConfigurationEditor(
         }}
       />
 
+      <RagStoreConfigurationEditor
+        ragConfiguration={configuration.ragConfiguration}
+        updateRagConfiguration={(ragConfiguration) => {
+          updateConfigField(configIndex, 'ragConfiguration', ragConfiguration);
+        }}
+      />
+
       <InputField
         label="Custom System Role"
         value={configuration.customSystemRole}
@@ -320,7 +335,12 @@ export function PromptStepBuilder(props: {
 
   function updateField(
     field: string,
-    value: string | boolean | JsonResponseData[]
+    value:
+      | string
+      | boolean
+      | JsonResponseData[]
+      | RagStoreConfiguration
+      | undefined
   ) {
     updateLocalActivity((prevValue) => {
       return {
@@ -346,7 +366,12 @@ export function PromptStepBuilder(props: {
   function updateConfigField(
     configIndex: number,
     field: string,
-    value: string | boolean | JsonResponseData[]
+    value:
+      | string
+      | boolean
+      | JsonResponseData[]
+      | RagStoreConfiguration
+      | undefined
   ) {
     updateLocalActivity((prevValue) => {
       return {
@@ -700,6 +725,7 @@ export function PromptStepBuilder(props: {
       editDoc: config.editDoc || false,
       systemRole: config.customSystemRole,
       webSearch: config.webSearch || false,
+      ragConfiguration: config.ragConfiguration,
     });
     const promptConfig: PromptConfiguration = {
       promptText: config.promptText,

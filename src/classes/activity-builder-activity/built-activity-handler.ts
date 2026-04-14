@@ -632,6 +632,17 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       this.stateData
     );
 
+    const ragConfiguration = config.ragConfiguration
+      ? {
+          ragQuery: replaceStoredDataInString(
+            config.ragConfiguration.ragQuery,
+            this.stateData
+          ),
+          topN: config.ragConfiguration.topN,
+          filters: config.ragConfiguration.filters,
+        }
+      : undefined;
+
     const aiPromptSteps: AiPromptStep[] = [
       {
         prompts: [],
@@ -640,6 +651,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         systemRole: customSystemRole,
         webSearch: config.webSearch || false,
         editDoc: config.editDoc || false,
+        ragConfiguration: ragConfiguration,
       },
     ];
 
