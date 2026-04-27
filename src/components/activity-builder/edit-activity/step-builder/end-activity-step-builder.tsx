@@ -6,13 +6,13 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import {
-  ActivityBuilder,
   ActivityBuilderStepType,
   FlowItem,
   PredefinedResponse,
   RequestUserInputActivityStep,
   RequestUserInputSpecialType,
 } from '../../types';
+import { useEditActivityContext } from '../../activity-builder-context';
 import { RoundedBorderDiv, TopLeftText } from '../../../../styled-components';
 import { CheckBoxInput, InputField } from '../../shared/input-components';
 import { IconButton } from '@mui/material';
@@ -47,8 +47,7 @@ export function getDefaultEndActivityStepBuilder(): RequestUserInputActivityStep
 }
 
 export function EndActivityStepBuilder(props: {
-  step: RequestUserInputActivityStep;
-  updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
+  stepId: string;
   deleteStep: () => void;
   flowsList: FlowItem[];
   stepIndex: number;
@@ -56,8 +55,17 @@ export function EndActivityStepBuilder(props: {
   height?: string;
   versions: StepVersion[];
 }): JSX.Element {
-  const { step, stepIndex, updateLocalActivity, versions } = props;
+  const { stepId, stepIndex, flowsList, versions } = props;
+  const { getStep, getFlowByStepId, updateStep, updateStepField } = useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
+
+  const step = getStep(stepId) as RequestUserInputActivityStep;
+  const flow = getFlowByStepId(stepId);
+
+  if (!step || !flow) {
+    return <div>Step not found</div>;
+  }
+
   const hasGoHomeButton = Boolean(
     step.predefinedResponses.find(
       (step) => step.clientId === goHomePredefinedResponse.clientId
@@ -66,22 +74,9 @@ export function EndActivityStepBuilder(props: {
 
   const [rerender, setRerender] = React.useState(0);
   function replacePromptStepWithVersion(version: StepVersion) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return version.step;
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    if (flow) {
+      updateStep(flow.clientId, version.step);
+    }
     setRerender(rerender + 1);
   }
 
@@ -89,25 +84,7 @@ export function EndActivityStepBuilder(props: {
     field: K,
     value: RequestUserInputActivityStep[K]
   ) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return {
-                  ...s,
-                  [field]: value,
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    updateStepField(stepId, field, value);
   }
 
   return (

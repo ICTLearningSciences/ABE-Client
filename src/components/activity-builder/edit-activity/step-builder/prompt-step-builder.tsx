@@ -53,7 +53,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
-import { useActivityBuilderContext } from '../../activity-builder-context';
+import { useActivityBuilderContext, useEditActivityContext } from '../../activity-builder-context';
 import { RagStoreConfigurationEditor } from './rag-store-configuration-editor';
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
@@ -266,6 +266,7 @@ function SinglePromptConfigurationEditor(
       <RagStoreConfigurationEditor
         ragConfiguration={configuration.ragConfiguration}
         updateRagConfiguration={(ragConfiguration) => {
+          console.log('Parent received RAG update:', ragConfiguration);
           updateConfigField(configIndex, 'ragConfiguration', ragConfiguration);
         }}
       />
@@ -283,9 +284,8 @@ function SinglePromptConfigurationEditor(
 }
 
 export function PromptStepBuilder(props: {
-  step: PromptActivityStep;
-  updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
-  deleteStep: (stepId: string, flowClientId: string) => void;
+  stepId: string;
+  deleteStep: (flowClientId: string, stepId: string) => void;
   flowsList: FlowItem[];
   stepIndex: number;
   previewed: boolean;
@@ -297,9 +297,8 @@ export function PromptStepBuilder(props: {
   versions: StepVersion[];
 }): JSX.Element {
   const {
-    step,
+    stepId,
     stepIndex,
-    updateLocalActivity,
     previewed,
     stopPreview,
     startPreview,
@@ -308,6 +307,25 @@ export function PromptStepBuilder(props: {
     versions,
     errors,
   } = props;
+  const {
+    getStep,
+    getFlowByStepId,
+    updateStep,
+    updateStepField,
+    updatePromptConfigField,
+    addPromptConfiguration,
+    removePromptConfiguration,
+    updateJsonResponseData: updateJsonResponseDataInContext,
+    addJsonResponseData: addJsonResponseDataInContext,
+    deleteJsonResponseData: deleteJsonResponseDataInContext,
+  } = useEditActivityContext();
+
+  const step = getStep(stepId) as PromptActivityStep;
+  const flow = getFlowByStepId(stepId);
+
+  if (!step || !flow) {
+    return <div>Step not found</div>;
+  }
   const currentFLow = flowsList.find((f) => {
     return f.steps.find((s) => s.stepId === step.stepId);
   });
@@ -342,25 +360,7 @@ export function PromptStepBuilder(props: {
       | RagStoreConfiguration
       | undefined
   ) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return {
-                  ...s,
-                  [field]: value,
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    updateStepField(step.stepId, field, value);
   }
 
   function updateConfigField(
@@ -373,89 +373,20 @@ export function PromptStepBuilder(props: {
       | RagStoreConfiguration
       | undefined
   ) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                const promptStep = s as PromptActivityStep;
-                const updatedConfigurations = [
-                  ...promptStep.promptConfigurations,
-                ];
-                updatedConfigurations[configIndex] = {
-                  ...updatedConfigurations[configIndex],
-                  [field]: value,
-                };
-                return {
-                  ...s,
-                  promptConfigurations: updatedConfigurations,
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    updatePromptConfigField(step.stepId, configIndex, field, value);
   }
 
   function addNewPromptConfiguration() {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                const promptStep = s as PromptActivityStep;
-                return {
-                  ...s,
-                  promptConfigurations: [
-                    ...promptStep.promptConfigurations,
-                    getDefaultSinglePromptConfiguration(),
-                  ],
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    addPromptConfiguration(step.stepId, getDefaultSinglePromptConfiguration());
     // Switch to the newly added tab
     setSelectedConfigIndex(step.promptConfigurations.length);
   }
 
-  function removePromptConfiguration(configIndex: number) {
+  function handleRemovePromptConfiguration(configIndex: number) {
     if (step.promptConfigurations.length <= 1) {
       return; // Can't remove the last configuration
     }
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                const promptStep = s as PromptActivityStep;
-                return {
-                  ...s,
-                  promptConfigurations: promptStep.promptConfigurations.filter(
-                    (_, index) => index !== configIndex
-                  ),
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    removePromptConfiguration(step.stepId, configIndex);
     // Adjust selected tab if needed
     if (selectedConfigIndex >= configIndex && selectedConfigIndex > 0) {
       setSelectedConfigIndex(selectedConfigIndex - 1);
@@ -464,107 +395,12 @@ export function PromptStepBuilder(props: {
 
   const [rerender, setRerender] = React.useState(0);
   function replacePromptStepWithVersion(version: StepVersion) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return version.step;
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    if (flow) {
+      updateStep(flow.clientId, version.step);
+    }
     setRerender(rerender + 1);
   }
 
-  function recursiveUpdateNestedJsonResponseData(
-    clientId: string,
-    field: string,
-    value: string | boolean,
-    baseJsonResponseDatas: JsonResponseData[],
-    parentJsonResponseDataIds: string[]
-  ): JsonResponseData[] {
-    if (!parentJsonResponseDataIds?.length) {
-      return baseJsonResponseDatas.map((jrd) => {
-        if (jrd.clientId === clientId) {
-          return {
-            ...jrd,
-            [field]: value,
-          };
-        }
-        return jrd;
-      });
-    } else {
-      return baseJsonResponseDatas.map((jrd) => {
-        if (jrd.clientId === parentJsonResponseDataIds[0]) {
-          return {
-            ...jrd,
-            subData: recursiveUpdateNestedJsonResponseData(
-              clientId,
-              field,
-              value,
-              jrd.subData || [],
-              parentJsonResponseDataIds.slice(1)
-            ),
-          };
-        }
-        return jrd;
-      });
-    }
-  }
-
-  function recursiveAddNewJsonResponseData(
-    parentJsonResponseDataIds: string[],
-    baseJsonResponseDatas: JsonResponseData[]
-  ): JsonResponseData[] {
-    if (!parentJsonResponseDataIds?.length) {
-      return [...baseJsonResponseDatas, getEmptyJsonResponseData()];
-    } else {
-      return baseJsonResponseDatas.map((jrd) => {
-        if (jrd.clientId === parentJsonResponseDataIds[0]) {
-          return {
-            ...jrd,
-            subData: recursiveAddNewJsonResponseData(
-              parentJsonResponseDataIds.slice(1),
-              jrd.subData || []
-            ),
-          };
-        }
-        return jrd;
-      });
-    }
-  }
-
-  function recursiveDeleteJsonResponseData(
-    clientId: string,
-    baseJsonResponseDatas: JsonResponseData[],
-    parentJsonResponseDataIds: string[]
-  ): JsonResponseData[] {
-    // for all json response data, if the clientId matches, remove it
-    if (!parentJsonResponseDataIds?.length) {
-      return baseJsonResponseDatas.filter((jrd) => jrd.clientId !== clientId);
-    } else {
-      return baseJsonResponseDatas.map((jrd) => {
-        if (jrd.clientId === parentJsonResponseDataIds[0]) {
-          return {
-            ...jrd,
-            subData: recursiveDeleteJsonResponseData(
-              clientId,
-              jrd.subData || [],
-              parentJsonResponseDataIds.slice(1)
-            ),
-          };
-        }
-        return jrd;
-      });
-    }
-  }
 
   function editJsonResponseData(
     configIndex: number,
@@ -573,99 +409,26 @@ export function PromptStepBuilder(props: {
     value: string | boolean,
     parentJsonResponseDataIds: string[]
   ) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                const promptStep = s as PromptActivityStep;
-                const config = promptStep.promptConfigurations[configIndex];
-                const responseData = config.jsonResponseData || [];
-
-                const updatedResponseData = !parentJsonResponseDataIds?.length
-                  ? responseData.map((jrd) => {
-                      if (jrd.clientId === clientId) {
-                        return {
-                          ...jrd,
-                          [field]: value,
-                        };
-                      }
-                      return jrd;
-                    })
-                  : recursiveUpdateNestedJsonResponseData(
-                      clientId,
-                      field,
-                      value,
-                      responseData,
-                      parentJsonResponseDataIds
-                    );
-
-                const updatedConfigurations = [
-                  ...promptStep.promptConfigurations,
-                ];
-                updatedConfigurations[configIndex] = {
-                  ...updatedConfigurations[configIndex],
-                  jsonResponseData: updatedResponseData,
-                };
-
-                return {
-                  ...s,
-                  promptConfigurations: updatedConfigurations,
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    updateJsonResponseDataInContext(
+      step.stepId,
+      configIndex,
+      clientId,
+      field,
+      value,
+      parentJsonResponseDataIds
+    );
   }
 
   function addNewJsonResponseData(
     configIndex: number,
     parentJsonResponseDataIds: string[]
   ) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                const promptStep = s as PromptActivityStep;
-                const config = promptStep.promptConfigurations[configIndex];
-                const responseData = config.jsonResponseData || [];
-
-                const updatedResponseData = !parentJsonResponseDataIds?.length
-                  ? [...responseData, getEmptyJsonResponseData()]
-                  : recursiveAddNewJsonResponseData(
-                      parentJsonResponseDataIds,
-                      responseData
-                    );
-
-                const updatedConfigurations = [
-                  ...promptStep.promptConfigurations,
-                ];
-                updatedConfigurations[configIndex] = {
-                  ...updatedConfigurations[configIndex],
-                  jsonResponseData: updatedResponseData,
-                };
-
-                return {
-                  ...s,
-                  promptConfigurations: updatedConfigurations,
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    addJsonResponseDataInContext(
+      step.stepId,
+      configIndex,
+      parentJsonResponseDataIds,
+      getEmptyJsonResponseData()
+    );
   }
 
   function deleteJsonResponseData(
@@ -673,45 +436,12 @@ export function PromptStepBuilder(props: {
     clientId: string,
     parentJsonResponseDataIds: string[]
   ) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                const promptStep = s as PromptActivityStep;
-                const config = promptStep.promptConfigurations[configIndex];
-                const responseData = config.jsonResponseData || [];
-
-                const updatedResponseData = !parentJsonResponseDataIds?.length
-                  ? responseData.filter((jrd) => jrd.clientId !== clientId)
-                  : recursiveDeleteJsonResponseData(
-                      clientId,
-                      responseData,
-                      parentJsonResponseDataIds
-                    );
-
-                const updatedConfigurations = [
-                  ...promptStep.promptConfigurations,
-                ];
-                updatedConfigurations[configIndex] = {
-                  ...updatedConfigurations[configIndex],
-                  jsonResponseData: updatedResponseData,
-                };
-
-                return {
-                  ...s,
-                  promptConfigurations: updatedConfigurations,
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    deleteJsonResponseDataInContext(
+      step.stepId,
+      configIndex,
+      clientId,
+      parentJsonResponseDataIds
+    );
   }
 
   async function executePromptTest() {
@@ -925,7 +655,7 @@ export function PromptStepBuilder(props: {
           </IconButton>
           {step.promptConfigurations.length > 1 && (
             <IconButton
-              onClick={() => removePromptConfiguration(selectedConfigIndex)}
+              onClick={() => handleRemovePromptConfiguration(selectedConfigIndex)}
               size="small"
               color="error"
               data-cy="remove-prompt-config-button"

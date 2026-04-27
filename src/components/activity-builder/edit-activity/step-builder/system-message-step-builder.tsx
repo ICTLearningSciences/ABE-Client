@@ -15,13 +15,13 @@ import {
   SystemMessageActivityStep,
   ActivityBuilderStepType,
   FlowItem,
-  ActivityBuilder,
 } from '../../types';
 import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
+import { useEditActivityContext } from '../../activity-builder-context';
 export function getDefaultSystemMessage(): SystemMessageActivityStep {
   return {
     stepId: uuid(),
@@ -32,9 +32,8 @@ export function getDefaultSystemMessage(): SystemMessageActivityStep {
   };
 }
 export function SystemMessageStepBuilder(props: {
-  step: SystemMessageActivityStep;
-  updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
-  updateStep: (step: SystemMessageActivityStep) => void;
+  stepId: string;
+  updateStep: (flowClientId: string, step: SystemMessageActivityStep) => void;
   deleteStep: () => void;
   flowsList: FlowItem[];
   stepIndex: number;
@@ -43,50 +42,27 @@ export function SystemMessageStepBuilder(props: {
   versions: StepVersion[];
   errors?: string[];
 }): JSX.Element {
-  const { step, stepIndex, updateLocalActivity, versions, errors } = props;
+  const { stepId, stepIndex, updateStep, flowsList, versions, errors } = props;
+  const { getStep, getFlowByStepId, updateStepField } = useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
+
+  const step = getStep(stepId) as SystemMessageActivityStep;
+  const flow = getFlowByStepId(stepId);
+
+  if (!step || !flow) {
+    return <div>Step not found</div>;
+  }
 
   const [rerender, setRerender] = React.useState(0);
   function replacePromptStepWithVersion(version: StepVersion) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return version.step;
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    if (flow) {
+      updateStep(flow.clientId, version.step as SystemMessageActivityStep);
+    }
     setRerender(rerender + 1);
   }
 
   function updateField(field: string, value: string | boolean) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return {
-                  ...s,
-                  [field]: value,
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    updateStepField(stepId, field, value);
   }
 
   return (

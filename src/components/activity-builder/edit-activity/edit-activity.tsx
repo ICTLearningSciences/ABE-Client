@@ -3,7 +3,6 @@ import {
   ActivityBuilderStepType,
   ActivityBuilder as ActivityBuilderType,
   ActivityBuilderVisibility,
-  FlowItem,
 } from '../types';
 import { ActivityFlowContainer } from './activity-flow-container';
 import { ColumnDiv, RowDiv } from '../../../styled-components';
@@ -18,27 +17,28 @@ import {
   DOC_TEXT_KEY,
 } from '../../../classes/activity-builder-activity/built-activity-handler';
 import { useWithCheckActivityErrors } from '../../../hooks/use-with-check-activity-errors';
-import { useActivityBuilderContext } from '../activity-builder-context';
-export function EditActivity(props: {
+import { useActivityBuilderContext, EditActivityProvider, useEditActivityContext } from '../activity-builder-context';
+// Inner component that uses the context
+function EditActivityContent(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
-  activity: ActivityBuilderType;
+  originalActivity: ActivityBuilderType;
   saveActivity: (activity: ActivityBuilderType) => Promise<ActivityBuilderType>;
   returnTo: () => void;
 }): JSX.Element {
   const {
-    activity,
+    originalActivity,
     saveActivity: _saveActivity,
     goToActivity,
     returnTo,
   } = props;
 
-  const [localActivityCopy, setLocalActivityCopy] =
-    React.useState<ActivityBuilderType>(JSON.parse(JSON.stringify(activity)));
+  const { activity, addFlow, updateTitle, updateDescription, updateVisibility } = useEditActivityContext();
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
   const { activityVersions, loadActivityVersions, canEditActivity } =
     useActivityBuilderContext();
+
   const globalStateKeys: string[] = useMemo(() => {
-    return localActivityCopy.flowsList.reduce(
+    return activity.flowsList.reduce(
       (acc, flow) => {
         const stateKeysForFlow = flow.steps.reduce((acc, step) => {
           if (step.stepType === ActivityBuilderStepType.REQUEST_USER_INPUT) {
@@ -59,28 +59,24 @@ export function EditActivity(props: {
       },
       [DOC_TEXT_KEY, DOC_NUM_WORDS_KEY] as string[]
     );
-  }, [localActivityCopy.flowsList]);
+  }, [activity.flowsList]);
 
   const { errors } = useWithCheckActivityErrors(
     globalStateKeys,
-    localActivityCopy
+    activity
   );
 
   useEffect(() => {
-    setLocalActivityCopy(JSON.parse(JSON.stringify(activity)));
-  }, [activity]);
-
-  useEffect(() => {
-    const alreadyLoaded = Boolean(activity.clientId in activityVersions);
-    if (activity.clientId && !alreadyLoaded) {
-      loadActivityVersions(activity.clientId);
+    const alreadyLoaded = Boolean(originalActivity.clientId in activityVersions);
+    if (originalActivity.clientId && !alreadyLoaded) {
+      loadActivityVersions(originalActivity.clientId);
     }
-  }, [activity.clientId, activityVersions]);
+  }, [originalActivity.clientId, activityVersions, loadActivityVersions]);
 
   async function saveActivity() {
     setSaveInProgress(true);
     try {
-      await _saveActivity(localActivityCopy);
+      await _saveActivity(activity);
     } catch (e) {
       console.error(e);
     } finally {
@@ -89,17 +85,7 @@ export function EditActivity(props: {
   }
 
   function addNewFlow() {
-    const emptyFlow: FlowItem = {
-      clientId: uuidv4(),
-      name: '',
-      steps: [],
-    };
-    setLocalActivityCopy((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: [...prevValue.flowsList, emptyFlow],
-      };
-    });
+    addFlow(uuidv4(), '');
   }
 
   return (
@@ -135,45 +121,24 @@ export function EditActivity(props: {
       >
         <InputField
           label="Activity Name"
-          value={localActivityCopy.title}
+          value={activity.title}
           width="100%"
-          disabled={!canEditActivity(localActivityCopy)}
-          key={localActivityCopy.clientId}
-          onChange={(v) => {
-            setLocalActivityCopy((prevValue) => {
-              return {
-                ...prevValue,
-                title: v,
-              };
-            });
-          }}
+          disabled={!canEditActivity(activity)}
+          key={activity.clientId}
+          onChange={updateTitle}
         />
         <InputField
           label="Activity Description"
           width="100%"
-          value={localActivityCopy.description}
-          onChange={(v) => {
-            setLocalActivityCopy((prevValue) => {
-              return {
-                ...prevValue,
-                description: v,
-              };
-            });
-          }}
+          value={activity.description}
+          onChange={updateDescription}
         />
         <SelectInputField
           label="Visibility"
-          value={localActivityCopy.visibility}
+          value={activity.visibility}
           options={Object.values(ActivityBuilderVisibility)}
-          disabled={!canEditActivity(localActivityCopy)}
-          onChange={(v) => {
-            setLocalActivityCopy((prevValue) => {
-              return {
-                ...prevValue,
-                visibility: v as ActivityBuilderVisibility,
-              };
-            });
-          }}
+          disabled={!canEditActivity(activity)}
+          onChange={(v) => updateVisibility(v as ActivityBuilderVisibility)}
         />
 
         <RowDiv>
@@ -181,11 +146,11 @@ export function EditActivity(props: {
             style={{
               marginRight: '10px',
             }}
-            disabled={saveInProgress || !isActivityRunnable(localActivityCopy)}
+            disabled={saveInProgress || !isActivityRunnable(activity)}
             variant="outlined"
             onClick={async () => {
               saveActivity().then(() => {
-                goToActivity(localActivityCopy);
+                goToActivity(activity);
               });
             }}
           >
@@ -199,8 +164,8 @@ export function EditActivity(props: {
               }}
               variant="outlined"
               disabled={
-                !canEditActivity(localActivityCopy) ||
-                equals(localActivityCopy, activity)
+                !canEditActivity(activity) ||
+                equals(activity, originalActivity)
               }
               onClick={saveActivity}
             >
@@ -217,7 +182,7 @@ export function EditActivity(props: {
             data-cy="add-flow"
             onClick={addNewFlow}
             variant="outlined"
-            disabled={!canEditActivity(localActivityCopy)}
+            disabled={!canEditActivity(activity)}
           >
             + Add Flow
           </Button>
@@ -225,12 +190,24 @@ export function EditActivity(props: {
       </ColumnDiv>
       <ActivityFlowContainer
         globalStateKeys={globalStateKeys}
-        localActivity={localActivityCopy}
-        updateLocalActivity={setLocalActivityCopy}
-        versions={activityVersions[localActivityCopy.clientId] || []}
-        disabled={!canEditActivity(localActivityCopy)}
+        versions={activityVersions[activity.clientId] || []}
+        disabled={!canEditActivity(activity)}
         stepErrors={errors}
       />
     </ColumnDiv>
+  );
+}
+
+// Wrapper component that provides the context
+export function EditActivity(props: {
+  goToActivity: (activity: ActivityBuilderType) => void;
+  activity: ActivityBuilderType;
+  saveActivity: (activity: ActivityBuilderType) => Promise<ActivityBuilderType>;
+  returnTo: () => void;
+}): JSX.Element {
+  return (
+    <EditActivityProvider initialActivity={props.activity}>
+      <EditActivityContent {...props} originalActivity={props.activity} />
+    </EditActivityProvider>
   );
 }

@@ -6,25 +6,24 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import { PromptStepBuilder } from "../../../src/components/activity-builder/edit-activity/step-builder/prompt-step-builder";
+import { EditActivityProvider } from "../../../src/components/activity-builder/activity-builder-context";
 import { examplePromptActivityStep, multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
 describe("Prompt Step Builder", ()=>{
     it("should render", ()=>{
         let step = examplePromptActivityStep;
-        const systemMessageStepBuilder = PromptStepBuilder({
-            step,
-            updateLocalActivity: ()=>{
-            },
-            deleteStep: ()=>{
-            },
-            stepIndex: 0,
-            flowsList: multipleFlowActivity.flowsList,
-            previewed: false,
-            startPreview: ()=>{
-            },
-            stopPreview: ()=>{
-            },
-            versions: [],
-        });
-        cy.mount(systemMessageStepBuilder);
+        cy.mount(
+            <EditActivityProvider initialActivity={multipleFlowActivity}>
+                <PromptStepBuilder
+                    stepId={step.stepId}
+                    deleteStep={() => {}}
+                    stepIndex={0}
+                    flowsList={multipleFlowActivity.flowsList}
+                    previewed={false}
+                    startPreview={() => {}}
+                    stopPreview={() => {}}
+                    versions={[]}
+                />
+            </EditActivityProvider>
+        );
     })
 })

@@ -21,7 +21,6 @@ import {
   SystemMessageActivityStep,
   ActivityBuilderStepType,
   FlowItem,
-  ActivityBuilder,
   LogicStepConditional,
   ConditionalActivityStep,
   Checking,
@@ -34,6 +33,7 @@ import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
 import { FlowStepSelector } from '../../shared/flow-step-selector';
 import { InfoTooltip } from '../../../info-tooltip';
+import { useEditActivityContext } from '../../activity-builder-context';
 
 export function getDefaultConditionalStep(): ConditionalActivityStep {
   return {
@@ -46,9 +46,8 @@ export function getDefaultConditionalStep(): ConditionalActivityStep {
 
 export function ConditionalStepBuilder(props: {
   globalStateKeys: string[];
-  step: ConditionalActivityStep;
-  updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
-  updateStep: (step: SystemMessageActivityStep) => void;
+  stepId: string;
+  updateStep: (flowClientId: string, step: SystemMessageActivityStep) => void;
   deleteStep: () => void;
   flowsList: FlowItem[];
   stepIndex: number;
@@ -58,33 +57,29 @@ export function ConditionalStepBuilder(props: {
   errors?: string[];
 }): JSX.Element {
   const {
-    step,
+    stepId,
     stepIndex,
-    updateLocalActivity,
+    updateStep,
+    flowsList,
     versions,
     globalStateKeys,
     errors,
   } = props;
+  const { getStep, getFlowByStepId, updateStepField } = useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
+
+  const step = getStep(stepId) as ConditionalActivityStep;
+  const flow = getFlowByStepId(stepId);
+
+  if (!step || !flow) {
+    return <div>Step not found</div>;
+  }
 
   const [rerender, setRerender] = React.useState(0);
   function replacePromptStepWithVersion(version: StepVersion) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return version.step;
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    if (flow) {
+      updateStep(flow.clientId, version.step as SystemMessageActivityStep);
+    }
     setRerender(rerender + 1);
   }
 
@@ -92,25 +87,7 @@ export function ConditionalStepBuilder(props: {
     field: string,
     value: string | boolean | LogicStepConditional[]
   ) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return {
-                  ...s,
-                  [field]: value,
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    updateStepField(stepId, field, value);
   }
 
   function updateConditionalField(
@@ -118,34 +95,16 @@ export function ConditionalStepBuilder(props: {
     field: string,
     value: string | boolean
   ) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                const step = s as ConditionalActivityStep;
-                return {
-                  ...step,
-                  conditionals: step.conditionals.map((c, i) => {
-                    if (i === index) {
-                      return {
-                        ...c,
-                        [field]: value,
-                      };
-                    }
-                    return c;
-                  }),
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
+    const updatedConditionals = step.conditionals.map((c, i) => {
+      if (i === index) {
+        return {
+          ...c,
+          [field]: value,
+        };
+      }
+      return c;
     });
+    updateStepField(stepId, 'conditionals', updatedConditionals);
   }
 
   return (
@@ -266,28 +225,11 @@ export function ConditionalStepBuilder(props: {
                   />
                   <IconButton
                     onClick={() => {
-                      updateLocalActivity((prevValue) => {
-                        return {
-                          ...prevValue,
-                          flowsList: prevValue.flowsList.map((f) => {
-                            return {
-                              ...f,
-                              steps: f.steps.map((s) => {
-                                if (s.stepId === step.stepId) {
-                                  const step = s as ConditionalActivityStep;
-                                  return {
-                                    ...step,
-                                    conditionals: step.conditionals.filter(
-                                      (c, i) => i !== index
-                                    ),
-                                  };
-                                }
-                                return s;
-                              }),
-                            };
-                          }),
-                        };
-                      });
+                      updateStepField(
+                        stepId,
+                        'conditionals',
+                        step.conditionals.filter((c, i) => i !== index)
+                      );
                     }}
                   >
                     <Delete />
