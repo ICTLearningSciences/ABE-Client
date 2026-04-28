@@ -1,7 +1,7 @@
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { LoadStatus } from "../education-management";
-import * as panelApis from './panel-apis';
-import { Panel, Panelist } from "./types";
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { LoadStatus } from '../education-management';
+import * as panelApis from '.';
+import { Panel, Panelist } from './types';
 
 interface UseWithPanels {
   panels: Panel[];
@@ -20,8 +20,12 @@ export function useWithPanels(): UseWithPanels {
   const dispatch = useAppDispatch();
   const panels = useAppSelector((state) => state.panels.panels);
   const panelists = useAppSelector((state) => state.panels.panelists);
-  const panelsLoadStatus = useAppSelector((state) => state.panels.panelsLoadStatus);
-  const panelistsLoadStatus = useAppSelector((state) => state.panels.panelistsLoadStatus);
+  const panelsLoadStatus = useAppSelector(
+    (state) => state.panels.panelsLoadStatus
+  );
+  const panelistsLoadStatus = useAppSelector(
+    (state) => state.panels.panelistsLoadStatus
+  );
 
   function fetchPanels() {
     dispatch(panelApis.fetchPanels());
@@ -42,7 +46,6 @@ export function useWithPanels(): UseWithPanels {
   function deletePanelist(panelistClientId: string) {
     dispatch(panelApis.deletePanelist(panelistClientId));
   }
-
 
   return {
     panels,

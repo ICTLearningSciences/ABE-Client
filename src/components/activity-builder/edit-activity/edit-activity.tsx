@@ -17,7 +17,11 @@ import {
   DOC_TEXT_KEY,
 } from '../../../classes/activity-builder-activity/built-activity-handler';
 import { useWithCheckActivityErrors } from '../../../hooks/use-with-check-activity-errors';
-import { useActivityBuilderContext, EditActivityProvider, useEditActivityContext } from '../activity-builder-context';
+import {
+  useActivityBuilderContext,
+  EditActivityProvider,
+  useEditActivityContext,
+} from '../activity-builder-context';
 // Inner component that uses the context
 function EditActivityContent(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
@@ -32,7 +36,13 @@ function EditActivityContent(props: {
     returnTo,
   } = props;
 
-  const { activity, addFlow, updateTitle, updateDescription, updateVisibility } = useEditActivityContext();
+  const {
+    activity,
+    addFlow,
+    updateTitle,
+    updateDescription,
+    updateVisibility,
+  } = useEditActivityContext();
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
   const { activityVersions, loadActivityVersions, canEditActivity } =
     useActivityBuilderContext();
@@ -61,13 +71,12 @@ function EditActivityContent(props: {
     );
   }, [activity.flowsList]);
 
-  const { errors } = useWithCheckActivityErrors(
-    globalStateKeys,
-    activity
-  );
+  const { errors } = useWithCheckActivityErrors(globalStateKeys, activity);
 
   useEffect(() => {
-    const alreadyLoaded = Boolean(originalActivity.clientId in activityVersions);
+    const alreadyLoaded = Boolean(
+      originalActivity.clientId in activityVersions
+    );
     if (originalActivity.clientId && !alreadyLoaded) {
       loadActivityVersions(originalActivity.clientId);
     }
@@ -164,8 +173,7 @@ function EditActivityContent(props: {
               }}
               variant="outlined"
               disabled={
-                !canEditActivity(activity) ||
-                equals(activity, originalActivity)
+                !canEditActivity(activity) || equals(activity, originalActivity)
               }
               onClick={saveActivity}
             >

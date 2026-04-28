@@ -8,12 +8,8 @@ import React from 'react';
 import {
   ActivityBuilderStepType,
   ActivityBuilderStepTypes,
-  ConditionalActivityStep,
   FlowItem,
-  PromptActivityStep,
-  RequestUserInputActivityStep,
   RequestUserInputSpecialType,
-  SystemMessageActivityStep,
 } from '../types';
 import { ColumnDiv } from '../../../styled-components';
 import { useEditActivityContext } from '../activity-builder-context';

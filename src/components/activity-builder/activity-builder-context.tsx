@@ -5,7 +5,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import { ActivityBuilder, BuiltActivityVersion, ActivityBuilderStepTypes, JsonResponseData } from './types';
+import {
+  ActivityBuilder,
+  BuiltActivityVersion,
+  ActivityBuilderStepTypes,
+  JsonResponseData,
+} from './types';
 import { AiPromptStep, RagStoreConfiguration } from '../../types';
 import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
 
@@ -85,39 +90,78 @@ type EditActivityAction =
   | { type: 'UPDATE_VISIBILITY'; payload: ActivityBuilder['visibility'] }
   | { type: 'ADD_FLOW'; payload: { clientId: string; name: string } }
   | { type: 'DELETE_FLOW'; payload: string }
-  | { type: 'UPDATE_FLOW_NAME'; payload: { flowClientId: string; name: string } }
-  | { type: 'ADD_STEP'; payload: { flowClientId: string; step: ActivityBuilderStepTypes; index: number } }
-  | { type: 'UPDATE_STEP'; payload: { flowClientId: string; step: ActivityBuilderStepTypes } }
+  | {
+      type: 'UPDATE_FLOW_NAME';
+      payload: { flowClientId: string; name: string };
+    }
+  | {
+      type: 'ADD_STEP';
+      payload: {
+        flowClientId: string;
+        step: ActivityBuilderStepTypes;
+        index: number;
+      };
+    }
+  | {
+      type: 'UPDATE_STEP';
+      payload: { flowClientId: string; step: ActivityBuilderStepTypes };
+    }
   | { type: 'DELETE_STEP'; payload: { flowClientId: string; stepId: string } }
-  | { type: 'UPDATE_PROMPT_CONFIG_FIELD'; payload: {
-      stepId: string;
-      configIndex: number;
-      field: string;
-      value: string | boolean | JsonResponseData[] | RagStoreConfiguration | undefined;
-    }}
-  | { type: 'UPDATE_STEP_FIELD'; payload: { stepId: string; field: string; value: any } }
-  | { type: 'ADD_PROMPT_CONFIGURATION'; payload: { stepId: string; configuration: any } }
-  | { type: 'REMOVE_PROMPT_CONFIGURATION'; payload: { stepId: string; configIndex: number } }
-  | { type: 'UPDATE_JSON_RESPONSE_DATA'; payload: {
-      stepId: string;
-      configIndex: number;
-      clientId: string;
-      field: string;
-      value: string | boolean;
-      parentJsonResponseDataIds: string[];
-    }}
-  | { type: 'ADD_JSON_RESPONSE_DATA'; payload: {
-      stepId: string;
-      configIndex: number;
-      parentJsonResponseDataIds: string[];
-      newData: JsonResponseData;
-    }}
-  | { type: 'DELETE_JSON_RESPONSE_DATA'; payload: {
-      stepId: string;
-      configIndex: number;
-      clientId: string;
-      parentJsonResponseDataIds: string[];
-    }};
+  | {
+      type: 'UPDATE_PROMPT_CONFIG_FIELD';
+      payload: {
+        stepId: string;
+        configIndex: number;
+        field: string;
+        value:
+          | string
+          | boolean
+          | JsonResponseData[]
+          | RagStoreConfiguration
+          | undefined;
+      };
+    }
+  | {
+      type: 'UPDATE_STEP_FIELD';
+      payload: { stepId: string; field: string; value: any };
+    }
+  | {
+      type: 'ADD_PROMPT_CONFIGURATION';
+      payload: { stepId: string; configuration: any };
+    }
+  | {
+      type: 'REMOVE_PROMPT_CONFIGURATION';
+      payload: { stepId: string; configIndex: number };
+    }
+  | {
+      type: 'UPDATE_JSON_RESPONSE_DATA';
+      payload: {
+        stepId: string;
+        configIndex: number;
+        clientId: string;
+        field: string;
+        value: string | boolean;
+        parentJsonResponseDataIds: string[];
+      };
+    }
+  | {
+      type: 'ADD_JSON_RESPONSE_DATA';
+      payload: {
+        stepId: string;
+        configIndex: number;
+        parentJsonResponseDataIds: string[];
+        newData: JsonResponseData;
+      };
+    }
+  | {
+      type: 'DELETE_JSON_RESPONSE_DATA';
+      payload: {
+        stepId: string;
+        configIndex: number;
+        clientId: string;
+        parentJsonResponseDataIds: string[];
+      };
+    };
 
 function editActivityReducer(
   state: ActivityBuilder,
@@ -141,7 +185,11 @@ function editActivityReducer(
         ...state,
         flowsList: [
           ...state.flowsList,
-          { clientId: action.payload.clientId, name: action.payload.name, steps: [] },
+          {
+            clientId: action.payload.clientId,
+            name: action.payload.name,
+            steps: [],
+          },
         ],
       };
 
@@ -182,7 +230,9 @@ function editActivityReducer(
             return {
               ...f,
               steps: f.steps.map((s) =>
-                s.stepId === action.payload.step.stepId ? action.payload.step : s
+                s.stepId === action.payload.step.stepId
+                  ? action.payload.step
+                  : s
               ),
             };
           }
@@ -225,7 +275,9 @@ function editActivityReducer(
           steps: f.steps.map((s) => {
             if (s.stepId === action.payload.stepId && s.stepType === 'PROMPT') {
               const promptStep = s as any;
-              const updatedConfigurations = [...promptStep.promptConfigurations];
+              const updatedConfigurations = [
+                ...promptStep.promptConfigurations,
+              ];
               updatedConfigurations[action.payload.configIndex] = {
                 ...updatedConfigurations[action.payload.configIndex],
                 [action.payload.field]: action.payload.value,
@@ -269,7 +321,8 @@ function editActivityReducer(
               return {
                 ...s,
                 promptConfigurations: promptStep.promptConfigurations.filter(
-                  (_: any, index: number) => index !== action.payload.configIndex
+                  (_: any, index: number) =>
+                    index !== action.payload.configIndex
                 ),
               };
             }
@@ -286,7 +339,8 @@ function editActivityReducer(
           steps: f.steps.map((s) => {
             if (s.stepId === action.payload.stepId && s.stepType === 'PROMPT') {
               const promptStep = s as any;
-              const config = promptStep.promptConfigurations[action.payload.configIndex];
+              const config =
+                promptStep.promptConfigurations[action.payload.configIndex];
               const updatedResponseData = updateNestedJsonResponseData(
                 config.jsonResponseData || [],
                 action.payload.clientId,
@@ -294,7 +348,9 @@ function editActivityReducer(
                 action.payload.value,
                 action.payload.parentJsonResponseDataIds
               );
-              const updatedConfigurations = [...promptStep.promptConfigurations];
+              const updatedConfigurations = [
+                ...promptStep.promptConfigurations,
+              ];
               updatedConfigurations[action.payload.configIndex] = {
                 ...updatedConfigurations[action.payload.configIndex],
                 jsonResponseData: updatedResponseData,
@@ -314,13 +370,16 @@ function editActivityReducer(
           steps: f.steps.map((s) => {
             if (s.stepId === action.payload.stepId && s.stepType === 'PROMPT') {
               const promptStep = s as any;
-              const config = promptStep.promptConfigurations[action.payload.configIndex];
+              const config =
+                promptStep.promptConfigurations[action.payload.configIndex];
               const updatedResponseData = addNestedJsonResponseData(
                 config.jsonResponseData || [],
                 action.payload.newData,
                 action.payload.parentJsonResponseDataIds
               );
-              const updatedConfigurations = [...promptStep.promptConfigurations];
+              const updatedConfigurations = [
+                ...promptStep.promptConfigurations,
+              ];
               updatedConfigurations[action.payload.configIndex] = {
                 ...updatedConfigurations[action.payload.configIndex],
                 jsonResponseData: updatedResponseData,
@@ -340,13 +399,16 @@ function editActivityReducer(
           steps: f.steps.map((s) => {
             if (s.stepId === action.payload.stepId && s.stepType === 'PROMPT') {
               const promptStep = s as any;
-              const config = promptStep.promptConfigurations[action.payload.configIndex];
+              const config =
+                promptStep.promptConfigurations[action.payload.configIndex];
               const updatedResponseData = deleteNestedJsonResponseData(
                 config.jsonResponseData || [],
                 action.payload.clientId,
                 action.payload.parentJsonResponseDataIds
               );
-              const updatedConfigurations = [...promptStep.promptConfigurations];
+              const updatedConfigurations = [
+                ...promptStep.promptConfigurations,
+              ];
               updatedConfigurations[action.payload.configIndex] = {
                 ...updatedConfigurations[action.payload.configIndex],
                 jsonResponseData: updatedResponseData,
@@ -444,7 +506,9 @@ interface EditActivityContextType {
   dispatch: React.Dispatch<EditActivityAction>;
   // Helpers
   getStep: (stepId: string) => ActivityBuilderStepTypes | undefined;
-  getFlowByStepId: (stepId: string) => { clientId: string; name: string } | undefined;
+  getFlowByStepId: (
+    stepId: string
+  ) => { clientId: string; name: string } | undefined;
   // Convenience action creators
   updateTitle: (title: string) => void;
   updateDescription: (description: string) => void;
@@ -452,7 +516,11 @@ interface EditActivityContextType {
   addFlow: (clientId: string, name: string) => void;
   deleteFlow: (flowClientId: string) => void;
   updateFlowName: (flowClientId: string, name: string) => void;
-  addStep: (flowClientId: string, step: ActivityBuilderStepTypes, index: number) => void;
+  addStep: (
+    flowClientId: string,
+    step: ActivityBuilderStepTypes,
+    index: number
+  ) => void;
   updateStep: (flowClientId: string, step: ActivityBuilderStepTypes) => void;
   deleteStep: (flowClientId: string, stepId: string) => void;
   updateStepField: (stepId: string, field: string, value: any) => void;
@@ -460,7 +528,12 @@ interface EditActivityContextType {
     stepId: string,
     configIndex: number,
     field: string,
-    value: string | boolean | JsonResponseData[] | RagStoreConfiguration | undefined
+    value:
+      | string
+      | boolean
+      | JsonResponseData[]
+      | RagStoreConfiguration
+      | undefined
   ) => void;
   addPromptConfiguration: (stepId: string, configuration: any) => void;
   removePromptConfiguration: (stepId: string, configIndex: number) => void;
@@ -486,12 +559,16 @@ interface EditActivityContextType {
   ) => void;
 }
 
-const EditActivityContext = React.createContext<EditActivityContextType | null>(null);
+const EditActivityContext = React.createContext<EditActivityContextType | null>(
+  null
+);
 
 export const useEditActivityContext = () => {
   const context = React.useContext(EditActivityContext);
   if (!context) {
-    throw new Error('useEditActivityContext must be used within EditActivityProvider');
+    throw new Error(
+      'useEditActivityContext must be used within EditActivityProvider'
+    );
   }
   return context;
 };
@@ -529,7 +606,8 @@ export const EditActivityProvider: React.FC<{
         }
         return undefined;
       },
-      updateTitle: (title: string) => dispatch({ type: 'UPDATE_TITLE', payload: title }),
+      updateTitle: (title: string) =>
+        dispatch({ type: 'UPDATE_TITLE', payload: title }),
       updateDescription: (description: string) =>
         dispatch({ type: 'UPDATE_DESCRIPTION', payload: description }),
       updateVisibility: (visibility: ActivityBuilder['visibility']) =>
@@ -540,28 +618,46 @@ export const EditActivityProvider: React.FC<{
         dispatch({ type: 'DELETE_FLOW', payload: flowClientId }),
       updateFlowName: (flowClientId: string, name: string) =>
         dispatch({ type: 'UPDATE_FLOW_NAME', payload: { flowClientId, name } }),
-      addStep: (flowClientId: string, step: ActivityBuilderStepTypes, index: number) =>
+      addStep: (
+        flowClientId: string,
+        step: ActivityBuilderStepTypes,
+        index: number
+      ) =>
         dispatch({ type: 'ADD_STEP', payload: { flowClientId, step, index } }),
       updateStep: (flowClientId: string, step: ActivityBuilderStepTypes) =>
         dispatch({ type: 'UPDATE_STEP', payload: { flowClientId, step } }),
       deleteStep: (flowClientId: string, stepId: string) =>
         dispatch({ type: 'DELETE_STEP', payload: { flowClientId, stepId } }),
       updateStepField: (stepId: string, field: string, value: any) =>
-        dispatch({ type: 'UPDATE_STEP_FIELD', payload: { stepId, field, value } }),
+        dispatch({
+          type: 'UPDATE_STEP_FIELD',
+          payload: { stepId, field, value },
+        }),
       updatePromptConfigField: (
         stepId: string,
         configIndex: number,
         field: string,
-        value: string | boolean | JsonResponseData[] | RagStoreConfiguration | undefined
+        value:
+          | string
+          | boolean
+          | JsonResponseData[]
+          | RagStoreConfiguration
+          | undefined
       ) =>
         dispatch({
           type: 'UPDATE_PROMPT_CONFIG_FIELD',
           payload: { stepId, configIndex, field, value },
         }),
       addPromptConfiguration: (stepId: string, configuration: any) =>
-        dispatch({ type: 'ADD_PROMPT_CONFIGURATION', payload: { stepId, configuration } }),
+        dispatch({
+          type: 'ADD_PROMPT_CONFIGURATION',
+          payload: { stepId, configuration },
+        }),
       removePromptConfiguration: (stepId: string, configIndex: number) =>
-        dispatch({ type: 'REMOVE_PROMPT_CONFIGURATION', payload: { stepId, configIndex } }),
+        dispatch({
+          type: 'REMOVE_PROMPT_CONFIGURATION',
+          payload: { stepId, configIndex },
+        }),
       updateJsonResponseData: (
         stepId: string,
         configIndex: number,
@@ -572,7 +668,14 @@ export const EditActivityProvider: React.FC<{
       ) =>
         dispatch({
           type: 'UPDATE_JSON_RESPONSE_DATA',
-          payload: { stepId, configIndex, clientId, field, value, parentJsonResponseDataIds },
+          payload: {
+            stepId,
+            configIndex,
+            clientId,
+            field,
+            value,
+            parentJsonResponseDataIds,
+          },
         }),
       addJsonResponseData: (
         stepId: string,

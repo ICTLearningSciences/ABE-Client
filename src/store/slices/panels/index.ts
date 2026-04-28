@@ -36,12 +36,9 @@ const initialState: State = {
   panelistsLoadStatus: LoadStatus.NONE,
 };
 
-export const fetchPanels = createAsyncThunk(
-  'state/fetchPanels',
-  async () => {
-    return await _fetchPanels();
-  }
-);
+export const fetchPanels = createAsyncThunk('state/fetchPanels', async () => {
+  return await _fetchPanels();
+});
 
 export const fetchPanelists = createAsyncThunk(
   'state/fetchPanelists',
@@ -83,16 +80,10 @@ export const stateSlice = createSlice({
   name: 'state',
   initialState,
   reducers: {
-    addNewLocalPanel: (
-      state,
-      action: PayloadAction<Panel>
-    ) => {
+    addNewLocalPanel: (state, action: PayloadAction<Panel>) => {
       state.panels.push(action.payload);
     },
-    addNewLocalPanelist: (
-      state,
-      action: PayloadAction<Panelist>
-    ) => {
+    addNewLocalPanelist: (state, action: PayloadAction<Panelist>) => {
       state.panelists.push(action.payload);
     },
   },
@@ -151,10 +142,9 @@ export const stateSlice = createSlice({
         state.panelists = state.panelists.filter(
           (p) => p.clientId !== action.payload.clientId
         );
-      })
-    }
-  });
-
+      });
+  },
+});
 
 export const { addNewLocalPanel, addNewLocalPanelist } = stateSlice.actions;
 

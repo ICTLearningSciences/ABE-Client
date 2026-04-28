@@ -53,7 +53,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
-import { useActivityBuilderContext, useEditActivityContext } from '../../activity-builder-context';
+import {
+  useActivityBuilderContext,
+  useEditActivityContext,
+} from '../../activity-builder-context';
 import { RagStoreConfigurationEditor } from './rag-store-configuration-editor';
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
@@ -401,7 +404,6 @@ export function PromptStepBuilder(props: {
     setRerender(rerender + 1);
   }
 
-
   function editJsonResponseData(
     configIndex: number,
     clientId: string,
@@ -655,7 +657,9 @@ export function PromptStepBuilder(props: {
           </IconButton>
           {step.promptConfigurations.length > 1 && (
             <IconButton
-              onClick={() => handleRemovePromptConfiguration(selectedConfigIndex)}
+              onClick={() =>
+                handleRemovePromptConfiguration(selectedConfigIndex)
+              }
               size="small"
               color="error"
               data-cy="remove-prompt-config-button"

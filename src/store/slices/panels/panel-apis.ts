@@ -1,8 +1,7 @@
-import { ACCESS_TOKEN_KEY } from "../../../../cypress/helpers/local-storage";
-import { execGql } from "../../../hooks/api";
-import { Connection } from "../../../types";
-import { localStorageGet } from "../../local-storage";
-import { Panel, Panelist } from "./types";
+import { execGql } from '../../../hooks/api';
+import { Connection } from '../../../types';
+import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
+import { Panel, Panelist } from './types';
 
 export const fullPanelData = `
 clientId
@@ -34,11 +33,11 @@ export const deletePanelMutation = `mutation DeletePanel($panelClientId: String!
         }
       `;
 
-export const addOrUpdatePanelMutation =  `mutation AddOrUpdatePanel($panel: PanelInputType!) {
+export const addOrUpdatePanelMutation = `mutation AddOrUpdatePanel($panel: PanelInputType!) {
     addOrUpdatePanel(panel: $panel) {
             ${fullPanelData}
     }
-   }`
+   }`;
 
 export const fullPanelistData = `
         clientId
@@ -53,7 +52,7 @@ export const fullPanelistData = `
           ragMetadataFilter
         }`;
 
-        export const fetchPanelistsQuery = `
+export const fetchPanelistsQuery = `
         query FetchPanelists($limit: Int, $filter: String, $filterObject: Object, $sortAscending: Boolean, $sortBy: String){
           fetchPanelists(limit: $limit, filter: $filter, filterObject: $filterObject, sortAscending: $sortAscending, sortBy: $sortBy) {
             edges {
@@ -69,13 +68,13 @@ export const deletePanelistMutation = `mutation DeletePanelist($panelistClientId
     deletePanelist(panelistClientId: $panelistClientId) {
         ${fullPanelistData}
     }
-    }`
+    }`;
 
 export const addOrUpdatePanelistMutation = `mutation AddOrUpdatePanelist($panelist: PanelistInputType!) {
           addOrUpdatePanelist(panelist: $panelist) {
             ${fullPanelistData}
           }
-         }`
+         }`;
 
 export async function fetchPanels(): Promise<Panel[]> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
@@ -142,7 +141,9 @@ export async function fetchPanelists(): Promise<Panelist[]> {
   return res.edges.map((edge) => edge.node);
 }
 
-export async function deletePanelist(panelistClientId: string): Promise<Panelist> {
+export async function deletePanelist(
+  panelistClientId: string
+): Promise<Panelist> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   const res = await execGql<Panelist>(
     {
@@ -159,7 +160,9 @@ export async function deletePanelist(panelistClientId: string): Promise<Panelist
   return res;
 }
 
-export async function addOrUpdatePanelist(panelist: Panelist): Promise<Panelist> {
+export async function addOrUpdatePanelist(
+  panelist: Panelist
+): Promise<Panelist> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
   const res = await execGql<Panelist>(
     {

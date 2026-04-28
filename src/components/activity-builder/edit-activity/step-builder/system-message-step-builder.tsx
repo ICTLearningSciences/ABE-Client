@@ -43,7 +43,8 @@ export function SystemMessageStepBuilder(props: {
   errors?: string[];
 }): JSX.Element {
   const { stepId, stepIndex, updateStep, flowsList, versions, errors } = props;
-  const { getStep, getFlowByStepId, updateStepField } = useEditActivityContext();
+  const { getStep, getFlowByStepId, updateStepField } =
+    useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
 
   const step = getStep(stepId) as SystemMessageActivityStep;

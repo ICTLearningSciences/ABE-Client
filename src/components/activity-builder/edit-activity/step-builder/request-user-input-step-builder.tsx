@@ -247,7 +247,8 @@ export function RequestUserInputStepBuilder(props: {
   errors?: string[];
 }): JSX.Element {
   const { stepId, stepIndex, flowsList, versions, errors } = props;
-  const { getStep, getFlowByStepId, updateStep, updateStepField } = useEditActivityContext();
+  const { getStep, getFlowByStepId, updateStep, updateStepField } =
+    useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
 
   const step = getStep(stepId) as RequestUserInputActivityStep;
