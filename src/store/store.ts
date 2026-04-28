@@ -12,6 +12,7 @@ import stateReducer from './slices/state';
 import configReducer from './slices/config';
 import docGoalsActivitiesReducer from './slices/doc-goals-activities';
 import educationManagementReducer from './slices/education-management';
+import panelsReducer from './slices/panels';
 import * as Sentry from '@sentry/react';
 
 const sentryEnhancer = Sentry.createReduxEnhancer({
@@ -31,6 +32,7 @@ const appReducer = combineReducers({
   config: configReducer,
   docGoalsActivities: docGoalsActivitiesReducer,
   educationManagement: educationManagementReducer,
+  panels: panelsReducer,
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,6 +47,7 @@ const rootReducer = (state: any, action: any) => {
         docGoalsActivities: docGoalsActivitiesReducer(undefined, action),
         educationManagement: educationManagementReducer(undefined, action),
         state: stateReducer(undefined, action),
+        panels: panelsReducer(undefined, action),
       },
       action
     );
