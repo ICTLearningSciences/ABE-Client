@@ -25,7 +25,6 @@ import {
   CardContent,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { PanelistRagConfigEditor } from '../panelist-builder/panelist-rag-config-editor';
 
 export function EditPanel(props: {
   panel: Panel;
@@ -157,16 +156,6 @@ export function EditPanel(props: {
             </FormControl>
           )}
         </div>
-
-        <PanelistRagConfigEditor
-          ragConfig={editedPanel.ragConfig}
-          updateRagConfig={(ragConfig) => {
-            setEditedPanel({
-              ...editedPanel,
-              ragConfig,
-            });
-          }}
-        />
       </ColumnDiv>
     </ColumnDiv>
   );

@@ -8,10 +8,6 @@ clientId
 panelName
 panelDescription
 panelists
-ragConfig {
-  includeRag
-  ragMetadataFilter
-}
 `;
 
 export const fetchPanelsQuery = `
@@ -48,8 +44,9 @@ export const fullPanelistData = `
         profilePicture
         introductionMessage
         ragConfig {
-          includeRag
-          ragMetadataFilter
+          ragQuery
+          topN
+          filters
         }`;
 
 export const fetchPanelistsQuery = `

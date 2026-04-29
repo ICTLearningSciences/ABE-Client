@@ -14,7 +14,7 @@ import React from 'react';
 import { Panelist } from '../../store/slices/panels/types';
 import { ColumnDiv } from '../../styled-components';
 import { Button, TextField } from '@mui/material';
-import { PanelistRagConfigEditor } from './panelist-rag-config-editor';
+import { RagStoreConfigurationEditor } from '../activity-builder/edit-activity/step-builder/rag-store-configuration-editor';
 
 export function EditPanelist(props: {
   panelist: Panelist;
@@ -111,12 +111,18 @@ export function EditPanelist(props: {
           fullWidth
         />
 
-        <PanelistRagConfigEditor
-          ragConfig={editedPanelist.ragConfig}
-          updateRagConfig={(ragConfig) => {
-            setEditedPanelist({
-              ...editedPanelist,
-              ragConfig,
+        <RagStoreConfigurationEditor
+          ragConfiguration={editedPanelist.ragConfig}
+          updateRagConfiguration={(updater) => {
+            setEditedPanelist((prev) => {
+              const newConfig =
+                typeof updater === 'function'
+                  ? updater(prev.ragConfig)
+                  : updater;
+              return {
+                ...prev,
+                ragConfig: newConfig,
+              };
             });
           }}
         />

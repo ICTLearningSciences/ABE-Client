@@ -4,6 +4,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React from 'react';
 import {
   ActivityBuilder,
@@ -88,6 +91,7 @@ type EditActivityAction =
   | { type: 'UPDATE_TITLE'; payload: string }
   | { type: 'UPDATE_DESCRIPTION'; payload: string }
   | { type: 'UPDATE_VISIBILITY'; payload: ActivityBuilder['visibility'] }
+  | { type: 'UPDATE_ATTACHED_PANEL'; payload: string | undefined }
   | { type: 'ADD_FLOW'; payload: { clientId: string; name: string } }
   | { type: 'DELETE_FLOW'; payload: string }
   | {
@@ -179,6 +183,9 @@ function editActivityReducer(
 
     case 'UPDATE_VISIBILITY':
       return { ...state, visibility: action.payload };
+
+    case 'UPDATE_ATTACHED_PANEL':
+      return { ...state, attachedPanel: action.payload };
 
     case 'ADD_FLOW':
       return {
@@ -513,6 +520,7 @@ interface EditActivityContextType {
   updateTitle: (title: string) => void;
   updateDescription: (description: string) => void;
   updateVisibility: (visibility: ActivityBuilder['visibility']) => void;
+  updateAttachedPanel: (panelClientId: string | undefined) => void;
   addFlow: (clientId: string, name: string) => void;
   deleteFlow: (flowClientId: string) => void;
   updateFlowName: (flowClientId: string, name: string) => void;
@@ -612,6 +620,8 @@ export const EditActivityProvider: React.FC<{
         dispatch({ type: 'UPDATE_DESCRIPTION', payload: description }),
       updateVisibility: (visibility: ActivityBuilder['visibility']) =>
         dispatch({ type: 'UPDATE_VISIBILITY', payload: visibility }),
+      updateAttachedPanel: (panelClientId: string | undefined) =>
+        dispatch({ type: 'UPDATE_ATTACHED_PANEL', payload: panelClientId }),
       addFlow: (clientId: string, name: string) =>
         dispatch({ type: 'ADD_FLOW', payload: { clientId, name } }),
       deleteFlow: (flowClientId: string) =>

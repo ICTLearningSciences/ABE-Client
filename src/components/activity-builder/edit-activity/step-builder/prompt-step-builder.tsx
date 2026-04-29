@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import {
-  ActivityBuilder,
   ActivityBuilderStepType,
   FlowItem,
   JsonResponseData,
@@ -243,6 +242,14 @@ function SinglePromptConfigurationEditor(
       )}
 
       <CheckBoxInput
+        label="Run for Each Panelist (if applicable)"
+        value={configuration.runForPanelists || false}
+        onChange={(e) => {
+          updateConfigField(configIndex, 'runForPanelists', e);
+        }}
+      />
+
+      <CheckBoxInput
         label="Include Chat History"
         value={configuration.includeChatLogContext}
         onChange={(e) => {
@@ -268,9 +275,13 @@ function SinglePromptConfigurationEditor(
 
       <RagStoreConfigurationEditor
         ragConfiguration={configuration.ragConfiguration}
-        updateRagConfiguration={(ragConfiguration) => {
-          console.log('Parent received RAG update:', ragConfiguration);
-          updateConfigField(configIndex, 'ragConfiguration', ragConfiguration);
+        updateRagConfiguration={(updater) => {
+          const newConfig =
+            typeof updater === 'function'
+              ? updater(configuration.ragConfiguration)
+              : updater;
+          console.log('Parent received RAG update:', newConfig);
+          updateConfigField(configIndex, 'ragConfiguration', newConfig);
         }}
       />
 

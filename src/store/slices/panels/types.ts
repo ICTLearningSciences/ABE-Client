@@ -1,7 +1,4 @@
-export interface RagConfig {
-  includeRag: boolean;
-  ragMetadataFilter: Record<string, string | string[]>;
-}
+import { RagStoreConfiguration } from '../../../types';
 
 export interface Panelist {
   clientId: string;
@@ -11,7 +8,7 @@ export interface Panelist {
   panelistName: string;
   panelistDescription: string;
   introductionMessage: string;
-  ragConfig: RagConfig;
+  ragConfig?: RagStoreConfiguration;
 }
 
 export interface Panel {
@@ -19,5 +16,4 @@ export interface Panel {
   panelName: string;
   panelDescription: string;
   panelists: string[];
-  ragConfig: RagConfig;
 }

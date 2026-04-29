@@ -96,8 +96,9 @@ export function EditGoogleDoc(props: {
       panelistDescription: '',
       introductionMessage: '',
       ragConfig: {
-        includeRag: false,
-        ragMetadataFilter: {},
+        ragQuery: '',
+        topN: 0,
+        filters: {},
       },
     };
     addOrUpdatePanelist(newPanelist);
@@ -110,10 +111,6 @@ export function EditGoogleDoc(props: {
       panelName: '',
       panelDescription: '',
       panelists: [],
-      ragConfig: {
-        includeRag: false,
-        ragMetadataFilter: {},
-      },
     };
     addOrUpdatePanel(newPanel);
     return newPanel;

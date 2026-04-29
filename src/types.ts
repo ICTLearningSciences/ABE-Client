@@ -351,6 +351,7 @@ export interface ActivityGQL extends IActivity {
   _id: string;
   title: string;
   activityType: 'gql';
+  attachedPanel?: string;
   introduction: string;
   description: string;
   steps?: ActivityStepGQL[];

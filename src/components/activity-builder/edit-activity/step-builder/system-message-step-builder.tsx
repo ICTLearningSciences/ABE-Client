@@ -29,6 +29,7 @@ export function getDefaultSystemMessage(): SystemMessageActivityStep {
     message: '',
     jumpToStepId: '',
     systemCustomName: '',
+    sendFromPanelists: false,
   };
 }
 export function SystemMessageStepBuilder(props: {
@@ -42,7 +43,7 @@ export function SystemMessageStepBuilder(props: {
   versions: StepVersion[];
   errors?: string[];
 }): JSX.Element {
-  const { stepId, stepIndex, updateStep, flowsList, versions, errors } = props;
+  const { stepId, stepIndex, updateStep, versions, errors } = props;
   const { getStep, getFlowByStepId, updateStepField } =
     useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
@@ -139,6 +140,14 @@ export function SystemMessageStepBuilder(props: {
           value={step.setStudentActivityComplete ?? false}
           onChange={(e) => {
             updateField('setStudentActivityComplete', e);
+          }}
+        />
+        <CheckBoxInput
+          label="Send message from each panelist?"
+          value={step.sendFromPanelists}
+          tooltip="If checked, an individual message will be sent to each panelist with the variable data pulled from their respective data pool."
+          onChange={(e) => {
+            updateField('sendFromPanelists', e);
           }}
         />
         <JumpToAlternateStep

@@ -12,4 +12,3 @@ The full terms of this copyright and license should always be found in the root 
 */
 export { SelectCreatePanelist } from './select-create-panelist';
 export { EditPanelist } from './edit-panelist';
-export { PanelistRagConfigEditor } from './panelist-rag-config-editor';

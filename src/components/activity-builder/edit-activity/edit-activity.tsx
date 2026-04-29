@@ -22,6 +22,7 @@ import {
   EditActivityProvider,
   useEditActivityContext,
 } from '../activity-builder-context';
+import { useWithPanels } from '../../../store/slices/panels/use-with-panels';
 // Inner component that uses the context
 function EditActivityContent(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
@@ -42,10 +43,12 @@ function EditActivityContent(props: {
     updateTitle,
     updateDescription,
     updateVisibility,
+    updateAttachedPanel,
   } = useEditActivityContext();
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
   const { activityVersions, loadActivityVersions, canEditActivity } =
     useActivityBuilderContext();
+  const { panels } = useWithPanels();
 
   const globalStateKeys: string[] = useMemo(() => {
     return activity.flowsList.reduce(
@@ -148,6 +151,14 @@ function EditActivityContent(props: {
           options={Object.values(ActivityBuilderVisibility)}
           disabled={!canEditActivity(activity)}
           onChange={(v) => updateVisibility(v as ActivityBuilderVisibility)}
+        />
+        <SelectInputField
+          label="Attached Panel"
+          value={activity.attachedPanel || ''}
+          options={['', ...panels.map((panel) => panel.clientId)]}
+          optionLabels={['None', ...panels.map((panel) => panel.panelName)]}
+          disabled={!canEditActivity(activity)}
+          onChange={(v) => updateAttachedPanel(v || undefined)}
         />
 
         <RowDiv>

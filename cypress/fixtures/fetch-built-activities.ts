@@ -24,6 +24,7 @@ export const myEditableActivity: ActivityBuilder = {
     clientId: '123',
     title: 'Example Activity',
     activityType: 'builder',
+    attachedPanel: '',
     description: '',
     user: testUser._id,
     visibility: ActivityBuilderVisibility.EDITABLE,

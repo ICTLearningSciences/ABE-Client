@@ -284,6 +284,7 @@ export interface AiPromptStep {
   prompts: PromptConfiguration[];
   targetAiServiceModel?: AiServiceModel;
   outputDataType: PromptOutputTypes;
+  runForPanelists?: boolean;
   includeChatLogContext?: boolean;
   responseFormat?:string;
   editDoc?: boolean;
