@@ -120,6 +120,7 @@ type EditActivityAction =
         value:
           | string
           | boolean
+          | string[]
           | JsonResponseData[]
           | RagStoreConfiguration
           | undefined;
@@ -539,6 +540,7 @@ interface EditActivityContextType {
     value:
       | string
       | boolean
+      | string[]
       | JsonResponseData[]
       | RagStoreConfiguration
       | undefined
@@ -650,6 +652,7 @@ export const EditActivityProvider: React.FC<{
         value:
           | string
           | boolean
+          | string[]
           | JsonResponseData[]
           | RagStoreConfiguration
           | undefined

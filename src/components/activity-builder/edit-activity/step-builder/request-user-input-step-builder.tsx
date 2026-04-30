@@ -361,13 +361,6 @@ export function RequestUserInputStepBuilder(props: {
       </div>
       <Collapse in={!collapsed}>
         <InputField
-          label="System Custom Name"
-          value={step.systemCustomName}
-          onChange={(e) => {
-            updateField('systemCustomName', e);
-          }}
-        />
-        <InputField
           label="Request Message (Optional)"
           value={step.message}
           onChange={(e) => {

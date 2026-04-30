@@ -57,6 +57,7 @@ import {
   useEditActivityContext,
 } from '../../activity-builder-context';
 import { RagStoreConfigurationEditor } from './rag-store-configuration-editor';
+import { PanelistSelector } from './panelist-selector';
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
     clientId: uuid(),
@@ -125,6 +126,7 @@ interface SinglePromptConfigurationEditorProps {
     value:
       | string
       | boolean
+      | string[]
       | JsonResponseData[]
       | RagStoreConfiguration
       | undefined
@@ -171,15 +173,6 @@ function SinglePromptConfigurationEditor(
         padding: '10px 0',
       }}
     >
-      <InputField
-        label="System Custom Name"
-        value={configuration.systemCustomName}
-        onChange={(e) => {
-          updateConfigField(configIndex, 'systemCustomName', e);
-        }}
-        width="100%"
-      />
-
       <InputField
         label="Prompt Text"
         value={configuration.promptText}
@@ -241,11 +234,14 @@ function SinglePromptConfigurationEditor(
         />
       )}
 
-      <CheckBoxInput
-        label="Run for Each Panelist (if applicable)"
-        value={configuration.runForPanelists || false}
-        onChange={(e) => {
-          updateConfigField(configIndex, 'runForPanelists', e);
+      <PanelistSelector
+        selectedPanelistClientIds={configuration.runForPanelistClientIds || []}
+        onChange={(panelistClientIds) => {
+          updateConfigField(
+            configIndex,
+            'runForPanelistClientIds',
+            panelistClientIds
+          );
         }}
       />
 
@@ -383,6 +379,7 @@ export function PromptStepBuilder(props: {
     value:
       | string
       | boolean
+      | string[]
       | JsonResponseData[]
       | RagStoreConfiguration
       | undefined

@@ -34,7 +34,7 @@ prompt{
     }
     outputDataType
     includeChatLogContext
-    runForPanelists
+    runForPanelistClientIds
   }
   title
   userInputIsIntention
@@ -64,7 +64,7 @@ _id
                     }
                   systemRole
                   outputDataType
-                  runForPanelists
+                  runForPanelistClientIds
                     includeChatLogContext
                     responseFormat
                     editDoc

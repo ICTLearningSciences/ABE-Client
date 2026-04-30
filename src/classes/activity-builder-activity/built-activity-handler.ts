@@ -361,20 +361,36 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
   async handleSystemMessageStep(step: SystemMessageActivityStep) {
     // Check if we should send messages from panelists
-    console.log('step.sendFromPanelists', step.sendFromPanelists);
+    console.log(
+      'step.sendFromPanelistClientIds',
+      step.sendFromPanelistClientIds
+    );
     console.log('this.activityPanel', this.activityPanel);
     console.log('this.activityPanelists', this.activityPanelists);
     if (
-      step.sendFromPanelists &&
+      step.sendFromPanelistClientIds &&
+      step.sendFromPanelistClientIds.length > 0 &&
       this.activityPanel &&
       this.activityPanelists
     ) {
+      const effectivePanelists = step.sendFromPanelistClientIds.reduce(
+        (acc: Panelist[], clientId) => {
+          const panelist = this.activityPanelists?.find(
+            (p) => p.clientId === clientId
+          );
+          if (panelist) {
+            acc.push(panelist);
+          }
+          return acc;
+        },
+        []
+      );
       const panelistData = this.stateData['panelistData'];
 
       if (panelistData && typeof panelistData === 'object') {
         // Send a message for each panelist
         for (const panelistClientId of Object.keys(panelistData)) {
-          const panelist = this.activityPanelists.find(
+          const panelist = effectivePanelists.find(
             (p) => p.clientId === panelistClientId
           );
 
@@ -664,12 +680,24 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
     for (const config of step.promptConfigurations) {
       if (
-        config.runForPanelists &&
+        config.runForPanelistClientIds &&
         this.activityPanel &&
         this.activityPanelists
       ) {
+        const effectivePanelists = config.runForPanelistClientIds.reduce(
+          (acc: Panelist[], clientId) => {
+            const panelist = this.activityPanelists?.find(
+              (p) => p.clientId === clientId
+            );
+            if (panelist) {
+              acc.push(panelist);
+            }
+            return acc;
+          },
+          []
+        );
         // Execute prompt for each panelist
-        for (const panelist of this.activityPanelists) {
+        for (const panelist of effectivePanelists) {
           promptExecutions.push(
             this.executePanelistPromptConfiguration(config, panelist)
           );

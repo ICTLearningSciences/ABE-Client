@@ -37,7 +37,7 @@ export const fullBuiltActivityQueryData = `
                               systemCustomName
                               message
                               setStudentActivityComplete
-                              sendFromPanelists
+                              sendFromPanelistClientIds
                           }
 
                           ... on RequestUserInputActivityStepType {
@@ -73,7 +73,7 @@ export const fullBuiltActivityQueryData = `
                                 systemCustomName
                                 includeEssay
                                 outputDataType
-                                runForPanelists
+                                runForPanelistClientIds
                                 jsonResponseData
                                 customSystemRole
                                 webSearch

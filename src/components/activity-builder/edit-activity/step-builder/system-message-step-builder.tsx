@@ -22,6 +22,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
 import { useEditActivityContext } from '../../activity-builder-context';
+import { PanelistSelector } from './panelist-selector';
 export function getDefaultSystemMessage(): SystemMessageActivityStep {
   return {
     stepId: uuid(),
@@ -29,7 +30,7 @@ export function getDefaultSystemMessage(): SystemMessageActivityStep {
     message: '',
     jumpToStepId: '',
     systemCustomName: '',
-    sendFromPanelists: false,
+    sendFromPanelistClientIds: [],
   };
 }
 export function SystemMessageStepBuilder(props: {
@@ -63,7 +64,7 @@ export function SystemMessageStepBuilder(props: {
     setRerender(rerender + 1);
   }
 
-  function updateField(field: string, value: string | boolean) {
+  function updateField(field: string, value: string | boolean | string[]) {
     updateStepField(stepId, field, value);
   }
 
@@ -122,13 +123,6 @@ export function SystemMessageStepBuilder(props: {
       </div>
       <Collapse in={!collapsed}>
         <InputField
-          label="System Custom Name"
-          value={step.systemCustomName}
-          onChange={(e) => {
-            updateField('systemCustomName', e);
-          }}
-        />
-        <InputField
           label="Message"
           value={step.message}
           onChange={(e) => {
@@ -142,12 +136,10 @@ export function SystemMessageStepBuilder(props: {
             updateField('setStudentActivityComplete', e);
           }}
         />
-        <CheckBoxInput
-          label="Send message from each panelist?"
-          value={step.sendFromPanelists}
-          tooltip="If checked, an individual message will be sent to each panelist with the variable data pulled from their respective data pool."
-          onChange={(e) => {
-            updateField('sendFromPanelists', e);
+        <PanelistSelector
+          selectedPanelistClientIds={step.sendFromPanelistClientIds || []}
+          onChange={(panelistClientIds) => {
+            updateField('sendFromPanelistClientIds', panelistClientIds);
           }}
         />
         <JumpToAlternateStep

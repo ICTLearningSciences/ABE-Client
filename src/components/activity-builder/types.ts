@@ -96,7 +96,7 @@ export interface SystemMessageActivityStep extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.SYSTEM_MESSAGE;
   message: string;
   systemCustomName: string;
-  sendFromPanelists: boolean;
+  sendFromPanelistClientIds: string[];
 }
 
 // LogicOperation
@@ -189,7 +189,7 @@ export interface SinglePromptConfigurationGql {
   systemCustomName: string;
   includeEssay: boolean;
   outputDataType: PromptOutputTypes;
-  runForPanelists?: boolean;
+  runForPanelistClientIds?: string[];
   jsonResponseData?: string;
   customSystemRole: string;
   webSearch?: boolean;
