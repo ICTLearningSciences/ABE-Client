@@ -185,6 +185,12 @@ export interface PromptConfiguration {
   includeUserInput?: boolean;
 }
 
+export interface RagStoreConfiguration {
+  ragQuery: string;
+  topN: number;
+  filters?: Record<string, string | string[]>;
+}
+
 export interface AiPromptStep {
   prompts: PromptConfiguration[];
   targetAiServiceModel?: AiServiceModel;
@@ -194,6 +200,7 @@ export interface AiPromptStep {
   responseFormat?: string;
   webSearch?: boolean;
   editDoc?: boolean;
+  ragConfiguration?: RagStoreConfiguration;
 }
 
 export enum PromptOutputTypes {
@@ -344,6 +351,7 @@ export interface ActivityGQL extends IActivity {
   _id: string;
   title: string;
   activityType: 'gql';
+  attachedPanel?: string;
   introduction: string;
   description: string;
   steps?: ActivityStepGQL[];

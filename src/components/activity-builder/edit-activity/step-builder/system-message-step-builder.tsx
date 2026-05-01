@@ -15,13 +15,14 @@ import {
   SystemMessageActivityStep,
   ActivityBuilderStepType,
   FlowItem,
-  ActivityBuilder,
 } from '../../types';
 import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
+import { useEditActivityContext } from '../../activity-builder-context';
+import { PanelistSelector } from './panelist-selector';
 export function getDefaultSystemMessage(): SystemMessageActivityStep {
   return {
     stepId: uuid(),
@@ -29,12 +30,12 @@ export function getDefaultSystemMessage(): SystemMessageActivityStep {
     message: '',
     jumpToStepId: '',
     systemCustomName: '',
+    sendFromPanelistClientIds: [],
   };
 }
 export function SystemMessageStepBuilder(props: {
-  step: SystemMessageActivityStep;
-  updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
-  updateStep: (step: SystemMessageActivityStep) => void;
+  stepId: string;
+  updateStep: (flowClientId: string, step: SystemMessageActivityStep) => void;
   deleteStep: () => void;
   flowsList: FlowItem[];
   stepIndex: number;
@@ -43,50 +44,28 @@ export function SystemMessageStepBuilder(props: {
   versions: StepVersion[];
   errors?: string[];
 }): JSX.Element {
-  const { step, stepIndex, updateLocalActivity, versions, errors } = props;
+  const { stepId, stepIndex, updateStep, versions, errors } = props;
+  const { getStep, getFlowByStepId, updateStepField } =
+    useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
+
+  const step = getStep(stepId) as SystemMessageActivityStep;
+  const flow = getFlowByStepId(stepId);
+
+  if (!step || !flow) {
+    return <div>Step not found</div>;
+  }
 
   const [rerender, setRerender] = React.useState(0);
   function replacePromptStepWithVersion(version: StepVersion) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return version.step;
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    if (flow) {
+      updateStep(flow.clientId, version.step as SystemMessageActivityStep);
+    }
     setRerender(rerender + 1);
   }
 
-  function updateField(field: string, value: string | boolean) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return {
-                  ...s,
-                  [field]: value,
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+  function updateField(field: string, value: string | boolean | string[]) {
+    updateStepField(stepId, field, value);
   }
 
   return (
@@ -144,13 +123,6 @@ export function SystemMessageStepBuilder(props: {
       </div>
       <Collapse in={!collapsed}>
         <InputField
-          label="System Custom Name"
-          value={step.systemCustomName}
-          onChange={(e) => {
-            updateField('systemCustomName', e);
-          }}
-        />
-        <InputField
           label="Message"
           value={step.message}
           onChange={(e) => {
@@ -162,6 +134,12 @@ export function SystemMessageStepBuilder(props: {
           value={step.setStudentActivityComplete ?? false}
           onChange={(e) => {
             updateField('setStudentActivityComplete', e);
+          }}
+        />
+        <PanelistSelector
+          selectedPanelistClientIds={step.sendFromPanelistClientIds || []}
+          onChange={(panelistClientIds) => {
+            updateField('sendFromPanelistClientIds', panelistClientIds);
           }}
         />
         <JumpToAlternateStep

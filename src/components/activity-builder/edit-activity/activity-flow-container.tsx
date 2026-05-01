@@ -8,7 +8,6 @@ import React, { useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
 import {
   ActivityBuilderStepTypes,
-  ActivityBuilder as ActivityBuilderType,
   BuiltActivityVersion,
   PromptActivityStep,
 } from '../types';
@@ -18,6 +17,7 @@ import { ColumnDiv } from '../../../styled-components';
 import { PromptStepBuilder } from './step-builder/prompt-step-builder';
 import { FlowErrors } from '../../../classes/activity-builder-activity/activity-step-error-checker';
 import ErrorIcon from '@mui/icons-material/Error';
+import { useEditActivityContext } from '../activity-builder-context';
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -54,23 +54,13 @@ export interface StepVersion {
 
 export function ActivityFlowContainer(props: {
   globalStateKeys: string[];
-  localActivity: ActivityBuilderType;
-  updateLocalActivity: React.Dispatch<
-    React.SetStateAction<ActivityBuilderType>
-  >;
   versions: BuiltActivityVersion[];
   disabled?: boolean;
   stepErrors: FlowErrors;
 }): JSX.Element {
-  const {
-    localActivity,
-    updateLocalActivity,
-    versions,
-    stepErrors,
-    globalStateKeys,
-    disabled,
-  } = props;
-  const flowsList = localActivity.flowsList;
+  const { versions, stepErrors, globalStateKeys, disabled } = props;
+  const { activity, updateStep, deleteStep } = useEditActivityContext();
+  const flowsList = activity.flowsList;
   const allStepVersions: StepVersion[] = versions
     .flatMap((v) =>
       v.activity.flowsList.map((s) => {
@@ -98,45 +88,6 @@ export function ActivityFlowContainer(props: {
     return allStepVersions.filter((v) => v.step.stepId === stepId);
   }
 
-  const updateStep = (step: ActivityBuilderStepTypes, flowClientId: string) => {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          if (f.clientId === flowClientId) {
-            return {
-              ...f,
-              steps: f.steps.map((s) => {
-                if (s.stepId === step.stepId) {
-                  return step;
-                }
-                return s;
-              }),
-            };
-          }
-          return f;
-        }),
-      };
-    });
-  };
-
-  const deleteStep = (stepId: string, flowClientId: string) => {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          if (f.clientId === flowClientId) {
-            return {
-              ...f,
-              steps: f.steps.filter((s) => s.stepId !== stepId),
-            };
-          }
-          return f;
-        }),
-      };
-    });
-  };
-
   function filterFlowName(name: string): string {
     return name.length > 20 ? name.substring(0, 20) + '...' : name;
   }
@@ -163,7 +114,6 @@ export function ActivityFlowContainer(props: {
           globalStateKeys={globalStateKeys}
           flow={flow}
           flowsList={flowsList}
-          updateLocalActivity={updateLocalActivity}
           updateStep={updateStep}
           deleteStep={deleteStep}
           setPreviewPromptId={(id: string) => setPreviewPromptId(id)}
@@ -184,9 +134,8 @@ export function ActivityFlowContainer(props: {
       >
         <PromptStepBuilder
           stepIndex={0}
-          step={previewPrompt as PromptActivityStep}
+          stepId={previewPrompt.stepId}
           deleteStep={deleteStep}
-          updateLocalActivity={updateLocalActivity}
           flowsList={flowsList}
           previewed={true}
           startPreview={() => setPreviewPromptId(previewPrompt.stepId)}

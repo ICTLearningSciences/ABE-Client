@@ -5,7 +5,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { DisplayIcons } from '../../helpers/display-icon-helper';
-import { ActivityGQL, PromptOutputTypes } from '../../types';
+import {
+  ActivityGQL,
+  PromptOutputTypes,
+  RagStoreConfiguration,
+} from '../../types';
 import { v4 as uuidv4 } from 'uuid';
 
 export function isActivityBuilder(
@@ -64,6 +68,7 @@ export interface ActivityBuilder extends IActivity {
   newDocRecommend?: boolean;
   disabled?: boolean;
   flowsList: FlowItem[];
+  attachedPanel?: string;
 }
 
 export enum ActivityBuilderStepType {
@@ -91,6 +96,7 @@ export interface SystemMessageActivityStep extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.SYSTEM_MESSAGE;
   message: string;
   systemCustomName: string;
+  sendFromPanelistClientIds: string[];
 }
 
 // LogicOperation
@@ -183,9 +189,11 @@ export interface SinglePromptConfigurationGql {
   systemCustomName: string;
   includeEssay: boolean;
   outputDataType: PromptOutputTypes;
+  runForPanelistClientIds?: string[];
   jsonResponseData?: string;
   customSystemRole: string;
   webSearch?: boolean;
+  ragConfiguration?: RagStoreConfiguration;
 }
 
 export interface SinglePromptConfiguration

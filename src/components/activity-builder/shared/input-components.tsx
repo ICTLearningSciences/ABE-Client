@@ -91,10 +91,11 @@ export function SelectInputField(props: {
   label: string;
   value: string;
   options: string[];
+  optionLabels?: string[];
   onChange: (value: string) => void;
   disabled?: boolean;
 }): JSX.Element {
-  const { label, options, onChange, value, disabled } = props;
+  const { label, options, optionLabels, onChange, value, disabled } = props;
   return (
     <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
       <InputLabel id={'select-field-label'}>{label}</InputLabel>
@@ -111,7 +112,7 @@ export function SelectInputField(props: {
       >
         {options.map((option, i) => (
           <MenuItem key={i} value={option}>
-            {option}
+            {optionLabels && optionLabels[i] ? optionLabels[i] : option}
           </MenuItem>
         ))}
       </Select>

@@ -6,17 +6,13 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import {
-  ActivityBuilder,
   ActivityBuilderStepType,
   ActivityBuilderStepTypes,
-  ConditionalActivityStep,
   FlowItem,
-  PromptActivityStep,
-  RequestUserInputActivityStep,
   RequestUserInputSpecialType,
-  SystemMessageActivityStep,
 } from '../types';
 import { ColumnDiv } from '../../../styled-components';
+import { useEditActivityContext } from '../activity-builder-context';
 import {
   RequestUserInputStepBuilder,
   getDefaultRequestUserInputBuilder,
@@ -50,9 +46,8 @@ export function FlowStepsBuilderTab(props: {
   globalStateKeys: string[];
   flow: FlowItem;
   flowsList: FlowItem[];
-  updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
-  updateStep: (step: ActivityBuilderStepTypes, flowClientId: string) => void;
-  deleteStep: (stepId: string, flowClientId: string) => void;
+  updateStep: (flowClientId: string, step: ActivityBuilderStepTypes) => void;
+  deleteStep: (flowClientId: string, stepId: string) => void;
   setPreviewPromptId: (id: string) => void;
   getVersionsForStep: (stepId: string) => StepVersion[];
   disabled?: boolean;
@@ -60,12 +55,12 @@ export function FlowStepsBuilderTab(props: {
   const {
     flow,
     flowsList,
-    updateLocalActivity,
     setPreviewPromptId,
     globalStateKeys,
     disabled,
     stepsErrors,
   } = props;
+  const { updateFlowName, addStep, deleteFlow } = useEditActivityContext();
 
   function renderActivityStep(step: ActivityBuilderStepTypes, i: number) {
     const errors = stepsErrors?.[step.stepId];
@@ -75,10 +70,9 @@ export function FlowStepsBuilderTab(props: {
           <SystemMessageStepBuilder
             key={i}
             stepIndex={i}
-            step={step as SystemMessageActivityStep}
-            updateLocalActivity={updateLocalActivity}
-            updateStep={(step) => props.updateStep(step, flow.clientId)}
-            deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
+            stepId={step.stepId}
+            updateStep={props.updateStep}
+            deleteStep={() => props.deleteStep(flow.clientId, step.stepId)}
             flowsList={flowsList}
             versions={props.getVersionsForStep(step.stepId)}
             errors={errors}
@@ -90,9 +84,8 @@ export function FlowStepsBuilderTab(props: {
             <EndActivityStepBuilder
               key={i}
               stepIndex={i}
-              step={step as RequestUserInputActivityStep}
-              updateLocalActivity={updateLocalActivity}
-              deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
+              stepId={step.stepId}
+              deleteStep={() => props.deleteStep(flow.clientId, step.stepId)}
               flowsList={flowsList}
               versions={props.getVersionsForStep(step.stepId)}
             />
@@ -102,9 +95,8 @@ export function FlowStepsBuilderTab(props: {
             <RequestUserInputStepBuilder
               key={i}
               stepIndex={i}
-              step={step as RequestUserInputActivityStep}
-              updateLocalActivity={updateLocalActivity}
-              deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
+              stepId={step.stepId}
+              deleteStep={() => props.deleteStep(flow.clientId, step.stepId)}
               flowsList={flowsList}
               versions={props.getVersionsForStep(step.stepId)}
               errors={errors}
@@ -116,9 +108,8 @@ export function FlowStepsBuilderTab(props: {
           <PromptStepBuilder
             key={i}
             stepIndex={i}
-            step={step as PromptActivityStep}
-            deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
-            updateLocalActivity={updateLocalActivity}
+            stepId={step.stepId}
+            deleteStep={props.deleteStep}
             flowsList={flowsList}
             previewed={false}
             startPreview={() => setPreviewPromptId(step.stepId)}
@@ -132,10 +123,9 @@ export function FlowStepsBuilderTab(props: {
           <ConditionalStepBuilder
             globalStateKeys={globalStateKeys}
             key={i}
-            step={step as ConditionalActivityStep}
-            updateLocalActivity={updateLocalActivity}
-            updateStep={(step) => props.updateStep(step, flow.clientId)}
-            deleteStep={() => props.deleteStep(step.stepId, flow.clientId)}
+            stepId={step.stepId}
+            updateStep={props.updateStep}
+            deleteStep={() => props.deleteStep(flow.clientId, step.stepId)}
             flowsList={flowsList}
             stepIndex={i}
             versions={props.getVersionsForStep(step.stepId)}
@@ -147,15 +137,8 @@ export function FlowStepsBuilderTab(props: {
     }
   }
 
-  function deleteFlow() {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.filter(
-          (f) => f.clientId !== flow.clientId
-        ),
-      };
-    });
+  function handleDeleteFlow() {
+    deleteFlow(flow.clientId);
   }
 
   function insertNewActivityStep(stepType: AddNewActivityStepType, i: number) {
@@ -171,24 +154,7 @@ export function FlowStepsBuilderTab(props: {
         : stepType === 'END_ACTIVITY_MESSAGE'
         ? getDefaultEndActivityStepBuilder()
         : defaultPromptBuilder(false);
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          if (f.clientId === flow.clientId) {
-            return {
-              ...f,
-              steps: [
-                ...f.steps.slice(0, i + 1),
-                newStep,
-                ...f.steps.slice(i + 1),
-              ],
-            };
-          }
-          return f;
-        }),
-      };
-    });
+    addStep(flow.clientId, newStep, i);
   }
 
   return (
@@ -239,7 +205,7 @@ export function FlowStepsBuilderTab(props: {
         }}
         color="error"
         variant="outlined"
-        onClick={deleteFlow}
+        onClick={handleDeleteFlow}
       >
         Delete Flow
       </Button>
@@ -251,22 +217,7 @@ export function FlowStepsBuilderTab(props: {
         <InputField
           label="Flow Title"
           value={flow.name}
-          onChange={(e) => {
-            updateLocalActivity((prevValue) => {
-              return {
-                ...prevValue,
-                flowsList: prevValue.flowsList.map((f) => {
-                  if (f.clientId === flow.clientId) {
-                    return {
-                      ...f,
-                      name: e,
-                    };
-                  }
-                  return f;
-                }),
-              };
-            });
-          }}
+          onChange={(name) => updateFlowName(flow.clientId, name)}
         />
       </div>
       {

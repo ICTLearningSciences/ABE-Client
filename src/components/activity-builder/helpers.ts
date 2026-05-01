@@ -153,8 +153,12 @@ export function getAllContextDataKeys(input: string): string[] {
 export function replaceStoredDataInString(
   str: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stateData: Record<string, any>
+  globalStateData: Record<string, any>,
+  forPanelistClientId?: string
 ): string {
+  const stateData = forPanelistClientId
+    ? globalStateData['panelistData']?.[forPanelistClientId]
+    : globalStateData;
   console.log('looking for string', str);
   console.log('in stateData', stateData);
   try {

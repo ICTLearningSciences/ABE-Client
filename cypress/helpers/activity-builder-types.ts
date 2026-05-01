@@ -69,6 +69,7 @@ export interface ActivityBuilder extends IActivity {
   newDocRecommend?: boolean;
   disabled?: boolean;
   flowsList: FlowItem[];
+  attachedPanel?: string;
 }
 
 export enum ActivityBuilderStepType {
@@ -95,6 +96,7 @@ export interface SystemMessageActivityStep extends ActivityBuilderStep {
   stepType: ActivityBuilderStepType.SYSTEM_MESSAGE;
   message: string;
   systemCustomName: string;
+  sendFromPanelistClientIds: boolean;
 }
 
 // LogicOperation
@@ -179,6 +181,12 @@ export interface JsonResponseData {
   subData?: JsonResponseData[];
 }
 
+export interface RagStoreConfiguration {
+  ragQuery: string;
+  topN: number;
+  filters?: Record<string, string | string[]>;
+}
+
 export interface SinglePromptConfigurationGql{
   promptText: string;
   responseFormat: string;
@@ -187,9 +195,11 @@ export interface SinglePromptConfigurationGql{
   systemCustomName: string;
   includeEssay: boolean;
   outputDataType: PromptOutputTypes;
+  runForPanelistClientIds?: string[];
   jsonResponseData?: string;
   customSystemRole: string;
   webSearch?: boolean;
+  ragConfiguration?: RagStoreConfiguration;
 }
 
 export interface SinglePromptConfiguration extends Omit<SinglePromptConfigurationGql, 'jsonResponseData'>{

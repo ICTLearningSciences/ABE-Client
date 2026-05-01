@@ -6,12 +6,12 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import {
-  ActivityBuilder,
   ActivityBuilderStepType,
   FlowItem,
   PredefinedResponse,
   RequestUserInputActivityStep,
 } from '../../types';
+import { useEditActivityContext } from '../../activity-builder-context';
 import {
   ColumnCenterDiv,
   ColumnDiv,
@@ -56,8 +56,7 @@ function PredefinedResponseUpdater(props: {
   deleteResponse: () => void;
   flowsList: FlowItem[];
 }): JSX.Element {
-  const { predefinedResponse, updateResponse, flowsList, deleteResponse } =
-    props;
+  const { predefinedResponse, updateResponse, deleteResponse } = props;
   return (
     <Box
       sx={{
@@ -137,8 +136,8 @@ function PredefinedResponseUpdater(props: {
                 />
               ) : undefined}
               <FlowStepSelector
+                flowsList={props.flowsList}
                 title="Jump to Step"
-                flowsList={flowsList}
                 width="150px"
                 currentJumpToStepId={predefinedResponse.jumpToStepId}
                 rowOrColumn="column"
@@ -237,8 +236,7 @@ function PredefinedResponsesUpdater(props: {
 }
 
 export function RequestUserInputStepBuilder(props: {
-  step: RequestUserInputActivityStep;
-  updateLocalActivity: React.Dispatch<React.SetStateAction<ActivityBuilder>>;
+  stepId: string;
   deleteStep: () => void;
   flowsList: FlowItem[];
   stepIndex: number;
@@ -247,27 +245,23 @@ export function RequestUserInputStepBuilder(props: {
   versions: StepVersion[];
   errors?: string[];
 }): JSX.Element {
-  const { step, stepIndex, updateLocalActivity, versions, errors } = props;
+  const { stepId, stepIndex, versions, errors } = props;
+  const { getStep, getFlowByStepId, updateStep, updateStepField } =
+    useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
+
+  const step = getStep(stepId) as RequestUserInputActivityStep;
+  const flow = getFlowByStepId(stepId);
+
+  if (!step || !flow) {
+    return <div>Step not found</div>;
+  }
 
   const [rerender, setRerender] = React.useState(0);
   function replacePromptStepWithVersion(version: StepVersion) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return version.step;
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    if (flow) {
+      updateStep(flow.clientId, version.step);
+    }
     setRerender(rerender + 1);
   }
 
@@ -275,60 +269,23 @@ export function RequestUserInputStepBuilder(props: {
     field: K,
     value: RequestUserInputActivityStep[K]
   ) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return {
-                  ...s,
-                  [field]: value,
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
-    });
+    updateStepField(stepId, field, value);
   }
 
   function updatePredefinedResponse(
     updatedResponse: Partial<PredefinedResponse>,
     clientId: string
   ) {
-    updateLocalActivity((prevValue) => {
-      return {
-        ...prevValue,
-        flowsList: prevValue.flowsList.map((f) => {
-          return {
-            ...f,
-            steps: f.steps.map((s) => {
-              if (s.stepId === step.stepId) {
-                return {
-                  ...s,
-                  predefinedResponses: (
-                    s as RequestUserInputActivityStep
-                  ).predefinedResponses.map((r) => {
-                    if (r.clientId === clientId) {
-                      return {
-                        ...r,
-                        ...updatedResponse,
-                      };
-                    }
-                    return r;
-                  }),
-                };
-              }
-              return s;
-            }),
-          };
-        }),
-      };
+    const updatedResponses = step.predefinedResponses.map((r) => {
+      if (r.clientId === clientId) {
+        return {
+          ...r,
+          ...updatedResponse,
+        };
+      }
+      return r;
     });
+    updateStepField(stepId, 'predefinedResponses', updatedResponses);
   }
 
   function addNewPredefinedResponse() {
@@ -403,13 +360,6 @@ export function RequestUserInputStepBuilder(props: {
         />
       </div>
       <Collapse in={!collapsed}>
-        <InputField
-          label="System Custom Name"
-          value={step.systemCustomName}
-          onChange={(e) => {
-            updateField('systemCustomName', e);
-          }}
-        />
         <InputField
           label="Request Message (Optional)"
           value={step.message}
