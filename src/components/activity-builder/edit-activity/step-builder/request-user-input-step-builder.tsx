@@ -56,8 +56,7 @@ function PredefinedResponseUpdater(props: {
   deleteResponse: () => void;
   flowsList: FlowItem[];
 }): JSX.Element {
-  const { predefinedResponse, updateResponse, flowsList, deleteResponse } =
-    props;
+  const { predefinedResponse, updateResponse, deleteResponse } = props;
   return (
     <Box
       sx={{
@@ -137,8 +136,8 @@ function PredefinedResponseUpdater(props: {
                 />
               ) : undefined}
               <FlowStepSelector
+                flowsList={props.flowsList}
                 title="Jump to Step"
-                flowsList={flowsList}
                 width="150px"
                 currentJumpToStepId={predefinedResponse.jumpToStepId}
                 rowOrColumn="column"
@@ -246,8 +245,9 @@ export function RequestUserInputStepBuilder(props: {
   versions: StepVersion[];
   errors?: string[];
 }): JSX.Element {
-  const { stepId, stepIndex, flowsList, versions, errors } = props;
-  const { getStep, getFlowByStepId, updateStep, updateStepField } = useEditActivityContext();
+  const { stepId, stepIndex, versions, errors } = props;
+  const { getStep, getFlowByStepId, updateStep, updateStepField } =
+    useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
 
   const step = getStep(stepId) as RequestUserInputActivityStep;
@@ -360,13 +360,6 @@ export function RequestUserInputStepBuilder(props: {
         />
       </div>
       <Collapse in={!collapsed}>
-        <InputField
-          label="System Custom Name"
-          value={step.systemCustomName}
-          onChange={(e) => {
-            updateField('systemCustomName', e);
-          }}
-        />
         <InputField
           label="Request Message (Optional)"
           value={step.message}

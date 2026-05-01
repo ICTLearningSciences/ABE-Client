@@ -22,6 +22,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
 import { useEditActivityContext } from '../../activity-builder-context';
+import { PanelistSelector } from './panelist-selector';
 export function getDefaultSystemMessage(): SystemMessageActivityStep {
   return {
     stepId: uuid(),
@@ -29,6 +30,7 @@ export function getDefaultSystemMessage(): SystemMessageActivityStep {
     message: '',
     jumpToStepId: '',
     systemCustomName: '',
+    sendFromPanelistClientIds: [],
   };
 }
 export function SystemMessageStepBuilder(props: {
@@ -42,8 +44,9 @@ export function SystemMessageStepBuilder(props: {
   versions: StepVersion[];
   errors?: string[];
 }): JSX.Element {
-  const { stepId, stepIndex, updateStep, flowsList, versions, errors } = props;
-  const { getStep, getFlowByStepId, updateStepField } = useEditActivityContext();
+  const { stepId, stepIndex, updateStep, versions, errors } = props;
+  const { getStep, getFlowByStepId, updateStepField } =
+    useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
 
   const step = getStep(stepId) as SystemMessageActivityStep;
@@ -61,7 +64,7 @@ export function SystemMessageStepBuilder(props: {
     setRerender(rerender + 1);
   }
 
-  function updateField(field: string, value: string | boolean) {
+  function updateField(field: string, value: string | boolean | string[]) {
     updateStepField(stepId, field, value);
   }
 
@@ -120,13 +123,6 @@ export function SystemMessageStepBuilder(props: {
       </div>
       <Collapse in={!collapsed}>
         <InputField
-          label="System Custom Name"
-          value={step.systemCustomName}
-          onChange={(e) => {
-            updateField('systemCustomName', e);
-          }}
-        />
-        <InputField
           label="Message"
           value={step.message}
           onChange={(e) => {
@@ -138,6 +134,12 @@ export function SystemMessageStepBuilder(props: {
           value={step.setStudentActivityComplete ?? false}
           onChange={(e) => {
             updateField('setStudentActivityComplete', e);
+          }}
+        />
+        <PanelistSelector
+          selectedPanelistClientIds={step.sendFromPanelistClientIds || []}
+          onChange={(panelistClientIds) => {
+            updateField('sendFromPanelistClientIds', panelistClientIds);
           }}
         />
         <JumpToAlternateStep

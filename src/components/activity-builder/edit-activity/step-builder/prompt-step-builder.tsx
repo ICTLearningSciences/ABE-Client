@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import {
-  ActivityBuilder,
   ActivityBuilderStepType,
   FlowItem,
   JsonResponseData,
@@ -53,8 +52,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { StepVersion } from '../activity-flow-container';
 import { VersionsDropdown } from './versions-dropdown';
-import { useActivityBuilderContext, useEditActivityContext } from '../../activity-builder-context';
+import {
+  useActivityBuilderContext,
+  useEditActivityContext,
+} from '../../activity-builder-context';
 import { RagStoreConfigurationEditor } from './rag-store-configuration-editor';
+import { PanelistSelector } from './panelist-selector';
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
     clientId: uuid(),
@@ -123,6 +126,7 @@ interface SinglePromptConfigurationEditorProps {
     value:
       | string
       | boolean
+      | string[]
       | JsonResponseData[]
       | RagStoreConfiguration
       | undefined
@@ -169,15 +173,6 @@ function SinglePromptConfigurationEditor(
         padding: '10px 0',
       }}
     >
-      <InputField
-        label="System Custom Name"
-        value={configuration.systemCustomName}
-        onChange={(e) => {
-          updateConfigField(configIndex, 'systemCustomName', e);
-        }}
-        width="100%"
-      />
-
       <InputField
         label="Prompt Text"
         value={configuration.promptText}
@@ -239,6 +234,17 @@ function SinglePromptConfigurationEditor(
         />
       )}
 
+      <PanelistSelector
+        selectedPanelistClientIds={configuration.runForPanelistClientIds || []}
+        onChange={(panelistClientIds) => {
+          updateConfigField(
+            configIndex,
+            'runForPanelistClientIds',
+            panelistClientIds
+          );
+        }}
+      />
+
       <CheckBoxInput
         label="Include Chat History"
         value={configuration.includeChatLogContext}
@@ -265,9 +271,13 @@ function SinglePromptConfigurationEditor(
 
       <RagStoreConfigurationEditor
         ragConfiguration={configuration.ragConfiguration}
-        updateRagConfiguration={(ragConfiguration) => {
-          console.log('Parent received RAG update:', ragConfiguration);
-          updateConfigField(configIndex, 'ragConfiguration', ragConfiguration);
+        updateRagConfiguration={(updater) => {
+          const newConfig =
+            typeof updater === 'function'
+              ? updater(configuration.ragConfiguration)
+              : updater;
+          console.log('Parent received RAG update:', newConfig);
+          updateConfigField(configIndex, 'ragConfiguration', newConfig);
         }}
       />
 
@@ -369,6 +379,7 @@ export function PromptStepBuilder(props: {
     value:
       | string
       | boolean
+      | string[]
       | JsonResponseData[]
       | RagStoreConfiguration
       | undefined
@@ -400,7 +411,6 @@ export function PromptStepBuilder(props: {
     }
     setRerender(rerender + 1);
   }
-
 
   function editJsonResponseData(
     configIndex: number,
@@ -655,7 +665,9 @@ export function PromptStepBuilder(props: {
           </IconButton>
           {step.promptConfigurations.length > 1 && (
             <IconButton
-              onClick={() => handleRemovePromptConfiguration(selectedConfigIndex)}
+              onClick={() =>
+                handleRemovePromptConfiguration(selectedConfigIndex)
+              }
               size="small"
               color="error"
               data-cy="remove-prompt-config-button"

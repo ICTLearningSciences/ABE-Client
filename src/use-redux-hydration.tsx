@@ -10,6 +10,7 @@ import { loadUserDocs } from './store/slices/state';
 import { useWithDocGoalsActivities } from './store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { useWithEducationalManagement } from './store/slices/education-management/use-with-educational-management';
 import { LoginStatus } from './store/slices/login';
+import { useWithPanels } from './store/slices/panels/use-with-panels';
 
 export async function useReduxHydration() {
   const userData = useAppSelector((state) => state.login.user);
@@ -20,7 +21,7 @@ export async function useReduxHydration() {
     useWithDocGoalsActivities(userData?._id || '', config);
   const { loadAllEducationalDataWithUserData } = useWithEducationalManagement();
   const [hydrated, setHydrated] = useState(false);
-
+  const { fetchPanels, fetchPanelists } = useWithPanels();
   useEffect(() => {
     if (loginStatus !== LoginStatus.AUTHENTICATED) {
       setHydrated(false);
@@ -33,6 +34,8 @@ export async function useReduxHydration() {
     setHydrated(true);
     const { _id: userId, educationalRole } = userData;
     dispatch(loadUserDocs({ userId }));
+    fetchPanels();
+    fetchPanelists();
     loadActivities();
     loadBuiltActivities();
     loadDocGoals();

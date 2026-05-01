@@ -58,12 +58,7 @@ export function ActivityFlowContainer(props: {
   disabled?: boolean;
   stepErrors: FlowErrors;
 }): JSX.Element {
-  const {
-    versions,
-    stepErrors,
-    globalStateKeys,
-    disabled,
-  } = props;
+  const { versions, stepErrors, globalStateKeys, disabled } = props;
   const { activity, updateStep, deleteStep } = useEditActivityContext();
   const flowsList = activity.flowsList;
   const allStepVersions: StepVersion[] = versions

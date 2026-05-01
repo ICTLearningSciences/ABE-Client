@@ -4,7 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
+import {
+  AiServicesResponseTypes,
+  AiServiceStepDataTypes,
+} from '../../ai-services/ai-service-types';
 import {
   ActivityBuilder,
   ActivityBuilderStep,
@@ -45,6 +48,8 @@ import {
 } from '../../components/activity-builder/helpers';
 import { ChatLogSubscriber } from '../../hooks/use-with-chat-log-subscribers';
 import { getDocData } from '../../hooks/api';
+import { Panelist, Panel } from '../../store/slices/panels/types';
+import { RagStoreConfiguration } from '../../types';
 
 interface UserResponseHandleState {
   responseNavigations: {
@@ -88,6 +93,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   docService: DocService;
   handleStudentActivityComplete: () => void;
   onGoHome: () => void;
+  activityPanel?: Panel;
+  activityPanelists?: Panelist[];
+
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
       !this.builtActivityData ||
@@ -165,7 +173,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     docService: DocService,
     handleStudentActivityComplete: () => void,
     onGoHome: () => void,
-    builtActivityData?: ActivityBuilder
+    builtActivityData?: ActivityBuilder,
+    activityPanel?: Panel,
+    activityPanelists?: Panelist[]
   ) {
     this.docId = docId;
     this.docService = docService;
@@ -182,6 +192,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.editDocGoal = editDocGoal;
     this.handleStudentActivityComplete = handleStudentActivityComplete;
     this.onGoHome = onGoHome;
+    this.activityPanel = activityPanel;
+    this.activityPanelists = activityPanelists;
     this.setBuiltActivityData = this.setBuiltActivityData.bind(this);
     this.initializeActivity = this.initializeActivity.bind(this);
     this.resetActivity = this.resetActivity.bind(this);
@@ -348,13 +360,68 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async handleSystemMessageStep(step: SystemMessageActivityStep) {
-    this.sendMessage({
-      id: uuidv4(),
-      message: replaceStoredDataInString(step.message, this.stateData),
-      sender: Sender.SYSTEM,
-      systemCustomName: step.systemCustomName,
-      displayType: MessageDisplayType.TEXT,
-    });
+    // Check if we should send messages from panelists
+    console.log(
+      'step.sendFromPanelistClientIds',
+      step.sendFromPanelistClientIds
+    );
+    console.log('this.activityPanel', this.activityPanel);
+    console.log('this.activityPanelists', this.activityPanelists);
+    if (
+      step.sendFromPanelistClientIds &&
+      step.sendFromPanelistClientIds.length > 0 &&
+      this.activityPanel &&
+      this.activityPanelists
+    ) {
+      const effectivePanelists = step.sendFromPanelistClientIds.reduce(
+        (acc: Panelist[], clientId) => {
+          const panelist = this.activityPanelists?.find(
+            (p) => p.clientId === clientId
+          );
+          if (panelist) {
+            acc.push(panelist);
+          }
+          return acc;
+        },
+        []
+      );
+      const panelistData = this.stateData['panelistData'];
+
+      if (panelistData && typeof panelistData === 'object') {
+        // Send a message for each panelist
+        for (const panelistClientId of Object.keys(panelistData)) {
+          const panelist = effectivePanelists.find(
+            (p) => p.clientId === panelistClientId
+          );
+
+          if (panelist) {
+            console.log('panelist found', panelist.panelistName);
+            this.sendMessage({
+              id: uuidv4(),
+              message: replaceStoredDataInString(
+                step.message,
+                this.stateData,
+                panelistClientId
+              ),
+              sender: Sender.SYSTEM,
+              systemCustomName: panelist.panelistName,
+              displayType: MessageDisplayType.TEXT,
+            });
+          } else {
+            console.log('panelist not found', panelistClientId);
+          }
+        }
+      }
+    } else {
+      // Normal system message
+      this.sendMessage({
+        id: uuidv4(),
+        message: replaceStoredDataInString(step.message, this.stateData),
+        sender: Sender.SYSTEM,
+        systemCustomName: step.systemCustomName,
+        displayType: MessageDisplayType.TEXT,
+      });
+    }
     await this.goToNextStep();
   }
 
@@ -419,6 +486,57 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       }
     }
     return [str];
+  }
+
+  mergeRagConfigs(
+    baseRagConfig: RagStoreConfiguration | undefined,
+    panelistRagConfig: RagStoreConfiguration
+  ): RagStoreConfiguration | undefined {
+    // If no base config, return panelist config
+    if (!baseRagConfig) {
+      return panelistRagConfig;
+    }
+
+    // Merge ragQuery fields (combine base + panelist)
+    const baseRagQuery = baseRagConfig.ragQuery || '';
+    const panelistRagQuery = panelistRagConfig.ragQuery || '';
+
+    const mergedRagQuery =
+      baseRagQuery && panelistRagQuery
+        ? `${baseRagQuery}\n${panelistRagQuery}`
+        : baseRagQuery || panelistRagQuery;
+
+    // Merge filters (combine agent_ids and group_ids arrays)
+    const mergedFilters: Record<string, string | string[]> = {
+      ...(baseRagConfig.filters || {}),
+    };
+
+    if (panelistRagConfig.filters) {
+      for (const [key, value] of Object.entries(panelistRagConfig.filters)) {
+        if (mergedFilters[key]) {
+          // Merge arrays for existing keys
+          const existingValue = mergedFilters[key];
+          const newValue = value;
+
+          const existingArray = Array.isArray(existingValue)
+            ? existingValue
+            : [existingValue];
+          const newArray = Array.isArray(newValue) ? newValue : [newValue];
+
+          mergedFilters[key] = [...existingArray, ...newArray];
+        } else {
+          // Add new key
+          mergedFilters[key] = value;
+        }
+      }
+    }
+
+    // Return merged config with base topN, merged filters and ragQuery
+    return {
+      ragQuery: mergedRagQuery,
+      topN: baseRagConfig.topN,
+      filters: mergedFilters,
+    };
   }
 
   async goToNextStep() {
@@ -542,12 +660,56 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   async handlePromptStep(step: PromptActivityStep) {
     this.setResponsePending(true);
 
-    // Execute all prompt configurations in parallel
-    const promptResults = await Promise.allSettled(
-      step.promptConfigurations.map((config) =>
-        this.executeSinglePromptConfiguration(config)
-      )
-    );
+    // Prepare all prompt executions (including panelist prompts)
+    const promptExecutions: Promise<
+      | {
+          type: 'json';
+          data: StateData;
+          originalConfiguration: SinglePromptConfiguration;
+          panelistClientId?: string;
+        }
+      | {
+          type: 'text';
+          message: string;
+          aiServiceStepData: AiServiceStepDataTypes[];
+          originalConfiguration: SinglePromptConfiguration;
+          panelistClientId?: string;
+          panelistName?: string;
+        }
+    >[] = [];
+
+    for (const config of step.promptConfigurations) {
+      if (
+        config.runForPanelistClientIds &&
+        this.activityPanel &&
+        this.activityPanelists
+      ) {
+        const effectivePanelists = config.runForPanelistClientIds.reduce(
+          (acc: Panelist[], clientId) => {
+            const panelist = this.activityPanelists?.find(
+              (p) => p.clientId === clientId
+            );
+            if (panelist) {
+              acc.push(panelist);
+            }
+            return acc;
+          },
+          []
+        );
+        // Execute prompt for each panelist
+        for (const panelist of effectivePanelists) {
+          promptExecutions.push(
+            this.executePanelistPromptConfiguration(config, panelist)
+          );
+        }
+      } else {
+        // Execute normal prompt
+        promptExecutions.push(this.executeSinglePromptConfiguration(config));
+      }
+    }
+
+    // Execute all prompts in parallel
+    const promptResults = await Promise.allSettled(promptExecutions);
 
     // Check if any prompts failed
     const hasFailures = promptResults.some(
@@ -564,19 +726,26 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
     // All prompts succeeded - process results
     const jsonResults: StateData = {};
+    const panelistData: Record<string, StateData> = {};
 
     for (const result of promptResults) {
       if (result.status === 'fulfilled') {
         if (result.value.type === 'json') {
-          // Merge JSON results into accumulated object
-          if (result.value.originalConfiguration.systemCustomName) {
-            jsonResults['named_system_responses'] = {
-              ...(jsonResults['named_system_responses'] || {}),
-              [result.value.originalConfiguration.systemCustomName]:
-                result.value.data,
-            };
+          // Check if this is a panelist result
+          if (result.value.panelistClientId) {
+            // Store panelist JSON data under panelistData
+            panelistData[result.value.panelistClientId] = result.value.data;
           } else {
-            Object.assign(jsonResults, result.value.data);
+            // Merge JSON results into accumulated object
+            if (result.value.originalConfiguration.systemCustomName) {
+              jsonResults['named_system_responses'] = {
+                ...(jsonResults['named_system_responses'] || {}),
+                [result.value.originalConfiguration.systemCustomName]:
+                  result.value.data,
+              };
+            } else {
+              Object.assign(jsonResults, result.value.data);
+            }
           }
         } else if (result.value.type === 'text') {
           // Send text response as message
@@ -586,6 +755,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             aiServiceStepData: result.value.aiServiceStepData,
             sender: Sender.SYSTEM,
             systemCustomName:
+              result.value.panelistName ||
               result.value.originalConfiguration.systemCustomName,
             displayType: MessageDisplayType.TEXT,
           });
@@ -596,6 +766,17 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // Merge all JSON results into stateData
     if (Object.keys(jsonResults).length > 0) {
       this.stateData = { ...this.stateData, ...jsonResults };
+    }
+
+    // Add panelist data to stateData
+    if (Object.keys(panelistData).length > 0) {
+      this.stateData = {
+        ...this.stateData,
+        panelistData: {
+          ...(this.stateData['panelistData'] || {}),
+          ...panelistData,
+        },
+      };
     }
 
     this.setResponsePending(false);
@@ -693,6 +874,135 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       config,
       config.jsonResponseData
     );
+  }
+
+  async executePanelistPromptConfiguration(
+    config: SinglePromptConfiguration,
+    panelist: Panelist
+  ): Promise<
+    | {
+        type: 'json';
+        data: StateData;
+        originalConfiguration: SinglePromptConfiguration;
+        panelistClientId: string;
+      }
+    | {
+        type: 'text';
+        message: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        aiServiceStepData: any;
+        originalConfiguration: SinglePromptConfiguration;
+        panelistClientId: string;
+        panelistName: string;
+      }
+  > {
+    // Build AI prompt steps with replaced data and panelist modifications
+    const basePromptText = replaceStoredDataInString(
+      config.promptText,
+      this.stateData
+    );
+    const panelistPromptSegment = replaceStoredDataInString(
+      panelist.promptSegment,
+      this.stateData
+    );
+    const promptText = `${basePromptText}\n${panelistPromptSegment}`;
+
+    const responseFormat = replaceStoredDataInString(
+      config.responseFormat,
+      this.stateData
+    );
+
+    const baseCustomSystemRole = replaceStoredDataInString(
+      config.customSystemRole,
+      this.stateData
+    );
+    const panelistRoleSegment = replaceStoredDataInString(
+      panelist.roleSegment,
+      this.stateData
+    );
+    const customSystemRole = `${baseCustomSystemRole}\n${panelistRoleSegment}`;
+
+    // Merge RAG configurations
+    const mergedRagConfig = this.mergeRagConfigs(
+      config.ragConfiguration,
+      panelist.ragConfig || { ragQuery: '', topN: 0, filters: {} }
+    );
+
+    const ragConfiguration = mergedRagConfig
+      ? {
+          ragQuery: replaceStoredDataInString(
+            mergedRagConfig.ragQuery,
+            this.stateData
+          ),
+          topN: mergedRagConfig.topN,
+          filters: mergedRagConfig.filters || {},
+        }
+      : undefined;
+
+    const aiPromptSteps: AiPromptStep[] = [
+      {
+        prompts: [],
+        outputDataType: config.outputDataType,
+        responseFormat,
+        systemRole: customSystemRole,
+        webSearch: config.webSearch || false,
+        editDoc: config.editDoc || false,
+        ragConfiguration: ragConfiguration,
+      },
+    ];
+
+    // Add chat log context if configured
+    if (config.includeChatLogContext) {
+      aiPromptSteps[0].prompts.push({
+        promptText: `Current state of chat log between user and system: ${chatLogToString(
+          this.chatLog,
+          1000
+        )}`,
+        includeEssay: false,
+        promptRole: PromptRoles.USER,
+      });
+    }
+
+    // Add main prompt
+    const promptConfiguration: PromptConfiguration = {
+      promptText,
+      includeEssay: config.includeEssay,
+      promptRole: PromptRoles.USER,
+    };
+    aiPromptSteps[0].prompts.push(promptConfiguration);
+
+    // Handle JSON response format
+    if (
+      config.jsonResponseData &&
+      config.outputDataType === PromptOutputTypes.JSON
+    ) {
+      aiPromptSteps[0].responseFormat =
+        recursivelyConvertExpectedDataToAiPromptString(
+          recursiveUpdateAdditionalInfo(config.jsonResponseData, this.stateData)
+        );
+    }
+
+    // Retry logic: attempt up to 3 times
+    const result = await this.retryPromptExecution(
+      aiPromptSteps,
+      config.outputDataType,
+      config,
+      config.jsonResponseData
+    );
+
+    // Add panelist information to the result
+    if (result.type === 'json') {
+      return {
+        ...result,
+        panelistClientId: panelist.clientId,
+      };
+    } else {
+      return {
+        ...result,
+        panelistClientId: panelist.clientId,
+        panelistName: panelist.panelistName,
+      };
+    }
   }
 
   async retryPromptExecution(

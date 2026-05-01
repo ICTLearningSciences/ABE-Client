@@ -21,6 +21,7 @@ export const fullBuiltActivityQueryData = `
                       user
                       visibility
                       activityType
+                      attachedPanel
                       description
                       displayIcon
                       disabled
@@ -36,6 +37,7 @@ export const fullBuiltActivityQueryData = `
                               systemCustomName
                               message
                               setStudentActivityComplete
+                              sendFromPanelistClientIds
                           }
 
                           ... on RequestUserInputActivityStepType {
@@ -71,6 +73,7 @@ export const fullBuiltActivityQueryData = `
                                 systemCustomName
                                 includeEssay
                                 outputDataType
+                                runForPanelistClientIds
                                 jsonResponseData
                                 customSystemRole
                                 webSearch

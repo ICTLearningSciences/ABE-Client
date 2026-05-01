@@ -25,6 +25,9 @@ import { ActivityBuilderPage } from '../activity-builder/activity-builder-page';
 import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
 import { useWithActivityVersions } from '../../hooks/use-with-activity-versions';
 import { useWithExecutePrompt } from '../../hooks/use-with-execute-prompts';
+import { useWithPanels } from '../../store/slices/panels/use-with-panels';
+import { Panel, Panelist } from '../../store/slices/panels/types';
+import { v4 as uuidv4 } from 'uuid';
 
 export function EditGoogleDoc(props: {
   docId: string;
@@ -68,11 +71,49 @@ export function EditGoogleDoc(props: {
   } = useWithDocGoalsActivities(user?._id || '', config);
   const { activityVersions, loadActivityVersions } = useWithActivityVersions();
   const { executePromptSteps } = useWithExecutePrompt();
+  const {
+    panels,
+    panelists,
+    addOrUpdatePanel,
+    addOrUpdatePanelist,
+    deletePanel,
+    deletePanelist,
+  } = useWithPanels();
 
   function goToActivityPreview(activity: ActivityTypes) {
     setPreviewingActivity(true);
     setGoalAndActivity(undefined, activity);
     updateViewingUserRole(UserRole.USER);
+  }
+
+  function addNewLocalPanelist(): Panelist {
+    const newPanelist: Panelist = {
+      clientId: uuidv4(),
+      promptSegment: '',
+      roleSegment: '',
+      profilePicture: '',
+      panelistName: '',
+      panelistDescription: '',
+      introductionMessage: '',
+      ragConfig: {
+        ragQuery: '',
+        topN: 0,
+        filters: {},
+      },
+    };
+    addOrUpdatePanelist(newPanelist);
+    return newPanelist;
+  }
+
+  function addNewLocalPanel(): Panel {
+    const newPanel: Panel = {
+      clientId: uuidv4(),
+      panelName: '',
+      panelDescription: '',
+      panelists: [],
+    };
+    addOrUpdatePanel(newPanel);
+    return newPanel;
   }
 
   if (goalsLoading) {
@@ -141,6 +182,14 @@ export function EditGoogleDoc(props: {
               activityVersions={activityVersions}
               loadActivityVersions={loadActivityVersions}
               executePromptSteps={executePromptSteps}
+              panels={panels}
+              panelists={panelists}
+              addOrUpdatePanel={addOrUpdatePanel}
+              addOrUpdatePanelist={addOrUpdatePanelist}
+              addNewLocalPanel={addNewLocalPanel}
+              addNewLocalPanelist={addNewLocalPanelist}
+              deletePanel={deletePanel}
+              deletePanelist={deletePanelist}
             />
           </ColumnDiv>
         </ColumnCenterDiv>

@@ -21,6 +21,7 @@ export const exampleSystemMessageActivityStep: SystemMessageActivityStep = {
   stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
   message: 'Hello, world!',
   systemCustomName: '',
+  sendFromPanelistClientIds: [],
 };
 
 export const exampleRequestUserInputActivityStep: RequestUserInputActivityStep =

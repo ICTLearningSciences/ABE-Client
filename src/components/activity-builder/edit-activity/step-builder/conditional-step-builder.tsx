@@ -56,16 +56,10 @@ export function ConditionalStepBuilder(props: {
   versions: StepVersion[];
   errors?: string[];
 }): JSX.Element {
-  const {
-    stepId,
-    stepIndex,
-    updateStep,
-    flowsList,
-    versions,
-    globalStateKeys,
-    errors,
-  } = props;
-  const { getStep, getFlowByStepId, updateStepField } = useEditActivityContext();
+  const { stepId, stepIndex, updateStep, versions, globalStateKeys, errors } =
+    props;
+  const { getStep, getFlowByStepId, updateStepField } =
+    useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
 
   const step = getStep(stepId) as ConditionalActivityStep;

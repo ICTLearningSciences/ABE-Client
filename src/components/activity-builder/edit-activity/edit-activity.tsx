@@ -17,7 +17,12 @@ import {
   DOC_TEXT_KEY,
 } from '../../../classes/activity-builder-activity/built-activity-handler';
 import { useWithCheckActivityErrors } from '../../../hooks/use-with-check-activity-errors';
-import { useActivityBuilderContext, EditActivityProvider, useEditActivityContext } from '../activity-builder-context';
+import {
+  useActivityBuilderContext,
+  EditActivityProvider,
+  useEditActivityContext,
+} from '../activity-builder-context';
+import { useWithPanels } from '../../../store/slices/panels/use-with-panels';
 // Inner component that uses the context
 function EditActivityContent(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
@@ -32,10 +37,18 @@ function EditActivityContent(props: {
     returnTo,
   } = props;
 
-  const { activity, addFlow, updateTitle, updateDescription, updateVisibility } = useEditActivityContext();
+  const {
+    activity,
+    addFlow,
+    updateTitle,
+    updateDescription,
+    updateVisibility,
+    updateAttachedPanel,
+  } = useEditActivityContext();
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
   const { activityVersions, loadActivityVersions, canEditActivity } =
     useActivityBuilderContext();
+  const { panels } = useWithPanels();
 
   const globalStateKeys: string[] = useMemo(() => {
     return activity.flowsList.reduce(
@@ -61,13 +74,12 @@ function EditActivityContent(props: {
     );
   }, [activity.flowsList]);
 
-  const { errors } = useWithCheckActivityErrors(
-    globalStateKeys,
-    activity
-  );
+  const { errors } = useWithCheckActivityErrors(globalStateKeys, activity);
 
   useEffect(() => {
-    const alreadyLoaded = Boolean(originalActivity.clientId in activityVersions);
+    const alreadyLoaded = Boolean(
+      originalActivity.clientId in activityVersions
+    );
     if (originalActivity.clientId && !alreadyLoaded) {
       loadActivityVersions(originalActivity.clientId);
     }
@@ -140,6 +152,14 @@ function EditActivityContent(props: {
           disabled={!canEditActivity(activity)}
           onChange={(v) => updateVisibility(v as ActivityBuilderVisibility)}
         />
+        <SelectInputField
+          label="Attached Panel"
+          value={activity.attachedPanel || ''}
+          options={['', ...panels.map((panel) => panel.clientId)]}
+          optionLabels={['None', ...panels.map((panel) => panel.panelName)]}
+          disabled={!canEditActivity(activity)}
+          onChange={(v) => updateAttachedPanel(v || undefined)}
+        />
 
         <RowDiv>
           <Button
@@ -164,8 +184,7 @@ function EditActivityContent(props: {
               }}
               variant="outlined"
               disabled={
-                !canEditActivity(activity) ||
-                equals(activity, originalActivity)
+                !canEditActivity(activity) || equals(activity, originalActivity)
               }
               onClick={saveActivity}
             >

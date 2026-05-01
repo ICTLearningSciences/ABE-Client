@@ -12,9 +12,14 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { IconButton } from '@mui/material';
 
+type RagConfigurationUpdater =
+  | RagStoreConfiguration
+  | undefined
+  | ((prev?: RagStoreConfiguration) => RagStoreConfiguration | undefined);
+
 interface RagStoreConfigurationEditorProps {
   ragConfiguration?: RagStoreConfiguration;
-  updateRagConfiguration: (ragConfiguration?: RagStoreConfiguration) => void;
+  updateRagConfiguration: (updater: RagConfigurationUpdater) => void;
 }
 
 export function RagStoreConfigurationEditor(
@@ -76,10 +81,10 @@ export function RagStoreConfigurationEditor(
         topN: 3,
         filters: {},
       };
-      updateRagConfiguration(newConfig);
+      updateRagConfiguration(() => newConfig);
       validateFields(newConfig);
     } else {
-      updateRagConfiguration(undefined);
+      updateRagConfiguration(() => undefined);
       setErrors({});
     }
   };
@@ -88,37 +93,41 @@ export function RagStoreConfigurationEditor(
     field: keyof RagStoreConfiguration,
     value: string | number
   ) => {
-    if (!ragConfiguration) return;
+    updateRagConfiguration((prevConfig) => {
+      if (!prevConfig) return prevConfig;
 
-    const updatedConfig = {
-      ...ragConfiguration,
-      [field]: value,
-    };
-    updateRagConfiguration(updatedConfig);
-    validateFields(updatedConfig);
+      const updatedConfig = {
+        ...prevConfig,
+        [field]: value,
+      };
+      validateFields(updatedConfig);
+      return updatedConfig;
+    });
   };
 
   const updateFilter = (
     filterKey: 'groups_ids' | 'agent_ids',
     value: string
   ) => {
-    if (!ragConfiguration) return;
+    updateRagConfiguration((prevConfig) => {
+      if (!prevConfig) return prevConfig;
 
-    const arrayValue = commaStringToArray(value);
-    const updatedFilters = { ...ragConfiguration.filters };
+      const arrayValue = commaStringToArray(value);
+      const updatedFilters = { ...prevConfig.filters };
 
-    if (arrayValue && arrayValue.length > 0) {
-      updatedFilters[filterKey] = arrayValue;
-    } else {
-      delete updatedFilters[filterKey];
-    }
+      if (arrayValue && arrayValue.length > 0) {
+        updatedFilters[filterKey] = arrayValue;
+      } else {
+        delete updatedFilters[filterKey];
+      }
 
-    const updatedConfig = {
-      ...ragConfiguration,
-      filters: updatedFilters,
-    };
-    updateRagConfiguration(updatedConfig);
-    validateFields(updatedConfig);
+      const updatedConfig = {
+        ...prevConfig,
+        filters: updatedFilters,
+      };
+      validateFields(updatedConfig);
+      return updatedConfig;
+    });
   };
 
   return (
@@ -189,7 +198,7 @@ export function RagStoreConfigurationEditor(
               <div>
                 <InputField
                   label="Top N"
-                  value={ragConfiguration.topN.toString()}
+                  value={ragConfiguration.topN?.toString() || '0'}
                   onChange={(value) => {
                     const numValue = parseInt(value, 10);
                     if (!isNaN(numValue)) {

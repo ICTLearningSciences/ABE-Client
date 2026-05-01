@@ -19,6 +19,7 @@ import { useAppSelector } from '../store/hooks';
 import { useWithEducationalManagement } from '../store/slices/education-management/use-with-educational-management';
 import { useNavigateWithParams } from './use-navigate-with-params';
 import { useWithPath } from './use-with-path';
+import { useWithPanels } from '../store/slices/panels/use-with-panels';
 
 export function useWithBuiltActivityHandler(
   resetActivityCounter: number,
@@ -38,6 +39,7 @@ export function useWithBuiltActivityHandler(
     studentActivityCompleted,
     goToPreviousView,
   } = useWithEducationalManagement();
+  const { panels, panelists } = useWithPanels();
   const { defaultHome, isOnCourseManagementPages, isOnStudentCoursesPages } =
     useWithPath();
   const viewState = useAppSelector(
@@ -67,6 +69,14 @@ export function useWithBuiltActivityHandler(
       setBuiltActivityHandler(undefined);
       clearChatLog(curDocId);
     } else if (!builtActivityHandler) {
+      const attachedPanel = selectedActivityBuilder?.attachedPanel
+        ? panels.find(
+            (p) => p.clientId === selectedActivityBuilder?.attachedPanel
+          )
+        : undefined;
+      const attachedPanelists = attachedPanel
+        ? panelists.filter((p) => attachedPanel.panelists.includes(p.clientId))
+        : undefined;
       const newActivityHandler = new BuiltActivityHandler(
         sendMessageHelper,
         () => {
@@ -89,7 +99,9 @@ export function useWithBuiltActivityHandler(
             navigate(defaultHome);
           }
         },
-        selectedActivityBuilder
+        selectedActivityBuilder,
+        attachedPanel,
+        attachedPanelists
       );
       newActivityHandler.initializeActivity();
       setBuiltActivityHandler(newActivityHandler);

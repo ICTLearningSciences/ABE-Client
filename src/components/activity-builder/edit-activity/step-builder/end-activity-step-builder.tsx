@@ -55,8 +55,9 @@ export function EndActivityStepBuilder(props: {
   height?: string;
   versions: StepVersion[];
 }): JSX.Element {
-  const { stepId, stepIndex, flowsList, versions } = props;
-  const { getStep, getFlowByStepId, updateStep, updateStepField } = useEditActivityContext();
+  const { stepId, stepIndex, versions } = props;
+  const { getStep, getFlowByStepId, updateStep, updateStepField } =
+    useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
 
   const step = getStep(stepId) as RequestUserInputActivityStep;
