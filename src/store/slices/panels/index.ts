@@ -27,6 +27,12 @@ export interface State {
   panelsLoadStatus: LoadStatus;
   panelists: Panelist[];
   panelistsLoadStatus: LoadStatus;
+
+  useSearch: boolean;
+  usePanelMode: boolean;
+  activity?: string;
+  activePanel?: string;
+  activePanelist?: string;
 }
 
 const initialState: State = {
@@ -34,6 +40,12 @@ const initialState: State = {
   panelsLoadStatus: LoadStatus.NONE,
   panelists: [],
   panelistsLoadStatus: LoadStatus.NONE,
+
+  useSearch: true,
+  usePanelMode: true,
+  activity: undefined,
+  activePanel: undefined,
+  activePanelist: undefined,
 };
 
 export const fetchPanels = createAsyncThunk('state/fetchPanels', async () => {
@@ -85,6 +97,21 @@ export const stateSlice = createSlice({
     },
     addNewLocalPanelist: (state, action: PayloadAction<Panelist>) => {
       state.panelists.push(action.payload);
+    },
+    setUseSearch: (state, action: PayloadAction<boolean>) => {
+      state.useSearch = action.payload;
+    },
+    setPanelMode: (state, action: PayloadAction<boolean>) => {
+      state.usePanelMode = action.payload;
+    },
+    setActivity: (state, action: PayloadAction<string>) => {
+      state.activity = action.payload;
+    },
+    setActivePanel: (state, action: PayloadAction<string>) => {
+      state.activePanel = action.payload;
+    },
+    setActivePanelist: (state, action: PayloadAction<string | undefined>) => {
+      state.activePanelist = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -146,6 +173,14 @@ export const stateSlice = createSlice({
   },
 });
 
-export const { addNewLocalPanel, addNewLocalPanelist } = stateSlice.actions;
+export const {
+  addNewLocalPanel,
+  addNewLocalPanelist,
+  setUseSearch,
+  setPanelMode,
+  setActivity,
+  setActivePanel,
+  setActivePanelist,
+} = stateSlice.actions;
 
 export default stateSlice.reducer;

@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import React from 'react';
-import './App.css';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import AdminView from './pages/admin/admin-view';
 import Login from './pages/login/login';
 import { Provider } from 'react-redux';
@@ -30,8 +30,23 @@ import {
 } from './pages/instructor/course-management';
 import { EducationalRole } from './types';
 import { useWithRouteChangeRerender } from './hooks/use-with-route-change-rerender';
+import SharkTank from './pages/shark-tank/shark-tank-view';
+import SharkTankChat from './pages/shark-tank/shark-tank-chat';
+import './App.css';
 
 export const freeDocEditingNavPath = '/docs';
+
+const sharkTankTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#5c8a69',
+      light: '#79a075',
+    },
+    secondary: {
+      main: '#dfd79f',
+    },
+  },
+});
 
 function MainApp() {
   const MAIN_APP_HEIGHT = '94vh';
@@ -162,6 +177,27 @@ function MainApp() {
           >
             <CourseManagement userRole={EducationalRole.STUDENT} />
           </div>
+        </>
+      ),
+    },
+
+    {
+      path: '/shark-tank',
+      element: (
+        <>
+          <ThemeProvider theme={sharkTankTheme}>
+            <SharkTank />
+          </ThemeProvider>
+        </>
+      ),
+    },
+    {
+      path: '/shark-tank/chat',
+      element: (
+        <>
+          <ThemeProvider theme={sharkTankTheme}>
+            <SharkTankChat />
+          </ThemeProvider>
         </>
       ),
     },

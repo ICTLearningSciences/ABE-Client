@@ -4,12 +4,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-/*
-This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved.
-Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
-
-The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
-*/
 import React, { useState } from 'react';
 import { IconButton, Divider, Drawer, Button } from '@mui/material';
 import { Home } from '@mui/icons-material';
@@ -18,6 +12,8 @@ import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import MenuIcon from '@mui/icons-material/Menu';
 import { RowDiv } from '../../styled-components';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
+
+import sharkIcon from '../../pages/shark-tank/icon.png';
 
 interface HomeAndCourseDisplayProps {
   defaultPath: string;
@@ -148,6 +144,16 @@ export function HomeAndCourseDisplay(
         disabled={curPath === freeDocEditingNavPath}
       >
         <TextSnippetIcon />
+      </IconButton>
+      <IconButton
+        data-cy="shark-home-button"
+        onClick={() => {
+          navigate('/shark-tank');
+        }}
+        color="primary"
+        disabled={curPath === '/shark-tank'}
+      >
+        <img src={sharkIcon} style={{ width: 28, height: 28 }} />
       </IconButton>
     </RowDiv>
   );

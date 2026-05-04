@@ -31,6 +31,7 @@ import { useWithEducationalManagement } from '../../store/slices/education-manag
 import { getStudentAssignmentDocs } from '../../helpers';
 import { useEducationalSetting } from '../../contexts/educational-setting-context';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
+import { Add } from '@mui/icons-material';
 
 export default function SelectCreateDocs(props: {
   googleDocs?: UserDoc[];
@@ -234,8 +235,9 @@ export default function SelectCreateDocs(props: {
                   fontWeight: 'bold',
                 }}
                 variant="contained"
+                startIcon={<Add />}
               >
-                + New
+                New
               </Button>
               {copyDocs && copyDocs.length > 0 && (
                 <Button
