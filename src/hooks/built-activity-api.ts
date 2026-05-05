@@ -56,6 +56,10 @@ export const fullBuiltActivityQueryData = `
                                   jumpToStepId
                                   isArray
                                   responseWeight
+                                  buttonAction{
+                                    buttonActionType
+                                    buttonActionValue
+                                  }
                               }
                               setStudentActivityComplete
                           }

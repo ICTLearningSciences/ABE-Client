@@ -48,6 +48,7 @@ export function useWithBuiltActivityHandler(
   const navigate = useNavigateWithParams();
   const [builtActivityHandler, setBuiltActivityHandler] =
     useState<BuiltActivityHandler>();
+  const [filteredPanelistIds, setFilteredPanelistIds] = useState<string[]>([]);
   const updatesFound = !equals(
     selectedActivityBuilder,
     builtActivityHandler?.builtActivityData
@@ -101,7 +102,8 @@ export function useWithBuiltActivityHandler(
         },
         selectedActivityBuilder,
         attachedPanel,
-        attachedPanelists
+        attachedPanelists,
+        setFilteredPanelistIds
       );
       newActivityHandler.initializeActivity();
       setBuiltActivityHandler(newActivityHandler);
@@ -168,5 +170,6 @@ export function useWithBuiltActivityHandler(
 
   return {
     activityReady: Boolean(builtActivityHandler),
+    filteredPanelistIds,
   };
 }
