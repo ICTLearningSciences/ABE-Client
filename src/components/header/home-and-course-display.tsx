@@ -122,6 +122,16 @@ export function HomeAndCourseDisplay(
         {' '}
         <Home />{' '}
       </IconButton>
+      <IconButton
+        data-cy="shark-home-button"
+        onClick={() => {
+          navigate('/shark-tank');
+        }}
+        color="primary"
+        disabled={curPath === '/shark-tank'}
+      >
+        <img src={sharkIcon} style={{ width: 28, height: 28 }} />
+      </IconButton>
 
       <Divider orientation="vertical" variant="middle" flexItem />
 
@@ -144,16 +154,6 @@ export function HomeAndCourseDisplay(
         disabled={curPath === freeDocEditingNavPath}
       >
         <TextSnippetIcon />
-      </IconButton>
-      <IconButton
-        data-cy="shark-home-button"
-        onClick={() => {
-          navigate('/shark-tank');
-        }}
-        color="primary"
-        disabled={curPath === '/shark-tank'}
-      >
-        <img src={sharkIcon} style={{ width: 28, height: 28 }} />
       </IconButton>
     </RowDiv>
   );

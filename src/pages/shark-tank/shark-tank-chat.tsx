@@ -6,42 +6,49 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import * as React from 'react';
-import { Button, Grid, MenuItem } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import { TextSnippet } from '@mui/icons-material';
 
-import { CssTextField } from './components';
 import PanelistCard from './components/panelist-card';
-import ChatThread from './components/chat-thread';
 import UserDocumentDisplay from './components/doc-display';
 import { Header } from './components/header';
-import ToggleAgentMode from './components/toggle-mode';
-import { useWithPanels } from '../../store/slices/panels/use-with-panels';
+import { Chat } from './components/chat';
 import { useWithState } from '../../exported-files';
-import { Panelist } from '../../store/slices/panels/types';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
-import withAuthorizationOnly from '../../hooks/wrap-with-authorization-only';
+import { useWithPanels } from '../../store/slices/panels/use-with-panels';
+import { Panelist } from '../../store/slices/panels/types';
+import withAuthorizationOnly from './wrap-with-authorization-only';
 
 import './shark-tank.css';
 
 function SharkTankChat(): JSX.Element {
   const navigate = useNavigateWithParams();
+  const { state: docState, updateCurrentDocId } = useWithState();
+  const useWithPanelActivity = useWithPanels();
+
+  const { curDocId } = docState;
   const {
-    usePanelMode,
     activity,
     activePanel,
     activePanelist,
     panelists,
+    setPanelMode,
+    setActivity,
     setActivePanelist,
-  } = useWithPanels();
-  const { state: docState, updateCurrentDocId } = useWithState();
-  const { curDocId } = docState;
+  } = useWithPanelActivity;
 
   function onMemberClick(m: Panelist): void {
-    console.log(m);
+    if (activePanelist?.clientId === m.clientId) {
+      setPanelMode(true);
+      setActivePanelist(undefined);
+    } else {
+      setPanelMode(false);
+      setActivePanelist(m.clientId);
+    }
   }
 
   if (!activePanel || !activity) {
-    navigate('/shark-panel');
+    navigate('/shark-tank');
     return <></>;
   }
 
@@ -49,87 +56,78 @@ function SharkTankChat(): JSX.Element {
     <main className="root">
       <Header title="Chat" />
       <div className="page">
-        <Grid container spacing={1} style={{ width: '100%', height: '100%' }}>
-          <Grid xs={8}>
-            <div className="column" style={{ height: '100%' }}>
-              {usePanelMode ? (
-                <div
-                  className="row spacing center-div"
-                  style={{
-                    overflowX: 'auto',
-                    padding: 20,
-                    backgroundImage:
-                      'linear-gradient(90deg,rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 100%)', // "rgba(0, 0, 0, 0.3)",
-                    width: '100%',
-                  }}
-                >
-                  {activePanel.panelists.map((m) => {
-                    const panelist = panelists.find((p) => p.clientId === m);
-                    if (!panelist) return <></>;
-                    return (
-                      <PanelistCard
-                        key={m}
-                        p={panelist}
-                        onMemberClick={onMemberClick}
-                      />
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="row center-div">
-                  <CssTextField
-                    label="Agent"
-                    focused
-                    select
-                    value={activePanelist}
-                    style={{ width: 300, margin: 10 }}
-                  >
-                    {activePanel.panelists.map((m) => {
-                      const panelist = panelists.find((p) => p.clientId === m);
-                      if (!panelist) return <></>;
-                      return (
-                        <MenuItem
-                          key={m}
-                          value={m}
-                          onClick={() => setActivePanelist(m)}
-                        >
-                          {panelist.panelistName}
-                        </MenuItem>
-                      );
-                    })}
-                  </CssTextField>
-                </div>
-              )}
-              <div
-                className="column center-div"
-                style={{
-                  flexGrow: 1,
-                  background: 'rgb(48, 53, 58)',
-                  margin: 20,
-                }}
+        <Grid container style={{ width: '100%', height: '100%' }}>
+          <Grid
+            xs={curDocId ? 8 : 12}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%',
+            }}
+          >
+            <div
+              className="row spacing center-div"
+              style={{
+                overflowX: 'auto',
+                paddingTop: 10,
+                paddingBottom: 10,
+                backgroundImage:
+                  'linear-gradient(90deg,rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 100%)', // "rgba(0, 0, 0, 0.3)",
+                width: '100%',
+                display: curDocId ? '' : 'none',
+              }}
+            >
+              {activePanel.panelists.map((m) => {
+                const panelist = panelists.find((p) => p.clientId === m);
+                if (!panelist) return <></>;
+                return (
+                  <PanelistCard
+                    key={m}
+                    p={panelist}
+                    isActive={!activePanelist || activePanelist.clientId === m}
+                    onMemberClick={onMemberClick}
+                  />
+                );
+              })}
+            </div>
+            <div
+              className="column center-div"
+              style={{
+                flexGrow: 1,
+                background: 'rgb(48, 53, 58)',
+                marginTop: 10,
+              }}
+            >
+              <UserDocumentDisplay
+                docId={curDocId}
+                onOpenDoc={updateCurrentDocId}
+              />
+            </div>
+            <div className="row spacing center-div" style={{ padding: 20 }}>
+              <Button
+                variant="contained"
+                disabled={!curDocId}
+                startIcon={<TextSnippet />}
+                onClick={() => updateCurrentDocId('')}
               >
-                <UserDocumentDisplay
-                  docId={curDocId}
-                  onOpenDoc={updateCurrentDocId}
-                />
-              </div>
-              <div className="row spacing center-div" style={{ padding: 20 }}>
-                <ToggleAgentMode />
-                <Button
-                  variant="contained"
-                  disabled={!curDocId}
-                  startIcon={<TextSnippet />}
-                  onClick={() => updateCurrentDocId('')}
-                >
-                  My Documents
-                </Button>
-                <div />
-              </div>
+                My Documents
+              </Button>
+              <div />
             </div>
           </Grid>
-          <Grid xs={4}>
-            <ChatThread currentDoc={curDocId} />
-          </Grid>
+          {curDocId && (
+            <Grid
+              xs={4}
+              style={{ height: '100%', paddingRight: 20, paddingLeft: 20 }}
+            >
+              <Chat
+                selectedActivity={activity}
+                setSelectedActivity={(activity) => {
+                  setActivity(activity._id);
+                }}
+              />
+            </Grid>
+          )}
         </Grid>
       </div>
     </main>

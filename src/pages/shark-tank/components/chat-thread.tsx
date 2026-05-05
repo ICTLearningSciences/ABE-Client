@@ -1,84 +1,158 @@
-/*
-This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
-Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
-
-The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
-*/
-
-import * as React from 'react';
-import { Button, Typography } from '@mui/material';
-import { Construction, ForumOutlined } from '@mui/icons-material';
+import React from 'react';
+import { Button } from '@mui/material';
+import { useRef, useState, useEffect } from 'react';
+import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import {
-  ChatActivity,
-  useWithCurrentGoalActivity,
-} from '../../../exported-files';
-import { useWithPanels } from '../../../store/slices/panels/use-with-panels';
-import { useSearchParams } from 'react-router-dom';
-import { URL_PARAM_NEW_DOC } from '../../../constants';
-import { useWithWindowSize } from '../../../hooks/use-with-window-size';
+  ChatMessageTypes,
+  Sender,
+  MessageDisplayType,
+  UserInputType,
+  ChatLog,
+} from '../../../store/slices/chat';
+import Message from './message';
+import { v4 as uuidv4 } from 'uuid';
 
-export function stringToColor(string: string) {
-  let hash = 0;
-  let i;
-  /* eslint-disable no-bitwise */
-  for (i = 0; i < string.length; i += 1) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  let color = '#';
-  for (i = 0; i < 3; i += 1) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-  /* eslint-enable no-bitwise */
-  return color;
-}
-
-export function stringAvatar(name: string) {
-  return {
-    sx: {
-      bgcolor: stringToColor(name),
-    },
-    children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
-  };
-}
-
-export default function ChatThread(props: {
-  currentDoc?: string;
+export function ChatThread(props: {
+  coachResponsePending: boolean;
+  chatLog: ChatLog;
+  curDocId: string;
+  setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
+  sendMessage: (message: ChatMessageTypes) => void;
 }): JSX.Element {
-  const { activity } = useWithPanels();
-  const [urlSearchParams] = useSearchParams();
-  const useCurrentGoalActivity = useWithCurrentGoalActivity();
-  const isNewDoc = urlSearchParams.get(URL_PARAM_NEW_DOC) === 'true';
-  const { height } = useWithWindowSize();
+  const { coachResponsePending, setAiInfoToDisplay, sendMessage } = props;
+  const messageContainerRef = useRef<HTMLDivElement>(null);
+  const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
+  const [mostRecentChatIdx, setMostRecentChatIdx] = useState<number>(0);
+  const [pingRef, setPingRef] = useState<number>();
 
-  const [previewingActivity, setPreviewingActivity] =
-    React.useState<boolean>(false);
-  const [mobileView, setMobileView] = React.useState<'chat' | 'document'>(
-    'chat'
-  );
+  const chatMessages: ChatMessageTypes[] = [
+    ...props.chatLog,
+    ...(coachResponsePending
+      ? [
+          {
+            id: 'pending-message',
+            message: '...',
+            sender: Sender.SYSTEM,
+            displayType: MessageDisplayType.PENDING_MESSAGE,
+          },
+        ]
+      : []),
+  ];
+
+  function scrollToElementById(id: string) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  async function addMessagesWithDelay() {
+    if (chatMessages.length < mostRecentChatIdx) {
+      setMostRecentChatIdx(0);
+      return;
+    }
+    if (pingRef || mostRecentChatIdx === chatMessages.length - 1) return;
+    setPingRef(1);
+    if (mostRecentChatIdx < chatMessages.length - 1) {
+      const msg = chatMessages[mostRecentChatIdx + 1];
+      setMostRecentChatIdx(mostRecentChatIdx + 1);
+      setTimeout(
+        () => setPingRef(undefined),
+        msg.message.split(' ').length * 100
+      );
+    }
+  }
+
+  useEffect(() => {
+    if (messageContainerRef.current) {
+      scrollToElementById('message-end-ref');
+    }
+  }, [messageElements]);
+
+  useEffect(() => {
+    const _newMessageElements = [];
+    for (let index = 0; index < chatMessages.length; index++) {
+      const message = chatMessages[index];
+      _newMessageElements.push(
+        <>
+          <Message
+            key={index}
+            message={message}
+            setAiInfoToDisplay={setAiInfoToDisplay}
+            messageIndex={index}
+            latestMessageIndex={mostRecentChatIdx}
+          />
+          {message.mcqChoices && index === chatMessages.length - 1 && (
+            <div
+              key={`mcq-choices-${index}`}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                width: '98%',
+                justifyContent: 'flex-end',
+                alignItems: 'flex-end',
+                margin: '10px',
+              }}
+            >
+              {message.mcqChoices.map((choice: string, i: number) => {
+                return (
+                  <Button
+                    key={i}
+                    variant="outlined"
+                    style={{
+                      marginBottom: '5px',
+                    }}
+                    data-cy={`mcq-choice-${choice.replaceAll(' ', '-')}`}
+                    onClick={() => {
+                      sendMessage({
+                        id: uuidv4(),
+                        message: choice,
+                        sender: Sender.USER,
+                        displayType: MessageDisplayType.TEXT,
+                        userInputType: UserInputType.MCQ,
+                      });
+                      if (message.retryFunction) {
+                        message.retryFunction();
+                      }
+                    }}
+                  >
+                    {choice}
+                  </Button>
+                );
+              })}
+            </div>
+          )}
+        </>
+      );
+    }
+    setMessageElements(_newMessageElements);
+  }, [chatMessages.length, mostRecentChatIdx]);
+
+  useEffect(() => {
+    addMessagesWithDelay();
+  }, [chatMessages.length, pingRef]);
 
   return (
     <div
-      className="box column"
+      ref={messageContainerRef}
+      data-cy="messages-container"
       style={{
+        display: 'flex',
+        flexDirection: 'column',
         height: '100%',
-        borderRadius: 0,
-        padding: 0,
-        boxShadow: '-5px 1px 10px 0px rgba(0, 0, 0, 0.3)',
+        width: '100%',
+        maxWidth: '100%',
+        justifyContent: 'flex-start',
+        margin: '1rem',
+        borderRadius: '1rem',
+        overflowX: 'hidden',
+        overflowY: 'auto',
+        border: '1px solid black',
+        position: 'relative',
       }}
     >
-      <div style={{ maxHeight: height - 150 }}>
-        <ChatActivity
-          activityFromParams={activity?._id || ''}
-          goalFromParams={''}
-          isNewDoc={isNewDoc}
-          useCurrentGoalActivity={useCurrentGoalActivity}
-          previewingActivity={previewingActivity}
-          setPreviewingActivity={setPreviewingActivity}
-          disableActivitySelector={false}
-          setToDocView={() => setMobileView('document')}
-        />
-      </div>
+      {messageElements}
+      <div id="message-end-ref" />
     </div>
   );
 }

@@ -26,6 +26,7 @@ export function useWithBuiltActivityHandler(
   editDocGoal: () => void,
   selectedActivityBuilder?: ActivityBuilder
 ) {
+  const { activePanelist } = useWithPanels();
   const { sendMessage, clearChatLog, coachResponsePending } = useWithChat();
   const { state, updateSessionIntention, newSession } = useWithState();
   const curDocId = state.curDocId;
@@ -129,6 +130,18 @@ export function useWithBuiltActivityHandler(
     newSession();
     builtActivityHandler.resetActivity();
   }, [resetActivityCounter]);
+
+  useEffect(() => {
+    if (builtActivityHandler) {
+      const attachedPanel = builtActivityHandler.activityPanel;
+      const attachedPanelists = attachedPanel
+        ? panelists.filter((p) => attachedPanel.panelists.includes(p.clientId))
+        : undefined;
+      builtActivityHandler.activityPanelists = activePanelist
+        ? [activePanelist]
+        : attachedPanelists;
+    }
+  }, [activePanelist]);
 
   const handleStudentActivityComplete = useCallback(() => {
     if (

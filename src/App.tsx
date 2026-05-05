@@ -30,7 +30,7 @@ import {
 } from './pages/instructor/course-management';
 import { EducationalRole } from './types';
 import { useWithRouteChangeRerender } from './hooks/use-with-route-change-rerender';
-import SharkTank from './pages/shark-tank/shark-tank-view';
+import SharkTankSetup from './pages/shark-tank/shark-tank-setup';
 import SharkTankChat from './pages/shark-tank/shark-tank-chat';
 import './App.css';
 
@@ -180,13 +180,12 @@ function MainApp() {
         </>
       ),
     },
-
     {
       path: '/shark-tank',
       element: (
         <>
           <ThemeProvider theme={sharkTankTheme}>
-            <SharkTank />
+            <SharkTankSetup />
           </ThemeProvider>
         </>
       ),

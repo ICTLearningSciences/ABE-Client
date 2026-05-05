@@ -9,7 +9,7 @@ import {
 } from '../../../exported-files';
 import { UserRole } from '../login';
 
-interface UseWithPanels {
+export interface UseWithPanels {
   panels: Panel[];
   panelists: Panelist[];
   panelsLoadStatus: LoadStatus;
@@ -93,8 +93,8 @@ export function useWithPanels(): UseWithPanels {
       if (panel && activity) {
         setGoalAndActivity(undefined, activity);
         updateViewingUserRole(UserRole.USER);
+        setActivePanel(activity.attachedPanel);
         dispatch(panelApis.setActivity(activity._id));
-        dispatch(panelApis.setActivePanel(activity.attachedPanel));
       }
     }
   }
@@ -104,7 +104,6 @@ export function useWithPanels(): UseWithPanels {
   }
 
   function setActivePanelist(id?: string): void {
-    if (usePanelMode) return;
     dispatch(panelApis.setActivePanelist(id));
   }
 

@@ -34,14 +34,14 @@ import {
 import { CssCard, CssTextField } from './components';
 import { Header } from './components/header';
 import ToggleAgentMode from './components/toggle-mode';
-import withAuthorizationOnly from '../../hooks/wrap-with-authorization-only';
+import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 import { useAppSelector } from '../../store/hooks';
 import { useWithPanels } from '../../store/slices/panels/use-with-panels';
-import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
+import withAuthorizationOnly from './wrap-with-authorization-only';
 
 import './shark-tank.css';
 
-function SharkTank(): JSX.Element {
+function SharkTankSetup(): JSX.Element {
   const {
     useSearch,
     usePanelMode,
@@ -64,7 +64,7 @@ function SharkTank(): JSX.Element {
     if (!activity && activities.length > 0) {
       setActivity(activities[0]._id);
     }
-  }, []);
+  }, [activities]);
 
   function startSession(): void {
     navigate('/shark-tank/chat');
@@ -132,8 +132,8 @@ function SharkTank(): JSX.Element {
           Select an activity and panelists you would like to discuss with
         </Typography>
 
-        <Grid container spacing={2} style={{ width: '90%', marginTop: 20 }}>
-          <Grid xs={8}>
+        <Grid container style={{ width: '90%', marginTop: 20 }}>
+          <Grid xs={8} style={{ padding: 10 }}>
             <CssCard title="Panel Name" icon={<InfoOutlined />}>
               <CssTextField value={activePanel?.panelName} />
             </CssCard>
@@ -147,7 +147,7 @@ function SharkTank(): JSX.Element {
             >
               {!usePanelMode && (
                 <Typography color="secondary" style={{ textAlign: 'center' }}>
-                  Which panelist do you wish to speak to?
+                  Which panelists do you wish to speak to?
                 </Typography>
               )}
               <FlipMove className="column spacing">
@@ -167,7 +167,7 @@ function SharkTank(): JSX.Element {
             </Button>
           </Grid>
 
-          <Grid xs={4}>
+          <Grid xs={4} style={{ padding: 10 }}>
             <CssCard alt title="Use Web Search" icon={<Search />}>
               <CssTextField
                 select
@@ -238,4 +238,4 @@ function SharkTank(): JSX.Element {
   );
 }
 
-export default withAuthorizationOnly(SharkTank);
+export default withAuthorizationOnly(SharkTankSetup);

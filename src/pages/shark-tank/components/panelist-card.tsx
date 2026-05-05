@@ -7,12 +7,12 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import * as motion from 'motion/react-client';
 import { Card, CardMedia, Typography, Fab } from '@mui/material';
-import { Mic } from '@mui/icons-material';
-import { stringToColor } from './chat-thread';
+import { stringToColor } from '../helpers';
 import { Panelist } from '../../../store/slices/panels/types';
 
 export default function PanelistCard(props: {
   p: Panelist;
+  isActive: boolean;
   onMemberClick: (m: Panelist) => void;
 }): JSX.Element {
   const { p, onMemberClick } = props;
@@ -30,14 +30,10 @@ export default function PanelistCard(props: {
           borderStyle: 'solid',
           borderColor: stringToColor(p.panelistName),
           borderRadius: 5,
+          opacity: !props.isActive ? 0.25 : 1,
         }}
       >
-        <CardMedia
-          component="img"
-          alt="green iguana"
-          height="100"
-          image={p.profilePicture}
-        />
+        <CardMedia component="img" height="100" image={p.profilePicture} />
         <div
           className="row"
           style={{
@@ -67,12 +63,6 @@ export default function PanelistCard(props: {
               {p.panelistName}
             </Typography>
           </div>
-          <Fab
-            size="small"
-            style={{ backgroundColor: stringToColor(p.panelistName) }}
-          >
-            <Mic />
-          </Fab>
         </div>
       </Card>
     </motion.div>
