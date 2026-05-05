@@ -7,6 +7,8 @@ The full terms of this copyright and license should always be found in the root 
 import React from 'react';
 import {
   ActivityBuilderStepType,
+  ButtonAction,
+  ButtonActionTypeEnum,
   FlowItem,
   PredefinedResponse,
   RequestUserInputActivityStep,
@@ -21,7 +23,17 @@ import {
 } from '../../../../styled-components';
 import { CheckBoxInput, InputField } from '../../shared/input-components';
 import { FlowStepSelector } from '../../shared/flow-step-selector';
-import { Box, Button, IconButton } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControl,
+  IconButton,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  Select,
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { v4 as uuid } from 'uuid';
 import { Delete } from '@mui/icons-material';
@@ -34,6 +46,8 @@ import { VersionsDropdown } from './versions-dropdown';
 import { isContextDataString } from '../../helpers';
 import DropdownDisplay from '../../../dropdown-display';
 import { InfoTooltip } from '../../../info-tooltip';
+import { useWithPanels } from '../../../../store/slices/panels/use-with-panels';
+import { Panelist } from '../../../../store/slices/panels/types';
 export function getDefaultRequestUserInputBuilder(): RequestUserInputActivityStep {
   return {
     stepId: uuid(),
@@ -47,6 +61,80 @@ export function getDefaultRequestUserInputBuilder(): RequestUserInputActivitySte
   };
 }
 
+function ButtonActionUpdater(props: {
+  buttonAction?: ButtonAction;
+  panelists: Panelist[];
+  onChange: (buttonAction: ButtonAction | undefined) => void;
+}): JSX.Element {
+  const { buttonAction, panelists, onChange } = props;
+  const selectedType = buttonAction?.buttonActionType ?? '';
+  const selectedPanelistIds = buttonAction?.buttonActionValue ?? [];
+
+  return (
+    <ColumnDiv
+      style={{ width: '100%', alignItems: 'center', gap: 8, marginTop: 8 }}
+    >
+      <FormControl size="small" style={{ width: '60%' }}>
+        <InputLabel>Button Action</InputLabel>
+        <Select
+          label="Button Action"
+          value={selectedType}
+          onChange={(e) => {
+            const val = e.target.value as ButtonActionTypeEnum | '';
+            if (!val) {
+              onChange(undefined);
+            } else {
+              onChange({ buttonActionType: val, buttonActionValue: [] });
+            }
+          }}
+        >
+          <MenuItem value="">None</MenuItem>
+          <MenuItem value={ButtonActionTypeEnum.FILTER_TO_PANELIST}>
+            Filter to Panelist
+          </MenuItem>
+          <MenuItem value={ButtonActionTypeEnum.CLEAR_PANELIST_FILTERS}>
+            Clear Panelist Filters
+          </MenuItem>
+        </Select>
+      </FormControl>
+      {buttonAction?.buttonActionType ===
+        ButtonActionTypeEnum.FILTER_TO_PANELIST && (
+        <FormControl size="small" style={{ width: '60%' }}>
+          <InputLabel>Panelists</InputLabel>
+          <Select
+            multiple
+            label="Panelists"
+            value={selectedPanelistIds}
+            onChange={(e) => {
+              const val = e.target.value;
+              onChange({
+                ...buttonAction,
+                buttonActionValue:
+                  typeof val === 'string' ? val.split(',') : val,
+              });
+            }}
+            renderValue={(selected) =>
+              (selected as string[])
+                .map(
+                  (id) =>
+                    panelists.find((p) => p.clientId === id)?.panelistName ?? id
+                )
+                .join(', ')
+            }
+          >
+            {panelists.map((p) => (
+              <MenuItem key={p.clientId} value={p.clientId}>
+                <Checkbox checked={selectedPanelistIds.includes(p.clientId)} />
+                <ListItemText primary={p.panelistName} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
+    </ColumnDiv>
+  );
+}
+
 function PredefinedResponseUpdater(props: {
   predefinedResponse: PredefinedResponse;
   updateResponse: (
@@ -55,6 +143,8 @@ function PredefinedResponseUpdater(props: {
   ) => void;
   deleteResponse: () => void;
   flowsList: FlowItem[];
+  panelists: Panelist[];
+  hasAttachedPanel: boolean;
 }): JSX.Element {
   const { predefinedResponse, updateResponse, deleteResponse } = props;
   return (
@@ -135,6 +225,7 @@ function PredefinedResponseUpdater(props: {
                   }}
                 />
               ) : undefined}
+
               <FlowStepSelector
                 flowsList={props.flowsList}
                 title="Jump to Step"
@@ -164,6 +255,18 @@ function PredefinedResponseUpdater(props: {
                   );
                 }}
               />
+              {props.hasAttachedPanel && (
+                <ButtonActionUpdater
+                  buttonAction={predefinedResponse.buttonAction}
+                  panelists={props.panelists}
+                  onChange={(buttonAction) => {
+                    props.updateResponse(
+                      { buttonAction },
+                      predefinedResponse.clientId
+                    );
+                  }}
+                />
+              )}
             </ColumnDiv>
           }
         />
@@ -181,6 +284,8 @@ function PredefinedResponsesUpdater(props: {
   addNewPredefinedResponse: () => void;
   deletePredefinedResponse: (clientId: string) => void;
   flowsList: FlowItem[];
+  panelists: Panelist[];
+  hasAttachedPanel: boolean;
   width?: string;
 }): JSX.Element {
   const {
@@ -225,6 +330,8 @@ function PredefinedResponsesUpdater(props: {
                 deletePredefinedResponse(response.clientId);
               }}
               flowsList={props.flowsList}
+              panelists={props.panelists}
+              hasAttachedPanel={props.hasAttachedPanel}
             />
           ))}
       </Box>
@@ -246,8 +353,16 @@ export function RequestUserInputStepBuilder(props: {
   errors?: string[];
 }): JSX.Element {
   const { stepId, stepIndex, versions, errors } = props;
-  const { getStep, getFlowByStepId, updateStep, updateStepField } =
+  const { activity, getStep, getFlowByStepId, updateStep, updateStepField } =
     useEditActivityContext();
+  const { panels, panelists } = useWithPanels();
+  const hasAttachedPanel = Boolean(activity.attachedPanel);
+  const attachedPanel = panels.find(
+    (p) => p.clientId === activity.attachedPanel
+  );
+  const attachedPanelists = panelists.filter(
+    (p) => attachedPanel?.panelists.includes(p.clientId)
+  );
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
 
   const step = getStep(stepId) as RequestUserInputActivityStep;
@@ -405,6 +520,8 @@ export function RequestUserInputStepBuilder(props: {
           addNewPredefinedResponse={addNewPredefinedResponse}
           deletePredefinedResponse={deletePredefinedResponse}
           flowsList={props.flowsList}
+          panelists={attachedPanelists}
+          hasAttachedPanel={hasAttachedPanel}
         />
 
         <JumpToAlternateStep
