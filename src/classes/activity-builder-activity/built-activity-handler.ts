@@ -12,6 +12,8 @@ import {
   ActivityBuilder,
   ActivityBuilderStep,
   ActivityBuilderStepType,
+  ButtonAction,
+  ButtonActionTypeEnum,
   PromptActivityStep,
   SystemMessageActivityStep,
   RequestUserInputActivityStep,
@@ -95,6 +97,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   onGoHome: () => void;
   activityPanel?: Panel;
   activityPanelists?: Panelist[];
+  filteredToPanelists: string[] = [];
+  onFilteredPanelistsChanged?: (filteredPanelistIds: string[]) => void;
 
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
@@ -175,7 +179,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     onGoHome: () => void,
     builtActivityData?: ActivityBuilder,
     activityPanel?: Panel,
-    activityPanelists?: Panelist[]
+    activityPanelists?: Panelist[],
+    onFilteredPanelistsChanged?: (filteredPanelistIds: string[]) => void
   ) {
     this.docId = docId;
     this.docService = docService;
@@ -194,6 +199,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.onGoHome = onGoHome;
     this.activityPanel = activityPanel;
     this.activityPanelists = activityPanelists;
+    this.onFilteredPanelistsChanged = onFilteredPanelistsChanged;
     this.setBuiltActivityData = this.setBuiltActivityData.bind(this);
     this.initializeActivity = this.initializeActivity.bind(this);
     this.resetActivity = this.resetActivity.bind(this);
@@ -208,6 +214,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.getStepById = this.getStepById.bind(this);
     this.addResponseNavigation = this.addResponseNavigation.bind(this);
     this.handleExtractMcqChoices = this.handleExtractMcqChoices.bind(this);
+    this.applyButtonAction = this.applyButtonAction.bind(this);
   }
 
   setBuiltActivityData(builtActivityData?: ActivityBuilder) {
@@ -238,6 +245,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.stateData = {};
     this.stepIdsSinceLastInput = [];
     this.userResponseHandleState = getDefaultUserResponseHandleState();
+    this.filteredToPanelists = [];
+    this.onFilteredPanelistsChanged?.([]);
     this.handleStep(this.curStep);
   }
 
@@ -373,7 +382,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       this.activityPanel &&
       this.activityPanelists
     ) {
-      const effectivePanelists = step.sendFromPanelistClientIds.reduce(
+      const allEffectivePanelists = step.sendFromPanelistClientIds.reduce(
         (acc: Panelist[], clientId) => {
           const panelist = this.activityPanelists?.find(
             (p) => p.clientId === clientId
@@ -385,6 +394,12 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         },
         []
       );
+      const effectivePanelists =
+        this.filteredToPanelists.length > 0
+          ? allEffectivePanelists.filter((p) =>
+              this.filteredToPanelists.includes(p.clientId)
+            )
+          : allEffectivePanelists;
       const panelistData = this.stateData['panelistData'];
 
       if (panelistData && typeof panelistData === 'object') {
@@ -474,6 +489,20 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       response,
       jumpToStepId,
     });
+  }
+
+  applyButtonAction(buttonAction: ButtonAction) {
+    if (
+      buttonAction.buttonActionType === ButtonActionTypeEnum.FILTER_TO_PANELIST
+    ) {
+      this.filteredToPanelists = buttonAction.buttonActionValue;
+    } else if (
+      buttonAction.buttonActionType ===
+      ButtonActionTypeEnum.CLEAR_PANELIST_FILTERS
+    ) {
+      this.filteredToPanelists = [];
+    }
+    this.onFilteredPanelistsChanged?.(this.filteredToPanelists);
   }
 
   getStoredArray(str: string): string[] {
@@ -591,6 +620,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           (response) => response.message === message
         );
       if (predefinedResponseMatch) {
+        if (predefinedResponseMatch.buttonAction) {
+          this.applyButtonAction(predefinedResponseMatch.buttonAction);
+        }
         if (predefinedResponseMatch.jumpToStepId) {
           const jumpStep = this.getStepById(
             predefinedResponseMatch.jumpToStepId
@@ -684,7 +716,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         this.activityPanel &&
         this.activityPanelists
       ) {
-        const effectivePanelists = config.runForPanelistClientIds.reduce(
+        const allEffectivePanelists = config.runForPanelistClientIds.reduce(
           (acc: Panelist[], clientId) => {
             const panelist = this.activityPanelists?.find(
               (p) => p.clientId === clientId
@@ -696,6 +728,12 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           },
           []
         );
+        const effectivePanelists =
+          this.filteredToPanelists.length > 0
+            ? allEffectivePanelists.filter((p) =>
+                this.filteredToPanelists.includes(p.clientId)
+              )
+            : allEffectivePanelists;
         // Execute prompt for each panelist
         for (const panelist of effectivePanelists) {
           promptExecutions.push(

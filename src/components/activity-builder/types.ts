@@ -131,6 +131,16 @@ export interface ConditionalActivityStep extends ActivityBuilderStep {
   conditionals: LogicStepConditional[];
 }
 
+export enum ButtonActionTypeEnum {
+  'FILTER_TO_PANELIST' = 'FILTER_TO_PANELIST',
+  'CLEAR_PANELIST_FILTERS' = 'CLEAR_PANELIST_FILTERS',
+}
+
+export interface ButtonAction {
+  buttonActionType: ButtonActionTypeEnum;
+  buttonActionValue: string[];
+}
+
 // RequestUserInput
 export interface PredefinedResponse {
   clientId: string;
@@ -138,6 +148,7 @@ export interface PredefinedResponse {
   message: string;
   jumpToStepId?: string;
   responseWeight?: string;
+  buttonAction?: ButtonAction;
 }
 
 export enum RequestUserInputSpecialType {
