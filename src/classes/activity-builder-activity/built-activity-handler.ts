@@ -879,7 +879,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       aiPromptSteps[0].prompts.push({
         promptText: `Current state of chat log between user and system: ${chatLogToString(
           this.chatLog,
-          1000
+          30
         )}`,
         includeEssay: false,
         promptRole: PromptRoles.USER,
@@ -994,7 +994,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       aiPromptSteps[0].prompts.push({
         promptText: `Current state of chat log between user and system: ${chatLogToString(
           this.chatLog,
-          1000
+          30
         )}`,
         includeEssay: false,
         promptRole: PromptRoles.USER,
