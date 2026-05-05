@@ -6,14 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import React from 'react';
-import {
-  Button,
-  Divider,
-  IconButton,
-  Menu,
-  MenuItem,
-  Typography,
-} from '@mui/material';
+import { Button, Divider, Menu, MenuItem, Typography } from '@mui/material';
 import {
   AccountCircleOutlined,
   Home,
@@ -49,12 +42,9 @@ export function Header(props: { title?: string }) {
       style={{ position: 'fixed', top: 0, justifyContent: 'space-between' }}
     >
       <div className="row center-div" style={{ marginLeft: 10 }}>
-        <IconButton color="inherit" onClick={() => navigate('/')}>
-          <Home />
-        </IconButton>
-        <Divider orientation="vertical" variant="middle" flexItem />
         <Button
-          style={{ color: 'white', fontWeight: 'bold' }}
+          color="inherit"
+          style={{ fontWeight: 'bold' }}
           startIcon={<img src={sharkIcon} width={28} height={28} />}
           onClick={() => navigate('/shark-tank')}
         >
@@ -74,6 +64,14 @@ export function Header(props: { title?: string }) {
       <div className="row center-div" style={{ flexGrow: 1 }}></div>
 
       <div className="row center-div spacing" style={{ marginRight: 20 }}>
+        <Button
+          color="inherit"
+          startIcon={<Home />}
+          onClick={() => navigate('/')}
+        >
+          ABE
+        </Button>
+        <Divider orientation="vertical" variant="middle" flexItem />
         {user && (
           <Button
             color="inherit"

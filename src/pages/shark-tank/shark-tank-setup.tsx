@@ -10,6 +10,7 @@ import FlipMove from 'react-flip-move';
 import * as motion from 'motion/react-client';
 import {
   Button,
+  CircularProgress,
   Grid,
   IconButton,
   List,
@@ -40,6 +41,7 @@ import { useWithPanels } from '../../store/slices/panels/use-with-panels';
 import withAuthorizationOnly from './wrap-with-authorization-only';
 
 import './shark-tank.css';
+import { LoadStatus } from '../../store/slices/doc-goals-activities';
 
 function SharkTankSetup(): JSX.Element {
   const {
@@ -57,6 +59,9 @@ function SharkTankSetup(): JSX.Element {
   } = useWithPanels();
   const activities = useAppSelector((state) =>
     state.docGoalsActivities.builtActivities.filter((a) => a.attachedPanel)
+  );
+  const activitiesLoadStatus = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivitiesLoadStatus
   );
   const navigate = useNavigateWithParams();
 
@@ -181,6 +186,9 @@ function SharkTankSetup(): JSX.Element {
             </CssCard>
             <CssCard alt title="Select Activity" icon={<ListAlt />}>
               <List className="column spacing">
+                {activitiesLoadStatus === LoadStatus.LOADING && (
+                  <CircularProgress style={{ alignSelf: 'center' }} />
+                )}
                 {activities.map((a) => {
                   const panel = panels.find(
                     (p) => p.clientId === a.attachedPanel

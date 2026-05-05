@@ -22,7 +22,7 @@ export function ChatThread(props: {
   const { coachResponsePending, setAiInfoToDisplay, sendMessage } = props;
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
-  const [mostRecentChatIdx, setMostRecentChatIdx] = useState<number>(0);
+  const [mostRecentChatIdx, setMostRecentChatIdx] = useState<number>(-1);
   const [pingRef, setPingRef] = useState<number>();
 
   const chatMessages: ChatMessageTypes[] = [
@@ -65,7 +65,8 @@ export function ChatThread(props: {
 
   useEffect(() => {
     if (messageContainerRef.current) {
-      scrollToElementById('message-end-ref');
+      const msg = chatMessages[mostRecentChatIdx];
+      scrollToElementById(msg?.id || 'message-end-ref');
     }
   }, [messageElements]);
 

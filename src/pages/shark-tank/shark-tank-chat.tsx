@@ -74,6 +74,7 @@ function SharkTankChat(): JSX.Element {
                 backgroundImage:
                   'linear-gradient(90deg,rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 100%)', // "rgba(0, 0, 0, 0.3)",
                 width: '100%',
+                maxWidth: '100%',
                 display: curDocId ? '' : 'none',
               }}
             >
@@ -95,11 +96,12 @@ function SharkTankChat(): JSX.Element {
               style={{
                 flexGrow: 1,
                 background: 'rgb(48, 53, 58)',
-                marginTop: 10,
+                margin: 10,
               }}
             >
               <UserDocumentDisplay
                 docId={curDocId}
+                activityId={activity?._id}
                 onOpenDoc={updateCurrentDocId}
               />
             </div>

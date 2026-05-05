@@ -53,6 +53,7 @@ export function useWithBuiltActivityHandler(
     selectedActivityBuilder,
     builtActivityHandler?.builtActivityData
   );
+  const [initialize, setInitialize] = useState<BuiltActivityHandler>();
 
   useEffect(() => {
     if (builtActivityHandler) {
@@ -104,9 +105,7 @@ export function useWithBuiltActivityHandler(
         attachedPanel,
         attachedPanelists
       );
-      newActivityHandler.initializeActivity();
-      setBuiltActivityHandler(newActivityHandler);
-      addNewSubscriber(newActivityHandler);
+      setInitialize(newActivityHandler);
     } else if (
       builtActivityHandler.builtActivityData?._id !==
         selectedActivityBuilder._id ||
@@ -122,6 +121,14 @@ export function useWithBuiltActivityHandler(
     updatesFound,
     defaultHome,
   ]);
+
+  useEffect(() => {
+    if (initialize) {
+      initialize.initializeActivity();
+      setBuiltActivityHandler(initialize);
+      addNewSubscriber(initialize);
+    }
+  }, [initialize]);
 
   useEffect(() => {
     if (!builtActivityHandler) {

@@ -10,7 +10,6 @@ import {
   isActivityBuilder,
 } from '../../../exported-files';
 import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activity-handler';
-import useWithFreeInput from '../../../hooks/use-with-free-input';
 import { useWithSystemPromptsConfig } from '../../../hooks/use-with-system-prompts-config';
 import { useAppSelector } from '../../../store/hooks';
 import { ChatMessageTypes } from '../../../store/slices/chat';
@@ -46,7 +45,6 @@ export function Chat(props: {
     (state) => state.chat.coachResponsePending
   );
   const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
-  useWithFreeInput(undefined);
   const { activityReady: builtActivityReady } = useWithBuiltActivityHandler(
     resetActivityCounter,
     () => {

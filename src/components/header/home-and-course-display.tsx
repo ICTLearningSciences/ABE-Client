@@ -13,8 +13,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { RowDiv } from '../../styled-components';
 import { useWithWindowSize } from '../../hooks/use-with-window-size';
 
-import sharkIcon from '../../pages/shark-tank/icon.png';
-
 interface HomeAndCourseDisplayProps {
   defaultPath: string;
   courseNavPath: string;
@@ -122,17 +120,6 @@ export function HomeAndCourseDisplay(
         {' '}
         <Home />{' '}
       </IconButton>
-      <IconButton
-        data-cy="shark-home-button"
-        onClick={() => {
-          navigate('/shark-tank');
-        }}
-        color="primary"
-        disabled={curPath === '/shark-tank'}
-      >
-        <img src={sharkIcon} style={{ width: 28, height: 28 }} />
-      </IconButton>
-
       <Divider orientation="vertical" variant="middle" flexItem />
 
       <IconButton
