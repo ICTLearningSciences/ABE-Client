@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 import React from 'react';
 import * as motion from 'motion/react-client';
-import { Card, CardMedia, Typography, Fab } from '@mui/material';
+import { Card, CardMedia, Typography } from '@mui/material';
 import { stringToColor } from '../helpers';
 import { Panelist } from '../../../store/slices/panels/types';
 

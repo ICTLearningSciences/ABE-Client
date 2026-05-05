@@ -70,6 +70,7 @@ function SharkTankSetup(): JSX.Element {
     navigate('/shark-tank/chat');
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const PanelMemberItem = React.forwardRef<any>((props: any, ref) => (
     <motion.div
       ref={ref}
@@ -218,7 +219,7 @@ function SharkTankSetup(): JSX.Element {
                       </Typography>
                       <Button
                         variant="contained"
-                        onClick={(e) => {
+                        onClick={() => {
                           setActivity(a._id);
                           setActivePanel(panel.clientId);
                         }}
