@@ -16,7 +16,7 @@ import { useNavigateWithParams } from '../../../hooks/use-navigate-with-params';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { logout } from '../../../store/slices/login';
 
-import sharkIcon from '../icon.png';
+import sharkIcon from '../../../static-images/shark-icon.png';
 
 export function Header(props: { title?: string }) {
   const dispatch = useAppDispatch();

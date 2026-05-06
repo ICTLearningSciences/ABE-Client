@@ -1,9 +1,21 @@
 import React from 'react';
-import { Button, IconButton, Menu, MenuItem } from '@mui/material';
-import { OpenInNew, Pageview } from '@mui/icons-material';
+import { Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Close, OpenInNew, Pageview } from '@mui/icons-material';
+
+export interface Reference {
+  name: string;
+  url: string;
+}
+const REFERENCES: Reference[] = [
+  {
+    name: 'Breitbart Vaccines',
+    url: 'https://www.cdc.gov/vaccines/index.html',
+  },
+];
 
 export function ReferencesButton(props: {
-  onSelectReference: (url: string) => void;
+  reference?: Reference;
+  onSelectReference: (ref?: Reference) => void;
 }): JSX.Element {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -15,8 +27,8 @@ export function ReferencesButton(props: {
     setAnchorEl(null);
   };
 
-  const open = (url: string) => {
-    props.onSelectReference(url);
+  const open = (ref?: Reference) => {
+    props.onSelectReference(ref);
     handleClose();
   };
 
@@ -36,6 +48,13 @@ export function ReferencesButton(props: {
       >
         References
       </Button>
+      {props.reference && (
+        <Tooltip title="Close reference">
+          <IconButton color="primary" onClick={() => open(undefined)}>
+            <Close />
+          </IconButton>
+        </Tooltip>
+      )}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -44,16 +63,19 @@ export function ReferencesButton(props: {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem
-          className="row"
-          style={{ justifyContent: 'space-between', minWidth: 200 }}
-          onClick={() => open('https://www.google.com')}
-        >
-          Google
-          <IconButton onClick={() => openInNew('https://www.google.com')}>
-            <OpenInNew />
-          </IconButton>
-        </MenuItem>
+        {REFERENCES.map((r, i) => (
+          <MenuItem
+            key={i}
+            className="row"
+            style={{ justifyContent: 'space-between', minWidth: 200 }}
+            onClick={() => open(r)}
+          >
+            {r.name}
+            <IconButton onClick={() => openInNew(r.url)}>
+              <OpenInNew />
+            </IconButton>
+          </MenuItem>
+        ))}
       </Menu>
     </div>
   );

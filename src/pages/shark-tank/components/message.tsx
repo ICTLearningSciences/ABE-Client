@@ -19,8 +19,9 @@ import BaseMessage, {
 export default function Message(props: {
   message: ChatMessageTypes;
   messageIndex: number;
-  latestMessageIndex: number;
+  viewed?: boolean;
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
+  onClicked?: (id: string) => void;
 }): JSX.Element {
   const { activePanel, panelists } = useWithPanels();
   const { message, messageIndex, setAiInfoToDisplay } = props;
@@ -46,7 +47,6 @@ export default function Message(props: {
   if (message.message === '') {
     return <></>;
   }
-
   if (!panelist) {
     return (
       <BaseMessage
@@ -57,7 +57,7 @@ export default function Message(props: {
       />
     );
   }
-  if (messageIndex > props.latestMessageIndex) {
+  if (!props.viewed) {
     return (
       <div
         id={message.id}
@@ -72,6 +72,7 @@ export default function Message(props: {
           <FadingText
             strings={[
               `${panelist.panelistName} is thinking...`,
+              `${panelist.panelistName} is typing...`,
               `${panelist.panelistName} is responding...`,
             ]}
             time={1000}

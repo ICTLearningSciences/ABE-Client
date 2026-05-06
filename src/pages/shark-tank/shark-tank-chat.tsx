@@ -13,7 +13,7 @@ import PanelistCard from './components/panelist-card';
 import UserDocumentDisplay from './components/doc-display';
 import { Header } from './components/header';
 import { Chat } from './components/chat';
-import { ReferencesButton } from './components/references-button';
+import { Reference, ReferencesButton } from './components/references-button';
 import { useWithState } from '../../exported-files';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 import { useWithPanels } from '../../store/slices/panels/use-with-panels';
@@ -26,7 +26,7 @@ function SharkTankChat(): JSX.Element {
   const navigate = useNavigateWithParams();
   const { state: docState, updateCurrentDocId } = useWithState();
   const useWithPanelActivity = useWithPanels();
-  const [link, setLink] = React.useState<string>();
+  const [reference, setReference] = React.useState<Reference>();
 
   const { curDocId } = docState;
   const {
@@ -51,11 +51,7 @@ function SharkTankChat(): JSX.Element {
 
   function onSelectDocument(docId: string): void {
     updateCurrentDocId(docId);
-    setLink(undefined);
-  }
-
-  function onSelectReference(url: string): void {
-    setLink(url);
+    setReference(undefined);
   }
 
   if (!activePanel || !activity) {
@@ -109,8 +105,8 @@ function SharkTankChat(): JSX.Element {
                 margin: 10,
               }}
             >
-              {link ? (
-                <iframe width="100%" height="100%" src={link} />
+              {reference ? (
+                <iframe width="100%" height="100%" src={reference.url} />
               ) : (
                 <UserDocumentDisplay
                   docId={curDocId}
@@ -128,7 +124,10 @@ function SharkTankChat(): JSX.Element {
                 My Documents
               </Button>
               <div />
-              <ReferencesButton onSelectReference={onSelectReference} />
+              <ReferencesButton
+                onSelectReference={setReference}
+                reference={reference}
+              />
             </div>
           </Grid>
           <Grid

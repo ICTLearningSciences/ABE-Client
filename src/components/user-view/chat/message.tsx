@@ -61,19 +61,13 @@ export const FadingText: React.FC<{ strings: string[]; time?: number }> = ({
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (currentStringIndex !== strings.length - 1) {
-        setFadeState('fading-out');
-      }
+      setFadeState('fading-out');
     }, time || 3000); // Change the duration as needed
-
     return () => clearTimeout(timeoutId);
   }, [currentStringIndex]);
 
   useEffect(() => {
-    if (
-      fadeState === 'fading-out' &&
-      currentStringIndex !== strings.length - 1
-    ) {
+    if (fadeState === 'fading-out') {
       const timeoutId = setTimeout(
         () => {
           setCurrentStringIndex(
@@ -83,7 +77,6 @@ export const FadingText: React.FC<{ strings: string[]; time?: number }> = ({
         },
         time ? time / 3 : 1000
       ); // Adjust the delay before fading in the next string
-
       return () => clearTimeout(timeoutId);
     }
   }, [fadeState, strings.length]);

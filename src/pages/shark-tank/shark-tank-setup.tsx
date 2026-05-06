@@ -133,7 +133,10 @@ function SharkTankSetup(): JSX.Element {
           Select an activity and panelists you would like to discuss with
         </Typography>
         {activitiesLoadStatus === LoadStatus.LOADING ? (
-          <CircularProgress size={40} style={{ alignSelf: 'center' }} />
+          <CircularProgress
+            size={40}
+            style={{ alignSelf: 'center', marginTop: 20 }}
+          />
         ) : (
           <Grid container style={{ width: '90%', marginTop: 20 }}>
             <Grid xs={8} style={{ padding: 10 }}>

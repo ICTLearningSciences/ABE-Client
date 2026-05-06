@@ -12,10 +12,12 @@ import { AdminControls } from './admin-controls';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import GoToEducationDashboardButton from './go-to-education-dashboard-button';
 import { UserRole } from '../../store/slices/login';
+import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 
 export function UserInfoSettings(): JSX.Element {
   const { state } = useWithLogin();
   const { state: configState } = useWithConfig();
+  const navigate = useNavigateWithParams();
   const userName = state.user?.name;
   const classroomCode = state.user?.classroomCode;
   const educationalRole = state.user?.educationalRole;
@@ -84,6 +86,14 @@ export function UserInfoSettings(): JSX.Element {
               userId={state.user._id}
               educationalRole={educationalRole}
             />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate('/shark-tank')}
+              fullWidth
+            >
+              Shark Tank Panel
+            </Button>
           </Stack>
         </Paper>
       )}

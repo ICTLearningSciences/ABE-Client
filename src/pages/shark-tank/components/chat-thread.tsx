@@ -24,32 +24,22 @@ export function ChatThread(props: {
   const { activePanel, activePanelist, panelists } = useWithPanels();
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
-  const [mostRecentChatIdx, setMostRecentChatIdx] = useState<number>(-1);
-  const [pingRef, setPingRef] = useState<number>();
+  const [viewedMessages, setViewedMessages] = useState<string[]>([]);
+  const [pingRef, setPingRef] = useState<NodeJS.Timeout>();
 
-  const chatMessages: ChatMessageTypes[] = [
-    ...(props.chatLog || []),
-    ...(coachResponsePending
-      ? [
-          {
-            id: 'pending-message',
-            message: '...',
-            sender: Sender.SYSTEM,
-            displayType: MessageDisplayType.PENDING_MESSAGE,
-          },
-        ]
-      : []),
-  ].filter((m) => {
-    const panelist = panelists.find(
-      (p) =>
-        activePanel?.panelists?.includes(p.clientId) &&
-        p.panelistName === m.systemCustomName
-    );
-    if (panelist) {
-      return !activePanelist || activePanelist.clientId === panelist.clientId;
+  const chatMessages: ChatMessageTypes[] = [...(props.chatLog || [])].filter(
+    (m) => {
+      const panelist = panelists.find(
+        (p) =>
+          activePanel?.panelists?.includes(p.clientId) &&
+          p.panelistName === m.systemCustomName
+      );
+      if (panelist) {
+        return !activePanelist || activePanelist.clientId === panelist.clientId;
+      }
+      return true;
     }
-    return true;
-  });
+  );
 
   function scrollToElementById(id: string) {
     const element = document.getElementById(id);
@@ -59,91 +49,106 @@ export function ChatThread(props: {
   }
 
   async function addMessagesWithDelay() {
-    if (chatMessages.length < mostRecentChatIdx) {
-      setMostRecentChatIdx(0);
-      return;
-    }
-    if (pingRef || mostRecentChatIdx === chatMessages.length - 1) return;
-    setPingRef(1);
-    if (mostRecentChatIdx < chatMessages.length - 1) {
-      const msg = chatMessages[mostRecentChatIdx + 1];
-      setMostRecentChatIdx(mostRecentChatIdx + 1);
-      setTimeout(
-        () => setPingRef(undefined),
-        msg.message.split(' ').length * 100
-      );
+    if (pingRef) return;
+    const unviewedMessage = chatMessages.find(
+      (m) => !viewedMessages.includes(m.id)
+    );
+    if (!unviewedMessage) return;
+    const timeoutId = setTimeout(
+      () => {
+        setPingRef(undefined);
+      },
+      unviewedMessage.message.split(' ').length * 100
+    );
+    setPingRef(timeoutId);
+    setViewedMessages([...viewedMessages, unviewedMessage.id]);
+  }
+
+  function onClickMessage(id: string) {
+    if (!viewedMessages.includes(id)) {
+      setViewedMessages([...viewedMessages, id]);
     }
   }
 
   useEffect(() => {
+    return () => {
+      if (pingRef) {
+        clearTimeout(pingRef);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    addMessagesWithDelay();
+  }, [chatMessages.length, pingRef]);
+
+  useEffect(() => {
     if (messageContainerRef.current) {
-      const msg = chatMessages[mostRecentChatIdx];
+      const msg = chatMessages.find(
+        (m) => m.id === viewedMessages[viewedMessages.length - 1]
+      );
       scrollToElementById(msg?.id || 'message-end-ref');
     }
   }, [messageElements]);
 
   useEffect(() => {
-    const _newMessageElements = [];
-    for (let index = 0; index < chatMessages.length; index++) {
-      const message = chatMessages[index];
-      _newMessageElements.push(
-        <>
-          <Message
-            key={index}
-            message={message}
-            setAiInfoToDisplay={setAiInfoToDisplay}
-            messageIndex={index}
-            latestMessageIndex={mostRecentChatIdx}
-          />
-          {message.mcqChoices && index === chatMessages.length - 1 && (
-            <div
-              key={`mcq-choices-${index}`}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                width: '98%',
-                justifyContent: 'flex-end',
-                alignItems: 'flex-end',
-                margin: '10px',
-              }}
-            >
-              {message.mcqChoices.map((choice: string, i: number) => {
-                return (
-                  <Button
-                    key={i}
-                    variant="outlined"
-                    style={{
-                      marginBottom: '5px',
-                    }}
-                    data-cy={`mcq-choice-${choice.replaceAll(' ', '-')}`}
-                    onClick={() => {
-                      sendMessage({
-                        id: uuidv4(),
-                        message: choice,
-                        sender: Sender.USER,
-                        displayType: MessageDisplayType.TEXT,
-                        userInputType: UserInputType.MCQ,
-                      });
-                      if (message.retryFunction) {
-                        message.retryFunction();
-                      }
-                    }}
-                  >
-                    {choice}
-                  </Button>
-                );
-              })}
-            </div>
-          )}
-        </>
-      );
-    }
+    const _newMessageElements = chatMessages.map(
+      (message: ChatMessageTypes, index: number) => {
+        return (
+          <>
+            <Message
+              key={index}
+              message={message}
+              setAiInfoToDisplay={setAiInfoToDisplay}
+              messageIndex={index}
+              viewed={viewedMessages.includes(message.id)}
+            />
+            {message.mcqChoices && index === chatMessages.length - 1 && (
+              <div
+                key={`mcq-choices-${index}`}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: '98%',
+                  justifyContent: 'flex-end',
+                  alignItems: 'flex-end',
+                  margin: '10px',
+                }}
+              >
+                {message.mcqChoices.map((choice: string, i: number) => {
+                  return (
+                    <Button
+                      key={i}
+                      variant="outlined"
+                      style={{
+                        marginBottom: '5px',
+                      }}
+                      data-cy={`mcq-choice-${choice.replaceAll(' ', '-')}`}
+                      onClick={() => {
+                        sendMessage({
+                          id: uuidv4(),
+                          message: choice,
+                          sender: Sender.USER,
+                          displayType: MessageDisplayType.TEXT,
+                          userInputType: UserInputType.MCQ,
+                        });
+                        if (message.retryFunction) {
+                          message.retryFunction();
+                        }
+                      }}
+                    >
+                      {choice}
+                    </Button>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        );
+      }
+    );
     setMessageElements(_newMessageElements);
-  }, [chatMessages.length, mostRecentChatIdx]);
-
-  useEffect(() => {
-    addMessagesWithDelay();
-  }, [chatMessages.length, mostRecentChatIdx]);
+  }, [chatMessages.length, viewedMessages]);
 
   return (
     <div
@@ -165,6 +170,20 @@ export function ChatThread(props: {
       }}
     >
       {messageElements}
+      {coachResponsePending && (
+        <Message
+          key={chatMessages.length}
+          message={{
+            id: 'pending-message',
+            message: '...',
+            sender: Sender.SYSTEM,
+            displayType: MessageDisplayType.PENDING_MESSAGE,
+          }}
+          setAiInfoToDisplay={setAiInfoToDisplay}
+          messageIndex={chatMessages.length}
+          onClicked={onClickMessage}
+        />
+      )}
       <div id="message-end-ref" />
     </div>
   );
