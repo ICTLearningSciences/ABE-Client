@@ -26,7 +26,7 @@ export function useWithBuiltActivityHandler(
   editDocGoal: () => void,
   selectedActivityBuilder?: ActivityBuilder
 ) {
-  const { activePanelist } = useWithPanels();
+  const { activePanelist, setActivePanelist } = useWithPanels();
   const { sendMessage, clearChatLog, coachResponsePending } = useWithChat();
   const { state, updateSessionIntention, newSession } = useWithState();
   const curDocId = state.curDocId;
@@ -49,7 +49,6 @@ export function useWithBuiltActivityHandler(
   const navigate = useNavigateWithParams();
   const [builtActivityHandler, setBuiltActivityHandler] =
     useState<BuiltActivityHandler>();
-  const [filteredPanelistIds, setFilteredPanelistIds] = useState<string[]>([]);
   const updatesFound = !equals(
     selectedActivityBuilder,
     builtActivityHandler?.builtActivityData
@@ -64,6 +63,10 @@ export function useWithBuiltActivityHandler(
 
   useEffect(() => {
     if (!curDocId) {
+      if (builtActivityHandler) {
+        builtActivityHandler.resetActivity();
+        setBuiltActivityHandler(undefined);
+      }
       //hack to ensure that sendMessageHelper is fully loaded with googleDocId
       return;
     }
@@ -105,7 +108,7 @@ export function useWithBuiltActivityHandler(
         selectedActivityBuilder,
         attachedPanel,
         attachedPanelists,
-        setFilteredPanelistIds
+        onFilteredPanelistsChanged
       );
       setInitialize(newActivityHandler);
     } else if (
@@ -129,6 +132,7 @@ export function useWithBuiltActivityHandler(
       initialize.initializeActivity();
       setBuiltActivityHandler(initialize);
       addNewSubscriber(initialize);
+      setInitialize(undefined);
     }
   }, [initialize]);
 
@@ -142,13 +146,9 @@ export function useWithBuiltActivityHandler(
 
   useEffect(() => {
     if (builtActivityHandler) {
-      const attachedPanel = builtActivityHandler.activityPanel;
-      const attachedPanelists = attachedPanel
-        ? panelists.filter((p) => attachedPanel.panelists.includes(p.clientId))
-        : undefined;
-      builtActivityHandler.activityPanelists = activePanelist
-        ? [activePanelist]
-        : attachedPanelists;
+      builtActivityHandler.filteredToPanelists = activePanelist
+        ? [activePanelist.clientId]
+        : [];
     }
   }, [activePanelist]);
 
@@ -188,8 +188,15 @@ export function useWithBuiltActivityHandler(
     });
   }
 
+  function onFilteredPanelistsChanged(filteredPanelistIds: string[]): void {
+    if (filteredPanelistIds.length > 0) {
+      setActivePanelist(filteredPanelistIds[0]);
+    } else {
+      setActivePanelist(undefined);
+    }
+  }
+
   return {
     activityReady: Boolean(builtActivityHandler),
-    filteredPanelistIds,
   };
 }

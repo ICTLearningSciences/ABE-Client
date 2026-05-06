@@ -17,7 +17,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  MenuItem,
   Typography,
 } from '@mui/material';
 import {
@@ -29,30 +28,26 @@ import {
   PeopleOutlined,
   Person,
   PlayCircleOutlineOutlined,
-  Search,
 } from '@mui/icons-material';
 
 import { CssCard, CssTextField } from './components';
 import { Header } from './components/header';
-import ToggleAgentMode from './components/toggle-mode';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 import { useAppSelector } from '../../store/hooks';
 import { useWithPanels } from '../../store/slices/panels/use-with-panels';
+import { LoadStatus } from '../../store/slices/doc-goals-activities';
 import withAuthorizationOnly from './wrap-with-authorization-only';
 
 import './shark-tank.css';
-import { LoadStatus } from '../../store/slices/doc-goals-activities';
 
 function SharkTankSetup(): JSX.Element {
   const {
-    useSearch,
     usePanelMode,
     activity,
     activePanel,
     activePanelist,
     panels,
     panelists,
-    updateSearch,
     setActivity,
     setActivePanel,
     setActivePanelist,
@@ -67,7 +62,7 @@ function SharkTankSetup(): JSX.Element {
 
   React.useEffect(() => {
     if (!activity && activities.length > 0) {
-      setActivity(activities[0]._id);
+      setActivity(activities[activities.length - 1]._id);
     }
   }, [activities]);
 
@@ -137,111 +132,102 @@ function SharkTankSetup(): JSX.Element {
         <Typography color="secondary">
           Select an activity and panelists you would like to discuss with
         </Typography>
-
-        <Grid container style={{ width: '90%', marginTop: 20 }}>
-          <Grid xs={8} style={{ padding: 10 }}>
-            <CssCard title="Panel Name" icon={<InfoOutlined />}>
-              <CssTextField value={activePanel?.panelName} />
-            </CssCard>
-            <CssCard title="Description" icon={<DescriptionOutlined />}>
-              <CssTextField value={activePanel?.panelDescription} multiline />
-            </CssCard>
-            <CssCard
-              title="Panelists"
-              icon={<PeopleOutlined />}
-              headerButton={<ToggleAgentMode />}
-            >
-              {!usePanelMode && (
-                <Typography color="secondary" style={{ textAlign: 'center' }}>
-                  Which panelists do you wish to speak to?
-                </Typography>
-              )}
-              <FlipMove className="column spacing">
-                {activePanel?.panelists?.map((p, i) => (
-                  <PanelMemberItem key={p} {...panelists[i]} />
-                ))}
-              </FlipMove>
-            </CssCard>
-            <Button
-              variant="contained"
-              fullWidth
-              startIcon={<PlayCircleOutlineOutlined />}
-              onClick={startSession}
-              disabled={!usePanelMode && !activePanelist}
-            >
-              Start Session
-            </Button>
-          </Grid>
-
-          <Grid xs={4} style={{ padding: 10 }}>
-            <CssCard alt title="Use Web Search" icon={<Search />}>
-              <CssTextField
-                select
-                value={useSearch ? 'true' : 'false'}
-                onChange={(e) => updateSearch(e.target.value)}
+        {activitiesLoadStatus === LoadStatus.LOADING ? (
+          <CircularProgress size={40} style={{ alignSelf: 'center' }} />
+        ) : (
+          <Grid container style={{ width: '90%', marginTop: 20 }}>
+            <Grid xs={8} style={{ padding: 10 }}>
+              <CssCard title="Panel Name" icon={<InfoOutlined />}>
+                <CssTextField value={activePanel?.panelName} />
+              </CssCard>
+              <CssCard title="Description" icon={<DescriptionOutlined />}>
+                <CssTextField value={activePanel?.panelDescription} multiline />
+              </CssCard>
+              <CssCard title="Panelists" icon={<PeopleOutlined />}>
+                <FlipMove className="column spacing">
+                  {activePanel?.panelists?.map((p, i) => (
+                    <PanelMemberItem key={p} {...panelists[i]} />
+                  ))}
+                </FlipMove>
+              </CssCard>
+              <Button
+                variant="contained"
+                fullWidth
+                startIcon={<PlayCircleOutlineOutlined />}
+                onClick={startSession}
+                disabled={!usePanelMode && !activePanelist}
               >
-                <MenuItem value="true">Yes</MenuItem>
-                <MenuItem value="false">No</MenuItem>
-              </CssTextField>
-            </CssCard>
-            <CssCard alt title="Select Activity" icon={<ListAlt />}>
-              <List className="column spacing">
-                {activitiesLoadStatus === LoadStatus.LOADING && (
-                  <CircularProgress style={{ alignSelf: 'center' }} />
-                )}
-                {activities.map((a) => {
-                  const panel = panels.find(
-                    (p) => p.clientId === a.attachedPanel
-                  );
-                  if (!panel) return <></>;
-                  return (
-                    <motion.div
-                      id={a._id}
-                      key={a._id}
-                      whileHover={{ scale: 1.01, filter: 'brightness(1.1)' }}
-                      className="box column spacing"
-                      style={{
-                        backgroundColor: 'rgb(100, 100, 100)',
-                      }}
-                    >
-                      <div
-                        className="row"
-                        style={{ justifyContent: 'space-between' }}
-                      >
-                        <Typography
-                          color="secondary"
-                          style={{ fontWeight: 'bold' }}
-                        >
-                          {a.title}
-                        </Typography>
-                        <div className="row center-div">
-                          <PeopleOutlined />
-                          <Typography style={{ fontSize: 12, marginLeft: 5 }}>
-                            {panel?.panelists.length || 0}
-                          </Typography>
-                        </div>
-                      </div>
-                      <Typography>{a.description}</Typography>
-                      <Typography variant="subtitle2">
-                        Panel: {panel.panelName}
-                      </Typography>
-                      <Button
-                        variant="contained"
-                        onClick={() => {
-                          setActivity(a._id);
-                          setActivePanel(panel.clientId);
+                Start Session
+              </Button>
+            </Grid>
+
+            <Grid xs={4} style={{ padding: 10 }}>
+              {/* <CssCard alt title="Use Web Search" icon={<Search />}>
+                <CssTextField
+                  select
+                  value={useSearch ? 'true' : 'false'}
+                  onChange={(e) => updateSearch(e.target.value)}
+                >
+                  <MenuItem value="true">Yes</MenuItem>
+                  <MenuItem value="false">No</MenuItem>
+                </CssTextField>
+              </CssCard> */}
+              <CssCard alt title="Select Activity" icon={<ListAlt />}>
+                <List className="column spacing">
+                  {activities.map((a) => {
+                    const panel = panels.find(
+                      (p) => p.clientId === a.attachedPanel
+                    );
+                    if (!panel) return <></>;
+                    return (
+                      <motion.div
+                        id={a._id}
+                        key={a._id}
+                        whileHover={{ scale: 1.01, filter: 'brightness(1.1)' }}
+                        className="box column spacing"
+                        style={{
+                          backgroundColor: 'rgb(100, 100, 100)',
                         }}
-                        disabled={activity?._id === a._id}
                       >
-                        {activity?._id === a._id ? 'Selected' : 'Select'}
-                      </Button>
-                    </motion.div>
-                  );
-                })}
-              </List>
-            </CssCard>
+                        <div
+                          className="row"
+                          style={{ justifyContent: 'space-between' }}
+                        >
+                          <Typography
+                            color="secondary"
+                            style={{ fontWeight: 'bold' }}
+                          >
+                            {a.title}
+                          </Typography>
+                          <div className="row center-div">
+                            <PeopleOutlined />
+                            <Typography style={{ fontSize: 12, marginLeft: 5 }}>
+                              {panel?.panelists.length || 0}
+                            </Typography>
+                          </div>
+                        </div>
+                        <Typography>{a.description}</Typography>
+                        <Typography variant="subtitle2">
+                          Panel: {panel.panelName}
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          onClick={() => {
+                            setActivity(a._id);
+                            setActivePanel(panel.clientId);
+                          }}
+                          disabled={activity?._id === a._id}
+                        >
+                          {activity?._id === a._id ? 'Selected' : 'Select'}
+                        </Button>
+                      </motion.div>
+                    );
+                  })}
+                </List>
+              </CssCard>
+            </Grid>
           </Grid>
-        </Grid>
+        )}
       </div>
     </main>
   );

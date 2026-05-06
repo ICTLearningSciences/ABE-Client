@@ -1,6 +1,6 @@
 import React from 'react';
-import { ForumOutlined, Construction, Replay } from '@mui/icons-material';
-import { Typography, Button, Menu, MenuItem } from '@mui/material';
+import { Construction, Replay } from '@mui/icons-material';
+import { Typography, Button, Menu, MenuItem, IconButton } from '@mui/material';
 import { ActivityTypes } from '../../../types';
 import { useAppSelector } from '../../../store/hooks';
 
@@ -37,15 +37,10 @@ export function ChatHeader(props: {
         padding: 10,
       }}
     >
-      <ForumOutlined color="primary" />
+      <IconButton color="primary" onClick={handleClick}>
+        <Construction />
+      </IconButton>
       <Typography style={{ flexGrow: 1 }}>{selectedActivity?.title}</Typography>
-      <Button
-        variant="contained"
-        startIcon={<Construction />}
-        onClick={handleClick}
-      >
-        Activity
-      </Button>
       <Button variant="outlined" startIcon={<Replay />} onClick={props.onReset}>
         Reset
       </Button>

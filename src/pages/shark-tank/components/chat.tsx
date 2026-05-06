@@ -88,7 +88,7 @@ export function Chat(props: {
       }}
     >
       <GlobalChatStyles />
-      {builtActivityReady ? (
+      {curDocId && builtActivityReady ? (
         <>
           <div
             data-cy="chat-box"

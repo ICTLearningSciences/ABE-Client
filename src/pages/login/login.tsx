@@ -89,6 +89,7 @@ export default function Login(props: {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: 'white',
       }}
     >
       <LoginUI

@@ -13,6 +13,7 @@ import PanelistCard from './components/panelist-card';
 import UserDocumentDisplay from './components/doc-display';
 import { Header } from './components/header';
 import { Chat } from './components/chat';
+import { ReferencesButton } from './components/references-button';
 import { useWithState } from '../../exported-files';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 import { useWithPanels } from '../../store/slices/panels/use-with-panels';
@@ -25,6 +26,7 @@ function SharkTankChat(): JSX.Element {
   const navigate = useNavigateWithParams();
   const { state: docState, updateCurrentDocId } = useWithState();
   const useWithPanelActivity = useWithPanels();
+  const [link, setLink] = React.useState<string>();
 
   const { curDocId } = docState;
   const {
@@ -47,6 +49,15 @@ function SharkTankChat(): JSX.Element {
     }
   }
 
+  function onSelectDocument(docId: string): void {
+    updateCurrentDocId(docId);
+    setLink(undefined);
+  }
+
+  function onSelectReference(url: string): void {
+    setLink(url);
+  }
+
   if (!activePanel || !activity) {
     navigate('/shark-tank');
     return <></>;
@@ -58,7 +69,7 @@ function SharkTankChat(): JSX.Element {
       <div className="page">
         <Grid container style={{ width: '100%', height: '100%' }}>
           <Grid
-            xs={curDocId ? 8 : 12}
+            xs={8}
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -75,7 +86,6 @@ function SharkTankChat(): JSX.Element {
                   'linear-gradient(90deg,rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 100%)', // "rgba(0, 0, 0, 0.3)",
                 width: '100%',
                 maxWidth: '100%',
-                display: curDocId ? '' : 'none',
               }}
             >
               {activePanel.panelists.map((m) => {
@@ -99,37 +109,39 @@ function SharkTankChat(): JSX.Element {
                 margin: 10,
               }}
             >
-              <UserDocumentDisplay
-                docId={curDocId}
-                activityId={activity?._id}
-                onOpenDoc={updateCurrentDocId}
-              />
+              {link ? (
+                <iframe width="100%" height="100%" src={link} />
+              ) : (
+                <UserDocumentDisplay
+                  docId={curDocId}
+                  activityId={activity?._id}
+                  onOpenDoc={(id) => updateCurrentDocId(id)}
+                />
+              )}
             </div>
             <div className="row spacing center-div" style={{ padding: 20 }}>
               <Button
                 variant="contained"
-                disabled={!curDocId}
                 startIcon={<TextSnippet />}
-                onClick={() => updateCurrentDocId('')}
+                onClick={() => onSelectDocument('')}
               >
                 My Documents
               </Button>
               <div />
+              <ReferencesButton onSelectReference={onSelectReference} />
             </div>
           </Grid>
-          {curDocId && (
-            <Grid
-              xs={4}
-              style={{ height: '100%', paddingRight: 20, paddingLeft: 20 }}
-            >
-              <Chat
-                selectedActivity={activity}
-                setSelectedActivity={(activity) => {
-                  setActivity(activity._id);
-                }}
-              />
-            </Grid>
-          )}
+          <Grid
+            xs={4}
+            style={{ height: '100%', paddingRight: 20, paddingLeft: 20 }}
+          >
+            <Chat
+              selectedActivity={activity}
+              setSelectedActivity={(activity) => {
+                setActivity(activity._id);
+              }}
+            />
+          </Grid>
         </Grid>
       </div>
     </main>

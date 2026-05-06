@@ -101,6 +101,7 @@ export function useWithPanels(): UseWithPanels {
 
   function setActivePanel(id: string): void {
     dispatch(panelApis.setActivePanel(id));
+    setActivePanelist(undefined);
   }
 
   function setActivePanelist(id?: string): void {

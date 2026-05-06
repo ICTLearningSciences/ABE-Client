@@ -11,6 +11,7 @@ import {
 } from '../../../store/slices/chat';
 import Message from './message';
 import { v4 as uuidv4 } from 'uuid';
+import { useWithPanels } from '../../../store/slices/panels/use-with-panels';
 
 export function ChatThread(props: {
   coachResponsePending: boolean;
@@ -20,13 +21,14 @@ export function ChatThread(props: {
   sendMessage: (message: ChatMessageTypes) => void;
 }): JSX.Element {
   const { coachResponsePending, setAiInfoToDisplay, sendMessage } = props;
+  const { activePanel, activePanelist, panelists } = useWithPanels();
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
   const [mostRecentChatIdx, setMostRecentChatIdx] = useState<number>(-1);
   const [pingRef, setPingRef] = useState<number>();
 
   const chatMessages: ChatMessageTypes[] = [
-    ...props.chatLog,
+    ...(props.chatLog || []),
     ...(coachResponsePending
       ? [
           {
@@ -37,7 +39,17 @@ export function ChatThread(props: {
           },
         ]
       : []),
-  ];
+  ].filter((m) => {
+    const panelist = panelists.find(
+      (p) =>
+        activePanel?.panelists?.includes(p.clientId) &&
+        p.panelistName === m.systemCustomName
+    );
+    if (panelist) {
+      return !activePanelist || activePanelist.clientId === panelist.clientId;
+    }
+    return true;
+  });
 
   function scrollToElementById(id: string) {
     const element = document.getElementById(id);
@@ -131,7 +143,7 @@ export function ChatThread(props: {
 
   useEffect(() => {
     addMessagesWithDelay();
-  }, [chatMessages.length, pingRef]);
+  }, [chatMessages.length, mostRecentChatIdx]);
 
   return (
     <div

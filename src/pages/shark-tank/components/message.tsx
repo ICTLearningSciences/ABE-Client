@@ -1,84 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { Avatar, Button, Paper, Typography } from '@mui/material';
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import rehypeRaw from 'rehype-raw';
+import { Avatar, Paper, Typography } from '@mui/material';
 import {
   ChatMessageTypes,
   MessageDisplayType,
   Sender,
 } from '../../../store/slices/chat';
-import { useAppSelector } from '../../../store/hooks';
-import { UserRole } from '../../../store/slices/login';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
-import { StyledFadingText } from '../../../components/user-view/chat/message-styles';
 import { useWithPanels } from '../../../store/slices/panels/use-with-panels';
 import { stringAvatar, stringToColor } from '../helpers';
-import BaseMessage from '../../../components/user-view/chat/message';
-
-function DisplayOpenAiInfoButton(props: {
-  chatMessage: ChatMessageTypes;
-  setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
-}): JSX.Element {
-  const { chatMessage, setAiInfoToDisplay } = props;
-  const userRole = useAppSelector((state) => state.login.userRole);
-  const showAdvancedOptions = useAppSelector(
-    (state) => state.state.viewingAdvancedOptions
-  );
-  const isAdmin = userRole === UserRole.ADMIN;
-  if (!chatMessage.aiServiceStepData || !isAdmin || !showAdvancedOptions) {
-    return <></>;
-  }
-  return (
-    <Button
-      onClick={() => {
-        setAiInfoToDisplay(chatMessage.aiServiceStepData);
-      }}
-    >
-      AI Request Info
-    </Button>
-  );
-}
-
-const FadingText: React.FC<{ strings: string[]; time?: number }> = ({
-  strings,
-  time,
-}) => {
-  const [currentStringIndex, setCurrentStringIndex] = useState(0);
-  const [fadeState, setFadeState] = useState<'fading-out' | 'fading-in'>(
-    'fading-in'
-  );
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (currentStringIndex !== strings.length - 1) {
-        setFadeState('fading-out');
-      }
-    }, time || 3000); // Change the duration as needed
-
-    return () => clearTimeout(timeoutId);
-  }, [currentStringIndex]);
-
-  useEffect(() => {
-    if (
-      fadeState === 'fading-out' &&
-      currentStringIndex !== strings.length - 1
-    ) {
-      const timeoutId = setTimeout(() => {
-        setCurrentStringIndex((prevIndex) => (prevIndex + 1) % strings.length);
-        setFadeState('fading-in');
-      }, 1000); // Adjust the delay before fading in the next string
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [fadeState, strings.length]);
-
-  return (
-    <StyledFadingText
-      isFadingIn={fadeState === 'fading-in'}
-      isFadingOut={fadeState === 'fading-out'}
-    >
-      {strings[currentStringIndex]}
-    </StyledFadingText>
-  );
-};
+import BaseMessage, {
+  DisplayOpenAiInfoButton,
+  FadingText,
+} from '../../../components/user-view/chat/message';
 
 export default function Message(props: {
   message: ChatMessageTypes;
@@ -86,7 +22,7 @@ export default function Message(props: {
   latestMessageIndex: number;
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
 }): JSX.Element {
-  const { activePanel, activePanelist, panelists } = useWithPanels();
+  const { activePanel, panelists } = useWithPanels();
   const { message, messageIndex, setAiInfoToDisplay } = props;
 
   const panelist = panelists.find(
@@ -117,7 +53,7 @@ export default function Message(props: {
         message={message}
         setAiInfoToDisplay={setAiInfoToDisplay}
         messageIndex={messageIndex}
-        displayMarkdown={false}
+        displayMarkdown={true}
       />
     );
   }
@@ -126,10 +62,6 @@ export default function Message(props: {
       <div
         id={message.id}
         style={{
-          display:
-            activePanelist && activePanelist.clientId !== panelist.clientId
-              ? 'none'
-              : '',
           position: 'relative',
           margin: 10,
         }}
@@ -139,8 +71,7 @@ export default function Message(props: {
         >
           <FadingText
             strings={[
-              `${panelist.panelistName} is responding.`,
-              `${panelist.panelistName} is responding..`,
+              `${panelist.panelistName} is thinking...`,
               `${panelist.panelistName} is responding...`,
             ]}
             time={1000}
@@ -153,10 +84,6 @@ export default function Message(props: {
     <div
       id={message.id}
       style={{
-        display:
-          activePanelist && activePanelist.clientId !== panelist.clientId
-            ? 'none'
-            : '',
         position: 'relative',
         margin: 10,
       }}
@@ -208,14 +135,91 @@ export default function Message(props: {
             color: 'black',
           }}
         >
-          {message.displayType === MessageDisplayType.TEXT
-            ? formatMessage(message.message).trim()
-            : ''}
-          {message.displayType === MessageDisplayType.PENDING_MESSAGE && (
-            <FadingText
-              strings={['Reading...', 'Analyzing...', 'Getting opinionated...']}
-            />
-          )}
+          <ReactMarkdown
+            remarkPlugins={[remarkBreaks]}
+            rehypePlugins={[rehypeRaw]}
+            components={{
+              h1: ({ children }) => (
+                <h1
+                  style={{ marginTop: '0', marginBottom: '0', lineHeight: '1' }}
+                >
+                  {children}
+                </h1>
+              ),
+              h2: ({ children }) => (
+                <h2 style={{ marginTop: '0', marginBottom: '0' }}>
+                  {children}
+                </h2>
+              ),
+              h3: ({ children }) => (
+                <h3 style={{ marginTop: '0', marginBottom: '0' }}>
+                  {children}
+                </h3>
+              ),
+              h4: ({ children }) => (
+                <h4 style={{ marginTop: '0', marginBottom: '0' }}>
+                  {children}
+                </h4>
+              ),
+              h5: ({ children }) => (
+                <h5 style={{ marginTop: '0', marginBottom: '0' }}>
+                  {children}
+                </h5>
+              ),
+              h6: ({ children }) => (
+                <h6 style={{ marginTop: '0', marginBottom: '0' }}>
+                  {children}
+                </h6>
+              ),
+              p: ({ children }) => (
+                <p
+                  style={{ marginTop: '0', marginBottom: '0', lineHeight: '1' }}
+                >
+                  {children}
+                </p>
+              ),
+              li: ({ children }) => (
+                <li
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    marginTop: '0',
+                    marginBottom: '0',
+                  }}
+                >
+                  {children}
+                </li>
+              ),
+              ul: ({ children }) => (
+                <ul
+                  style={{
+                    marginTop: '0',
+                    marginBottom: '0',
+                    lineHeight: '1',
+                    paddingLeft: '10px',
+                  }}
+                >
+                  {children}
+                </ul>
+              ),
+              ol: ({ children }) => (
+                <ol
+                  style={{
+                    marginTop: '0',
+                    marginBottom: '0',
+                    lineHeight: '1',
+                    paddingLeft: '10px',
+                  }}
+                >
+                  {children}
+                </ol>
+              ),
+            }}
+          >
+            {message.displayType === MessageDisplayType.TEXT
+              ? formatMessage(message.message).trim()
+              : ''}
+          </ReactMarkdown>
         </pre>
       </Paper>
       <DisplayOpenAiInfoButton
