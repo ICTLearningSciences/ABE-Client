@@ -9,15 +9,14 @@ import * as React from 'react';
 import { Button, Grid } from '@mui/material';
 import { TextSnippet } from '@mui/icons-material';
 
-import PanelistCard from './components/panelist-card';
 import UserDocumentDisplay from './components/doc-display';
 import { Header } from './components/header';
 import { Chat } from './components/chat';
 import { ReferencesButton } from './components/references-button';
+import { ChatPanelists } from './components/chat-panelists';
 import { useWithState } from '../../exported-files';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 import { useWithPanels } from '../../store/slices/panels/use-with-panels';
-import { Panelist } from '../../store/slices/panels/types';
 import withAuthorizationOnly from './wrap-with-authorization-only';
 import { Source } from '../../ai-services/ai-service-types';
 
@@ -30,25 +29,7 @@ function SharkTankChat(): JSX.Element {
   const [reference, setReference] = React.useState<Source>();
 
   const { curDocId } = docState;
-  const {
-    activity,
-    activePanel,
-    activePanelist,
-    panelists,
-    setPanelMode,
-    setActivity,
-    setActivePanelist,
-  } = useWithPanelActivity;
-
-  function onMemberClick(m: Panelist): void {
-    if (activePanelist?.clientId === m.clientId) {
-      setPanelMode(true);
-      setActivePanelist(undefined);
-    } else {
-      setPanelMode(false);
-      setActivePanelist(m.clientId);
-    }
-  }
+  const { activity, activePanel, setActivity } = useWithPanelActivity;
 
   function onSelectDocument(docId: string): void {
     updateCurrentDocId(docId);
@@ -73,31 +54,7 @@ function SharkTankChat(): JSX.Element {
               height: '100%',
             }}
           >
-            <div
-              className="row spacing center-div"
-              style={{
-                overflowX: 'auto',
-                paddingTop: 10,
-                paddingBottom: 10,
-                backgroundImage:
-                  'linear-gradient(90deg,rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 100%)', // "rgba(0, 0, 0, 0.3)",
-                width: '100%',
-                maxWidth: '100%',
-              }}
-            >
-              {activePanel.panelists.map((m) => {
-                const panelist = panelists.find((p) => p.clientId === m);
-                if (!panelist) return <></>;
-                return (
-                  <PanelistCard
-                    key={m}
-                    p={panelist}
-                    isActive={!activePanelist || activePanelist.clientId === m}
-                    onMemberClick={onMemberClick}
-                  />
-                );
-              })}
-            </div>
+            <ChatPanelists useWithPanelActivity={useWithPanelActivity} />
             <div
               className="column center-div"
               style={{
@@ -118,7 +75,7 @@ function SharkTankChat(): JSX.Element {
             </div>
             <div className="row spacing center-div" style={{ padding: 20 }}>
               <Button
-                variant="contained"
+                variant={reference ? 'outlined' : 'contained'}
                 startIcon={<TextSnippet />}
                 onClick={() => onSelectDocument('')}
               >

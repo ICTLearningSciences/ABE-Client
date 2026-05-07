@@ -51,9 +51,10 @@ export function ReferencesButton(props: {
   return (
     <div>
       <Button
-        variant="contained"
+        variant={props.reference ? 'contained' : 'outlined'}
         startIcon={<Pageview />}
         onClick={handleClick}
+        disabled={sources.length === 0}
       >
         References
       </Button>
