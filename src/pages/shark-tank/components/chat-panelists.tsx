@@ -29,7 +29,6 @@ export function ChatPanelists(props: {
     <div
       className="row center-div"
       style={{
-        padding: 10,
         backgroundImage:
           'linear-gradient(90deg,rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 100%)',
         overflow: 'hidden',
@@ -37,7 +36,7 @@ export function ChatPanelists(props: {
     >
       <div
         className="row spacing"
-        style={{ overflowX: 'auto', overflowY: 'hidden' }}
+        style={{ overflowX: 'auto', overflowY: 'hidden', padding: 10 }}
       >
         {activePanel?.panelists.map((m) => {
           const panelist = panelists.find((p) => p.clientId === m);

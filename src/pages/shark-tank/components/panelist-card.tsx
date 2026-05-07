@@ -24,8 +24,8 @@ export default function PanelistCard(props: {
     >
       <Card
         style={{
-          height: 160,
-          width: 256,
+          height: 80,
+          width: 128,
           position: 'relative',
           borderWidth: 5,
           borderStyle: 'solid',
@@ -34,7 +34,7 @@ export default function PanelistCard(props: {
           opacity: !props.isActive ? 0.25 : 1,
         }}
       >
-        <CardMedia component="img" height="160" image={p.profilePicture} />
+        <CardMedia component="img" image={p.profilePicture} />
         <div
           className="row"
           style={{
