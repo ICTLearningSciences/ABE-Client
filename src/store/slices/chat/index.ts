@@ -6,7 +6,10 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Activity, DocGoal } from '../../../types';
-import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
+import {
+  AiServiceStepDataTypes,
+  Source,
+} from '../../../ai-services/ai-service-types';
 
 export enum Sender {
   USER = 'USER',
@@ -49,6 +52,7 @@ export interface PendingMessage extends ChatMessage {
 
 export interface TextMessage extends ChatMessage {
   message: string;
+  sources?: Source[];
 }
 
 export interface BulletPointMessage extends ChatMessage {

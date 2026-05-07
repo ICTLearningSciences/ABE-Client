@@ -65,6 +65,11 @@ export default function Message(props: {
           position: 'relative',
           margin: 10,
         }}
+        onClick={() => {
+          if (props.onClicked) {
+            props.onClicked(message.id);
+          }
+        }}
       >
         <Typography
           style={{ fontSize: 12, color: stringToColor(panelist.panelistName) }}

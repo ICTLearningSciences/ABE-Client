@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 import {
   AiServicesResponseTypes,
   AiServiceStepDataTypes,
+  Source,
 } from '../../ai-services/ai-service-types';
 import {
   ActivityBuilder,
@@ -703,6 +704,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       | {
           type: 'text';
           message: string;
+          sources?: Source[];
           aiServiceStepData: AiServiceStepDataTypes[];
           originalConfiguration: SinglePromptConfiguration;
           panelistClientId?: string;
@@ -790,6 +792,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           this.sendMessage({
             id: uuidv4(),
             message: result.value.message,
+            sources: result.value.sources,
             aiServiceStepData: result.value.aiServiceStepData,
             sender: Sender.SYSTEM,
             systemCustomName:
@@ -832,6 +835,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     | {
         type: 'text';
         message: string;
+        sources?: Source[];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         aiServiceStepData: any;
         originalConfiguration: SinglePromptConfiguration;
@@ -927,6 +931,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     | {
         type: 'text';
         message: string;
+        sources?: Source[];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         aiServiceStepData: any;
         originalConfiguration: SinglePromptConfiguration;
@@ -1027,7 +1032,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       config,
       config.jsonResponseData
     );
-
     // Add panelist information to the result
     if (result.type === 'json') {
       return {
@@ -1037,6 +1041,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     } else {
       return {
         ...result,
+        sources: result.sources,
         panelistClientId: panelist.clientId,
         panelistName: panelist.panelistName,
       };
@@ -1057,6 +1062,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     | {
         type: 'text';
         message: string;
+        sources?: Source[];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         aiServiceStepData: any;
         originalConfiguration: SinglePromptConfiguration;
@@ -1068,7 +1074,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       try {
         const _response = await this.executePrompt(aiPromptSteps);
         const response = _response.answer;
-
         if (outputDataType === PromptOutputTypes.JSON) {
           // Validate and parse JSON response
           if (!isJsonString(response)) {
@@ -1091,6 +1096,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           return {
             type: 'text',
             message: response,
+            sources: _response.sources,
             aiServiceStepData: _response.aiAllStepsData,
             originalConfiguration: originalConfiguration,
           };

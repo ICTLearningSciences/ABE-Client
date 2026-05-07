@@ -13,12 +13,13 @@ import PanelistCard from './components/panelist-card';
 import UserDocumentDisplay from './components/doc-display';
 import { Header } from './components/header';
 import { Chat } from './components/chat';
-import { Reference, ReferencesButton } from './components/references-button';
+import { ReferencesButton } from './components/references-button';
 import { useWithState } from '../../exported-files';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 import { useWithPanels } from '../../store/slices/panels/use-with-panels';
 import { Panelist } from '../../store/slices/panels/types';
 import withAuthorizationOnly from './wrap-with-authorization-only';
+import { Source } from '../../ai-services/ai-service-types';
 
 import './shark-tank.css';
 
@@ -26,7 +27,7 @@ function SharkTankChat(): JSX.Element {
   const navigate = useNavigateWithParams();
   const { state: docState, updateCurrentDocId } = useWithState();
   const useWithPanelActivity = useWithPanels();
-  const [reference, setReference] = React.useState<Reference>();
+  const [reference, setReference] = React.useState<Source>();
 
   const { curDocId } = docState;
   const {

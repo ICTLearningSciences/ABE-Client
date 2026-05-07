@@ -10,6 +10,7 @@ import { GeminiStepDataType } from './gemini-ai-service';
 import { OpenAiStepDataType } from './open-ai-service';
 import { SageStepDataType } from './ask-sage-service';
 import { AnthropicStepDataType } from './anthropic-ai-service';
+
 export interface AiStepData<ReqType, ResType> {
   aiServiceRequestParams: ReqType;
   aiServiceResponse: ResType;
@@ -20,9 +21,16 @@ export interface AiStepData<ReqType, ResType> {
   };
 }
 
+export interface Source {
+  title: string;
+  fileName: string;
+  url: string;
+}
+
 export interface AiResponseType<AiStepDataType> {
   aiAllStepsData: AiStepDataType[];
   answer: string;
+  sources?: Source[];
 }
 
 export interface AiJobStatusType<ServiceResponseType> {
