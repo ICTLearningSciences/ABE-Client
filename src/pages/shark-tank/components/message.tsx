@@ -80,7 +80,6 @@ export default function Message(props: {
               `${panelist.panelistName} is typing...`,
               `${panelist.panelistName} is responding...`,
             ]}
-            time={1000}
           />
         </Typography>
       </div>
