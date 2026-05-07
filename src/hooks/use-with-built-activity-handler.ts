@@ -26,6 +26,7 @@ export function useWithBuiltActivityHandler(
   editDocGoal: () => void,
   selectedActivityBuilder?: ActivityBuilder
 ) {
+  const { activePanelist, setActivePanelist } = useWithPanels();
   const { sendMessage, clearChatLog, coachResponsePending } = useWithChat();
   const { state, updateSessionIntention, newSession } = useWithState();
   const curDocId = state.curDocId;
@@ -48,11 +49,11 @@ export function useWithBuiltActivityHandler(
   const navigate = useNavigateWithParams();
   const [builtActivityHandler, setBuiltActivityHandler] =
     useState<BuiltActivityHandler>();
-  const [filteredPanelistIds, setFilteredPanelistIds] = useState<string[]>([]);
   const updatesFound = !equals(
     selectedActivityBuilder,
     builtActivityHandler?.builtActivityData
   );
+  const [initialize, setInitialize] = useState<BuiltActivityHandler>();
 
   useEffect(() => {
     if (builtActivityHandler) {
@@ -62,6 +63,10 @@ export function useWithBuiltActivityHandler(
 
   useEffect(() => {
     if (!curDocId) {
+      if (builtActivityHandler) {
+        builtActivityHandler.resetActivity();
+        setBuiltActivityHandler(undefined);
+      }
       //hack to ensure that sendMessageHelper is fully loaded with googleDocId
       return;
     }
@@ -103,11 +108,9 @@ export function useWithBuiltActivityHandler(
         selectedActivityBuilder,
         attachedPanel,
         attachedPanelists,
-        setFilteredPanelistIds
+        onFilteredPanelistsChanged
       );
-      newActivityHandler.initializeActivity();
-      setBuiltActivityHandler(newActivityHandler);
-      addNewSubscriber(newActivityHandler);
+      setInitialize(newActivityHandler);
     } else if (
       builtActivityHandler.builtActivityData?._id !==
         selectedActivityBuilder._id ||
@@ -125,12 +128,29 @@ export function useWithBuiltActivityHandler(
   ]);
 
   useEffect(() => {
+    if (initialize) {
+      initialize.initializeActivity();
+      setBuiltActivityHandler(initialize);
+      addNewSubscriber(initialize);
+      setInitialize(undefined);
+    }
+  }, [initialize]);
+
+  useEffect(() => {
     if (!builtActivityHandler) {
       return;
     }
     newSession();
     builtActivityHandler.resetActivity();
   }, [resetActivityCounter]);
+
+  useEffect(() => {
+    if (builtActivityHandler) {
+      builtActivityHandler.filteredToPanelists = activePanelist
+        ? [activePanelist.clientId]
+        : [];
+    }
+  }, [activePanelist]);
 
   const handleStudentActivityComplete = useCallback(() => {
     if (
@@ -168,8 +188,15 @@ export function useWithBuiltActivityHandler(
     });
   }
 
+  function onFilteredPanelistsChanged(filteredPanelistIds: string[]): void {
+    if (filteredPanelistIds.length > 0) {
+      setActivePanelist(filteredPanelistIds[0]);
+    } else {
+      setActivePanelist(undefined);
+    }
+  }
+
   return {
     activityReady: Boolean(builtActivityHandler),
-    filteredPanelistIds,
   };
 }

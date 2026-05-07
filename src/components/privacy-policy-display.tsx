@@ -25,12 +25,7 @@ export function PrivacyPolicyDisplay() {
 
   return (
     <div>
-      <Button
-        onClick={() => setPrivacyPolicyOpen(true)}
-        style={{ color: 'blue' }}
-      >
-        Privacy Policy
-      </Button>
+      <Button onClick={() => setPrivacyPolicyOpen(true)}>Privacy Policy</Button>
       {privacyPolicyOpen && (
         <Dialog
           open={privacyPolicyOpen}

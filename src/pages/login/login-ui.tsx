@@ -32,6 +32,7 @@ export function LoginUI(props: {
         border: '1px solid lightgrey',
         padding: '20px',
         boxShadow: '-5px 5px 10px 0px rgba(0,0,0,0.75)',
+        color: 'black',
       }}
     >
       <ColumnDiv

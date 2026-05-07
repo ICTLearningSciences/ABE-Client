@@ -112,6 +112,7 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
           {
             id: uuidv4(),
             message: response.answer,
+            sources: response.sources,
             sender: Sender.SYSTEM,
             displayType: MessageDisplayType.TEXT,
             aiServiceStepData: response.aiAllStepsData,

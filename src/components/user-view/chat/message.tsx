@@ -26,7 +26,7 @@ const baseMessageStyle: React.CSSProperties = {
   overflowWrap: 'break-word',
 };
 
-function DisplayOpenAiInfoButton(props: {
+export function DisplayOpenAiInfoButton(props: {
   chatMessage: ChatMessageTypes;
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
 }): JSX.Element {
@@ -50,7 +50,10 @@ function DisplayOpenAiInfoButton(props: {
   );
 }
 
-const FadingText: React.FC<{ strings: string[] }> = ({ strings }) => {
+export const FadingText: React.FC<{ strings: string[]; time?: number }> = ({
+  strings,
+  time,
+}) => {
   const [currentStringIndex, setCurrentStringIndex] = useState(0);
   const [fadeState, setFadeState] = useState<'fading-out' | 'fading-in'>(
     'fading-in'
@@ -58,24 +61,22 @@ const FadingText: React.FC<{ strings: string[] }> = ({ strings }) => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (currentStringIndex !== strings.length - 1) {
-        setFadeState('fading-out');
-      }
-    }, 3000); // Change the duration as needed
-
+      setFadeState('fading-out');
+    }, time || 3000); // Change the duration as needed
     return () => clearTimeout(timeoutId);
   }, [currentStringIndex]);
 
   useEffect(() => {
-    if (
-      fadeState === 'fading-out' &&
-      currentStringIndex !== strings.length - 1
-    ) {
-      const timeoutId = setTimeout(() => {
-        setCurrentStringIndex((prevIndex) => (prevIndex + 1) % strings.length);
-        setFadeState('fading-in');
-      }, 1000); // Adjust the delay before fading in the next string
-
+    if (fadeState === 'fading-out') {
+      const timeoutId = setTimeout(
+        () => {
+          setCurrentStringIndex(
+            (prevIndex) => (prevIndex + 1) % strings.length
+          );
+          setFadeState('fading-in');
+        },
+        time ? time / 3 : 1000
+      ); // Adjust the delay before fading in the next string
       return () => clearTimeout(timeoutId);
     }
   }, [fadeState, strings.length]);
@@ -232,7 +233,7 @@ export default function Message(props: {
       )}
       {message.displayType === MessageDisplayType.PENDING_MESSAGE && (
         <FadingText
-          strings={['Reading...', 'Analyzing...', 'Getting opinionated...']}
+          strings={['Reading...', 'Analyzing...', 'Thinking carefully...']}
         />
       )}
       <DisplayOpenAiInfoButton

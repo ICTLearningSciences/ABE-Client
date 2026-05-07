@@ -1,0 +1,239 @@
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import * as React from 'react';
+import FlipMove from 'react-flip-move';
+import * as motion from 'motion/react-client';
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from '@mui/material';
+import {
+  CheckBox,
+  CheckBoxOutlineBlank,
+  DescriptionOutlined,
+  InfoOutlined,
+  ListAlt,
+  PeopleOutlined,
+  Person,
+  PlayCircleOutlineOutlined,
+} from '@mui/icons-material';
+
+import { CssCard, CssTextField } from './components';
+import { Header } from './components/header';
+import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
+import { useAppSelector } from '../../store/hooks';
+import { useWithPanels } from '../../store/slices/panels/use-with-panels';
+import { LoadStatus } from '../../store/slices/doc-goals-activities';
+import withAuthorizationOnly from './wrap-with-authorization-only';
+
+import './shark-tank.css';
+
+function SharkTankSetup(): JSX.Element {
+  const {
+    usePanelMode,
+    activity,
+    activePanel,
+    activePanelist,
+    panels,
+    panelists,
+    setActivity,
+    setActivePanel,
+    setActivePanelist,
+  } = useWithPanels();
+  const activities = useAppSelector((state) =>
+    state.docGoalsActivities.builtActivities.filter((a) => a.attachedPanel)
+  );
+  const activitiesLoadStatus = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivitiesLoadStatus
+  );
+  const navigate = useNavigateWithParams();
+
+  React.useEffect(() => {
+    if (!activity && activities.length > 0) {
+      setActivity(activities[activities.length - 1]._id);
+    }
+  }, [activities]);
+
+  function startSession(): void {
+    navigate('/shark-tank/chat');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const PanelMemberItem = React.forwardRef<any>((props: any, ref) => (
+    <motion.div
+      ref={ref}
+      className="row spacing"
+      whileHover={
+        !usePanelMode ? { scale: 1.01, filter: 'brightness(1.1)' } : {}
+      }
+      onClick={() => setActivePanelist(props.clientId)}
+    >
+      <ListItem
+        className="box"
+        style={{
+          padding: 5,
+          borderColor: activePanelist === props.clientId ? '#5c8a69' : '',
+          backgroundImage:
+            activePanelist === props.clientId
+              ? 'linear-gradient(to right, #79a07530, #64574730)'
+              : '',
+        }}
+      >
+        <ListItemIcon style={{ color: 'white', marginLeft: 5 }}>
+          <Person />
+        </ListItemIcon>
+        <ListItemText
+          primary={
+            <Typography style={{ fontSize: 12 }} color="secondary">
+              {props.panelistDescription}
+            </Typography>
+          }
+          secondary={
+            <Typography style={{ fontSize: 14 }}>
+              {props.panelistName}
+            </Typography>
+          }
+        />
+      </ListItem>
+      {!usePanelMode && (
+        <IconButton
+          color="primary"
+          onClick={() => setActivePanelist(props.clientId)}
+        >
+          {activePanelist?.clientId === props.clientId ? (
+            <CheckBox />
+          ) : (
+            <CheckBoxOutlineBlank />
+          )}
+        </IconButton>
+      )}
+    </motion.div>
+  ));
+
+  return (
+    <main className="root">
+      <Header title="Configure Session" />
+      <div className="page">
+        <Typography variant="h4" style={{ fontWeight: 'bold', marginTop: 20 }}>
+          Configure Session
+        </Typography>
+        <Typography color="secondary">
+          Select an activity and panelists you would like to discuss with
+        </Typography>
+        {activitiesLoadStatus === LoadStatus.LOADING ? (
+          <CircularProgress
+            size={40}
+            style={{ alignSelf: 'center', marginTop: 20 }}
+          />
+        ) : (
+          <Grid container style={{ width: '90%', marginTop: 20 }}>
+            <Grid xs={8} style={{ padding: 10 }}>
+              <CssCard title="Panel Name" icon={<InfoOutlined />}>
+                <CssTextField value={activePanel?.panelName} />
+              </CssCard>
+              <CssCard title="Description" icon={<DescriptionOutlined />}>
+                <CssTextField value={activePanel?.panelDescription} multiline />
+              </CssCard>
+              <CssCard title="Panelists" icon={<PeopleOutlined />}>
+                <FlipMove className="column spacing">
+                  {activePanel?.panelists?.map((p, i) => (
+                    <PanelMemberItem key={p} {...panelists[i]} />
+                  ))}
+                </FlipMove>
+              </CssCard>
+              <Button
+                variant="contained"
+                fullWidth
+                startIcon={<PlayCircleOutlineOutlined />}
+                onClick={startSession}
+                disabled={!usePanelMode && !activePanelist}
+              >
+                Start Session
+              </Button>
+            </Grid>
+
+            <Grid xs={4} style={{ padding: 10 }}>
+              {/* <CssCard alt title="Use Web Search" icon={<Search />}>
+                <CssTextField
+                  select
+                  value={useSearch ? 'true' : 'false'}
+                  onChange={(e) => updateSearch(e.target.value)}
+                >
+                  <MenuItem value="true">Yes</MenuItem>
+                  <MenuItem value="false">No</MenuItem>
+                </CssTextField>
+              </CssCard> */}
+              <CssCard alt title="Select Activity" icon={<ListAlt />}>
+                <List className="column spacing">
+                  {activities.map((a) => {
+                    const panel = panels.find(
+                      (p) => p.clientId === a.attachedPanel
+                    );
+                    if (!panel) return <></>;
+                    return (
+                      <motion.div
+                        id={a._id}
+                        key={a._id}
+                        whileHover={{ scale: 1.01, filter: 'brightness(1.1)' }}
+                        className="box column spacing"
+                        style={{
+                          backgroundColor: 'rgb(100, 100, 100)',
+                        }}
+                      >
+                        <div
+                          className="row"
+                          style={{ justifyContent: 'space-between' }}
+                        >
+                          <Typography
+                            color="secondary"
+                            style={{ fontWeight: 'bold' }}
+                          >
+                            {a.title}
+                          </Typography>
+                          <div className="row center-div">
+                            <PeopleOutlined />
+                            <Typography style={{ fontSize: 12, marginLeft: 5 }}>
+                              {panel?.panelists.length || 0}
+                            </Typography>
+                          </div>
+                        </div>
+                        <Typography>{a.description}</Typography>
+                        <Typography variant="subtitle2">
+                          Panel: {panel.panelName}
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          onClick={() => {
+                            setActivity(a._id);
+                            setActivePanel(panel.clientId);
+                          }}
+                          disabled={activity?._id === a._id}
+                        >
+                          {activity?._id === a._id ? 'Selected' : 'Select'}
+                        </Button>
+                      </motion.div>
+                    );
+                  })}
+                </List>
+              </CssCard>
+            </Grid>
+          </Grid>
+        )}
+      </div>
+    </main>
+  );
+}
+
+export default withAuthorizationOnly(SharkTankSetup);

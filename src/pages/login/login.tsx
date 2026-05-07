@@ -18,8 +18,12 @@ import {
   studentCoursesUrl,
 } from '../instructor/course-management';
 import { PrivacyPolicyDisplay } from '../../components/privacy-policy-display';
-export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
-  const { useLogin } = props;
+
+export default function Login(props: {
+  useLogin: UseWithLogin;
+  loginTo?: string;
+}): JSX.Element {
+  const { useLogin, loginTo } = props;
   const { loginWithGoogle, state: loginState } = useLogin;
   const navigate = useNavigateWithParams();
   const config = useAppSelector((state) => state.config);
@@ -43,6 +47,10 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
     const isStudentFromUrl = new URLSearchParams(window.location.search).get(
       'isStudent'
     );
+    if (loginTo) {
+      navigate(loginTo);
+      return;
+    }
     if (
       (sectionCodeFromUrl || isStudentFromUrl) &&
       user?.educationalRole !== EducationalRole.INSTRUCTOR
@@ -81,6 +89,7 @@ export default function Login(props: { useLogin: UseWithLogin }): JSX.Element {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: 'white',
       }}
     >
       <LoginUI
