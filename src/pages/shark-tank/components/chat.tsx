@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CircularProgress } from '@mui/material';
+import { Typography } from '@mui/material';
 import { createGlobalStyle } from 'styled-components';
 import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
 import ViewPreviousRunModal from '../../../components/admin-view/view-previous-run-modal';
@@ -88,24 +88,24 @@ export function Chat(props: {
       }}
     >
       <GlobalChatStyles />
-      {curDocId && builtActivityReady ? (
-        <>
-          <div
-            data-cy="chat-box"
-            className="column center-div"
-            style={{
-              height: '100%',
-              width: '100%',
-              justifyContent: 'space-around',
+      <>
+        <div
+          data-cy="chat-box"
+          className="column center-div"
+          style={{
+            height: '100%',
+            width: '100%',
+            justifyContent: 'space-around',
+          }}
+        >
+          <ChatHeader
+            selectedActivity={selectedActivity}
+            onSelectActivity={props.setSelectedActivity}
+            onReset={() => {
+              setResetActivityCounter(resetActivityCounter + 1);
             }}
-          >
-            <ChatHeader
-              selectedActivity={selectedActivity}
-              onSelectActivity={props.setSelectedActivity}
-              onReset={() => {
-                setResetActivityCounter(resetActivityCounter + 1);
-              }}
-            />
+          />
+          {curDocId && builtActivityReady ? (
             <ChatThread
               sendMessage={sendNewMessage}
               coachResponsePending={coachResponsePending}
@@ -113,38 +113,43 @@ export function Chat(props: {
               chatLog={messages}
               setAiInfoToDisplay={setAiInfoToDisplay}
             />
-            <ChatInput
-              sendMessage={sendNewMessage}
-              disableInput={disableInput}
-            />
-          </div>
-          {systemPromptData && (
-            <SystemPromptModal
-              targetSystemPrompt={targetSystemPrompt}
-              setTargetSystemPrompt={setTargetSystemPrompt}
-              deleteSystemPrompt={deleteSystemPrompt}
-              isSaving={isSaving}
-              isEdited={isEdited}
-              editSystemPrompts={editOrAddSystemPrompt}
-              saveSystemPrompts={save}
-              systemPrompts={systemPromptData}
-              open={viewSystemPrompts}
-              close={() => {
-                setViewSystemPrompts(false);
-              }}
-            />
+          ) : (
+            <Typography
+              className="column center-div"
+              style={{ height: '100%' }}
+            >
+              Please select a document to get started
+            </Typography>
           )}
-          <ViewPreviousRunModal
-            previousRunStepData={openAiInfoToDisplay}
-            open={Boolean(openAiInfoToDisplay)}
+          <ChatInput
+            sendMessage={sendNewMessage}
+            disableInput={!curDocId || !builtActivityReady || disableInput}
+          />
+        </div>
+        {systemPromptData && (
+          <SystemPromptModal
+            targetSystemPrompt={targetSystemPrompt}
+            setTargetSystemPrompt={setTargetSystemPrompt}
+            deleteSystemPrompt={deleteSystemPrompt}
+            isSaving={isSaving}
+            isEdited={isEdited}
+            editSystemPrompts={editOrAddSystemPrompt}
+            saveSystemPrompts={save}
+            systemPrompts={systemPromptData}
+            open={viewSystemPrompts}
             close={() => {
-              setAiInfoToDisplay(undefined);
+              setViewSystemPrompts(false);
             }}
           />
-        </>
-      ) : (
-        <CircularProgress />
-      )}
+        )}
+        <ViewPreviousRunModal
+          previousRunStepData={openAiInfoToDisplay}
+          open={Boolean(openAiInfoToDisplay)}
+          close={() => {
+            setAiInfoToDisplay(undefined);
+          }}
+        />
+      </>
     </div>
   );
 }
