@@ -53,7 +53,9 @@ function SharkTankSetup(): JSX.Element {
     setActivePanelist,
   } = useWithPanels();
   const activities = useAppSelector((state) =>
-    state.docGoalsActivities.builtActivities.filter((a) => a.attachedPanel)
+    state.docGoalsActivities.builtActivities.filter(
+      (a) => a.attachedPanel && a.title === 'CFT Panel Activity'
+    )
   );
   const activitiesLoadStatus = useAppSelector(
     (state) => state.docGoalsActivities.builtActivitiesLoadStatus
