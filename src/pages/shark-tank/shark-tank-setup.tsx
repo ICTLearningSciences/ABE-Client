@@ -30,7 +30,7 @@ import {
   PlayCircleOutlineOutlined,
 } from '@mui/icons-material';
 
-import { CssCard, CssTextField } from './components';
+import { CssCard } from './components';
 import { Header } from './components/header';
 import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 import { useAppSelector } from '../../store/hooks';
@@ -143,10 +143,14 @@ function SharkTankSetup(): JSX.Element {
           <Grid container style={{ width: '90%', marginTop: 20 }}>
             <Grid xs={8} style={{ padding: 10 }}>
               <CssCard title="Panel Name" icon={<InfoOutlined />}>
-                <CssTextField value={activePanel?.panelName} />
+                <div className="box">
+                  <Typography>{activePanel?.panelName}</Typography>
+                </div>
               </CssCard>
               <CssCard title="Description" icon={<DescriptionOutlined />}>
-                <CssTextField value={activePanel?.panelDescription} multiline />
+                <div className="box">
+                  <Typography>{activePanel?.panelDescription}</Typography>
+                </div>
               </CssCard>
               <CssCard title="Panelists" icon={<PeopleOutlined />}>
                 <FlipMove className="column spacing">

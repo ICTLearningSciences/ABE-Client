@@ -16,16 +16,16 @@ export const CssTextField = styled(TextField)({
   '& .MuiOutlinedInput-root': {
     color: 'rgb(223, 215, 159)',
     backgroundColor: 'rgb(61, 67, 74)',
-    border: '1px solid rgba(223, 215, 159, 0.3)',
+    border: '2px solid rgba(223, 215, 159, 0.3)',
     borderRadius: 10,
     '& fieldset': {
-      border: '1px solid rgba(223, 215, 159, 0.3)',
+      border: '2px solid rgba(223, 215, 159, 0.3)',
     },
     '&:hover fieldset': {
-      border: '1px solid rgba(223, 215, 159, 0.5)',
+      border: '2px solid rgba(223, 215, 159, 0.5)',
     },
     '&.Mui-focused fieldset': {
-      border: '1px solid rgba(92, 138, 105, 1)',
+      border: '2px solid rgba(92, 138, 105, 1)',
     },
     '&.Mui-focused': {
       color: 'white',

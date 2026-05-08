@@ -12,7 +12,9 @@ export function ChatHeader(props: {
   const { selectedActivity } = props;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const builtActivities = useAppSelector((state) =>
-    state.docGoalsActivities.builtActivities.filter((a) => a.attachedPanel)
+    state.docGoalsActivities.builtActivities.filter(
+      (a) => a.attachedPanel && a.title === 'CFT Panel Activity'
+    )
   );
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

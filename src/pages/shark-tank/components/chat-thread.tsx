@@ -120,7 +120,9 @@ export function ChatThread(props: {
                     <Button
                       key={i}
                       variant="outlined"
+                      color="secondary"
                       style={{
+                        borderWidth: '2px',
                         marginBottom: '5px',
                       }}
                       data-cy={`mcq-choice-${choice.replaceAll(' ', '-')}`}

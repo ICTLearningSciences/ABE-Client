@@ -54,7 +54,7 @@ export function Header(props: { title?: string }) {
         <Typography
           variant="subtitle1"
           color="secondary"
-          style={{ fontSize: 12, marginLeft: 5 }}
+          style={{ fontSize: 14, marginLeft: 5 }}
         >
           {props.title}
         </Typography>
