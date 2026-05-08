@@ -207,7 +207,7 @@ export default function SelectCreateDocs(props: {
           {!viewingArchived && (
             <div
               style={{
-                width: '20%',
+                // width: '20%',
                 display: 'flex',
                 gap: '5px',
                 marginTop: isMobile ? '10px' : '0px',
@@ -244,12 +244,12 @@ export default function SelectCreateDocs(props: {
                   onClick={() => {
                     setExampleDocsOpen(true);
                   }}
-                  size="small"
+                  // size="small"
                   variant="outlined"
                   style={{
-                    width: 'fit-content',
+                    // width: 'fit-content',
                     padding: 5,
-                    height: 'fit-content',
+                    // height: 'fit-content',
                   }}
                 >
                   Examples
@@ -259,7 +259,7 @@ export default function SelectCreateDocs(props: {
           )}
           <h2 style={{ width: '60%', textAlign: 'center' }}>{title}</h2>
           <Button
-            style={{ width: '20%' }}
+            // style={{ width: '20%' }}
             data-cy={`toggle-view-archived`}
             onClick={() => {
               setViewingArchived(!viewingArchived);

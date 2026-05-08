@@ -32,6 +32,10 @@ function SharkTankChat(): JSX.Element {
   const { activity, activePanel, setActivity } = useWithPanelActivity;
 
   function onSelectDocument(docId: string): void {
+    if (reference) {
+      setReference(undefined);
+      return;
+    }
     updateCurrentDocId(docId);
     setReference(undefined);
   }
