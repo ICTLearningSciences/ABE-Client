@@ -132,7 +132,7 @@ function SharkTankSetup(): JSX.Element {
           Configure Session
         </Typography>
         <Typography color="secondary">
-          Select an activity and panelists you would like to discuss with
+          Choose your activity and panelists.
         </Typography>
         {activitiesLoadStatus === LoadStatus.LOADING ? (
           <CircularProgress
