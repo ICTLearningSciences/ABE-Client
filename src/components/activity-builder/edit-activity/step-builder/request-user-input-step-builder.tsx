@@ -303,7 +303,7 @@ function PredefinedResponsesUpdater(props: {
       }}
     >
       <RowDiv>
-        <span style={{ fontWeight: 'bold' }}>Buttons & User Selection</span>
+        <span style={{ fontWeight: 'bold' }}>Buttons & Selection Options</span>
         <InfoTooltip title="A list of responses the user can choose from." />
       </RowDiv>
 
