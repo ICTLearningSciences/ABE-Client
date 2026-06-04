@@ -25,6 +25,7 @@ import {
   RelevantGoogleDoc,
   StudentData,
 } from './store/slices/education-management';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function extractErrorMessageFromError(err: any | unknown): string {
   if (err?.response?.data) {
@@ -462,4 +463,11 @@ export function getAssignmentsByStudentCompletionStatus(
       isGraded: Boolean(assignmentProgress.instructorGrade),
     };
   });
+}
+
+export function copyAndSet<T>(array: T[], idx: number, value: T): T[] {
+  if (idx >= array.length || idx < 0) {
+    return [...array, value];
+  }
+  return [...array.slice(0, idx), value, ...array.slice(idx + 1)];
 }

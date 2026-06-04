@@ -33,6 +33,7 @@ import { useWithRouteChangeRerender } from './hooks/use-with-route-change-rerend
 import SharkTankSetup from './pages/shark-tank/shark-tank-setup';
 import SharkTankChat from './pages/shark-tank/shark-tank-chat';
 import './App.css';
+import AdminManageUsers from './pages/admin/manage-users';
 
 export const freeDocEditingNavPath = '/docs';
 
@@ -197,6 +198,29 @@ function MainApp() {
           <ThemeProvider theme={sharkTankTheme}>
             <SharkTankChat />
           </ThemeProvider>
+        </>
+      ),
+    },
+    {
+      path: '/admin',
+      element: (
+        <>
+          <Header
+            useLogin={useLogin}
+            courseNavPath={courseNavPath}
+            freeDocEditingNavPath={freeDocEditingNavPath}
+          />
+          <div
+            style={{
+              width: '100%',
+              height: MAIN_APP_HEIGHT,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <AdminManageUsers />
+          </div>
         </>
       ),
     },

@@ -74,6 +74,14 @@ export function UserInfoSettings(): JSX.Element {
             Admin Settings
           </Typography>
           <AdminControls />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate('/admin')}
+            fullWidth
+          >
+            Manage Users
+          </Button>
         </Paper>
       )}
       {state.user?._id && (
