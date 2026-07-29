@@ -32,6 +32,7 @@ import {
   UpdateUserInfo,
   IGDocVersion,
   DocService,
+  EducationalRole,
 } from '../types';
 import { AxiosMiddleware } from './axios-middlewares';
 import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
@@ -40,6 +41,7 @@ import { isBulletPointMessage } from '../store/slices/chat/helpers';
 import { activityQueryData } from './api-helpers';
 import { omit } from 'lodash';
 import { OpenAiServiceJobStatusResponseType } from '../ai-services/open-ai-service';
+import { UserRole } from '../store/slices/login';
 
 const API_ENDPOINT =
   process.env.REACT_APP_GOOGLE_API_ENDPOINT || 'http://localhost:8000/docs';
@@ -942,6 +944,55 @@ export async function archiveDoc(
     },
     {
       dataPath: 'addOrUpdateDoc',
+    }
+  );
+  return data;
+}
+
+export async function fetchUsers(): Promise<User[]> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const data = await execGql<User[]>(
+    {
+      query: `
+        query FetchUsers {
+          fetchUsers {
+            ${userDataQuery}
+          }
+        }
+      `,
+    },
+    {
+      dataPath: 'fetchUsers',
+      accessToken: accessToken || undefined,
+    }
+  );
+  return data;
+}
+
+export async function updateUserRole(
+  userId: string,
+  userRole?: UserRole,
+  educationalRole?: EducationalRole
+): Promise<User> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const data = await execGql<User>(
+    {
+      query: `
+        mutation UpdateUserRole($userId: String!, $userRole: String, $educationalRole: String) {
+          updateUserRole(userId: $userId, userRole: $userRole, educationalRole: $educationalRole) {
+            ${userDataQuery}
+          }
+        }
+      `,
+      variables: {
+        userId,
+        userRole,
+        educationalRole,
+      },
+    },
+    {
+      dataPath: 'updateUserRole',
+      accessToken: accessToken || undefined,
     }
   );
   return data;
