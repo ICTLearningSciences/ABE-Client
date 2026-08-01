@@ -5,17 +5,20 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
+export type LoadingStatus = 0 | 1 | 2 | 3 | 4;
+export type LoadingActionType =
+  | "LOADING_STARTED"
+  | "LOADING_SUCCEEDED"
+  | "LOADING_FAILED"
+  | "SAVING_STARTED"
+  | "SAVING_SUCCEEDED"
+  | "SAVING_FAILED";
+export type LoadingStatusType =
+  "NONE" | "SAVING" | "LOADING" | "SUCCESS" | "ERROR";
+
 export interface LoadingError {
   message: string;
   error: string;
-}
-
-export enum LoadingStatus {
-  NONE = 0,
-  LOADING = 1,
-  SAVING = 2,
-  SUCCEEDED = 3,
-  FAILED = 4,
 }
 
 export interface LoadingState {
@@ -28,40 +31,23 @@ export interface LoadingAction {
   payload?: LoadingError;
 }
 
-export enum LoadingActionType {
-  LOADING_STARTED = 'LOADING_STARTED',
-  LOADING_SUCCEEDED = 'LOADING_SUCCEEDED',
-  LOADING_FAILED = 'LOADING_FAILED',
-  SAVING_STARTED = 'SAVING_STARTED',
-  SAVING_SUCCEEDED = 'SAVING_SUCCEEDED',
-  SAVING_FAILED = 'SAVING_FAILED',
-}
-
-export enum LoadingStatusType {
-  NONE = 'NONE',
-  SAVING = 'SAVING',
-  LOADING = 'LOADING',
-  SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR',
-}
-
 export function LoadingReducer(
-  state: LoadingState,
-  action: LoadingAction
+  _state: LoadingState,
+  action: LoadingAction,
 ): LoadingState {
   const { type, payload } = action;
   switch (type) {
-    case LoadingActionType.LOADING_STARTED:
-      return { status: LoadingStatusType.LOADING };
-    case LoadingActionType.SAVING_STARTED:
-      return { status: LoadingStatusType.SAVING };
-    case LoadingActionType.LOADING_SUCCEEDED:
-    case LoadingActionType.SAVING_SUCCEEDED:
-      return { status: LoadingStatusType.SUCCESS };
-    case LoadingActionType.LOADING_FAILED:
-    case LoadingActionType.SAVING_FAILED:
-      return { status: LoadingStatusType.ERROR, error: payload };
+    case "LOADING_STARTED":
+      return { status: "LOADING" };
+    case "SAVING_STARTED":
+      return { status: "SAVING" };
+    case "LOADING_SUCCEEDED":
+    case "SAVING_SUCCEEDED":
+      return { status: "SUCCESS" };
+    case "LOADING_FAILED":
+    case "SAVING_FAILED":
+      return { status: "ERROR", error: payload };
     default:
-      return { status: LoadingStatusType.NONE };
+      return { status: "NONE" };
   }
 }

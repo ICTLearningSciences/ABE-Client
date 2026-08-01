@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -14,18 +14,18 @@ import {
   Stack,
   Tabs,
   Tab,
-} from '@mui/material';
-import { Edit as EditIcon } from '@mui/icons-material';
-import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import {
+} from "@mui/material";
+import { Edit } from "@mui/icons-material";
+import { useWithEducationalManagement } from "../../../store/slices/education-management/use-with-educational-management";
+import type {
   Course,
-  CourseOwnership,
-} from '../../../store/slices/education-management/types';
-import CourseModal, { CourseModalMode } from './course-modal';
-import DeleteConfirmationModal from './delete-confirmation-modal';
-import CourseContent from './course-content';
-import CourseSharedInstructors from './course-shared-instructors';
-import { useAppSelector } from '../../../store/hooks';
+  Instructor,
+} from "../../../store/slices/education-management/types";
+import CourseModal from "./course-modal";
+import DeleteConfirmationModal from "./delete-confirmation-modal";
+import CourseContent from "./course-content";
+import CourseSharedInstructors from "./course-shared-instructors";
+import { useAppSelector } from "../../../store/hooks";
 
 interface CourseViewProps {
   courseId: string;
@@ -46,11 +46,11 @@ const CourseView: React.FC<CourseViewProps> = ({
   const [showEditModal, setShowEditModal] = useState(startWithEditModal);
   const [selectedTab, setSelectedTab] = useState(0);
   const course = educationManagement.courses.find((c) => c._id === courseId);
-  const myInstructorData = useAppSelector(
-    (state) => state.educationManagement.instructorData
+  const myInstructorData: Instructor = useAppSelector(
+    (state) => state.educationManagement.instructorData,
   );
   const ownsThisCourse = myInstructorData?.courses.some(
-    (c) => c.courseId === courseId && c.ownership === CourseOwnership.OWNER
+    (c) => c.courseId === courseId && c.ownership === "OWNER",
   );
 
   const handleEditCourse = async (courseData: Partial<Course>) => {
@@ -63,7 +63,7 @@ const CourseView: React.FC<CourseViewProps> = ({
     onCourseDeleted?.();
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
 
@@ -71,16 +71,16 @@ const CourseView: React.FC<CourseViewProps> = ({
     return (
       <Box
         sx={{
-          textAlign: 'center',
+          textAlign: "center",
           maxWidth: 400,
-          mx: 'auto',
+          mx: "auto",
           py: 8,
         }}
       >
-        <Typography variant="h1" sx={{ fontSize: '48px', mb: 3 }}>
+        <Typography variant="h1" sx={{ fontSize: "48px", mb: 3 }}>
           ❌
         </Typography>
-        <Typography variant="h4" sx={{ mb: 2, color: 'text.primary' }}>
+        <Typography variant="h4" sx={{ mb: 2, color: "text.primary" }}>
           Course Not Found
         </Typography>
         <Typography variant="body1" color="text.secondary">
@@ -91,24 +91,26 @@ const CourseView: React.FC<CourseViewProps> = ({
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 800, px: 2.5 }}>
+    <Box sx={{ width: "100%", maxWidth: 800, px: 2.5 }}>
       {/* Course Header */}
-      <Card sx={{ mb: 4, backgroundColor: 'grey.50' }}>
+      <Card sx={{ mb: 4, backgroundColor: "grey.50" }}>
         <CardContent sx={{ p: 3 }}>
           <Stack
             direction="row"
-            justifyContent="space-between"
-            alignItems="flex-start"
+            style={{
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+            }}
           >
             <Box sx={{ flex: 1 }}>
-              <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                <Typography sx={{ fontSize: '32px', mr: 2 }}>📚</Typography>
+              <Stack direction="row" sx={{ mb: 1.5, alignItems: "center" }}>
+                <Typography sx={{ fontSize: "32px", mr: 2 }}>📚</Typography>
                 <Typography
                   variant="h4"
                   sx={{
-                    color: '#1B6A9C',
+                    color: "#1B6A9C",
                     fontWeight: 600,
-                    fontSize: '1.75rem',
+                    fontSize: "1.75rem",
                   }}
                 >
                   {course.title}
@@ -127,16 +129,16 @@ const CourseView: React.FC<CourseViewProps> = ({
               <>
                 <Button
                   variant="outlined"
-                  startIcon={<EditIcon />}
+                  startIcon={<Edit />}
                   onClick={() => setShowEditModal(true)}
                   disabled={educationManagement.isCourseModifying}
                   data-cy="edit-course-button"
                   sx={{
-                    color: '#1B6A9C',
-                    borderColor: '#1B6A9C',
-                    '&:hover': {
-                      backgroundColor: '#1B6A9C',
-                      color: 'white',
+                    color: "#1B6A9C",
+                    borderColor: "#1B6A9C",
+                    "&:hover": {
+                      backgroundColor: "#1B6A9C",
+                      color: "white",
                     },
                   }}
                 >
@@ -161,16 +163,16 @@ const CourseView: React.FC<CourseViewProps> = ({
             onChange={handleTabChange}
             sx={{
               borderBottom: 1,
-              borderColor: 'divider',
+              borderColor: "divider",
               mb: 3,
-              '& .MuiTab-root': {
-                color: '#666',
-                '&.Mui-selected': {
-                  color: '#1B6A9C',
+              "& .MuiTab-root": {
+                color: "#666",
+                "&.Mui-selected": {
+                  color: "#1B6A9C",
                 },
               },
-              '& .MuiTabs-indicator': {
-                backgroundColor: '#1B6A9C',
+              "& .MuiTabs-indicator": {
+                backgroundColor: "#1B6A9C",
               },
             }}
           >
@@ -199,7 +201,7 @@ const CourseView: React.FC<CourseViewProps> = ({
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSubmit={handleEditCourse}
-        mode={CourseModalMode.EDIT}
+        mode={"edit"}
         initialData={course}
         isLoading={educationManagement.isCourseModifying}
       />

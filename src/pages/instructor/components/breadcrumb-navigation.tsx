@@ -4,13 +4,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useMemo } from 'react';
-import { Box, Typography, Breadcrumbs } from '@mui/material';
-import { NavigateNext } from '@mui/icons-material';
-import { UseWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import { CourseManagementState } from '../../../store/slices/education-management';
-import { useAppSelector } from '../../../store/hooks';
+
+import React, { useMemo } from "react";
+import { Box, Typography, Breadcrumbs } from "@mui/material";
+import { NavigateNext } from "@mui/icons-material";
+import type { UseWithEducationalManagement } from "../../../store/slices/education-management/use-with-educational-management";
+import { useWithDocGoalsActivities } from "../../../store/slices/doc-goals-activities/use-with-doc-goals-activites";
+import type { CourseManagementState } from "../../../store/slices/education-management";
+import { useAppSelector } from "../../../store/hooks";
 
 export interface BreadcrumbItem {
   id: string;
@@ -39,28 +40,28 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
   const user = useAppSelector((state) => state.login.user);
   const config = useAppSelector((state) => state.config).config;
   const { getActivityById } = useWithDocGoalsActivities(
-    user?._id || '',
-    config
+    user?._id || "",
+    config,
   );
   const items: BreadcrumbItem[] = useMemo(() => {
     const items: BreadcrumbItem[] = [
       {
-        id: 'dashboard',
-        title: 'Courses',
-        icon: '🏫',
+        id: "dashboard",
+        title: "Courses",
+        icon: "🏫",
         onClick: () => handleDashboardSelect(),
       },
     ];
 
     if (viewState.selectedCourseId) {
       const course = educationManagement.courses.find(
-        (c) => c._id === viewState.selectedCourseId
+        (c) => c._id === viewState.selectedCourseId,
       );
       if (course) {
         items.push({
           id: course._id,
           title: `Course: ${course.title}`,
-          icon: '📚',
+          icon: "📚",
           onClick: () => handleCourseSelect(course._id),
         });
       }
@@ -68,13 +69,13 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
 
     if (viewState.selectedSectionId && viewState.selectedCourseId) {
       const section = educationManagement.sections.find(
-        (s) => s._id === viewState.selectedSectionId
+        (s) => s._id === viewState.selectedSectionId,
       );
       if (section) {
         items.push({
           id: section._id,
           title: `Section: ${section.title}`,
-          icon: '📑',
+          icon: "📑",
           onClick: () => handleSectionSelect(section._id),
         });
       }
@@ -86,13 +87,13 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
       viewState.selectedSectionId
     ) {
       const assignment = educationManagement.assignments.find(
-        (a) => a._id === viewState.selectedAssignmentId
+        (a) => a._id === viewState.selectedAssignmentId,
       );
       if (assignment) {
         items.push({
           id: assignment._id,
           title: `Assignment: ${assignment.title}`,
-          icon: '📝',
+          icon: "📝",
           onClick: () => handleAssignmentSelect(assignment._id),
         });
       }
@@ -100,15 +101,15 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
 
     if (viewState.selectedStudentId) {
       const student = educationManagement.students.find(
-        (s) => s.userId === viewState.selectedStudentId
+        (s) => s.userId === viewState.selectedStudentId,
       );
       if (student) {
         items.push({
           id: student.userId,
           title: `Student: ${student.name}`,
-          icon: '👤',
+          icon: "👤",
           onClick: () => {
-            console.log('student clicked');
+            console.log("student clicked");
           },
         });
       }
@@ -123,10 +124,10 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
       const activity = getActivityById(viewState.selectedActivityId);
       items.push({
         id: viewState.selectedActivityId,
-        title: `Activity: ${activity?.title || 'Activity'}`,
-        icon: '📝',
+        title: `Activity: ${activity?.title || "Activity"}`,
+        icon: "📝",
         onClick: () => {
-          console.log('activity clicked');
+          console.log("activity clicked");
         },
       });
     }
@@ -147,16 +148,16 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
     <Box
       sx={{
         py: 1.5,
-        borderBottom: '1px solid #e9ecef',
+        borderBottom: "1px solid #e9ecef",
       }}
       data-cy="breadcrumb-navigation"
     >
       <Breadcrumbs
         separator={<NavigateNext fontSize="small" />}
         sx={{
-          '& .MuiBreadcrumbs-separator': {
-            color: 'text.disabled',
-            fontSize: '12px',
+          "& .MuiBreadcrumbs-separator": {
+            color: "text.disabled",
+            fontSize: "12px",
           },
         }}
       >
@@ -166,32 +167,32 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
             onClick={item.onClick}
             data-cy={`breadcrumb-item-${item.id}`}
             sx={{
-              display: 'flex',
-              alignItems: 'center',
+              display: "flex",
+              alignItems: "center",
               gap: 0.75,
               px: 1,
               py: 0.5,
               borderRadius: 0.5,
-              cursor: 'pointer',
-              transition: 'background-color 0.2s ease',
-              backgroundColor: 'transparent',
-              '&:hover': {
-                backgroundColor: 'grey.50',
+              cursor: "pointer",
+              transition: "background-color 0.2s ease",
+              backgroundColor: "transparent",
+              "&:hover": {
+                backgroundColor: "grey.50",
               },
             }}
           >
             <Typography
               sx={{
-                fontSize: '14px',
+                fontSize: "14px",
               }}
             >
               {item.icon}
             </Typography>
             <Typography
               sx={{
-                fontSize: '14px',
-                fontWeight: index === items.length - 1 ? '600' : '500',
-                color: index === items.length - 1 ? '#1B6A9C' : 'text.primary',
+                fontSize: "14px",
+                fontWeight: index === items.length - 1 ? "600" : "500",
+                color: index === items.length - 1 ? "#1B6A9C" : "text.primary",
               }}
             >
               {item.title}

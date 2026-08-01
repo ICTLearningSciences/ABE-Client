@@ -4,8 +4,13 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Panel, Panelist } from './types';
+
+import {
+  type PayloadAction,
+  createAsyncThunk,
+  createSlice,
+} from "@reduxjs/toolkit";
+import type { Panel, Panelist } from "./types";
 import {
   fetchPanels as _fetchPanels,
   fetchPanelists as _fetchPanelists,
@@ -13,14 +18,8 @@ import {
   addOrUpdatePanelist as _addOrUpdatePanelist,
   deletePanel as _deletePanel,
   deletePanelist as _deletePanelist,
-} from './panel-apis';
-
-export enum LoadStatus {
-  NONE,
-  LOADING,
-  SUCCEEDED,
-  FAILED,
-}
+} from "./panel-apis";
+import type { LoadStatus } from "../doc-goals-activities";
 
 export interface State {
   panels: Panel[];
@@ -37,9 +36,9 @@ export interface State {
 
 const initialState: State = {
   panels: [],
-  panelsLoadStatus: LoadStatus.NONE,
+  panelsLoadStatus: 0,
   panelists: [],
-  panelistsLoadStatus: LoadStatus.NONE,
+  panelistsLoadStatus: 0,
 
   useSearch: true,
   usePanelMode: true,
@@ -48,48 +47,48 @@ const initialState: State = {
   activePanelist: undefined,
 };
 
-export const fetchPanels = createAsyncThunk('state/fetchPanels', async () => {
+export const fetchPanels = createAsyncThunk("state/fetchPanels", async () => {
   return await _fetchPanels();
 });
 
 export const fetchPanelists = createAsyncThunk(
-  'state/fetchPanelists',
+  "state/fetchPanelists",
   async () => {
     return await _fetchPanelists();
-  }
+  },
 );
 
 export const addOrUpdatePanel = createAsyncThunk(
-  'state/addOrUpdatePanel',
+  "state/addOrUpdatePanel",
   async (panel: Panel) => {
     return await _addOrUpdatePanel(panel);
-  }
+  },
 );
 
 export const addOrUpdatePanelist = createAsyncThunk(
-  'state/addOrUpdatePanelist',
+  "state/addOrUpdatePanelist",
   async (panelist: Panelist) => {
     return await _addOrUpdatePanelist(panelist);
-  }
+  },
 );
 
 export const deletePanel = createAsyncThunk(
-  'state/deletePanel',
+  "state/deletePanel",
   async (panelClientId: string) => {
     return await _deletePanel(panelClientId);
-  }
+  },
 );
 
 export const deletePanelist = createAsyncThunk(
-  'state/deletePanelist',
+  "state/deletePanelist",
   async (panelistClientId: string) => {
     return await _deletePanelist(panelistClientId);
-  }
+  },
 );
 
 /** Reducer */
 export const stateSlice = createSlice({
-  name: 'state',
+  name: "state",
   initialState,
   reducers: {
     addNewLocalPanel: (state, action: PayloadAction<Panel>) => {
@@ -117,30 +116,30 @@ export const stateSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchPanels.pending, (state) => {
-        state.panelsLoadStatus = LoadStatus.LOADING;
+        state.panelsLoadStatus = 1;
       })
       .addCase(fetchPanels.fulfilled, (state, action) => {
         state.panels = action.payload;
-        state.panelsLoadStatus = LoadStatus.SUCCEEDED;
+        state.panelsLoadStatus = 2;
       })
       .addCase(fetchPanels.rejected, (state) => {
-        state.panelsLoadStatus = LoadStatus.FAILED;
+        state.panelsLoadStatus = 3;
       })
 
       .addCase(fetchPanelists.pending, (state) => {
-        state.panelistsLoadStatus = LoadStatus.LOADING;
+        state.panelistsLoadStatus = 1;
       })
       .addCase(fetchPanelists.fulfilled, (state, action) => {
         state.panelists = action.payload;
-        state.panelistsLoadStatus = LoadStatus.SUCCEEDED;
+        state.panelistsLoadStatus = 2;
       })
       .addCase(fetchPanelists.rejected, (state) => {
-        state.panelistsLoadStatus = LoadStatus.FAILED;
+        state.panelistsLoadStatus = 3;
       })
 
       .addCase(addOrUpdatePanel.fulfilled, (state, action) => {
         const panelIndex = state.panels.findIndex(
-          (p) => p.clientId === action.payload.clientId
+          (p) => p.clientId === action.payload.clientId,
         );
         if (panelIndex >= 0) {
           state.panels[panelIndex] = action.payload;
@@ -150,7 +149,7 @@ export const stateSlice = createSlice({
       })
       .addCase(addOrUpdatePanelist.fulfilled, (state, action) => {
         const panelistIndex = state.panelists.findIndex(
-          (p) => p.clientId === action.payload.clientId
+          (p) => p.clientId === action.payload.clientId,
         );
         if (panelistIndex >= 0) {
           state.panelists[panelistIndex] = action.payload;
@@ -161,13 +160,13 @@ export const stateSlice = createSlice({
 
       .addCase(deletePanel.fulfilled, (state, action) => {
         state.panels = state.panels.filter(
-          (p) => p.clientId !== action.payload.clientId
+          (p) => p.clientId !== action.payload.clientId,
         );
       })
 
       .addCase(deletePanelist.fulfilled, (state, action) => {
         state.panelists = state.panelists.filter(
-          (p) => p.clientId !== action.payload.clientId
+          (p) => p.clientId !== action.payload.clientId,
         );
       });
   },

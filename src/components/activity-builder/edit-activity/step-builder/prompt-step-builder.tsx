@@ -4,81 +4,80 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import {
-  ActivityBuilderStepType,
-  FlowItem,
-  JsonResponseData,
-  JsonResponseDataType,
-  PromptActivityStep,
-  SinglePromptConfiguration,
-} from '../../types';
-import {
-  RoundedBorderDiv,
-  RowDiv,
-  TopLeftText,
-} from '../../../../styled-components';
-import {
-  CheckBoxInput,
-  InputField,
-  SelectInputField,
-} from '../../shared/input-components';
-import {
-  AiPromptStep,
-  PromptConfiguration,
-  PromptOutputTypes,
-  PromptRoles,
-  RagStoreConfiguration,
-} from '../../../../types';
+
+import React from "react";
+import { v4 as uuid } from "uuid";
 import {
   Button,
   CircularProgress,
+  Collapse,
   IconButton,
   Tabs,
   Tab,
   Box,
-} from '@mui/material';
-import { Delete, Add } from '@mui/icons-material';
-import { v4 as uuid } from 'uuid';
-import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
-import { AiServicesResponseTypes } from '../../../../ai-services/ai-service-types';
-import ViewPreviousRunModal from '../../../admin-view/view-previous-run-modal';
-import { recursivelyConvertExpectedDataToAiPromptString } from '../../helpers';
-import { TextDialog } from '../../../dialog';
-import ViewPreviousRunsModal from '../../../admin-view/view-previous-runs-modal';
-import { JsonResponseDataUpdater } from './json-response-data-builder';
-import Collapse from '@mui/material/Collapse';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { StepVersion } from '../activity-flow-container';
-import { VersionsDropdown } from './versions-dropdown';
+} from "@mui/material";
+import { Delete, Add, ExpandMore, ExpandLess } from "@mui/icons-material";
+
+import type {
+  FlowItem,
+  JsonResponseData,
+  PromptActivityStep,
+  SinglePromptConfiguration,
+} from "../../types";
+import {
+  RoundedBorderDiv,
+  RowDiv,
+  TopLeftText,
+} from "../../../../styled-components";
+import {
+  CheckBoxInput,
+  InputField,
+  SelectInputField,
+} from "../../shared/input-components";
+import type {
+  AiPromptStep,
+  PromptConfiguration,
+  RagStoreConfiguration,
+} from "../../../../types";
+import { JumpToAlternateStep } from "../../shared/jump-to-alternate-step";
+import type { AiServicesResponseTypes } from "../../../../ai-services/ai-service-types";
+import ViewPreviousRunModal from "../../../admin-view/view-previous-run-modal";
+import { recursivelyConvertExpectedDataToAiPromptString } from "../../helpers";
+import { TextDialog } from "../../../dialog";
+import ViewPreviousRunsModal from "../../../admin-view/view-previous-runs-modal";
+import { JsonResponseDataUpdater } from "./json-response-data-builder";
+import type { StepVersion } from "../activity-flow-container";
+import { VersionsDropdown } from "./versions-dropdown";
 import {
   useActivityBuilderContext,
   useEditActivityContext,
-} from '../../activity-builder-context';
-import { RagStoreConfigurationEditor } from './rag-store-configuration-editor';
-import { PanelistSelector } from './panelist-selector';
+} from "../../activity-builder-context";
+import { RagStoreConfigurationEditor } from "./rag-store-configuration-editor";
+import { PanelistSelector } from "./panelist-selector";
+
+export type ViewingInputType = "PROMPT_TEXT" | "RESPONSE_FORMAT" | "NONE";
+
 export function getEmptyJsonResponseData(): JsonResponseData {
   return {
     clientId: uuid(),
-    name: '',
-    type: JsonResponseDataType.STRING,
+    name: "",
+    type: "string",
     isRequired: true,
-    additionalInfo: '',
+    additionalInfo: "",
   };
 }
 
 export function getDefaultSinglePromptConfiguration(): SinglePromptConfiguration {
   return {
-    promptText: '',
-    responseFormat: '',
+    promptText: "",
+    responseFormat: "",
     editDoc: false,
-    outputDataType: PromptOutputTypes.TEXT,
+    outputDataType: "TEXT",
     jsonResponseData: [],
     includeChatLogContext: false,
-    systemCustomName: '',
+    systemCustomName: "",
     includeEssay: false,
-    customSystemRole: '',
+    customSystemRole: "",
     webSearch: false,
     ragConfiguration: undefined,
   };
@@ -87,7 +86,7 @@ export function getDefaultSinglePromptConfiguration(): SinglePromptConfiguration
 export function defaultEditDocPromptBuilder(): PromptActivityStep {
   return {
     stepId: uuid(),
-    stepType: ActivityBuilderStepType.PROMPT,
+    stepType: "PROMPT",
     promptConfigurations: [
       {
         ...getDefaultSinglePromptConfiguration(),
@@ -95,7 +94,7 @@ export function defaultEditDocPromptBuilder(): PromptActivityStep {
         includeEssay: true,
       },
     ],
-    jumpToStepId: '',
+    jumpToStepId: "",
   };
 }
 
@@ -105,16 +104,10 @@ export function defaultPromptBuilder(editDoc?: boolean): PromptActivityStep {
   }
   return {
     stepId: uuid(),
-    stepType: ActivityBuilderStepType.PROMPT,
+    stepType: "PROMPT",
     promptConfigurations: [getDefaultSinglePromptConfiguration()],
-    jumpToStepId: '',
+    jumpToStepId: "",
   };
-}
-
-export enum ViewingInputType {
-  PROMPT_TEXT = 'PROMPT_TEXT',
-  RESPONSE_FORMAT = 'RESPONSE_FORMAT',
-  NONE = 'NONE',
 }
 
 interface SinglePromptConfigurationEditorProps {
@@ -129,29 +122,29 @@ interface SinglePromptConfigurationEditorProps {
       | string[]
       | JsonResponseData[]
       | RagStoreConfiguration
-      | undefined
+      | undefined,
   ) => void;
   editJsonResponseData: (
     configIndex: number,
     clientId: string,
     field: string,
     value: string | boolean,
-    parentJsonResponseDataIds: string[]
+    parentJsonResponseDataIds: string[],
   ) => void;
   addNewJsonResponseData: (
     configIndex: number,
-    parentJsonResponseDataIds: string[]
+    parentJsonResponseDataIds: string[],
   ) => void;
   deleteJsonResponseData: (
     configIndex: number,
     clientId: string,
-    parentJsonResponseDataIds: string[]
+    parentJsonResponseDataIds: string[],
   ) => void;
 }
 
 function SinglePromptConfigurationEditor(
-  props: SinglePromptConfigurationEditorProps
-): JSX.Element {
+  props: SinglePromptConfigurationEditorProps,
+): React.ReactNode {
   const {
     configuration,
     configIndex,
@@ -161,27 +154,27 @@ function SinglePromptConfigurationEditor(
     deleteJsonResponseData,
   } = props;
   const [viewingInputType, setViewingInputType] =
-    React.useState<ViewingInputType>(ViewingInputType.PROMPT_TEXT);
+    React.useState<ViewingInputType>("PROMPT_TEXT");
 
   return (
     <div
       key={configIndex}
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-        padding: '10px 0',
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        padding: "10px 0",
       }}
     >
       <InputField
         label="Prompt Text"
         value={configuration.promptText}
         onFocus={() => {
-          setViewingInputType(ViewingInputType.PROMPT_TEXT);
+          setViewingInputType("PROMPT_TEXT");
         }}
-        maxRows={viewingInputType === ViewingInputType.PROMPT_TEXT ? 20 : 3}
+        maxRows={viewingInputType === "PROMPT_TEXT" ? 20 : 3}
         onChange={(e) => {
-          updateConfigField(configIndex, 'promptText', e);
+          updateConfigField(configIndex, "promptText", e);
         }}
         width="100%"
       />
@@ -189,30 +182,28 @@ function SinglePromptConfigurationEditor(
       <SelectInputField
         label="Output Data Type"
         value={configuration.outputDataType}
-        options={[...Object.values(PromptOutputTypes)]}
+        options={["TEXT", "JSON"]}
         onChange={(e) => {
-          updateConfigField(configIndex, 'outputDataType', e);
+          updateConfigField(configIndex, "outputDataType", e);
         }}
       />
 
-      {configuration.outputDataType === PromptOutputTypes.TEXT && (
+      {configuration.outputDataType === "TEXT" && (
         <InputField
           label="Text Response Format"
           value={configuration.responseFormat}
           onFocus={() => {
-            setViewingInputType(ViewingInputType.RESPONSE_FORMAT);
+            setViewingInputType("RESPONSE_FORMAT");
           }}
-          maxRows={
-            viewingInputType === ViewingInputType.RESPONSE_FORMAT ? 20 : 3
-          }
+          maxRows={viewingInputType === "RESPONSE_FORMAT" ? 20 : 3}
           onChange={(e) => {
-            updateConfigField(configIndex, 'responseFormat', e);
+            updateConfigField(configIndex, "responseFormat", e);
           }}
           width="100%"
         />
       )}
 
-      {configuration.outputDataType === PromptOutputTypes.JSON && (
+      {configuration.outputDataType === "JSON" && (
         <JsonResponseDataUpdater
           jsonResponseData={configuration.jsonResponseData || []}
           editDataField={(clientId, field, value, parentIds) => {
@@ -221,7 +212,7 @@ function SinglePromptConfigurationEditor(
               clientId,
               field,
               value,
-              parentIds
+              parentIds,
             );
           }}
           addNewJsonResponseData={(parentIds) => {
@@ -239,8 +230,8 @@ function SinglePromptConfigurationEditor(
         onChange={(panelistClientIds) => {
           updateConfigField(
             configIndex,
-            'runForPanelistClientIds',
-            panelistClientIds
+            "runForPanelistClientIds",
+            panelistClientIds,
           );
         }}
       />
@@ -249,7 +240,7 @@ function SinglePromptConfigurationEditor(
         label="Include Chat History"
         value={configuration.includeChatLogContext}
         onChange={(e) => {
-          updateConfigField(configIndex, 'includeChatLogContext', e);
+          updateConfigField(configIndex, "includeChatLogContext", e);
         }}
       />
 
@@ -257,7 +248,7 @@ function SinglePromptConfigurationEditor(
         label="Include Essay"
         value={configuration.includeEssay}
         onChange={(e) => {
-          updateConfigField(configIndex, 'includeEssay', e);
+          updateConfigField(configIndex, "includeEssay", e);
         }}
       />
 
@@ -265,7 +256,7 @@ function SinglePromptConfigurationEditor(
         label="Enable Web Search"
         value={configuration.webSearch || false}
         onChange={(e) => {
-          updateConfigField(configIndex, 'webSearch', e);
+          updateConfigField(configIndex, "webSearch", e);
         }}
       />
 
@@ -273,11 +264,11 @@ function SinglePromptConfigurationEditor(
         ragConfiguration={configuration.ragConfiguration}
         updateRagConfiguration={(updater) => {
           const newConfig =
-            typeof updater === 'function'
+            typeof updater === "function"
               ? updater(configuration.ragConfiguration)
               : updater;
-          console.log('Parent received RAG update:', newConfig);
-          updateConfigField(configIndex, 'ragConfiguration', newConfig);
+          console.log("Parent received RAG update:", newConfig);
+          updateConfigField(configIndex, "ragConfiguration", newConfig);
         }}
       />
 
@@ -285,7 +276,7 @@ function SinglePromptConfigurationEditor(
         label="Custom System Role"
         value={configuration.customSystemRole}
         onChange={(e) => {
-          updateConfigField(configIndex, 'customSystemRole', e);
+          updateConfigField(configIndex, "customSystemRole", e);
         }}
         width="100%"
       />
@@ -305,7 +296,7 @@ export function PromptStepBuilder(props: {
   width?: string;
   height?: string;
   versions: StepVersion[];
-}): JSX.Element {
+}): React.ReactNode {
   const {
     stepId,
     stepIndex,
@@ -347,7 +338,7 @@ export function PromptStepBuilder(props: {
   >([]);
   const [viewingPreviousRuns, setViewingPreviousRuns] =
     React.useState<boolean>(false);
-  const [executeError, setExecuteError] = React.useState<string>('');
+  const [executeError, setExecuteError] = React.useState<string>("");
   const [executeInProgress, setExecuteInProgress] =
     React.useState<boolean>(false);
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
@@ -364,11 +355,7 @@ export function PromptStepBuilder(props: {
   function updateField(
     field: string,
     value:
-      | string
-      | boolean
-      | JsonResponseData[]
-      | RagStoreConfiguration
-      | undefined
+      string | boolean | JsonResponseData[] | RagStoreConfiguration | undefined,
   ) {
     updateStepField(step.stepId, field, value);
   }
@@ -382,7 +369,7 @@ export function PromptStepBuilder(props: {
       | string[]
       | JsonResponseData[]
       | RagStoreConfiguration
-      | undefined
+      | undefined,
   ) {
     updatePromptConfigField(step.stepId, configIndex, field, value);
   }
@@ -417,7 +404,7 @@ export function PromptStepBuilder(props: {
     clientId: string,
     field: string,
     value: string | boolean,
-    parentJsonResponseDataIds: string[]
+    parentJsonResponseDataIds: string[],
   ) {
     updateJsonResponseDataInContext(
       step.stepId,
@@ -425,32 +412,32 @@ export function PromptStepBuilder(props: {
       clientId,
       field,
       value,
-      parentJsonResponseDataIds
+      parentJsonResponseDataIds,
     );
   }
 
   function addNewJsonResponseData(
     configIndex: number,
-    parentJsonResponseDataIds: string[]
+    parentJsonResponseDataIds: string[],
   ) {
     addJsonResponseDataInContext(
       step.stepId,
       configIndex,
       parentJsonResponseDataIds,
-      getEmptyJsonResponseData()
+      getEmptyJsonResponseData(),
     );
   }
 
   function deleteJsonResponseData(
     configIndex: number,
     clientId: string,
-    parentJsonResponseDataIds: string[]
+    parentJsonResponseDataIds: string[],
   ) {
     deleteJsonResponseDataInContext(
       step.stepId,
       configIndex,
       clientId,
-      parentJsonResponseDataIds
+      parentJsonResponseDataIds,
     );
   }
 
@@ -470,7 +457,7 @@ export function PromptStepBuilder(props: {
     const promptConfig: PromptConfiguration = {
       promptText: config.promptText,
       includeEssay: config.includeEssay,
-      promptRole: PromptRoles.USER,
+      promptRole: "user",
     };
     aiPromptSteps[0].prompts.push(promptConfig);
     if (config.jsonResponseData?.length) {
@@ -479,7 +466,7 @@ export function PromptStepBuilder(props: {
     }
     try {
       if (!executePromptSteps) {
-        throw new Error('Execute prompt steps function is not available');
+        throw new Error("Execute prompt steps function is not available");
       }
       const _response = await executePromptSteps(aiPromptSteps);
       setViewRunResults(_response);
@@ -496,11 +483,11 @@ export function PromptStepBuilder(props: {
     <RoundedBorderDiv
       key={rerender}
       style={{
-        width: props.width || '100%',
-        height: props.height || '100%',
-        display: 'flex',
-        position: 'relative',
-        flexDirection: 'column',
+        width: props.width || "100%",
+        height: props.height || "100%",
+        display: "flex",
+        position: "relative",
+        flexDirection: "column",
         padding: 10,
       }}
       data-cy="prompt-step-builder"
@@ -508,7 +495,7 @@ export function PromptStepBuilder(props: {
       <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>
       <div
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 60,
         }}
@@ -520,20 +507,20 @@ export function PromptStepBuilder(props: {
       </div>
       <IconButton
         style={{
-          width: 'fit-content',
-          position: 'absolute',
+          width: "fit-content",
+          position: "absolute",
           left: 10,
           top: 40,
         }}
         onClick={() => setCollapsed(!collapsed)}
       >
-        {collapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+        {collapsed ? <ExpandMore /> : <ExpandLess />}
       </IconButton>
       <RowDiv
         data-cy="run-prompt-buttons"
         style={{
-          width: 'fit-content',
-          alignSelf: 'center',
+          width: "fit-content",
+          alignSelf: "center",
         }}
       >
         {previewed && (
@@ -590,16 +577,16 @@ export function PromptStepBuilder(props: {
               body={executeError}
               open={Boolean(executeError)}
               close={() => {
-                setExecuteError('');
+                setExecuteError("");
               }}
             />
           </>
         )}
         <Button
-          variant={previewed ? 'contained' : 'outlined'}
+          variant={previewed ? "contained" : "outlined"}
           style={{
-            width: 'fit-content',
-            alignSelf: 'center',
+            width: "fit-content",
+            alignSelf: "center",
           }}
           data-cy="preview-prompt-button"
           onClick={() => {
@@ -610,25 +597,25 @@ export function PromptStepBuilder(props: {
             }
           }}
         >
-          {previewed ? 'Return' : 'Preview'}
+          {previewed ? "Return" : "Preview"}
         </Button>
       </RowDiv>
       <IconButton
         style={{
-          position: 'absolute',
+          position: "absolute",
           right: 10,
           top: 10,
         }}
         onClick={() => {
-          deleteStep(step.stepId, currentFLow?.clientId || '');
+          deleteStep(step.stepId, currentFLow?.clientId || "");
         }}
       >
         <Delete />
       </IconButton>
-      <h4 style={{ alignSelf: 'center' }}>Prompt Step</h4>
+      <h4 style={{ alignSelf: "center" }}>Prompt Step</h4>
       {errors && errors.length > 0 && (
-        <span style={{ color: 'red', textAlign: 'center' }}>
-          {errors.join(', ')}
+        <span style={{ color: "red", textAlign: "center" }}>
+          {errors.join(", ")}
         </span>
       )}
       <Collapse in={!collapsed}>
@@ -636,9 +623,9 @@ export function PromptStepBuilder(props: {
         <Box
           sx={{
             borderBottom: 1,
-            borderColor: 'divider',
-            display: 'flex',
-            alignItems: 'center',
+            borderColor: "divider",
+            display: "flex",
+            alignItems: "center",
           }}
         >
           <Tabs
@@ -658,7 +645,7 @@ export function PromptStepBuilder(props: {
           <IconButton
             onClick={addNewPromptConfiguration}
             size="small"
-            style={{ marginLeft: 'auto' }}
+            style={{ marginLeft: "auto" }}
             data-cy="add-prompt-config-button"
           >
             <Add />
@@ -693,7 +680,7 @@ export function PromptStepBuilder(props: {
           step={step}
           flowsList={props.flowsList}
           onNewStepSelected={(stepId) => {
-            updateField('jumpToStepId', stepId);
+            updateField("jumpToStepId", stepId);
           }}
         />
       </Collapse>

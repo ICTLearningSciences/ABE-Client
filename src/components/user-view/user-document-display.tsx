@@ -4,14 +4,15 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { HugeRTEEditor } from './raw-text-document/huge-rte';
-import { useWithStoreDocVersions } from '../../hooks/use-with-google-doc-versions';
-import { useAppSelector } from '../../store/hooks';
-import { LoginService } from '../../store/slices/login';
-import { Button } from '@mui/material';
-import ChatIcon from '@mui/icons-material/Chat';
-import { useWithWindowSize } from '../../hooks/use-with-window-size';
+
+import React from "react";
+import { Button } from "@mui/material";
+import ChatIcon from "@mui/icons-material/Chat";
+import { HugeRTEEditor } from "./raw-text-document/huge-rte";
+import { useWithStoreDocVersions } from "../../hooks/use-with-google-doc-versions";
+import { useAppSelector } from "../../store/hooks";
+import { useWithWindowSize } from "../../hooks/use-with-window-size";
+
 interface UserDocumentDisplayProps {
   docId: string;
   docUrl: string;
@@ -23,17 +24,17 @@ interface UserDocumentDisplayProps {
 export function GoogleDocDisplay(props: {
   docUrl: string;
   currentActivityId: string;
-}): JSX.Element {
+}): React.ReactNode {
   const { docUrl, currentActivityId } = props;
   const loggedInEmail = useAppSelector((state) => state.login.user?.email);
   const params = new URL(docUrl);
-  loggedInEmail && params.searchParams.set('authuser', loggedInEmail);
+  loggedInEmail && params.searchParams.set("authuser", loggedInEmail);
   const docUrlWithParams = params.toString();
   useWithStoreDocVersions(currentActivityId);
   return (
     <iframe
-      width={'98%'}
-      height={'98%'}
+      width={"98%"}
+      height={"98%"}
       src={docUrlWithParams}
       data-cy="google-doc-iframe"
     />
@@ -41,25 +42,25 @@ export function GoogleDocDisplay(props: {
 }
 
 export function UserDocumentDisplay(
-  props: UserDocumentDisplayProps
-): JSX.Element {
+  props: UserDocumentDisplayProps,
+): React.ReactNode {
   const { docId, docUrl, width, currentActivityId, setToChatView } = props;
   const loginService = useAppSelector(
-    (state) => state.login.user?.loginService
+    (state) => state.login.user?.loginService,
   );
   const { isMobile } = useWithWindowSize();
 
   // Render appropriate document component based on doc service type
   const renderDocumentComponent = () => {
     switch (loginService) {
-      case LoginService.GOOGLE:
+      case "GOOGLE":
         return (
           <GoogleDocDisplay
             docUrl={docUrl}
             currentActivityId={currentActivityId}
           />
         );
-      case LoginService.AMAZON_COGNITO:
+      case "AMAZON_COGNITO":
       default:
         return (
           <HugeRTEEditor docId={docId} currentActivityId={currentActivityId} />
@@ -70,11 +71,11 @@ export function UserDocumentDisplay(
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        justifyContent: 'space-around',
-        alignItems: 'center',
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        justifyContent: "space-around",
+        alignItems: "center",
         width: width,
       }}
     >
@@ -82,9 +83,9 @@ export function UserDocumentDisplay(
         <Button
           onClick={setToChatView}
           variant="contained"
-          style={{ alignSelf: 'flex-start', margin: 10 }}
+          style={{ alignSelf: "flex-start", margin: 10 }}
         >
-          {' '}
+          {" "}
           <ChatIcon /> Back to Chat
         </Button>
       )}

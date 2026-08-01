@@ -4,24 +4,24 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { recursivelyConvertExpectedDataToAiPromptString } from '../components/activity-builder/helpers';
-import { JsonResponseDataType } from '../components/activity-builder/types';
+import { recursivelyConvertExpectedDataToAiPromptString } from "../components/activity-builder/helpers";
+import { JsonResponseDataType } from "../components/activity-builder/types";
 
-test.skip('epxected json data conversion string', () => {
+test.skip("epxected json data conversion string", () => {
   const res = recursivelyConvertExpectedDataToAiPromptString([
     {
-      clientId: '1',
-      name: 'name',
-      type: JsonResponseDataType.STRING,
+      clientId: "1",
+      name: "name",
+      type: "string",
       isRequired: true,
-      additionalInfo: 'name of the user',
+      additionalInfo: "name of the user",
     },
     {
-      clientId: '2',
-      name: 'age',
-      type: JsonResponseDataType.STRING,
+      clientId: "2",
+      name: "age",
+      type: "string",
       isRequired: true,
-      additionalInfo: 'age of the user',
+      additionalInfo: "age of the user",
     },
   ]);
   console.log(res);

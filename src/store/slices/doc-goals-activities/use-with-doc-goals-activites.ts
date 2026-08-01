@@ -1,34 +1,40 @@
-import { useMemo } from 'react';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { useMemo } from "react";
 import {
   fetchDocGoals as _fetchDocGoals,
   fetchActivities as _fetchActivities,
   fetchBuiltActivities as _fetchBuiltActivities,
   addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
-  LoadStatus,
   addNewLocalBuiltActivity as _addNewLocalBuiltActivity,
   storeActivityVersionForActivity,
   copyBuiltActivity as _copyBuiltActivity,
   deleteBuiltActivity as _deleteBuiltActivity,
-} from '.';
+} from ".";
 import {
-  ActivityBuilder,
+  type ActivityBuilder,
   defaultActivityBuilder,
-} from '../../../components/activity-builder/types';
-import {
+} from "../../../components/activity-builder/types";
+import type {
   ActivityGQL,
   ActivityTypes,
   Config,
   DocGoal,
   DocGoalGQl,
-} from '../../../types';
-import { useAppDispatch, useAppSelector } from '../../hooks';
+} from "../../../types";
+import { useAppDispatch, useAppSelector } from "../../hooks";
 
 export interface UseWithDocGoalsActivities {
   loadDocGoals: () => Promise<DocGoalGQl[]>;
   loadBuiltActivities: () => Promise<ActivityBuilder[]>;
   loadActivities: () => Promise<ActivityGQL[]>;
   addOrUpdateBuiltActivity: (
-    activity: ActivityBuilder
+    activity: ActivityBuilder,
   ) => Promise<ActivityBuilder>;
   addNewLocalBuiltActivity: () => ActivityBuilder;
   copyBuiltActivity: (activityId: string) => Promise<ActivityBuilder>;
@@ -45,26 +51,26 @@ export interface UseWithDocGoalsActivities {
 export function useWithDocGoalsActivities(
   userId: string,
   config?: Config,
-  storeVersion = true
+  storeVersion = true,
 ): UseWithDocGoalsActivities {
   const dispatch = useAppDispatch();
   const activitiesLoadingState = useAppSelector(
-    (state) => state.docGoalsActivities.activitiesLoadStatus
+    (state) => state.docGoalsActivities.activitiesLoadStatus,
   );
   const docGoalsLoadingState = useAppSelector(
-    (state) => state.docGoalsActivities.docGoalsLoadStatus
+    (state) => state.docGoalsActivities.docGoalsLoadStatus,
   );
-  const activities = useAppSelector(
-    (state) => state.docGoalsActivities.activities
+  const activities: ActivityGQL[] = useAppSelector(
+    (state) => state.docGoalsActivities.activities,
   );
-  const builtActivities = useAppSelector(
-    (state) => state.docGoalsActivities.builtActivities
+  const builtActivities: ActivityBuilder[] = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivities,
   );
   const builtActivitiesLoadingState = useAppSelector(
-    (state) => state.docGoalsActivities.builtActivitiesLoadStatus
+    (state) => state.docGoalsActivities.builtActivitiesLoadStatus,
   );
-  const docGoalsGql = useAppSelector(
-    (state) => state.docGoalsActivities.docGoals
+  const docGoalsGql: DocGoalGQl[] = useAppSelector(
+    (state) => state.docGoalsActivities.docGoals,
   );
   const displayedGoalActivities = config?.displayedGoalActivities || [];
 
@@ -87,11 +93,11 @@ export function useWithDocGoalsActivities(
           }
           return [...acc, { ...activity, disabled: builtActivity.disabled }];
         },
-        [] as ActivityBuilder[]
+        [] as ActivityBuilder[],
       );
       return [...acc, { ...goal, builtActivities: builtActivities || [] }];
     },
-    [] as DocGoal[]
+    [] as DocGoal[],
   );
 
   const getActivityById = (id: string): ActivityTypes | undefined => {
@@ -120,7 +126,7 @@ export function useWithDocGoalsActivities(
   }
 
   async function addOrUpdateBuiltActivity(
-    activity: ActivityBuilder
+    activity: ActivityBuilder,
   ): Promise<ActivityBuilder> {
     if (storeVersion) {
       dispatch(storeActivityVersionForActivity(activity));
@@ -163,11 +169,13 @@ export function useWithDocGoalsActivities(
     docGoals: docGoalsActivities,
     frontPageActivities,
     isLoading:
-      docGoalsLoadingState === LoadStatus.LOADING ||
-      builtActivitiesLoadingState === LoadStatus.LOADING ||
-      activitiesLoadingState === LoadStatus.LOADING,
+      docGoalsLoadingState === 1 ||
+      builtActivitiesLoadingState === 1 ||
+      activitiesLoadingState === 1,
     educationReadyActivities: builtActivities.filter((a) =>
-      a.flowsList.some((f) => f.steps.some((s) => s.setStudentActivityComplete))
+      a.flowsList.some((f) =>
+        f.steps.some((s) => s.setStudentActivityComplete),
+      ),
     ),
   };
 }

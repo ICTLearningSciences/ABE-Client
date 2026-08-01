@@ -4,13 +4,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
+
+import React, { useState } from "react";
+import { Box, Typography, IconButton } from "@mui/material";
 import {
   ExpandMore,
   ChevronRight,
   FiberManualRecord,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
 export interface TreeItem {
   id: string;
@@ -52,7 +53,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ title }) => {
         py: 1.5,
         px: 1,
         borderBottom: 1,
-        borderColor: 'divider',
+        borderColor: "divider",
         mb: 1,
       }}
     >
@@ -60,10 +61,10 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ title }) => {
         variant="subtitle2"
         sx={{
           fontWeight: 600,
-          color: 'text.primary',
-          textTransform: 'uppercase',
-          fontSize: '11px',
-          letterSpacing: '0.5px',
+          color: "text.primary",
+          textTransform: "uppercase",
+          fontSize: "11px",
+          letterSpacing: "0.5px",
         }}
       >
         {title}
@@ -87,54 +88,54 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
   const getFontSize = (level: number) => {
     switch (level) {
       case 0:
-        return '14px';
+        return "14px";
       case 1:
-        return '13px';
+        return "13px";
       case 2:
-        return '12px';
+        return "12px";
       default:
-        return '12px';
+        return "12px";
     }
   };
 
   const getIconSize = (level: number) => {
     switch (level) {
       case 0:
-        return '16px';
+        return "16px";
       case 1:
-        return '14px';
+        return "14px";
       case 2:
-        return '12px';
+        return "12px";
       default:
-        return '12px';
+        return "12px";
     }
   };
 
   const getTextColor = (level: number) => {
     switch (level) {
       case 0:
-        return '#1B6A9C';
+        return "#1B6A9C";
       case 1:
-        return '#495057';
+        return "#495057";
       case 2:
-        return '#6c757d';
+        return "#6c757d";
       default:
-        return '#6c757d';
+        return "#6c757d";
     }
   };
 
   const getFontWeight = (level: number) => {
-    return level === 0 ? '500' : 'normal';
+    return level === 0 ? "500" : "normal";
   };
 
   return (
     <Box>
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
           py: level === 0 ? 1 : level === 1 ? 0.75 : 0.5,
-          cursor: 'pointer',
+          cursor: "pointer",
           ml: `${indentWidth}px`,
         }}
       >
@@ -143,24 +144,24 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
           onClick={() => hasSubItems && onToggleExpand(item.id)}
           size="small"
           sx={{
-            width: '20px',
-            height: '20px',
+            width: "20px",
+            height: "20px",
             mr: 1,
-            color: 'text.secondary',
-            cursor: hasSubItems ? 'pointer' : 'default',
-            '&:hover': {
-              backgroundColor: hasSubItems ? 'action.hover' : 'transparent',
+            color: "text.secondary",
+            cursor: hasSubItems ? "pointer" : "default",
+            "&:hover": {
+              backgroundColor: hasSubItems ? "action.hover" : "transparent",
             },
           }}
         >
           {hasSubItems ? (
             isExpanded ? (
-              <ExpandMore sx={{ fontSize: '12px' }} />
+              <ExpandMore sx={{ fontSize: "12px" }} />
             ) : (
-              <ChevronRight sx={{ fontSize: '12px' }} />
+              <ChevronRight sx={{ fontSize: "12px" }} />
             )
           ) : (
-            <FiberManualRecord sx={{ fontSize: '8px' }} />
+            <FiberManualRecord sx={{ fontSize: "8px" }} />
           )}
         </IconButton>
 
@@ -169,17 +170,17 @@ const TreeItemComponent: React.FC<TreeItemProps> = ({
           onClick={item.onClick}
           data-cy={`tree-item-${item.id}`}
           sx={{
-            display: 'flex',
-            alignItems: 'center',
+            display: "flex",
+            alignItems: "center",
             flex: 1,
             px: 1,
             py: 0.5,
             borderRadius: 1,
-            backgroundColor: isSelected ? '#e3f2fd' : 'transparent',
-            transition: 'background-color 0.2s ease',
-            cursor: 'pointer',
-            '&:hover': {
-              backgroundColor: isSelected ? '#e3f2fd' : 'grey.50',
+            backgroundColor: isSelected ? "#e3f2fd" : "transparent",
+            transition: "background-color 0.2s ease",
+            cursor: "pointer",
+            "&:hover": {
+              backgroundColor: isSelected ? "#e3f2fd" : "grey.50",
             },
           }}
         >

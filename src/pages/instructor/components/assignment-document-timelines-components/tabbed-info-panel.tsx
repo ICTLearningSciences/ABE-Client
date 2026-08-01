@@ -4,12 +4,13 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
-import { Box, Typography, Paper, Tabs, Tab } from '@mui/material';
-import { DehydratedGQLTimelinePoint } from '../../../../types';
-import { ChatLogTab } from './chat-log-tab';
-import { AiOutlineTab } from './ai-outline-tab';
-import { AiChangeSummaryTab } from './ai-change-summary-tab';
+
+import React, { useState } from "react";
+import { Box, Typography, Paper, Tabs, Tab } from "@mui/material";
+import type { DehydratedGQLTimelinePoint } from "../../../../types";
+import { ChatLogTab } from "./chat-log-tab";
+import { AiOutlineTab } from "./ai-outline-tab";
+import { AiChangeSummaryTab } from "./ai-change-summary-tab";
 
 interface TabbedInfoPanelProps {
   timelinePoint: DehydratedGQLTimelinePoint | null;
@@ -32,10 +33,10 @@ function TabPanel(props: TabPanelProps) {
       id={`info-tabpanel-${index}`}
       aria-labelledby={`info-tab-${index}`}
       {...other}
-      style={{ height: '100%' }}
+      style={{ height: "100%" }}
     >
       {value === index && (
-        <Box sx={{ p: 2, pt: 0, height: '100%', overflow: 'auto' }}>
+        <Box sx={{ p: 2, pt: 0, height: "100%", overflow: "auto" }}>
           {children}
         </Box>
       )}
@@ -49,7 +50,7 @@ export const TabbedInfoPanel: React.FC<TabbedInfoPanelProps> = ({
 }) => {
   const [tabValue, setTabValue] = useState(0);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
@@ -57,10 +58,10 @@ export const TabbedInfoPanel: React.FC<TabbedInfoPanelProps> = ({
     return (
       <Box
         sx={{
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <Typography color="text.secondary">
@@ -73,11 +74,11 @@ export const TabbedInfoPanel: React.FC<TabbedInfoPanelProps> = ({
   return (
     <Paper
       sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        border: '1px solid',
-        borderColor: 'grey.200',
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        border: "1px solid",
+        borderColor: "grey.200",
       }}
     >
       <Tabs
@@ -85,15 +86,15 @@ export const TabbedInfoPanel: React.FC<TabbedInfoPanelProps> = ({
         onChange={handleTabChange}
         sx={{
           borderBottom: 1,
-          borderColor: 'divider',
-          '& .MuiTab-root': {
-            color: '#666',
-            '&.Mui-selected': {
-              color: '#1976d2',
+          borderColor: "divider",
+          "& .MuiTab-root": {
+            color: "#666",
+            "&.Mui-selected": {
+              color: "#1976d2",
             },
           },
-          '& .MuiTabs-indicator': {
-            backgroundColor: '#1976d2',
+          "& .MuiTabs-indicator": {
+            backgroundColor: "#1976d2",
           },
         }}
       >
@@ -105,7 +106,7 @@ export const TabbedInfoPanel: React.FC<TabbedInfoPanelProps> = ({
         />
       </Tabs>
 
-      <Box sx={{ flex: 1, overflow: 'hidden', height: '100%' }}>
+      <Box sx={{ flex: 1, overflow: "hidden", height: "100%" }}>
         <TabPanel value={tabValue} index={0}>
           <ChatLogTab
             chatLog={timelinePoint.version?.chatLog || []}

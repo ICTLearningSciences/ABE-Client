@@ -4,13 +4,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect, useState } from 'react';
+
+import { useEffect, useState } from "react";
 
 export function useWithRouteChangeRerender(): {
   stateCounter: number;
   path: string;
 } {
-  const path = typeof window !== 'undefined' ? window.location.pathname : '';
+  const path = typeof window !== "undefined" ? window.location.pathname : "";
   const [stateCounter, setStateCounter] = useState(0);
 
   useEffect(() => {

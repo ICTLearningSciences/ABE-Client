@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+
+import React, { useState } from "react";
 import {
   Button,
   Drawer,
@@ -12,39 +13,36 @@ import {
   ThemeProvider,
   Tooltip,
   createTheme,
-} from '@mui/material';
-import { UseWithLogin } from '../../store/slices/login/use-with-login';
-import { useAppSelector } from '../../store/hooks';
-import { LoginStatus } from '../../store/slices/login';
-import { DEFAULT_COLOR_THEME } from '../../constants';
-import { Home } from '@mui/icons-material';
-import { HeaderTitle } from '../header-title';
-import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
-import PersonIcon from '@mui/icons-material/Person';
-import { UserInfoSettings } from '../settings/user-info-settings';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { CuiHeader } from './cui-header';
-import { PrivacyPolicyDisplay } from '../privacy-policy-display';
-import { RowDiv } from '../../styled-components';
-import { FirefoxCookieWarningDialog } from '../firefox-cookie-warning-dialog';
-import { useWithBrowserDetection } from '../../hooks/use-with-browser-detection';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import { HomeAndCourseDisplay } from './home-and-course-display';
+} from "@mui/material";
+import { Home, Logout, Person, WarningAmber } from "@mui/icons-material";
+
+import type { UseWithLogin } from "../../store/slices/login/use-with-login";
+import { useAppSelector } from "../../store/hooks";
+import { DEFAULT_COLOR_THEME } from "../../constants";
+import { HeaderTitle } from "../header-title";
+import { useNavigateWithParams } from "../../hooks/use-navigate-with-params";
+import { UserInfoSettings } from "../settings/user-info-settings";
+import { CuiHeader } from "./cui-header";
+import { PrivacyPolicyDisplay } from "../privacy-policy-display";
+import { RowDiv } from "../../styled-components";
+import { FirefoxCookieWarningDialog } from "../firefox-cookie-warning-dialog";
+import { useWithBrowserDetection } from "../../hooks/use-with-browser-detection";
+import { HomeAndCourseDisplay } from "./home-and-course-display";
 
 export default function Header(props: {
   useLogin: UseWithLogin;
   courseNavPath: string;
   freeDocEditingNavPath: string;
-}): JSX.Element {
+}): React.ReactNode {
   const { useLogin, courseNavPath, freeDocEditingNavPath } = props;
   const { logout } = useLogin;
   const loginStatus = useAppSelector((state) => state.login.loginStatus);
-  const loggedIn = loginStatus === LoginStatus.AUTHENTICATED;
+  const loggedIn = loginStatus === 3;
   const navigate = useNavigateWithParams();
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
   const defaultPath = courseNavPath || freeDocEditingNavPath;
-  const curPath = typeof window !== 'undefined' ? window.location.pathname : '';
+  const curPath = typeof window !== "undefined" ? window.location.pathname : "";
   const theme = createTheme({
     palette: {
       primary: {
@@ -53,7 +51,7 @@ export default function Header(props: {
     },
   });
   const [profileOpen, setProfileOpen] = useState(false);
-  const buttonDisplayType = courseNavPath ? 'DOC_AND_COURSE' : 'DOC_ONLY';
+  const buttonDisplayType = courseNavPath ? "DOC_AND_COURSE" : "DOC_ONLY";
   const { warnFirefoxWithGoogleLogin } = useWithBrowserDetection();
 
   function docOnlyDisplay() {
@@ -81,34 +79,34 @@ export default function Header(props: {
       >
         <div
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'space-around',
-            height: '100%',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "space-around",
+            height: "100%",
           }}
           data-cy="profile-drawer"
         >
           <div
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'space-around',
-              height: '90%',
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "space-around",
+              height: "90%",
             }}
           >
             <UserInfoSettings />
           </div>
           <Button
-            style={{ color: 'blue' }}
+            style={{ color: "blue" }}
             variant="contained"
             onClick={async () => {
               await logout();
-              navigate('/');
+              navigate("/");
             }}
           >
-            Logout <LogoutIcon style={{ marginLeft: 10 }} />
+            Logout <Logout style={{ marginLeft: 10 }} />
           </Button>
           <PrivacyPolicyDisplay />
         </div>
@@ -116,24 +114,24 @@ export default function Header(props: {
       <header
         data-cy="header"
         style={{
-          width: '100%',
-          height: '6vh',
+          width: "100%",
+          height: "6vh",
           backgroundColor: colorTheme.headerColor,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          overflow: 'hidden',
-          boxSizing: 'border-box',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "white",
+          overflow: "hidden",
+          boxSizing: "border-box",
         }}
       >
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
             left: 40,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           {loggedIn && (
@@ -142,7 +140,7 @@ export default function Header(props: {
                 gap: 20,
               }}
             >
-              {buttonDisplayType === 'DOC_AND_COURSE' && (
+              {buttonDisplayType === "DOC_AND_COURSE" && (
                 <HomeAndCourseDisplay
                   defaultPath={defaultPath}
                   courseNavPath={courseNavPath}
@@ -151,7 +149,7 @@ export default function Header(props: {
                   navigate={navigate}
                 />
               )}
-              {buttonDisplayType === 'DOC_ONLY' && docOnlyDisplay()}
+              {buttonDisplayType === "DOC_ONLY" && docOnlyDisplay()}
             </RowDiv>
           )}
         </div>
@@ -168,8 +166,8 @@ export default function Header(props: {
           any issues, try enabling third-party cookies in your settings or
           switch to another browser."
             >
-              <WarningAmberIcon
-                style={{ color: 'red', fontSize: '30px', cursor: 'pointer' }}
+              <WarningAmber
+                style={{ color: "red", fontSize: "30px", cursor: "pointer" }}
               />
             </Tooltip>
           )}
@@ -178,11 +176,11 @@ export default function Header(props: {
         {loggedIn && (
           <div
             style={{
-              position: 'absolute',
+              position: "absolute",
               right: 20,
-              display: 'flex',
-              height: 'fit-content',
-              alignItems: 'center',
+              display: "flex",
+              height: "fit-content",
+              alignItems: "center",
             }}
           >
             <IconButton
@@ -190,11 +188,11 @@ export default function Header(props: {
                 setProfileOpen(true);
               }}
               style={{
-                color: 'white',
+                color: "white",
               }}
               data-cy="profile-button"
             >
-              <PersonIcon />
+              <Person />
             </IconButton>
           </div>
         )}

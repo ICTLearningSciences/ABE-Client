@@ -1,22 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { Typography } from '@mui/material';
-import { createGlobalStyle } from 'styled-components';
-import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
-import ViewPreviousRunModal from '../../../components/admin-view/view-previous-run-modal';
-import SystemPromptModal from '../../../components/user-view/chat/system-prompt-modal';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { useState, useEffect } from "react";
+import { createGlobalStyle } from "styled-components";
+import { Typography } from "@mui/material";
+import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-types";
+import ViewPreviousRunModal from "../../../components/admin-view/view-previous-run-modal";
+import SystemPromptModal from "../../../components/user-view/chat/system-prompt-modal";
 import {
   useWithChat,
   useWithState,
   isActivityBuilder,
-} from '../../../exported-files';
-import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activity-handler';
-import { useWithSystemPromptsConfig } from '../../../hooks/use-with-system-prompts-config';
-import { useAppSelector } from '../../../store/hooks';
-import { ChatMessageTypes } from '../../../store/slices/chat';
-import { ActivityTypes } from '../../../types';
-import { ChatHeader } from './chat-header';
-import { ChatInput } from './chat-input';
-import { ChatThread } from './chat-thread';
+} from "../../../exported-files";
+import { useWithBuiltActivityHandler } from "../../../hooks/use-with-built-activity-handler";
+import { useWithSystemPromptsConfig } from "../../../hooks/use-with-system-prompts-config";
+import { useAppSelector } from "../../../store/hooks";
+import type { ChatMessageTypes } from "../../../store/slices/chat";
+import type { ActivityTypes } from "../../../types";
+import { ChatHeader } from "./chat-header";
+import { ChatInput } from "./chat-input";
+import { ChatThread } from "./chat-thread";
 
 export const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
@@ -42,7 +49,7 @@ export function Chat(props: {
   const { state } = useWithState();
   const { curDocId } = state;
   const coachResponsePending = useAppSelector(
-    (state) => state.chat.coachResponsePending
+    (state) => state.chat.coachResponsePending,
   );
   const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
   const { activityReady: builtActivityReady } = useWithBuiltActivityHandler(
@@ -52,13 +59,13 @@ export function Chat(props: {
     },
     selectedActivity && isActivityBuilder(selectedActivity)
       ? selectedActivity
-      : undefined
+      : undefined,
   );
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
   const disableInput =
     coachResponsePending ||
     Boolean(
-      messages?.length > 0 && messages[messages.length - 1].disableUserInput
+      messages?.length > 0 && messages[messages.length - 1].disableUserInput,
     );
   const [openAiInfoToDisplay, setAiInfoToDisplay] =
     useState<AiServiceStepDataTypes[]>();
@@ -66,7 +73,7 @@ export function Chat(props: {
   const [targetSystemPrompt, setTargetSystemPrompt] = useState<number>(0);
   const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
-    : '';
+    : "";
 
   useEffect(() => {
     setSystemRole(systemRole);
@@ -80,11 +87,11 @@ export function Chat(props: {
     <div
       data-cy="chat-container-parent"
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        width: '100%',
-        alignItems: 'center',
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        width: "100%",
+        alignItems: "center",
       }}
     >
       <GlobalChatStyles />
@@ -93,9 +100,9 @@ export function Chat(props: {
           data-cy="chat-box"
           className="column center-div"
           style={{
-            height: '100%',
-            width: '100%',
-            justifyContent: 'space-around',
+            height: "100%",
+            width: "100%",
+            justifyContent: "space-around",
           }}
         >
           <ChatHeader
@@ -116,7 +123,7 @@ export function Chat(props: {
           ) : (
             <Typography
               className="column center-div"
-              style={{ height: '100%' }}
+              style={{ height: "100%" }}
             >
               Please select a document to get started
             </Typography>

@@ -1,10 +1,11 @@
 /*
-This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved.
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
 Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+
+import React from "react";
 import {
   FormControl,
   Select,
@@ -13,14 +14,11 @@ import {
   Typography,
   IconButton,
   Box,
-} from '@mui/material';
-import {
-  NavigateBefore as ArrowBackIcon,
-  NavigateNext as ArrowForwardIcon,
-} from '@mui/icons-material';
-import { StudentAssignmentCompletionStatus } from '../../../../helpers';
-import { useWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
-import { isStudentData } from '../../../../store/slices/education-management/types';
+} from "@mui/material";
+import { NavigateBefore, NavigateNext } from "@mui/icons-material";
+import type { StudentAssignmentCompletionStatus } from "../../../../helpers";
+import { useWithEducationalManagement } from "../../../../store/slices/education-management/use-with-educational-management";
+import { isStudentData } from "../../../../store/slices/education-management/types";
 
 interface StudentSelectorProps {
   studentStatuses: StudentAssignmentCompletionStatus[];
@@ -39,7 +37,7 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
   const isStudentViewer = myData && isStudentData(myData);
 
   const currentStudentIndex = studentStatuses.findIndex(
-    (status) => status.studentId === currentStudentId
+    (status) => status.studentId === currentStudentId,
   );
   const canGoPrevious = currentStudentIndex > 0;
   const canGoNext = currentStudentIndex < studentStatuses.length - 1;
@@ -61,17 +59,17 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        position: 'relative',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        position: "relative",
         gap: 0.5,
       }}
     >
       {!isStudentViewer && (
         <Box
           sx={{
-            position: 'absolute',
+            position: "absolute",
             left: 0,
             right: 0,
             top: -30,
@@ -84,12 +82,12 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
             size="small"
             sx={{
               padding: 0.5,
-              '&:disabled': {
+              "&:disabled": {
                 opacity: 0.3,
               },
             }}
           >
-            <ArrowBackIcon fontSize="small" />
+            <NavigateBefore fontSize="small" />
           </IconButton>
           <IconButton
             data-cy="student-selector-next"
@@ -98,12 +96,12 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
             size="small"
             sx={{
               padding: 0.5,
-              '&:disabled': {
+              "&:disabled": {
                 opacity: 0.3,
               },
             }}
           >
-            <ArrowForwardIcon fontSize="small" />
+            <NavigateNext fontSize="small" />
           </IconButton>
         </Box>
       )}
@@ -111,8 +109,8 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
         sx={{
           minWidth: 300,
           padding: 0,
-          height: 'fit-content',
-          width: 'fit-content',
+          height: "fit-content",
+          width: "fit-content",
         }}
         style={{
           padding: 0,
@@ -129,16 +127,16 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
             value={currentStudentId}
             onChange={(e) => onStudentChange(e.target.value, assignmentId)}
             sx={{
-              '& .MuiOutlinedInput-root': {
-                '&.Mui-focused fieldset': {
-                  borderColor: '#1976d2',
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "#1976d2",
                 },
               },
-              '& .MuiSelect-select': {
+              "& .MuiSelect-select": {
                 padding: 0,
               },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: '#1976d2',
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "#1976d2",
               },
               padding: 0,
             }}
@@ -152,19 +150,19 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
                     studentStatus.studentId === currentStudentId ? 600 : 400,
                   backgroundColor:
                     studentStatus.studentId === currentStudentId
-                      ? 'rgba(25, 118, 210, 0.08)'
-                      : 'transparent',
-                  '&:hover': {
+                      ? "rgba(25, 118, 210, 0.08)"
+                      : "transparent",
+                  "&:hover": {
                     backgroundColor:
                       studentStatus.studentId === currentStudentId
-                        ? 'rgba(25, 118, 210, 0.12)'
+                        ? "rgba(25, 118, 210, 0.12)"
                         : undefined,
                   },
                 }}
               >
                 <ListItemText
                   primary={studentStatus.studentName}
-                  primaryTypographyProps={{
+                  style={{
                     fontWeight:
                       studentStatus.studentId === currentStudentId ? 600 : 400,
                   }}

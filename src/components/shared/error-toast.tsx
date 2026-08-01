@@ -4,13 +4,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useEffect } from 'react';
-import { Snackbar, Alert } from '@mui/material';
-import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
+
+import React, { useEffect } from "react";
+import { Snackbar, Alert } from "@mui/material";
+import { useWithEducationalManagement } from "../../store/slices/education-management/use-with-educational-management";
 
 export const ErrorToast: React.FC = () => {
   const [open, setOpen] = React.useState(false);
-  const { errorMessage, clearErrorMessage } = useWithEducationalManagement();
+  const { errorMessage } = useWithEducationalManagement();
 
   useEffect(() => {
     if (errorMessage) {
@@ -19,19 +20,13 @@ export const ErrorToast: React.FC = () => {
   }, [errorMessage]);
 
   const handleClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
+    _event?: React.SyntheticEvent | Event,
+    reason?: string,
   ) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setOpen(false);
-  };
-
-  const handleExited = () => {
-    if (errorMessage) {
-      clearErrorMessage();
-    }
   };
 
   return (
@@ -39,14 +34,13 @@ export const ErrorToast: React.FC = () => {
       open={open}
       autoHideDuration={6000}
       onClose={handleClose}
-      TransitionProps={{ onExited: handleExited }}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
     >
       <Alert
         onClose={handleClose}
         severity="error"
         variant="filled"
-        sx={{ width: '100%' }}
+        sx={{ width: "100%" }}
       >
         {errorMessage?.slice(0, 200)}
       </Alert>

@@ -4,43 +4,32 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import {
+  createAsyncThunk,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import {
   loginGoogle,
   refreshAccessToken as _refreshAccessToken,
   updateUserInfo,
-} from '../../../hooks/api';
-import { loginAmazonCognito } from '../../../hooks/aws-cognito-api';
-import { extractErrorMessageFromError } from '../../../helpers';
-import { UpdateUserInfo, User, UserAccessToken } from '../../../types';
+} from "../../../hooks/api";
+import { loginAmazonCognito } from "../../../hooks/aws-cognito-api";
+import { extractErrorMessageFromError } from "../../../helpers";
+import type { UpdateUserInfo, User, UserAccessToken } from "../../../types";
 import {
   ACCESS_TOKEN_KEY,
   localStorageClear,
   localStorageStore,
-} from '../../local-storage';
-import { loginMicrosoft } from '../../../hooks/microsoft-api';
+} from "../../local-storage";
+import { loginMicrosoft } from "../../../hooks/microsoft-api";
 
-export enum LoginStatus {
-  NONE = 0,
-  NOT_LOGGED_IN = 1,
-  IN_PROGRESS = 2,
-  AUTHENTICATED = 3,
-  FAILED = 4,
-}
-
-export enum LoginRejectedReason {
-  NONE = 'NONE',
-  DISABLED = 'DISABLED',
-  FAILED = 'FAILED',
-  NO_ACCOUNT_FOUND = 'NO_ACCOUNT_FOUND',
-}
-
-export enum UserRole {
-  NONE = 'NONE',
-  ADMIN = 'ADMIN',
-  CONTENT_MANAGER = 'CONTENT_MANAGER',
-  USER = 'USER',
-}
+export type LoginStatus = 0 | 1 | 2 | 3 | 4;
+export type LoginRejectedReason =
+  "NONE" | "DISABLED" | "FAILED" | "NO_ACCOUNT_FOUND";
+export type UserRole = "NONE" | "ADMIN" | "CONTENT_MANAGER" | "USER";
+export type LoginService = "GOOGLE" | "MICROSOFT" | "AMAZON_COGNITO";
 
 export interface LoginState {
   accessToken?: string;
@@ -52,70 +41,64 @@ export interface LoginState {
 }
 
 const initialState: LoginState = {
-  loginStatus: LoginStatus.NONE,
-  userRole: UserRole.NONE,
+  loginStatus: 0,
+  userRole: "NONE",
 };
 
 export const refreshAccessToken = createAsyncThunk(
-  'login/refreshAccessToken',
+  "login/refreshAccessToken",
   async () => {
     return await _refreshAccessToken();
-  }
+  },
 );
 
-export const logout = createAsyncThunk('login/logout', async () => {
+export const logout = createAsyncThunk("login/logout", async () => {
   return Promise.resolve();
 });
 
-export enum LoginService {
-  GOOGLE = 'GOOGLE',
-  MICROSOFT = 'MICROSOFT',
-  AMAZON_COGNITO = 'AMAZON_COGNITO',
-}
-
 export const login = createAsyncThunk(
-  'login/login',
+  "login/login",
   async (
     args: {
       accessToken: string;
       service: LoginService;
     },
-    thunkAPI
+    thunkAPI,
   ) => {
     try {
       const login =
-        args.service === LoginService.GOOGLE
+        args.service === "GOOGLE"
           ? await loginGoogle(args.accessToken)
-          : args.service === LoginService.AMAZON_COGNITO
-          ? await loginAmazonCognito(args.accessToken)
-          : await loginMicrosoft(args.accessToken);
+          : args.service === "AMAZON_COGNITO"
+            ? await loginAmazonCognito(args.accessToken)
+            : await loginMicrosoft(args.accessToken);
       // Note: This was previously done to convert from 15 min access token to 90 day access token, wrong way to go
       // return await login(googleLogin.accessToken);
       return login;
     } catch (err: unknown) {
       if (
         err instanceof Error &&
-        err.message.includes('Your account has been disabled')
+        err.message.includes("Your account has been disabled")
       ) {
         thunkAPI.dispatch(loginSlice.actions.setIsDisabled(true));
       }
       console.error(err);
       throw new Error(extractErrorMessageFromError(err));
     }
-  }
+  },
 );
 
 export const _updateUserInfo = createAsyncThunk(
-  'login/updateUserInfo',
+  "login/updateUserInfo",
   async (userInfo: UpdateUserInfo) => {
     return await updateUserInfo(userInfo);
-  }
+  },
 );
 
 /** Reducer */
 
 export const loginSlice = createSlice({
-  name: 'login',
+  name: "login",
   initialState,
   reducers: {
     setIsDisabled: (state: LoginState, action: PayloadAction<boolean>) => {
@@ -126,44 +109,44 @@ export const loginSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       localStorageStore(ACCESS_TOKEN_KEY, action.payload.accessToken);
       state.userRole = action.payload.user.userRole;
-      state.loginStatus = LoginStatus.AUTHENTICATED;
+      state.loginStatus = 3;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(logout.fulfilled, (state) => {
         localStorageClear(ACCESS_TOKEN_KEY);
-        state.userRole = UserRole.NONE;
+        state.userRole = "NONE";
         state.accessToken = undefined;
-        state.loginStatus = LoginStatus.NOT_LOGGED_IN;
+        state.loginStatus = 1;
       })
       .addCase(login.pending, (state) => {
-        state.loginStatus = LoginStatus.IN_PROGRESS;
+        state.loginStatus = 2;
       })
       .addCase(login.fulfilled, (state, action) => {
         localStorageStore(ACCESS_TOKEN_KEY, action.payload.accessToken);
         state.userRole = action.payload.user.userRole;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
-        state.loginStatus = LoginStatus.AUTHENTICATED;
+        state.loginStatus = 3;
       })
       .addCase(login.rejected, (state) => {
-        state.loginStatus = LoginStatus.FAILED;
+        state.loginStatus = 4;
         localStorageClear(ACCESS_TOKEN_KEY);
       })
 
       .addCase(refreshAccessToken.pending, (state) => {
-        state.loginStatus = LoginStatus.IN_PROGRESS;
+        state.loginStatus = 2;
       })
       .addCase(refreshAccessToken.fulfilled, (state, action) => {
         localStorageStore(ACCESS_TOKEN_KEY, action.payload.accessToken);
         state.userRole = action.payload.user.userRole;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
-        state.loginStatus = LoginStatus.AUTHENTICATED;
+        state.loginStatus = 3;
       })
       .addCase(refreshAccessToken.rejected, (state) => {
-        state.loginStatus = LoginStatus.FAILED;
+        state.loginStatus = 4;
         localStorageClear(ACCESS_TOKEN_KEY);
       });
 

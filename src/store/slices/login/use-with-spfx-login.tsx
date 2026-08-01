@@ -4,10 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useAppSelector, useAppDispatch } from '../../hooks';
-import * as loginActions from '.';
-import { UpdateUserInfo, User, UserAccessToken } from '../../../types';
-import { UseWithLogin } from './use-with-login';
+
+import { useAppSelector, useAppDispatch } from "../../hooks";
+import * as loginActions from ".";
+import type { UpdateUserInfo, User, UserAccessToken } from "../../../types";
+import type { UseWithLogin } from "./use-with-login";
 
 export function useWithSpfxLogin(): UseWithLogin {
   const dispatch = useAppDispatch();
@@ -15,54 +16,54 @@ export function useWithSpfxLogin(): UseWithLogin {
 
   async function loginWithGoogle(googleAccessToken: string) {
     if (
-      state.loginStatus === loginActions.LoginStatus.NONE ||
-      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
-      state.loginStatus === loginActions.LoginStatus.FAILED
+      state.loginStatus === 0 ||
+      state.loginStatus === 1 ||
+      state.loginStatus === 4
     ) {
       return await dispatch(
         loginActions.login({
           accessToken: googleAccessToken,
-          service: loginActions.LoginService.GOOGLE,
-        })
+          service: "GOOGLE",
+        }),
       ).unwrap();
     }
   }
 
   async function loginWithMicrosoft(microsoftAccessToken: string) {
     if (
-      state.loginStatus === loginActions.LoginStatus.NONE ||
-      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
-      state.loginStatus === loginActions.LoginStatus.FAILED
+      state.loginStatus === 0 ||
+      state.loginStatus === 1 ||
+      state.loginStatus === 4
     ) {
       await dispatch(
         loginActions.login({
           accessToken: microsoftAccessToken,
-          service: loginActions.LoginService.MICROSOFT,
-        })
+          service: "MICROSOFT",
+        }),
       );
     }
   }
 
   async function loginWithAmazonCognito(cognitoIdToken: string) {
     if (
-      state.loginStatus === loginActions.LoginStatus.NONE ||
-      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
-      state.loginStatus === loginActions.LoginStatus.FAILED
+      state.loginStatus === 0 ||
+      state.loginStatus === 1 ||
+      state.loginStatus === 4
     ) {
       await dispatch(
         loginActions.login({
           accessToken: cognitoIdToken,
-          service: loginActions.LoginService.AMAZON_COGNITO,
-        })
+          service: "AMAZON_COGNITO",
+        }),
       );
     }
   }
 
   function refreshAccessToken() {
     if (
-      state.loginStatus === loginActions.LoginStatus.NONE ||
-      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
-      state.loginStatus === loginActions.LoginStatus.FAILED
+      state.loginStatus === 0 ||
+      state.loginStatus === 1 ||
+      state.loginStatus === 4
     ) {
       dispatch(loginActions.refreshAccessToken());
     }

@@ -4,19 +4,20 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import {
+
+import Validator, { type Schema } from "jsonschema";
+import type {
   ActivityBuilder,
   FlowItem,
   JsonResponseData,
   PredefinedResponse,
-} from './types';
-import Validator, { Schema } from 'jsonschema';
+} from "./types";
 
 function convertExpectedDataIntoSchema(
-  expectedData: JsonResponseData[]
+  expectedData: JsonResponseData[],
 ): Schema {
   const schema: Schema = {
-    type: 'object',
+    type: "object",
     properties: {},
     required: [],
   };
@@ -30,41 +31,21 @@ function convertExpectedDataIntoSchema(
   }
   return schema;
 }
-export const STRING_ARRAY_SPLITTER = ',,,';
+export const STRING_ARRAY_SPLITTER = ",,,";
 
-// jsonResponseData:[
-//   {
-//     clientId: "1",
-//     name: "nickname",
-//     type: "string"
-//   },
-//   {
-//     clientId: "2",
-//     name: "people",
-//     type: "object",
-//     subData: [
-//       {
-//         clientId: "3",
-//         name: "person1",
-//         type: "string"
-//       }
-//     ]
-//   }
-// [
-// recursively convert expected data into a prompt string
 export function recursivelyConvertExpectedDataToAiPromptString(
-  expectedData: JsonResponseData[]
+  expectedData: JsonResponseData[],
 ): string {
   let promptString = `Respond in JSON. Validate that your response is valid JSON. Your JSON must follow this format:\n`;
   promptString += `{\n`;
 
   function buildSchema(data: JsonResponseData[], indent: string): string {
-    let schema = '';
+    let schema = "";
     data.forEach((item, index) => {
       schema += `${indent}"${item.name}": `;
-      if (item.type === 'object' && item.subData) {
+      if (item.type === "object" && item.subData) {
         schema += `{${
-          item.additionalInfo ? `\t// ${item.additionalInfo}` : ''
+          item.additionalInfo ? `\t// ${item.additionalInfo}` : ""
         }\n`;
         schema += buildSchema(item.subData, `${indent}  `);
         schema += `${indent}}\n`;
@@ -75,14 +56,14 @@ export function recursivelyConvertExpectedDataToAiPromptString(
         }
       }
       if (index < data.length - 1) {
-        schema += ',';
+        schema += ",";
       }
-      schema += '\n';
+      schema += "\n";
     });
     return schema;
   }
 
-  promptString += buildSchema(expectedData, '  ');
+  promptString += buildSchema(expectedData, "  ");
   promptString += `}\n`;
 
   return promptString;
@@ -90,7 +71,7 @@ export function recursivelyConvertExpectedDataToAiPromptString(
 
 export function receivedExpectedData(
   expectedData: JsonResponseData[],
-  jsonResponse: string
+  jsonResponse: string,
 ) {
   try {
     const v = new Validator.Validator();
@@ -110,7 +91,7 @@ export function receivedExpectedData(
 
 export function getFlowForStepId(
   flow: FlowItem[],
-  stepId: string
+  stepId: string,
 ): FlowItem | undefined {
   return flow.find((flowItem) => {
     return flowItem.steps.find((step) => {
@@ -122,7 +103,7 @@ export function getFlowForStepId(
 export function processPredefinedResponses(
   processPredefinedResponses: PredefinedResponse[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stateData: Record<string, any>
+  stateData: Record<string, any>,
 ): PredefinedResponse[] {
   const processedPredefinedResponses = processPredefinedResponses.map(
     (response) => {
@@ -130,11 +111,11 @@ export function processPredefinedResponses(
         ...response,
         message: replaceStoredDataInString(response.message, stateData),
         responseWeight: replaceStoredDataInString(
-          response.responseWeight || '',
-          stateData
+          response.responseWeight || "",
+          stateData,
         ),
       };
-    }
+    },
   );
   return processedPredefinedResponses;
 }
@@ -154,26 +135,26 @@ export function replaceStoredDataInString(
   str: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   globalStateData: Record<string, any>,
-  forPanelistClientId?: string
+  forPanelistClientId?: string,
 ): string {
   const stateData = forPanelistClientId
-    ? globalStateData['panelistData']?.[forPanelistClientId]
+    ? globalStateData["panelistData"]?.[forPanelistClientId]
     : globalStateData;
-  console.log('looking for string', str);
-  console.log('in stateData', stateData);
+  console.log("looking for string", str);
+  console.log("in stateData", stateData);
   try {
     // replace all instances of {{key.data...}} in str with stored data[key][data...]
     const regex = /{{(.*?)}}/g;
-    return str.trim().replace(regex, (match, key) => {
-      const keys = key.split('.');
+    return str.trim().replace(regex, (_match, key) => {
+      const keys = key.split(".");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const value = keys.reduce((acc: Record<string, any>, k: string) => {
         return acc[k];
       }, stateData);
       if (Array.isArray(value)) {
-        return value.map((v: string) => v || '').join(STRING_ARRAY_SPLITTER);
+        return value.map((v: string) => v || "").join(STRING_ARRAY_SPLITTER);
       }
-      return value || '';
+      return value || "";
     });
   } catch (e) {
     console.error(e);
@@ -183,14 +164,14 @@ export function replaceStoredDataInString(
 
 export function sortMessagesByResponseWeight(
   messageList: string[],
-  predefinedResponses: PredefinedResponse[]
+  predefinedResponses: PredefinedResponse[],
 ): string[] {
   const sortedMessages = messageList.sort((a, b) => {
     const responseWeightA = predefinedResponses.find(
-      (response) => response.message === a
+      (response) => response.message === a,
     )?.responseWeight;
     const responseWeightB = predefinedResponses.find(
-      (response) => response.message === b
+      (response) => response.message === b,
     )?.responseWeight;
     try {
       if (responseWeightA && responseWeightB) {
@@ -224,14 +205,14 @@ export function isActivityRunnable(activity: ActivityBuilder) {
 export function recursiveUpdateAdditionalInfo(
   data: JsonResponseData[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stateData: Record<string, any>
+  stateData: Record<string, any>,
 ) {
   const copy: JsonResponseData[] = JSON.parse(JSON.stringify(data));
   for (const item of copy) {
     if (item.additionalInfo) {
       item.additionalInfo = replaceStoredDataInString(
         item.additionalInfo,
-        stateData
+        stateData,
       );
     }
     if (item.subData) {

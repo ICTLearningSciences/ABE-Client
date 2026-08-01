@@ -1,35 +1,43 @@
-import React, { useEffect, useMemo } from 'react';
-import {
-  ActivityBuilderStepType,
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import React, { useEffect, useMemo } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { Button, CircularProgress, IconButton } from "@mui/material";
+import { ArrowBack } from "@mui/icons-material";
+
+import type {
   ActivityBuilder as ActivityBuilderType,
   ActivityBuilderVisibility,
-} from '../types';
-import { ActivityFlowContainer } from './activity-flow-container';
-import { ColumnDiv, RowDiv } from '../../../styled-components';
-import { Button, CircularProgress, IconButton } from '@mui/material';
-import { InputField, SelectInputField } from '../shared/input-components';
-import { equals } from '../../../helpers';
-import { v4 as uuidv4 } from 'uuid';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { isActivityRunnable } from '../helpers';
+} from "../types";
+import { ActivityFlowContainer } from "./activity-flow-container";
+import { ColumnDiv, RowDiv } from "../../../styled-components";
+import { InputField, SelectInputField } from "../shared/input-components";
+import { equals } from "../../../helpers";
+import { isActivityRunnable } from "../helpers";
 import {
   DOC_NUM_WORDS_KEY,
   DOC_TEXT_KEY,
-} from '../../../classes/activity-builder-activity/built-activity-handler';
-import { useWithCheckActivityErrors } from '../../../hooks/use-with-check-activity-errors';
+} from "../../../classes/activity-builder-activity/built-activity-handler";
+import { useWithCheckActivityErrors } from "../../../hooks/use-with-check-activity-errors";
 import {
   useActivityBuilderContext,
   EditActivityProvider,
   useEditActivityContext,
-} from '../activity-builder-context';
-import { useWithPanels } from '../../../store/slices/panels/use-with-panels';
+} from "../activity-builder-context";
+import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
+
 // Inner component that uses the context
 function EditActivityContent(props: {
   goToActivity: (activity: ActivityBuilderType) => void;
   originalActivity: ActivityBuilderType;
   saveActivity: (activity: ActivityBuilderType) => Promise<ActivityBuilderType>;
   returnTo: () => void;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     originalActivity,
     saveActivity: _saveActivity,
@@ -54,14 +62,14 @@ function EditActivityContent(props: {
     return activity.flowsList.reduce(
       (acc, flow) => {
         const stateKeysForFlow = flow.steps.reduce((acc, step) => {
-          if (step.stepType === ActivityBuilderStepType.REQUEST_USER_INPUT) {
+          if (step.stepType === "REQUEST_USER_INPUT") {
             if (step.saveResponseVariableName) {
               acc.push(step.saveResponseVariableName);
             }
           }
-          if (step.stepType === ActivityBuilderStepType.PROMPT) {
+          if (step.stepType === "PROMPT") {
             const jsonKeys = step.promptConfigurations.flatMap(
-              (d) => d.jsonResponseData?.map((d) => d.name) || []
+              (d) => d.jsonResponseData?.map((d) => d.name) || [],
             );
             acc.push(...jsonKeys);
           }
@@ -70,7 +78,7 @@ function EditActivityContent(props: {
         acc.push(...stateKeysForFlow);
         return acc;
       },
-      [DOC_TEXT_KEY, DOC_NUM_WORDS_KEY] as string[]
+      [DOC_TEXT_KEY, DOC_NUM_WORDS_KEY] as string[],
     );
   }, [activity.flowsList]);
 
@@ -78,7 +86,7 @@ function EditActivityContent(props: {
 
   useEffect(() => {
     const alreadyLoaded = Boolean(
-      originalActivity.clientId in activityVersions
+      originalActivity.clientId in activityVersions,
     );
     if (originalActivity.clientId && !alreadyLoaded) {
       loadActivityVersions(originalActivity.clientId);
@@ -97,38 +105,38 @@ function EditActivityContent(props: {
   }
 
   function addNewFlow() {
-    addFlow(uuidv4(), '');
+    addFlow(uuidv4(), "");
   }
 
   return (
     <ColumnDiv
       style={{
-        width: '100%',
-        height: '100%',
-        overflowY: 'auto',
-        position: 'relative',
+        width: "100%",
+        height: "100%",
+        overflowY: "auto",
+        position: "relative",
       }}
     >
       <IconButton
         data-cy="return-to-activity-list"
         onClick={returnTo}
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 0,
           zIndex: 100,
-          color: '#1976d2',
+          color: "#1976d2",
         }}
       >
-        <ArrowBackIcon />
+        <ArrowBack />
       </IconButton>
       <ColumnDiv
         data-cy="edit-activity-header"
         style={{
-          width: '50%',
-          alignSelf: 'center',
-          justifyContent: 'center',
-          alignItems: 'center',
+          width: "50%",
+          alignSelf: "center",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
         <InputField
@@ -148,15 +156,15 @@ function EditActivityContent(props: {
         <SelectInputField
           label="Visibility"
           value={activity.visibility}
-          options={Object.values(ActivityBuilderVisibility)}
+          options={["editable", "read-only", "private"]}
           disabled={!canEditActivity(activity)}
           onChange={(v) => updateVisibility(v as ActivityBuilderVisibility)}
         />
         <SelectInputField
           label="Attached Panel"
-          value={activity.attachedPanel || ''}
-          options={['', ...panels.map((panel) => panel.clientId)]}
-          optionLabels={['None', ...panels.map((panel) => panel.panelName)]}
+          value={activity.attachedPanel || ""}
+          options={["", ...panels.map((panel) => panel.clientId)]}
+          optionLabels={["None", ...panels.map((panel) => panel.panelName)]}
           disabled={!canEditActivity(activity)}
           onChange={(v) => updateAttachedPanel(v || undefined)}
         />
@@ -164,7 +172,7 @@ function EditActivityContent(props: {
         <RowDiv>
           <Button
             style={{
-              marginRight: '10px',
+              marginRight: "10px",
             }}
             disabled={saveInProgress || !isActivityRunnable(activity)}
             variant="outlined"
@@ -180,7 +188,7 @@ function EditActivityContent(props: {
             <Button
               data-cy="save-activity"
               style={{
-                marginRight: '10px',
+                marginRight: "10px",
               }}
               variant="outlined"
               disabled={
@@ -223,7 +231,7 @@ export function EditActivity(props: {
   activity: ActivityBuilderType;
   saveActivity: (activity: ActivityBuilderType) => Promise<ActivityBuilderType>;
   returnTo: () => void;
-}): JSX.Element {
+}): React.ReactNode {
   return (
     <EditActivityProvider initialActivity={props.activity}>
       <EditActivityContent {...props} originalActivity={props.activity} />

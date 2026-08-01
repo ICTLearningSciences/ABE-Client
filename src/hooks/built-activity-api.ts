@@ -4,105 +4,105 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import {
+
+import type {
   ActivityBuilder,
-  ActivityBuilderStepType,
   BuiltActivityVersion,
   PromptActivityStepGql,
-} from '../components/activity-builder/types';
-import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
-import { Connection } from '../types';
-import { execGql } from './api';
+} from "../components/activity-builder/types";
+import { ACCESS_TOKEN_KEY, localStorageGet } from "../store/local-storage";
+import type { Connection } from "../types";
+import { execGql } from "./api";
 
 export const fullBuiltActivityQueryData = `
-                      _id
-                      clientId
-                      title
-                      user
-                      visibility
-                      activityType
-                      attachedPanel
-                      description
-                      displayIcon
-                      disabled
-                      newDocRecommend
-                      flowsList{
-                        clientId
-                        name
-                        steps{
-                          ... on SystemMessageActivityStepType {
-                              stepId
-                              stepType
-                              jumpToStepId
-                              systemCustomName
-                              message
-                              setStudentActivityComplete
-                              sendFromPanelistClientIds
-                          }
+  _id
+  clientId
+  title
+  user
+  visibility
+  activityType
+  attachedPanel
+  description
+  displayIcon
+  disabled
+  newDocRecommend
+  flowsList{
+    clientId
+    name
+    steps{
+      ... on SystemMessageActivityStepType {
+          stepId
+          stepType
+          jumpToStepId
+          systemCustomName
+          message
+          setStudentActivityComplete
+          sendFromPanelistClientIds
+      }
 
-                          ... on RequestUserInputActivityStepType {
-                              stepId
-                              stepType
-                              jumpToStepId
-                              message
-                              saveAsIntention
-                              saveResponseVariableName
-                              systemCustomName
-                              specialType
-                              disableFreeInput
-                              predefinedResponses{
-                                  clientId
-                                  message
-                                  jumpToStepId
-                                  isArray
-                                  responseWeight
-                                  buttonAction{
-                                    buttonActionType
-                                    buttonActionValue
-                                  }
-                              }
-                              setStudentActivityComplete
-                          }
+      ... on RequestUserInputActivityStepType {
+          stepId
+          stepType
+          jumpToStepId
+          message
+          saveAsIntention
+          saveResponseVariableName
+          systemCustomName
+          specialType
+          disableFreeInput
+          predefinedResponses{
+              clientId
+              message
+              jumpToStepId
+              isArray
+              responseWeight
+              buttonAction{
+                buttonActionType
+                buttonActionValue
+              }
+          }
+          setStudentActivityComplete
+      }
 
-                          ... on PromptActivityStepType{
-                              stepId
-                              stepType
-                              jumpToStepId
-                              setStudentActivityComplete
-                              promptConfigurations{
-                                promptText
-                                responseFormat
-                                editDoc
-                                includeChatLogContext
-                                systemCustomName
-                                includeEssay
-                                outputDataType
-                                runForPanelistClientIds
-                                jsonResponseData
-                                customSystemRole
-                                webSearch
-                                ragConfiguration{
-                                  ragQuery
-                                  topN
-                                  filters
-                                }
-                              }
-                          }
+      ... on PromptActivityStepType{
+          stepId
+          stepType
+          jumpToStepId
+          setStudentActivityComplete
+          promptConfigurations{
+            promptText
+            responseFormat
+            editDoc
+            includeChatLogContext
+            systemCustomName
+            includeEssay
+            outputDataType
+            runForPanelistClientIds
+            jsonResponseData
+            customSystemRole
+            webSearch
+            ragConfiguration{
+              ragQuery
+              topN
+              filters
+            }
+          }
+      }
 
-                          ... on ConditionalActivityStepType {
-                              stepId
-                              stepType
-                              jumpToStepId
-                              conditionals{
-                                  stateDataKey
-                                  checking
-                                  operation
-                                  expectedValue
-                                  targetStepId
-                              }
-                          }
-                      }
-                      }
+      ... on ConditionalActivityStepType {
+          stepId
+          stepType
+          jumpToStepId
+          conditionals{
+              stateDataKey
+              checking
+              operation
+              expectedValue
+              targetStepId
+          }
+      }
+  }
+}
 `;
 
 export const fetchActivityVersionsQueryData = `
@@ -113,24 +113,24 @@ export const fetchActivityVersionsQueryData = `
 `;
 
 export function convertGqlToBuiltActivity(
-  activity: ActivityBuilder
+  activity: ActivityBuilder,
 ): ActivityBuilder {
   const copy: ActivityBuilder = JSON.parse(JSON.stringify(activity));
   copy.flowsList.forEach((flow) => {
     flow.steps.forEach((step) => {
-      if (step.stepType === ActivityBuilderStepType.PROMPT) {
+      if (step.stepType === "PROMPT") {
         const _step: PromptActivityStepGql = step as PromptActivityStepGql;
         // Convert jsonResponseData in each prompt configuration
         _step.promptConfigurations = _step.promptConfigurations.map(
           (config) => {
-            if (typeof config.jsonResponseData === 'string') {
+            if (typeof config.jsonResponseData === "string") {
               return {
                 ...config,
                 jsonResponseData: JSON.parse(config.jsonResponseData as string),
               };
             }
             return config;
-          }
+          },
         );
       }
     });
@@ -139,12 +139,12 @@ export function convertGqlToBuiltActivity(
 }
 
 export function convertBuiltActivityToGql(
-  activity: ActivityBuilder
+  activity: ActivityBuilder,
 ): ActivityBuilder {
   const copy: ActivityBuilder = JSON.parse(JSON.stringify(activity));
   copy.flowsList.forEach((flow) => {
     flow.steps.forEach((step) => {
-      if (step.stepType === ActivityBuilderStepType.PROMPT) {
+      if (step.stepType === "PROMPT") {
         const _step: PromptActivityStepGql = step as PromptActivityStepGql;
         // Convert jsonResponseData in each prompt configuration
         _step.promptConfigurations = _step.promptConfigurations.map(
@@ -156,7 +156,7 @@ export function convertBuiltActivityToGql(
               };
             }
             return config;
-          }
+          },
         );
       }
     });
@@ -165,9 +165,9 @@ export function convertBuiltActivityToGql(
 }
 
 export async function addOrUpdateBuiltActivity(
-  activity: ActivityBuilder
+  activity: ActivityBuilder,
 ): Promise<ActivityBuilder> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<ActivityBuilder>(
     {
       query: `
@@ -182,15 +182,15 @@ export async function addOrUpdateBuiltActivity(
       },
     },
     {
-      dataPath: 'addOrUpdateBuiltActivity',
+      dataPath: "addOrUpdateBuiltActivity",
       accessToken,
-    }
+    },
   );
   return convertGqlToBuiltActivity(res);
 }
 
 export async function fetchBuiltActivities(): Promise<ActivityBuilder[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<ActivityBuilder[]>(
     {
       query: `
@@ -202,17 +202,17 @@ export async function fetchBuiltActivities(): Promise<ActivityBuilder[]> {
         `,
     },
     {
-      dataPath: 'fetchBuiltActivities',
+      dataPath: "fetchBuiltActivities",
       accessToken,
-    }
+    },
   );
   return res.map(convertGqlToBuiltActivity);
 }
 
 export async function fetchActivityVersions(
-  activityClientId: string
+  activityClientId: string,
 ): Promise<BuiltActivityVersion[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Connection<BuiltActivityVersion>>(
     {
       query: `
@@ -228,14 +228,14 @@ export async function fetchActivityVersions(
         `,
       variables: {
         filter: JSON.stringify({
-          'activity.clientId': activityClientId,
+          "activity.clientId": activityClientId,
         }),
       },
     },
     {
-      dataPath: 'fetchBuiltActivityVersions',
+      dataPath: "fetchBuiltActivityVersions",
       accessToken,
-    }
+    },
   );
   const versions = res.edges.map((edge) => edge.node);
   return versions.map((version) => {
@@ -245,9 +245,9 @@ export async function fetchActivityVersions(
 }
 
 export async function storeActivityVersion(
-  activity: ActivityBuilder
+  activity: ActivityBuilder,
 ): Promise<BuiltActivityVersion> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<BuiltActivityVersion>(
     {
       query: `
@@ -262,17 +262,17 @@ export async function storeActivityVersion(
       },
     },
     {
-      dataPath: 'storeBuiltActivityVersion',
+      dataPath: "storeBuiltActivityVersion",
       accessToken,
-    }
+    },
   );
   return res;
 }
 
 export async function copyBuiltActivity(
-  activityId: string
+  activityId: string,
 ): Promise<ActivityBuilder> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<ActivityBuilder>(
     {
       query: `
@@ -287,15 +287,15 @@ mutation CopyBuiltActivity($activityIdToCopy: String!) {
       },
     },
     {
-      dataPath: 'copyBuiltActivity',
+      dataPath: "copyBuiltActivity",
       accessToken,
-    }
+    },
   );
   return convertGqlToBuiltActivity(res);
 }
 
 export async function deleteBuiltActivity(activityId: string): Promise<string> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<string>(
     {
       query: `mutation DeleteBuiltActivity($activityIdToDelete: String!) {
@@ -303,7 +303,7 @@ export async function deleteBuiltActivity(activityId: string): Promise<string> {
            }`,
       variables: { activityIdToDelete: activityId },
     },
-    { accessToken, dataPath: 'deleteBuiltActivity' }
+    { accessToken, dataPath: "deleteBuiltActivity" },
   );
   return res;
 }

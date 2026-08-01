@@ -1,24 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { motion } from 'framer-motion';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
 
-import ActivityTranscript from './ActivityTranscript';
-import { equals, formatISODateToReadable } from '../../../helpers';
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Box, CircularProgress, IconButton, Typography } from "@mui/material";
 import {
-  GQLTimelinePoint,
-  UserDoc,
-  AiGenerationStatus,
-  StoreUserDoc,
-  TimelinePointType,
-} from '../../../types';
+  ExpandMore,
+  ExpandLess,
+  FiberManualRecord,
+  SaveAs,
+} from "@mui/icons-material";
+
+import ActivityTranscript from "./ActivityTranscript";
+import { equals, formatISODateToReadable } from "../../../helpers";
+import type { GQLTimelinePoint, UserDoc, StoreUserDoc } from "../../../types";
 import {
   formatTimeDifferenceToReadable,
   getIntentionText,
-} from '../../../helpers/functions';
-import SaveAsIcon from '@mui/icons-material/SaveAs';
+} from "../../../helpers/functions";
 import {
   AIOutlineContainer,
   ContentBg,
@@ -38,7 +41,7 @@ import {
   Text3,
   Text3Bold,
   Text3List,
-} from '../../../styles/content-revision-styles';
+} from "../../../styles/content-revision-styles";
 
 interface EvidenceObject {
   [key: string]: string[];
@@ -52,7 +55,7 @@ export const TimepointOutline = React.memo(
     hasOverflowX: boolean;
     saveTimelinePoint: (timelinePoint: GQLTimelinePoint) => Promise<void>;
     updateUserDoc: (googleDoc: StoreUserDoc) => Promise<UserDoc>;
-  }): JSX.Element {
+  }): React.ReactNode {
     const {
       timelinePoint,
       hasOverflowX,
@@ -71,23 +74,23 @@ export const TimepointOutline = React.memo(
  `reverseOutline` JSON data and checks if there is a 'Thesis Statement', 'Supporting Claims', and
  'Evidence Given for Each Claim' in the parsed data. */
     useEffect(() => {
-      if (timelinePoint.reverseOutline === 'No outline available') return;
+      if (timelinePoint.reverseOutline === "No outline available") return;
 
       try {
         const reverseOutlineParsed = JSON.parse(timelinePoint.reverseOutline);
         setAIOutline(true);
 
-        if (reverseOutlineParsed['Thesis Statement'] !== '') {
+        if (reverseOutlineParsed["Thesis Statement"] !== "") {
           setThesis(true);
         }
-        if (reverseOutlineParsed['Supporting Claims'].length > 0) {
+        if (reverseOutlineParsed["Supporting Claims"].length > 0) {
           setSupportingClaims(true);
         }
-        if (reverseOutlineParsed['Evidence Given for Each Claim'].length > 0) {
+        if (reverseOutlineParsed["Evidence Given for Each Claim"].length > 0) {
           setClaimEvidence(true);
         }
       } catch (e) {
-        console.error('Error parsing reverse outline', e);
+        console.error("Error parsing reverse outline", e);
       }
     }, [timelinePoint]);
 
@@ -95,7 +98,7 @@ export const TimepointOutline = React.memo(
   application. This component takes in props including title, outline, fontType, open, dataCy, and
   optional claimNumber. It renders a collapsible section with a title and a list of items. Clicking
   on the title toggles the visibility of the list. The component uses Material-UI components like
-  Typography, Box, ExpandLessIcon, and ExpandMoreIcon to achieve this functionality. */
+  Typography, Box, ExpandLess, and ExpandMore to achieve this functionality. */
     function AIOutlineExpand(props: {
       title: string;
       outline: string[];
@@ -103,7 +106,7 @@ export const TimepointOutline = React.memo(
       open: boolean;
       dataCy: string;
       claimNumber?: number | undefined;
-    }): JSX.Element {
+    }): React.ReactNode {
       const { title, outline, fontType, open, claimNumber, dataCy } = props;
       const [expanded, setExpanded] = useState<boolean>(open);
 
@@ -116,22 +119,22 @@ export const TimepointOutline = React.memo(
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 100 }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
         >
           <Box data-cy={`${dataCy}-container`}>
             <div
               style={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                cursor: 'pointer',
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "pointer",
               }}
               onClick={toggleExpand}
             >
-              {fontType === 'bold' ? (
+              {fontType === "bold" ? (
                 <Text3Bold
-                  style={{ marginTop: 10, maxWidth: '90%' }}
+                  style={{ marginTop: 10, maxWidth: "90%" }}
                   data-cy={`${dataCy}-title`}
                 >
                   {!claimNumber ? title : `${claimNumber}. ${title}`}
@@ -140,12 +143,12 @@ export const TimepointOutline = React.memo(
                 <Text3 data-cy={`${dataCy}-title`}>{title}</Text3>
               )}
 
-              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              {expanded ? <ExpandLess /> : <ExpandMore />}
             </div>
 
             <SupportingClaimsContainer
               collapsed={!expanded}
-              className={expanded ? 'expanded' : 'collapsed'}
+              className={expanded ? "expanded" : "collapsed"}
               data-cy={`${dataCy}-accordion`}
             >
               {outline.map((claim: string, i: number) => {
@@ -153,14 +156,14 @@ export const TimepointOutline = React.memo(
                   <Box
                     key={i}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      marginLeft: '10px',
+                      display: "flex",
+                      alignItems: "center",
+                      marginLeft: "10px",
                     }}
                   >
-                    <FiberManualRecordIcon
+                    <FiberManualRecord
                       sx={{
-                        fontSize: '0.5rem !important',
+                        fontSize: "0.5rem !important",
                         color: ContentRevisionTextColor3,
                       }}
                     />
@@ -184,7 +187,9 @@ export const TimepointOutline = React.memo(
      * two Typography components. The first Typography component displays "Revision:" and the second
      * Typography component displays the formatted revision date and time difference.
      */
-    function RevisionTimeHeader(props: { revisionTime: string }): JSX.Element {
+    function RevisionTimeHeader(props: {
+      revisionTime: string;
+    }): React.ReactNode {
       const { revisionTime } = props;
 
       const formatTime = formatTimeDifferenceToReadable(revisionTime);
@@ -207,7 +212,7 @@ export const TimepointOutline = React.memo(
     function IntentionDisplay(props: {
       timelinePoint: GQLTimelinePoint;
       saveTimelinePoint: (timelinePoint: GQLTimelinePoint) => Promise<void>;
-    }): JSX.Element {
+    }): React.ReactNode {
       const { timelinePoint, saveTimelinePoint } = props;
       const intentionText = getIntentionText(timelinePoint);
       const [editedInentionText, setEditedIntentionText] =
@@ -231,8 +236,7 @@ export const TimepointOutline = React.memo(
               value={editedInentionText}
               disableUnderline
               disabled={
-                timelinePoint.type === TimelinePointType.INTRO ||
-                timelineGenerationInProgress
+                timelinePoint.type === "INTRO" || timelineGenerationInProgress
               }
               endAdornment={
                 editedInentionText !== intentionText ? (
@@ -257,7 +261,7 @@ export const TimepointOutline = React.memo(
                     {saving ? (
                       <CircularProgress />
                     ) : (
-                      <SaveAsIcon className="save-icon" />
+                      <SaveAs className="save-icon" />
                     )}
                   </IconButton>
                 ) : undefined
@@ -266,7 +270,7 @@ export const TimepointOutline = React.memo(
               maxRows={4}
               placeholder="Enter your text here..."
               data-cy="intention-textarea"
-              onChange={(e) => setEditedIntentionText(e.target.value)}
+              onChange={(e: any) => setEditedIntentionText(e.target.value)}
             />
           </InputWrapper>
         </InputContainer>
@@ -276,7 +280,7 @@ export const TimepointOutline = React.memo(
     function AssignmentDescriptionDisplay(props: {
       assignmentDescription: string;
       saveTimelineDescription: (description: string) => Promise<void>;
-    }): JSX.Element {
+    }): React.ReactNode {
       const { assignmentDescription, saveTimelineDescription } = props;
       const [editedAssignmentDescription, setEditedAssignmentDescription] =
         useState(assignmentDescription);
@@ -299,8 +303,7 @@ export const TimepointOutline = React.memo(
               value={editedAssignmentDescription}
               disableUnderline
               disabled={
-                timelinePoint.type === TimelinePointType.INTRO ||
-                timelineGenerationInProgress
+                timelinePoint.type === "INTRO" || timelineGenerationInProgress
               }
               endAdornment={
                 editedAssignmentDescription !== assignmentDescription ? (
@@ -308,7 +311,7 @@ export const TimepointOutline = React.memo(
                     onClick={() => {
                       setSaving(true);
                       saveTimelineDescription(
-                        editedAssignmentDescription
+                        editedAssignmentDescription,
                       ).finally(() => {
                         setSaving(false);
                       });
@@ -317,7 +320,7 @@ export const TimepointOutline = React.memo(
                     {saving ? (
                       <CircularProgress />
                     ) : (
-                      <SaveAsIcon className="save-icon" />
+                      <SaveAs className="save-icon" />
                     )}
                   </IconButton>
                 ) : undefined
@@ -326,7 +329,9 @@ export const TimepointOutline = React.memo(
               maxRows={4}
               placeholder="Enter your assignment description here..."
               data-cy="assignment-textarea"
-              onChange={(e) => setEditedAssignmentDescription(e.target.value)}
+              onChange={(e: any) =>
+                setEditedAssignmentDescription(e.target.value)
+              }
             />
           </InputWrapper>
         </InputContainer>
@@ -343,23 +348,21 @@ and dynamically adjust the height of the input field. */
     function SummaryDisplay(props: {
       timelinePoint: GQLTimelinePoint;
       saveTimelinePoint: (timelinePoint: GQLTimelinePoint) => Promise<void>;
-    }): JSX.Element {
+    }): React.ReactNode {
       const { timelinePoint, saveTimelinePoint } = props;
       const targetSummary =
         timelinePoint.userInputSummary || timelinePoint.changeSummary;
       const [editedChangeSummary, setEditedChangeSummary] = useState(
-        JSON.parse(JSON.stringify(targetSummary))
+        JSON.parse(JSON.stringify(targetSummary)),
       );
       const [saving, setSaving] = useState(false);
 
-      if (
-        timelinePoint.changeSummaryStatus === AiGenerationStatus.IN_PROGRESS
-      ) {
+      if (timelinePoint.changeSummaryStatus === "IN_PROGRESS") {
         return (
           <AIOutlineContainer
             style={{
-              display: 'flex',
-              flexDirection: 'column',
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <Text2Typography data-cy="ai-summary-in-progress">
@@ -367,8 +370,8 @@ and dynamically adjust the height of the input field. */
             </Text2Typography>
             <CircularProgress
               style={{
-                alignSelf: 'center',
-                justifySelf: 'center',
+                alignSelf: "center",
+                justifySelf: "center",
               }}
             />
           </AIOutlineContainer>
@@ -377,7 +380,7 @@ and dynamically adjust the height of the input field. */
 
       return (
         <InputContainer data-cy="summary-container">
-          {timelinePoint.type !== TimelinePointType.INTRO ? (
+          {timelinePoint.type !== "INTRO" ? (
             <InputWrapper>
               <StyledDivider />
 
@@ -413,14 +416,14 @@ and dynamically adjust the height of the input field. */
                       {saving ? (
                         <CircularProgress />
                       ) : (
-                        <SaveAsIcon className="save-icon" />
+                        <SaveAs className="save-icon" />
                       )}
                     </IconButton>
                   ) : undefined
                 }
                 maxRows={4}
                 placeholder="Enter your text here..."
-                onChange={(e) => setEditedChangeSummary(e.target.value)}
+                onChange={(e: any) => setEditedChangeSummary(e.target.value)}
                 data-cy="summary-textarea"
               />
             </InputWrapper>
@@ -432,10 +435,12 @@ and dynamically adjust the height of the input field. */
     /* The above code is a TypeScript React component named `AIOutlineDisplay` that takes in a prop
   `reverseOutline` and renders different sections based on the values of certain states (`thesis`,
   `supportingClaims`, `claimEvidence`). Here's a breakdown of what the code is doing: */
-    function AIOutlineDisplay(props: { reverseOutline: string }): JSX.Element {
+    function AIOutlineDisplay(props: {
+      reverseOutline: string;
+    }): React.ReactNode {
       const { reverseOutline } = props;
 
-      if (reverseOutline === 'No outline available')
+      if (reverseOutline === "No outline available")
         return (
           <Text2Typography data-cy="no-ai-outline">
             No AI outline available
@@ -451,7 +456,7 @@ and dynamically adjust the height of the input field. */
         following elements: */}
           {thesis ? (
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <Text2Typography data-cy="ai-outline-statement-title">
                   Thesis
                 </Text2Typography>
@@ -461,7 +466,7 @@ and dynamically adjust the height of the input field. */
                     ...Text2Styles,
                     color: ContentBg,
                     borderRadius: 5,
-                    padding: '0px 10px',
+                    padding: "0px 10px",
                     backgroundColor: ContentRevisionTextColor2,
                   }}
                 >
@@ -469,7 +474,7 @@ and dynamically adjust the height of the input field. */
                 </Typography>
               </div>
               <Text3 data-cy="ai-outline-statement-content">
-                {outline['Thesis Statement']}
+                {outline["Thesis Statement"]}
               </Text3>
             </div>
           ) : null}
@@ -479,7 +484,7 @@ and dynamically adjust the height of the input field. */
           {supportingClaims ? (
             <AIOutlineExpand
               title="Supporting Claims"
-              outline={outline['Supporting Claims']}
+              outline={outline["Supporting Claims"]}
               fontType="bold"
               open={true}
               dataCy="supporting-claims"
@@ -491,12 +496,12 @@ and dynamically adjust the height of the input field. */
           {claimEvidence ? (
             <div>
               <Text2Typography
-                style={{ margin: '10px 5px 0px 0px' }}
+                style={{ margin: "10px 5px 0px 0px" }}
                 data-cy="claim-evidence-title"
               >
                 Evidence Given for Each Claim
               </Text2Typography>
-              {outline['Evidence Given for Each Claim'].map(
+              {outline["Evidence Given for Each Claim"].map(
                 (evidence: EvidenceObject, i: number) => {
                   const keys = Object.keys(evidence);
                   const claimKey = keys[0];
@@ -515,7 +520,7 @@ and dynamically adjust the height of the input field. */
                       dataCy={`claim-evidence-${i + 1}`}
                     />
                   );
-                }
+                },
               )}
             </div>
           ) : null}
@@ -536,7 +541,7 @@ and dynamically adjust the height of the input field. */
           <div style={{ marginRight: 10 }}>
             <StyledDivider />
             <AssignmentDescriptionDisplay
-              assignmentDescription={googleDoc?.assignmentDescription || ''}
+              assignmentDescription={googleDoc?.assignmentDescription || ""}
               saveTimelineDescription={async (description: string) => {
                 if (!googleDoc) return;
                 const updatedGoogleDoc = {
@@ -574,24 +579,22 @@ and dynamically adjust the height of the input field. */
             supportingClaims &&
             claimEvidence &&
             aiOutline &&
-            timelinePoint.reverseOutlineStatus ===
-              AiGenerationStatus.COMPLETED &&
-            timelinePoint.type !== TimelinePointType.INTRO ? (
+            timelinePoint.reverseOutlineStatus === "COMPLETED" &&
+            timelinePoint.type !== "INTRO" ? (
               <div style={{ marginRight: 10 }}>
                 <AIOutlineDisplay
                   reverseOutline={timelinePoint.reverseOutline}
                 />
               </div>
-            ) : timelinePoint.reverseOutlineStatus ===
-              AiGenerationStatus.COMPLETED ? (
+            ) : timelinePoint.reverseOutlineStatus === "COMPLETED" ? (
               <Text2Typography data-cy="no-ai-outline">
                 No AI outline available
               </Text2Typography>
             ) : (
               <AIOutlineContainer
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
+                  display: "flex",
+                  flexDirection: "column",
                   marginRight: 10,
                 }}
               >
@@ -600,8 +603,8 @@ and dynamically adjust the height of the input field. */
                 </Text2Typography>
                 <CircularProgress
                   style={{
-                    alignSelf: 'center',
-                    justifySelf: 'center',
+                    alignSelf: "center",
+                    justifySelf: "center",
                   }}
                 />
               </AIOutlineContainer>
@@ -614,7 +617,7 @@ and dynamically adjust the height of the input field. */
   (prevProps, nextProps) => {
     const timelinePointChanges = !equals<GQLTimelinePoint>(
       prevProps.timelinePoint,
-      nextProps.timelinePoint
+      nextProps.timelinePoint,
     );
     const googleDocChanges =
       prevProps.googleDoc &&
@@ -626,5 +629,5 @@ and dynamically adjust the height of the input field. */
     return (
       !timelinePointChanges && !googleDocChanges && !generationInProgressChanges
     );
-  }
+  },
 );

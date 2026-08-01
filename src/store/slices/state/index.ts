@@ -4,35 +4,34 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+
 import {
+  createAsyncThunk,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
+import type {
   AiServiceModel,
   DocData,
   UserDoc,
   Intention,
   StoreUserDoc,
-} from '../../../types';
-import { UserRole } from '../login';
-import { v4 as uuidv4 } from 'uuid';
+} from "../../../types";
+import type { UserRole } from "../login";
+import { v4 as uuidv4 } from "uuid";
 import {
   archiveDoc,
   deleteUserDoc as _deleteUserDoc,
   fetchDocs,
   updateDocStorage,
-} from '../../../hooks/api';
-
-export enum UserDocsLoadStatus {
-  NONE,
-  LOADING,
-  SUCCEEDED,
-  FAILED,
-}
+} from "../../../hooks/api";
+import type { LoadStatus } from "../doc-goals-activities";
 
 export interface State {
   curDocId: string;
   mostRecentDocVersion?: DocData;
   userDocs: UserDoc[];
-  userDocsLoadStatus: UserDocsLoadStatus;
+  userDocsLoadStatus: LoadStatus;
   sessionId: string;
   sessionIntention?: Intention;
   overrideAiServiceModel?: AiServiceModel;
@@ -42,21 +41,21 @@ export interface State {
 }
 
 const initialState: State = {
-  curDocId: '',
-  userDocsLoadStatus: UserDocsLoadStatus.NONE,
+  curDocId: "",
+  userDocsLoadStatus: 0,
   userDocs: [],
   sessionId: uuidv4(),
   overrideAiServiceModel: undefined,
-  viewingRole: UserRole.USER,
+  viewingRole: "USER",
   viewingAdvancedOptions: false,
   warnExpiredAccessToken: false,
 };
 
 export const loadUserDocs = createAsyncThunk(
-  'state/loadUserDocs',
+  "state/loadUserDocs",
   async (args: { userId: string }) => {
     return await fetchDocs(args.userId);
-  }
+  },
 );
 
 export interface DeleteUserDocArgs {
@@ -65,24 +64,24 @@ export interface DeleteUserDocArgs {
 }
 
 export const deleteUserDoc = createAsyncThunk(
-  'state/deleteUserDoc',
+  "state/deleteUserDoc",
   async (args: DeleteUserDocArgs) => {
     return await _deleteUserDoc(args.googleDocId, args.userId);
-  }
+  },
 );
 
 export const updateUserDoc = createAsyncThunk(
-  'state/updateUserDoc',
+  "state/updateUserDoc",
   async (args: { userDoc: StoreUserDoc }) => {
     return await updateDocStorage(args.userDoc);
-  }
+  },
 );
 
 export const setArchiveUserDoc = createAsyncThunk(
-  'state/setArchiveUserDoc',
+  "state/setArchiveUserDoc",
   async (args: { googleDocId: string; userId: string; archive: boolean }) => {
     return await archiveDoc(args.googleDocId, args.userId, args.archive);
-  }
+  },
 );
 
 interface UpdateDocTitle {
@@ -92,12 +91,12 @@ interface UpdateDocTitle {
 
 /** Reducer */
 export const stateSlice = createSlice({
-  name: 'state',
+  name: "state",
   initialState,
   reducers: {
     setWarnExpiredAccessToken: (
       state: State,
-      action: PayloadAction<boolean>
+      action: PayloadAction<boolean>,
     ) => {
       state.warnExpiredAccessToken = action.payload;
     },
@@ -113,13 +112,13 @@ export const stateSlice = createSlice({
     },
     setSessionIntention: (
       state: State,
-      action: PayloadAction<Intention | undefined>
+      action: PayloadAction<Intention | undefined>,
     ) => {
       state.sessionIntention = action.payload;
     },
     overrideAiModel: (
       state: State,
-      action: PayloadAction<AiServiceModel | undefined>
+      action: PayloadAction<AiServiceModel | undefined>,
     ) => {
       state.overrideAiServiceModel = action.payload;
     },
@@ -128,13 +127,13 @@ export const stateSlice = createSlice({
     },
     updateViewingAdvancedOptions: (
       state: State,
-      action: PayloadAction<boolean>
+      action: PayloadAction<boolean>,
     ) => {
       state.viewingAdvancedOptions = action.payload;
     },
     updateDocTitleLocally: (
       state: State,
-      action: PayloadAction<UpdateDocTitle>
+      action: PayloadAction<UpdateDocTitle>,
     ) => {
       state.userDocs = state.userDocs.map((doc) => {
         if (doc.googleDocId === action.payload.googleDocId) {
@@ -145,24 +144,24 @@ export const stateSlice = createSlice({
     },
     storeMostRecentDocVersion: (
       state: State,
-      action: PayloadAction<DocData>
+      action: PayloadAction<DocData>,
     ) => {
       state.mostRecentDocVersion = action.payload;
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(loadUserDocs.fulfilled, (state, action) => {
-      state.userDocsLoadStatus = UserDocsLoadStatus.SUCCEEDED;
+    (builder.addCase(loadUserDocs.fulfilled, (state, action) => {
+      state.userDocsLoadStatus = 2;
       state.userDocs = action.payload;
     }),
       builder.addCase(loadUserDocs.rejected, (state) => {
-        state.userDocsLoadStatus = UserDocsLoadStatus.FAILED;
+        state.userDocsLoadStatus = 3;
         state.userDocs = [];
       }),
       builder.addCase(loadUserDocs.pending, (state) => {
-        state.userDocsLoadStatus = UserDocsLoadStatus.LOADING;
+        state.userDocsLoadStatus = 1;
         state.userDocs = [];
-      });
+      }));
 
     builder.addCase(updateUserDoc.fulfilled, (state, action) => {
       state.userDocs = state.userDocs.map((doc) => {
@@ -174,7 +173,7 @@ export const stateSlice = createSlice({
     });
     builder.addCase(deleteUserDoc.fulfilled, (state, action) => {
       state.userDocs = state.userDocs.filter(
-        (doc) => doc.googleDocId !== action.payload.googleDocId
+        (doc) => doc.googleDocId !== action.payload.googleDocId,
       );
     });
 

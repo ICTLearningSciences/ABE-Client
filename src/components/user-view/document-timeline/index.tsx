@@ -1,17 +1,24 @@
-import React, { RefObject, useEffect, useRef, useState } from 'react';
-import { useWithDocumentTimeline } from '../../../hooks/use-with-document-timeline';
-import { useAppSelector } from '../../../store/hooks';
-import { Button, CircularProgress } from '@mui/material';
-import { ColumnDiv, RowDiv } from '../../../styled-components';
-import TimepointDocumentText from './timepoint-document-text';
-import { TimepointOutline } from './timepoint-outline';
-import TimelineFooter from './timeline-footer';
-import { useWithUsersDocs } from '../../../hooks/use-with-users-docs';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import React, { type RefObject, useEffect, useRef, useState } from "react";
+import { Button, CircularProgress } from "@mui/material";
+import { useWithDocumentTimeline } from "../../../hooks/use-with-document-timeline";
+import { useAppSelector } from "../../../store/hooks";
+import { ColumnDiv, RowDiv } from "../../../styled-components";
+import TimepointDocumentText from "./timepoint-document-text";
+import { TimepointOutline } from "./timepoint-outline";
+import TimelineFooter from "./timeline-footer";
+import { useWithUsersDocs } from "../../../hooks/use-with-users-docs";
 
 export function DocumentTimelinePage(props: {
   returnToDocs: () => void;
   docIdFromParams: string;
-}): JSX.Element {
+}): React.ReactNode {
   const { returnToDocs, docIdFromParams: docId } = props;
   const footerTimelineRef = useRef<HTMLElement | null>(null);
   const userId = useAppSelector((state) => state.login.user?._id);
@@ -38,12 +45,12 @@ export function DocumentTimelinePage(props: {
     return (
       <div
         style={{
-          height: '100%',
-          display: 'flex',
+          height: "100%",
+          display: "flex",
           flexGrow: 1,
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
         <div>Error occured: {errorMessage.message}</div>
@@ -56,12 +63,12 @@ export function DocumentTimelinePage(props: {
     return (
       <div
         style={{
-          height: '100%',
-          display: 'flex',
+          height: "100%",
+          display: "flex",
           flexGrow: 1,
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
         <div>No History found.</div>
@@ -73,7 +80,7 @@ export function DocumentTimelinePage(props: {
     return (
       <ColumnDiv
         style={{
-          alignItems: 'center',
+          alignItems: "center",
         }}
       >
         Generating History, this could take a bit...
@@ -91,34 +98,34 @@ export function DocumentTimelinePage(props: {
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        height: '100%',
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100%",
       }}
     >
       <ColumnDiv
         style={{
-          position: 'absolute',
-          height: 'calc(100% - 10%)',
-          width: '100%',
+          position: "absolute",
+          height: "calc(100% - 10%)",
+          width: "100%",
           top: 45,
         }}
       >
         <RowDiv
           style={{
-            height: '90%',
-            alignItems: 'flex-end',
-            width: '100%',
+            height: "90%",
+            alignItems: "flex-end",
+            width: "100%",
           }}
         >
           <div
             style={{
-              width: '50%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'center',
+              width: "50%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
             }}
           >
             <TimepointDocumentText
@@ -128,11 +135,11 @@ export function DocumentTimelinePage(props: {
           </div>
           <div
             style={{
-              width: '50%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'center',
+              width: "50%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
             }}
           >
             <TimepointOutline

@@ -4,15 +4,16 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { CircularProgress, MenuItem, Select, Typography } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import { EducationalRole, User } from '../../types';
-import { UserRole } from '../../store/slices/login';
-import { fetchUsers, updateUserRole } from '../../hooks/api';
-import { copyAndSet } from '../../helpers';
 
-export default function AdminManageUsers(): JSX.Element {
+import React from "react";
+import { CircularProgress, MenuItem, Select, Typography } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import type { EducationalRole, User } from "../../types";
+import { fetchUsers, updateUserRole } from "../../hooks/api";
+import { copyAndSet } from "../../helpers";
+import type { UserRole } from "../../store/slices/login";
+
+export default function AdminManageUsers(): React.ReactNode {
   const [users, setUsers] = React.useState<User[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
@@ -30,7 +31,7 @@ export default function AdminManageUsers(): JSX.Element {
   async function updateUser(
     id: string,
     userRole?: UserRole,
-    educationalRole?: EducationalRole
+    educationalRole?: EducationalRole,
   ) {
     const user = await updateUserRole(id, userRole, educationalRole);
     const idx = users.findIndex((p) => p._id === user._id);
@@ -44,7 +45,7 @@ export default function AdminManageUsers(): JSX.Element {
   }, []);
 
   return (
-    <div style={{ width: '100%', height: '100%' }} className="column spacing">
+    <div style={{ width: "100%", height: "100%" }} className="column spacing">
       {isLoading ? (
         <CircularProgress />
       ) : (
@@ -54,27 +55,27 @@ export default function AdminManageUsers(): JSX.Element {
             id: p._id,
           }))}
           columns={[
-            { field: 'id' },
+            { field: "id" },
             {
-              field: 'name',
-              headerName: 'Name',
+              field: "name",
+              headerName: "Name",
               width: 300,
             },
             {
-              field: 'lastLoginAt',
-              headerName: 'Last Activity',
+              field: "lastLoginAt",
+              headerName: "Last Activity",
               width: 250,
               renderCell: (params) => (
                 <Typography>
                   {params.row.lastLoginAt
                     ? new Date(params.row.lastLoginAt).toLocaleString()
-                    : ''}
+                    : ""}
                 </Typography>
               ),
             },
             {
-              field: 'userRole',
-              headerName: 'User Role',
+              field: "userRole",
+              headerName: "User Role",
               width: 150,
               renderCell: (params) => (
                 <Select
@@ -84,7 +85,7 @@ export default function AdminManageUsers(): JSX.Element {
                     updateUser(params.row.id, e.target.value as UserRole)
                   }
                 >
-                  {Object.values(UserRole).map((r) => (
+                  {["NONE", "ADMIN", "CONTENT_MANAGER", "USER"].map((r) => (
                     <MenuItem value={r} key={r}>
                       {r}
                     </MenuItem>
@@ -93,8 +94,8 @@ export default function AdminManageUsers(): JSX.Element {
               ),
             },
             {
-              field: 'educationalRole',
-              headerName: 'Educational Role',
+              field: "educationalRole",
+              headerName: "Educational Role",
               width: 200,
               renderCell: (params) => (
                 <Select
@@ -104,11 +105,11 @@ export default function AdminManageUsers(): JSX.Element {
                     updateUser(
                       params.row.id,
                       undefined,
-                      e.target.value as EducationalRole
+                      e.target.value as EducationalRole,
                     )
                   }
                 >
-                  {Object.values(EducationalRole).map((r) => (
+                  {["INSTRUCTOR", "STUDENT"].map((r) => (
                     <MenuItem value={r} key={r}>
                       {r}
                     </MenuItem>
@@ -117,7 +118,7 @@ export default function AdminManageUsers(): JSX.Element {
               ),
             },
           ]}
-          pageSize={20}
+          pageSizeOptions={[20]}
           initialState={{
             columns: {
               columnVisibilityModel: {

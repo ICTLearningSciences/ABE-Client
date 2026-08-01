@@ -4,31 +4,31 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useEffect } from 'react';
-import { UseWithLogin } from '../../store/slices/login/use-with-login';
-import { LoginStatus } from '../../store/slices/login';
-import { useGoogleLogin } from '@react-oauth/google';
-import { useAppSelector } from '../../store/hooks';
-import { LoginUI } from './login-ui';
-import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
-import { useAuth } from 'react-oidc-context';
-import { EducationalRole, User } from '../../types';
+
+import React, { useEffect } from "react";
+import { useAuth } from "react-oidc-context";
+import { useGoogleLogin } from "@react-oauth/google";
+import type { UseWithLogin } from "../../store/slices/login/use-with-login";
+import { useAppSelector } from "../../store/hooks";
+import { LoginUI } from "./login-ui";
+import { useNavigateWithParams } from "../../hooks/use-navigate-with-params";
+import type { User } from "../../types";
 import {
   courseManagementUrl,
   studentCoursesUrl,
-} from '../instructor/course-management';
-import { PrivacyPolicyDisplay } from '../../components/privacy-policy-display';
+} from "../instructor/course-management";
+import { PrivacyPolicyDisplay } from "../../components/privacy-policy-display";
 
 export default function Login(props: {
   useLogin: UseWithLogin;
   loginTo?: string;
-}): JSX.Element {
+}): React.ReactNode {
   const { useLogin, loginTo } = props;
   const { loginWithGoogle, state: loginState } = useLogin;
   const navigate = useNavigateWithParams();
   const config = useAppSelector((state) => state.config);
   const { loginWithAmazonCognito } = useLogin;
-  const orgName = config.config?.orgName || 'ABE';
+  const orgName = config.config?.orgName || "ABE";
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       loginWithGoogle(tokenResponse.access_token).then((user) => {
@@ -38,14 +38,14 @@ export default function Login(props: {
   });
 
   async function handleLoginNavigate(user?: User) {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
     const sectionCodeFromUrl = new URLSearchParams(window.location.search).get(
-      'sectionCode'
+      "sectionCode",
     );
     const isStudentFromUrl = new URLSearchParams(window.location.search).get(
-      'isStudent'
+      "isStudent",
     );
     if (loginTo) {
       navigate(loginTo);
@@ -53,17 +53,17 @@ export default function Login(props: {
     }
     if (
       (sectionCodeFromUrl || isStudentFromUrl) &&
-      user?.educationalRole !== EducationalRole.INSTRUCTOR
+      user?.educationalRole !== "INSTRUCTOR"
     ) {
       navigate(studentCoursesUrl);
       return;
     }
     if (!user?.educationalRole) {
-      navigate('/docs');
+      navigate("/docs");
     }
-    if (user?.educationalRole === EducationalRole.STUDENT) {
+    if (user?.educationalRole === "STUDENT") {
       navigate(studentCoursesUrl);
-    } else if (user?.educationalRole === EducationalRole.INSTRUCTOR) {
+    } else if (user?.educationalRole === "INSTRUCTOR") {
       navigate(courseManagementUrl);
     }
   }
@@ -77,7 +77,7 @@ export default function Login(props: {
   }, [awsCognitoAuth.isAuthenticated, awsCognitoAuth.user?.id_token]);
 
   useEffect(() => {
-    if (loginState.loginStatus === LoginStatus.AUTHENTICATED) {
+    if (loginState.loginStatus === 3) {
       handleLoginNavigate(loginState.user);
     }
   }, [loginState.loginStatus]);
@@ -85,11 +85,11 @@ export default function Login(props: {
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'white',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "white",
       }}
     >
       <LoginUI
@@ -100,8 +100,8 @@ export default function Login(props: {
       />
       <div
         style={{
-          position: 'absolute',
-          bottom: '0',
+          position: "absolute",
+          bottom: "0",
         }}
       >
         <PrivacyPolicyDisplay />

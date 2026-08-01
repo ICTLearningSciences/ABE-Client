@@ -4,11 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect, useState } from 'react';
-import { useAppSelector } from '../store/hooks';
-import { useWithChat } from '../store/slices/chat/use-with-chat';
-import { ChatLog } from '../store/slices/chat';
-import { DocData } from '../types';
+
+import { useEffect, useState } from "react";
+import { useAppSelector } from "../store/hooks";
+import { useWithChat } from "../store/slices/chat/use-with-chat";
+import type { ChatLog } from "../store/slices/chat";
+import type { DocData } from "../types";
 
 export abstract class ChatLogSubscriber {
   abstract newChatLogReceived(chatLog: ChatLog): void;
@@ -20,7 +21,7 @@ export function useWithChatLogSubscribers() {
 
   const { state } = useWithChat();
   const mostRecentDocVersion = useAppSelector(
-    (state) => state.state.mostRecentDocVersion
+    (state) => state.state.mostRecentDocVersion,
   );
   const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const messages = state.chatLogs[curDocId] || [];
@@ -28,7 +29,7 @@ export function useWithChatLogSubscribers() {
   useEffect(() => {
     for (let i = 0; i < subscribers.length; i++) {
       const newChatLogFunction = subscribers[i].newChatLogReceived.bind(
-        subscribers[i]
+        subscribers[i],
       );
       newChatLogFunction(messages);
     }
@@ -37,7 +38,7 @@ export function useWithChatLogSubscribers() {
   useEffect(() => {
     for (let i = 0; i < subscribers.length; i++) {
       const newDocDataFunction = subscribers[i].newDocDataReceived.bind(
-        subscribers[i]
+        subscribers[i],
       );
       newDocDataFunction(mostRecentDocVersion);
     }

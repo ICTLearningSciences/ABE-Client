@@ -8,10 +8,10 @@ The full terms of this copyright and license should always be found in the root 
 import {
   convertBuiltActivityToGql,
   convertGqlToBuiltActivity,
-} from '../hooks/built-activity-api';
-import { examplePromptActivity } from './activity-builder-fixture';
+} from "../hooks/built-activity-api";
+import { examplePromptActivity } from "./activity-builder-fixture";
 
-test.only('', () => {
+test.only("", () => {
   const gqlActivity = convertBuiltActivityToGql(examplePromptActivity);
   convertGqlToBuiltActivity(gqlActivity);
 });

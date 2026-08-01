@@ -1,16 +1,16 @@
 /*
-This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved.
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
 Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { RagStoreConfiguration } from '../../../../types';
-import { CheckBoxInput, InputField } from '../../shared/input-components';
-import Collapse from '@mui/material/Collapse';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { IconButton } from '@mui/material';
+
+import React from "react";
+import { ExpandMore, ExpandLess } from "@mui/icons-material";
+import { Collapse, IconButton } from "@mui/material";
+
+import type { RagStoreConfiguration } from "../../../../types";
+import { CheckBoxInput, InputField } from "../../shared/input-components";
 
 type RagConfigurationUpdater =
   | RagStoreConfiguration
@@ -23,8 +23,8 @@ interface RagStoreConfigurationEditorProps {
 }
 
 export function RagStoreConfigurationEditor(
-  props: RagStoreConfigurationEditorProps
-): JSX.Element {
+  props: RagStoreConfigurationEditorProps,
+): React.ReactNode {
   const { ragConfiguration, updateRagConfiguration } = props;
   const [collapsed, setCollapsed] = React.useState<boolean>(true);
   const [errors, setErrors] = React.useState<{
@@ -36,7 +36,7 @@ export function RagStoreConfigurationEditor(
 
   // Convert string array to comma-separated string
   const arrayToCommaString = (arr?: string[]): string => {
-    return arr?.join(', ') || '';
+    return arr?.join(", ") || "";
   };
 
   // Convert comma-separated string to string array
@@ -44,29 +44,29 @@ export function RagStoreConfigurationEditor(
     const trimmed = str.trim();
     if (!trimmed) return undefined;
     return trimmed
-      .split(',')
+      .split(",")
       .map((item) => item.trim())
       .filter((item) => item);
   };
 
   const groupsIds = arrayToCommaString(
-    ragConfiguration?.filters?.groups_ids as string[] | undefined
+    ragConfiguration?.filters?.groups_ids as string[] | undefined,
   );
   const agentIds = arrayToCommaString(
-    ragConfiguration?.filters?.agent_ids as string[] | undefined
+    ragConfiguration?.filters?.agent_ids as string[] | undefined,
   );
 
   const validateFields = (config: RagStoreConfiguration): boolean => {
     const newErrors: { topN?: string; ragQuery?: string } = {};
     let isValid = true;
 
-    if (!config.ragQuery || config.ragQuery.trim() === '') {
-      newErrors.ragQuery = 'Query is required when RAG is enabled';
+    if (!config.ragQuery || config.ragQuery.trim() === "") {
+      newErrors.ragQuery = "Query is required when RAG is enabled";
       isValid = false;
     }
 
     if (config.topN === undefined || config.topN === null || config.topN <= 0) {
-      newErrors.topN = 'Top N must be a positive number';
+      newErrors.topN = "Top N must be a positive number";
       isValid = false;
     }
 
@@ -77,7 +77,7 @@ export function RagStoreConfigurationEditor(
   const handleEnableChange = (enabled: boolean) => {
     if (enabled) {
       const newConfig: RagStoreConfiguration = {
-        ragQuery: '',
+        ragQuery: "",
         topN: 3,
         filters: {},
       };
@@ -91,7 +91,7 @@ export function RagStoreConfigurationEditor(
 
   const updateField = (
     field: keyof RagStoreConfiguration,
-    value: string | number
+    value: string | number,
   ) => {
     updateRagConfiguration((prevConfig) => {
       if (!prevConfig) return prevConfig;
@@ -106,8 +106,8 @@ export function RagStoreConfigurationEditor(
   };
 
   const updateFilter = (
-    filterKey: 'groups_ids' | 'agent_ids',
-    value: string
+    filterKey: "groups_ids" | "agent_ids",
+    value: string,
   ) => {
     updateRagConfiguration((prevConfig) => {
       if (!prevConfig) return prevConfig;
@@ -133,27 +133,27 @@ export function RagStoreConfigurationEditor(
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-        padding: '10px 0',
-        border: '1px solid #ccc',
-        borderRadius: '4px',
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        padding: "10px 0",
+        border: "1px solid #ccc",
+        borderRadius: "4px",
       }}
     >
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
         }}
       >
         <IconButton
           size="small"
           onClick={() => setCollapsed(!collapsed)}
-          style={{ padding: '4px' }}
+          style={{ padding: "4px" }}
         >
-          {collapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+          {collapsed ? <ExpandMore /> : <ExpandLess />}
         </IconButton>
         <h4 style={{ margin: 0 }}>RAG Configuration</h4>
       </div>
@@ -161,10 +161,10 @@ export function RagStoreConfigurationEditor(
       <Collapse in={!collapsed}>
         <div
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            paddingTop: '10px',
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            paddingTop: "10px",
           }}
         >
           <CheckBoxInput
@@ -179,15 +179,15 @@ export function RagStoreConfigurationEditor(
                 <InputField
                   label="Query"
                   value={ragConfiguration.ragQuery}
-                  onChange={(value) => updateField('ragQuery', value)}
+                  onChange={(value) => updateField("ragQuery", value)}
                   width="100%"
                 />
                 {errors.ragQuery && (
                   <span
                     style={{
-                      color: 'red',
-                      fontSize: '12px',
-                      marginLeft: '8px',
+                      color: "red",
+                      fontSize: "12px",
+                      marginLeft: "8px",
                     }}
                   >
                     {errors.ragQuery}
@@ -198,11 +198,11 @@ export function RagStoreConfigurationEditor(
               <div>
                 <InputField
                   label="Top N"
-                  value={ragConfiguration.topN?.toString() || '0'}
+                  value={ragConfiguration.topN?.toString() || "0"}
                   onChange={(value) => {
                     const numValue = parseInt(value, 10);
                     if (!isNaN(numValue)) {
-                      updateField('topN', numValue);
+                      updateField("topN", numValue);
                     }
                   }}
                   width="100%"
@@ -210,9 +210,9 @@ export function RagStoreConfigurationEditor(
                 {errors.topN && (
                   <span
                     style={{
-                      color: 'red',
-                      fontSize: '12px',
-                      marginLeft: '8px',
+                      color: "red",
+                      fontSize: "12px",
+                      marginLeft: "8px",
                     }}
                   >
                     {errors.topN}
@@ -223,14 +223,14 @@ export function RagStoreConfigurationEditor(
               <InputField
                 label="Group IDs (comma-separated)"
                 value={groupsIds}
-                onChange={(value) => updateFilter('groups_ids', value)}
+                onChange={(value) => updateFilter("groups_ids", value)}
                 width="100%"
               />
 
               <InputField
                 label="Agent IDs (comma-separated)"
                 value={agentIds}
-                onChange={(value) => updateFilter('agent_ids', value)}
+                onChange={(value) => updateFilter("agent_ids", value)}
                 width="100%"
               />
             </>

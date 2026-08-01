@@ -4,13 +4,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { CircularProgress } from '@mui/material';
-import { Chat } from './chat/chat';
-import { UseWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-activity';
-import { DocGoalModal } from './doc-introduction/doc-goal-modal';
-import { useEffect, useState } from 'react';
-import { useAppSelector } from '../../store/hooks';
+
+import React, { useEffect, useState } from "react";
+import { CircularProgress } from "@mui/material";
+import { Chat } from "./chat/chat";
+import type { UseWithCurrentGoalActivity } from "../../hooks/use-with-current-goal-activity";
+import { DocGoalModal } from "./doc-introduction/doc-goal-modal";
+import { useAppSelector } from "../../store/hooks";
+import type { ActivityBuilder } from "../activity-builder/types";
 
 export function ChatActivity(props: {
   activityFromParams: string;
@@ -21,7 +22,7 @@ export function ChatActivity(props: {
   setPreviewingActivity: (previewingActivity: boolean) => void;
   disableActivitySelector?: boolean;
   setToDocView: () => void;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     activityFromParams,
     goalFromParams,
@@ -43,7 +44,7 @@ export function ChatActivity(props: {
 
   const [docGoalModalOpen, setDocGoalModalOpen] = useState(false);
   const builtActivities = useAppSelector(
-    (state) => state.docGoalsActivities.builtActivities
+    (state) => state.docGoalsActivities.builtActivities,
   );
   const [checkedUrlParams, setCheckedUrlParams] = useState<boolean>(false);
   function editDocGoal() {
@@ -63,7 +64,7 @@ export function ChatActivity(props: {
     }
     const goal = docGoals.find((goal) => goal._id === goalFromParams);
     const activity = builtActivities?.find(
-      (activity) => activity?._id === activityFromParams
+      (activity: ActivityBuilder) => activity?._id === activityFromParams,
     );
     setGoalAndActivity(goal, activity);
     const goalHasActivities = goal?.builtActivities?.length;

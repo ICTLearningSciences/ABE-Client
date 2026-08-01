@@ -4,31 +4,31 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import PencilIcon from '@mui/icons-material/Edit';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
-import DefaultIcon from '@mui/icons-material/Interests';
-import PencilOutline from '@mui/icons-material/DriveFileRenameOutline';
-export enum DisplayIcons {
-  LIGHT_BULB = 'LIGHT_BULB',
-  PENCIL = 'PENCIL',
-  PENCIL_OUTLINE = 'PENCIL_OUTLINE',
-  DEFAULT = 'DEFAULT',
-}
+
+import React from "react";
+import {
+  Edit,
+  Lightbulb,
+  Interests,
+  DriveFileMoveOutlined,
+} from "@mui/icons-material";
+
+export type DisplayIcons =
+  "LIGHT_BULB" | "PENCIL" | "PENCIL_OUTLINE" | "DEFAULT";
 
 export const DisplayIcon = (props: {
   iconName: DisplayIcons;
   style?: React.CSSProperties;
-}): JSX.Element => {
+}): React.ReactNode => {
   switch (props.iconName) {
-    case DisplayIcons.LIGHT_BULB:
-      return <LightbulbIcon style={props.style} />;
-    case DisplayIcons.PENCIL:
-      return <PencilIcon style={props.style} />;
-    case DisplayIcons.PENCIL_OUTLINE:
-      return <PencilOutline style={props.style} />;
-    case DisplayIcons.DEFAULT:
-      return <DefaultIcon style={props.style} />;
+    case "LIGHT_BULB":
+      return <Lightbulb style={props.style} />;
+    case "PENCIL":
+      return <Edit style={props.style} />;
+    case "PENCIL_OUTLINE":
+      return <DriveFileMoveOutlined style={props.style} />;
+    case "DEFAULT":
+      return <Interests style={props.style} />;
     default:
       return <> </>;
   }

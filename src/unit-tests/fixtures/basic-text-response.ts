@@ -4,62 +4,61 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-
-import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
+import type { AiServicesResponseTypes } from "../../ai-services/ai-service-types";
 
 export const openAiTextResponse = (
-  resText: string
+  resText: string,
 ): AiServicesResponseTypes => {
   return {
     aiAllStepsData: [
       {
         aiServiceRequestParams: {
-          model: 'gpt-4o-mini',
+          model: "gpt-4o-mini",
           input: [
             {
-              role: 'system',
-              content: ' ',
+              role: "system",
+              content: " ",
             },
             {
-              role: 'user',
+              role: "user",
               content:
-                'Please look up current events related to Chocolate Bars.',
+                "Please look up current events related to Chocolate Bars.",
             },
           ],
           tools: [
             {
-              type: 'web_search_preview',
+              type: "web_search_preview",
             },
           ],
           tool_choice: {
-            type: 'web_search_preview',
+            type: "web_search_preview",
           },
           store: false,
         },
         aiServiceResponse: {
-          id: 'resp_67dc7ebc06dc819289afec75d63dd4cd0613b3084b7f7cef',
-          object: 'response',
+          id: "resp_67dc7ebc06dc819289afec75d63dd4cd0613b3084b7f7cef",
+          object: "response",
           created_at: 1742503612,
-          status: 'completed',
+          status: "completed",
           error: null,
           incomplete_details: null,
           instructions: null,
           max_output_tokens: null,
-          model: 'gpt-4o-mini-2024-07-18',
+          model: "gpt-4o-mini-2024-07-18",
           output: [
             {
-              type: 'web_search_call',
-              id: 'ws_67dc7ebc1edc819281b651094201ac030613b3084b7f7cef',
-              status: 'completed',
+              type: "web_search_call",
+              id: "ws_67dc7ebc1edc819281b651094201ac030613b3084b7f7cef",
+              status: "completed",
             },
             {
-              type: 'message',
-              id: 'msg_67dc7ebdaf6c8192828869399f9234870613b3084b7f7cef',
-              status: 'completed',
-              role: 'assistant',
+              type: "message",
+              id: "msg_67dc7ebdaf6c8192828869399f9234870613b3084b7f7cef",
+              status: "completed",
+              role: "assistant",
               content: [
                 {
-                  type: 'output_text',
+                  type: "output_text",
                   text: resText,
                   annotations: [],
                 },
@@ -75,27 +74,27 @@ export const openAiTextResponse = (
           temperature: 1,
           text: {
             format: {
-              type: 'text',
+              type: "text",
             },
           },
           tool_choice: {
-            type: 'web_search_preview',
+            type: "web_search_preview",
           },
           tools: [
             {
-              type: 'web_search_preview',
-              search_context_size: 'medium',
+              type: "web_search_preview",
+              search_context_size: "medium",
               user_location: {
-                type: 'approximate',
+                type: "approximate",
                 city: undefined,
-                country: 'US',
+                country: "US",
                 region: undefined,
                 timezone: undefined,
               },
             },
           ],
           top_p: 1,
-          truncation: 'disabled',
+          truncation: "disabled",
           usage: {
             input_tokens: 336,
             input_tokens_details: {

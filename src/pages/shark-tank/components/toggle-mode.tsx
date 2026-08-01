@@ -4,11 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Tooltip, FormGroup, FormControlLabel, Switch } from '@mui/material';
-import { useWithPanels } from '../../../store/slices/panels/use-with-panels';
 
-export default function ToggleAgentMode(): JSX.Element {
+import React from "react";
+import { Tooltip, FormGroup, FormControlLabel, Switch } from "@mui/material";
+import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
+
+export default function ToggleAgentMode(): React.ReactNode {
   const { usePanelMode, setPanelMode } = useWithPanels();
 
   function onToggleAgentMode(): void {
@@ -17,13 +18,13 @@ export default function ToggleAgentMode(): JSX.Element {
 
   return (
     <Tooltip
-      title={usePanelMode ? 'Speak with a panel' : 'Speak with a single agent'}
+      title={usePanelMode ? "Speak with a panel" : "Speak with a single agent"}
     >
       <FormGroup>
         <FormControlLabel
           control={<Switch checked={usePanelMode} />}
           onChange={() => onToggleAgentMode()}
-          label={usePanelMode ? 'CF Panel Mode' : 'CF Agent Mode'}
+          label={usePanelMode ? "CF Panel Mode" : "CF Agent Mode"}
         />
       </FormGroup>
     </Tooltip>

@@ -4,27 +4,26 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import axios from 'axios';
-import {
+
+import axios from "axios";
+import Validator, { type Schema } from "jsonschema";
+import type {
   GQLTimelinePoint,
-  AiGenerationStatus,
   AiServiceModel,
   AiServiceNames,
   User,
-} from './types';
-import Validator, { Schema } from 'jsonschema';
-import { ChatLog } from './store/slices/chat';
-import {
-  ActivityBuilder,
-  ActivityBuilderVisibility,
-} from './components/activity-builder/types';
-import { UserRole } from './store/slices/login';
-import {
+} from "./types";
+import type { ChatLog } from "./store/slices/chat";
+import type { ActivityBuilder } from "./components/activity-builder/types";
+import type {
   Assignment,
   AssignmentProgress,
   RelevantGoogleDoc,
   StudentData,
-} from './store/slices/education-management';
+} from "./store/slices/education-management";
+
+export type AssignmentCompletionStatus =
+  "ASSIGNMENT_COMPLETE" | "IN_PROGRESS" | "NOT_STARTED";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function extractErrorMessageFromError(err: any | unknown): string {
@@ -48,7 +47,7 @@ export function extractErrorMessageFromError(err: any | unknown): string {
       const error = JSON.stringify(err);
       return error;
     } catch (err) {
-      return 'Cannot stringify error, unknown error structure';
+      return "Cannot stringify error, unknown error structure";
     }
   }
 }
@@ -56,7 +55,7 @@ export function extractErrorMessageFromError(err: any | unknown): string {
 export function addQueryParam(
   url: string,
   paramName: string,
-  paramValue: string
+  paramValue: string,
 ): string {
   const urlObject = new URL(url);
   urlObject.searchParams.append(paramName, paramValue);
@@ -79,17 +78,17 @@ export function formatISODateToReadable(isoDate: string): string {
   ) {
     // If the date is today, show the time of day with AM/PM
     const hours = inputDate.getHours() % 12 || 12;
-    const minutes = inputDate.getMinutes().toString().padStart(2, '0');
-    const period = inputDate.getHours() < 12 ? 'AM' : 'PM';
+    const minutes = inputDate.getMinutes().toString().padStart(2, "0");
+    const period = inputDate.getHours() < 12 ? "AM" : "PM";
     return `${hours}:${minutes} ${period} (Today)`;
   } else {
     // If the date is not today, show the full date
     const options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     };
-    return inputDate.toLocaleDateString('en-US', options);
+    return inputDate.toLocaleDateString("en-US", options);
   }
 }
 
@@ -104,20 +103,20 @@ export function formatISODate(isoDate: string): string {
   ) {
     // If the date is today, show the time of day with AM/PM
     const hours = inputDate.getHours() % 12 || 12;
-    const minutes = inputDate.getMinutes().toString().padStart(2, '0');
-    const period = inputDate.getHours() < 12 ? 'AM' : 'PM';
+    const minutes = inputDate.getMinutes().toString().padStart(2, "0");
+    const period = inputDate.getHours() < 12 ? "AM" : "PM";
     return `${hours}:${minutes} ${period} (Today)`;
   } else {
     // If the date is not today, show the full date with time
     const options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'short',
-      day: '2-digit',
-      hour: 'numeric',
-      minute: 'numeric',
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "numeric",
+      minute: "numeric",
       hour12: true,
     };
-    return inputDate.toLocaleString('en-US', options);
+    return inputDate.toLocaleString("en-US", options);
   }
 }
 
@@ -138,12 +137,12 @@ export function validateJsonResponse<T>(response: string, schema: Schema): T {
     const result = v.validate(responseJson, schema);
     if (result.errors.length > 0) {
       console.error(result.errors);
-      throw new Error('invalid json response shape');
+      throw new Error("invalid json response shape");
     }
     return responseJson;
   } catch (e) {
     console.error(e);
-    throw new Error('failed to handle prompt response');
+    throw new Error("failed to handle prompt response");
   }
 }
 
@@ -152,7 +151,7 @@ type GenericObject = Record<string, any>;
 
 export function removeDuplicatesByField<T extends GenericObject>(
   list: T[],
-  fieldToCheck: keyof T
+  fieldToCheck: keyof T,
 ): T[] {
   const uniqueValues = new Set();
 
@@ -171,7 +170,7 @@ export function removeDuplicatesByField<T extends GenericObject>(
 export function hasHoursPassed(
   lastDateISOtime: string,
   nextDateISOtime: string,
-  hours: number
+  hours: number,
 ): boolean {
   return (
     new Date(nextDateISOtime).getTime() - new Date(lastDateISOtime).getTime() >
@@ -181,7 +180,7 @@ export function hasHoursPassed(
 
 export function hasMinutesPassed(
   timeToCheck: string,
-  minutes: number
+  minutes: number,
 ): boolean {
   return (
     new Date().getTime() - new Date(timeToCheck).getTime() > minutes * 60 * 1000
@@ -193,48 +192,48 @@ export function hasMinutesPassed(
  * 12-hour format with hours and minutes.
  */
 export const convertDateTimelinePointTime = (date: string): string => {
-  if (!date) return '';
+  if (!date) return "";
   const timestamp = new Date(date);
 
   const options: Intl.DateTimeFormatOptions = {
-    hour: '2-digit',
-    minute: '2-digit',
+    hour: "2-digit",
+    minute: "2-digit",
     hour12: true,
-    timeZone: 'UTC',
+    timeZone: "UTC",
   };
 
-  return timestamp.toLocaleString('en-US', options);
+  return timestamp.toLocaleString("en-US", options);
 };
 
 export const isTimelinePointFullyLoaded = (
-  timelinePoint: GQLTimelinePoint
+  timelinePoint: GQLTimelinePoint,
 ): boolean => {
   return (
-    timelinePoint.changeSummaryStatus === AiGenerationStatus.COMPLETED &&
-    timelinePoint.reverseOutlineStatus === AiGenerationStatus.COMPLETED
+    timelinePoint.changeSummaryStatus === "COMPLETED" &&
+    timelinePoint.reverseOutlineStatus === "COMPLETED"
   );
 };
 
 export const aiServiceModelToString = (
   aiServiceModel: AiServiceModel,
-  isDefault?: boolean
+  isDefault?: boolean,
 ): string => {
-  return `${isDefault ? '(DEFAULT) ' : ''}${aiServiceModel.serviceName} : ${
+  return `${isDefault ? "(DEFAULT) " : ""}${aiServiceModel.serviceName} : ${
     aiServiceModel.model
   }`;
 };
 
 export const aiServiceModelStringParse = (
-  aiServiceModelString: string
+  aiServiceModelString: string,
 ): AiServiceModel => {
-  const [serviceName, model] = aiServiceModelString.split(' : ');
+  const [serviceName, model] = aiServiceModelString.split(" : ");
   return {
     serviceName: serviceName as AiServiceNames,
     model,
   };
 };
 export function chatLogToString(chatLog: ChatLog, numTotalMessages: number) {
-  let chatLogString = '';
+  let chatLogString = "";
   const messages = chatLog.slice(-numTotalMessages);
   for (let i = 0; i < messages.length; i++) {
     chatLogString += `${messages[i].sender}: ${messages[i].message}\n`;
@@ -243,15 +242,15 @@ export function chatLogToString(chatLog: ChatLog, numTotalMessages: number) {
 }
 
 export function isJsonMarkdown(jsonMarkdown: string): boolean {
-  return jsonMarkdown.startsWith('```json\n');
+  return jsonMarkdown.startsWith("```json\n");
 }
 
 export function convertMarkdownToJsonString(jsonMarkdown: string): string {
   const trimmedMarkdown = jsonMarkdown.trim();
-  const withoutStart = trimmedMarkdown.startsWith('```json\n')
+  const withoutStart = trimmedMarkdown.startsWith("```json\n")
     ? trimmedMarkdown.slice(7) // Length of "```json\n"
     : trimmedMarkdown;
-  const withoutEnd = withoutStart.endsWith('```')
+  const withoutEnd = withoutStart.endsWith("```")
     ? withoutStart.slice(0, -3) // Length of "```"
     : withoutStart;
   return withoutEnd.trim();
@@ -259,32 +258,32 @@ export function convertMarkdownToJsonString(jsonMarkdown: string): string {
 
 export function userCanEditActivity(
   activity: ActivityBuilder,
-  user: User
+  user: User,
 ): boolean {
   return (
-    user.userRole === UserRole.ADMIN ||
+    user.userRole === "ADMIN" ||
     activity.user === user._id ||
-    activity.visibility === ActivityBuilderVisibility.EDITABLE
+    activity.visibility === "editable"
   );
 }
 
 export function addQueryParamToUrl(
   paramName: string,
-  paramValue: string
+  paramValue: string,
 ): void {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return;
   }
   const urlParams = new URLSearchParams(window.location.search);
   urlParams.set(paramName, paramValue);
   const newUrl =
     window.location.pathname +
-    (urlParams.toString() ? `?${urlParams.toString()}` : '');
-  window.history.replaceState({}, '', newUrl);
+    (urlParams.toString() ? `?${urlParams.toString()}` : "");
+  window.history.replaceState({}, "", newUrl);
 }
 
 export function removeQueryParamFromUrl(paramName: string): void {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return;
   }
 
@@ -296,8 +295,8 @@ export function removeQueryParamFromUrl(paramName: string): void {
   urlParams.delete(paramName);
   const newUrl =
     window.location.pathname +
-    (urlParams.toString() ? `?${urlParams.toString()}` : '');
-  window.history.replaceState({}, '', newUrl);
+    (urlParams.toString() ? `?${urlParams.toString()}` : "");
+  window.history.replaceState({}, "", newUrl);
 }
 
 export function getStudentDocIds(student: StudentData): string[] {
@@ -308,29 +307,23 @@ export function getStudentDocIds(student: StudentData): string[] {
       }
       return acc;
     },
-    [] as string[]
+    [] as string[],
   );
 }
 
 export function getStudentAssignmentDocs(
   student: StudentData,
-  assignmentId: string
+  assignmentId: string,
 ): RelevantGoogleDoc[] {
   const targetAssignmentProgress = student.assignmentProgress.find(
-    (a) => a.assignmentId === assignmentId
+    (a) => a.assignmentId === assignmentId,
   );
   if (!targetAssignmentProgress) {
     return [];
   }
   return [...targetAssignmentProgress.relevantGoogleDocs].sort((a) =>
-    a.primaryDocument ? -1 : 1
+    a.primaryDocument ? -1 : 1,
   );
-}
-
-export enum AssignmentCompletionStatus {
-  ASSIGNMENT_COMPLETE = 'ASSIGNMENT_COMPLETE',
-  IN_PROGRESS = 'IN_PROGRESS',
-  NOT_STARTED = 'NOT_STARTED',
 }
 
 export interface StudentAssignmentCompletionStatus {
@@ -343,11 +336,11 @@ export interface StudentAssignmentCompletionStatus {
 
 export function getStudentsByAssignmentCompletionStatus(
   students: StudentData[],
-  assignment: Assignment
+  assignment: Assignment,
 ): StudentAssignmentCompletionStatus[] {
   return students.map((student) => {
     const assignmentProgress = student.assignmentProgress.find(
-      (progress) => progress.assignmentId === assignment._id
+      (progress) => progress.assignmentId === assignment._id,
     );
 
     // If no assignment progress exists, student hasn't started
@@ -359,7 +352,7 @@ export function getStudentsByAssignmentCompletionStatus(
         studentId: student.userId,
         studentName: student.name,
         assignmentId: assignment._id,
-        status: AssignmentCompletionStatus.NOT_STARTED,
+        status: "NOT_STARTED",
         isGraded: false,
       };
     }
@@ -367,7 +360,7 @@ export function getStudentsByAssignmentCompletionStatus(
     // Check completion status for each activity in the assignment
     const completionStatuses = assignment.activityIds.map((activityId) => {
       const activityCompletion = assignmentProgress.activityCompletions.find(
-        (completion) => completion.activityId === activityId
+        (completion) => completion.activityId === activityId,
       );
       return (
         (activityCompletion?.complete &&
@@ -382,11 +375,11 @@ export function getStudentsByAssignmentCompletionStatus(
 
     let status: AssignmentCompletionStatus;
     if (allComplete) {
-      status = AssignmentCompletionStatus.ASSIGNMENT_COMPLETE;
+      status = "ASSIGNMENT_COMPLETE";
     } else if (someComplete) {
-      status = AssignmentCompletionStatus.IN_PROGRESS;
+      status = "IN_PROGRESS";
     } else {
-      status = AssignmentCompletionStatus.NOT_STARTED;
+      status = "NOT_STARTED";
     }
 
     return {
@@ -409,11 +402,11 @@ export interface AssignmentCompletionStatusForStudent {
 
 export function getAssignmentsByStudentCompletionStatus(
   student: StudentData,
-  assignments: Assignment[]
+  assignments: Assignment[],
 ): AssignmentCompletionStatusForStudent[] {
   return assignments.map((assignment) => {
     const assignmentProgress = student.assignmentProgress.find(
-      (progress) => progress.assignmentId === assignment._id
+      (progress) => progress.assignmentId === assignment._id,
     );
 
     // If no assignment progress exists, student hasn't started
@@ -425,7 +418,7 @@ export function getAssignmentsByStudentCompletionStatus(
         assignmentId: assignment._id,
         assignmentTitle: assignment.title,
         studentId: student.userId,
-        status: AssignmentCompletionStatus.NOT_STARTED,
+        status: "NOT_STARTED",
         isGraded: false,
       };
     }
@@ -433,7 +426,7 @@ export function getAssignmentsByStudentCompletionStatus(
     // Check completion status for each activity in the assignment
     const completionStatuses = assignment.activityIds.map((activityId) => {
       const activityCompletion = assignmentProgress.activityCompletions.find(
-        (completion) => completion.activityId === activityId
+        (completion) => completion.activityId === activityId,
       );
       return (
         (activityCompletion?.complete &&
@@ -448,11 +441,11 @@ export function getAssignmentsByStudentCompletionStatus(
 
     let status: AssignmentCompletionStatus;
     if (allComplete) {
-      status = AssignmentCompletionStatus.ASSIGNMENT_COMPLETE;
+      status = "ASSIGNMENT_COMPLETE";
     } else if (someComplete) {
-      status = AssignmentCompletionStatus.IN_PROGRESS;
+      status = "IN_PROGRESS";
     } else {
-      status = AssignmentCompletionStatus.NOT_STARTED;
+      status = "NOT_STARTED";
     }
 
     return {

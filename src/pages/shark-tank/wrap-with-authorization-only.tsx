@@ -4,12 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { CircularProgress } from '@mui/material';
-import { Header } from './components/header';
-import { LoginStatus } from '../../store/slices/login';
-import { useWithLogin } from '../../store/slices/login/use-with-login';
-import Login from '../login/login';
+
+import { CircularProgress } from "@mui/material";
+import { Header } from "./components/header";
+import { useWithLogin } from "../../store/slices/login/use-with-login";
+import Login from "../login/login";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,15 +16,12 @@ const withAuthorizationOnly = (Component: any) => (props: any) => {
   const useLogin = useWithLogin();
   const loginState = useLogin.state;
 
-  if (
-    loginState.loginStatus === LoginStatus.NONE ||
-    loginState.loginStatus === LoginStatus.IN_PROGRESS
-  ) {
+  if (loginState.loginStatus === 0 || loginState.loginStatus === 2) {
     return (
       <main className="root">
         <div
           className="page row center-div"
-          style={{ height: '100%', width: '100%' }}
+          style={{ height: "100%", width: "100%" }}
         >
           <CircularProgress />
         </div>
@@ -33,7 +29,7 @@ const withAuthorizationOnly = (Component: any) => (props: any) => {
     );
   }
 
-  return loginState.loginStatus === LoginStatus.AUTHENTICATED ? (
+  return loginState.loginStatus === 3 ? (
     <Component
       {...props}
       accessToken={loginState.accessToken}
@@ -44,7 +40,7 @@ const withAuthorizationOnly = (Component: any) => (props: any) => {
       <Header title="Login" />
       <div
         className="page row center-div"
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: "100%", width: "100%" }}
       >
         <Login useLogin={useLogin} loginTo="/shark-tank" />
       </div>

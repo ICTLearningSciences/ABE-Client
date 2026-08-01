@@ -4,18 +4,19 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { initialState, CourseManagementState } from './state';
-import { buildExtraReducers } from './reducers';
+
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { initialState, type CourseManagementState } from "./state";
+import { buildExtraReducers } from "./reducers";
 
 // Re-export types and thunks for external use
-export * from './types';
-export * from './state';
-export * from './thunks';
+export * from "./types";
+export * from "./state";
+export * from "./thunks";
 
 /** Reducer */
 export const educationManagementSlice = createSlice({
-  name: 'educationManagement',
+  name: "educationManagement",
   initialState,
   reducers: {
     setViewState: (state, action: PayloadAction<CourseManagementState>) => {

@@ -4,22 +4,34 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { DisplayIcons } from '../../helpers/display-icon-helper';
-import {
+
+import { v4 as uuidv4 } from "uuid";
+import type { DisplayIcons } from "../../helpers/display-icon-helper";
+import type {
   ActivityGQL,
   PromptOutputTypes,
   RagStoreConfiguration,
-} from '../../types';
-import { v4 as uuidv4 } from 'uuid';
+} from "../../types";
+
+export type ActivityBuilderStepType =
+  "SYSTEM_MESSAGE" | "REQUEST_USER_INPUT" | "PROMPT" | "CONDITIONAL";
+export type ActivityBuilderVisibility = "editable" | "read-only" | "private";
+export type NumericOperations = ">" | "<" | "==" | "!=" | ">=" | "<=";
+export type Checking = "LENGTH" | "VALUE" | "CONTAINS";
+export type ButtonActionTypeEnum =
+  "FILTER_TO_PANELIST" | "CLEAR_PANELIST_FILTERS";
+export type RequestUserInputSpecialType = "END_ACTIVITY";
+export type JsonResponseDataType = "string" | "object" | "array";
+export type SubJsonResponseDataType = "string" | "array";
 
 export function isActivityBuilder(
-  activity: ActivityGQL | ActivityBuilder
+  activity: ActivityGQL | ActivityBuilder,
 ): activity is ActivityBuilder {
-  return (activity as ActivityBuilder).activityType === 'builder';
+  return (activity as ActivityBuilder).activityType === "builder";
 }
 
 export interface IActivity {
-  activityType: 'builder' | 'gql';
+  activityType: "builder" | "gql";
 }
 
 export interface FlowItem {
@@ -32,34 +44,28 @@ export function defaultActivityBuilder(userId: string): ActivityBuilder {
   return {
     _id: uuidv4(),
     clientId: uuidv4(),
-    activityType: 'builder',
-    title: 'New Activity',
+    activityType: "builder",
+    title: "New Activity",
     user: userId,
-    visibility: ActivityBuilderVisibility.READ_ONLY,
-    description: '',
-    displayIcon: DisplayIcons.DEFAULT,
+    visibility: "read-only",
+    description: "",
+    displayIcon: "DEFAULT",
     newDocRecommend: false,
     disabled: false,
     flowsList: [
       {
         clientId: uuidv4(),
-        name: 'Flow 1',
+        name: "Flow 1",
         steps: [],
       },
     ],
   };
 }
 
-export enum ActivityBuilderVisibility {
-  EDITABLE = 'editable',
-  READ_ONLY = 'read-only',
-  PRIVATE = 'private',
-}
-
 export interface ActivityBuilder extends IActivity {
   _id: string;
   clientId: string;
-  activityType: 'builder';
+  activityType: "builder";
   title: string;
   user: string;
   visibility: ActivityBuilderVisibility;
@@ -69,13 +75,6 @@ export interface ActivityBuilder extends IActivity {
   disabled?: boolean;
   flowsList: FlowItem[];
   attachedPanel?: string;
-}
-
-export enum ActivityBuilderStepType {
-  SYSTEM_MESSAGE = 'SYSTEM_MESSAGE',
-  REQUEST_USER_INPUT = 'REQUEST_USER_INPUT',
-  PROMPT = 'PROMPT',
-  CONDITIONAL = 'CONDITIONAL',
 }
 
 export interface ActivityBuilderStep {
@@ -93,30 +92,13 @@ export type ActivityBuilderStepTypes =
 
 // SystemMessage
 export interface SystemMessageActivityStep extends ActivityBuilderStep {
-  stepType: ActivityBuilderStepType.SYSTEM_MESSAGE;
+  stepType: "SYSTEM_MESSAGE";
   message: string;
   systemCustomName: string;
   sendFromPanelistClientIds: string[];
 }
 
 // LogicOperation
-export enum NumericOperations {
-  GREATER_THAN = '>',
-  LESS_THAN = '<',
-  EQUALS = '==',
-  NOT_EQUALS = '!=',
-  GREATER_THAN_EQUALS = '>=',
-  LESS_THAN_EQUALS = '<=',
-}
-
-export enum Checking {
-  // array or string
-  LENGTH = 'LENGTH',
-  // string, boolean, number
-  VALUE = 'VALUE',
-  // array or string
-  CONTAINS = 'CONTAINS',
-}
 
 export interface LogicStepConditional {
   stateDataKey: string;
@@ -127,13 +109,8 @@ export interface LogicStepConditional {
 }
 
 export interface ConditionalActivityStep extends ActivityBuilderStep {
-  stepType: ActivityBuilderStepType.CONDITIONAL;
+  stepType: "CONDITIONAL";
   conditionals: LogicStepConditional[];
-}
-
-export enum ButtonActionTypeEnum {
-  'FILTER_TO_PANELIST' = 'FILTER_TO_PANELIST',
-  'CLEAR_PANELIST_FILTERS' = 'CLEAR_PANELIST_FILTERS',
 }
 
 export interface ButtonAction {
@@ -151,12 +128,8 @@ export interface PredefinedResponse {
   buttonAction?: ButtonAction;
 }
 
-export enum RequestUserInputSpecialType {
-  END_ACTIVITY = 'END_ACTIVITY',
-}
-
 export interface RequestUserInputActivityStep extends ActivityBuilderStep {
-  stepType: ActivityBuilderStepType.REQUEST_USER_INPUT;
+  stepType: "REQUEST_USER_INPUT";
   message: string;
   saveAsIntention: boolean;
   saveResponseVariableName: string;
@@ -167,16 +140,6 @@ export interface RequestUserInputActivityStep extends ActivityBuilderStep {
 }
 
 //Prompt
-export enum JsonResponseDataType {
-  STRING = 'string',
-  OBJECT = 'object',
-  ARRAY = 'array',
-}
-
-export enum SubJsonResponseDataType {
-  STRING = 'string',
-  ARRAY = 'array',
-}
 
 export interface JsonResponseDataGQL {
   clientId: string;
@@ -207,18 +170,22 @@ export interface SinglePromptConfigurationGql {
   ragConfiguration?: RagStoreConfiguration;
 }
 
-export interface SinglePromptConfiguration
-  extends Omit<SinglePromptConfigurationGql, 'jsonResponseData'> {
+export interface SinglePromptConfiguration extends Omit<
+  SinglePromptConfigurationGql,
+  "jsonResponseData"
+> {
   jsonResponseData?: JsonResponseData[];
 }
 
 export interface PromptActivityStepGql extends ActivityBuilderStep {
-  stepType: ActivityBuilderStepType.PROMPT;
+  stepType: "PROMPT";
   promptConfigurations: SinglePromptConfigurationGql[];
 }
 
-export interface PromptActivityStep
-  extends Omit<PromptActivityStepGql, 'promptConfigurations'> {
+export interface PromptActivityStep extends Omit<
+  PromptActivityStepGql,
+  "promptConfigurations"
+> {
   promptConfigurations: SinglePromptConfiguration[];
 }
 

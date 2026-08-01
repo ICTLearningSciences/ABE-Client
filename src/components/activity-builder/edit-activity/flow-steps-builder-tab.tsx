@@ -4,42 +4,38 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import {
-  ActivityBuilderStepType,
-  ActivityBuilderStepTypes,
-  FlowItem,
-  RequestUserInputSpecialType,
-} from '../types';
-import { ColumnDiv } from '../../../styled-components';
-import { useEditActivityContext } from '../activity-builder-context';
+
+import { Button, Tooltip } from "@mui/material";
+import { Info } from "@mui/icons-material";
+
+import type { ActivityBuilderStepTypes, FlowItem } from "../types";
+import { ColumnDiv } from "../../../styled-components";
+import { useEditActivityContext } from "../activity-builder-context";
 import {
   RequestUserInputStepBuilder,
   getDefaultRequestUserInputBuilder,
-} from './step-builder/request-user-input-step-builder';
+} from "./step-builder/request-user-input-step-builder";
 import {
   PromptStepBuilder,
   defaultPromptBuilder,
-} from './step-builder/prompt-step-builder';
-import { InputField } from '../shared/input-components';
-import { AddNewActivityButton } from '../shared/add-new-activity-button';
-import { Button, Tooltip } from '@mui/material';
-import InfoIcon from '@mui/icons-material/Info';
+} from "./step-builder/prompt-step-builder";
+import { InputField } from "../shared/input-components";
+import { AddNewActivityButton } from "../shared/add-new-activity-button";
 import {
   SystemMessageStepBuilder,
   getDefaultSystemMessage,
-} from './step-builder/system-message-step-builder';
-import { StepVersion } from './activity-flow-container';
+} from "./step-builder/system-message-step-builder";
+import type { StepVersion } from "./activity-flow-container";
 import {
   ConditionalStepBuilder,
   getDefaultConditionalStep,
-} from './step-builder/conditional-step-builder';
-import { StepErrors } from '../../../classes/activity-builder-activity/activity-step-error-checker';
-import { AddNewActivityStepType } from '../shared/add-new-activity-button';
+} from "./step-builder/conditional-step-builder";
+import type { StepErrors } from "../../../classes/activity-builder-activity/activity-step-error-checker";
+import type { AddNewActivityStepType } from "../shared/add-new-activity-button";
 import {
   EndActivityStepBuilder,
   getDefaultEndActivityStepBuilder,
-} from './step-builder/end-activity-step-builder';
+} from "./step-builder/end-activity-step-builder";
 
 export function FlowStepsBuilderTab(props: {
   stepsErrors?: StepErrors;
@@ -65,7 +61,7 @@ export function FlowStepsBuilderTab(props: {
   function renderActivityStep(step: ActivityBuilderStepTypes, i: number) {
     const errors = stepsErrors?.[step.stepId];
     switch (step.stepType) {
-      case ActivityBuilderStepType.SYSTEM_MESSAGE:
+      case "SYSTEM_MESSAGE":
         return (
           <SystemMessageStepBuilder
             key={i}
@@ -78,8 +74,8 @@ export function FlowStepsBuilderTab(props: {
             errors={errors}
           />
         );
-      case ActivityBuilderStepType.REQUEST_USER_INPUT:
-        if (step.specialType === RequestUserInputSpecialType.END_ACTIVITY) {
+      case "REQUEST_USER_INPUT":
+        if (step.specialType === "END_ACTIVITY") {
           return (
             <EndActivityStepBuilder
               key={i}
@@ -103,7 +99,7 @@ export function FlowStepsBuilderTab(props: {
             />
           );
         }
-      case ActivityBuilderStepType.PROMPT:
+      case "PROMPT":
         return (
           <PromptStepBuilder
             key={i}
@@ -113,12 +109,12 @@ export function FlowStepsBuilderTab(props: {
             flowsList={flowsList}
             previewed={false}
             startPreview={() => setPreviewPromptId(step.stepId)}
-            stopPreview={() => setPreviewPromptId('')}
+            stopPreview={() => setPreviewPromptId("")}
             versions={props.getVersionsForStep(step.stepId)}
             errors={errors}
           />
         );
-      case ActivityBuilderStepType.CONDITIONAL:
+      case "CONDITIONAL":
         return (
           <ConditionalStepBuilder
             globalStateKeys={globalStateKeys}
@@ -143,26 +139,26 @@ export function FlowStepsBuilderTab(props: {
 
   function insertNewActivityStep(stepType: AddNewActivityStepType, i: number) {
     const newStep: ActivityBuilderStepTypes =
-      stepType === ActivityBuilderStepType.SYSTEM_MESSAGE
+      stepType === "SYSTEM_MESSAGE"
         ? getDefaultSystemMessage()
-        : stepType === ActivityBuilderStepType.REQUEST_USER_INPUT
-        ? getDefaultRequestUserInputBuilder()
-        : stepType === ActivityBuilderStepType.CONDITIONAL
-        ? getDefaultConditionalStep()
-        : stepType === 'EDIT_DOC_PROMPT'
-        ? defaultPromptBuilder(stepType === 'EDIT_DOC_PROMPT')
-        : stepType === 'END_ACTIVITY_MESSAGE'
-        ? getDefaultEndActivityStepBuilder()
-        : defaultPromptBuilder(false);
+        : stepType === "REQUEST_USER_INPUT"
+          ? getDefaultRequestUserInputBuilder()
+          : stepType === "CONDITIONAL"
+            ? getDefaultConditionalStep()
+            : stepType === "EDIT_DOC_PROMPT"
+              ? defaultPromptBuilder(stepType === "EDIT_DOC_PROMPT")
+              : stepType === "END_ACTIVITY_MESSAGE"
+                ? getDefaultEndActivityStepBuilder()
+                : defaultPromptBuilder(false);
     addStep(flow.clientId, newStep, i);
   }
 
   return (
     <ColumnDiv
       style={{
-        alignItems: 'center',
-        position: 'relative',
-        pointerEvents: disabled ? 'none' : 'auto',
+        alignItems: "center",
+        position: "relative",
+        pointerEvents: disabled ? "none" : "auto",
         opacity: disabled ? 0.5 : 1,
       }}
     >
@@ -177,31 +173,31 @@ export function FlowStepsBuilderTab(props: {
       >
         <div
           style={{
-            position: 'sticky',
+            position: "sticky",
             left: 10,
             top: 10,
-            alignSelf: 'flex-start',
-            color: 'gray',
-            cursor: 'pointer',
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
+            alignSelf: "flex-start",
+            color: "gray",
+            cursor: "pointer",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
             height: 0,
-            overflow: 'visible',
+            overflow: "visible",
             paddingTop: 20,
           }}
         >
-          <InfoIcon />
+          <Info />
           Variables
         </div>
       </Tooltip>
       <Button
         style={{
-          position: 'absolute',
-          right: '0',
-          top: '0',
+          position: "absolute",
+          right: "0",
+          top: "0",
         }}
         color="error"
         variant="outlined"
@@ -211,7 +207,7 @@ export function FlowStepsBuilderTab(props: {
       </Button>
       <div
         style={{
-          alignSelf: 'center',
+          alignSelf: "center",
         }}
       >
         <InputField
@@ -232,10 +228,10 @@ export function FlowStepsBuilderTab(props: {
           <ColumnDiv
             key={`${flow.clientId}-${step.stepId}`}
             style={{
-              alignItems: 'center',
-              width: '100%',
-              maxWidth: '900px',
-              position: 'relative',
+              alignItems: "center",
+              width: "100%",
+              maxWidth: "900px",
+              position: "relative",
             }}
           >
             {renderActivityStep(step, i)}

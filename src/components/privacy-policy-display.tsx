@@ -4,6 +4,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+
+import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import {
   Button,
   Dialog,
@@ -11,14 +14,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-} from '@mui/material';
-import { useAppSelector } from '../store/hooks';
-import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
+} from "@mui/material";
+import { useAppSelector } from "../store/hooks";
 
 export function PrivacyPolicyDisplay() {
   const config = useAppSelector((state) => state.config);
-  const privacyPolicy = config.config?.privacyPolicy || '';
+  const privacyPolicy = config.config?.privacyPolicy || "";
   const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
 
   if (!privacyPolicy) return null;
@@ -31,7 +32,7 @@ export function PrivacyPolicyDisplay() {
           open={privacyPolicyOpen}
           onClose={() => setPrivacyPolicyOpen(false)}
         >
-          <DialogTitle style={{ textAlign: 'center' }}>
+          <DialogTitle style={{ textAlign: "center" }}>
             Privacy Policy
           </DialogTitle>
           <DialogContent>
@@ -39,7 +40,7 @@ export function PrivacyPolicyDisplay() {
               <ReactMarkdown>{privacyPolicy}</ReactMarkdown>
             </DialogContentText>
             <DialogActions>
-              {' '}
+              {" "}
               <Button onClick={() => setPrivacyPolicyOpen(false)}>Close</Button>
             </DialogActions>
           </DialogContent>

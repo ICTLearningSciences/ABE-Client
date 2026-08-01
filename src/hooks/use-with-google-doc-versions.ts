@@ -4,16 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useState } from 'react';
-import { useWithChat } from '../store/slices/chat/use-with-chat';
-import { getDocData, submitDocVersion } from './api';
-import { useAppSelector } from '../store/hooks';
-import useInterval from './use-interval';
-import { DocService, DocVersion, Intention } from '../types';
-import { equals, hasHoursPassed } from '../helpers';
-import { useWithUsersDocs } from './use-with-users-docs';
-import { useWithState } from '../store/slices/state/use-with-state';
-import { isAxiosError } from 'axios';
+
+import { useState } from "react";
+import { isAxiosError } from "axios";
+import { useWithChat } from "../store/slices/chat/use-with-chat";
+import { getDocData, submitDocVersion } from "./api";
+import { useAppSelector } from "../store/hooks";
+import useInterval from "./use-interval";
+import type { DocVersion, Intention, UserDoc } from "../types";
+import { equals, hasHoursPassed } from "../helpers";
+import { useWithUsersDocs } from "./use-with-users-docs";
+import { useWithState } from "../store/slices/state/use-with-state";
 
 export interface TrackedState {
   id: string;
@@ -35,31 +36,31 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
   const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const sessionId: string = useAppSelector((state) => state.state.sessionId);
   const viewState = useAppSelector(
-    (state) => state.educationManagement.viewState
+    (state) => state.educationManagement.viewState,
   );
-  const selectedAssignmentId = viewState.selectedAssignmentId || '';
+  const selectedAssignmentId = viewState.selectedAssignmentId || "";
   const sessionIntention: Intention | undefined = useAppSelector(
-    (state) => state.state.sessionIntention
+    (state) => state.state.sessionIntention,
   );
   const accessTokenExpired: boolean = useAppSelector(
-    (state) => state.state.warnExpiredAccessToken
+    (state) => state.state.warnExpiredAccessToken,
   );
   const curGoogleDoc = useAppSelector((state) =>
-    state.state.userDocs.find((doc) => doc.googleDocId === curDocId)
+    state.state.userDocs.find((doc: UserDoc) => doc.googleDocId === curDocId),
   );
   const { updateDocTitleLocally } = useWithUsersDocs();
   const useDayIntention = curGoogleDoc?.currentDayIntention?.createdAt
     ? !hasHoursPassed(
         curGoogleDoc.currentDayIntention.createdAt,
         new Date().toISOString(),
-        8
+        8,
       )
     : false;
   const messages = state.chatLogs[curDocId] || [];
   const [lastSavedVersion, setLastSavedVersion] = useState<TrackedState>({
-    id: '',
-    title: '',
-    plainText: '',
+    id: "",
+    title: "",
+    plainText: "",
     numMessages: messages.length,
     sessionId: sessionId,
     activityId: selectedActivityId,
@@ -71,14 +72,12 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
       if (!messages.length || !sessionId) {
         return;
       }
-      const docData = await getDocData(curDocId, DocService.GOOGLE_DOCS).catch(
-        (e) => {
-          if (isAxiosError(e) && e.response?.status === 403) {
-            warnExpiredAccessToken(true);
-          }
-          throw e;
+      const docData = await getDocData(curDocId, "GOOGLE_DOCS").catch((e) => {
+        if (isAxiosError(e) && e.response?.status === 403) {
+          warnExpiredAccessToken(true);
         }
-      );
+        throw e;
+      });
       updateMostRecentDocVersion(docData);
       const newState: TrackedState = {
         id: docData.lastChangedId,
@@ -109,7 +108,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         sessionId: sessionId,
         chatLog: messages,
         activity: selectedActivityId,
-        intent: '',
+        intent: "",
         title: docData.title,
         lastModifyingUser: docData.lastModifyingUser,
         modifiedTime: docData.modifiedTime,
@@ -126,10 +125,10 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
     accessTokenExpired
       ? null
       : curDocId
-      ? process.env.NODE_ENV === 'development'
-        ? 5000
-        : 5000
-      : null
+        ? import.meta.env.NODE_ENV === "development"
+          ? 5000
+          : 5000
+        : null,
   );
 
   return {

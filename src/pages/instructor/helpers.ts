@@ -4,40 +4,40 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import {
+
+import type {
   Assignment,
   AssignmentProgress,
   Section,
   StudentData,
-  CourseOwnership,
   Instructor,
   Course,
   ActivityCompletion,
-} from '../../store/slices/education-management/types';
-import { UseWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
-import { TreeItem, TreeSection } from './components/collapsible-tree';
+} from "../../store/slices/education-management/types";
+import type { UseWithEducationalManagement } from "../../store/slices/education-management/use-with-educational-management";
+import type { TreeItem, TreeSection } from "./components/collapsible-tree";
 
 export const getSectionsForCourse = (
   educationManagement: UseWithEducationalManagement,
-  courseId: string
+  courseId: string,
 ): Section[] => {
   return educationManagement.sections.filter((section) =>
     educationManagement.courses.find(
       (course) =>
-        course._id === courseId && course.sectionIds.includes(section._id)
-    )
+        course._id === courseId && course.sectionIds.includes(section._id),
+    ),
   );
 };
 
 export const getAssignmentsForSection = (
   educationManagement: UseWithEducationalManagement,
-  sectionId: string
+  sectionId: string,
 ): Assignment[] => {
   const section = educationManagement.sections.find((s) => s._id === sectionId);
   if (!section) return [];
 
   return educationManagement.assignments.filter((assignment) =>
-    section.assignments.some((sa) => sa.assignmentId === assignment._id)
+    section.assignments.some((sa) => sa.assignmentId === assignment._id),
   );
 };
 
@@ -45,35 +45,31 @@ export function getCourseManagementTreeData(
   educationManagement: UseWithEducationalManagement,
   handleCourseSelect: (courseId: string) => void,
   handleSectionSelect: (sectionId: string) => void,
-  handleAssignmentSelect: (assignmentId: string) => void
+  handleAssignmentSelect: (assignmentId: string) => void,
 ): TreeItem[] {
-  return educationManagement.courses.map(
-    (course): TreeItem => ({
-      id: course._id,
-      icon: '📚',
-      title: course.title,
-      onClick: () => handleCourseSelect(course._id),
-      subItems: getSectionsForCourse(educationManagement, course._id).map(
-        (section): TreeItem => ({
-          id: section._id,
-          icon: '📑',
-          title: section.title,
-          onClick: () => handleSectionSelect(section._id),
-          subItems: getAssignmentsForSection(
-            educationManagement,
-            section._id
-          ).map(
-            (assignment): TreeItem => ({
-              id: assignment._id,
-              icon: '📝',
-              title: assignment.title,
-              onClick: () => handleAssignmentSelect(assignment._id),
-            })
-          ),
-        })
-      ),
-    })
-  );
+  return educationManagement.courses.map((course): TreeItem => ({
+    id: course._id,
+    icon: "📚",
+    title: course.title,
+    onClick: () => handleCourseSelect(course._id),
+    subItems: getSectionsForCourse(educationManagement, course._id).map(
+      (section): TreeItem => ({
+        id: section._id,
+        icon: "📑",
+        title: section.title,
+        onClick: () => handleSectionSelect(section._id),
+        subItems: getAssignmentsForSection(
+          educationManagement,
+          section._id,
+        ).map((assignment): TreeItem => ({
+          id: assignment._id,
+          icon: "📝",
+          title: assignment.title,
+          onClick: () => handleAssignmentSelect(assignment._id),
+        })),
+      }),
+    ),
+  }));
 }
 
 export function getCourseManagementSectionedTreeData(
@@ -81,7 +77,7 @@ export function getCourseManagementSectionedTreeData(
   handleCourseSelect: (courseId: string) => void,
   handleSectionSelect: (sectionId: string) => void,
   handleAssignmentSelect: (assignmentId: string) => void,
-  currentInstructor?: Instructor
+  currentInstructor?: Instructor,
 ): TreeSection[] {
   if (!currentInstructor) {
     return [];
@@ -89,37 +85,35 @@ export function getCourseManagementSectionedTreeData(
 
   const createCourseTreeItem = (course: Course): TreeItem => ({
     id: course._id,
-    icon: '📚',
+    icon: "📚",
     title: course.title,
     onClick: () => handleCourseSelect(course._id),
     subItems: getSectionsForCourse(educationManagement, course._id).map(
       (section): TreeItem => ({
         id: section._id,
-        icon: '📑',
+        icon: "📑",
         title: section.title,
         onClick: () => handleSectionSelect(section._id),
         subItems: getAssignmentsForSection(
           educationManagement,
-          section._id
-        ).map(
-          (assignment): TreeItem => ({
-            id: assignment._id,
-            icon: '📝',
-            title: assignment.title,
-            onClick: () => handleAssignmentSelect(assignment._id),
-          })
-        ),
-      })
+          section._id,
+        ).map((assignment): TreeItem => ({
+          id: assignment._id,
+          icon: "📝",
+          title: assignment.title,
+          onClick: () => handleAssignmentSelect(assignment._id),
+        })),
+      }),
     ),
   });
 
   // Separate owned and shared courses
   const ownedCourseIds = currentInstructor.courses
-    .filter((courseData) => courseData.ownership === CourseOwnership.OWNER)
+    .filter((courseData) => courseData.ownership === "OWNER")
     .map((courseData) => courseData.courseId);
 
   const sharedCourseIds = currentInstructor.courses
-    .filter((courseData) => courseData.ownership === CourseOwnership.SHARED)
+    .filter((courseData) => courseData.ownership === "SHARED")
     .map((courseData) => courseData.courseId);
 
   const ownedCourses = educationManagement.courses
@@ -134,16 +128,16 @@ export function getCourseManagementSectionedTreeData(
 
   if (ownedCourses.length > 0) {
     sections.push({
-      id: 'my-courses',
-      title: 'My Courses',
+      id: "my-courses",
+      title: "My Courses",
       items: ownedCourses,
     });
   }
 
   if (sharedCourses.length > 0) {
     sections.push({
-      id: 'shared-courses',
-      title: 'Courses Shared with Me',
+      id: "shared-courses",
+      title: "Courses Shared with Me",
       items: sharedCourses,
     });
   }
@@ -157,11 +151,11 @@ export interface CompletedAssignmentDict {
 
 export function isAssignmentComplete(
   assignment: Assignment,
-  assignmentProgress: AssignmentProgress
+  assignmentProgress: AssignmentProgress,
 ): boolean {
   const relevantActivityCompletions =
     assignmentProgress.activityCompletions.filter((ac) =>
-      assignment.activityIds.includes(ac.activityId)
+      assignment.activityIds.includes(ac.activityId),
     );
   if (relevantActivityCompletions.length !== assignment.activityIds.length) {
     return false;
@@ -171,13 +165,13 @@ export function isAssignmentComplete(
 
 export function getCompletedAssignmentDictForStudent(
   assignments: Assignment[],
-  studentData?: StudentData
+  studentData?: StudentData,
 ): CompletedAssignmentDict {
   if (!studentData) return {};
   return studentData.assignmentProgress.reduce(
     (acc: CompletedAssignmentDict, progress: AssignmentProgress) => {
       const assignment = assignments.find(
-        (a) => a._id === progress.assignmentId
+        (a) => a._id === progress.assignmentId,
       );
       if (!assignment) {
         return acc;
@@ -185,7 +179,7 @@ export function getCompletedAssignmentDictForStudent(
       acc[progress.assignmentId] = isAssignmentComplete(assignment, progress);
       return acc;
     },
-    {}
+    {},
   );
 }
 
@@ -196,7 +190,7 @@ export interface AssignmentsInSection {
 
 export function getAssignmentsInSection(
   assignments: Assignment[],
-  section?: Section
+  section?: Section,
 ): AssignmentsInSection {
   if (!section) {
     return {
@@ -206,7 +200,7 @@ export function getAssignmentsInSection(
   }
   const _requiredAssignments = section.assignments.filter((sa) => sa.mandatory);
   const _optionalAssignments = section.assignments.filter(
-    (sa) => !sa.mandatory
+    (sa) => !sa.mandatory,
   );
   return {
     requiredAssignments: _requiredAssignments.reduce((acc, sa) => {
@@ -239,32 +233,32 @@ export interface StudentSectionProgress {
 
 export function getStudentSectionProgress(
   studentData: StudentData,
-  assignments: AssignmentsInSection
+  assignments: AssignmentsInSection,
 ): StudentSectionProgress {
   const { requiredAssignments, optionalAssignments } = assignments;
   const requiredAssignmentsProgress = requiredAssignments.reduce(
     (acc, assignment) => {
       const assignmentProgress = studentData.assignmentProgress.find(
-        (ap) => ap.assignmentId === assignment._id
+        (ap) => ap.assignmentId === assignment._id,
       );
       acc[assignment._id] = assignmentProgress
         ? isAssignmentComplete(assignment, assignmentProgress)
         : false;
       return acc;
     },
-    {} as { [assignmentId: string]: boolean }
+    {} as { [assignmentId: string]: boolean },
   );
   const optionalAssignmentsProgress = optionalAssignments.reduce(
     (acc, assignment) => {
       const assignmentProgress = studentData.assignmentProgress.find(
-        (ap) => ap.assignmentId === assignment._id
+        (ap) => ap.assignmentId === assignment._id,
       );
       acc[assignment._id] = assignmentProgress
         ? isAssignmentComplete(assignment, assignmentProgress)
         : false;
       return acc;
     },
-    {} as { [assignmentId: string]: boolean }
+    {} as { [assignmentId: string]: boolean },
   );
   return {
     studentData,
@@ -276,20 +270,20 @@ export function getStudentSectionProgress(
 export function getStudentActivityCompletionData(
   studentData: StudentData,
   assignmentId: string,
-  activityId: string
+  activityId: string,
 ): ActivityCompletion | undefined {
   const assignmentProgress = studentData.assignmentProgress.find(
-    (ap) => ap.assignmentId === assignmentId
+    (ap) => ap.assignmentId === assignmentId,
   );
   const activityCompletion = assignmentProgress?.activityCompletions.find(
-    (ap) => ap.activityId === activityId
+    (ap) => ap.activityId === activityId,
   );
   return activityCompletion;
 }
 
 export function getAssignmentsDataInSection(
   assignments: Assignment[],
-  section?: Section
+  section?: Section,
 ): Assignment[] {
   if (!section) {
     return [];
@@ -306,13 +300,13 @@ export function getAssignmentsDataInSection(
 export function reorderArray<T>(
   array: T[],
   itemId: T,
-  direction: 'up' | 'down'
+  direction: "up" | "down",
 ): T[] {
   const currentIndex = array.indexOf(itemId);
   if (currentIndex === -1) return array;
 
   const newArray = [...array];
-  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+  const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
 
   if (targetIndex < 0 || targetIndex >= newArray.length) {
     return array;

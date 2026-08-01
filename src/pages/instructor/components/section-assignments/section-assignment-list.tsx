@@ -1,15 +1,20 @@
-import { Box, Stack } from '@mui/material';
-import {
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { useEffect, useMemo, useState } from "react";
+import { Box, Stack, Typography, Grid } from "@mui/material";
+import type {
   Assignment,
   Section,
-} from '../../../../store/slices/education-management/types';
-import { Typography } from '@mui/material';
-import OptionalRequirements from '../optional-requirements';
-import { Grid } from '@mui/material';
-import AssignmentCard from '../assignment-card';
-import { UseWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
-import React, { useEffect, useMemo, useState } from 'react';
-import { reorderArray } from '../../helpers';
+} from "../../../../store/slices/education-management/types";
+import OptionalRequirements from "../optional-requirements";
+import AssignmentCard from "../assignment-card";
+import type { UseWithEducationalManagement } from "../../../../store/slices/education-management/use-with-educational-management";
+import { reorderArray } from "../../helpers";
 
 export function SectionAssignmentList(props: {
   assignments: Assignment[];
@@ -53,7 +58,7 @@ export function SectionAssignmentList(props: {
     useState(0);
   const numOptionalAssignments = useMemo(
     () => section.assignments.filter((sa) => !sa.mandatory).length,
-    [section]
+    [section],
   );
   const [updateInProgress, setUpdateInProgress] = useState(false);
 
@@ -68,16 +73,16 @@ export function SectionAssignmentList(props: {
   // track number of mandatory, and how many are completed
   const assignmentCompletionData = useMemo(() => {
     const numMandatory = Object.keys(
-      studentAssignmentProgress?.requiredAssignmentsProgress ?? {}
+      studentAssignmentProgress?.requiredAssignmentsProgress ?? {},
     ).length;
     const numMandatoryCompleted = Object.values(
-      studentAssignmentProgress?.requiredAssignmentsProgress ?? {}
+      studentAssignmentProgress?.requiredAssignmentsProgress ?? {},
     ).filter((isCompleted) => isCompleted).length;
     const numOptional = Object.keys(
-      studentAssignmentProgress?.optionalAssignmentsProgress ?? {}
+      studentAssignmentProgress?.optionalAssignmentsProgress ?? {},
     ).length;
     const numOptionalCompleted = Object.values(
-      studentAssignmentProgress?.optionalAssignmentsProgress ?? {}
+      studentAssignmentProgress?.optionalAssignmentsProgress ?? {},
     ).filter((isCompleted) => isCompleted).length;
     return {
       numMandatory,
@@ -90,7 +95,7 @@ export function SectionAssignmentList(props: {
   useEffect(() => {
     if (section) {
       setOptionalAssignmentsRequired(
-        section.numOptionalAssignmentsRequired || 0
+        section.numOptionalAssignmentsRequired || 0,
       );
     }
   }, [section]);
@@ -105,13 +110,13 @@ export function SectionAssignmentList(props: {
       });
       setOptionalAssignmentsRequired(value);
     } catch (error) {
-      console.error('Failed to update optional assignments required:', error);
+      console.error("Failed to update optional assignments required:", error);
     }
   };
 
   const handleAssignmentOrderChange = async (
     assignmentId: string,
-    direction: 'up' | 'down'
+    direction: "up" | "down",
   ) => {
     if (!section || !section.assignmentOrder) return;
     setUpdateInProgress(true);
@@ -119,7 +124,7 @@ export function SectionAssignmentList(props: {
     const newAssignmentOrder = reorderArray(
       section.assignmentOrder,
       assignmentId,
-      direction
+      direction,
     );
 
     try {
@@ -128,7 +133,7 @@ export function SectionAssignmentList(props: {
         assignmentOrder: newAssignmentOrder,
       });
     } catch (error) {
-      console.error('Failed to update assignment order:', error);
+      console.error("Failed to update assignment order:", error);
     } finally {
       setUpdateInProgress(false);
     }
@@ -141,13 +146,11 @@ export function SectionAssignmentList(props: {
     <Box sx={{ mb: 4 }}>
       <Stack
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 2 }}
+        sx={{ mb: 2, justifyContent: "space-between", alignItems: "center" }}
       >
         <Typography
           variant="h6"
-          sx={{ fontWeight: 600, color: 'text.primary' }}
+          sx={{ fontWeight: 600, color: "text.primary" }}
         >
           {title}
         </Typography>
@@ -156,21 +159,21 @@ export function SectionAssignmentList(props: {
             variant="body2"
             color="text.secondary"
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
             }}
           >
             {Boolean(assignmentCompletionData.numMandatory) && (
               <Typography variant="body2" color="text.primary">
-                Required Assignments completed:{' '}
+                Required Assignments completed:{" "}
                 {assignmentCompletionData.numMandatoryCompleted}/
                 {assignmentCompletionData.numMandatory}
               </Typography>
             )}
             {Boolean(assignmentCompletionData.numOptional) && (
               <Typography variant="body2" color="text.secondary">
-                Optional Assignments completed:{' '}
+                Optional Assignments completed:{" "}
                 {assignmentCompletionData.numOptionalCompleted}/
                 {assignmentCompletionData.numOptional}
               </Typography>
@@ -179,7 +182,7 @@ export function SectionAssignmentList(props: {
         ) : (
           <Typography variant="body2" color="text.secondary">
             {assignments.length} assignment
-            {assignments.length !== 1 ? 's' : ''}
+            {assignments.length !== 1 ? "s" : ""}
           </Typography>
         )}
       </Stack>
@@ -199,7 +202,7 @@ export function SectionAssignmentList(props: {
           const assignment = assignments.find((a) => a._id === assignmentId);
           if (!assignment) return null;
           const sectionAssignment = section.assignments.find(
-            (sa) => sa.assignmentId === assignmentId
+            (sa) => sa.assignmentId === assignmentId,
           );
           if (!sectionAssignment) return null;
 
@@ -207,7 +210,7 @@ export function SectionAssignmentList(props: {
           const isLast = index === section.assignmentOrder!.length - 1;
 
           return (
-            <Grid item xs={12} key={assignment._id}>
+            <Grid size={12} key={assignment._id}>
               <AssignmentCard
                 assignment={assignment}
                 onClick={onAssignmentSelect}

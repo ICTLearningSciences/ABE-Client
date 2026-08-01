@@ -4,13 +4,15 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import {
+
+import Anthropic from "@anthropic-ai/sdk";
+import type {
   AiJobStatusType,
   AiResponseType,
   AiServiceStepDataTypes,
   AiStepData,
-} from './ai-service-types';
-import Anthropic from '@anthropic-ai/sdk';
+} from "./ai-service-types";
+
 export type AnthropicReqType =
   Anthropic.Messages.MessageCreateParamsNonStreaming;
 export type AnthropicResType = Anthropic.Messages.Message;
@@ -25,7 +27,7 @@ export type AnthropicServiceJobStatusResponseType =
   AiJobStatusType<AnthropicPromptResponse>;
 
 export function isAnthropicData(
-  stepData: AiServiceStepDataTypes
+  stepData: AiServiceStepDataTypes,
 ): stepData is AnthropicStepDataType {
-  return 'content' in stepData.aiServiceResponse;
+  return "content" in stepData.aiServiceResponse;
 }

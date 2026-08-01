@@ -1,3 +1,12 @@
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Box,
   Modal,
@@ -6,17 +15,12 @@ import {
   Paper,
   Stack,
   Divider,
-} from '@mui/material';
-import {
-  isInstructorData,
-  LoadStatus,
-} from '../../../store/slices/education-management';
-import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { removeQueryParamFromUrl } from '../../../helpers';
+} from "@mui/material";
+import { isInstructorData } from "../../../store/slices/education-management";
+import { useWithEducationalManagement } from "../../../store/slices/education-management/use-with-educational-management";
+import { removeQueryParamFromUrl } from "../../../helpers";
 
-export const queryParamSectionCode = 'sectionCode';
+export const queryParamSectionCode = "sectionCode";
 
 export function JoinUrlSection() {
   const [urlParams] = useSearchParams();
@@ -37,7 +41,7 @@ export function JoinUrlSection() {
 
   useEffect(() => {
     if (
-      sectionsLoadState !== LoadStatus.SUCCEEDED ||
+      sectionsLoadState !== 2 ||
       !myData ||
       !urlParams ||
       checkResults !== undefined
@@ -50,13 +54,13 @@ export function JoinUrlSection() {
     }
     removeQueryParamFromUrl(queryParamSectionCode);
     const targetSection = sections.find(
-      (section) => section.sectionCode === targetSectionCode
+      (section) => section.sectionCode === targetSectionCode,
     );
     const inSection =
       !isInstructorData(myData) &&
       targetSection &&
       myData.enrolledSections.some(
-        (sectionId) => sectionId === targetSection._id
+        (sectionId) => sectionId === targetSection._id,
       );
     setCheckResults({ inSection: inSection ?? false, targetSectionCode });
   }, [sectionsLoadState, isLoading, myData, urlParams, sections]);
@@ -84,11 +88,11 @@ export function JoinUrlSection() {
     try {
       await enrollStudentInSection(
         myData.userId,
-        checkResults.targetSectionCode
+        checkResults.targetSectionCode,
       );
       setOpen(false);
     } catch (error) {
-      console.error('Failed to join section:', error);
+      console.error("Failed to join section:", error);
     } finally {
       setIsJoining(false);
     }
@@ -103,9 +107,9 @@ export function JoinUrlSection() {
       open={open}
       onClose={handleDecline}
       sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         p: 2,
       }}
     >
@@ -113,20 +117,22 @@ export function JoinUrlSection() {
         elevation={8}
         sx={{
           maxWidth: 500,
-          width: '100%',
+          width: "100%",
           p: 4,
           borderRadius: 2,
-          position: 'relative',
+          position: "relative",
         }}
       >
         <Stack spacing={3}>
           {/* Header */}
-          <Box textAlign="center">
+          <Box style={{ textAlign: "center" }}>
             <Typography
               variant="h5"
               component="h2"
-              fontWeight="bold"
               color="primary"
+              style={{
+                fontWeight: "bold",
+              }}
             >
               Join Section
             </Typography>
@@ -148,7 +154,7 @@ export function JoinUrlSection() {
 
           {/* Description */}
           <Box>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1">
               By joining this section, you&apos;ll have access to:
             </Typography>
             <Box component="ul" sx={{ pl: 2, m: 0 }}>
@@ -167,7 +173,11 @@ export function JoinUrlSection() {
           <Divider />
 
           {/* Action Buttons */}
-          <Stack direction="row" spacing={2} justifyContent="center">
+          <Stack
+            direction="row"
+            spacing={2}
+            style={{ justifyContent: "center" }}
+          >
             <Button
               variant="outlined"
               onClick={handleDecline}
@@ -182,7 +192,7 @@ export function JoinUrlSection() {
               disabled={isJoining}
               sx={{ minWidth: 120 }}
             >
-              {isJoining ? 'Joining...' : 'Join Section'}
+              {isJoining ? "Joining..." : "Join Section"}
             </Button>
           </Stack>
         </Stack>

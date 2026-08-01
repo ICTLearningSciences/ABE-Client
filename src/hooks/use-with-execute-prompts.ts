@@ -4,19 +4,21 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import axios, { CancelTokenSource } from 'axios';
-import { AiServicesResponseTypes } from '../ai-services/ai-service-types';
-import { AiPromptStep, getDocServiceFromLoginService } from '../types';
-import { asyncPromptExecute } from './use-with-synchronous-polling';
-import { useMemo, useState } from 'react';
-import { useAppSelector } from '../store/hooks';
-import { useWithConfig } from '../store/slices/config/use-with-config';
-import { useWithEducationalManagement } from '../store/slices/education-management/use-with-educational-management';
-import { getStudentActivityCompletionData } from '../pages/instructor/helpers';
-import { isStudentData } from '../store/slices/education-management';
+
+import { useMemo, useState } from "react";
+import axios, { type CancelTokenSource } from "axios";
+import type { AiServicesResponseTypes } from "../ai-services/ai-service-types";
+import { type AiPromptStep, getDocServiceFromLoginService } from "../types";
+import { asyncPromptExecute } from "./use-with-synchronous-polling";
+import { useAppSelector } from "../store/hooks";
+import { useWithConfig } from "../store/slices/config/use-with-config";
+import { useWithEducationalManagement } from "../store/slices/education-management/use-with-educational-management";
+import { getStudentActivityCompletionData } from "../pages/instructor/helpers";
+import { isStudentData } from "../store/slices/education-management";
+
 export function useWithExecutePrompt() {
   const userId: string | undefined = useAppSelector(
-    (state) => state.login.user?._id
+    (state) => state.login.user?._id,
   );
   const [abortController, setAbortController] = useState<{
     controller: AbortController;
@@ -27,13 +29,13 @@ export function useWithExecutePrompt() {
   const docService = getDocServiceFromLoginService(user?.loginService);
   const { availableAiServiceModels } = useWithConfig();
   const defaultAiServiceModel = useAppSelector(
-    (state) => state.config.config?.defaultAiModel
+    (state) => state.config.config?.defaultAiModel,
   );
   const configAiServiceModelOverride = useAppSelector(
-    (state) => state.config.config?.overrideAiModel
+    (state) => state.config.config?.overrideAiModel,
   );
   const localAiServiceModelOverride = useAppSelector(
-    (state) => state.state.overrideAiServiceModel
+    (state) => state.state.overrideAiServiceModel,
   );
   const { viewState, myData } = useWithEducationalManagement();
   const assignmentDefaultAiServiceModel =
@@ -44,18 +46,18 @@ export function useWithExecutePrompt() {
       myData && isStudentData(myData)
         ? getStudentActivityCompletionData(
             myData,
-            viewState.selectedAssignmentId || '',
-            selectedActivityId || ''
+            viewState.selectedAssignmentId || "",
+            selectedActivityId || "",
           )?.defaultLLM
         : undefined,
-    [myData, viewState.selectedAssignmentId, selectedActivityId]
+    [myData, viewState.selectedAssignmentId, selectedActivityId],
   );
 
   /**
    * Process to ENSURE only available models are used in prompt steps
    */
   function applyAvailableModelsToPromptSteps(
-    promptSteps: AiPromptStep[]
+    promptSteps: AiPromptStep[],
   ): AiPromptStep[] {
     return promptSteps.map((step) => {
       step.targetAiServiceModel =
@@ -65,12 +67,12 @@ export function useWithExecutePrompt() {
         configAiServiceModelOverride ||
         step.targetAiServiceModel;
       const targetAvailableAiService = availableAiServiceModels.find(
-        (model) => model.serviceName === step.targetAiServiceModel?.serviceName
+        (model) => model.serviceName === step.targetAiServiceModel?.serviceName,
       );
       const targetServiceIsAvailable = Boolean(
         targetAvailableAiService?.models.find(
-          (model) => model === step.targetAiServiceModel?.model
-        )
+          (model) => model === step.targetAiServiceModel?.model,
+        ),
       );
       if (targetServiceIsAvailable) {
         return step;
@@ -79,7 +81,7 @@ export function useWithExecutePrompt() {
         return step;
       } else {
         throw new Error(
-          'Target AI Service Model is not available. Please select a different model.'
+          "Target AI Service Model is not available. Please select a different model.",
         );
       }
     });
@@ -87,7 +89,7 @@ export function useWithExecutePrompt() {
 
   async function executePromptSteps(
     aiPromptSteps: AiPromptStep[],
-    callback?: (response: AiServicesResponseTypes) => void
+    callback?: (response: AiServicesResponseTypes) => void,
   ) {
     const abortController = new AbortController();
     const source = axios.CancelToken.source();
@@ -101,9 +103,9 @@ export function useWithExecutePrompt() {
     const res = await asyncPromptExecute(
       curDocId,
       processedAiPromptSteps,
-      userId || '',
+      userId || "",
       docService,
-      source.token
+      source.token,
     );
 
     if (callback && !abortController.signal.aborted) callback(res);

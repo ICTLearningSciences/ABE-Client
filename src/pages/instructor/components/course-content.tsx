@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -13,11 +14,11 @@ import {
   CardContent,
   Grid,
   Stack,
-} from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
-import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import { Section } from '../../../store/slices/education-management/types';
-import SectionModal, { SectionModalMode } from './section-modal';
+} from "@mui/material";
+import { Add } from "@mui/icons-material";
+import { useWithEducationalManagement } from "../../../store/slices/education-management/use-with-educational-management";
+import type { Section } from "../../../store/slices/education-management/types";
+import SectionModal from "./section-modal";
 
 interface CourseContentProps {
   courseId: string;
@@ -34,8 +35,8 @@ const CourseContent: React.FC<CourseContentProps> = ({
   const [showSectionModal, setShowSectionModal] = useState(false);
 
   const course = educationManagement.courses.find((c) => c._id === courseId);
-  const courseSections = educationManagement.sections.filter(
-    (section) => course?.sectionIds.includes(section._id)
+  const courseSections = educationManagement.sections.filter((section) =>
+    course?.sectionIds.includes(section._id),
   );
 
   const handleAddSection = async (sectionData: Partial<Section>) => {
@@ -55,26 +56,24 @@ const CourseContent: React.FC<CourseContentProps> = ({
     <Box>
       <Stack
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 2.5 }}
+        sx={{ mb: 2.5, alignItems: "center", justifyContent: "space-between" }}
       >
         <Typography
           variant="h5"
-          sx={{ fontWeight: 600, color: 'text.primary' }}
+          sx={{ fontWeight: 600, color: "text.primary" }}
         >
           Sections
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {courseSections.length} section
-          {courseSections.length !== 1 ? 's' : ''}
+          {courseSections.length !== 1 ? "s" : ""}
         </Typography>
       </Stack>
 
       {!isStudentView && (
         <Button
           variant="contained"
-          startIcon={<AddIcon />}
+          startIcon={<Add />}
           onClick={handleOpenSectionModal}
           disabled={educationManagement.isSectionModifying}
           fullWidth
@@ -82,9 +81,9 @@ const CourseContent: React.FC<CourseContentProps> = ({
           sx={{
             py: 2,
             mb: 3,
-            backgroundColor: '#1B6A9C',
-            '&:hover': {
-              backgroundColor: '#145a87',
+            backgroundColor: "#1B6A9C",
+            "&:hover": {
+              backgroundColor: "#145a87",
             },
           }}
         >
@@ -96,14 +95,14 @@ const CourseContent: React.FC<CourseContentProps> = ({
         <Card
           variant="outlined"
           sx={{
-            border: '2px dashed',
-            borderColor: 'grey.300',
-            textAlign: 'center',
+            border: "2px dashed",
+            borderColor: "grey.300",
+            textAlign: "center",
             py: 5,
             px: 2.5,
           }}
         >
-          <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
+          <Typography sx={{ fontSize: "48px", color: "grey.300", mb: 2 }}>
             📑
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
@@ -111,23 +110,23 @@ const CourseContent: React.FC<CourseContentProps> = ({
           </Typography>
           <Typography variant="body2" color="text.disabled">
             {isStudentView
-              ? 'Sections will appear here when added by instructors'
-              : 'Add your first section to organize course content'}
+              ? "Sections will appear here when added by instructors"
+              : "Add your first section to organize course content"}
           </Typography>
         </Card>
       ) : (
         <Grid container spacing={2}>
           {courseSections.map((section) => (
-            <Grid item xs={12} key={section._id}>
+            <Grid size={12} key={section._id}>
               <Card
                 variant="outlined"
                 data-cy={`section-card-${section._id}`}
                 sx={{
-                  cursor: onSectionSelect ? 'pointer' : 'default',
-                  transition: 'all 0.2s ease',
-                  '&:hover': onSectionSelect
+                  cursor: onSectionSelect ? "pointer" : "default",
+                  transition: "all 0.2s ease",
+                  "&:hover": onSectionSelect
                     ? {
-                        borderColor: '#1B6A9C',
+                        borderColor: "#1B6A9C",
                         boxShadow: 2,
                       }
                     : {},
@@ -135,16 +134,16 @@ const CourseContent: React.FC<CourseContentProps> = ({
                 onClick={() => onSectionSelect?.(section._id)}
               >
                 <CardContent>
-                  <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                    <Typography sx={{ fontSize: '20px', mr: 1.5 }}>
+                  <Stack direction="row" sx={{ mb: 1.5, alignItems: "center" }}>
+                    <Typography sx={{ fontSize: "20px", mr: 1.5 }}>
                       📑
                     </Typography>
                     <Typography
                       variant="h6"
                       sx={{
-                        color: '#1B6A9C',
+                        color: "#1B6A9C",
                         fontWeight: 600,
-                        fontSize: '1rem',
+                        fontSize: "1rem",
                       }}
                     >
                       {section.title}
@@ -160,9 +159,9 @@ const CourseContent: React.FC<CourseContentProps> = ({
                   </Typography>
 
                   <Typography variant="caption" color="text.disabled">
-                    Section Code: {section.sectionCode} •{' '}
+                    Section Code: {section.sectionCode} •{" "}
                     {section.assignments.length} assignment
-                    {section.assignments.length !== 1 ? 's' : ''}
+                    {section.assignments.length !== 1 ? "s" : ""}
                   </Typography>
                 </CardContent>
               </Card>
@@ -175,7 +174,7 @@ const CourseContent: React.FC<CourseContentProps> = ({
         isOpen={showSectionModal}
         onClose={handleCloseSectionModal}
         onSubmit={handleAddSection}
-        mode={SectionModalMode.CREATE}
+        mode={"create"}
         isLoading={educationManagement.isSectionModifying}
       />
     </Box>

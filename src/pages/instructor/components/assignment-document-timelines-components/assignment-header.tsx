@@ -4,23 +4,24 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
-import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
-import { DocumentSelector } from './document-selector';
-import { StudentSelector } from './student-selector';
-import { AssignmentSelector } from './assignment-selector';
-import {
+
+import React from "react";
+import { Box, Typography, Button } from "@mui/material";
+import { ArrowBack } from "@mui/icons-material";
+import { DocumentSelector } from "./document-selector";
+import { StudentSelector } from "./student-selector";
+import { AssignmentSelector } from "./assignment-selector";
+import type {
   Assignment,
   RelevantGoogleDoc,
   StudentData,
-} from '../../../../store/slices/education-management/types';
-import { RowDiv } from '../../../../styled-components';
-import { AssignmentGrader } from './assignment-grader';
-import {
+} from "../../../../store/slices/education-management/types";
+import { RowDiv } from "../../../../styled-components";
+import { AssignmentGrader } from "./assignment-grader";
+import type {
   StudentAssignmentCompletionStatus,
   AssignmentCompletionStatusForStudent,
-} from '../../../../helpers';
+} from "../../../../helpers";
 
 interface AssignmentHeaderProps {
   studentAssignmentCompletionStatuses: StudentAssignmentCompletionStatus[];
@@ -54,40 +55,40 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
     <Box
       data-cy="assignment-header"
       sx={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
       }}
     >
       {onBackToStudentInfo && (
         <Button
-          startIcon={<ArrowBackIcon />}
+          startIcon={<ArrowBack />}
           onClick={onBackToStudentInfo}
-          sx={{ color: 'text.secondary', alignSelf: 'flex-start' }}
+          sx={{ color: "text.secondary", alignSelf: "flex-start" }}
         >
           Back
         </Button>
       )}
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          width: '100%',
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
           columnGap: 1,
-          alignItems: 'center',
+          alignItems: "center",
         }}
       >
         <RowDiv
           style={{
             flex: 1,
             gap: 5,
-            textAlign: 'center',
-            justifyContent: 'center',
+            textAlign: "center",
+            justifyContent: "center",
           }}
         >
           <Typography
-            sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'right' }}
+            sx={{ fontWeight: 600, color: "#1976d2", textAlign: "right" }}
           >
             Student:
           </Typography>
@@ -103,12 +104,12 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
           style={{
             flex: 1,
             gap: 5,
-            textAlign: 'center',
-            justifyContent: 'center',
+            textAlign: "center",
+            justifyContent: "center",
           }}
         >
           <Typography
-            sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'right' }}
+            sx={{ fontWeight: 600, color: "#1976d2", textAlign: "right" }}
           >
             Assignment:
           </Typography>
@@ -122,7 +123,7 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
           ) : (
             <Typography
               data-cy="assignment-header-assignment-title"
-              sx={{ fontWeight: 400, color: 'black' }}
+              sx={{ fontWeight: 400, color: "black" }}
             >
               {assignmentTitle}
             </Typography>
@@ -133,20 +134,20 @@ export const AssignmentHeader: React.FC<AssignmentHeaderProps> = ({
           style={{
             flex: 1,
             gap: 5,
-            textAlign: 'center',
-            justifyContent: 'center',
+            textAlign: "center",
+            justifyContent: "center",
           }}
         >
           {onDocumentChange && (
             <>
               <Typography
-                sx={{ fontWeight: 600, color: '#1976d2', textAlign: 'right' }}
+                sx={{ fontWeight: 600, color: "#1976d2", textAlign: "right" }}
               >
                 Document:
               </Typography>
               <DocumentSelector
                 docData={docData}
-                selectedDocId={selectedDocId || ''}
+                selectedDocId={selectedDocId || ""}
                 onDocumentChange={onDocumentChange}
               />
             </>

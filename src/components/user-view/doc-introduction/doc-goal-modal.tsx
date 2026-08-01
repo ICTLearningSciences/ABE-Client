@@ -4,46 +4,62 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useEffect } from 'react';
+
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
   CircularProgress,
   IconButton,
   Modal,
-  SxProps,
-  Theme,
-} from '@mui/material';
-import { ActivityTypes, DocGoal, UserDoc, Intention } from '../../../types';
-import { ColumnDiv, RowDiv } from '../../../styled-components';
-import { useState } from 'react';
-import ChangeIcon from '@mui/icons-material/Construction';
-import { ActivitiesDisplay } from './activities-display';
-import { GoalsDisplay } from './goals-display';
-import { useAppSelector } from '../../../store/hooks';
-import { hasHoursPassed } from '../../../helpers';
-import { InputDocumentIntention } from './input-document-intention';
-import { InputDocumentAssignment } from './input-document-assignment';
-import { InputDayIntention } from './input-day-inention';
-import { useWithUsersDocs } from '../../../hooks/use-with-users-docs';
-import { FREE_INPUT_GOAL_ID } from '../../../constants';
+  type SxProps,
+  type Theme,
+} from "@mui/material";
+import { Construction } from "@mui/icons-material";
+
+import type {
+  ActivityTypes,
+  DocGoal,
+  UserDoc,
+  Intention,
+} from "../../../types";
+import { ColumnDiv, RowDiv } from "../../../styled-components";
+import { ActivitiesDisplay } from "./activities-display";
+import { GoalsDisplay } from "./goals-display";
+import { useAppSelector } from "../../../store/hooks";
+import { hasHoursPassed } from "../../../helpers";
+import { InputDocumentIntention } from "./input-document-intention";
+import { InputDocumentAssignment } from "./input-document-assignment";
+import { InputDayIntention } from "./input-day-inention";
+import { useWithUsersDocs } from "../../../hooks/use-with-users-docs";
+import { FREE_INPUT_GOAL_ID } from "../../../constants";
+
+// const enum SelectingStage {
+//   LOADING,
+//   DOCUMENT_INTENTION,
+//   ASSIGNMENT_DESCRIPTION,
+//   DAY_INTENTION,
+//   GOAL,
+//   ACTIVITY,
+// }
+type SelectingStage = 0 | 1 | 2 | 3 | 4 | 5;
 
 const style: SxProps<Theme> = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  WebkitTransform: 'translate(-50%, -50%)',
-  transform: 'translate(-50%, -50%)',
-  width: 'fit-content',
-  height: 'fit-content',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  WebkitTransform: "translate(-50%, -50%)",
+  transform: "translate(-50%, -50%)",
+  width: "fit-content",
+  height: "fit-content",
   p: 4,
-  display: 'flex',
-  boxSizing: 'border-box',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  backgroundColor: 'white',
-  borderRadius: '20px',
-  border: '5px solid black',
+  display: "flex",
+  boxSizing: "border-box",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  backgroundColor: "white",
+  borderRadius: "20px",
+  border: "5px solid black",
 };
 
 export function DocGoalModal(props: {
@@ -55,7 +71,7 @@ export function DocGoalModal(props: {
   selectedGoal?: DocGoal;
   docGoals?: DocGoal[];
   isNewDoc: boolean;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     open,
     close,
@@ -64,18 +80,11 @@ export function DocGoalModal(props: {
     setSelectedActivity: beginActivity,
     isNewDoc,
   } = props;
-
-  const enum SelectingStage {
-    LOADING,
-    DOCUMENT_INTENTION,
-    ASSIGNMENT_DESCRIPTION,
-    DAY_INTENTION,
-    GOAL,
-    ACTIVITY,
-  }
   const curDocId = useAppSelector((state) => state.state.curDocId);
   const googleDocs = useAppSelector((state) => state.state.userDocs);
-  const curDoc = googleDocs.find((doc) => doc.googleDocId === curDocId);
+  const curDoc = googleDocs.find(
+    (doc: UserDoc) => doc.googleDocId === curDocId,
+  );
   const [curStageIndex, setCurStageIndex] = useState(0);
   const [stages, setStages] = useState<SelectingStage[]>([]);
   const currentStage = stages[curStageIndex];
@@ -83,46 +92,46 @@ export function DocGoalModal(props: {
   const [_selectedGoal, _setSelectedGoal] = useState<DocGoal>();
   const [firstLoadComplete, setFirstLoadComplete] = useState(false);
   const [documentIntention, setDocumentIntention] = useState<string>(
-    curDoc?.documentIntention?.description || ''
+    curDoc?.documentIntention?.description || "",
   );
   const [assignmentDescription, setAssignmentDescription] = useState<string>(
-    curDoc?.assignmentDescription || ''
+    curDoc?.assignmentDescription || "",
   );
-  const [dayIntention, setDayIntention] = useState<string>('');
+  const [dayIntention, setDayIntention] = useState<string>("");
   const { updateUserDoc } = useWithUsersDocs();
 
   useEffect(() => {
     if (curDoc?.googleDocId) {
-      setDocumentIntention(curDoc.documentIntention?.description || '');
-      setAssignmentDescription(curDoc.assignmentDescription || '');
-      setDayIntention(curDoc.currentDayIntention?.description || '');
+      setDocumentIntention(curDoc.documentIntention?.description || "");
+      setAssignmentDescription(curDoc.assignmentDescription || "");
+      setDayIntention(curDoc.currentDayIntention?.description || "");
     }
   }, [curDoc?.googleDocId]);
 
   function getRequiredStages(userDoc: UserDoc): SelectingStage[] {
     const stages: SelectingStage[] = [];
     if (!userDoc.documentIntention) {
-      stages.push(SelectingStage.DOCUMENT_INTENTION);
+      stages.push(1);
     }
     if (
       !userDoc.assignmentDescription &&
-      userDoc.assignmentDescription !== ''
+      userDoc.assignmentDescription !== ""
     ) {
-      stages.push(SelectingStage.ASSIGNMENT_DESCRIPTION);
+      stages.push(2);
     }
 
     const eightHoursSinceDocIntention = userDoc.documentIntention?.createdAt
       ? hasHoursPassed(
           userDoc.documentIntention.createdAt,
           new Date().toISOString(),
-          8
+          8,
         )
       : false;
     const eightHoursSinceDayIntention = userDoc.currentDayIntention?.createdAt
       ? hasHoursPassed(
           userDoc.currentDayIntention.createdAt,
           new Date().toISOString(),
-          8
+          8,
         )
       : false;
 
@@ -130,18 +139,18 @@ export function DocGoalModal(props: {
       userDoc.currentDayIntention?.description &&
       eightHoursSinceDayIntention
     ) {
-      stages.push(SelectingStage.DAY_INTENTION);
+      stages.push(3);
     }
 
     if (
       !userDoc.currentDayIntention?.description &&
       eightHoursSinceDocIntention
     ) {
-      stages.push(SelectingStage.DAY_INTENTION);
+      stages.push(3);
     }
 
-    stages.push(SelectingStage.GOAL);
-    stages.push(SelectingStage.ACTIVITY);
+    stages.push(4);
+    stages.push(5);
     return stages;
   }
   // Manages first stage load
@@ -177,9 +186,7 @@ export function DocGoalModal(props: {
   function goBackToGoalStage() {
     _setSelectedGoal(undefined);
     _setSelectedActivity(undefined);
-    setCurStageIndex(
-      stages.findIndex((stage) => stage === SelectingStage.GOAL)
-    );
+    setCurStageIndex(stages.findIndex((stage) => stage === 4));
   }
 
   function nextStage() {
@@ -204,11 +211,11 @@ export function DocGoalModal(props: {
   if (!docGoals || !docGoals.length) return <CircularProgress />;
 
   function getDisplayByStage(stage: SelectingStage) {
-    if (stage === SelectingStage.LOADING) {
+    if (stage === 0) {
       return <CircularProgress />;
     }
 
-    if (stage === SelectingStage.DOCUMENT_INTENTION) {
+    if (stage === 1) {
       return (
         <InputDocumentIntention
           documentIntention={documentIntention}
@@ -217,7 +224,7 @@ export function DocGoalModal(props: {
       );
     }
 
-    if (stage === SelectingStage.ASSIGNMENT_DESCRIPTION) {
+    if (stage === 2) {
       return (
         <InputDocumentAssignment
           documentAssignment={assignmentDescription}
@@ -226,7 +233,7 @@ export function DocGoalModal(props: {
       );
     }
 
-    if (stage === SelectingStage.DAY_INTENTION) {
+    if (stage === 3) {
       return (
         <InputDayIntention
           dayIntention={dayIntention}
@@ -235,7 +242,7 @@ export function DocGoalModal(props: {
       );
     }
 
-    if (stage === SelectingStage.GOAL) {
+    if (stage === 4) {
       return (
         <GoalsDisplay
           docGoals={[...(docGoals || [])].reverse()}
@@ -287,7 +294,7 @@ export function DocGoalModal(props: {
       ...(newDocumentIntention
         ? { documentIntention: newDocumentIntention }
         : {}),
-      ...(newAssignmentDescription || newAssignmentDescription === ''
+      ...(newAssignmentDescription || newAssignmentDescription === ""
         ? { assignmentDescription: newAssignmentDescription }
         : {}),
       ...(newDayIntention ? { currentDayIntention: newDayIntention } : {}),
@@ -299,25 +306,17 @@ export function DocGoalModal(props: {
       return;
     }
     const nextStageIsGoal =
-      curStageIndex + 1 !== stages.length &&
-      stages[curStageIndex + 1] === SelectingStage.GOAL;
+      curStageIndex + 1 !== stages.length && stages[curStageIndex + 1] === 4;
 
-    if (
-      nextStageIsGoal &&
-      [
-        SelectingStage.DOCUMENT_INTENTION,
-        SelectingStage.ASSIGNMENT_DESCRIPTION,
-        SelectingStage.DAY_INTENTION,
-      ].includes(currentStage)
-    ) {
+    if (nextStageIsGoal && [1, 2, 3].includes(currentStage)) {
       updateUserDocIntentions(curDoc);
     }
 
-    if (currentStage === SelectingStage.GOAL) {
+    if (currentStage === 4) {
       // goal stage next button disabled
     }
 
-    if (currentStage === SelectingStage.ACTIVITY) {
+    if (currentStage === 5) {
       if (!_selectedGoal) {
         // Should always be a selected goal, since activity stage requires it.
         return;
@@ -338,7 +337,7 @@ export function DocGoalModal(props: {
               <div
                 data-cy="selected-goal-display"
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   top: 20,
                   left: 20,
                 }}
@@ -347,8 +346,8 @@ export function DocGoalModal(props: {
                   <>
                     <span
                       style={{
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
+                        fontWeight: "bold",
+                        cursor: "pointer",
                       }}
                       onClick={goBackToGoalStage}
                     >
@@ -360,17 +359,17 @@ export function DocGoalModal(props: {
                       }}
                       onClick={goBackToGoalStage}
                     >
-                      <ChangeIcon />
+                      <Construction />
                     </IconButton>
                   </>
                 )}
               </div>
               <ColumnDiv
                 style={{
-                  height: 'fit-content',
-                  width: 'fit-content',
-                  alignItems: 'center',
-                  justifyContent: 'space-around',
+                  height: "fit-content",
+                  width: "fit-content",
+                  alignItems: "center",
+                  justifyContent: "space-around",
                 }}
               >
                 {curStageIndex < stages.length ? (
@@ -381,24 +380,24 @@ export function DocGoalModal(props: {
 
                 <RowDiv
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
+                    display: "flex",
+                    justifyContent: "space-between",
                   }}
                 >
                   <Button
                     data-cy="doc-goal-cancel-button"
                     variant="text"
                     style={{
-                      marginRight: '40px',
-                      color: 'black',
-                      position: 'absolute',
+                      marginRight: "40px",
+                      color: "black",
+                      position: "absolute",
                       top: 20,
                       right: 0,
                     }}
                     onClick={() => {
                       if (!props.selectedActivity) {
                         const freeInputGoal = docGoals?.find(
-                          (goal) => goal._id === FREE_INPUT_GOAL_ID
+                          (goal) => goal._id === FREE_INPUT_GOAL_ID,
                         );
                         if (freeInputGoal) {
                           beginGoal(freeInputGoal);
@@ -411,20 +410,20 @@ export function DocGoalModal(props: {
                   </Button>
                   <RowDiv
                     style={{
-                      margin: '20px',
+                      margin: "20px",
                     }}
                   >
                     <Button
                       data-cy="doc-goal-modal-back-button"
                       variant="text"
                       style={{
-                        borderRadius: '20px',
-                        marginRight: '40px',
+                        borderRadius: "20px",
+                        marginRight: "40px",
                       }}
                       onClick={() => {
                         _setSelectedGoal(undefined);
                         _setSelectedActivity(undefined);
-                        // _setStage(SelectingStage.GOAL);
+                        // _setStage(4);
                         prevStage();
                       }}
                       disabled={curStageIndex === 0}
@@ -435,21 +434,19 @@ export function DocGoalModal(props: {
                       variant="contained"
                       data-cy="doc-goal-modal-next-button"
                       style={{
-                        borderRadius: '20px',
+                        borderRadius: "20px",
                       }}
                       disabled={
-                        currentStage === SelectingStage.GOAL ||
-                        (currentStage === SelectingStage.ACTIVITY &&
-                          !_selectedActivity)
+                        currentStage === 4 ||
+                        (currentStage === 5 && !_selectedActivity)
                       }
                       onClick={() => {
                         handleNextClick(currentStage);
                       }}
                     >
-                      {currentStage === SelectingStage.ACTIVITY ||
-                      currentStage === SelectingStage.GOAL
-                        ? 'Start'
-                        : 'Next'}
+                      {currentStage === 5 || currentStage === 4
+                        ? "Start"
+                        : "Next"}
                     </Button>
                   </RowDiv>
                 </RowDiv>

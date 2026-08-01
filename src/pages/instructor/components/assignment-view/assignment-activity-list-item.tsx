@@ -4,7 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+
 import {
   Typography,
   Card,
@@ -12,23 +12,24 @@ import {
   Grid,
   Stack,
   IconButton,
-} from '@mui/material';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+} from "@mui/material";
 import {
   CheckCircle,
   RadioButtonUnchecked,
-  Settings as SettingsIcon,
+  Settings,
   KeyboardArrowUp,
   KeyboardArrowDown,
-} from '@mui/icons-material';
-import { ActivityBuilder } from '../../../../components/activity-builder/types';
-import { RowDiv } from '../../../../styled-components';
+  RemoveCircle,
+} from "@mui/icons-material";
+import type { ActivityBuilder } from "../../../../components/activity-builder/types";
+import { RowDiv } from "../../../../styled-components";
+
 export function AssignmentActivityListItem(props: {
   activity: ActivityBuilder;
   onActivitySelect: (activityId: string) => void;
   onRemoveActivity: (activityId: string) => void;
   onOpenLLMModal: (activityId: string) => void;
-  onActivityOrderChange?: (activityId: string, upOrDown: 'up' | 'down') => void;
+  onActivityOrderChange?: (activityId: string, upOrDown: "up" | "down") => void;
   isComplete: boolean;
   isStudentView: boolean;
   isAssignmentModifying: boolean;
@@ -48,26 +49,25 @@ export function AssignmentActivityListItem(props: {
     isLast,
   } = props;
   return (
-    <Grid item xs={12} key={activity._id}>
+    <Grid size={12} key={activity._id}>
       <Card variant="outlined">
         <CardContent>
           <Stack
             direction="row"
-            alignItems="center"
-            justifyContent="space-between"
+            style={{ alignItems: "center", justifyContent: "space-between" }}
           >
             <Typography
               variant="h6"
               onClick={() => onActivitySelect(activity._id)}
               data-cy={`activity-item-${activity._id}`}
               sx={{
-                color: '#1B6A9C',
+                color: "#1B6A9C",
                 fontWeight: 600,
-                fontSize: '1rem',
-                cursor: 'pointer',
-                '&:hover': {
-                  textDecoration: 'underline',
-                  color: '#145a87',
+                fontSize: "1rem",
+                cursor: "pointer",
+                "&:hover": {
+                  textDecoration: "underline",
+                  color: "#145a87",
                 },
               }}
             >
@@ -75,15 +75,15 @@ export function AssignmentActivityListItem(props: {
             </Typography>
             <RowDiv>
               {isComplete && isStudentView && (
-                <CheckCircle sx={{ color: 'green' }} />
+                <CheckCircle sx={{ color: "green" }} />
               )}
               {!isComplete && isStudentView && (
-                <RadioButtonUnchecked sx={{ color: 'grey' }} />
+                <RadioButtonUnchecked sx={{ color: "grey" }} />
               )}
               {!isStudentView && onActivityOrderChange && (
                 <>
                   <IconButton
-                    onClick={() => onActivityOrderChange(activity._id, 'up')}
+                    onClick={() => onActivityOrderChange(activity._id, "up")}
                     disabled={isAssignmentModifying || isFirst}
                     size="small"
                     data-cy={`move-activity-up-${activity._id}`}
@@ -91,7 +91,7 @@ export function AssignmentActivityListItem(props: {
                     <KeyboardArrowUp />
                   </IconButton>
                   <IconButton
-                    onClick={() => onActivityOrderChange(activity._id, 'down')}
+                    onClick={() => onActivityOrderChange(activity._id, "down")}
                     disabled={isAssignmentModifying || isLast}
                     size="small"
                     data-cy={`move-activity-down-${activity._id}`}
@@ -106,7 +106,7 @@ export function AssignmentActivityListItem(props: {
                   disabled={isAssignmentModifying}
                   size="small"
                 >
-                  <RemoveCircleIcon />
+                  <RemoveCircle />
                 </IconButton>
               )}
 
@@ -114,14 +114,14 @@ export function AssignmentActivityListItem(props: {
                 <IconButton
                   onClick={() => onOpenLLMModal(activity._id)}
                   sx={{
-                    '&:hover': {
-                      color: 'primary.main',
+                    "&:hover": {
+                      color: "primary.main",
                     },
                   }}
                   size="small"
                   data-cy={`llm-settings-button-${activity._id}`}
                 >
-                  <SettingsIcon />
+                  <Settings />
                 </IconButton>
               )}
             </RowDiv>

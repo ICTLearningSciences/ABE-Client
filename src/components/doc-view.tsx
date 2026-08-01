@@ -4,21 +4,22 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { useEffect } from 'react';
-import withAuthorizationOnly from '../hooks/wrap-with-authorization-only';
-import { EditGoogleDoc } from './user-view/user-edit-google-doc';
-import { useLocation, useParams, useSearchParams } from 'react-router-dom';
-import { useWithState } from '../store/slices/state/use-with-state';
-import { URL_PARAM_NEW_DOC } from '../constants';
-import { useNavigateWithParams } from '../hooks/use-navigate-with-params';
-import { useAppSelector } from '../store/hooks';
+
+import React from "react";
+import { useEffect } from "react";
+import withAuthorizationOnly from "../hooks/wrap-with-authorization-only";
+import { EditGoogleDoc } from "./user-view/user-edit-google-doc";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
+import { useWithState } from "../store/slices/state/use-with-state";
+import { URL_PARAM_NEW_DOC } from "../constants";
+import { useNavigateWithParams } from "../hooks/use-navigate-with-params";
+import { useAppSelector } from "../store/hooks";
 
 function DocView(props: {
   docId?: string;
   goalId?: string;
   disableActivitySelector?: boolean;
-}): JSX.Element {
+}): React.ReactNode {
   const { docId: docIdFromUrlParams } = useParams<Record<string, string>>();
   const docId = props.docId || docIdFromUrlParams;
   const navigate = useNavigateWithParams();
@@ -27,17 +28,17 @@ function DocView(props: {
   const queryParams = new URLSearchParams(location.search);
 
   const viewState = useAppSelector(
-    (state) => state.educationManagement.viewState
+    (state) => state.educationManagement.viewState,
   );
 
   const activityFromParams =
-    viewState.selectedActivityId || queryParams.get('activityId') || '';
+    viewState.selectedActivityId || queryParams.get("activityId") || "";
 
-  const goalFromParams = props.goalId || queryParams.get('goalId') || '';
+  const goalFromParams = props.goalId || queryParams.get("goalId") || "";
   const googleDocUrl = `https://docs.google.com/document/d/${docId}/edit`;
 
   const [urlSearchParams] = useSearchParams();
-  const isNewGoogleDoc = urlSearchParams.get(URL_PARAM_NEW_DOC) === 'true';
+  const isNewGoogleDoc = urlSearchParams.get(URL_PARAM_NEW_DOC) === "true";
 
   useEffect(() => {
     if (docId) {
@@ -50,7 +51,7 @@ function DocView(props: {
   }, []);
 
   if (!docId) {
-    navigate('/docs');
+    navigate("/docs");
     return <></>;
   }
 

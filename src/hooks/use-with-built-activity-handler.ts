@@ -5,26 +5,26 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { useCallback, useEffect, useState } from 'react';
-import { BuiltActivityHandler } from '../classes/activity-builder-activity/built-activity-handler';
-import { ChatMessageTypes } from '../store/slices/chat';
-import { useWithChat } from '../store/slices/chat/use-with-chat';
-import { useWithState } from '../store/slices/state/use-with-state';
-import { useWithChatLogSubscribers } from './use-with-chat-log-subscribers';
-import { useWithExecutePrompt } from './use-with-execute-prompts';
-import { ActivityBuilder } from '../components/activity-builder/types';
-import { equals } from '../helpers';
-import { getDocServiceFromLoginService } from '../types';
-import { useAppSelector } from '../store/hooks';
-import { useWithEducationalManagement } from '../store/slices/education-management/use-with-educational-management';
-import { useNavigateWithParams } from './use-navigate-with-params';
-import { useWithPath } from './use-with-path';
-import { useWithPanels } from '../store/slices/panels/use-with-panels';
+import { useCallback, useEffect, useState } from "react";
+import { BuiltActivityHandler } from "../classes/activity-builder-activity/built-activity-handler";
+import type { ChatMessageTypes } from "../store/slices/chat";
+import { useWithChat } from "../store/slices/chat/use-with-chat";
+import { useWithState } from "../store/slices/state/use-with-state";
+import { useWithChatLogSubscribers } from "./use-with-chat-log-subscribers";
+import { useWithExecutePrompt } from "./use-with-execute-prompts";
+import type { ActivityBuilder } from "../components/activity-builder/types";
+import { equals } from "../helpers";
+import { getDocServiceFromLoginService } from "../types";
+import { useAppSelector } from "../store/hooks";
+import { useWithEducationalManagement } from "../store/slices/education-management/use-with-educational-management";
+import { useNavigateWithParams } from "./use-navigate-with-params";
+import { useWithPath } from "./use-with-path";
+import { useWithPanels } from "../store/slices/panels/use-with-panels";
 
 export function useWithBuiltActivityHandler(
   resetActivityCounter: number,
   editDocGoal: () => void,
-  selectedActivityBuilder?: ActivityBuilder
+  selectedActivityBuilder?: ActivityBuilder,
 ) {
   const { activePanelist, setActivePanelist } = useWithPanels();
   const { sendMessage, clearChatLog, coachResponsePending } = useWithChat();
@@ -44,14 +44,14 @@ export function useWithBuiltActivityHandler(
   const { defaultHome, isOnCourseManagementPages, isOnStudentCoursesPages } =
     useWithPath();
   const viewState = useAppSelector(
-    (state) => state.educationManagement.viewState
+    (state) => state.educationManagement.viewState,
   );
   const navigate = useNavigateWithParams();
   const [builtActivityHandler, setBuiltActivityHandler] =
     useState<BuiltActivityHandler>();
   const updatesFound = !equals(
     selectedActivityBuilder,
-    builtActivityHandler?.builtActivityData
+    builtActivityHandler?.builtActivityData,
   );
   const [initialize, setInitialize] = useState<BuiltActivityHandler>();
 
@@ -77,7 +77,7 @@ export function useWithBuiltActivityHandler(
     } else if (!builtActivityHandler) {
       const attachedPanel = selectedActivityBuilder?.attachedPanel
         ? panels.find(
-            (p) => p.clientId === selectedActivityBuilder?.attachedPanel
+            (p) => p.clientId === selectedActivityBuilder?.attachedPanel,
           )
         : undefined;
       const attachedPanelists = attachedPanel
@@ -108,7 +108,7 @@ export function useWithBuiltActivityHandler(
         selectedActivityBuilder,
         attachedPanel,
         attachedPanelists,
-        onFilteredPanelistsChanged
+        onFilteredPanelistsChanged,
       );
       setInitialize(newActivityHandler);
     } else if (
@@ -167,7 +167,7 @@ export function useWithBuiltActivityHandler(
       viewState.selectedCourseId,
       viewState.selectedSectionId,
       viewState.selectedAssignmentId,
-      selectedActivityBuilder._id
+      selectedActivityBuilder._id,
     );
   }, [
     myEducationalData,

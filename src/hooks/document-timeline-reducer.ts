@@ -5,12 +5,21 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import {
+import type {
   DehydratedGQLDocumentTimeline,
   GQLTimelinePoint,
   IGDocVersion,
-} from '../types';
-import { LoadingError, LoadingStatusType } from './generic-loading-reducer';
+} from "../types";
+import type { LoadingError, LoadingStatusType } from "./loading-reducer";
+
+export type TimelineActionType =
+  | "LOADING_STARTED"
+  | "LOADING_SUCCEEDED"
+  | "LOADING_FAILED"
+  | "PARTIAL_DATA_LOADED"
+  | "SAVE_TIMELINE_POINT"
+  | "SELECT_TIMEPOINT"
+  | "SELECT_DOC";
 
 export interface DocumentState {
   status: LoadingStatusType;
@@ -35,19 +44,9 @@ export interface TimelineAction {
   savedTimelinePoint?: GQLTimelinePoint;
 }
 
-export enum TimelineActionType {
-  LOADING_STARTED = 'LOADING_STARTED',
-  LOADING_SUCCEEDED = 'LOADING_SUCCEEDED',
-  LOADING_FAILED = 'LOADING_FAILED',
-  PARTIAL_DATA_LOADED = 'PARTIAL_DATA_LOADED',
-  SAVE_TIMELINE_POINT = 'SAVE_TIMELINE_POINT',
-  SELECT_TIMEPOINT = 'SELECT_TIMEPOINT',
-  SELECT_DOC = 'SELECT_DOC',
-}
-
 export function TimelineReducer(
   state: TimelineState,
-  action: TimelineAction
+  action: TimelineAction,
 ): TimelineState {
   const {
     type,
@@ -59,7 +58,7 @@ export function TimelineReducer(
   } = action;
 
   switch (type) {
-    case TimelineActionType.LOADING_STARTED:
+    case "LOADING_STARTED":
       if (!docId) return state;
       return {
         ...state,
@@ -67,12 +66,12 @@ export function TimelineReducer(
           ...state.documentStates,
           [docId]: {
             ...state.documentStates[docId],
-            status: LoadingStatusType.LOADING,
+            status: "LOADING",
             error: undefined,
           },
         },
       };
-    case TimelineActionType.PARTIAL_DATA_LOADED: {
+    case "PARTIAL_DATA_LOADED": {
       if (!docId || !dataPayload) return state;
       const currentDocState = state.documentStates[docId];
       return {
@@ -81,7 +80,7 @@ export function TimelineReducer(
           ...state.documentStates,
           [docId]: {
             ...currentDocState,
-            status: LoadingStatusType.LOADING,
+            status: "LOADING",
             timeline: dataPayload,
             docVersions: docVersionsPayload
               ? [...(currentDocState.docVersions || []), ...docVersionsPayload]
@@ -99,7 +98,7 @@ export function TimelineReducer(
         },
       };
     }
-    case TimelineActionType.LOADING_SUCCEEDED: {
+    case "LOADING_SUCCEEDED": {
       if (!docId || !dataPayload) return state;
       const docState = state.documentStates[docId] || {};
       return {
@@ -108,7 +107,7 @@ export function TimelineReducer(
           ...state.documentStates,
           [docId]: {
             ...docState,
-            status: LoadingStatusType.SUCCESS,
+            status: "SUCCESS",
             timeline: dataPayload,
             docVersions: docVersionsPayload
               ? [...(docState.docVersions || []), ...docVersionsPayload]
@@ -126,7 +125,7 @@ export function TimelineReducer(
         },
       };
     }
-    case TimelineActionType.LOADING_FAILED: {
+    case "LOADING_FAILED": {
       if (!docId) return state;
       return {
         ...state,
@@ -134,13 +133,13 @@ export function TimelineReducer(
           ...state.documentStates,
           [docId]: {
             ...state.documentStates[docId],
-            status: LoadingStatusType.ERROR,
+            status: "ERROR",
             error: errorPayload,
           },
         },
       };
     }
-    case TimelineActionType.SELECT_TIMEPOINT: {
+    case "SELECT_TIMEPOINT": {
       const targetDocId = docId || state.selectedDocId;
       if (!targetDocId) return state;
       return {
@@ -154,7 +153,7 @@ export function TimelineReducer(
         },
       };
     }
-    case TimelineActionType.SAVE_TIMELINE_POINT: {
+    case "SAVE_TIMELINE_POINT": {
       if (!action.savedTimelinePoint || !docId) {
         return state;
       }
@@ -171,7 +170,7 @@ export function TimelineReducer(
               timelinePoints: currentTimeline.timelinePoints.map((tp) =>
                 tp.versionTime === action.savedTimelinePoint?.versionTime
                   ? action.savedTimelinePoint
-                  : tp
+                  : tp,
               ),
             },
             selectedTimepointVersionTime: action.savedTimelinePoint.versionTime,
@@ -179,7 +178,7 @@ export function TimelineReducer(
         },
       };
     }
-    case TimelineActionType.SELECT_DOC: {
+    case "SELECT_DOC": {
       if (!docId) return state;
       return {
         ...state,

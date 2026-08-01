@@ -4,10 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useWithDocGoalsActivities } from '../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import { DocGoal, ActivityTypes } from '../types';
-import { useState } from 'react';
-import { useAppSelector } from '../store/hooks';
+
+import { useState } from "react";
+import { useWithDocGoalsActivities } from "../store/slices/doc-goals-activities/use-with-doc-goals-activites";
+import type { DocGoal, ActivityTypes } from "../types";
+import { useAppSelector } from "../store/hooks";
 
 export interface CurrentGoalAndActivity {
   selectedGoal?: DocGoal;
@@ -30,8 +31,8 @@ export function useWithCurrentGoalActivity(): UseWithCurrentGoalActivity {
   const user = useAppSelector((state) => state.login.user);
   const config = useAppSelector((state) => state.config).config;
   const { docGoals, isLoading } = useWithDocGoalsActivities(
-    user?._id || '',
-    config
+    user?._id || "",
+    config,
   );
 
   const [goalActivityState, setGoalActivityState] =

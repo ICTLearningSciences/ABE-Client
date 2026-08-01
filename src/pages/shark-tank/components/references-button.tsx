@@ -1,13 +1,20 @@
-import React from 'react';
-import { Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
-import { Close, OpenInNew, Pageview } from '@mui/icons-material';
-import { useWithChat, useWithState } from '../../../exported-files';
-import { Source } from '../../../ai-services/ai-service-types';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import React from "react";
+import { Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
+import { Close, OpenInNew, Pageview } from "@mui/icons-material";
+import { useWithChat, useWithState } from "../../../exported-files";
+import type { Source } from "../../../ai-services/ai-service-types";
 
 export function ReferencesButton(props: {
   reference?: Source;
   onSelectReference: (ref?: Source) => void;
-}): JSX.Element {
+}): React.ReactNode {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { state } = useWithState();
   const { curDocId } = state;
@@ -19,7 +26,7 @@ export function ReferencesButton(props: {
     if (!curDocId) return;
     const sources = [];
     for (const msg of messages) {
-      if ('sources' in msg) {
+      if ("sources" in msg) {
         for (const source of msg.sources || []) {
           sources.push(source);
         }
@@ -43,7 +50,7 @@ export function ReferencesButton(props: {
 
   const openInNew = (url: string) => {
     if (window) {
-      window.open(url, '_blank');
+      window.open(url, "_blank");
       handleClose();
     }
   };
@@ -51,7 +58,7 @@ export function ReferencesButton(props: {
   return (
     <div>
       <Button
-        variant={props.reference ? 'contained' : 'outlined'}
+        variant={props.reference ? "contained" : "outlined"}
         startIcon={<Pageview />}
         onClick={handleClick}
         disabled={sources.length === 0}
@@ -65,19 +72,12 @@ export function ReferencesButton(props: {
           </IconButton>
         </Tooltip>
       )}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
-      >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         {sources.map((r, i) => (
           <MenuItem
             key={i}
             className="row"
-            style={{ justifyContent: 'space-between', minWidth: 200 }}
+            style={{ justifyContent: "space-between", minWidth: 200 }}
             onClick={() => open(r)}
           >
             {r.title}

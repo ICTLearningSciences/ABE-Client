@@ -4,11 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useMemo } from 'react';
-import { Button, CircularProgress } from '@mui/material';
-import { UserDoc, NewDocData, SortConfig } from '../../types';
-import { RowDiv } from '../../styled-components';
+
+import React, { useMemo } from "react";
 import {
+  Button,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -16,22 +16,23 @@ import {
   TableHead,
   TableRow,
   Paper,
-} from '@mui/material';
-import { TwoOptionDialog } from '../dialog';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { GoogleDocItemRow } from './google-doc-item-row';
-import { useAppSelector } from '../../store/hooks';
+} from "@mui/material";
+import { Add, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+
+import type { UserDoc, NewDocData, SortConfig } from "../../types";
+import { RowDiv } from "../../styled-components";
+import { TwoOptionDialog } from "../dialog";
+import { GoogleDocItemRow } from "./google-doc-item-row";
+import { useAppSelector } from "../../store/hooks";
 import {
-  Assignment,
+  type Assignment,
   isStudentData,
-  StudentData,
-} from '../../store/slices/education-management/types';
-import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
-import { getStudentAssignmentDocs } from '../../helpers';
-import { useEducationalSetting } from '../../contexts/educational-setting-context';
-import { useWithWindowSize } from '../../hooks/use-with-window-size';
-import { Add } from '@mui/icons-material';
+  type StudentData,
+} from "../../store/slices/education-management/types";
+import { useWithEducationalManagement } from "../../store/slices/education-management/use-with-educational-management";
+import { getStudentAssignmentDocs } from "../../helpers";
+import { useEducationalSetting } from "../../contexts/educational-setting-context";
+import { useWithWindowSize } from "../../hooks/use-with-window-size";
 
 export default function SelectCreateDocs(props: {
   googleDocs?: UserDoc[];
@@ -43,7 +44,7 @@ export default function SelectCreateDocs(props: {
     isAdminDoc?: boolean,
     courseId?: string,
     courseAssignmentId?: string,
-    callback?: (newDocData: NewDocData) => void
+    callback?: (newDocData: NewDocData) => void,
   ) => void;
   handleDeleteDoc: (docId: string) => Promise<void>;
   onHistoryClicked: (docId: string) => void;
@@ -55,7 +56,7 @@ export default function SelectCreateDocs(props: {
   archiveDoc: (googleDocId: string) => Promise<void>;
   unarchiveDoc: (googleDocId: string) => Promise<void>;
   docsLoading: boolean;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     googleDocs: _googleDocs,
     copyDocs,
@@ -89,20 +90,21 @@ export default function SelectCreateDocs(props: {
     isStudent && viewState.selectedAssignmentId
       ? getStudentAssignmentDocs(
           myData as StudentData,
-          viewState.selectedAssignmentId
+          viewState.selectedAssignmentId,
         )
       : [];
-  const primaryDocId = studentAssignmentDocs.find((d) => d.primaryDocument)
-    ?.docId;
+  const primaryDocId = studentAssignmentDocs.find(
+    (d) => d.primaryDocument,
+  )?.docId;
   const assignments = useAppSelector(
-    (state) => state.educationManagement.assignments
+    (state) => state.educationManagement.assignments,
   );
   const googleDocs = getDisplayedDocs(
     archivedDocs || [],
     unarchivedDocs || [],
     viewingArchived,
     isEducationalSetting,
-    viewState.selectedAssignmentId
+    viewState.selectedAssignmentId,
   );
   const title = useMemo(
     () =>
@@ -110,14 +112,14 @@ export default function SelectCreateDocs(props: {
         assignments,
         viewingArchived,
         isEducationalSetting,
-        viewState.selectedAssignmentId
+        viewState.selectedAssignmentId,
       ),
     [
       assignments,
       viewingArchived,
       isEducationalSetting,
       viewState.selectedAssignmentId,
-    ]
+    ],
   );
 
   function getDisplayedDocs(
@@ -125,15 +127,15 @@ export default function SelectCreateDocs(props: {
     unarchivedDocs: UserDoc[],
     viewingArchived: boolean,
     isEducationalSetting: boolean,
-    courseAssignmentId?: string
+    courseAssignmentId?: string,
   ): UserDoc[] {
     if (courseAssignmentId && isEducationalSetting) {
       return viewingArchived
         ? archivedDocs.filter(
-            (doc) => doc.courseAssignmentId === courseAssignmentId
+            (doc) => doc.courseAssignmentId === courseAssignmentId,
           )
         : unarchivedDocs.filter(
-            (doc) => doc.courseAssignmentId === courseAssignmentId
+            (doc) => doc.courseAssignmentId === courseAssignmentId,
           );
     }
     return viewingArchived ? archivedDocs : unarchivedDocs;
@@ -143,35 +145,35 @@ export default function SelectCreateDocs(props: {
     assignments: Assignment[],
     viewingArchived: boolean,
     isEducationalSetting: boolean,
-    courseAssignmentId?: string
+    courseAssignmentId?: string,
   ): string {
     if (!courseAssignmentId || !isEducationalSetting) {
-      return viewingArchived ? 'Archived Docs' : 'Your Docs';
+      return viewingArchived ? "Archived Docs" : "Your Docs";
     }
     const assignment = assignments.find(
-      (assignment) => assignment._id === courseAssignmentId
+      (assignment) => assignment._id === courseAssignmentId,
     );
     return viewingArchived
-      ? 'Archived Docs'
-      : `Assignment Docs: ${assignment?.title || 'Assignment'}`;
+      ? "Archived Docs"
+      : `Assignment Docs: ${assignment?.title || "Assignment"}`;
   }
 
   function SortIndicator(props: { field: string }) {
     const { field } = props;
     const isActive = sortBy.field === field;
     return sortBy.ascend ? (
-      <KeyboardArrowUpIcon
+      <KeyboardArrowUp
         style={{
           opacity: isActive ? 1 : 0,
-          position: 'absolute',
+          position: "absolute",
           right: 0,
         }}
       />
     ) : (
-      <KeyboardArrowDownIcon
+      <KeyboardArrowDown
         style={{
           opacity: isActive ? 1 : 0,
-          position: 'absolute',
+          position: "absolute",
           right: 0,
         }}
       />
@@ -189,31 +191,31 @@ export default function SelectCreateDocs(props: {
     return (
       <div
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          width: '100%',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
         }}
       >
         {/* Header */}
         <RowDiv
           style={{
-            position: 'relative',
-            width: '100%',
-            alignItems: 'center',
-            justifyContent: 'center',
+            position: "relative",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           {!viewingArchived && (
             <div
               style={{
                 // width: '20%',
-                display: 'flex',
-                gap: '5px',
-                marginTop: isMobile ? '10px' : '0px',
-                flexDirection: isMobile ? 'column' : 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
+                display: "flex",
+                gap: "5px",
+                marginTop: isMobile ? "10px" : "0px",
+                flexDirection: isMobile ? "column" : "row",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <Button
@@ -227,12 +229,12 @@ export default function SelectCreateDocs(props: {
                     viewState.selectedAssignmentId,
                     (data) => {
                       goToDoc(data.docId, true);
-                    }
+                    },
                   );
                 }}
                 size="medium"
                 style={{
-                  fontWeight: 'bold',
+                  fontWeight: "bold",
                 }}
                 variant="contained"
                 startIcon={<Add />}
@@ -257,7 +259,7 @@ export default function SelectCreateDocs(props: {
               )}
             </div>
           )}
-          <h2 style={{ width: '60%', textAlign: 'center' }}>{title}</h2>
+          <h2 style={{ width: "60%", textAlign: "center" }}>{title}</h2>
           <Button
             // style={{ width: '20%' }}
             data-cy={`toggle-view-archived`}
@@ -266,7 +268,7 @@ export default function SelectCreateDocs(props: {
             }}
             variant="outlined"
           >
-            {viewingArchived ? 'View Active' : 'View Archived'}
+            {viewingArchived ? "View Active" : "View Archived"}
           </Button>
         </RowDiv>
 
@@ -275,62 +277,62 @@ export default function SelectCreateDocs(props: {
           component={Paper}
           sx={{
             ...(isMobile && {
-              overflowX: 'auto',
-              maxWidth: '600px',
+              overflowX: "auto",
+              maxWidth: "600px",
             }),
           }}
         >
           <Table
             sx={{
               ...(isMobile && {
-                minWidth: '600px',
+                minWidth: "600px",
               }),
             }}
           >
             <TableHead>
               <TableRow>
-                <TableCell style={{ width: '40%' }}>Title</TableCell>
+                <TableCell style={{ width: "40%" }}>Title</TableCell>
                 <TableCell
-                  style={{ cursor: 'pointer', textAlign: 'center' }}
-                  onClick={() => handleSortClick('createdAt')}
+                  style={{ cursor: "pointer", textAlign: "center" }}
+                  onClick={() => handleSortClick("createdAt")}
                 >
                   <RowDiv
                     data-cy="created-at-header"
                     style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: '4px',
-                      textAlign: 'center',
-                      position: 'relative',
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: "4px",
+                      textAlign: "center",
+                      position: "relative",
                     }}
                   >
-                    <span style={{ textAlign: 'center' }}>Created At</span>
+                    <span style={{ textAlign: "center" }}>Created At</span>
                     <SortIndicator field="createdAt" />
                   </RowDiv>
                 </TableCell>
                 <TableCell
-                  style={{ cursor: 'pointer', textAlign: 'center' }}
-                  onClick={() => handleSortClick('updatedAt')}
+                  style={{ cursor: "pointer", textAlign: "center" }}
+                  onClick={() => handleSortClick("updatedAt")}
                 >
                   <RowDiv
                     data-cy="updated-at-header"
                     style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: '4px',
-                      position: 'relative',
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: "4px",
+                      position: "relative",
                     }}
                   >
-                    <span style={{ textAlign: 'center' }}>Updated At</span>
+                    <span style={{ textAlign: "center" }}>Updated At</span>
                     <SortIndicator field="updatedAt" />
                   </RowDiv>
                 </TableCell>
                 {isStudent && (
-                  <TableCell style={{ width: '50px' }}>
+                  <TableCell style={{ width: "50px" }}>
                     Main Document?
                   </TableCell>
                 )}
-                <TableCell style={{ width: '50px' }}></TableCell>
+                <TableCell style={{ width: "50px" }}></TableCell>
               </TableRow>
             </TableHead>
 
@@ -338,7 +340,7 @@ export default function SelectCreateDocs(props: {
             <TableBody>
               {docsLoading && (
                 <TableRow>
-                  <TableCell colSpan={4} style={{ textAlign: 'center' }}>
+                  <TableCell colSpan={4} style={{ textAlign: "center" }}>
                     <CircularProgress />
                   </TableCell>
                 </TableRow>
@@ -378,22 +380,22 @@ export default function SelectCreateDocs(props: {
         </TableContainer>
         <TwoOptionDialog
           title={`Are you sure you want to delete the document "${
-            docToDelete?.title || 'My Document'
+            docToDelete?.title || "My Document"
           }"?`}
           actionInProgress={deleteInProgress}
           open={Boolean(docToDelete)}
           option1={{
-            display: 'Delete',
+            display: "Delete",
             onClick: () => {
               setDeleteInProgress(true);
-              handleDeleteDoc(docToDelete?.googleDocId || '').finally(() => {
+              handleDeleteDoc(docToDelete?.googleDocId || "").finally(() => {
                 setDeleteInProgress(false);
                 setDocToDelete(undefined);
               });
             },
           }}
           option2={{
-            display: 'Cancel',
+            display: "Cancel",
             onClick: () => {
               setDocToDelete(undefined);
             },
@@ -407,12 +409,12 @@ export default function SelectCreateDocs(props: {
     return (
       <div
         style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         Creating google doc, this could take a few seconds...
@@ -425,11 +427,11 @@ export default function SelectCreateDocs(props: {
     <div
       style={{
         // width: '60%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        position: 'relative',
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        position: "relative",
         ...sx,
       }}
     >

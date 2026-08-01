@@ -4,19 +4,20 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { DocVersion, DocData } from '../types';
-import { useAppSelector } from '../store/hooks';
-import { submitDocVersion as submitDocVersionGQL } from './api';
-import { useWithChat, useWithUsersDocs } from '../exported-files';
-import { equals, hasHoursPassed } from '../helpers';
-import useInterval from './use-interval';
-import { useState } from 'react';
-import { ChatMessageTypes } from '../store/slices/chat';
-import { TrackedState } from './use-with-google-doc-versions';
+
+import { useState } from "react";
+import type { DocVersion, DocData, UserDoc } from "../types";
+import { useAppSelector } from "../store/hooks";
+import { submitDocVersion as submitDocVersionGQL } from "./api";
+import { useWithChat, useWithUsersDocs } from "../exported-files";
+import { equals, hasHoursPassed } from "../helpers";
+import useInterval from "./use-interval";
+import type { ChatMessageTypes } from "../store/slices/chat";
+import type { TrackedState } from "./use-with-google-doc-versions";
 
 export function useWithRawTextDocVersions(
   currentActivityId: string,
-  docData?: DocData
+  docData?: DocData,
 ) {
   const { state: chatState } = useWithChat();
   const curDocId = useAppSelector((state) => state.state.curDocId);
@@ -24,32 +25,32 @@ export function useWithRawTextDocVersions(
   const { updateDocTitleLocally } = useWithUsersDocs();
   const messages = chatState.chatLogs[curDocId] || [];
   const viewState = useAppSelector(
-    (state) => state.educationManagement.viewState
+    (state) => state.educationManagement.viewState,
   );
-  const selectedAssignmentId = viewState.selectedAssignmentId || '';
+  const selectedAssignmentId = viewState.selectedAssignmentId || "";
   const [lastSavedVersion, setLastSavedVersion] = useState<TrackedState>({
-    id: '',
-    title: '',
-    plainText: '',
+    id: "",
+    title: "",
+    plainText: "",
     numMessages: messages.length,
     sessionId: sessionId,
     activityId: currentActivityId,
     courseAssignmentId: selectedAssignmentId,
   });
   const sessionIntention = useAppSelector(
-    (state) => state.state.sessionIntention
+    (state) => state.state.sessionIntention,
   );
   const curGoogleDoc = useAppSelector((state) =>
-    state.state.userDocs.find((doc) => doc.googleDocId === curDocId)
+    state.state.userDocs.find((doc: UserDoc) => doc.googleDocId === curDocId),
   );
   const accessTokenExpired = useAppSelector(
-    (state) => state.state.warnExpiredAccessToken
+    (state) => state.state.warnExpiredAccessToken,
   );
   const useDayIntention = curGoogleDoc?.currentDayIntention?.createdAt
     ? !hasHoursPassed(
         curGoogleDoc.currentDayIntention.createdAt,
         new Date().toISOString(),
-        8
+        8,
       )
     : false;
   const user = useAppSelector((state) => state.login.user);
@@ -59,13 +60,13 @@ export function useWithRawTextDocVersions(
     markdownText: string,
     title: string,
     messages: ChatMessageTypes[],
-    sessionId: string
+    sessionId: string,
   ) {
     const newDocData: DocVersion = {
       docId: curDocId,
       plainText: docText,
       markdownText: markdownText,
-      lastChangedId: '', // does not apply to raw text.
+      lastChangedId: "", // does not apply to raw text.
       sessionIntention,
       dayIntention: useDayIntention
         ? curGoogleDoc?.currentDayIntention
@@ -74,9 +75,9 @@ export function useWithRawTextDocVersions(
       sessionId,
       chatLog: messages,
       activity: currentActivityId,
-      intent: '',
+      intent: "",
       title: title,
-      lastModifyingUser: user?.email || '',
+      lastModifyingUser: user?.email || "",
       modifiedTime: new Date().toISOString(),
       courseAssignmentId: selectedAssignmentId,
     };
@@ -87,14 +88,14 @@ export function useWithRawTextDocVersions(
     title: string,
     docText: string,
     markdownText: string,
-    currentActivityId: string
+    currentActivityId: string,
   ) {
     if (title !== lastSavedVersion.title) {
       updateDocTitleLocally(curDocId, title);
     }
 
     const newState: TrackedState = {
-      id: '',
+      id: "",
       title: title,
       plainText: docText,
       numMessages: messages.length,
@@ -115,16 +116,16 @@ export function useWithRawTextDocVersions(
           docData.title,
           docData.plainText,
           docData.markdownText,
-          currentActivityId
+          currentActivityId,
         );
       }
     },
     accessTokenExpired
       ? null
       : curDocId
-      ? process.env.NODE_ENV === 'development'
-        ? 5000
-        : 5000
-      : null
+        ? import.meta.env.NODE_ENV === "development"
+          ? 5000
+          : 5000
+        : null,
   );
 }

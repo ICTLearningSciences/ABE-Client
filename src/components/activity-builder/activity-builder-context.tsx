@@ -7,15 +7,15 @@ The full terms of this copyright and license should always be found in the root 
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React from 'react';
-import {
+import React from "react";
+import type {
   ActivityBuilder,
   BuiltActivityVersion,
   ActivityBuilderStepTypes,
   JsonResponseData,
-} from './types';
-import { AiPromptStep, RagStoreConfiguration } from '../../types';
-import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
+} from "./types";
+import type { AiPromptStep, RagStoreConfiguration } from "../../types";
+import type { AiServicesResponseTypes } from "../../ai-services/ai-service-types";
 
 interface ActivityBuilderContextType {
   userId?: string;
@@ -23,11 +23,11 @@ interface ActivityBuilderContextType {
   canDeleteActivity: (activity: ActivityBuilder) => boolean;
   activityVersions: Record<string, BuiltActivityVersion[]>;
   loadActivityVersions: (
-    activityClientId: string
+    activityClientId: string,
   ) => Promise<BuiltActivityVersion[]>;
   executePromptSteps?: (
     aiPromptSteps: AiPromptStep[],
-    callback?: (response: AiServicesResponseTypes) => void
+    callback?: (response: AiServicesResponseTypes) => void,
   ) => Promise<AiServicesResponseTypes>;
 }
 
@@ -50,12 +50,12 @@ export const ActivityBuilderProvider: React.FC<{
   canEditActivity: (activity: ActivityBuilder) => boolean;
   activityVersions: Record<string, BuiltActivityVersion[]>;
   loadActivityVersions: (
-    activityClientId: string
+    activityClientId: string,
   ) => Promise<BuiltActivityVersion[]>;
   canDeleteActivity: (activity: ActivityBuilder) => boolean;
   executePromptSteps: (
     aiPromptSteps: AiPromptStep[],
-    callback?: (response: AiServicesResponseTypes) => void
+    callback?: (response: AiServicesResponseTypes) => void,
   ) => Promise<AiServicesResponseTypes>;
 }> = ({
   userId,
@@ -87,19 +87,19 @@ export const ActivityBuilderProvider: React.FC<{
 // ============================================================================
 
 type EditActivityAction =
-  | { type: 'SET_ACTIVITY'; payload: ActivityBuilder }
-  | { type: 'UPDATE_TITLE'; payload: string }
-  | { type: 'UPDATE_DESCRIPTION'; payload: string }
-  | { type: 'UPDATE_VISIBILITY'; payload: ActivityBuilder['visibility'] }
-  | { type: 'UPDATE_ATTACHED_PANEL'; payload: string | undefined }
-  | { type: 'ADD_FLOW'; payload: { clientId: string; name: string } }
-  | { type: 'DELETE_FLOW'; payload: string }
+  | { type: "SET_ACTIVITY"; payload: ActivityBuilder }
+  | { type: "UPDATE_TITLE"; payload: string }
+  | { type: "UPDATE_DESCRIPTION"; payload: string }
+  | { type: "UPDATE_VISIBILITY"; payload: ActivityBuilder["visibility"] }
+  | { type: "UPDATE_ATTACHED_PANEL"; payload: string | undefined }
+  | { type: "ADD_FLOW"; payload: { clientId: string; name: string } }
+  | { type: "DELETE_FLOW"; payload: string }
   | {
-      type: 'UPDATE_FLOW_NAME';
+      type: "UPDATE_FLOW_NAME";
       payload: { flowClientId: string; name: string };
     }
   | {
-      type: 'ADD_STEP';
+      type: "ADD_STEP";
       payload: {
         flowClientId: string;
         step: ActivityBuilderStepTypes;
@@ -107,12 +107,12 @@ type EditActivityAction =
       };
     }
   | {
-      type: 'UPDATE_STEP';
+      type: "UPDATE_STEP";
       payload: { flowClientId: string; step: ActivityBuilderStepTypes };
     }
-  | { type: 'DELETE_STEP'; payload: { flowClientId: string; stepId: string } }
+  | { type: "DELETE_STEP"; payload: { flowClientId: string; stepId: string } }
   | {
-      type: 'UPDATE_PROMPT_CONFIG_FIELD';
+      type: "UPDATE_PROMPT_CONFIG_FIELD";
       payload: {
         stepId: string;
         configIndex: number;
@@ -127,19 +127,19 @@ type EditActivityAction =
       };
     }
   | {
-      type: 'UPDATE_STEP_FIELD';
+      type: "UPDATE_STEP_FIELD";
       payload: { stepId: string; field: string; value: any };
     }
   | {
-      type: 'ADD_PROMPT_CONFIGURATION';
+      type: "ADD_PROMPT_CONFIGURATION";
       payload: { stepId: string; configuration: any };
     }
   | {
-      type: 'REMOVE_PROMPT_CONFIGURATION';
+      type: "REMOVE_PROMPT_CONFIGURATION";
       payload: { stepId: string; configIndex: number };
     }
   | {
-      type: 'UPDATE_JSON_RESPONSE_DATA';
+      type: "UPDATE_JSON_RESPONSE_DATA";
       payload: {
         stepId: string;
         configIndex: number;
@@ -150,7 +150,7 @@ type EditActivityAction =
       };
     }
   | {
-      type: 'ADD_JSON_RESPONSE_DATA';
+      type: "ADD_JSON_RESPONSE_DATA";
       payload: {
         stepId: string;
         configIndex: number;
@@ -159,7 +159,7 @@ type EditActivityAction =
       };
     }
   | {
-      type: 'DELETE_JSON_RESPONSE_DATA';
+      type: "DELETE_JSON_RESPONSE_DATA";
       payload: {
         stepId: string;
         configIndex: number;
@@ -170,25 +170,25 @@ type EditActivityAction =
 
 function editActivityReducer(
   state: ActivityBuilder,
-  action: EditActivityAction
+  action: EditActivityAction,
 ): ActivityBuilder {
   switch (action.type) {
-    case 'SET_ACTIVITY':
+    case "SET_ACTIVITY":
       return action.payload;
 
-    case 'UPDATE_TITLE':
+    case "UPDATE_TITLE":
       return { ...state, title: action.payload };
 
-    case 'UPDATE_DESCRIPTION':
+    case "UPDATE_DESCRIPTION":
       return { ...state, description: action.payload };
 
-    case 'UPDATE_VISIBILITY':
+    case "UPDATE_VISIBILITY":
       return { ...state, visibility: action.payload };
 
-    case 'UPDATE_ATTACHED_PANEL':
+    case "UPDATE_ATTACHED_PANEL":
       return { ...state, attachedPanel: action.payload };
 
-    case 'ADD_FLOW':
+    case "ADD_FLOW":
       return {
         ...state,
         flowsList: [
@@ -201,23 +201,23 @@ function editActivityReducer(
         ],
       };
 
-    case 'DELETE_FLOW':
+    case "DELETE_FLOW":
       return {
         ...state,
         flowsList: state.flowsList.filter((f) => f.clientId !== action.payload),
       };
 
-    case 'UPDATE_FLOW_NAME':
+    case "UPDATE_FLOW_NAME":
       return {
         ...state,
         flowsList: state.flowsList.map((f) =>
           f.clientId === action.payload.flowClientId
             ? { ...f, name: action.payload.name }
-            : f
+            : f,
         ),
       };
 
-    case 'ADD_STEP':
+    case "ADD_STEP":
       return {
         ...state,
         flowsList: state.flowsList.map((f) => {
@@ -230,7 +230,7 @@ function editActivityReducer(
         }),
       };
 
-    case 'UPDATE_STEP':
+    case "UPDATE_STEP":
       return {
         ...state,
         flowsList: state.flowsList.map((f) => {
@@ -240,7 +240,7 @@ function editActivityReducer(
               steps: f.steps.map((s) =>
                 s.stepId === action.payload.step.stepId
                   ? action.payload.step
-                  : s
+                  : s,
               ),
             };
           }
@@ -248,7 +248,7 @@ function editActivityReducer(
         }),
       };
 
-    case 'DELETE_STEP':
+    case "DELETE_STEP":
       return {
         ...state,
         flowsList: state.flowsList.map((f) => {
@@ -262,7 +262,7 @@ function editActivityReducer(
         }),
       };
 
-    case 'UPDATE_STEP_FIELD':
+    case "UPDATE_STEP_FIELD":
       return {
         ...state,
         flowsList: state.flowsList.map((f) => ({
@@ -270,18 +270,18 @@ function editActivityReducer(
           steps: f.steps.map((s) =>
             s.stepId === action.payload.stepId
               ? { ...s, [action.payload.field]: action.payload.value }
-              : s
+              : s,
           ),
         })),
       };
 
-    case 'UPDATE_PROMPT_CONFIG_FIELD':
+    case "UPDATE_PROMPT_CONFIG_FIELD":
       return {
         ...state,
         flowsList: state.flowsList.map((f) => ({
           ...f,
           steps: f.steps.map((s) => {
-            if (s.stepId === action.payload.stepId && s.stepType === 'PROMPT') {
+            if (s.stepId === action.payload.stepId && s.stepType === "PROMPT") {
               const promptStep = s as any;
               const updatedConfigurations = [
                 ...promptStep.promptConfigurations,
@@ -297,13 +297,13 @@ function editActivityReducer(
         })),
       };
 
-    case 'ADD_PROMPT_CONFIGURATION':
+    case "ADD_PROMPT_CONFIGURATION":
       return {
         ...state,
         flowsList: state.flowsList.map((f) => ({
           ...f,
           steps: f.steps.map((s) => {
-            if (s.stepId === action.payload.stepId && s.stepType === 'PROMPT') {
+            if (s.stepId === action.payload.stepId && s.stepType === "PROMPT") {
               const promptStep = s as any;
               return {
                 ...s,
@@ -318,19 +318,19 @@ function editActivityReducer(
         })),
       };
 
-    case 'REMOVE_PROMPT_CONFIGURATION':
+    case "REMOVE_PROMPT_CONFIGURATION":
       return {
         ...state,
         flowsList: state.flowsList.map((f) => ({
           ...f,
           steps: f.steps.map((s) => {
-            if (s.stepId === action.payload.stepId && s.stepType === 'PROMPT') {
+            if (s.stepId === action.payload.stepId && s.stepType === "PROMPT") {
               const promptStep = s as any;
               return {
                 ...s,
                 promptConfigurations: promptStep.promptConfigurations.filter(
                   (_: any, index: number) =>
-                    index !== action.payload.configIndex
+                    index !== action.payload.configIndex,
                 ),
               };
             }
@@ -339,13 +339,13 @@ function editActivityReducer(
         })),
       };
 
-    case 'UPDATE_JSON_RESPONSE_DATA':
+    case "UPDATE_JSON_RESPONSE_DATA":
       return {
         ...state,
         flowsList: state.flowsList.map((f) => ({
           ...f,
           steps: f.steps.map((s) => {
-            if (s.stepId === action.payload.stepId && s.stepType === 'PROMPT') {
+            if (s.stepId === action.payload.stepId && s.stepType === "PROMPT") {
               const promptStep = s as any;
               const config =
                 promptStep.promptConfigurations[action.payload.configIndex];
@@ -354,7 +354,7 @@ function editActivityReducer(
                 action.payload.clientId,
                 action.payload.field,
                 action.payload.value,
-                action.payload.parentJsonResponseDataIds
+                action.payload.parentJsonResponseDataIds,
               );
               const updatedConfigurations = [
                 ...promptStep.promptConfigurations,
@@ -370,20 +370,20 @@ function editActivityReducer(
         })),
       };
 
-    case 'ADD_JSON_RESPONSE_DATA':
+    case "ADD_JSON_RESPONSE_DATA":
       return {
         ...state,
         flowsList: state.flowsList.map((f) => ({
           ...f,
           steps: f.steps.map((s) => {
-            if (s.stepId === action.payload.stepId && s.stepType === 'PROMPT') {
+            if (s.stepId === action.payload.stepId && s.stepType === "PROMPT") {
               const promptStep = s as any;
               const config =
                 promptStep.promptConfigurations[action.payload.configIndex];
               const updatedResponseData = addNestedJsonResponseData(
                 config.jsonResponseData || [],
                 action.payload.newData,
-                action.payload.parentJsonResponseDataIds
+                action.payload.parentJsonResponseDataIds,
               );
               const updatedConfigurations = [
                 ...promptStep.promptConfigurations,
@@ -399,20 +399,20 @@ function editActivityReducer(
         })),
       };
 
-    case 'DELETE_JSON_RESPONSE_DATA':
+    case "DELETE_JSON_RESPONSE_DATA":
       return {
         ...state,
         flowsList: state.flowsList.map((f) => ({
           ...f,
           steps: f.steps.map((s) => {
-            if (s.stepId === action.payload.stepId && s.stepType === 'PROMPT') {
+            if (s.stepId === action.payload.stepId && s.stepType === "PROMPT") {
               const promptStep = s as any;
               const config =
                 promptStep.promptConfigurations[action.payload.configIndex];
               const updatedResponseData = deleteNestedJsonResponseData(
                 config.jsonResponseData || [],
                 action.payload.clientId,
-                action.payload.parentJsonResponseDataIds
+                action.payload.parentJsonResponseDataIds,
               );
               const updatedConfigurations = [
                 ...promptStep.promptConfigurations,
@@ -439,11 +439,11 @@ function updateNestedJsonResponseData(
   clientId: string,
   field: string,
   value: string | boolean,
-  parentIds: string[]
+  parentIds: string[],
 ): JsonResponseData[] {
   if (!parentIds.length) {
     return data.map((item) =>
-      item.clientId === clientId ? { ...item, [field]: value } : item
+      item.clientId === clientId ? { ...item, [field]: value } : item,
     );
   }
   return data.map((item) => {
@@ -455,7 +455,7 @@ function updateNestedJsonResponseData(
           clientId,
           field,
           value,
-          parentIds.slice(1)
+          parentIds.slice(1),
         ),
       };
     }
@@ -466,7 +466,7 @@ function updateNestedJsonResponseData(
 function addNestedJsonResponseData(
   data: JsonResponseData[],
   newData: JsonResponseData,
-  parentIds: string[]
+  parentIds: string[],
 ): JsonResponseData[] {
   if (!parentIds.length) {
     return [...data, newData];
@@ -478,7 +478,7 @@ function addNestedJsonResponseData(
         subData: addNestedJsonResponseData(
           item.subData || [],
           newData,
-          parentIds.slice(1)
+          parentIds.slice(1),
         ),
       };
     }
@@ -489,7 +489,7 @@ function addNestedJsonResponseData(
 function deleteNestedJsonResponseData(
   data: JsonResponseData[],
   clientId: string,
-  parentIds: string[]
+  parentIds: string[],
 ): JsonResponseData[] {
   if (!parentIds.length) {
     return data.filter((item) => item.clientId !== clientId);
@@ -501,7 +501,7 @@ function deleteNestedJsonResponseData(
         subData: deleteNestedJsonResponseData(
           item.subData || [],
           clientId,
-          parentIds.slice(1)
+          parentIds.slice(1),
         ),
       };
     }
@@ -515,12 +515,12 @@ interface EditActivityContextType {
   // Helpers
   getStep: (stepId: string) => ActivityBuilderStepTypes | undefined;
   getFlowByStepId: (
-    stepId: string
+    stepId: string,
   ) => { clientId: string; name: string } | undefined;
   // Convenience action creators
   updateTitle: (title: string) => void;
   updateDescription: (description: string) => void;
-  updateVisibility: (visibility: ActivityBuilder['visibility']) => void;
+  updateVisibility: (visibility: ActivityBuilder["visibility"]) => void;
   updateAttachedPanel: (panelClientId: string | undefined) => void;
   addFlow: (clientId: string, name: string) => void;
   deleteFlow: (flowClientId: string) => void;
@@ -528,7 +528,7 @@ interface EditActivityContextType {
   addStep: (
     flowClientId: string,
     step: ActivityBuilderStepTypes,
-    index: number
+    index: number,
   ) => void;
   updateStep: (flowClientId: string, step: ActivityBuilderStepTypes) => void;
   deleteStep: (flowClientId: string, stepId: string) => void;
@@ -543,7 +543,7 @@ interface EditActivityContextType {
       | string[]
       | JsonResponseData[]
       | RagStoreConfiguration
-      | undefined
+      | undefined,
   ) => void;
   addPromptConfiguration: (stepId: string, configuration: any) => void;
   removePromptConfiguration: (stepId: string, configIndex: number) => void;
@@ -553,31 +553,31 @@ interface EditActivityContextType {
     clientId: string,
     field: string,
     value: string | boolean,
-    parentJsonResponseDataIds: string[]
+    parentJsonResponseDataIds: string[],
   ) => void;
   addJsonResponseData: (
     stepId: string,
     configIndex: number,
     parentJsonResponseDataIds: string[],
-    newData: JsonResponseData
+    newData: JsonResponseData,
   ) => void;
   deleteJsonResponseData: (
     stepId: string,
     configIndex: number,
     clientId: string,
-    parentJsonResponseDataIds: string[]
+    parentJsonResponseDataIds: string[],
   ) => void;
 }
 
 const EditActivityContext = React.createContext<EditActivityContextType | null>(
-  null
+  null,
 );
 
 export const useEditActivityContext = () => {
   const context = React.useContext(EditActivityContext);
   if (!context) {
     throw new Error(
-      'useEditActivityContext must be used within EditActivityProvider'
+      "useEditActivityContext must be used within EditActivityProvider",
     );
   }
   return context;
@@ -589,12 +589,12 @@ export const EditActivityProvider: React.FC<{
 }> = ({ children, initialActivity }) => {
   const [activity, dispatch] = React.useReducer(
     editActivityReducer,
-    initialActivity
+    initialActivity,
   );
 
   // Sync with external changes to initialActivity (e.g., when activity prop changes)
   React.useEffect(() => {
-    dispatch({ type: 'SET_ACTIVITY', payload: initialActivity });
+    dispatch({ type: "SET_ACTIVITY", payload: initialActivity });
   }, [initialActivity]);
 
   const contextValue = React.useMemo<EditActivityContextType>(
@@ -617,32 +617,32 @@ export const EditActivityProvider: React.FC<{
         return undefined;
       },
       updateTitle: (title: string) =>
-        dispatch({ type: 'UPDATE_TITLE', payload: title }),
+        dispatch({ type: "UPDATE_TITLE", payload: title }),
       updateDescription: (description: string) =>
-        dispatch({ type: 'UPDATE_DESCRIPTION', payload: description }),
-      updateVisibility: (visibility: ActivityBuilder['visibility']) =>
-        dispatch({ type: 'UPDATE_VISIBILITY', payload: visibility }),
+        dispatch({ type: "UPDATE_DESCRIPTION", payload: description }),
+      updateVisibility: (visibility: ActivityBuilder["visibility"]) =>
+        dispatch({ type: "UPDATE_VISIBILITY", payload: visibility }),
       updateAttachedPanel: (panelClientId: string | undefined) =>
-        dispatch({ type: 'UPDATE_ATTACHED_PANEL', payload: panelClientId }),
+        dispatch({ type: "UPDATE_ATTACHED_PANEL", payload: panelClientId }),
       addFlow: (clientId: string, name: string) =>
-        dispatch({ type: 'ADD_FLOW', payload: { clientId, name } }),
+        dispatch({ type: "ADD_FLOW", payload: { clientId, name } }),
       deleteFlow: (flowClientId: string) =>
-        dispatch({ type: 'DELETE_FLOW', payload: flowClientId }),
+        dispatch({ type: "DELETE_FLOW", payload: flowClientId }),
       updateFlowName: (flowClientId: string, name: string) =>
-        dispatch({ type: 'UPDATE_FLOW_NAME', payload: { flowClientId, name } }),
+        dispatch({ type: "UPDATE_FLOW_NAME", payload: { flowClientId, name } }),
       addStep: (
         flowClientId: string,
         step: ActivityBuilderStepTypes,
-        index: number
+        index: number,
       ) =>
-        dispatch({ type: 'ADD_STEP', payload: { flowClientId, step, index } }),
+        dispatch({ type: "ADD_STEP", payload: { flowClientId, step, index } }),
       updateStep: (flowClientId: string, step: ActivityBuilderStepTypes) =>
-        dispatch({ type: 'UPDATE_STEP', payload: { flowClientId, step } }),
+        dispatch({ type: "UPDATE_STEP", payload: { flowClientId, step } }),
       deleteStep: (flowClientId: string, stepId: string) =>
-        dispatch({ type: 'DELETE_STEP', payload: { flowClientId, stepId } }),
+        dispatch({ type: "DELETE_STEP", payload: { flowClientId, stepId } }),
       updateStepField: (stepId: string, field: string, value: any) =>
         dispatch({
-          type: 'UPDATE_STEP_FIELD',
+          type: "UPDATE_STEP_FIELD",
           payload: { stepId, field, value },
         }),
       updatePromptConfigField: (
@@ -655,20 +655,20 @@ export const EditActivityProvider: React.FC<{
           | string[]
           | JsonResponseData[]
           | RagStoreConfiguration
-          | undefined
+          | undefined,
       ) =>
         dispatch({
-          type: 'UPDATE_PROMPT_CONFIG_FIELD',
+          type: "UPDATE_PROMPT_CONFIG_FIELD",
           payload: { stepId, configIndex, field, value },
         }),
       addPromptConfiguration: (stepId: string, configuration: any) =>
         dispatch({
-          type: 'ADD_PROMPT_CONFIGURATION',
+          type: "ADD_PROMPT_CONFIGURATION",
           payload: { stepId, configuration },
         }),
       removePromptConfiguration: (stepId: string, configIndex: number) =>
         dispatch({
-          type: 'REMOVE_PROMPT_CONFIGURATION',
+          type: "REMOVE_PROMPT_CONFIGURATION",
           payload: { stepId, configIndex },
         }),
       updateJsonResponseData: (
@@ -677,10 +677,10 @@ export const EditActivityProvider: React.FC<{
         clientId: string,
         field: string,
         value: string | boolean,
-        parentJsonResponseDataIds: string[]
+        parentJsonResponseDataIds: string[],
       ) =>
         dispatch({
-          type: 'UPDATE_JSON_RESPONSE_DATA',
+          type: "UPDATE_JSON_RESPONSE_DATA",
           payload: {
             stepId,
             configIndex,
@@ -694,24 +694,24 @@ export const EditActivityProvider: React.FC<{
         stepId: string,
         configIndex: number,
         parentJsonResponseDataIds: string[],
-        newData: JsonResponseData
+        newData: JsonResponseData,
       ) =>
         dispatch({
-          type: 'ADD_JSON_RESPONSE_DATA',
+          type: "ADD_JSON_RESPONSE_DATA",
           payload: { stepId, configIndex, parentJsonResponseDataIds, newData },
         }),
       deleteJsonResponseData: (
         stepId: string,
         configIndex: number,
         clientId: string,
-        parentJsonResponseDataIds: string[]
+        parentJsonResponseDataIds: string[],
       ) =>
         dispatch({
-          type: 'DELETE_JSON_RESPONSE_DATA',
+          type: "DELETE_JSON_RESPONSE_DATA",
           payload: { stepId, configIndex, clientId, parentJsonResponseDataIds },
         }),
     }),
-    [activity]
+    [activity],
   );
 
   return (

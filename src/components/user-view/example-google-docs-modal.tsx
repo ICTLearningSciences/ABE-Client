@@ -4,30 +4,33 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { Box, Button, Modal, Theme } from '@mui/material';
-import { makeStyles } from 'tss-react/mui';
-import { UserDoc } from '../../types';
-import { RowDiv, RowDivSB } from '../../styled-components';
-import React, { useEffect } from 'react';
-import CreateNewAdminGoogleDoc from '../admin-view/author-new-google-doc-modal';
-import LockIcon from '@mui/icons-material/Lock';
-import { PreviewGoogleDocModal } from './preview-google-doc-modal';
-import styled from 'styled-components';
+
+import React, { useEffect } from "react";
+import styled from "styled-components";
+import { makeStyles } from "tss-react/mui";
+import { Box, Button, Modal, type Theme } from "@mui/material";
+import { Lock } from "@mui/icons-material";
+
+import type { UserDoc } from "../../types";
+import { RowDiv, RowDivSB } from "../../styled-components";
+import CreateNewAdminGoogleDoc from "../admin-view/author-new-google-doc-modal";
+import { PreviewGoogleDocModal } from "./preview-google-doc-modal";
+
 const useStyles = makeStyles({ name: { ExampleGoogleDocModal } })(
   (theme: Theme) => ({
     inputField: {
-      width: '100%',
+      width: "100%",
       margin: 10,
     },
     modal: {},
     paper: {
       backgroundColor: theme.palette.background.paper,
-      border: '2px solid #000',
+      border: "2px solid #000",
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
-      maxWidth: '50%',
+      maxWidth: "50%",
     },
-  })
+  }),
 );
 
 export const StyledExampleGoogleDocItem = styled(RowDivSB)`
@@ -43,21 +46,21 @@ export default function ExampleGoogleDocModal(props: {
   close: () => void;
   goToDoc: (docId: string) => void;
   viewingAsAdmin: boolean;
-}): JSX.Element {
-  const [selectedGoogleDoc, setSelectedGoogleDoc] = React.useState<string>('');
+}): React.ReactNode {
+  const [selectedGoogleDoc, setSelectedGoogleDoc] = React.useState<string>("");
   const { open, close, adminDocs, onCreateDoc, viewingAsAdmin } = props;
   const [openNewDocModal, setOpenNewDocModal] = React.useState(false);
-  const [previewDocId, setPreviewDocId] = React.useState<string>('');
+  const [previewDocId, setPreviewDocId] = React.useState<string>("");
   const { classes } = useStyles();
   const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 'fit-content',
-    minWidth: '30%',
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "fit-content",
+    minWidth: "30%",
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
   };
@@ -68,7 +71,7 @@ export default function ExampleGoogleDocModal(props: {
 
   useEffect(() => {
     if (!open) {
-      setSelectedGoogleDoc('');
+      setSelectedGoogleDoc("");
     }
   }, [open]);
 
@@ -78,48 +81,48 @@ export default function ExampleGoogleDocModal(props: {
         <Box sx={style}>
           <div
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              height: '100%',
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              height: "100%",
             }}
           >
-            <h2 style={{ alignSelf: 'center', marginBottom: 5 }}>
+            <h2 style={{ alignSelf: "center", marginBottom: 5 }}>
               Example Documents
             </h2>
             <span
               style={{
-                alignSelf: 'center',
-                fontWeight: 'bold',
-                marginBottom: '10px',
+                alignSelf: "center",
+                fontWeight: "bold",
+                marginBottom: "10px",
               }}
             >
               Select One
             </span>
             <div
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '80%',
-                overflow: 'auto',
+                display: "flex",
+                flexDirection: "column",
+                height: "80%",
+                overflow: "auto",
               }}
             >
               <div
                 style={{
-                  maxHeight: 'fit-content',
-                  overflow: 'auto',
+                  maxHeight: "fit-content",
+                  overflow: "auto",
                 }}
               >
                 {adminDocs?.map((doc, i) => (
                   <StyledExampleGoogleDocItem
                     key={i}
                     style={{
-                      borderBottom: '1px solid black',
+                      borderBottom: "1px solid black",
                       backgroundColor:
                         selectedGoogleDoc === doc.googleDocId
-                          ? 'lightgrey'
-                          : '',
-                      cursor: 'pointer',
+                          ? "lightgrey"
+                          : "",
+                      cursor: "pointer",
                     }}
                     onClick={() => {
                       setSelectedGoogleDoc(doc.googleDocId);
@@ -132,15 +135,15 @@ export default function ExampleGoogleDocModal(props: {
             </div>
             <RowDiv
               style={{
-                alignSelf: 'center',
-                marginTop: '20px',
+                alignSelf: "center",
+                marginTop: "20px",
               }}
             >
               <Button
                 size="large"
                 variant="outlined"
                 style={{
-                  marginRight: '20px',
+                  marginRight: "20px",
                 }}
                 onClick={() => {
                   setPreviewDocId(selectedGoogleDoc);
@@ -154,7 +157,7 @@ export default function ExampleGoogleDocModal(props: {
                   onCreateDoc(selectedGoogleDoc);
                 }}
                 style={{
-                  marginRight: '20px',
+                  marginRight: "20px",
                 }}
                 disabled={!selectedGoogleDoc}
                 size="large"
@@ -170,21 +173,21 @@ export default function ExampleGoogleDocModal(props: {
             {viewingAsAdmin && (
               <RowDiv
                 style={{
-                  alignSelf: 'center',
-                  marginTop: '20px',
-                  padding: '10px',
-                  border: '1px solid black',
+                  alignSelf: "center",
+                  marginTop: "20px",
+                  padding: "10px",
+                  border: "1px solid black",
                 }}
               >
-                <LockIcon
+                <Lock
                   style={{
-                    marginRight: '10px',
+                    marginRight: "10px",
                   }}
                 />
                 <span
                   style={{
-                    marginRight: '20px',
-                    fontWeight: 'bold',
+                    marginRight: "20px",
+                    fontWeight: "bold",
                   }}
                 >
                   Admin
@@ -193,7 +196,7 @@ export default function ExampleGoogleDocModal(props: {
                   variant="outlined"
                   size="large"
                   style={{
-                    marginRight: '20px',
+                    marginRight: "20px",
                   }}
                   onClick={() => {
                     setOpenNewDocModal(true);
@@ -207,7 +210,7 @@ export default function ExampleGoogleDocModal(props: {
                     props.goToDoc(selectedGoogleDoc);
                   }}
                   style={{
-                    marginRight: '20px',
+                    marginRight: "20px",
                   }}
                   disabled={!selectedGoogleDoc}
                   size="large"
@@ -226,13 +229,13 @@ export default function ExampleGoogleDocModal(props: {
           setOpenNewDocModal(false);
         }}
         onCreateDoc={(title: string) => {
-          onCreateDoc('', title, true);
+          onCreateDoc("", title, true);
         }}
       />
       <PreviewGoogleDocModal
-        docUrl={previewDocId ? previewUrlBuilder(previewDocId) : ''}
+        docUrl={previewDocId ? previewUrlBuilder(previewDocId) : ""}
         close={() => {
-          setPreviewDocId('');
+          setPreviewDocId("");
         }}
       />
     </div>

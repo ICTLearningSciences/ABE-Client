@@ -4,21 +4,22 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { BuiltActivityVersion } from '../components/activity-builder/types';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchActivityVersions } from '../store/slices/doc-goals-activities';
+
+import type { BuiltActivityVersion } from "../components/activity-builder/types";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { fetchActivityVersions } from "../store/slices/doc-goals-activities";
 
 export function useWithActivityVersions() {
   const activityVersions = useAppSelector(
-    (state) => state.docGoalsActivities.builtActivityVersions
+    (state) => state.docGoalsActivities.builtActivityVersions,
   );
   const activityVersionsLoadStatus = useAppSelector(
-    (state) => state.docGoalsActivities.builtActivityVersionsLoadStatus
+    (state) => state.docGoalsActivities.builtActivityVersionsLoadStatus,
   );
   const dispatch = useAppDispatch();
 
   async function loadActivityVersions(
-    activityClientId: string
+    activityClientId: string,
   ): Promise<BuiltActivityVersion[]> {
     const res = await dispatch(fetchActivityVersions(activityClientId));
     return res.payload as BuiltActivityVersion[];

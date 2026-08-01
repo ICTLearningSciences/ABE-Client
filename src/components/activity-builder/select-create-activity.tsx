@@ -4,21 +4,24 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
-import { ColumnDiv, RowDiv } from '../../styled-components';
-import { ActivityBuilder as ActivityBuilderType } from './types';
-import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
-import { isActivityRunnable } from './helpers';
-import PreviewIcon from '@mui/icons-material/Preview';
-import EditIcon from '@mui/icons-material/Edit';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { TwoOptionDialog } from '../dialog';
-import { useActivityBuilderContext } from './activity-builder-context';
-import SchoolIcon from '@mui/icons-material/School';
-import { useAppSelector } from '../../store/hooks';
-import { EducationalRole } from '../../types';
-import { UserRole } from '../../store/slices/login';
+
+import React, { useState } from "react";
+import { Button, CircularProgress, IconButton, Tooltip } from "@mui/material";
+import {
+  Preview,
+  Edit,
+  ContentCopy,
+  Delete,
+  School,
+} from "@mui/icons-material";
+
+import { ColumnDiv, RowDiv } from "../../styled-components";
+import type { ActivityBuilder as ActivityBuilderType } from "./types";
+import { isActivityRunnable } from "./helpers";
+import { TwoOptionDialog } from "../dialog";
+import { useActivityBuilderContext } from "./activity-builder-context";
+import { useAppSelector } from "../../store/hooks";
+
 export function ExistingActivityItem(props: {
   activity: ActivityBuilderType;
   goToActivity: () => void;
@@ -48,9 +51,9 @@ export function ExistingActivityItem(props: {
     <RowDiv
       data-cy={`activity-item-${activity._id}`}
       style={{
-        width: '100%',
-        justifyContent: 'space-between',
-        borderBottom: '1px solid black',
+        width: "100%",
+        justifyContent: "space-between",
+        borderBottom: "1px solid black",
       }}
     >
       <RowDiv style={{ gap: 10 }}>
@@ -59,19 +62,19 @@ export function ExistingActivityItem(props: {
       <RowDiv style={{ gap: 10 }}>
         {isInstructor && educationReady && (
           <Tooltip title="Ready to Assign">
-            <SchoolIcon style={{ marginRight: 20 }} />
+            <School style={{ marginRight: 20 }} />
           </Tooltip>
         )}
         {isInstructor && !educationReady && (
           <Tooltip title="NOT READY TO ASSIGN: No student completion step found for this activity.">
-            <SchoolIcon style={{ marginRight: 20, opacity: 0.3 }} />
+            <School style={{ marginRight: 20, opacity: 0.3 }} />
           </Tooltip>
         )}
         <Button
           data-cy={`preview-button-${activity._id}`}
           disabled={!isActivityRunnable(activity)}
           onClick={goToActivity}
-          startIcon={<PreviewIcon />}
+          startIcon={<Preview />}
           variant="outlined"
         >
           Preview
@@ -85,20 +88,18 @@ export function ExistingActivityItem(props: {
             });
           }}
           variant="outlined"
-          startIcon={
-            copying ? <CircularProgress size={20} /> : <ContentCopyIcon />
-          }
+          startIcon={copying ? <CircularProgress size={20} /> : <ContentCopy />}
           data-cy={`activity-item-copy-${activity._id}`}
         >
-          {copying ? 'Copying...' : 'Copy'}
+          {copying ? "Copying..." : "Copy"}
         </Button>
         <Button
           onClick={editActivity}
           variant="contained"
-          startIcon={<EditIcon />}
+          startIcon={<Edit />}
           data-cy={`activity-item-edit-${activity._id}`}
         >
-          {canEditActivity ? 'Edit' : 'View'}
+          {canEditActivity ? "Edit" : "View"}
         </Button>
         <IconButton
           disabled={deleting || !canDeleteActivity}
@@ -108,18 +109,18 @@ export function ExistingActivityItem(props: {
           data-cy={`activity-item-delete-${activity._id}`}
           color="error"
         >
-          {deleting ? <CircularProgress size={20} /> : <DeleteIcon />}
+          {deleting ? <CircularProgress size={20} /> : <Delete />}
         </IconButton>
       </RowDiv>
       <TwoOptionDialog
         open={showDeleteDialog}
         actionInProgress={deleting}
         option1={{
-          display: 'Cancel',
+          display: "Cancel",
           onClick: () => setShowDeleteDialog(false),
         }}
         option2={{
-          display: 'Delete',
+          display: "Delete",
           onClick: () => {
             setDeleting(true);
             deleteBuiltActivity(activity._id).finally(() => {
@@ -143,7 +144,7 @@ export function ExistingActivities(props: {
   onCreateActivity: () => void;
   isInstructor: boolean;
   isActivityEducationReady: (activityId: string) => boolean;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     activities,
     editActivity,
@@ -156,21 +157,21 @@ export function ExistingActivities(props: {
   const activityContext = useActivityBuilderContext();
   console.log(activityContext);
   const myActivities = activities.filter(
-    (activity) => activity.user === activityContext.userId
+    (activity) => activity.user === activityContext.userId,
   );
   const otherActivities = activities.filter(
-    (activity) => activity.user !== activityContext.userId
+    (activity) => activity.user !== activityContext.userId,
   );
 
   return (
     <ColumnDiv
       style={{
-        width: '95%',
+        width: "95%",
       }}
     >
       <h2
         style={{
-          fontStyle: 'italic',
+          fontStyle: "italic",
         }}
       >
         My Activities
@@ -200,8 +201,8 @@ export function ExistingActivities(props: {
         variant="outlined"
         style={{
           marginTop: 10,
-          width: 'fit-content',
-          alignSelf: 'center',
+          width: "fit-content",
+          alignSelf: "center",
         }}
         onClick={onCreateActivity}
       >
@@ -210,7 +211,7 @@ export function ExistingActivities(props: {
 
       <h2
         style={{
-          fontStyle: 'italic',
+          fontStyle: "italic",
         }}
       >
         Other Activities
@@ -248,7 +249,7 @@ export function SelectCreateActivity(props: {
   onCreateActivity: () => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
   deleteBuiltActivity: (activityId: string) => Promise<void>;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     builtActivities,
     isActivityEducationReady,
@@ -260,19 +261,17 @@ export function SelectCreateActivity(props: {
   } = props;
   const userRole = useAppSelector((state) => state.login.userRole);
   const educationalRole = useAppSelector(
-    (state) => state.login.user?.educationalRole
+    (state) => state.login.user?.educationalRole,
   );
-  const isInstructor =
-    userRole === UserRole.ADMIN ||
-    educationalRole === EducationalRole.INSTRUCTOR;
+  const isInstructor = userRole === "ADMIN" || educationalRole === "INSTRUCTOR";
   return (
     <ColumnDiv
       style={{
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        overflow: 'auto',
-        position: 'relative',
+        width: "100%",
+        height: "100%",
+        alignItems: "center",
+        overflow: "auto",
+        position: "relative",
       }}
     >
       <h1>Activity Builder</h1>

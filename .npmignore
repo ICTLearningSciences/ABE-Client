@@ -1,8 +1,0 @@
-
-node_modules
-src
-cypress
-cicd
-docker-client
-public
-.env

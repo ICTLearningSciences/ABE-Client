@@ -4,11 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Box, Typography, Paper } from '@mui/material';
-import { SmartToy, Person } from '@mui/icons-material';
-import { ChatItem } from '../../../../types';
-import { Sender } from '../../../../store/slices/chat';
+
+import React from "react";
+import { Box, Typography, Paper } from "@mui/material";
+import { SmartToy, Person } from "@mui/icons-material";
+import type { ChatItem } from "../../../../types";
+import type { Sender } from "../../../../store/slices/chat";
 
 interface ChatLogTabProps {
   chatLog: ChatItem[];
@@ -17,9 +18,9 @@ interface ChatLogTabProps {
 
 const getSenderInfo = (sender: Sender, studentName: string) => {
   switch (sender) {
-    case Sender.SYSTEM:
-      return { icon: SmartToy, label: 'AI' };
-    case Sender.USER:
+    case "SYSTEM":
+      return { icon: SmartToy, label: "AI" };
+    case "USER":
       return { icon: Person, label: studentName };
     default:
       return { icon: Person, label: studentName };
@@ -32,7 +33,7 @@ export const ChatLogTab: React.FC<ChatLogTabProps> = ({
 }) => {
   if (!chatLog?.length) {
     return (
-      <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>
+      <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
         No chat messages available
       </Typography>
     );
@@ -41,55 +42,50 @@ export const ChatLogTab: React.FC<ChatLogTabProps> = ({
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
         gap: 1,
-        overflow: 'auto',
-        height: '100%',
+        overflow: "auto",
+        height: "100%",
       }}
       data-cy="chat-log-tab"
     >
       {chatLog.map((item, index) => {
         const { icon: SenderIcon, label } = getSenderInfo(
           item.sender,
-          studentName
+          studentName,
         );
 
         return (
           <Box
             key={index}
             sx={{
-              alignSelf:
-                item.sender === Sender.USER ? 'flex-end' : 'flex-start',
-              maxWidth: '80%',
+              alignSelf: item.sender === "USER" ? "flex-end" : "flex-start",
+              maxWidth: "80%",
             }}
           >
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
                 gap: 0.5,
                 mb: 0.5,
                 justifyContent:
-                  item.sender === Sender.USER ? 'flex-end' : 'flex-start',
+                  item.sender === "USER" ? "flex-end" : "flex-start",
               }}
             >
               <SenderIcon
                 sx={{
                   fontSize: 16,
                   color:
-                    item.sender === Sender.USER
-                      ? 'primary.main'
-                      : 'text.secondary',
+                    item.sender === "USER" ? "primary.main" : "text.secondary",
                 }}
               />
               <Typography
                 variant="caption"
                 sx={{
                   color:
-                    item.sender === Sender.USER
-                      ? 'primary.main'
-                      : 'text.secondary',
+                    item.sender === "USER" ? "primary.main" : "text.secondary",
                   fontWeight: 500,
                 }}
               >
@@ -100,15 +96,15 @@ export const ChatLogTab: React.FC<ChatLogTabProps> = ({
               sx={{
                 p: 1.5,
                 backgroundColor:
-                  item.sender === Sender.USER ? 'primary.light' : 'grey.100',
-                color: item.sender === Sender.USER ? 'white' : 'text.primary',
+                  item.sender === "USER" ? "primary.light" : "grey.100",
+                color: item.sender === "USER" ? "white" : "text.primary",
                 borderRadius: 2,
-                overflow: 'auto',
+                overflow: "auto",
               }}
             >
               <Typography
                 variant="body2"
-                sx={{ whiteSpace: 'pre-wrap', overflow: 'auto' }}
+                sx={{ whiteSpace: "pre-wrap", overflow: "auto" }}
               >
                 {item.message}
               </Typography>

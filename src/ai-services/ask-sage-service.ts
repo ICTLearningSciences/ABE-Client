@@ -5,12 +5,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import {
+import type {
   AiResponseType,
   AiJobStatusType,
   AiStepData,
   AiServiceStepDataTypes,
-} from './ai-service-types';
+} from "./ai-service-types";
 
 interface ApiRequestData {
   model: string;
@@ -46,7 +46,7 @@ export type SageServiceJobStatusResponseType =
   AiJobStatusType<SagePromptResponse>;
 
 export function isSageData(
-  stepData: AiServiceStepDataTypes
+  stepData: AiServiceStepDataTypes,
 ): stepData is SageStepDataType {
-  return 'message' in stepData.aiServiceResponse;
+  return "message" in stepData.aiServiceResponse;
 }

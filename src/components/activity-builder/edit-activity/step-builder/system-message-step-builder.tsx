@@ -4,32 +4,27 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { v4 as uuid } from 'uuid';
-import { IconButton } from '@mui/material';
-import { Delete } from '@mui/icons-material';
-import { RoundedBorderDiv, TopLeftText } from '../../../../styled-components';
-import { CheckBoxInput, InputField } from '../../shared/input-components';
-import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
-import {
-  SystemMessageActivityStep,
-  ActivityBuilderStepType,
-  FlowItem,
-} from '../../types';
-import Collapse from '@mui/material/Collapse';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { StepVersion } from '../activity-flow-container';
-import { VersionsDropdown } from './versions-dropdown';
-import { useEditActivityContext } from '../../activity-builder-context';
-import { PanelistSelector } from './panelist-selector';
+
+import React from "react";
+import { v4 as uuid } from "uuid";
+import { Collapse, IconButton } from "@mui/material";
+import { Delete, ExpandMore, ExpandLess } from "@mui/icons-material";
+import { RoundedBorderDiv, TopLeftText } from "../../../../styled-components";
+import { CheckBoxInput, InputField } from "../../shared/input-components";
+import { JumpToAlternateStep } from "../../shared/jump-to-alternate-step";
+import type { SystemMessageActivityStep, FlowItem } from "../../types";
+import type { StepVersion } from "../activity-flow-container";
+import { VersionsDropdown } from "./versions-dropdown";
+import { useEditActivityContext } from "../../activity-builder-context";
+import { PanelistSelector } from "./panelist-selector";
+
 export function getDefaultSystemMessage(): SystemMessageActivityStep {
   return {
     stepId: uuid(),
-    stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
-    message: '',
-    jumpToStepId: '',
-    systemCustomName: '',
+    stepType: "SYSTEM_MESSAGE",
+    message: "",
+    jumpToStepId: "",
+    systemCustomName: "",
     sendFromPanelistClientIds: [],
   };
 }
@@ -43,7 +38,7 @@ export function SystemMessageStepBuilder(props: {
   height?: string;
   versions: StepVersion[];
   errors?: string[];
-}): JSX.Element {
+}): React.ReactNode {
   const { stepId, stepIndex, updateStep, versions, errors } = props;
   const { getStep, getFlowByStepId, updateStepField } =
     useEditActivityContext();
@@ -72,18 +67,18 @@ export function SystemMessageStepBuilder(props: {
     <RoundedBorderDiv
       key={rerender}
       style={{
-        width: props.width || '100%',
-        height: props.height || '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
+        width: props.width || "100%",
+        height: props.height || "100%",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
         padding: 10,
       }}
     >
       <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>
       <IconButton
         style={{
-          position: 'absolute',
+          position: "absolute",
           right: 10,
           top: 10,
         }}
@@ -93,25 +88,25 @@ export function SystemMessageStepBuilder(props: {
       </IconButton>
       <IconButton
         style={{
-          width: 'fit-content',
-          position: 'absolute',
+          width: "fit-content",
+          position: "absolute",
           left: 10,
           top: 40,
         }}
         onClick={() => setCollapsed(!collapsed)}
       >
-        {collapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+        {collapsed ? <ExpandMore /> : <ExpandLess />}
       </IconButton>
 
-      <h4 style={{ alignSelf: 'center' }}>System Message</h4>
+      <h4 style={{ alignSelf: "center" }}>System Message</h4>
       {errors && errors.length > 0 && (
-        <span style={{ color: 'red', textAlign: 'center' }}>
-          {errors.join(', ')}
+        <span style={{ color: "red", textAlign: "center" }}>
+          {errors.join(", ")}
         </span>
       )}
       <div
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 60,
         }}
@@ -126,27 +121,27 @@ export function SystemMessageStepBuilder(props: {
           label="Message"
           value={step.message}
           onChange={(e) => {
-            updateField('message', e);
+            updateField("message", e);
           }}
         />
         <CheckBoxInput
           label="Set Student Activity Complete?"
           value={step.setStudentActivityComplete ?? false}
           onChange={(e) => {
-            updateField('setStudentActivityComplete', e);
+            updateField("setStudentActivityComplete", e);
           }}
         />
         <PanelistSelector
           selectedPanelistClientIds={step.sendFromPanelistClientIds || []}
           onChange={(panelistClientIds) => {
-            updateField('sendFromPanelistClientIds', panelistClientIds);
+            updateField("sendFromPanelistClientIds", panelistClientIds);
           }}
         />
         <JumpToAlternateStep
           step={step}
           flowsList={props.flowsList}
           onNewStepSelected={(stepId) => {
-            updateField('jumpToStepId', stepId);
+            updateField("jumpToStepId", stepId);
           }}
         />
       </Collapse>

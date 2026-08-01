@@ -4,46 +4,46 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Box, Button, Input, Modal, Theme } from '@mui/material';
-import { makeStyles } from 'tss-react/mui';
-import { RowDiv, RowDivSB } from '../../styled-components';
-import { useState } from 'react';
+
+import React, { useState } from "react";
+import { makeStyles } from "tss-react/mui";
+import { Box, Button, Input, Modal, type Theme } from "@mui/material";
+import { RowDiv, RowDivSB } from "../../styled-components";
 
 const useStyles = makeStyles({ name: { CreateNewAdminGoogleDoc } })(
   (theme: Theme) => ({
     inputField: {
-      width: '100%',
+      width: "100%",
       margin: 10,
     },
     modal: {},
     paper: {
       backgroundColor: theme.palette.background.paper,
-      border: '2px solid #000',
+      border: "2px solid #000",
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
-      maxWidth: '50%',
+      maxWidth: "50%",
     },
-  })
+  }),
 );
 
 export default function CreateNewAdminGoogleDoc(props: {
   onCreateDoc: (title: string) => void;
   open: boolean;
   close: () => void;
-}): JSX.Element {
+}): React.ReactNode {
   const { open, close, onCreateDoc } = props;
   const { classes } = useStyles();
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState("");
   const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '30%',
-    height: 'fit-content',
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "30%",
+    height: "fit-content",
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
   };
@@ -54,16 +54,16 @@ export default function CreateNewAdminGoogleDoc(props: {
         <Box sx={style}>
           <div
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              height: '100%',
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              height: "100%",
             }}
           >
             <h3>New Example Document</h3>
             <RowDivSB
               style={{
-                justifyContent: 'center',
+                justifyContent: "center",
               }}
             >
               <h4>Title</h4>
@@ -80,7 +80,7 @@ export default function CreateNewAdminGoogleDoc(props: {
               <Button
                 variant="outlined"
                 style={{
-                  marginRight: '20px',
+                  marginRight: "20px",
                 }}
                 onClick={() => {
                   onCreateDoc(title);
@@ -91,7 +91,7 @@ export default function CreateNewAdminGoogleDoc(props: {
               </Button>
               <Button
                 onClick={() => {
-                  setTitle('');
+                  setTitle("");
                   close();
                 }}
                 variant="outlined"

@@ -4,46 +4,46 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Box } from '@mui/material';
-import { useWithEducationalManagement } from '../../store/slices/education-management/use-with-educational-management';
-import { useWithLogin } from '../../store/slices/login/use-with-login';
-import { TreeSection } from './components/collapsible-tree';
-import CourseView from './components/course-view';
-import SectionView from './components/section-view';
-import AssignmentView from './components/assignment-view/assignment-view';
-import BreadcrumbNavigation from './components/breadcrumb-navigation';
-import CourseModal, { CourseModalMode } from './components/course-modal';
-import JoinSectionModal from './components/join-section-modal';
+
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { Box } from "@mui/material";
+import { useWithEducationalManagement } from "../../store/slices/education-management/use-with-educational-management";
+import { useWithLogin } from "../../store/slices/login/use-with-login";
+import type { TreeSection } from "./components/collapsible-tree";
+import CourseView from "./components/course-view";
+import SectionView from "./components/section-view";
+import AssignmentView from "./components/assignment-view/assignment-view";
+import BreadcrumbNavigation from "./components/breadcrumb-navigation";
+import CourseModal from "./components/course-modal";
+import JoinSectionModal from "./components/join-section-modal";
 import {
   getCourseManagementTreeData,
   getCourseManagementSectionedTreeData,
   getAssignmentsInSection,
-} from './helpers';
+} from "./helpers";
 import {
-  Course,
+  type Course,
   isStudentData,
-} from '../../store/slices/education-management/types';
-import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import { EducationalRole } from '../../types';
-import withAuthorizationOnly from '../../hooks/wrap-with-authorization-only';
-import { ActivityView } from './components/activity-view';
-import { useAppSelector } from '../../store/hooks';
-import { LoadingDialog } from '../../components/dialog';
-import { JoinUrlSection } from './components/join-url-section';
-import { useWithEducationalEvents } from '../../store/slices/education-management/use-with-educational-events';
-import { useWithDocumentTimeline } from '../../hooks/use-with-document-timeline';
-import { AssignmentDocumentTimelines } from './components/assignment-document-timelines';
-import { StudentInfoPage } from './components/section-student-grades/student-info-page';
-import { getStudentAssignmentDocs, getStudentDocIds } from '../../helpers';
-import { LoginStatus } from '../../store/slices/login';
-import { CourseManagementSidebar } from './components/course-management-sidebar';
-import { ErrorToast } from '../../components/shared/error-toast';
-import { DashboardMain } from './course-management/dashboard/dashboard-main';
-import { useWithWindowSize } from '../../hooks/use-with-window-size';
+} from "../../store/slices/education-management/types";
+import { useWithDocGoalsActivities } from "../../store/slices/doc-goals-activities/use-with-doc-goals-activites";
+import type { EducationalRole } from "../../types";
+import withAuthorizationOnly from "../../hooks/wrap-with-authorization-only";
+import { ActivityView } from "./components/activity-view";
+import { useAppSelector } from "../../store/hooks";
+import { LoadingDialog } from "../../components/dialog";
+import { JoinUrlSection } from "./components/join-url-section";
+import { useWithEducationalEvents } from "../../store/slices/education-management/use-with-educational-events";
+import { useWithDocumentTimeline } from "../../hooks/use-with-document-timeline";
+import { AssignmentDocumentTimelines } from "./components/assignment-document-timelines";
+import { StudentInfoPage } from "./components/section-student-grades/student-info-page";
+import { getStudentAssignmentDocs, getStudentDocIds } from "../../helpers";
+import { CourseManagementSidebar } from "./components/course-management-sidebar";
+import { ErrorToast } from "../../components/shared/error-toast";
+import { DashboardMain } from "./course-management/dashboard/dashboard-main";
+import { useWithWindowSize } from "../../hooks/use-with-window-size";
 
-export const courseManagementUrl = '/course-management';
-export const studentCoursesUrl = '/student/courses';
+export const courseManagementUrl = "/course-management";
+export const studentCoursesUrl = "/student/courses";
 
 interface CourseManagementProps {
   userRole?: EducationalRole;
@@ -72,8 +72,8 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const [isJoinSectionModalOpen, setIsJoinSectionModalOpen] = useState(false);
   const config = useAppSelector((state) => state.config).config;
   const docGoalActivities = useWithDocGoalsActivities(
-    loginState.user?._id || '',
-    config
+    loginState.user?._id || "",
+    config,
   );
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const { isMobile } = useWithWindowSize();
@@ -90,7 +90,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     const alreadyHaveEducationalData =
       Boolean(loginState.user?.educationalRole) || myData;
     if (
-      loginState.loginStatus !== LoginStatus.AUTHENTICATED ||
+      loginState.loginStatus !== 3 ||
       !loginState.user ||
       alreadyHaveEducationalData ||
       isLoading ||
@@ -99,37 +99,34 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       return;
     }
     alreadyLoadedDataRef.current = true;
-    updateUserInfo({ educationalRole: EducationalRole.STUDENT }).then(
-      (user) => {
-        loadUserEducationalData(user._id, EducationalRole.STUDENT);
-      }
-    );
+    updateUserInfo({ educationalRole: "STUDENT" }).then((user) => {
+      loadUserEducationalData(user._id, "STUDENT");
+    });
   }, [loginState.loginStatus, myData, isLoading]);
 
   const isStudent =
-    userRole === EducationalRole.STUDENT ||
-    loginState.user?.educationalRole === EducationalRole.STUDENT;
+    userRole === "STUDENT" || loginState.user?.educationalRole === "STUDENT";
 
   const myInstructorData = useAppSelector(
-    (state) => state.educationManagement.instructorData
+    (state) => state.educationManagement.instructorData,
   );
 
   const targetStudent = educationManagement.students.find(
-    (s) => s.userId === viewState.selectedStudentId
+    (s) => s.userId === viewState.selectedStudentId,
   );
 
   const allStudentDocIds = targetStudent ? getStudentDocIds(targetStudent) : [];
 
   const handleViewStudentTimelines = async (
     studentId: string,
-    assignmentId: string
+    assignmentId: string,
   ) => {
     const targetStudent =
       myData?._id && myData.userId === studentId && isStudentData(myData)
         ? myData
         : educationManagement.students.find((s) => s.userId === studentId);
     if (!targetStudent) {
-      throw new Error('No student found.');
+      throw new Error("No student found.");
     }
     const docs = getStudentAssignmentDocs(targetStudent, assignmentId);
     const primaryDoc =
@@ -139,14 +136,14 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     await viewAssignmentDocumentTimelines(
       targetStudent.userId,
       assignmentId,
-      primaryDoc?.docId
+      primaryDoc?.docId,
     );
     try {
       if (primaryDoc?.docId) {
         await fetchDocumentTimeline(targetStudent.userId, primaryDoc.docId);
       }
     } catch (error) {
-      console.error('Failed to fetch document timeline:', error);
+      console.error("Failed to fetch document timeline:", error);
     }
   };
 
@@ -157,7 +154,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       try {
         await fetchDocumentTimeline(currentStudentId, docId);
       } catch (error) {
-        console.error('Failed to fetch document timeline:', error);
+        console.error("Failed to fetch document timeline:", error);
       }
     }
   };
@@ -165,9 +162,9 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   const handleCreateCourse = async (courseData: Partial<Course>) => {
     if (
       !loginState.user?._id ||
-      loginState.user?.educationalRole !== EducationalRole.INSTRUCTOR
+      loginState.user?.educationalRole !== "INSTRUCTOR"
     ) {
-      console.error('User is not an instructor');
+      console.error("User is not an instructor");
       return;
     }
     const newCourse = await educationManagement.createCourse(courseData);
@@ -202,7 +199,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       !viewState.selectedSectionId ||
       !viewState.selectedAssignmentId
     ) {
-      console.error('Missing required view state for activity select');
+      console.error("Missing required view state for activity select");
       return;
     }
     educationManagement.studentActivityStarted(
@@ -210,7 +207,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       viewState.selectedCourseId,
       viewState.selectedSectionId,
       viewState.selectedAssignmentId,
-      activityId
+      activityId,
     );
     viewActivity(activityId);
   };
@@ -229,11 +226,11 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
 
   const handleJoinSection = async (sectionCode: string) => {
     if (!loginState.user?._id) {
-      throw new Error('User not authenticated');
+      throw new Error("User not authenticated");
     }
     await educationManagement.enrollStudentInSection(
       loginState.user._id,
-      sectionCode
+      sectionCode,
     );
     setIsJoinSectionModalOpen(false);
   };
@@ -248,10 +245,10 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
 
   const handleRemoveFromSection = async (
     courseId: string,
-    sectionId: string
+    sectionId: string,
   ) => {
     if (!loginState.user?._id) {
-      console.error('No current user found');
+      console.error("No current user found");
       return;
     }
 
@@ -259,12 +256,12 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       await educationManagement.removeStudentFromSection(
         loginState.user._id,
         courseId,
-        sectionId
+        sectionId,
       );
       await educationManagement.loadAllEducationalData(loginState.user._id);
       viewDashboard();
     } catch (error) {
-      console.error('Failed to remove from section:', error);
+      console.error("Failed to remove from section:", error);
     }
   };
 
@@ -275,12 +272,12 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         educationManagement,
         handleCourseSelect,
         handleSectionSelect,
-        handleAssignmentSelect
+        handleAssignmentSelect,
       );
       return [
         {
-          id: 'my-courses',
-          title: 'My Courses',
+          id: "my-courses",
+          title: "My Courses",
           items: treeItems,
         },
       ];
@@ -292,7 +289,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       handleCourseSelect,
       handleSectionSelect,
       handleAssignmentSelect,
-      myInstructorData
+      myInstructorData,
     );
   }, [
     educationManagement.courses,
@@ -316,12 +313,12 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   return (
     <Box
       sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        backgroundColor: "white",
+        borderRadius: "8px",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
       }}
     >
       {/* Sidebar */}
@@ -343,10 +340,10 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
       <Box
         sx={{
           flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          width: '100%',
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          width: "100%",
         }}
         data-cy="course-management-main-content-outer"
       >
@@ -362,16 +359,16 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         <Box
           sx={{
             flex: 1,
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            overflow: 'auto',
-            height: '100%',
-            width: '100%',
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            overflow: "auto",
+            height: "100%",
+            width: "100%",
           }}
           data-cy="course-management-main-content-inner"
         >
-          {viewState.view === 'dashboard' && (
+          {viewState.view === "dashboard" && (
             <DashboardMain
               courses={educationManagement.courses}
               isStudent={isStudent}
@@ -381,7 +378,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
             />
           )}
 
-          {viewState.view === 'course' && viewState.selectedCourseId && (
+          {viewState.view === "course" && viewState.selectedCourseId && (
             <CourseView
               courseId={viewState.selectedCourseId}
               onSectionSelect={handleSectionSelect}
@@ -390,7 +387,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
             />
           )}
 
-          {viewState.view === 'section' &&
+          {viewState.view === "section" &&
             viewState.selectedCourseId &&
             viewState.selectedSectionId && (
               <SectionView
@@ -404,7 +401,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               />
             )}
 
-          {viewState.view === 'assignment' &&
+          {viewState.view === "assignment" &&
             viewState.selectedCourseId &&
             viewState.selectedSectionId &&
             viewState.selectedAssignmentId && (
@@ -420,7 +417,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               />
             )}
 
-          {viewState.view === 'activity' &&
+          {viewState.view === "activity" &&
             viewState.selectedActivityId &&
             viewState.selectedAssignmentId && (
               <ActivityView
@@ -429,7 +426,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               />
             )}
 
-          {viewState.view === 'activity-document-timelines' &&
+          {viewState.view === "activity-document-timelines" &&
             viewState.selectedStudent &&
             viewState.selectedAssignment &&
             viewState.selectedSectionId && (
@@ -441,7 +438,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 documentStates={documentStates}
                 loadInProgress={loadInProgress}
                 errorMessage={errorMessage}
-                selectedDocId={viewState.selectedDocId || ''}
+                selectedDocId={viewState.selectedDocId || ""}
                 getHydratedTimeline={getHydratedTimeline}
                 onBackToStudentInfo={() => {
                   goToPreviousView();
@@ -452,16 +449,14 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
               />
             )}
 
-          {viewState.view === 'student-info' &&
+          {viewState.view === "student-info" &&
             viewState.selectedStudentId &&
             viewState.selectedSectionId &&
             viewState.selectedCourseId && (
               <StudentInfoPage
-                selectedStudent={
-                  educationManagement.students.find(
-                    (s) => s.userId === viewState.selectedStudentId
-                  )!
-                }
+                selectedStudent={educationManagement.students.find(
+                  (s) => s.userId === viewState.selectedStudentId,
+                )!}
                 getStudentProgressCounts={(studentId: string) => {
                   const sectionStudentsProgress =
                     educationManagement.allSectionsStudentsProgress[
@@ -472,10 +467,10 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                     return { requiredCompleted: 0, optionalCompleted: 0 };
 
                   const requiredCompleted = Object.values(
-                    studentProgress.requiredAssignmentsProgress
+                    studentProgress.requiredAssignmentsProgress,
                   ).filter(Boolean).length;
                   const optionalCompleted = Object.values(
-                    studentProgress.optionalAssignmentsProgress
+                    studentProgress.optionalAssignmentsProgress,
                   ).filter(Boolean).length;
 
                   return { requiredCompleted, optionalCompleted };
@@ -483,28 +478,26 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
                 assignmentsInSection={getAssignmentsInSection(
                   educationManagement.assignments,
                   educationManagement.sections.find(
-                    (s) => s._id === viewState.selectedSectionId
-                  )!
+                    (s) => s._id === viewState.selectedSectionId,
+                  )!,
                 )}
                 sectionStudentsProgress={
                   educationManagement.allSectionsStudentsProgress[
                     viewState.selectedSectionId!
                   ]
                 }
-                section={
-                  educationManagement.sections.find(
-                    (s) => s._id === viewState.selectedSectionId
-                  )!
-                }
+                section={educationManagement.sections.find(
+                  (s) => s._id === viewState.selectedSectionId,
+                )!}
                 handleBanStudent={async (studentUserId: string) => {
                   try {
                     await educationManagement.banStudentFromSection(
                       viewState.selectedSectionId!,
-                      studentUserId
+                      studentUserId,
                     );
                     handleSectionSelect(viewState.selectedSectionId!);
                   } catch (error) {
-                    console.error('Failed to ban student:', error);
+                    console.error("Failed to ban student:", error);
                   }
                 }}
                 educationManagement={educationManagement}
@@ -522,7 +515,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
         isOpen={isCourseModalOpen}
         onClose={handleCloseCourseModal}
         onSubmit={handleCreateCourse}
-        mode={CourseModalMode.CREATE}
+        mode={"create"}
         isLoading={educationManagement.isCourseModifying}
       />
       <JoinSectionModal

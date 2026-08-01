@@ -4,47 +4,48 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-export const ACCESS_TOKEN_KEY = 'accessToken';
-export const ACTIVE_MENTOR_KEY = 'activeMentor';
-export const CLASSROOM_CODE_KEY = 'classroomCode';
+
+export const ACCESS_TOKEN_KEY = "accessToken";
+export const ACTIVE_MENTOR_KEY = "activeMentor";
+export const CLASSROOM_CODE_KEY = "classroomCode";
 
 export function localStorageGet(key: string): string | null {
-  if (typeof window === 'undefined') {
-    return '';
+  if (typeof window === "undefined") {
+    return "";
   }
   return localStorage.getItem(key);
 }
 
 export function localStorageStore(key: string, value: string): void {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return;
   }
   localStorage.setItem(key, value);
 }
 
 export function localStorageClear(key: string): void {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return;
   }
   localStorage.removeItem(key);
 }
 
 export function sessionStorageGet(key: string): string | null {
-  if (typeof window === 'undefined') {
-    return '';
+  if (typeof window === "undefined") {
+    return "";
   }
   return sessionStorage.getItem(key);
 }
 
 export function sessionStorageStore(key: string, value: string): void {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return;
   }
   sessionStorage.setItem(key, value);
 }
 
 export function sessionStorageClear(key: string): void {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return;
   }
   sessionStorage.removeItem(key);

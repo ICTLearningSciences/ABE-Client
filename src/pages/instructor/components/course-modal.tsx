@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -16,15 +17,12 @@ import {
   Typography,
   Box,
   Alert,
-} from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
-import { Course } from '../../../store/slices/education-management/types';
-import { extractErrorMessageFromError } from '../../../helpers';
+} from "@mui/material";
+import { Close } from "@mui/icons-material";
+import type { Course } from "../../../store/slices/education-management/types";
+import { extractErrorMessageFromError } from "../../../helpers";
 
-export enum CourseModalMode {
-  CREATE = 'create',
-  EDIT = 'edit',
-}
+export type CourseModalMode = "create" | "edit";
 
 interface CourseModalProps {
   isOpen: boolean;
@@ -44,23 +42,23 @@ const CourseModal: React.FC<CourseModalProps> = ({
   isLoading = false,
 }) => {
   const [formData, setFormData] = useState<Partial<Course>>({
-    title: '',
-    description: '',
+    title: "",
+    description: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [requestError, setRequestError] = useState<string>('');
+  const [requestError, setRequestError] = useState<string>("");
 
   useEffect(() => {
     if (isOpen) {
-      if (mode === CourseModalMode.EDIT && initialData) {
+      if (mode === "edit" && initialData) {
         setFormData({
-          title: initialData.title || '',
-          description: initialData.description || '',
+          title: initialData.title || "",
+          description: initialData.description || "",
         });
       } else {
         setFormData({
-          title: '',
-          description: '',
+          title: "",
+          description: "",
         });
       }
       setErrors({});
@@ -71,11 +69,11 @@ const CourseModal: React.FC<CourseModalProps> = ({
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.title?.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = "Title is required";
     }
 
     if (!formData.description?.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = "Description is required";
     }
 
     setErrors(newErrors);
@@ -90,23 +88,23 @@ const CourseModal: React.FC<CourseModalProps> = ({
     }
 
     const submitData: Partial<Course> = {
-      title: formData.title?.trim() || '',
-      description: formData.description?.trim() || '',
+      title: formData.title?.trim() || "",
+      description: formData.description?.trim() || "",
     };
 
-    if (mode === CourseModalMode.EDIT && initialData) {
+    if (mode === "edit" && initialData) {
       submitData._id = initialData._id;
     }
 
     onSubmit(submitData).catch((error) => {
       setRequestError(
-        extractErrorMessageFromError(error) || 'Failed to join section'
+        extractErrorMessageFromError(error) || "Failed to join section",
       );
     });
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setRequestError('');
+    setRequestError("");
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -116,7 +114,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
     if (errors[field]) {
       setErrors((prev) => ({
         ...prev,
-        [field]: '',
+        [field]: "",
       }));
     }
   };
@@ -128,39 +126,41 @@ const CourseModal: React.FC<CourseModalProps> = ({
       maxWidth="sm"
       fullWidth
       data-cy="course-modal"
-      PaperProps={{
-        sx: {
-          borderRadius: 2,
-          p: 1,
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: 2,
+            p: 1,
+          },
         },
       }}
     >
       <DialogTitle
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          color: '#1B6A9C',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          color: "#1B6A9C",
           fontWeight: 600,
-          fontSize: '1.25rem',
+          fontSize: "1.25rem",
         }}
       >
-        {mode === CourseModalMode.CREATE ? 'Create New Course' : 'Edit Course'}
+        {mode === "create" ? "Create New Course" : "Edit Course"}
         <IconButton
           onClick={onClose}
           disabled={isLoading}
           size="small"
-          sx={{ color: 'grey.500' }}
+          sx={{ color: "grey.500" }}
         >
-          <CloseIcon />
+          <Close />
         </IconButton>
       </DialogTitle>
 
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          {mode === CourseModalMode.CREATE
-            ? 'Add a new course to your curriculum. You can add sections and assignments later.'
-            : 'Update the course information below.'}
+          {mode === "create"
+            ? "Add a new course to your curriculum. You can add sections and assignments later."
+            : "Update the course information below."}
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
@@ -169,29 +169,30 @@ const CourseModal: React.FC<CourseModalProps> = ({
             required
             label="Title"
             placeholder="e.g., Introduction to React"
-            value={formData.title || ''}
-            onChange={(e) => handleInputChange('title', e.target.value)}
+            value={formData.title || ""}
+            onChange={(e) => handleInputChange("title", e.target.value)}
             error={!!errors.title}
             helperText={errors.title}
             disabled={isLoading}
             data-cy="course-title-input"
             sx={{ mb: 2.5 }}
-            InputProps={{
-              sx: {
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1B6A9C',
+            slotProps={{
+              input: {
+                sx: {
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#1B6A9C",
+                  },
                 },
               },
-            }}
-            InputLabelProps={{
-              sx: {
-                '&.Mui-focused': {
-                  color: '#1B6A9C',
+              inputLabel: {
+                sx: {
+                  "&.Mui-focused": {
+                    color: "#1B6A9C",
+                  },
                 },
               },
             }}
           />
-
           <TextField
             fullWidth
             required
@@ -199,24 +200,26 @@ const CourseModal: React.FC<CourseModalProps> = ({
             rows={4}
             label="Description"
             placeholder="Brief description of the course..."
-            value={formData.description || ''}
-            onChange={(e) => handleInputChange('description', e.target.value)}
+            value={formData.description || ""}
+            onChange={(e) => handleInputChange("description", e.target.value)}
             error={!!errors.description}
             helperText={errors.description}
             disabled={isLoading}
             data-cy="course-description-input"
             sx={{ mb: 3 }}
-            InputProps={{
-              sx: {
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1B6A9C',
+            slotProps={{
+              input: {
+                sx: {
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#1B6A9C",
+                  },
                 },
               },
-            }}
-            InputLabelProps={{
-              sx: {
-                '&.Mui-focused': {
-                  color: '#1B6A9C',
+              inputLabel: {
+                sx: {
+                  "&.Mui-focused": {
+                    color: "#1B6A9C",
+                  },
                 },
               },
             }}
@@ -236,11 +239,11 @@ const CourseModal: React.FC<CourseModalProps> = ({
           variant="outlined"
           data-cy="course-modal-cancel-button"
           sx={{
-            color: 'grey.600',
-            borderColor: 'grey.300',
-            '&:hover': {
-              borderColor: 'grey.400',
-              backgroundColor: 'grey.50',
+            color: "grey.600",
+            borderColor: "grey.300",
+            "&:hover": {
+              borderColor: "grey.400",
+              backgroundColor: "grey.50",
             },
           }}
         >
@@ -252,17 +255,17 @@ const CourseModal: React.FC<CourseModalProps> = ({
           variant="contained"
           data-cy="course-modal-submit-button"
           sx={{
-            backgroundColor: '#1B6A9C',
-            '&:hover': {
-              backgroundColor: '#145a87',
+            backgroundColor: "#1B6A9C",
+            "&:hover": {
+              backgroundColor: "#145a87",
             },
           }}
         >
           {isLoading
-            ? 'Saving...'
-            : mode === CourseModalMode.CREATE
-            ? 'Create Course'
-            : 'Update Course'}
+            ? "Saving..."
+            : mode === "create"
+              ? "Create Course"
+              : "Update Course"}
         </Button>
       </DialogActions>
     </Dialog>

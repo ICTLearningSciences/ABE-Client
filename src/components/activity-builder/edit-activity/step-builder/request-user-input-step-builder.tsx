@@ -4,57 +4,56 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import {
-  ActivityBuilderStepType,
-  ButtonAction,
-  ButtonActionTypeEnum,
-  FlowItem,
-  PredefinedResponse,
-  RequestUserInputActivityStep,
-} from '../../types';
-import { useEditActivityContext } from '../../activity-builder-context';
-import {
-  ColumnCenterDiv,
-  ColumnDiv,
-  RoundedBorderDiv,
-  RowDiv,
-  TopLeftText,
-} from '../../../../styled-components';
-import { CheckBoxInput, InputField } from '../../shared/input-components';
-import { FlowStepSelector } from '../../shared/flow-step-selector';
+
+import React from "react";
+import { v4 as uuid } from "uuid";
 import {
   Box,
   Button,
   Checkbox,
+  Collapse,
   FormControl,
   IconButton,
   InputLabel,
   ListItemText,
   MenuItem,
   Select,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { v4 as uuid } from 'uuid';
-import { Delete } from '@mui/icons-material';
-import { JumpToAlternateStep } from '../../shared/jump-to-alternate-step';
-import Collapse from '@mui/material/Collapse';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { StepVersion } from '../activity-flow-container';
-import { VersionsDropdown } from './versions-dropdown';
-import { isContextDataString } from '../../helpers';
-import DropdownDisplay from '../../../dropdown-display';
-import { InfoTooltip } from '../../../info-tooltip';
-import { useWithPanels } from '../../../../store/slices/panels/use-with-panels';
-import { Panelist } from '../../../../store/slices/panels/types';
+} from "@mui/material";
+import { Delete, ExpandMore, ExpandLess } from "@mui/icons-material";
+
+import type {
+  ButtonAction,
+  ButtonActionTypeEnum,
+  FlowItem,
+  PredefinedResponse,
+  RequestUserInputActivityStep,
+} from "../../types";
+import { useEditActivityContext } from "../../activity-builder-context";
+import {
+  ColumnCenterDiv,
+  ColumnDiv,
+  RoundedBorderDiv,
+  RowDiv,
+  TopLeftText,
+} from "../../../../styled-components";
+import { CheckBoxInput, InputField } from "../../shared/input-components";
+import { FlowStepSelector } from "../../shared/flow-step-selector";
+import { JumpToAlternateStep } from "../../shared/jump-to-alternate-step";
+import type { StepVersion } from "../activity-flow-container";
+import { VersionsDropdown } from "./versions-dropdown";
+import { isContextDataString } from "../../helpers";
+import DropdownDisplay from "../../../dropdown-display";
+import { InfoTooltip } from "../../../info-tooltip";
+import { useWithPanels } from "../../../../store/slices/panels/use-with-panels";
+import type { Panelist } from "../../../../store/slices/panels/types";
+
 export function getDefaultRequestUserInputBuilder(): RequestUserInputActivityStep {
   return {
     stepId: uuid(),
-    stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
-    message: '',
-    saveResponseVariableName: '',
-    systemCustomName: '',
+    stepType: "REQUEST_USER_INPUT",
+    message: "",
+    saveResponseVariableName: "",
+    systemCustomName: "",
     saveAsIntention: false,
     disableFreeInput: false,
     predefinedResponses: [],
@@ -65,22 +64,22 @@ function ButtonActionUpdater(props: {
   buttonAction?: ButtonAction;
   panelists: Panelist[];
   onChange: (buttonAction: ButtonAction | undefined) => void;
-}): JSX.Element {
+}): React.ReactNode {
   const { buttonAction, panelists, onChange } = props;
-  const selectedType = buttonAction?.buttonActionType ?? '';
+  const selectedType = buttonAction?.buttonActionType ?? "";
   const selectedPanelistIds = buttonAction?.buttonActionValue ?? [];
 
   return (
     <ColumnDiv
-      style={{ width: '100%', alignItems: 'center', gap: 8, marginTop: 8 }}
+      style={{ width: "100%", alignItems: "center", gap: 8, marginTop: 8 }}
     >
-      <FormControl size="small" style={{ width: '60%' }}>
+      <FormControl size="small" style={{ width: "60%" }}>
         <InputLabel>Button Action</InputLabel>
         <Select
           label="Button Action"
           value={selectedType}
           onChange={(e) => {
-            const val = e.target.value as ButtonActionTypeEnum | '';
+            const val = e.target.value as ButtonActionTypeEnum | "";
             if (!val) {
               onChange(undefined);
             } else {
@@ -89,17 +88,14 @@ function ButtonActionUpdater(props: {
           }}
         >
           <MenuItem value="">None</MenuItem>
-          <MenuItem value={ButtonActionTypeEnum.FILTER_TO_PANELIST}>
-            Filter to Panelist
-          </MenuItem>
-          <MenuItem value={ButtonActionTypeEnum.CLEAR_PANELIST_FILTERS}>
+          <MenuItem value={"FILTER_TO_PANELIST"}>Filter to Panelist</MenuItem>
+          <MenuItem value={"CLEAR_PANELIST_FILTERS"}>
             Clear Panelist Filters
           </MenuItem>
         </Select>
       </FormControl>
-      {buttonAction?.buttonActionType ===
-        ButtonActionTypeEnum.FILTER_TO_PANELIST && (
-        <FormControl size="small" style={{ width: '60%' }}>
+      {buttonAction?.buttonActionType === "FILTER_TO_PANELIST" && (
+        <FormControl size="small" style={{ width: "60%" }}>
           <InputLabel>Panelists</InputLabel>
           <Select
             multiple
@@ -110,16 +106,17 @@ function ButtonActionUpdater(props: {
               onChange({
                 ...buttonAction,
                 buttonActionValue:
-                  typeof val === 'string' ? val.split(',') : val,
+                  typeof val === "string" ? val.split(",") : val,
               });
             }}
             renderValue={(selected) =>
               (selected as string[])
                 .map(
                   (id) =>
-                    panelists.find((p) => p.clientId === id)?.panelistName ?? id
+                    panelists.find((p) => p.clientId === id)?.panelistName ??
+                    id,
                 )
-                .join(', ')
+                .join(", ")
             }
           >
             {panelists.map((p) => (
@@ -139,13 +136,13 @@ function PredefinedResponseUpdater(props: {
   predefinedResponse: PredefinedResponse;
   updateResponse: (
     updatedResponse: Partial<PredefinedResponse>,
-    clientId: string
+    clientId: string,
   ) => void;
   deleteResponse: () => void;
   flowsList: FlowItem[];
   panelists: Panelist[];
   hasAttachedPanel: boolean;
-}): JSX.Element {
+}): React.ReactNode {
   const { predefinedResponse, updateResponse, deleteResponse } = props;
   return (
     <Box
@@ -153,20 +150,20 @@ function PredefinedResponseUpdater(props: {
         mt: 2,
         borderRadius: 2,
         boxShadow: 1,
-        backgroundColor: 'white',
-        border: '1px solid #e0e0e0',
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
+        backgroundColor: "white",
+        border: "1px solid #e0e0e0",
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
       }}
     >
       <ColumnDiv
         style={{
           // alignItems: 'center',
-          width: '100%',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          position: 'relative',
+          width: "100%",
+          justifyContent: "space-between",
+          alignItems: "center",
+          position: "relative",
         }}
       >
         <IconButton
@@ -174,17 +171,17 @@ function PredefinedResponseUpdater(props: {
           onClick={deleteResponse}
           color="primary"
           style={{
-            position: 'absolute',
+            position: "absolute",
             right: 0,
             top: 0,
           }}
         >
-          <DeleteIcon />
+          <Delete />
         </IconButton>
 
         <RowDiv
           style={{
-            width: '60%',
+            width: "60%",
           }}
         >
           <InputField
@@ -196,7 +193,7 @@ function PredefinedResponseUpdater(props: {
                 {
                   message: e,
                 },
-                predefinedResponse.clientId
+                predefinedResponse.clientId,
               );
             }}
           />
@@ -207,8 +204,8 @@ function PredefinedResponseUpdater(props: {
           content={
             <ColumnDiv
               style={{
-                width: '100%',
-                alignItems: 'center',
+                width: "100%",
+                alignItems: "center",
               }}
             >
               {isContextDataString(predefinedResponse.message) ? (
@@ -220,7 +217,7 @@ function PredefinedResponseUpdater(props: {
                       {
                         isArray: e,
                       },
-                      predefinedResponse.clientId
+                      predefinedResponse.clientId,
                     );
                   }}
                 />
@@ -238,20 +235,20 @@ function PredefinedResponseUpdater(props: {
                       ...predefinedResponse,
                       jumpToStepId: stepId,
                     },
-                    predefinedResponse.clientId
+                    predefinedResponse.clientId,
                   );
                 }}
               />
               <InputField
                 label="Response Weight"
                 width="60%"
-                value={predefinedResponse.responseWeight || ''}
+                value={predefinedResponse.responseWeight || ""}
                 onChange={(e) => {
                   props.updateResponse(
                     {
                       responseWeight: e,
                     },
-                    predefinedResponse.clientId
+                    predefinedResponse.clientId,
                   );
                 }}
               />
@@ -262,7 +259,7 @@ function PredefinedResponseUpdater(props: {
                   onChange={(buttonAction) => {
                     props.updateResponse(
                       { buttonAction },
-                      predefinedResponse.clientId
+                      predefinedResponse.clientId,
                     );
                   }}
                 />
@@ -279,7 +276,7 @@ function PredefinedResponsesUpdater(props: {
   step: RequestUserInputActivityStep;
   updatePredefinedResponse: (
     updatedResponse: Partial<PredefinedResponse>,
-    clientId: string
+    clientId: string,
   ) => void;
   addNewPredefinedResponse: () => void;
   deletePredefinedResponse: (clientId: string) => void;
@@ -287,7 +284,7 @@ function PredefinedResponsesUpdater(props: {
   panelists: Panelist[];
   hasAttachedPanel: boolean;
   width?: string;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     step,
     updatePredefinedResponse,
@@ -297,24 +294,24 @@ function PredefinedResponsesUpdater(props: {
   return (
     <ColumnCenterDiv
       style={{
-        width: props.width || '100%',
-        alignSelf: 'center',
-        justifyContent: 'center',
+        width: props.width || "100%",
+        alignSelf: "center",
+        justifyContent: "center",
       }}
     >
       <RowDiv>
-        <span style={{ fontWeight: 'bold' }}>Buttons & Selection Options</span>
+        <span style={{ fontWeight: "bold" }}>Buttons & Selection Options</span>
         <InfoTooltip title="A list of responses the user can choose from." />
       </RowDiv>
 
       <Box
         sx={{
-          display: 'grid',
+          display: "grid",
           gridTemplateColumns: {
-            xs: '1fr',
-            lg: 'repeat(3, 1fr)',
+            xs: "1fr",
+            lg: "repeat(3, 1fr)",
           },
-          width: '100%',
+          width: "100%",
           gap: 1,
         }}
       >
@@ -351,17 +348,17 @@ export function RequestUserInputStepBuilder(props: {
   height?: string;
   versions: StepVersion[];
   errors?: string[];
-}): JSX.Element {
+}): React.ReactNode {
   const { stepId, stepIndex, versions, errors } = props;
   const { activity, getStep, getFlowByStepId, updateStep, updateStepField } =
     useEditActivityContext();
   const { panels, panelists } = useWithPanels();
   const hasAttachedPanel = Boolean(activity.attachedPanel);
   const attachedPanel = panels.find(
-    (p) => p.clientId === activity.attachedPanel
+    (p) => p.clientId === activity.attachedPanel,
   );
-  const attachedPanelists = panelists.filter(
-    (p) => attachedPanel?.panelists.includes(p.clientId)
+  const attachedPanelists = panelists.filter((p) =>
+    attachedPanel?.panelists.includes(p.clientId),
   );
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
 
@@ -382,14 +379,14 @@ export function RequestUserInputStepBuilder(props: {
 
   function updateField<K extends keyof RequestUserInputActivityStep>(
     field: K,
-    value: RequestUserInputActivityStep[K]
+    value: RequestUserInputActivityStep[K],
   ) {
     updateStepField(stepId, field, value);
   }
 
   function updatePredefinedResponse(
     updatedResponse: Partial<PredefinedResponse>,
-    clientId: string
+    clientId: string,
   ) {
     const updatedResponses = step.predefinedResponses.map((r) => {
       if (r.clientId === clientId) {
@@ -400,24 +397,24 @@ export function RequestUserInputStepBuilder(props: {
       }
       return r;
     });
-    updateStepField(stepId, 'predefinedResponses', updatedResponses);
+    updateStepField(stepId, "predefinedResponses", updatedResponses);
   }
 
   function addNewPredefinedResponse() {
-    updateField('predefinedResponses', [
+    updateField("predefinedResponses", [
       ...step.predefinedResponses,
       {
         clientId: uuid(),
-        message: '',
-        responseWeight: '0',
+        message: "",
+        responseWeight: "0",
       },
     ]);
   }
 
   function deletePredefinedResponse(clientId: string) {
     updateField(
-      'predefinedResponses',
-      step.predefinedResponses.filter((r) => r.clientId !== clientId)
+      "predefinedResponses",
+      step.predefinedResponses.filter((r) => r.clientId !== clientId),
     );
   }
 
@@ -425,19 +422,19 @@ export function RequestUserInputStepBuilder(props: {
     <RoundedBorderDiv
       key={rerender}
       style={{
-        width: props.width || '100%',
-        height: props.height || '100%',
-        display: 'flex',
-        position: 'relative',
-        flexDirection: 'column',
+        width: props.width || "100%",
+        height: props.height || "100%",
+        display: "flex",
+        position: "relative",
+        flexDirection: "column",
         padding: 10,
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
       }}
     >
       <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>
       <IconButton
         style={{
-          position: 'absolute',
+          position: "absolute",
           right: 10,
           top: 10,
         }}
@@ -447,24 +444,24 @@ export function RequestUserInputStepBuilder(props: {
       </IconButton>
       <IconButton
         style={{
-          width: 'fit-content',
-          position: 'absolute',
+          width: "fit-content",
+          position: "absolute",
           left: 10,
           top: 40,
         }}
         onClick={() => setCollapsed(!collapsed)}
       >
-        {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        {collapsed ? <ExpandLess /> : <ExpandMore />}
       </IconButton>
-      <h4 style={{ alignSelf: 'center' }}>Request User Input</h4>
+      <h4 style={{ alignSelf: "center" }}>Request User Input</h4>
       {errors && errors.length > 0 && (
-        <span style={{ color: 'red', textAlign: 'center' }}>
-          {errors.join(', ')}
+        <span style={{ color: "red", textAlign: "center" }}>
+          {errors.join(", ")}
         </span>
       )}
       <div
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 60,
         }}
@@ -479,14 +476,14 @@ export function RequestUserInputStepBuilder(props: {
           label="Request Message (Optional)"
           value={step.message}
           onChange={(e) => {
-            updateField('message', e);
+            updateField("message", e);
           }}
         />
         <InputField
           label="Save Response As (Optional)"
           value={step.saveResponseVariableName}
           onChange={(e) => {
-            updateField('saveResponseVariableName', e);
+            updateField("saveResponseVariableName", e);
           }}
         />
         <RowDiv>
@@ -494,7 +491,7 @@ export function RequestUserInputStepBuilder(props: {
             label="Input is session intention."
             value={step.saveAsIntention}
             onChange={(e) => {
-              updateField('saveAsIntention', e);
+              updateField("saveAsIntention", e);
             }}
           />
           <InfoTooltip title="If checked, the user's input will be saved as a session intention." />
@@ -503,14 +500,14 @@ export function RequestUserInputStepBuilder(props: {
           label="Disable Text Input? (requires predefined responses)"
           value={step.disableFreeInput}
           onChange={(e) => {
-            updateField('disableFreeInput', e);
+            updateField("disableFreeInput", e);
           }}
         />
         <CheckBoxInput
           label="Set Student Activity Complete?"
           value={step.setStudentActivityComplete ?? false}
           onChange={(e) => {
-            updateField('setStudentActivityComplete', e);
+            updateField("setStudentActivityComplete", e);
           }}
         />
         <PredefinedResponsesUpdater
@@ -528,7 +525,7 @@ export function RequestUserInputStepBuilder(props: {
           step={step}
           flowsList={props.flowsList}
           onNewStepSelected={(stepId) => {
-            updateField('jumpToStepId', stepId);
+            updateField("jumpToStepId", stepId);
           }}
         />
       </Collapse>

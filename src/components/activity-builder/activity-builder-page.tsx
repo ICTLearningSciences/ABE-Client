@@ -4,28 +4,24 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-/*
-This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved.
-Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
 
-The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
-*/
-import React from 'react';
-import { SelectCreateActivity } from './select-create-activity';
-import { EditActivity } from './edit-activity/edit-activity';
-import { ActivityBuilder } from './types';
-import { ActivityBuilderProvider } from './activity-builder-context';
-import { BuiltActivityVersion } from './types';
-import { AiPromptStep } from '../../types';
-import { AiServicesResponseTypes } from '../../ai-services/ai-service-types';
-import { Tabs, Tab, Box } from '@mui/material';
-import { Panel, Panelist } from '../../store/slices/panels/types';
-import { SelectCreatePanelist } from '../panelist-builder/select-create-panelist';
-import { EditPanelist } from '../panelist-builder/edit-panelist';
-import { SelectCreatePanel } from '../panel-builder/select-create-panel';
-import { EditPanel } from '../panel-builder/edit-panel';
+import React from "react";
+import { Tabs, Tab, Box } from "@mui/material";
 
-type BuilderTab = 'ACTIVITY_BUILDER' | 'PANELIST_BUILDER' | 'PANEL_BUILDER';
+import { SelectCreateActivity } from "./select-create-activity";
+import { EditActivity } from "./edit-activity/edit-activity";
+import type { ActivityBuilder } from "./types";
+import { ActivityBuilderProvider } from "./activity-builder-context";
+import type { BuiltActivityVersion } from "./types";
+import type { AiPromptStep } from "../../types";
+import type { AiServicesResponseTypes } from "../../ai-services/ai-service-types";
+import type { Panel, Panelist } from "../../store/slices/panels/types";
+import { SelectCreatePanelist } from "../panelist-builder/select-create-panelist";
+import { EditPanelist } from "../panelist-builder/edit-panelist";
+import { SelectCreatePanel } from "../panel-builder/select-create-panel";
+import { EditPanel } from "../panel-builder/edit-panel";
+
+type BuilderTab = "ACTIVITY_BUILDER" | "PANELIST_BUILDER" | "PANEL_BUILDER";
 
 export function ActivityBuilderPage(props: {
   goToActivity: (activity: ActivityBuilder) => void;
@@ -33,7 +29,7 @@ export function ActivityBuilderPage(props: {
   builtActivities: ActivityBuilder[];
   isActivityEducationReady: (activityId: string) => boolean;
   addOrUpdateBuiltActivity: (
-    activity: ActivityBuilder
+    activity: ActivityBuilder,
   ) => Promise<ActivityBuilder>;
   addNewLocalBuiltActivity: () => ActivityBuilder;
   copyBuiltActivity: (activityId: string) => Promise<ActivityBuilder>;
@@ -43,11 +39,11 @@ export function ActivityBuilderPage(props: {
   canDeleteActivity: (activity: ActivityBuilder) => boolean;
   activityVersions: Record<string, BuiltActivityVersion[]>;
   loadActivityVersions: (
-    activityClientId: string
+    activityClientId: string,
   ) => Promise<BuiltActivityVersion[]>;
   executePromptSteps: (
     aiPromptSteps: AiPromptStep[],
-    callback?: (response: AiServicesResponseTypes) => void
+    callback?: (response: AiServicesResponseTypes) => void,
   ) => Promise<AiServicesResponseTypes>;
   // Panel/Panelist props
   panels: Panel[];
@@ -58,7 +54,7 @@ export function ActivityBuilderPage(props: {
   addNewLocalPanelist: () => Panelist;
   deletePanel: (panelClientId: string) => void;
   deletePanelist: (panelistClientId: string) => void;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     goToActivity,
     curActivity,
@@ -82,27 +78,27 @@ export function ActivityBuilderPage(props: {
   } = props;
 
   const [selectedTab, setSelectedTab] =
-    React.useState<BuilderTab>('ACTIVITY_BUILDER');
+    React.useState<BuilderTab>("ACTIVITY_BUILDER");
   const [selectedActivityClientId, setSelectedActivityClientId] =
-    React.useState<string>(curActivity?.clientId || '');
+    React.useState<string>(curActivity?.clientId || "");
   const [selectedPanelistClientId, setSelectedPanelistClientId] =
-    React.useState<string>('');
+    React.useState<string>("");
   const [selectedPanelClientId, setSelectedPanelClientId] =
-    React.useState<string>('');
+    React.useState<string>("");
 
   const selectedActivity = builtActivities.find(
-    (activity) => activity.clientId === selectedActivityClientId
+    (activity) => activity.clientId === selectedActivityClientId,
   );
   const selectedPanelist = panelists.find(
-    (panelist) => panelist.clientId === selectedPanelistClientId
+    (panelist) => panelist.clientId === selectedPanelistClientId,
   );
   const selectedPanel = panels.find(
-    (panel) => panel.clientId === selectedPanelClientId
+    (panel) => panel.clientId === selectedPanelClientId,
   );
 
   const renderContent = () => {
     // Activity Builder Tab
-    if (selectedTab === 'ACTIVITY_BUILDER') {
+    if (selectedTab === "ACTIVITY_BUILDER") {
       if (!selectedActivity) {
         return (
           <ActivityBuilderProvider
@@ -141,7 +137,7 @@ export function ActivityBuilderPage(props: {
           >
             <EditActivity
               returnTo={() => {
-                setSelectedActivityClientId('');
+                setSelectedActivityClientId("");
               }}
               goToActivity={goToActivity}
               activity={selectedActivity}
@@ -155,7 +151,7 @@ export function ActivityBuilderPage(props: {
     }
 
     // Panelist Builder Tab
-    if (selectedTab === 'PANELIST_BUILDER') {
+    if (selectedTab === "PANELIST_BUILDER") {
       if (!selectedPanelist) {
         return (
           <SelectCreatePanelist
@@ -176,10 +172,10 @@ export function ActivityBuilderPage(props: {
             panelist={selectedPanelist}
             onSave={(panelist) => {
               addOrUpdatePanelist(panelist);
-              setSelectedPanelistClientId('');
+              setSelectedPanelistClientId("");
             }}
             onCancel={() => {
-              setSelectedPanelistClientId('');
+              setSelectedPanelistClientId("");
             }}
           />
         );
@@ -187,7 +183,7 @@ export function ActivityBuilderPage(props: {
     }
 
     // Panel Builder Tab
-    if (selectedTab === 'PANEL_BUILDER') {
+    if (selectedTab === "PANEL_BUILDER") {
       if (!selectedPanel) {
         return (
           <SelectCreatePanel
@@ -209,10 +205,10 @@ export function ActivityBuilderPage(props: {
             panelists={panelists}
             onSave={(panel) => {
               addOrUpdatePanel(panel);
-              setSelectedPanelClientId('');
+              setSelectedPanelClientId("");
             }}
             onCancel={() => {
-              setSelectedPanelClientId('');
+              setSelectedPanelClientId("");
             }}
           />
         );
@@ -225,10 +221,10 @@ export function ActivityBuilderPage(props: {
   return (
     <Box
       style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Tabs
@@ -236,9 +232,9 @@ export function ActivityBuilderPage(props: {
         onChange={(_, newValue) => {
           setSelectedTab(newValue as BuilderTab);
           // Clear selections when switching tabs
-          setSelectedActivityClientId('');
-          setSelectedPanelistClientId('');
-          setSelectedPanelClientId('');
+          setSelectedActivityClientId("");
+          setSelectedPanelistClientId("");
+          setSelectedPanelClientId("");
         }}
         centered
       >
@@ -246,7 +242,7 @@ export function ActivityBuilderPage(props: {
         <Tab label="Panelist Builder" value="PANELIST_BUILDER" />
         <Tab label="Panel Builder" value="PANEL_BUILDER" />
       </Tabs>
-      <Box style={{ flexGrow: 1, overflow: 'auto' }}>{renderContent()}</Box>
+      <Box style={{ flexGrow: 1, overflow: "auto" }}>{renderContent()}</Box>
     </Box>
   );
 }

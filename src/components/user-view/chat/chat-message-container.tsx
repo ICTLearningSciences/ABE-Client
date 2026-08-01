@@ -1,23 +1,29 @@
-import React from 'react';
-import { Button } from '@mui/material';
-import { useRef, useState, useEffect } from 'react';
-import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
-import {
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import React, { useRef, useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { Button } from "@mui/material";
+import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-types";
+import type {
   ChatMessageTypes,
-  Sender,
   MessageDisplayType,
-  UserInputType,
-} from '../../../store/slices/chat';
-import { useWithChat } from '../../../store/slices/chat/use-with-chat';
-import Message from './message';
-import { v4 as uuidv4 } from 'uuid';
+  Sender,
+} from "../../../store/slices/chat";
+import { useWithChat } from "../../../store/slices/chat/use-with-chat";
+import Message from "./message";
+
 export function ChatMessagesContainer(props: {
   coachResponsePending: boolean;
   curDocId: string;
   setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
   sendMessage: (message: ChatMessageTypes) => void;
   displayMarkdown: boolean;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     coachResponsePending,
     curDocId,
@@ -26,7 +32,7 @@ export function ChatMessagesContainer(props: {
     displayMarkdown,
   } = props;
   const messageContainerRef = useRef<HTMLDivElement>(null);
-  const [messageElements, setMessageElements] = useState<JSX.Element[]>([]);
+  const [messageElements, setMessageElements] = useState<React.ReactNode[]>([]);
   const { state } = useWithChat();
   const messages = state.chatLogs[curDocId] || [];
   const chatMessages: ChatMessageTypes[] = [
@@ -34,21 +40,21 @@ export function ChatMessagesContainer(props: {
     ...(coachResponsePending
       ? [
           {
-            id: 'pending-message',
-            message: '...',
-            sender: Sender.SYSTEM,
-            displayType: MessageDisplayType.PENDING_MESSAGE,
+            id: "pending-message",
+            message: "...",
+            sender: "SYSTEM" as Sender,
+            displayType: "PENDING_MESSAGE" as MessageDisplayType,
           },
         ]
       : []),
   ];
   const mostRecentChatId =
-    chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].id : '';
+    chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].id : "";
 
   function scrollToElementById(id: string) {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
 
@@ -60,20 +66,20 @@ export function ChatMessagesContainer(props: {
   }
 
   function getMostRecentAiResponse(
-    messages: ChatMessageTypes[]
+    messages: ChatMessageTypes[],
   ): ChatMessageTypes | undefined {
     // first, find the most recent user message, then find the most recent system message after that
     if (!messages || messages.length <= 1) return undefined;
     let mostRecentUserMessageIndex = -1;
     for (let i = messages.length - 1; i >= 0; i--) {
-      if (messages[i].sender === Sender.USER) {
+      if (messages[i].sender === "USER") {
         mostRecentUserMessageIndex = i;
         break;
       }
     }
     if (mostRecentUserMessageIndex === -1) return undefined;
     for (let i = mostRecentUserMessageIndex; i < messages.length; i++) {
-      if (messages[i].sender === Sender.SYSTEM) {
+      if (messages[i].sender === "SYSTEM") {
         return messages[i];
       }
     }
@@ -102,12 +108,12 @@ export function ChatMessagesContainer(props: {
               <div
                 key={`mcq-choices-${index}`}
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  width: '98%',
-                  justifyContent: 'flex-end',
-                  alignItems: 'flex-end',
-                  margin: '10px',
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "98%",
+                  justifyContent: "flex-end",
+                  alignItems: "flex-end",
+                  margin: "10px",
                 }}
               >
                 {message.mcqChoices.map((choice: string, i: number) => {
@@ -116,16 +122,16 @@ export function ChatMessagesContainer(props: {
                       key={i}
                       variant="outlined"
                       style={{
-                        marginBottom: '5px',
+                        marginBottom: "5px",
                       }}
-                      data-cy={`mcq-choice-${choice.replaceAll(' ', '-')}`}
+                      data-cy={`mcq-choice-${choice.replaceAll(" ", "-")}`}
                       onClick={() => {
                         sendMessage({
                           id: uuidv4(),
                           message: choice,
-                          sender: Sender.USER,
-                          displayType: MessageDisplayType.TEXT,
-                          userInputType: UserInputType.MCQ,
+                          sender: "USER",
+                          displayType: "TEXT",
+                          userInputType: "MCQ",
                         });
                         if (message.retryFunction) {
                           message.retryFunction();
@@ -140,7 +146,7 @@ export function ChatMessagesContainer(props: {
             )}
           </>
         );
-      }
+      },
     );
     setMessageElements(_newMessageElements);
   }, [chatMessages.length, mostRecentChatId, displayMarkdown]);
@@ -150,18 +156,18 @@ export function ChatMessagesContainer(props: {
       ref={messageContainerRef}
       data-cy="messages-container"
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        width: '100%',
-        maxWidth: '100%',
-        justifyContent: 'flex-start',
-        margin: '1rem',
-        borderRadius: '1rem',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-        border: '1px solid black',
-        position: 'relative',
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        width: "100%",
+        maxWidth: "100%",
+        justifyContent: "flex-start",
+        margin: "1rem",
+        borderRadius: "1rem",
+        overflowX: "hidden",
+        overflowY: "auto",
+        border: "1px solid black",
+        position: "relative",
       }}
     >
       {messageElements}

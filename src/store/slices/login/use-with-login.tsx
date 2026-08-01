@@ -4,24 +4,25 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useAppSelector, useAppDispatch } from '../../hooks';
-import * as loginActions from '.';
-import { useEffect } from 'react';
+
+import { useEffect } from "react";
+import { useAuth } from "react-oidc-context";
+import { useAppSelector, useAppDispatch } from "../../hooks";
+import * as loginActions from ".";
 import {
   ACCESS_TOKEN_KEY,
   CLASSROOM_CODE_KEY,
   localStorageClear,
   localStorageGet,
-} from '../../local-storage';
-import { UpdateUserInfo, User, UserAccessToken } from '../../../types';
-import { removeQueryParamFromUrl } from '../../../helpers';
-import { useAuth } from 'react-oidc-context';
+} from "../../local-storage";
+import type { UpdateUserInfo, User, UserAccessToken } from "../../../types";
+import { removeQueryParamFromUrl } from "../../../helpers";
 
 export interface UseWithLogin {
   state: loginActions.LoginState;
   logout: () => Promise<void>;
   loginWithGoogle: (
-    googleAccessToken: string
+    googleAccessToken: string,
   ) => Promise<UserAccessToken | undefined>;
   loginWithMicrosoft: (microsoftAccessToken: string) => Promise<void>;
   loginWithAmazonCognito: (cognitoIdToken: string) => Promise<void>;
@@ -38,10 +39,7 @@ export function useWithLogin(): UseWithLogin {
 
   useEffect(() => {
     checkForClassroomCode(state.loginStatus);
-    if (
-      state.loginStatus === loginActions.LoginStatus.AUTHENTICATED ||
-      state.loginStatus === loginActions.LoginStatus.IN_PROGRESS
-    ) {
+    if (state.loginStatus === 3 || state.loginStatus === 2) {
       return;
     }
     const token = localStorageGet(ACCESS_TOKEN_KEY);
@@ -53,74 +51,74 @@ export function useWithLogin(): UseWithLogin {
   }, [state.loginStatus]);
 
   async function checkForClassroomCode(loginStatus: loginActions.LoginStatus) {
-    if (loginStatus !== loginActions.LoginStatus.AUTHENTICATED) {
+    if (loginStatus !== 3) {
       return;
     }
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
     const urlParams = new URLSearchParams(window.location.search);
-    const classroomCodeUrlParam = urlParams.get('classroomCode');
+    const classroomCodeUrlParam = urlParams.get("classroomCode");
     const classroomCodeLocalStorage = localStorageGet(CLASSROOM_CODE_KEY);
     if (classroomCodeUrlParam) {
       await updateUserInfo({ classroomCode: classroomCodeUrlParam });
     } else if (classroomCodeLocalStorage) {
       await updateUserInfo({ classroomCode: classroomCodeLocalStorage });
     }
-    removeQueryParamFromUrl('classroomCode');
+    removeQueryParamFromUrl("classroomCode");
     localStorageClear(CLASSROOM_CODE_KEY);
   }
 
   async function loginWithGoogle(googleAccessToken: string) {
     if (
-      state.loginStatus === loginActions.LoginStatus.NONE ||
-      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
-      state.loginStatus === loginActions.LoginStatus.FAILED
+      state.loginStatus === 0 ||
+      state.loginStatus === 1 ||
+      state.loginStatus === 4
     ) {
       return await dispatch(
         loginActions.login({
           accessToken: googleAccessToken,
-          service: loginActions.LoginService.GOOGLE,
-        })
+          service: "GOOGLE",
+        }),
       ).unwrap();
     }
   }
 
   async function loginWithMicrosoft(microsoftAccessToken: string) {
     if (
-      state.loginStatus === loginActions.LoginStatus.NONE ||
-      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
-      state.loginStatus === loginActions.LoginStatus.FAILED
+      state.loginStatus === 0 ||
+      state.loginStatus === 1 ||
+      state.loginStatus === 4
     ) {
       await dispatch(
         loginActions.login({
           accessToken: microsoftAccessToken,
-          service: loginActions.LoginService.MICROSOFT,
-        })
+          service: "MICROSOFT",
+        }),
       );
     }
   }
 
   async function loginWithAmazonCognito(cognitoIdToken: string) {
     if (
-      state.loginStatus === loginActions.LoginStatus.NONE ||
-      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
-      state.loginStatus === loginActions.LoginStatus.FAILED
+      state.loginStatus === 0 ||
+      state.loginStatus === 1 ||
+      state.loginStatus === 4
     ) {
       await dispatch(
         loginActions.login({
           accessToken: cognitoIdToken,
-          service: loginActions.LoginService.AMAZON_COGNITO,
-        })
+          service: "AMAZON_COGNITO",
+        }),
       );
     }
   }
 
   function refreshAccessToken() {
     if (
-      state.loginStatus === loginActions.LoginStatus.NONE ||
-      state.loginStatus === loginActions.LoginStatus.NOT_LOGGED_IN ||
-      state.loginStatus === loginActions.LoginStatus.FAILED
+      state.loginStatus === 0 ||
+      state.loginStatus === 1 ||
+      state.loginStatus === 4
     ) {
       dispatch(loginActions.refreshAccessToken());
     }
@@ -128,11 +126,11 @@ export function useWithLogin(): UseWithLogin {
 
   async function logout() {
     await dispatch(loginActions.logout());
-    if (awsCognitoAuth.isAuthenticated && typeof window !== 'undefined') {
+    if (awsCognitoAuth.isAuthenticated && typeof window !== "undefined") {
       try {
         await awsCognitoAuth.signoutRedirect({
           extraQueryParams: {
-            client_id: process.env.REACT_APP_COGNITO_CLIENT_ID || '',
+            client_id: import.meta.env.VITE_COGNITO_CLIENT_ID || "",
             logout_uri: window.location.origin,
           },
         });

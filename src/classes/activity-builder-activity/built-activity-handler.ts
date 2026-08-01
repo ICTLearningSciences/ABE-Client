@@ -4,42 +4,35 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import {
+
+import { v4 as uuidv4 } from "uuid";
+
+import type {
   AiServicesResponseTypes,
   AiServiceStepDataTypes,
   Source,
-} from '../../ai-services/ai-service-types';
-import {
+} from "../../ai-services/ai-service-types";
+import type {
   ActivityBuilder,
   ActivityBuilderStep,
-  ActivityBuilderStepType,
   ButtonAction,
-  ButtonActionTypeEnum,
   PromptActivityStep,
   SystemMessageActivityStep,
   RequestUserInputActivityStep,
   PredefinedResponse,
   ConditionalActivityStep,
-  Checking,
   SinglePromptConfiguration,
   JsonResponseData,
-} from '../../components/activity-builder/types';
-import {
-  ChatLog,
-  ChatMessageTypes,
-  MessageDisplayType,
-  Sender,
-} from '../../store/slices/chat';
-import { v4 as uuidv4 } from 'uuid';
-import {
+} from "../../components/activity-builder/types";
+import type { ChatLog, ChatMessageTypes } from "../../store/slices/chat";
+import type {
   AiPromptStep,
   DocData,
   DocService,
   PromptConfiguration,
   PromptOutputTypes,
-  PromptRoles,
-} from '../../types';
-import { chatLogToString, isJsonString } from '../../helpers';
+} from "../../types";
+import { chatLogToString, isJsonString } from "../../helpers";
 import {
   recursivelyConvertExpectedDataToAiPromptString,
   processPredefinedResponses,
@@ -48,11 +41,11 @@ import {
   sortMessagesByResponseWeight,
   recursiveUpdateAdditionalInfo,
   STRING_ARRAY_SPLITTER,
-} from '../../components/activity-builder/helpers';
-import { ChatLogSubscriber } from '../../hooks/use-with-chat-log-subscribers';
-import { getDocData } from '../../hooks/api';
-import { Panelist, Panel } from '../../store/slices/panels/types';
-import { RagStoreConfiguration } from '../../types';
+} from "../../components/activity-builder/helpers";
+import { ChatLogSubscriber } from "../../hooks/use-with-chat-log-subscribers";
+import { getDocData } from "../../hooks/api";
+import type { Panelist, Panel } from "../../store/slices/panels/types";
+import type { RagStoreConfiguration } from "../../types";
 
 interface UserResponseHandleState {
   responseNavigations: {
@@ -66,10 +59,10 @@ function getDefaultUserResponseHandleState(): UserResponseHandleState {
     responseNavigations: [],
   };
 }
-export const EDIT_DOC_GOAL_MESSAGE = 'New Activity';
-export const GO_HOME_BUTTON_MESSAGE = 'Return to Home';
-export const DOC_TEXT_KEY = 'doc_text';
-export const DOC_NUM_WORDS_KEY = 'doc_num_words';
+export const EDIT_DOC_GOAL_MESSAGE = "New Activity";
+export const GO_HOME_BUTTON_MESSAGE = "Return to Home";
+export const DOC_TEXT_KEY = "doc_text";
+export const DOC_NUM_WORDS_KEY = "doc_num_words";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type StateData = Record<string, any>;
@@ -86,7 +79,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   setResponsePending: (pending: boolean) => void;
   updateSessionIntention: (intention: string) => void;
   executePrompt: (
-    aiPromptSteps: AiPromptStep[]
+    aiPromptSteps: AiPromptStep[],
   ) => Promise<AiServicesResponseTypes>;
   editDocGoal: () => void;
   userResponseHandleState: UserResponseHandleState;
@@ -107,7 +100,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       !this.builtActivityData.flowsList.length ||
       !this.builtActivityData.flowsList[0].steps.length
     ) {
-      throw new Error('No activity data found');
+      throw new Error("No activity data found");
     }
     for (let i = 0; i < this.builtActivityData.flowsList.length; i++) {
       const flow = this.builtActivityData.flowsList[i];
@@ -123,21 +116,21 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
   getNextStep(currentStep: ActivityBuilderStep): ActivityBuilderStep {
     if (!this.builtActivityData) {
-      throw new Error('No activity data found');
+      throw new Error("No activity data found");
     }
 
     if (currentStep.jumpToStepId) {
       const jumpStep = this.getStepById(currentStep.jumpToStepId);
       if (!jumpStep) {
         throw new Error(
-          `Unable to find target step ${currentStep.jumpToStepId}, maybe you deleted it and forgot to update this step?`
+          `Unable to find target step ${currentStep.jumpToStepId}, maybe you deleted it and forgot to update this step?`,
         );
       }
       return jumpStep;
     } else {
       // go to next step in current flow
       const currentStepFlowList = this.builtActivityData.flowsList.find(
-        (flow) => flow.steps.find((step) => step.stepId === currentStep.stepId)
+        (flow) => flow.steps.find((step) => step.stepId === currentStep.stepId),
       );
 
       if (!currentStepFlowList) {
@@ -145,18 +138,18 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       }
 
       const currentStepIndex = currentStepFlowList.steps.findIndex(
-        (step) => step.stepId === currentStep.stepId
+        (step) => step.stepId === currentStep.stepId,
       );
 
       if (currentStepIndex === -1) {
         throw new Error(
-          `Unable to find requested step: ${currentStep.stepId} in flow ${currentStepFlowList.name}`
+          `Unable to find requested step: ${currentStep.stepId} in flow ${currentStepFlowList.name}`,
         );
       }
       const nextStepIndex = currentStepIndex + 1;
       if (nextStepIndex >= currentStepFlowList.steps.length) {
         throw new Error(
-          'No next step found, maybe you forgot to add a jumpToStepId for the last step in a flow?'
+          "No next step found, maybe you forgot to add a jumpToStepId for the last step in a flow?",
         );
       } else {
         return currentStepFlowList.steps[nextStepIndex];
@@ -171,7 +164,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     setResponsePending: (pending: boolean) => void,
     updateSessionIntention: (intention: string) => void,
     executePrompt: (
-      aiPromptSteps: AiPromptStep[]
+      aiPromptSteps: AiPromptStep[],
     ) => Promise<AiServicesResponseTypes>,
     docId: string,
     editDocGoal: () => void,
@@ -181,7 +174,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     builtActivityData?: ActivityBuilder,
     activityPanel?: Panel,
     activityPanelists?: Panelist[],
-    onFilteredPanelistsChanged?: (filteredPanelistIds: string[]) => void
+    onFilteredPanelistsChanged?: (filteredPanelistIds: string[]) => void,
   ) {
     this.docId = docId;
     this.docService = docService;
@@ -228,7 +221,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       !this.builtActivityData.flowsList.length ||
       !this.builtActivityData.flowsList[0].steps.length
     ) {
-      throw new Error('No built activity data found');
+      throw new Error("No built activity data found");
     }
     this.resetActivity();
   }
@@ -239,7 +232,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       !this.builtActivityData.flowsList.length ||
       !this.builtActivityData.flowsList[0].steps.length
     ) {
-      throw new Error('No built activity data found');
+      throw new Error("No built activity data found");
     }
     this.clearChat();
     this.curStep = this.builtActivityData.flowsList[0].steps[0];
@@ -258,16 +251,16 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     if (step.setStudentActivityComplete) {
       this.handleStudentActivityComplete();
     }
-    if (step.stepType === ActivityBuilderStepType.REQUEST_USER_INPUT) {
+    if (step.stepType === "REQUEST_USER_INPUT") {
       this.stepIdsSinceLastInput = [];
     }
     if (this.stepIdsSinceLastInput.includes(step.stepId)) {
       this.sendMessage({
         id: uuidv4(),
         message:
-          'Oops! A loop was detected in this activity, we are halting the activity to prevent an infinite loop. Please contact the activity creator to fix this issue.',
-        sender: Sender.SYSTEM,
-        displayType: MessageDisplayType.TEXT,
+          "Oops! A loop was detected in this activity, we are halting the activity to prevent an infinite loop. Please contact the activity creator to fix this issue.",
+        sender: "SYSTEM",
+        displayType: "TEXT",
       });
       return;
     }
@@ -275,18 +268,18 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // work through steps until we get to a user message step, then wait to be notified of a user message
     // handle the step
     switch (step.stepType) {
-      case ActivityBuilderStepType.REQUEST_USER_INPUT:
+      case "REQUEST_USER_INPUT":
         await this.handleRequestUserInputStep(
-          step as RequestUserInputActivityStep
+          step as RequestUserInputActivityStep,
         );
         break;
-      case ActivityBuilderStepType.SYSTEM_MESSAGE:
+      case "SYSTEM_MESSAGE":
         await this.handleSystemMessageStep(step as SystemMessageActivityStep);
         break;
-      case ActivityBuilderStepType.PROMPT:
+      case "PROMPT":
         await this.handlePromptStep(step as PromptActivityStep);
         break;
-      case ActivityBuilderStepType.CONDITIONAL:
+      case "CONDITIONAL":
         await this.handleLogicOperationStep(step as ConditionalActivityStep);
         break;
       default:
@@ -300,7 +293,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.stateData = {
       ...this.stateData,
       [DOC_TEXT_KEY]: docData.plainText,
-      [DOC_NUM_WORDS_KEY]: docData.plainText.split(' ').length,
+      [DOC_NUM_WORDS_KEY]: docData.plainText.split(" ").length,
     };
     const conditionals = step.conditionals.map((c) => ({
       ...c,
@@ -312,12 +305,12 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       const stateValue = this.stateData[condition.stateDataKey];
       if (!stateValue) {
         this.sendErrorMessage(
-          `An error occured during this activity. Could not find state value ${condition.stateDataKey}.`
+          `An error occured during this activity. Could not find state value ${condition.stateDataKey}.`,
         );
         return;
       }
 
-      if (condition.checking === Checking.VALUE) {
+      if (condition.checking === "VALUE") {
         const expression = `${String(stateValue)} ${condition.operation} ${
           condition.expectedValue
         }`;
@@ -326,21 +319,21 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           const step = this.getStepById(condition.targetStepId);
           if (!step) {
             this.sendErrorMessage(
-              `An error occured during this activity. Could not find step: ${condition.targetStepId}`
+              `An error occured during this activity. Could not find step: ${condition.targetStepId}`,
             );
             return;
           }
           this.handleStep(step);
           return;
         }
-      } else if (condition.checking === Checking.LENGTH) {
+      } else if (condition.checking === "LENGTH") {
         const expression = `${stateValue.length} ${condition.operation} ${condition.expectedValue}`;
         const conditionTrue = new Function(`return ${expression};`)();
         if (conditionTrue) {
           const step = this.getStepById(condition.targetStepId);
           if (!step) {
             this.sendErrorMessage(
-              `An error occured during this activity. Could not find step: ${condition.targetStepId}`
+              `An error occured during this activity. Could not find step: ${condition.targetStepId}`,
             );
             return;
           }
@@ -356,7 +349,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           const step = this.getStepById(condition.targetStepId);
           if (!step) {
             this.sendErrorMessage(
-              `An error occured during this activity. Could not find step: ${condition.targetStepId}`
+              `An error occured during this activity. Could not find step: ${condition.targetStepId}`,
             );
             return;
           }
@@ -372,11 +365,11 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   async handleSystemMessageStep(step: SystemMessageActivityStep) {
     // Check if we should send messages from panelists
     console.log(
-      'step.sendFromPanelistClientIds',
-      step.sendFromPanelistClientIds
+      "step.sendFromPanelistClientIds",
+      step.sendFromPanelistClientIds,
     );
-    console.log('this.activityPanel', this.activityPanel);
-    console.log('this.activityPanelists', this.activityPanelists);
+    console.log("this.activityPanel", this.activityPanel);
+    console.log("this.activityPanelists", this.activityPanelists);
     if (
       step.sendFromPanelistClientIds &&
       step.sendFromPanelistClientIds.length > 0 &&
@@ -386,45 +379,45 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       const allEffectivePanelists = step.sendFromPanelistClientIds.reduce(
         (acc: Panelist[], clientId) => {
           const panelist = this.activityPanelists?.find(
-            (p) => p.clientId === clientId
+            (p) => p.clientId === clientId,
           );
           if (panelist) {
             acc.push(panelist);
           }
           return acc;
         },
-        []
+        [],
       );
       const effectivePanelists =
         this.filteredToPanelists.length > 0
           ? allEffectivePanelists.filter((p) =>
-              this.filteredToPanelists.includes(p.clientId)
+              this.filteredToPanelists.includes(p.clientId),
             )
           : allEffectivePanelists;
-      const panelistData = this.stateData['panelistData'];
+      const panelistData = this.stateData["panelistData"];
 
-      if (panelistData && typeof panelistData === 'object') {
+      if (panelistData && typeof panelistData === "object") {
         // Send a message for each panelist
         for (const panelistClientId of Object.keys(panelistData)) {
           const panelist = effectivePanelists.find(
-            (p) => p.clientId === panelistClientId
+            (p) => p.clientId === panelistClientId,
           );
 
           if (panelist) {
-            console.log('panelist found', panelist.panelistName);
+            console.log("panelist found", panelist.panelistName);
             this.sendMessage({
               id: uuidv4(),
               message: replaceStoredDataInString(
                 step.message,
                 this.stateData,
-                panelistClientId
+                panelistClientId,
               ),
-              sender: Sender.SYSTEM,
+              sender: "SYSTEM",
               systemCustomName: panelist.panelistName,
-              displayType: MessageDisplayType.TEXT,
+              displayType: "TEXT",
             });
           } else {
-            console.log('panelist not found', panelistClientId);
+            console.log("panelist not found", panelistClientId);
           }
         }
       }
@@ -433,9 +426,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       this.sendMessage({
         id: uuidv4(),
         message: replaceStoredDataInString(step.message, this.stateData),
-        sender: Sender.SYSTEM,
+        sender: "SYSTEM",
         systemCustomName: step.systemCustomName,
-        displayType: MessageDisplayType.TEXT,
+        displayType: "TEXT",
       });
     }
     await this.goToNextStep();
@@ -444,14 +437,14 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   async handleRequestUserInputStep(step: RequestUserInputActivityStep) {
     const processedPredefinedResponses = processPredefinedResponses(
       step.predefinedResponses,
-      this.stateData
+      this.stateData,
     );
     this.sendMessage({
       id: uuidv4(),
       message: replaceStoredDataInString(step.message, this.stateData),
-      sender: Sender.SYSTEM,
+      sender: "SYSTEM",
       systemCustomName: step.systemCustomName,
-      displayType: MessageDisplayType.TEXT,
+      displayType: "TEXT",
       disableUserInput: step.disableFreeInput,
       mcqChoices: this.handleExtractMcqChoices(processedPredefinedResponses),
     });
@@ -474,7 +467,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       } else {
         const resString = replaceStoredDataInString(
           res.message,
-          this.stateData
+          this.stateData,
         );
         if (res.jumpToStepId) {
           this.addResponseNavigation(resString, res.jumpToStepId);
@@ -493,14 +486,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   applyButtonAction(buttonAction: ButtonAction) {
-    if (
-      buttonAction.buttonActionType === ButtonActionTypeEnum.FILTER_TO_PANELIST
-    ) {
+    if (buttonAction.buttonActionType === "FILTER_TO_PANELIST") {
       this.filteredToPanelists = buttonAction.buttonActionValue;
-    } else if (
-      buttonAction.buttonActionType ===
-      ButtonActionTypeEnum.CLEAR_PANELIST_FILTERS
-    ) {
+    } else if (buttonAction.buttonActionType === "CLEAR_PANELIST_FILTERS") {
       this.filteredToPanelists = [];
     }
     this.onFilteredPanelistsChanged?.(this.filteredToPanelists);
@@ -520,7 +508,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
   mergeRagConfigs(
     baseRagConfig: RagStoreConfiguration | undefined,
-    panelistRagConfig: RagStoreConfiguration
+    panelistRagConfig: RagStoreConfiguration,
   ): RagStoreConfiguration | undefined {
     // If no base config, return panelist config
     if (!baseRagConfig) {
@@ -528,8 +516,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     }
 
     // Merge ragQuery fields (combine base + panelist)
-    const baseRagQuery = baseRagConfig.ragQuery || '';
-    const panelistRagQuery = panelistRagConfig.ragQuery || '';
+    const baseRagQuery = baseRagConfig.ragQuery || "";
+    const panelistRagQuery = panelistRagConfig.ragQuery || "";
 
     const mergedRagQuery =
       baseRagQuery && panelistRagQuery
@@ -571,7 +559,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
   async goToNextStep() {
     if (!this.curStep) {
-      throw new Error('No current step found');
+      throw new Error("No current step found");
     }
     try {
       this.curStep = this.getNextStep(this.curStep);
@@ -587,20 +575,20 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.sendMessage({
       id: uuidv4(),
       message,
-      sender: Sender.SYSTEM,
-      displayType: MessageDisplayType.TEXT,
+      sender: "SYSTEM",
+      displayType: "TEXT",
       disableUserInput: true,
     });
   }
 
   async handleNewUserMessage(message: string) {
     if (!this.curStep) {
-      throw new Error('No current step found');
+      throw new Error("No current step found");
     }
-    if (this.curStep.stepType !== ActivityBuilderStepType.REQUEST_USER_INPUT) {
+    if (this.curStep.stepType !== "REQUEST_USER_INPUT") {
       return;
     }
-    console.log('message', message);
+    console.log("message", message);
     if (message === EDIT_DOC_GOAL_MESSAGE) {
       this.editDocGoal();
     }
@@ -618,7 +606,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     if (requestUserInputStep.predefinedResponses.length > 0) {
       const predefinedResponseMatch =
         requestUserInputStep.predefinedResponses.find(
-          (response) => response.message === message
+          (response) => response.message === message,
         );
       if (predefinedResponseMatch) {
         if (predefinedResponseMatch.buttonAction) {
@@ -626,11 +614,11 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         }
         if (predefinedResponseMatch.jumpToStepId) {
           const jumpStep = this.getStepById(
-            predefinedResponseMatch.jumpToStepId
+            predefinedResponseMatch.jumpToStepId,
           );
           if (!jumpStep) {
             this.sendErrorMessage(
-              `Unable to find target step ${predefinedResponseMatch.jumpToStepId} for predefined input ${predefinedResponseMatch.message}, maybe you deleted it and forgot to update this step?`
+              `Unable to find target step ${predefinedResponseMatch.jumpToStepId} for predefined input ${predefinedResponseMatch.message}, maybe you deleted it and forgot to update this step?`,
             );
             return;
           }
@@ -652,7 +640,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           const jumpStep = this.getStepById(responseNavigation.jumpToStepId);
           if (!jumpStep) {
             this.sendErrorMessage(
-              `Unable to find target step ${responseNavigation.jumpToStepId} for predefined input ${responseNavigation.response}, maybe you deleted it and forgot to update this step?`
+              `Unable to find target step ${responseNavigation.jumpToStepId} for predefined input ${responseNavigation.response}, maybe you deleted it and forgot to update this step?`,
             );
             return;
           }
@@ -675,7 +663,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.stateData = {
       ...this.stateData,
       [DOC_TEXT_KEY]: docData.plainText,
-      [DOC_NUM_WORDS_KEY]: docData.plainText.split(' ').length,
+      [DOC_NUM_WORDS_KEY]: docData.plainText.split(" ").length,
     };
   }
 
@@ -685,7 +673,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       return;
     }
     const newMessage = chatLog[chatLog.length - 1];
-    if (newMessage.sender === Sender.USER) {
+    if (newMessage.sender === "USER") {
       this.handleNewUserMessage(newMessage.message);
     }
   }
@@ -696,13 +684,13 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // Prepare all prompt executions (including panelist prompts)
     const promptExecutions: Promise<
       | {
-          type: 'json';
+          type: "json";
           data: StateData;
           originalConfiguration: SinglePromptConfiguration;
           panelistClientId?: string;
         }
       | {
-          type: 'text';
+          type: "text";
           message: string;
           sources?: Source[];
           aiServiceStepData: AiServiceStepDataTypes[];
@@ -721,25 +709,25 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         const allEffectivePanelists = config.runForPanelistClientIds.reduce(
           (acc: Panelist[], clientId) => {
             const panelist = this.activityPanelists?.find(
-              (p) => p.clientId === clientId
+              (p) => p.clientId === clientId,
             );
             if (panelist) {
               acc.push(panelist);
             }
             return acc;
           },
-          []
+          [],
         );
         const effectivePanelists =
           this.filteredToPanelists.length > 0
             ? allEffectivePanelists.filter((p) =>
-                this.filteredToPanelists.includes(p.clientId)
+                this.filteredToPanelists.includes(p.clientId),
               )
             : allEffectivePanelists;
         // Execute prompt for each panelist
         for (const panelist of effectivePanelists) {
           promptExecutions.push(
-            this.executePanelistPromptConfiguration(config, panelist)
+            this.executePanelistPromptConfiguration(config, panelist),
           );
         }
       } else {
@@ -753,12 +741,12 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
     // Check if any prompts failed
     const hasFailures = promptResults.some(
-      (result) => result.status === 'rejected'
+      (result) => result.status === "rejected",
     );
 
     if (hasFailures) {
       // If any prompt failed, fail the entire step
-      this.sendErrorMessage('AI Service request failed');
+      this.sendErrorMessage("AI Service request failed");
       this.lastFailedStepId = step.stepId;
       this.setResponsePending(false);
       return;
@@ -769,8 +757,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     const panelistData: Record<string, StateData> = {};
 
     for (const result of promptResults) {
-      if (result.status === 'fulfilled') {
-        if (result.value.type === 'json') {
+      if (result.status === "fulfilled") {
+        if (result.value.type === "json") {
           // Check if this is a panelist result
           if (result.value.panelistClientId) {
             // Store panelist JSON data under panelistData
@@ -778,8 +766,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           } else {
             // Merge JSON results into accumulated object
             if (result.value.originalConfiguration.systemCustomName) {
-              jsonResults['named_system_responses'] = {
-                ...(jsonResults['named_system_responses'] || {}),
+              jsonResults["named_system_responses"] = {
+                ...(jsonResults["named_system_responses"] || {}),
                 [result.value.originalConfiguration.systemCustomName]:
                   result.value.data,
               };
@@ -787,18 +775,18 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
               Object.assign(jsonResults, result.value.data);
             }
           }
-        } else if (result.value.type === 'text') {
+        } else if (result.value.type === "text") {
           // Send text response as message
           this.sendMessage({
             id: uuidv4(),
             message: result.value.message,
             sources: result.value.sources,
             aiServiceStepData: result.value.aiServiceStepData,
-            sender: Sender.SYSTEM,
+            sender: "SYSTEM",
             systemCustomName:
               result.value.panelistName ||
               result.value.originalConfiguration.systemCustomName,
-            displayType: MessageDisplayType.TEXT,
+            displayType: "TEXT",
           });
         }
       }
@@ -814,7 +802,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       this.stateData = {
         ...this.stateData,
         panelistData: {
-          ...(this.stateData['panelistData'] || {}),
+          ...(this.stateData["panelistData"] || {}),
           ...panelistData,
         },
       };
@@ -825,15 +813,15 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async executeSinglePromptConfiguration(
-    config: SinglePromptConfiguration
+    config: SinglePromptConfiguration,
   ): Promise<
     | {
-        type: 'json';
+        type: "json";
         data: StateData;
         originalConfiguration: SinglePromptConfiguration;
       }
     | {
-        type: 'text';
+        type: "text";
         message: string;
         sources?: Source[];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -844,22 +832,22 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // Build AI prompt steps with replaced data
     const promptText = replaceStoredDataInString(
       config.promptText,
-      this.stateData
+      this.stateData,
     );
     const responseFormat = replaceStoredDataInString(
       config.responseFormat,
-      this.stateData
+      this.stateData,
     );
     const customSystemRole = replaceStoredDataInString(
       config.customSystemRole,
-      this.stateData
+      this.stateData,
     );
 
     const ragConfiguration = config.ragConfiguration
       ? {
           ragQuery: replaceStoredDataInString(
             config.ragConfiguration.ragQuery,
-            this.stateData
+            this.stateData,
           ),
           topN: config.ragConfiguration.topN,
           filters: config.ragConfiguration.filters,
@@ -883,10 +871,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       aiPromptSteps[0].prompts.push({
         promptText: `Current state of chat log between user and system: ${chatLogToString(
           this.chatLog,
-          30
+          30,
         )}`,
         includeEssay: false,
-        promptRole: PromptRoles.USER,
+        promptRole: "user",
       });
     }
 
@@ -894,18 +882,18 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     const promptConfiguration: PromptConfiguration = {
       promptText,
       includeEssay: config.includeEssay,
-      promptRole: PromptRoles.USER,
+      promptRole: "user",
     };
     aiPromptSteps[0].prompts.push(promptConfiguration);
 
     // Handle JSON response format
-    if (
-      config.jsonResponseData &&
-      config.outputDataType === PromptOutputTypes.JSON
-    ) {
+    if (config.jsonResponseData && config.outputDataType === "JSON") {
       aiPromptSteps[0].responseFormat =
         recursivelyConvertExpectedDataToAiPromptString(
-          recursiveUpdateAdditionalInfo(config.jsonResponseData, this.stateData)
+          recursiveUpdateAdditionalInfo(
+            config.jsonResponseData,
+            this.stateData,
+          ),
         );
     }
 
@@ -914,22 +902,22 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       aiPromptSteps,
       config.outputDataType,
       config,
-      config.jsonResponseData
+      config.jsonResponseData,
     );
   }
 
   async executePanelistPromptConfiguration(
     config: SinglePromptConfiguration,
-    panelist: Panelist
+    panelist: Panelist,
   ): Promise<
     | {
-        type: 'json';
+        type: "json";
         data: StateData;
         originalConfiguration: SinglePromptConfiguration;
         panelistClientId: string;
       }
     | {
-        type: 'text';
+        type: "text";
         message: string;
         sources?: Source[];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -942,40 +930,40 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // Build AI prompt steps with replaced data and panelist modifications
     const basePromptText = replaceStoredDataInString(
       config.promptText,
-      this.stateData
+      this.stateData,
     );
     const panelistPromptSegment = replaceStoredDataInString(
       panelist.promptSegment,
-      this.stateData
+      this.stateData,
     );
     const promptText = `${basePromptText}\n${panelistPromptSegment}`;
 
     const responseFormat = replaceStoredDataInString(
       config.responseFormat,
-      this.stateData
+      this.stateData,
     );
 
     const baseCustomSystemRole = replaceStoredDataInString(
       config.customSystemRole,
-      this.stateData
+      this.stateData,
     );
     const panelistRoleSegment = replaceStoredDataInString(
       panelist.roleSegment,
-      this.stateData
+      this.stateData,
     );
     const customSystemRole = `${baseCustomSystemRole}\n${panelistRoleSegment}`;
 
     // Merge RAG configurations
     const mergedRagConfig = this.mergeRagConfigs(
       config.ragConfiguration,
-      panelist.ragConfig || { ragQuery: '', topN: 0, filters: {} }
+      panelist.ragConfig || { ragQuery: "", topN: 0, filters: {} },
     );
 
     const ragConfiguration = mergedRagConfig
       ? {
           ragQuery: replaceStoredDataInString(
             mergedRagConfig.ragQuery,
-            this.stateData
+            this.stateData,
           ),
           topN: mergedRagConfig.topN,
           filters: mergedRagConfig.filters || {},
@@ -999,10 +987,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       aiPromptSteps[0].prompts.push({
         promptText: `Current state of chat log between user and system: ${chatLogToString(
           this.chatLog,
-          30
+          30,
         )}`,
         includeEssay: false,
-        promptRole: PromptRoles.USER,
+        promptRole: "user",
       });
     }
 
@@ -1010,18 +998,18 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     const promptConfiguration: PromptConfiguration = {
       promptText,
       includeEssay: config.includeEssay,
-      promptRole: PromptRoles.USER,
+      promptRole: "user",
     };
     aiPromptSteps[0].prompts.push(promptConfiguration);
 
     // Handle JSON response format
-    if (
-      config.jsonResponseData &&
-      config.outputDataType === PromptOutputTypes.JSON
-    ) {
+    if (config.jsonResponseData && config.outputDataType === "JSON") {
       aiPromptSteps[0].responseFormat =
         recursivelyConvertExpectedDataToAiPromptString(
-          recursiveUpdateAdditionalInfo(config.jsonResponseData, this.stateData)
+          recursiveUpdateAdditionalInfo(
+            config.jsonResponseData,
+            this.stateData,
+          ),
         );
     }
 
@@ -1030,10 +1018,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       aiPromptSteps,
       config.outputDataType,
       config,
-      config.jsonResponseData
+      config.jsonResponseData,
     );
     // Add panelist information to the result
-    if (result.type === 'json') {
+    if (result.type === "json") {
       return {
         ...result,
         panelistClientId: panelist.clientId,
@@ -1052,15 +1040,15 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     aiPromptSteps: AiPromptStep[],
     outputDataType: PromptOutputTypes,
     originalConfiguration: SinglePromptConfiguration,
-    jsonResponseData?: JsonResponseData[]
+    jsonResponseData?: JsonResponseData[],
   ): Promise<
     | {
-        type: 'json';
+        type: "json";
         data: StateData;
         originalConfiguration: SinglePromptConfiguration;
       }
     | {
-        type: 'text';
+        type: "text";
         message: string;
         sources?: Source[];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1074,27 +1062,27 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       try {
         const _response = await this.executePrompt(aiPromptSteps);
         const response = _response.answer;
-        if (outputDataType === PromptOutputTypes.JSON) {
+        if (outputDataType === "JSON") {
           // Validate and parse JSON response
           if (!isJsonString(response)) {
-            throw new Error('Did not receive valid JSON data');
+            throw new Error("Did not receive valid JSON data");
           }
           if (jsonResponseData) {
             if (!receivedExpectedData(jsonResponseData, response)) {
-              this.errorMessage = 'Did not receive expected JSON data';
-              throw new Error('Did not receive expected JSON data');
+              this.errorMessage = "Did not receive expected JSON data";
+              throw new Error("Did not receive expected JSON data");
             }
           }
           const resData = JSON.parse(response);
           return {
-            type: 'json',
+            type: "json",
             data: resData,
             originalConfiguration: originalConfiguration,
           };
         } else {
           // Return text response
           return {
-            type: 'text',
+            type: "text",
             message: response,
             sources: _response.sources,
             aiServiceStepData: _response.aiAllStepsData,
@@ -1108,6 +1096,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     }
 
     // All retries exhausted
-    throw lastError || new Error('Prompt execution failed after 3 attempts');
+    throw lastError || new Error("Prompt execution failed after 3 attempts");
   }
 }
