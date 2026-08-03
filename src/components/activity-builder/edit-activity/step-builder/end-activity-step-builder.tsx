@@ -16,7 +16,7 @@ import type { StepVersion } from "../activity-flow-container";
 import { VersionsDropdown } from "./versions-dropdown";
 import { InfoTooltip } from "../../../info-tooltip";
 import { goHomePredefinedResponse } from "../../../../helpers";
-import { useEditActivityContext } from "../../helpers";
+import { useEditActivityContext } from "../../activity-builder-context";
 
 export function EndActivityStepBuilder(props: {
   stepId: string;

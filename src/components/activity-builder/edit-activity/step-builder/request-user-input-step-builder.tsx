@@ -40,11 +40,12 @@ import { FlowStepSelector } from "../../shared/flow-step-selector";
 import { JumpToAlternateStep } from "../../shared/jump-to-alternate-step";
 import type { StepVersion } from "../activity-flow-container";
 import { VersionsDropdown } from "./versions-dropdown";
-import { isContextDataString, useEditActivityContext } from "../../helpers";
+import { isContextDataString } from "../../helpers";
 import DropdownDisplay from "../../../dropdown-display";
 import { InfoTooltip } from "../../../info-tooltip";
 import { useWithPanels } from "../../../../store/slices/panels/use-with-panels";
 import type { Panelist } from "../../../../store/slices/panels/types";
+import { useEditActivityContext } from "../../activity-builder-context";
 
 function ButtonActionUpdater(props: {
   buttonAction?: ButtonAction;

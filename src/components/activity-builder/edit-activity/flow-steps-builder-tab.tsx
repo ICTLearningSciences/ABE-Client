@@ -10,7 +10,6 @@ import { Info } from "@mui/icons-material";
 
 import type { ActivityBuilderStepTypes, FlowItem } from "../types";
 import { ColumnDiv } from "../../../styled-components";
-import { useEditActivityContext } from "../helpers";
 import { RequestUserInputStepBuilder } from "./step-builder/request-user-input-step-builder";
 import { PromptStepBuilder } from "./step-builder/prompt-step-builder";
 import { InputField } from "../shared/input-components";
@@ -28,6 +27,7 @@ import {
   getDefaultRequestUserInputBuilder,
   getDefaultSystemMessage,
 } from "../../../helpers";
+import { useEditActivityContext } from "../activity-builder-context";
 
 export function FlowStepsBuilderTab(props: {
   stepsErrors?: StepErrors;

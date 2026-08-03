@@ -28,7 +28,7 @@ import type { StepVersion } from "../activity-flow-container";
 import { VersionsDropdown } from "./versions-dropdown";
 import { FlowStepSelector } from "../../shared/flow-step-selector";
 import { InfoTooltip } from "../../../info-tooltip";
-import { useEditActivityContext } from "../../helpers";
+import { useEditActivityContext } from "../../activity-builder-context";
 
 export function ConditionalStepBuilder(props: {
   globalStateKeys: string[];

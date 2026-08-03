@@ -18,18 +18,18 @@ import { ActivityFlowContainer } from "./activity-flow-container";
 import { ColumnDiv, RowDiv } from "../../../styled-components";
 import { InputField, SelectInputField } from "../shared/input-components";
 import { equals } from "../../../helpers";
-import {
-  isActivityRunnable,
-  useActivityBuilderContext,
-  useEditActivityContext,
-} from "../helpers";
+import { isActivityRunnable, useActivityBuilderContext } from "../helpers";
 import {
   DOC_NUM_WORDS_KEY,
   DOC_TEXT_KEY,
 } from "../../../classes/activity-builder-activity/built-activity-handler";
 import { useWithCheckActivityErrors } from "../../../hooks/use-with-check-activity-errors";
-import { EditActivityProvider } from "../activity-builder-context";
+import {
+  EditActivityProvider,
+  useEditActivityContext,
+} from "../activity-builder-context";
 import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
+import { useAppSelector } from "../../../store/hooks";
 
 // Inner component that uses the context
 function EditActivityContent(props: {
@@ -54,7 +54,7 @@ function EditActivityContent(props: {
     updateAttachedPanel,
   } = useEditActivityContext();
   const [saveInProgress, setSaveInProgress] = React.useState<boolean>(false);
-  const { activityVersions, loadActivityVersions, canEditActivity } =
+  const { activityVersions, loadActivityVersions } =
     useActivityBuilderContext();
   const { panels } = useWithPanels();
 
@@ -108,6 +108,12 @@ function EditActivityContent(props: {
     addFlow(uuidv4(), "");
   }
 
+  const user = useAppSelector((state) => state.login.user);
+  const canEdit =
+    activity.user === user?._id ||
+    user?.userRole === "ADMIN" ||
+    activity.visibility === "editable";
+
   if (!errors) return <div />;
   return (
     <ColumnDiv
@@ -144,7 +150,7 @@ function EditActivityContent(props: {
           label="Activity Name"
           value={activity.title}
           width="100%"
-          disabled={!canEditActivity(activity)}
+          disabled={!canEdit}
           key={activity.clientId}
           onChange={updateTitle}
         />
@@ -158,7 +164,7 @@ function EditActivityContent(props: {
           label="Visibility"
           value={activity.visibility}
           options={["editable", "read-only", "private"]}
-          disabled={!canEditActivity(activity)}
+          disabled={!canEdit}
           onChange={(v) => updateVisibility(v as ActivityBuilderVisibility)}
         />
         <SelectInputField
@@ -166,7 +172,7 @@ function EditActivityContent(props: {
           value={activity.attachedPanel || ""}
           options={["", ...panels.map((panel) => panel.clientId)]}
           optionLabels={["None", ...panels.map((panel) => panel.panelName)]}
-          disabled={!canEditActivity(activity)}
+          disabled={!canEdit}
           onChange={(v) => updateAttachedPanel(v || undefined)}
         />
 
@@ -192,9 +198,7 @@ function EditActivityContent(props: {
                 marginRight: "10px",
               }}
               variant="outlined"
-              disabled={
-                !canEditActivity(activity) || equals(activity, originalActivity)
-              }
+              disabled={!canEdit || equals(activity, originalActivity)}
               onClick={saveActivity}
             >
               Save
@@ -210,7 +214,7 @@ function EditActivityContent(props: {
             data-cy="add-flow"
             onClick={addNewFlow}
             variant="outlined"
-            disabled={!canEditActivity(activity)}
+            disabled={!canEdit}
           >
             + Add Flow
           </Button>
@@ -219,7 +223,7 @@ function EditActivityContent(props: {
       <ActivityFlowContainer
         globalStateKeys={globalStateKeys}
         versions={activityVersions[activity.clientId] || []}
-        disabled={!canEditActivity(activity)}
+        disabled={!canEdit}
         stepErrors={errors}
       />
     </ColumnDiv>

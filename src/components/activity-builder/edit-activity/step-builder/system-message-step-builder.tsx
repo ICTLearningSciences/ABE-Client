@@ -14,8 +14,8 @@ import { JumpToAlternateStep } from "../../shared/jump-to-alternate-step";
 import type { SystemMessageActivityStep, FlowItem } from "../../types";
 import type { StepVersion } from "../activity-flow-container";
 import { VersionsDropdown } from "./versions-dropdown";
-import { useEditActivityContext } from "../../helpers";
 import { PanelistSelector } from "./panelist-selector";
+import { useEditActivityContext } from "../../activity-builder-context";
 
 export function SystemMessageStepBuilder(props: {
   stepId: string;

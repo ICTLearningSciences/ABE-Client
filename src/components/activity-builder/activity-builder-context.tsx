@@ -16,7 +16,6 @@ import type {
 } from "./types";
 import type { AiPromptStep, RagStoreConfiguration } from "../../types";
 import type { AiServicesResponseTypes } from "../../ai-services/ai-service-types";
-import type { EditActivityAction } from "./helpers";
 
 interface ActivityBuilderContextType {
   userId?: string;
@@ -40,6 +39,11 @@ const ActivityBuilderContext = React.createContext<ActivityBuilderContextType>({
   loadActivityVersions: () => Promise.resolve([]),
   executePromptSteps: undefined,
 });
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useActivityBuilderContext = () => {
+  return React.useContext(ActivityBuilderContext);
+};
 
 export const ActivityBuilderProvider: React.FC<{
   children: React.ReactNode;
@@ -82,6 +86,88 @@ export const ActivityBuilderProvider: React.FC<{
 // ============================================================================
 // Edit Activity Context (for managing local activity state during editing)
 // ============================================================================
+
+type EditActivityAction =
+  | { type: "SET_ACTIVITY"; payload: ActivityBuilder }
+  | { type: "UPDATE_TITLE"; payload: string }
+  | { type: "UPDATE_DESCRIPTION"; payload: string }
+  | { type: "UPDATE_VISIBILITY"; payload: ActivityBuilder["visibility"] }
+  | { type: "UPDATE_ATTACHED_PANEL"; payload: string | undefined }
+  | { type: "ADD_FLOW"; payload: { clientId: string; name: string } }
+  | { type: "DELETE_FLOW"; payload: string }
+  | {
+      type: "UPDATE_FLOW_NAME";
+      payload: { flowClientId: string; name: string };
+    }
+  | {
+      type: "ADD_STEP";
+      payload: {
+        flowClientId: string;
+        step: ActivityBuilderStepTypes;
+        index: number;
+      };
+    }
+  | {
+      type: "UPDATE_STEP";
+      payload: { flowClientId: string; step: ActivityBuilderStepTypes };
+    }
+  | { type: "DELETE_STEP"; payload: { flowClientId: string; stepId: string } }
+  | {
+      type: "UPDATE_PROMPT_CONFIG_FIELD";
+      payload: {
+        stepId: string;
+        configIndex: number;
+        field: string;
+        value:
+          | string
+          | boolean
+          | string[]
+          | JsonResponseData[]
+          | RagStoreConfiguration
+          | undefined;
+      };
+    }
+  | {
+      type: "UPDATE_STEP_FIELD";
+      payload: { stepId: string; field: string; value: any };
+    }
+  | {
+      type: "ADD_PROMPT_CONFIGURATION";
+      payload: { stepId: string; configuration: any };
+    }
+  | {
+      type: "REMOVE_PROMPT_CONFIGURATION";
+      payload: { stepId: string; configIndex: number };
+    }
+  | {
+      type: "UPDATE_JSON_RESPONSE_DATA";
+      payload: {
+        stepId: string;
+        configIndex: number;
+        clientId: string;
+        field: string;
+        value: string | boolean;
+        parentJsonResponseDataIds: string[];
+      };
+    }
+  | {
+      type: "ADD_JSON_RESPONSE_DATA";
+      payload: {
+        stepId: string;
+        configIndex: number;
+        parentJsonResponseDataIds: string[];
+        newData: JsonResponseData;
+      };
+    }
+  | {
+      type: "DELETE_JSON_RESPONSE_DATA";
+      payload: {
+        stepId: string;
+        configIndex: number;
+        clientId: string;
+        parentJsonResponseDataIds: string[];
+      };
+    };
 
 function editActivityReducer(
   state: ActivityBuilder,
@@ -487,6 +573,17 @@ interface EditActivityContextType {
 const EditActivityContext = React.createContext<EditActivityContextType | null>(
   null,
 );
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useEditActivityContext = () => {
+  const context = React.useContext(EditActivityContext);
+  if (!context) {
+    throw new Error(
+      "useEditActivityContext must be used within EditActivityProvider",
+    );
+  }
+  return context;
+};
 
 export const EditActivityProvider: React.FC<{
   children: React.ReactNode;

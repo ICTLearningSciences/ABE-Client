@@ -32,6 +32,7 @@ import {
 import { useWithEducationalManagement } from "../../store/slices/education-management/use-with-educational-management";
 import { getStudentAssignmentDocs } from "../../helpers";
 import { useWithWindowSize } from "../../hooks/use-with-window-size";
+import { useEducationalSetting } from "../../contexts/educational-setting-context";
 
 export default function SelectCreateDocs(props: {
   googleDocs?: UserDoc[];
@@ -78,7 +79,7 @@ export default function SelectCreateDocs(props: {
   const [docToDelete, setDocToDelete] = React.useState<UserDoc>();
   const [deleteInProgress, setDeleteInProgress] = React.useState(false);
   const [loadInProgress, setLoadInProgress] = React.useState(false);
-  const isEducationalSetting = true;
+  const { isEducationalSetting } = useEducationalSetting();
   const { isMobile } = useWithWindowSize();
   const { viewState, myData, studentActivityDocPrimaryStatusSet } =
     useWithEducationalManagement();

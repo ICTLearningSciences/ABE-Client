@@ -42,11 +42,7 @@ import type {
 import { JumpToAlternateStep } from "../../shared/jump-to-alternate-step";
 import type { AiServicesResponseTypes } from "../../../../ai-services/ai-service-types";
 import ViewPreviousRunModal from "../../../admin-view/view-previous-run-modal";
-import {
-  recursivelyConvertExpectedDataToAiPromptString,
-  useActivityBuilderContext,
-  useEditActivityContext,
-} from "../../helpers";
+import { recursivelyConvertExpectedDataToAiPromptString } from "../../helpers";
 import { TextDialog } from "../../../dialog";
 import ViewPreviousRunsModal from "../../../admin-view/view-previous-runs-modal";
 import { JsonResponseDataUpdater } from "./json-response-data-builder";
@@ -55,6 +51,8 @@ import { VersionsDropdown } from "./versions-dropdown";
 import { RagStoreConfigurationEditor } from "./rag-store-configuration-editor";
 import { PanelistSelector } from "./panelist-selector";
 import { getDefaultSinglePromptConfiguration } from "../../../../helpers";
+import { useEditActivityContext } from "../../activity-builder-context";
+import { useWithExecutePrompt } from "../../../../hooks/use-with-execute-prompts";
 
 type ViewingInputType = "PROMPT_TEXT" | "RESPONSE_FORMAT" | "NONE";
 
@@ -281,7 +279,7 @@ export function PromptStepBuilder(props: {
 
   const step = getStep(stepId) as PromptActivityStep;
   const flow = getFlowByStepId(stepId);
-  const { executePromptSteps } = useActivityBuilderContext();
+  const { executePromptSteps } = useWithExecutePrompt();
   const currentFLow = flowsList.find((f) => {
     return f.steps.find((s) => s.stepId === step.stepId);
   });

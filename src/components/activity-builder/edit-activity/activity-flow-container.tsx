@@ -15,10 +15,11 @@ import type {
   PromptActivityStep,
 } from "../types";
 import { FlowStepsBuilderTab } from "./flow-steps-builder-tab";
-import { getPromptStepById, useEditActivityContext } from "../helpers";
+import { getPromptStepById } from "../helpers";
 import { ColumnDiv } from "../../../styled-components";
 import { PromptStepBuilder } from "./step-builder/prompt-step-builder";
 import type { FlowErrors } from "../../../classes/activity-builder-activity/activity-step-error-checker";
+import { useEditActivityContext } from "../activity-builder-context";
 
 interface TabPanelProps {
   children?: React.ReactNode;

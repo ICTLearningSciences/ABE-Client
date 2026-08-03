@@ -155,6 +155,7 @@ export function ExistingActivities(props: {
   } = props;
   const activityContext = useActivityBuilderContext();
   console.log(activityContext);
+  const user = useAppSelector((state) => state.login.user);
   const myActivities = activities.filter(
     (activity) => activity.user === activityContext.userId,
   );
@@ -217,6 +218,12 @@ export function ExistingActivities(props: {
       </h2>
       {otherActivities.length === 0 && <p>No activities found</p>}
       {otherActivities.map((activity) => {
+        const canEdit =
+          activity.user === user?._id ||
+          user?.userRole === "ADMIN" ||
+          activity.visibility === "editable";
+        const canDelete =
+          user?.userRole === "ADMIN" || activity.user === user?._id;
         return (
           <ExistingActivityItem
             key={activity._id}
@@ -229,8 +236,8 @@ export function ExistingActivities(props: {
               props.goToActivity(activity);
             }}
             deleteBuiltActivity={deleteBuiltActivity}
-            canEditActivity={activityContext.canEditActivity(activity)}
-            canDeleteActivity={activityContext.canDeleteActivity(activity)}
+            canEditActivity={canEdit}
+            canDeleteActivity={canDelete}
             isInstructor={isInstructor}
             educationReady={isActivityEducationReady(activity._id)}
           />
