@@ -20,11 +20,9 @@ export function ReferencesButton(props: {
   const { curDocId } = state;
   const { state: chatState } = useWithChat();
   const messages = curDocId ? chatState.chatLogs[curDocId] || [] : [];
-  const [sources, setSources] = React.useState<Source[]>([]);
 
-  React.useEffect(() => {
-    if (!curDocId) return;
-    const sources = [];
+  const sources = [];
+  if (curDocId) {
     for (const msg of messages) {
       if ("sources" in msg) {
         for (const source of msg.sources || []) {
@@ -32,8 +30,7 @@ export function ReferencesButton(props: {
         }
       }
     }
-    setSources(sources);
-  }, [messages]);
+  }
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

@@ -279,7 +279,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
   const instructors: Instructor[] = useAppSelector(
     (state) => state.educationManagement.instructors,
   );
-  const myData: Instructor | StudentData = useAppSelector(
+  const myData: Instructor | StudentData | undefined = useAppSelector(
     (state) =>
       state.educationManagement.instructorData ||
       state.educationManagement.studentData,
@@ -1019,7 +1019,7 @@ export function useWithEducationalManagement(): UseWithEducationalManagement {
       }
     }
     return hydratedViewState;
-  }, [viewState, courses, sections, assignments, activities, students]);
+  }, [viewState, courses, sections, assignments, activities, students, myData]);
 
   function clearErrorMessage() {
     dispatch(_clearErrorMessage());

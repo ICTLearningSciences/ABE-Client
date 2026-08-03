@@ -10,32 +10,24 @@ import { Info } from "@mui/icons-material";
 
 import type { ActivityBuilderStepTypes, FlowItem } from "../types";
 import { ColumnDiv } from "../../../styled-components";
-import { useEditActivityContext } from "../activity-builder-context";
-import {
-  RequestUserInputStepBuilder,
-  getDefaultRequestUserInputBuilder,
-} from "./step-builder/request-user-input-step-builder";
-import {
-  PromptStepBuilder,
-  defaultPromptBuilder,
-} from "./step-builder/prompt-step-builder";
+import { useEditActivityContext } from "../helpers";
+import { RequestUserInputStepBuilder } from "./step-builder/request-user-input-step-builder";
+import { PromptStepBuilder } from "./step-builder/prompt-step-builder";
 import { InputField } from "../shared/input-components";
 import { AddNewActivityButton } from "../shared/add-new-activity-button";
-import {
-  SystemMessageStepBuilder,
-  getDefaultSystemMessage,
-} from "./step-builder/system-message-step-builder";
+import { SystemMessageStepBuilder } from "./step-builder/system-message-step-builder";
 import type { StepVersion } from "./activity-flow-container";
-import {
-  ConditionalStepBuilder,
-  getDefaultConditionalStep,
-} from "./step-builder/conditional-step-builder";
+import { ConditionalStepBuilder } from "./step-builder/conditional-step-builder";
 import type { StepErrors } from "../../../classes/activity-builder-activity/activity-step-error-checker";
 import type { AddNewActivityStepType } from "../shared/add-new-activity-button";
+import { EndActivityStepBuilder } from "./step-builder/end-activity-step-builder";
 import {
-  EndActivityStepBuilder,
+  defaultPromptBuilder,
+  getDefaultConditionalStep,
   getDefaultEndActivityStepBuilder,
-} from "./step-builder/end-activity-step-builder";
+  getDefaultRequestUserInputBuilder,
+  getDefaultSystemMessage,
+} from "../../../helpers";
 
 export function FlowStepsBuilderTab(props: {
   stepsErrors?: StepErrors;

@@ -115,7 +115,9 @@ export default function TimelineFooter(props: {
     <TimelineTestContainer
       data-cy="timeline-footer-wrapper"
       ref={footerTimelineRef}
+      // eslint-disable-next-line react-hooks/refs
       style={{
+        // eslint-disable-next-line react-hooks/refs
         width: footerTimelineRef.current?.scrollWidth || innerWidth,
       }}
     >
@@ -124,7 +126,9 @@ export default function TimelineFooter(props: {
         alternativeLabel
         connector={<ColorlibConnector />}
         sx={StepperSx}
+        // eslint-disable-next-line react-hooks/refs
         style={{
+          // eslint-disable-next-line react-hooks/refs
           width: footerTimelineRef.current?.scrollWidth || innerWidth || "100%",
         }}
       >

@@ -8,10 +8,15 @@ The full terms of this copyright and license should always be found in the root 
 import Validator, { type Schema } from "jsonschema";
 import type {
   ActivityBuilder,
+  ActivityBuilderStepTypes,
+  BuiltActivityVersion,
   FlowItem,
   JsonResponseData,
   PredefinedResponse,
 } from "./types";
+import React from "react";
+import type { AiServicesResponseTypes } from "../../ai-services/ai-service-types";
+import type { AiPromptStep, RagStoreConfiguration } from "../../types";
 
 function convertExpectedDataIntoSchema(
   expectedData: JsonResponseData[],
@@ -221,3 +226,185 @@ export function recursiveUpdateAdditionalInfo(
   }
   return copy;
 }
+
+interface ActivityBuilderContextType {
+  userId?: string;
+  canEditActivity: (activity: ActivityBuilder) => boolean;
+  canDeleteActivity: (activity: ActivityBuilder) => boolean;
+  activityVersions: Record<string, BuiltActivityVersion[]>;
+  loadActivityVersions: (
+    activityClientId: string,
+  ) => Promise<BuiltActivityVersion[]>;
+  executePromptSteps?: (
+    aiPromptSteps: AiPromptStep[],
+    callback?: (response: AiServicesResponseTypes) => void,
+  ) => Promise<AiServicesResponseTypes>;
+}
+export const useActivityBuilderContext = () => {
+  return React.useContext(ActivityBuilderContext);
+};
+const ActivityBuilderContext = React.createContext<ActivityBuilderContextType>({
+  userId: undefined,
+  canEditActivity: () => false,
+  canDeleteActivity: () => false,
+  activityVersions: {},
+  loadActivityVersions: () => Promise.resolve([]),
+  executePromptSteps: undefined,
+});
+
+export type EditActivityAction =
+  | { type: "SET_ACTIVITY"; payload: ActivityBuilder }
+  | { type: "UPDATE_TITLE"; payload: string }
+  | { type: "UPDATE_DESCRIPTION"; payload: string }
+  | { type: "UPDATE_VISIBILITY"; payload: ActivityBuilder["visibility"] }
+  | { type: "UPDATE_ATTACHED_PANEL"; payload: string | undefined }
+  | { type: "ADD_FLOW"; payload: { clientId: string; name: string } }
+  | { type: "DELETE_FLOW"; payload: string }
+  | {
+      type: "UPDATE_FLOW_NAME";
+      payload: { flowClientId: string; name: string };
+    }
+  | {
+      type: "ADD_STEP";
+      payload: {
+        flowClientId: string;
+        step: ActivityBuilderStepTypes;
+        index: number;
+      };
+    }
+  | {
+      type: "UPDATE_STEP";
+      payload: { flowClientId: string; step: ActivityBuilderStepTypes };
+    }
+  | { type: "DELETE_STEP"; payload: { flowClientId: string; stepId: string } }
+  | {
+      type: "UPDATE_PROMPT_CONFIG_FIELD";
+      payload: {
+        stepId: string;
+        configIndex: number;
+        field: string;
+        value:
+          | string
+          | boolean
+          | string[]
+          | JsonResponseData[]
+          | RagStoreConfiguration
+          | undefined;
+      };
+    }
+  | {
+      type: "UPDATE_STEP_FIELD";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      payload: { stepId: string; field: string; value: any };
+    }
+  | {
+      type: "ADD_PROMPT_CONFIGURATION";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      payload: { stepId: string; configuration: any };
+    }
+  | {
+      type: "REMOVE_PROMPT_CONFIGURATION";
+      payload: { stepId: string; configIndex: number };
+    }
+  | {
+      type: "UPDATE_JSON_RESPONSE_DATA";
+      payload: {
+        stepId: string;
+        configIndex: number;
+        clientId: string;
+        field: string;
+        value: string | boolean;
+        parentJsonResponseDataIds: string[];
+      };
+    }
+  | {
+      type: "ADD_JSON_RESPONSE_DATA";
+      payload: {
+        stepId: string;
+        configIndex: number;
+        parentJsonResponseDataIds: string[];
+        newData: JsonResponseData;
+      };
+    }
+  | {
+      type: "DELETE_JSON_RESPONSE_DATA";
+      payload: {
+        stepId: string;
+        configIndex: number;
+        clientId: string;
+        parentJsonResponseDataIds: string[];
+      };
+    };
+interface EditActivityContextType {
+  activity: ActivityBuilder;
+  dispatch: React.Dispatch<EditActivityAction>;
+  // Helpers
+  getStep: (stepId: string) => ActivityBuilderStepTypes | undefined;
+  getFlowByStepId: (
+    stepId: string,
+  ) => { clientId: string; name: string } | undefined;
+  // Convenience action creators
+  updateTitle: (title: string) => void;
+  updateDescription: (description: string) => void;
+  updateVisibility: (visibility: ActivityBuilder["visibility"]) => void;
+  updateAttachedPanel: (panelClientId: string | undefined) => void;
+  addFlow: (clientId: string, name: string) => void;
+  deleteFlow: (flowClientId: string) => void;
+  updateFlowName: (flowClientId: string, name: string) => void;
+  addStep: (
+    flowClientId: string,
+    step: ActivityBuilderStepTypes,
+    index: number,
+  ) => void;
+  updateStep: (flowClientId: string, step: ActivityBuilderStepTypes) => void;
+  deleteStep: (flowClientId: string, stepId: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updateStepField: (stepId: string, field: string, value: any) => void;
+  updatePromptConfigField: (
+    stepId: string,
+    configIndex: number,
+    field: string,
+    value:
+      | string
+      | boolean
+      | string[]
+      | JsonResponseData[]
+      | RagStoreConfiguration
+      | undefined,
+  ) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  addPromptConfiguration: (stepId: string, configuration: any) => void;
+  removePromptConfiguration: (stepId: string, configIndex: number) => void;
+  updateJsonResponseData: (
+    stepId: string,
+    configIndex: number,
+    clientId: string,
+    field: string,
+    value: string | boolean,
+    parentJsonResponseDataIds: string[],
+  ) => void;
+  addJsonResponseData: (
+    stepId: string,
+    configIndex: number,
+    parentJsonResponseDataIds: string[],
+    newData: JsonResponseData,
+  ) => void;
+  deleteJsonResponseData: (
+    stepId: string,
+    configIndex: number,
+    clientId: string,
+    parentJsonResponseDataIds: string[],
+  ) => void;
+}
+const EditActivityContext = React.createContext<EditActivityContextType | null>(
+  null,
+);
+export const useEditActivityContext = () => {
+  const context = React.useContext(EditActivityContext);
+  if (!context) {
+    throw new Error(
+      "useEditActivityContext must be used within EditActivityProvider",
+    );
+  }
+  return context;
+};

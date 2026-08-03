@@ -4,10 +4,23 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-module.exports = {
-  preset: "ts-jest",
-  transform: {
-    "^.+\\.(ts|tsx)?$": "ts-jest",
-    "^.+\\.(js|jsx)$": "babel-jest",
-  },
-};
+
+import { createContext, useContext } from "react";
+
+interface EducationalSettingContextType {
+  isEducationalSetting: boolean;
+}
+
+const EducationalSettingContext = createContext<
+  EducationalSettingContextType | undefined
+>(undefined);
+
+export function useEducationalSetting(): EducationalSettingContextType {
+  const context = useContext(EducationalSettingContext);
+  if (context === undefined) {
+    throw new Error(
+      "useEducationalSetting must be used within an EducationalSettingProvider",
+    );
+  }
+  return context;
+}

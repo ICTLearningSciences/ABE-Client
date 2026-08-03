@@ -150,19 +150,18 @@ export const stateSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    (builder.addCase(loadUserDocs.fulfilled, (state, action) => {
+    builder.addCase(loadUserDocs.fulfilled, (state, action) => {
       state.userDocsLoadStatus = 2;
       state.userDocs = action.payload;
-    }),
-      builder.addCase(loadUserDocs.rejected, (state) => {
-        state.userDocsLoadStatus = 3;
-        state.userDocs = [];
-      }),
-      builder.addCase(loadUserDocs.pending, (state) => {
-        state.userDocsLoadStatus = 1;
-        state.userDocs = [];
-      }));
-
+    });
+    builder.addCase(loadUserDocs.rejected, (state) => {
+      state.userDocsLoadStatus = 3;
+      state.userDocs = [];
+    });
+    builder.addCase(loadUserDocs.pending, (state) => {
+      state.userDocsLoadStatus = 1;
+      state.userDocs = [];
+    });
     builder.addCase(updateUserDoc.fulfilled, (state, action) => {
       state.userDocs = state.userDocs.map((doc) => {
         if (doc.googleDocId === action.payload.googleDocId) {
@@ -176,7 +175,6 @@ export const stateSlice = createSlice({
         (doc) => doc.googleDocId !== action.payload.googleDocId,
       );
     });
-
     builder.addCase(setArchiveUserDoc.fulfilled, (state, action) => {
       state.userDocs = state.userDocs.map((doc) => {
         if (

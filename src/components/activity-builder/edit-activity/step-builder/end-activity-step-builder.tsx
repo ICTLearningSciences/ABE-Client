@@ -6,42 +6,17 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import React from "react";
-import { v4 as uuid } from "uuid";
 import { Collapse, IconButton } from "@mui/material";
 import { Delete, ExpandMore, ExpandLess } from "@mui/icons-material";
 
-import type {
-  FlowItem,
-  PredefinedResponse,
-  RequestUserInputActivityStep,
-} from "../../types";
-import { useEditActivityContext } from "../../activity-builder-context";
+import type { FlowItem, RequestUserInputActivityStep } from "../../types";
 import { RoundedBorderDiv, TopLeftText } from "../../../../styled-components";
 import { CheckBoxInput, InputField } from "../../shared/input-components";
 import type { StepVersion } from "../activity-flow-container";
 import { VersionsDropdown } from "./versions-dropdown";
 import { InfoTooltip } from "../../../info-tooltip";
-import { GO_HOME_BUTTON_MESSAGE } from "../../../../classes/activity-builder-activity/built-activity-handler";
-
-const goHomePredefinedResponse: PredefinedResponse = {
-  clientId: "go-home-predefined-response",
-  message: GO_HOME_BUTTON_MESSAGE,
-};
-
-export function getDefaultEndActivityStepBuilder(): RequestUserInputActivityStep {
-  return {
-    stepId: uuid(),
-    stepType: "REQUEST_USER_INPUT",
-    message: "",
-    saveResponseVariableName: "",
-    systemCustomName: "",
-    saveAsIntention: false,
-    disableFreeInput: true,
-    setStudentActivityComplete: true,
-    predefinedResponses: [goHomePredefinedResponse],
-    specialType: "END_ACTIVITY",
-  };
-}
+import { goHomePredefinedResponse } from "../../../../helpers";
+import { useEditActivityContext } from "../../helpers";
 
 export function EndActivityStepBuilder(props: {
   stepId: string;
@@ -59,10 +34,6 @@ export function EndActivityStepBuilder(props: {
 
   const step = getStep(stepId) as RequestUserInputActivityStep;
   const flow = getFlowByStepId(stepId);
-
-  if (!step || !flow) {
-    return <div>Step not found</div>;
-  }
 
   const hasGoHomeButton = Boolean(
     step.predefinedResponses.find(
@@ -85,6 +56,9 @@ export function EndActivityStepBuilder(props: {
     updateStepField(stepId, field, value);
   }
 
+  if (!step || !flow) {
+    return <div>Step not found</div>;
+  }
   return (
     <RoundedBorderDiv
       key={rerender}

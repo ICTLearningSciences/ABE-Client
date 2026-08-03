@@ -102,7 +102,7 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
     updateUserInfo({ educationalRole: "STUDENT" }).then((user) => {
       loadUserEducationalData(user._id, "STUDENT");
     });
-  }, [loginState.loginStatus, myData, isLoading]);
+  }, [loginState.loginStatus, loginState.user, myData, isLoading]);
 
   const isStudent =
     userRole === "STUDENT" || loginState.user?.educationalRole === "STUDENT";
@@ -531,4 +531,5 @@ const CourseManagement: React.FC<CourseManagementProps> = ({ userRole }) => {
   );
 };
 
-export default withAuthorizationOnly(CourseManagement);
+const Page = withAuthorizationOnly(CourseManagement);
+export default Page;

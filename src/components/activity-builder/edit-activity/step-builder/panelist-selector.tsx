@@ -17,8 +17,8 @@ import {
 } from "@mui/material";
 import { ExpandMore } from "@mui/icons-material";
 import { useWithPanels } from "../../../../store/slices/panels/use-with-panels";
-import { useEditActivityContext } from "../../activity-builder-context";
 import type { Panelist } from "../../../../store/slices/panels/types";
+import { useEditActivityContext } from "../../helpers";
 
 interface PanelistSelectorProps {
   selectedPanelistClientIds: string[];

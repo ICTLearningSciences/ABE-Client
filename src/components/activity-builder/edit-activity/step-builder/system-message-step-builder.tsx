@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import React from "react";
-import { v4 as uuid } from "uuid";
 import { Collapse, IconButton } from "@mui/material";
 import { Delete, ExpandMore, ExpandLess } from "@mui/icons-material";
 import { RoundedBorderDiv, TopLeftText } from "../../../../styled-components";
@@ -15,19 +14,9 @@ import { JumpToAlternateStep } from "../../shared/jump-to-alternate-step";
 import type { SystemMessageActivityStep, FlowItem } from "../../types";
 import type { StepVersion } from "../activity-flow-container";
 import { VersionsDropdown } from "./versions-dropdown";
-import { useEditActivityContext } from "../../activity-builder-context";
+import { useEditActivityContext } from "../../helpers";
 import { PanelistSelector } from "./panelist-selector";
 
-export function getDefaultSystemMessage(): SystemMessageActivityStep {
-  return {
-    stepId: uuid(),
-    stepType: "SYSTEM_MESSAGE",
-    message: "",
-    jumpToStepId: "",
-    systemCustomName: "",
-    sendFromPanelistClientIds: [],
-  };
-}
 export function SystemMessageStepBuilder(props: {
   stepId: string;
   updateStep: (flowClientId: string, step: SystemMessageActivityStep) => void;
@@ -43,6 +32,7 @@ export function SystemMessageStepBuilder(props: {
   const { getStep, getFlowByStepId, updateStepField } =
     useEditActivityContext();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
+  const [rerender, setRerender] = React.useState(0);
 
   const step = getStep(stepId) as SystemMessageActivityStep;
   const flow = getFlowByStepId(stepId);
@@ -51,7 +41,6 @@ export function SystemMessageStepBuilder(props: {
     return <div>Step not found</div>;
   }
 
-  const [rerender, setRerender] = React.useState(0);
   function replacePromptStepWithVersion(version: StepVersion) {
     if (flow) {
       updateStep(flow.clientId, version.step as SystemMessageActivityStep);

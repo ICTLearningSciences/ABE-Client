@@ -7,6 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 
 import axios from "axios";
 import Validator, { type Schema } from "jsonschema";
+import { v4 as uuid } from "uuid";
 import type {
   GQLTimelinePoint,
   AiServiceModel,
@@ -14,13 +15,22 @@ import type {
   User,
 } from "./types";
 import type { ChatLog } from "./store/slices/chat";
-import type { ActivityBuilder } from "./components/activity-builder/types";
+import type {
+  ActivityBuilder,
+  ConditionalActivityStep,
+  PredefinedResponse,
+  PromptActivityStep,
+  RequestUserInputActivityStep,
+  SinglePromptConfiguration,
+  SystemMessageActivityStep,
+} from "./components/activity-builder/types";
 import type {
   Assignment,
   AssignmentProgress,
   RelevantGoogleDoc,
   StudentData,
 } from "./store/slices/education-management";
+import { GO_HOME_BUTTON_MESSAGE } from "./classes/activity-builder-activity/built-activity-handler";
 
 export type AssignmentCompletionStatus =
   "ASSIGNMENT_COMPLETE" | "IN_PROGRESS" | "NOT_STARTED";
@@ -46,7 +56,7 @@ export function extractErrorMessageFromError(err: any | unknown): string {
     try {
       const error = JSON.stringify(err);
       return error;
-    } catch (err) {
+    } catch {
       return "Cannot stringify error, unknown error structure";
     }
   }
@@ -62,7 +72,6 @@ export function addQueryParam(
   return urlObject.toString();
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function equals<T>(val1: T, val2: T): boolean {
   return JSON.stringify(val1) === JSON.stringify(val2);
 }
@@ -123,7 +132,7 @@ export function formatISODate(isoDate: string): string {
 export function isJsonString(str: string): boolean {
   try {
     JSON.parse(str);
-  } catch (e) {
+  } catch {
     console.log(`Error parsing string: ${str}`);
     return false;
   }
@@ -142,7 +151,7 @@ export function validateJsonResponse<T>(response: string, schema: Schema): T {
     return responseJson;
   } catch (e) {
     console.error(e);
-    throw new Error("failed to handle prompt response");
+    throw new Error("failed to handle prompt response", { cause: e });
   }
 }
 
@@ -463,4 +472,97 @@ export function copyAndSet<T>(array: T[], idx: number, value: T): T[] {
     return [...array, value];
   }
   return [...array.slice(0, idx), value, ...array.slice(idx + 1)];
+}
+
+export function getDefaultSystemMessage(): SystemMessageActivityStep {
+  return {
+    stepId: uuid(),
+    stepType: "SYSTEM_MESSAGE",
+    message: "",
+    jumpToStepId: "",
+    systemCustomName: "",
+    sendFromPanelistClientIds: [],
+  };
+}
+
+export function getDefaultRequestUserInputBuilder(): RequestUserInputActivityStep {
+  return {
+    stepId: uuid(),
+    stepType: "REQUEST_USER_INPUT",
+    message: "",
+    saveResponseVariableName: "",
+    systemCustomName: "",
+    saveAsIntention: false,
+    disableFreeInput: false,
+    predefinedResponses: [],
+  };
+}
+
+export function getDefaultSinglePromptConfiguration(): SinglePromptConfiguration {
+  return {
+    promptText: "",
+    responseFormat: "",
+    editDoc: false,
+    outputDataType: "TEXT",
+    jsonResponseData: [],
+    includeChatLogContext: false,
+    systemCustomName: "",
+    includeEssay: false,
+    customSystemRole: "",
+    webSearch: false,
+    ragConfiguration: undefined,
+  };
+}
+function defaultEditDocPromptBuilder(): PromptActivityStep {
+  return {
+    stepId: uuid(),
+    stepType: "PROMPT",
+    promptConfigurations: [
+      {
+        ...getDefaultSinglePromptConfiguration(),
+        editDoc: false, // editDoc is deprecated, always false
+        includeEssay: true,
+      },
+    ],
+    jumpToStepId: "",
+  };
+}
+export function defaultPromptBuilder(editDoc?: boolean): PromptActivityStep {
+  if (editDoc) {
+    return defaultEditDocPromptBuilder();
+  }
+  return {
+    stepId: uuid(),
+    stepType: "PROMPT",
+    promptConfigurations: [getDefaultSinglePromptConfiguration()],
+    jumpToStepId: "",
+  };
+}
+
+export const goHomePredefinedResponse: PredefinedResponse = {
+  clientId: "go-home-predefined-response",
+  message: GO_HOME_BUTTON_MESSAGE,
+};
+export function getDefaultEndActivityStepBuilder(): RequestUserInputActivityStep {
+  return {
+    stepId: uuid(),
+    stepType: "REQUEST_USER_INPUT",
+    message: "",
+    saveResponseVariableName: "",
+    systemCustomName: "",
+    saveAsIntention: false,
+    disableFreeInput: true,
+    setStudentActivityComplete: true,
+    predefinedResponses: [goHomePredefinedResponse],
+    specialType: "END_ACTIVITY",
+  };
+}
+
+export function getDefaultConditionalStep(): ConditionalActivityStep {
+  return {
+    stepId: uuid(),
+    stepType: "CONDITIONAL",
+    jumpToStepId: "",
+    conditionals: [],
+  };
 }

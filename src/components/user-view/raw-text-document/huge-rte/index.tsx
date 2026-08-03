@@ -69,6 +69,7 @@ export function HugeRTEEditor({
 
   const debouncedUpdate = useMemo(
     () =>
+      // eslint-disable-next-line react-hooks/refs
       debounce((htmlText: string) => {
         const rawText = editor.current?.editor?.getContent({ format: "text" });
         const mdText = converter.makeMarkdown(htmlText);

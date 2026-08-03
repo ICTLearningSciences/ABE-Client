@@ -7,12 +7,9 @@ The full terms of this copyright and license should always be found in the root 
 
 import React from "react";
 import { Box, Typography, Chip } from "@mui/material";
-import type {
-  ActivityGQL,
-  DehydratedGQLTimelinePoint,
-} from "../../../../types";
-import { applyTextDiff } from "../assignment-document-timelines";
+import type { DehydratedGQLTimelinePoint } from "../../../../types";
 import { useAppSelector } from "../../../../store/hooks";
+import { applyTextDiff } from "../../helpers";
 
 interface TimelineViewProps {
   timelinePoints: DehydratedGQLTimelinePoint[];
@@ -27,15 +24,16 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   onTimelinePointSelect,
   isSidebarCollapsed,
 }) => {
-  if (!timelinePoints.length) {
-    return null;
-  }
   const activities = useAppSelector(
     (state) => state.docGoalsActivities.builtActivities,
   );
 
+  if (!timelinePoints.length) {
+    return null;
+  }
+
   function getActivityTitle(activityId: string) {
-    const activity = activities.find((a: ActivityGQL) => a._id === activityId);
+    const activity = activities.find((a) => a._id === activityId);
     return activity?.title || "Unknown Activity";
   }
 

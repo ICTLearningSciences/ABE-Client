@@ -10,7 +10,6 @@ import { Header } from "./components/header";
 import { useWithLogin } from "../../store/slices/login/use-with-login";
 import Login from "../login/login";
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const withAuthorizationOnly = (Component: any) => (props: any) => {
   const useLogin = useWithLogin();

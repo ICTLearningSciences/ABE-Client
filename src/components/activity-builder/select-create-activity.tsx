@@ -17,9 +17,8 @@ import {
 
 import { ColumnDiv, RowDiv } from "../../styled-components";
 import type { ActivityBuilder as ActivityBuilderType } from "./types";
-import { isActivityRunnable } from "./helpers";
+import { isActivityRunnable, useActivityBuilderContext } from "./helpers";
 import { TwoOptionDialog } from "../dialog";
-import { useActivityBuilderContext } from "./activity-builder-context";
 import { useAppSelector } from "../../store/hooks";
 
 export function ExistingActivityItem(props: {

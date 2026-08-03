@@ -67,4 +67,5 @@ function DocView(props: {
   );
 }
 
-export default withAuthorizationOnly(DocView);
+const Page = withAuthorizationOnly(DocView);
+export default Page;

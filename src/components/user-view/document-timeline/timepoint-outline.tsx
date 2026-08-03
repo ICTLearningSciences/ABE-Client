@@ -270,7 +270,7 @@ export const TimepointOutline = React.memo(
               maxRows={4}
               placeholder="Enter your text here..."
               data-cy="intention-textarea"
-              onChange={(e: any) => setEditedIntentionText(e.target.value)}
+              onChange={(e) => setEditedIntentionText(e.target.value)}
             />
           </InputWrapper>
         </InputContainer>
@@ -329,9 +329,7 @@ export const TimepointOutline = React.memo(
               maxRows={4}
               placeholder="Enter your assignment description here..."
               data-cy="assignment-textarea"
-              onChange={(e: any) =>
-                setEditedAssignmentDescription(e.target.value)
-              }
+              onChange={(e) => setEditedAssignmentDescription(e.target.value)}
             />
           </InputWrapper>
         </InputContainer>
@@ -423,7 +421,7 @@ and dynamically adjust the height of the input field. */
                 }
                 maxRows={4}
                 placeholder="Enter your text here..."
-                onChange={(e: any) => setEditedChangeSummary(e.target.value)}
+                onChange={(e) => setEditedChangeSummary(e.target.value)}
                 data-cy="summary-textarea"
               />
             </InputWrapper>

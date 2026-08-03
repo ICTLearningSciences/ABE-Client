@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import React from "react";
-import { v4 as uuid } from "uuid";
 import { Button, Collapse, IconButton } from "@mui/material";
 import { Delete, AddCircle, ExpandMore, ExpandLess } from "@mui/icons-material";
 import {
@@ -29,16 +28,7 @@ import type { StepVersion } from "../activity-flow-container";
 import { VersionsDropdown } from "./versions-dropdown";
 import { FlowStepSelector } from "../../shared/flow-step-selector";
 import { InfoTooltip } from "../../../info-tooltip";
-import { useEditActivityContext } from "../../activity-builder-context";
-
-export function getDefaultConditionalStep(): ConditionalActivityStep {
-  return {
-    stepId: uuid(),
-    stepType: "CONDITIONAL",
-    jumpToStepId: "",
-    conditionals: [],
-  };
-}
+import { useEditActivityContext } from "../../helpers";
 
 export function ConditionalStepBuilder(props: {
   globalStateKeys: string[];
@@ -60,10 +50,6 @@ export function ConditionalStepBuilder(props: {
 
   const step = getStep(stepId) as ConditionalActivityStep;
   const flow = getFlowByStepId(stepId);
-
-  if (!step || !flow) {
-    return <div>Step not found</div>;
-  }
 
   const [rerender, setRerender] = React.useState(0);
   function replacePromptStepWithVersion(version: StepVersion) {
@@ -95,6 +81,10 @@ export function ConditionalStepBuilder(props: {
       return c;
     });
     updateStepField(stepId, "conditionals", updatedConditionals);
+  }
+
+  if (!step || !flow) {
+    return <div>Step not found</div>;
   }
 
   return (

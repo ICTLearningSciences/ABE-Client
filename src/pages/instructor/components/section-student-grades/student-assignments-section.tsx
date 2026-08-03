@@ -71,7 +71,7 @@ export function StudentAssignmentsSection({
     return (assignment: Assignment) => {
       return getStudentAssignmentDocs(student, assignment._id);
     };
-  }, [student, assignments]);
+  }, [student]);
 
   function getGradeDisplay(
     assignment: Assignment,

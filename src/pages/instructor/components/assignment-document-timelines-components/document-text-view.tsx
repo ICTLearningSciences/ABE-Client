@@ -10,8 +10,8 @@ import { Box, Typography, Paper, Button } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import type { DehydratedGQLTimelinePoint } from "../../../../types";
-import type { TextDiffResult } from "../assignment-document-timelines";
 import { RowDiv } from "../../../../styled-components";
+import type { TextDiffResult } from "../../helpers";
 
 interface DocumentTextViewProps {
   timelinePoint: DehydratedGQLTimelinePoint | null;

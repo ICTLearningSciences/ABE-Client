@@ -17,10 +17,7 @@ import {
 } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import { useWithEducationalManagement } from "../../../store/slices/education-management/use-with-educational-management";
-import type {
-  Course,
-  Instructor,
-} from "../../../store/slices/education-management/types";
+import type { Course } from "../../../store/slices/education-management/types";
 import CourseModal from "./course-modal";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
 import CourseContent from "./course-content";
@@ -46,7 +43,7 @@ const CourseView: React.FC<CourseViewProps> = ({
   const [showEditModal, setShowEditModal] = useState(startWithEditModal);
   const [selectedTab, setSelectedTab] = useState(0);
   const course = educationManagement.courses.find((c) => c._id === courseId);
-  const myInstructorData: Instructor = useAppSelector(
+  const myInstructorData = useAppSelector(
     (state) => state.educationManagement.instructorData,
   );
   const ownsThisCourse = myInstructorData?.courses.some(

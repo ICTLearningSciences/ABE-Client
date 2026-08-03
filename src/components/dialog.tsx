@@ -42,7 +42,9 @@ export function ErrorDialog(props: {
         <Button
           data-cy="close-error-dialog"
           onClick={() => {
-            clearError && clearError();
+            if (clearError) {
+              clearError();
+            }
           }}
         >
           Close

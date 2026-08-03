@@ -42,71 +42,29 @@ import type {
 import { JumpToAlternateStep } from "../../shared/jump-to-alternate-step";
 import type { AiServicesResponseTypes } from "../../../../ai-services/ai-service-types";
 import ViewPreviousRunModal from "../../../admin-view/view-previous-run-modal";
-import { recursivelyConvertExpectedDataToAiPromptString } from "../../helpers";
+import {
+  recursivelyConvertExpectedDataToAiPromptString,
+  useActivityBuilderContext,
+  useEditActivityContext,
+} from "../../helpers";
 import { TextDialog } from "../../../dialog";
 import ViewPreviousRunsModal from "../../../admin-view/view-previous-runs-modal";
 import { JsonResponseDataUpdater } from "./json-response-data-builder";
 import type { StepVersion } from "../activity-flow-container";
 import { VersionsDropdown } from "./versions-dropdown";
-import {
-  useActivityBuilderContext,
-  useEditActivityContext,
-} from "../../activity-builder-context";
 import { RagStoreConfigurationEditor } from "./rag-store-configuration-editor";
 import { PanelistSelector } from "./panelist-selector";
+import { getDefaultSinglePromptConfiguration } from "../../../../helpers";
 
-export type ViewingInputType = "PROMPT_TEXT" | "RESPONSE_FORMAT" | "NONE";
+type ViewingInputType = "PROMPT_TEXT" | "RESPONSE_FORMAT" | "NONE";
 
-export function getEmptyJsonResponseData(): JsonResponseData {
+function getEmptyJsonResponseData(): JsonResponseData {
   return {
     clientId: uuid(),
     name: "",
     type: "string",
     isRequired: true,
     additionalInfo: "",
-  };
-}
-
-export function getDefaultSinglePromptConfiguration(): SinglePromptConfiguration {
-  return {
-    promptText: "",
-    responseFormat: "",
-    editDoc: false,
-    outputDataType: "TEXT",
-    jsonResponseData: [],
-    includeChatLogContext: false,
-    systemCustomName: "",
-    includeEssay: false,
-    customSystemRole: "",
-    webSearch: false,
-    ragConfiguration: undefined,
-  };
-}
-
-export function defaultEditDocPromptBuilder(): PromptActivityStep {
-  return {
-    stepId: uuid(),
-    stepType: "PROMPT",
-    promptConfigurations: [
-      {
-        ...getDefaultSinglePromptConfiguration(),
-        editDoc: false, // editDoc is deprecated, always false
-        includeEssay: true,
-      },
-    ],
-    jumpToStepId: "",
-  };
-}
-
-export function defaultPromptBuilder(editDoc?: boolean): PromptActivityStep {
-  if (editDoc) {
-    return defaultEditDocPromptBuilder();
-  }
-  return {
-    stepId: uuid(),
-    stepType: "PROMPT",
-    promptConfigurations: [getDefaultSinglePromptConfiguration()],
-    jumpToStepId: "",
   };
 }
 
@@ -323,14 +281,10 @@ export function PromptStepBuilder(props: {
 
   const step = getStep(stepId) as PromptActivityStep;
   const flow = getFlowByStepId(stepId);
-
-  if (!step || !flow) {
-    return <div>Step not found</div>;
-  }
+  const { executePromptSteps } = useActivityBuilderContext();
   const currentFLow = flowsList.find((f) => {
     return f.steps.find((s) => s.stepId === step.stepId);
   });
-  const { executePromptSteps } = useActivityBuilderContext();
   const [viewRunResults, setViewRunResults] =
     React.useState<AiServicesResponseTypes>();
   const [previousRunResults, setPreviousRunResults] = React.useState<
@@ -479,6 +433,9 @@ export function PromptStepBuilder(props: {
     }
   }
 
+  if (!step || !flow) {
+    return <div>Step not found</div>;
+  }
   return (
     <RoundedBorderDiv
       key={rerender}

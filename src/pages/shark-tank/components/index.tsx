@@ -5,8 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import React from "react";
-import { SvgIcon, TextField, Typography, styled } from "@mui/material";
+import { TextField, styled } from "@mui/material";
 
 export const CssTextField = styled(TextField)({
   "& .MuiSvgIcon-root": {
@@ -31,38 +30,3 @@ export const CssTextField = styled(TextField)({
     },
   },
 });
-
-export const CssCard = (props: {
-  icon?: React.ReactNode;
-  title?: string;
-  headerButton?: React.ReactNode;
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-  alt?: boolean;
-}): React.ReactNode => {
-  return (
-    <div
-      className="box column spacing"
-      style={{
-        marginBottom: 20,
-        borderColor: props.alt ? "#5c8a69" : "",
-        backgroundImage: props.alt
-          ? "linear-gradient(110deg, rgba(121, 160, 117, 0.3) 60%, rgba(100, 87, 71, 0.3) 100%)"
-          : "linear-gradient(145deg, rgb(48, 53, 58) 30%, rgb(61, 67, 74) 80%, rgb(48, 53, 58) 100%)",
-        boxShadow: "-5px 5px 10px 0px rgba(0, 0, 0, 0.2)",
-        ...props.style,
-      }}
-    >
-      <div className="row spacing">
-        <SvgIcon fontSize="small" style={{ color: props.alt ? "" : "#5c8a69" }}>
-          {props.icon}
-        </SvgIcon>
-        <Typography style={{ fontWeight: "bold", fontSize: 14, flexGrow: 1 }}>
-          {props.title?.toUpperCase()}
-        </Typography>
-        {props.headerButton}
-      </div>
-      {props.children}
-    </div>
-  );
-};

@@ -41,4 +41,5 @@ function AdminView(): React.ReactNode {
   );
 }
 
-export default withAuthorizationOnly(AdminView);
+const Page = withAuthorizationOnly(AdminView);
+export default Page;

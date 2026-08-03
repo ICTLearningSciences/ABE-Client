@@ -24,27 +24,27 @@ export function useWithEducationalEvents() {
     (state) => state.educationManagement.viewState,
   );
 
-  function handleNewDocCreated(newDocData: NewDocData) {
-    if (
-      !viewState.selectedCourseId ||
-      !viewState.selectedSectionId ||
-      !viewState.selectedAssignmentId ||
-      !viewState.selectedActivityId ||
-      !loginState.user?._id
-    ) {
-      return;
-    }
-    studentActivityNewDocCreated(
-      loginState.user._id,
-      viewState.selectedCourseId,
-      viewState.selectedSectionId,
-      viewState.selectedAssignmentId,
-      viewState.selectedActivityId,
-      newDocData.docId,
-    );
-  }
-
   useEffect(() => {
+    function handleNewDocCreated(newDocData: NewDocData) {
+      if (
+        !viewState.selectedCourseId ||
+        !viewState.selectedSectionId ||
+        !viewState.selectedAssignmentId ||
+        !viewState.selectedActivityId ||
+        !loginState.user?._id
+      ) {
+        return;
+      }
+      studentActivityNewDocCreated(
+        loginState.user._id,
+        viewState.selectedCourseId,
+        viewState.selectedSectionId,
+        viewState.selectedAssignmentId,
+        viewState.selectedActivityId,
+        newDocData.docId,
+      );
+    }
+
     educationalEventsEmitter.on("NEW_DOC_CREATED", handleNewDocCreated);
     return () => {
       educationalEventsEmitter.off("NEW_DOC_CREATED", handleNewDocCreated);

@@ -109,4 +109,5 @@ function SharkTankChat(): React.ReactNode {
   );
 }
 
-export default withAuthorizationOnly(SharkTankChat);
+const Page = withAuthorizationOnly(SharkTankChat);
+export default Page;

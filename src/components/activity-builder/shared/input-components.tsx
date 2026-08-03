@@ -38,7 +38,7 @@ export function InputField(props: {
   }, 500);
 
   useEffect(() => {
-    debounceOnChange(localValue);
+    debounceOnChange.current(localValue);
   }, [localValue]);
 
   return (

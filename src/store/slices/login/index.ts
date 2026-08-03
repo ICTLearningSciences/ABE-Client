@@ -83,7 +83,7 @@ export const login = createAsyncThunk(
         thunkAPI.dispatch(loginSlice.actions.setIsDisabled(true));
       }
       console.error(err);
-      throw new Error(extractErrorMessageFromError(err));
+      throw new Error(extractErrorMessageFromError(err), { cause: err });
     }
   },
 );

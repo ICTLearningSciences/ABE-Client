@@ -14,18 +14,18 @@ export const useDebouncedCallback = (
   callback: (...args: any[]) => void,
   delay: number,
 ) => {
-  const debouncedFn = useRef(debounce(callback, delay)).current;
+  const debouncedFn = useRef(debounce(callback, delay));
 
   useEffect(() => {
     // Update the debounced function if callback or delay changes
-    debouncedFn.cancel(); // Cancel the previous debounce instance
-    debouncedFn.flush = debounce(callback, delay);
+    debouncedFn.current.cancel(); // Cancel the previous debounce instance
+    debouncedFn.current.flush = debounce(callback, delay);
   }, [callback, delay]);
 
   useEffect(() => {
     // Cleanup on unmount
     return () => {
-      debouncedFn.cancel();
+      debouncedFn.current.cancel();
     };
   }, [debouncedFn]);
 

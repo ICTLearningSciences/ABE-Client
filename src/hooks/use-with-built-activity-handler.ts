@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BuiltActivityHandler } from "../classes/activity-builder-activity/built-activity-handler";
 import type { ChatMessageTypes } from "../store/slices/chat";
 import { useWithChat } from "../store/slices/chat/use-with-chat";
@@ -58,6 +58,7 @@ export function useWithBuiltActivityHandler(
   useEffect(() => {
     if (builtActivityHandler) {
       builtActivityHandler.executePrompt = executePromptSteps;
+      setBuiltActivityHandler(builtActivityHandler);
     }
   }, [executePromptSteps]);
 
@@ -149,10 +150,11 @@ export function useWithBuiltActivityHandler(
       builtActivityHandler.filteredToPanelists = activePanelist
         ? [activePanelist.clientId]
         : [];
+      setBuiltActivityHandler(builtActivityHandler);
     }
   }, [activePanelist]);
 
-  const handleStudentActivityComplete = useCallback(() => {
+  function handleStudentActivityComplete() {
     if (
       !myEducationalData ||
       !viewState.selectedCourseId ||
@@ -169,14 +171,7 @@ export function useWithBuiltActivityHandler(
       viewState.selectedAssignmentId,
       selectedActivityBuilder._id,
     );
-  }, [
-    myEducationalData,
-    viewState.selectedCourseId,
-    viewState.selectedSectionId,
-    viewState.selectedAssignmentId,
-    selectedActivityBuilder?._id,
-    studentActivityCompleted,
-  ]);
+  }
 
   function sendMessageHelper(msg: ChatMessageTypes, clearChat?: boolean) {
     sendMessage(msg, clearChat || false, curDocId);

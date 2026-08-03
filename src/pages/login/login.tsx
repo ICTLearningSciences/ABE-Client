@@ -24,10 +24,13 @@ export default function Login(props: {
   loginTo?: string;
 }): React.ReactNode {
   const { useLogin, loginTo } = props;
-  const { loginWithGoogle, state: loginState } = useLogin;
+  const {
+    loginWithGoogle,
+    loginWithAmazonCognito,
+    state: loginState,
+  } = useLogin;
   const navigate = useNavigateWithParams();
   const config = useAppSelector((state) => state.config);
-  const { loginWithAmazonCognito } = useLogin;
   const orgName = config.config?.orgName || "ABE";
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => {

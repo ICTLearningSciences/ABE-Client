@@ -38,8 +38,8 @@ export function ChatInput(props: {
         value={message}
         disabled={props.disableInput}
         placeholder={props.disableInput ? "" : "Enter your response here..."}
-        onChange={(e: any) => setMessage(e.target.value)}
-        onKeyDown={(e: any) => {
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
             if (message) {

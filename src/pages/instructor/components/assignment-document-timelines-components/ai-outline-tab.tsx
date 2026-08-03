@@ -34,7 +34,7 @@ export const AiOutlineTab: React.FC<AiOutlineTabProps> = ({
   let parsedReverseOutline: ReverseOutline;
   try {
     parsedReverseOutline = JSON.parse(reverseOutline);
-  } catch (error) {
+  } catch {
     return (
       <Typography color="error" sx={{ fontStyle: "italic" }}>
         Error parsing AI outline data

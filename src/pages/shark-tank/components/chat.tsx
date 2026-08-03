@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createGlobalStyle } from "styled-components";
 import { Typography } from "@mui/material";
 import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-types";
@@ -25,7 +25,7 @@ import { ChatHeader } from "./chat-header";
 import { ChatInput } from "./chat-input";
 import { ChatThread } from "./chat-thread";
 
-export const GlobalChatStyles = createGlobalStyle`
+const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
     border-color: rgb(0, 0, 0) !important;
     border-width: 1px !important;
@@ -74,10 +74,7 @@ export function Chat(props: {
   const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
     : "";
-
-  useEffect(() => {
-    setSystemRole(systemRole);
-  }, [systemRole]);
+  setSystemRole(systemRole);
 
   async function sendNewMessage(message: ChatMessageTypes) {
     sendMessage(message, false, curDocId);

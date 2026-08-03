@@ -178,7 +178,9 @@ export function DocGoalModal(props: {
   function completeModal(goal: DocGoal) {
     beginGoal(goal);
     beginActivity(_selectedActivity);
-    curDoc && setStages(getRequiredStages(curDoc));
+    if (curDoc) {
+      setStages(getRequiredStages(curDoc));
+    }
     setCurStageIndex(0);
     closeModal();
   }

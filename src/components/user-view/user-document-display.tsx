@@ -28,7 +28,9 @@ export function GoogleDocDisplay(props: {
   const { docUrl, currentActivityId } = props;
   const loggedInEmail = useAppSelector((state) => state.login.user?.email);
   const params = new URL(docUrl);
-  loggedInEmail && params.searchParams.set("authuser", loggedInEmail);
+  if (loggedInEmail) {
+    params.searchParams.set("authuser", loggedInEmail);
+  }
   const docUrlWithParams = params.toString();
   useWithStoreDocVersions(currentActivityId);
   return (

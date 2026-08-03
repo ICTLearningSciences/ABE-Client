@@ -38,6 +38,40 @@ export function useWithLogin(): UseWithLogin {
   const awsCognitoAuth = useAuth();
 
   useEffect(() => {
+    function refreshAccessToken() {
+      if (
+        state.loginStatus === 0 ||
+        state.loginStatus === 1 ||
+        state.loginStatus === 4
+      ) {
+        dispatch(loginActions.refreshAccessToken());
+      }
+    }
+    async function updateUserInfo(userInfo: UpdateUserInfo): Promise<User> {
+      const user = await dispatch(loginActions._updateUserInfo(userInfo));
+      return user.payload as User;
+    }
+    async function checkForClassroomCode(
+      loginStatus: loginActions.LoginStatus,
+    ) {
+      if (loginStatus !== 3) {
+        return;
+      }
+      if (typeof window === "undefined") {
+        return;
+      }
+      const urlParams = new URLSearchParams(window.location.search);
+      const classroomCodeUrlParam = urlParams.get("classroomCode");
+      const classroomCodeLocalStorage = localStorageGet(CLASSROOM_CODE_KEY);
+      if (classroomCodeUrlParam) {
+        await updateUserInfo({ classroomCode: classroomCodeUrlParam });
+      } else if (classroomCodeLocalStorage) {
+        await updateUserInfo({ classroomCode: classroomCodeLocalStorage });
+      }
+      removeQueryParamFromUrl("classroomCode");
+      localStorageClear(CLASSROOM_CODE_KEY);
+    }
+
     checkForClassroomCode(state.loginStatus);
     if (state.loginStatus === 3 || state.loginStatus === 2) {
       return;
@@ -48,25 +82,21 @@ export function useWithLogin(): UseWithLogin {
     } else {
       dispatch(loginActions.logout());
     }
-  }, [state.loginStatus]);
+  }, [state.loginStatus, dispatch]);
 
-  async function checkForClassroomCode(loginStatus: loginActions.LoginStatus) {
-    if (loginStatus !== 3) {
-      return;
+  function refreshAccessToken() {
+    if (
+      state.loginStatus === 0 ||
+      state.loginStatus === 1 ||
+      state.loginStatus === 4
+    ) {
+      dispatch(loginActions.refreshAccessToken());
     }
-    if (typeof window === "undefined") {
-      return;
-    }
-    const urlParams = new URLSearchParams(window.location.search);
-    const classroomCodeUrlParam = urlParams.get("classroomCode");
-    const classroomCodeLocalStorage = localStorageGet(CLASSROOM_CODE_KEY);
-    if (classroomCodeUrlParam) {
-      await updateUserInfo({ classroomCode: classroomCodeUrlParam });
-    } else if (classroomCodeLocalStorage) {
-      await updateUserInfo({ classroomCode: classroomCodeLocalStorage });
-    }
-    removeQueryParamFromUrl("classroomCode");
-    localStorageClear(CLASSROOM_CODE_KEY);
+  }
+
+  async function updateUserInfo(userInfo: UpdateUserInfo): Promise<User> {
+    const user = await dispatch(loginActions._updateUserInfo(userInfo));
+    return user.payload as User;
   }
 
   async function loginWithGoogle(googleAccessToken: string) {
@@ -114,16 +144,6 @@ export function useWithLogin(): UseWithLogin {
     }
   }
 
-  function refreshAccessToken() {
-    if (
-      state.loginStatus === 0 ||
-      state.loginStatus === 1 ||
-      state.loginStatus === 4
-    ) {
-      dispatch(loginActions.refreshAccessToken());
-    }
-  }
-
   async function logout() {
     await dispatch(loginActions.logout());
     if (awsCognitoAuth.isAuthenticated && typeof window !== "undefined") {
@@ -142,11 +162,6 @@ export function useWithLogin(): UseWithLogin {
 
   async function setUser(user: UserAccessToken) {
     dispatch(loginActions.setUser(user));
-  }
-
-  async function updateUserInfo(userInfo: UpdateUserInfo): Promise<User> {
-    const user = await dispatch(loginActions._updateUserInfo(userInfo));
-    return user.payload as User;
   }
 
   return {

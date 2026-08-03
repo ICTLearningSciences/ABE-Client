@@ -33,7 +33,7 @@ const useStyles = makeStyles({ name: { ExampleGoogleDocModal } })(
   }),
 );
 
-export const StyledExampleGoogleDocItem = styled(RowDivSB)`
+const StyledExampleGoogleDocItem = styled(RowDivSB)`
   &:hover {
     background-color: rgb(245, 245, 245);
   }

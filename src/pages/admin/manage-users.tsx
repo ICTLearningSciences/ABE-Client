@@ -23,7 +23,7 @@ export default function AdminManageUsers(): React.ReactNode {
       const users = await fetchUsers();
       setUsers(users);
       setIsLoading(false);
-    } catch (err) {
+    } catch {
       setIsLoading(false);
     }
   }

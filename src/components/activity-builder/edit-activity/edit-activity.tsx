@@ -18,17 +18,17 @@ import { ActivityFlowContainer } from "./activity-flow-container";
 import { ColumnDiv, RowDiv } from "../../../styled-components";
 import { InputField, SelectInputField } from "../shared/input-components";
 import { equals } from "../../../helpers";
-import { isActivityRunnable } from "../helpers";
+import {
+  isActivityRunnable,
+  useActivityBuilderContext,
+  useEditActivityContext,
+} from "../helpers";
 import {
   DOC_NUM_WORDS_KEY,
   DOC_TEXT_KEY,
 } from "../../../classes/activity-builder-activity/built-activity-handler";
 import { useWithCheckActivityErrors } from "../../../hooks/use-with-check-activity-errors";
-import {
-  useActivityBuilderContext,
-  EditActivityProvider,
-  useEditActivityContext,
-} from "../activity-builder-context";
+import { EditActivityProvider } from "../activity-builder-context";
 import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
 
 // Inner component that uses the context
@@ -108,6 +108,7 @@ function EditActivityContent(props: {
     addFlow(uuidv4(), "");
   }
 
+  if (!errors) return <div />;
   return (
     <ColumnDiv
       style={{

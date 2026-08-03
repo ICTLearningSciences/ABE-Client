@@ -43,7 +43,7 @@ import { createGlobalStyle } from "styled-components";
 import { useWithConfig } from "../../../store/slices/config/use-with-config";
 import type { ChatMessageTypes } from "../../../store/slices/chat";
 
-export const GlobalChatStyles = createGlobalStyle`
+const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
     border-color: rgb(0, 0, 0) !important;
     border-width: 1px !important;

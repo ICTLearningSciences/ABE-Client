@@ -44,4 +44,5 @@ function DocHistoryContainer(props: {
   );
 }
 
-export default withAuthorizationOnly(DocHistoryContainer);
+const Page = withAuthorizationOnly(DocHistoryContainer);
+export default Page;

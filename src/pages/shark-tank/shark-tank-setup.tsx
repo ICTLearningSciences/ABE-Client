@@ -17,6 +17,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  SvgIcon,
   Typography,
 } from "@mui/material";
 import {
@@ -30,7 +31,6 @@ import {
   PlayCircleOutlineOutlined,
 } from "@mui/icons-material";
 
-import { CssCard } from "./components";
 import { Header } from "./components/header";
 import { useNavigateWithParams } from "../../hooks/use-navigate-with-params";
 import { useAppSelector } from "../../store/hooks";
@@ -39,6 +39,41 @@ import withAuthorizationOnly from "./wrap-with-authorization-only";
 import type { ActivityBuilder } from "../../exported-files";
 
 import "./shark-tank.css";
+
+const CssCard = (props: {
+  icon?: React.ReactNode;
+  title?: string;
+  headerButton?: React.ReactNode;
+  children?: React.ReactNode;
+  style?: React.CSSProperties;
+  alt?: boolean;
+}): React.ReactNode => {
+  return (
+    <div
+      className="box column spacing"
+      style={{
+        marginBottom: 20,
+        borderColor: props.alt ? "#5c8a69" : "",
+        backgroundImage: props.alt
+          ? "linear-gradient(110deg, rgba(121, 160, 117, 0.3) 60%, rgba(100, 87, 71, 0.3) 100%)"
+          : "linear-gradient(145deg, rgb(48, 53, 58) 30%, rgb(61, 67, 74) 80%, rgb(48, 53, 58) 100%)",
+        boxShadow: "-5px 5px 10px 0px rgba(0, 0, 0, 0.2)",
+        ...props.style,
+      }}
+    >
+      <div className="row spacing">
+        <SvgIcon fontSize="small" style={{ color: props.alt ? "" : "#5c8a69" }}>
+          {props.icon}
+        </SvgIcon>
+        <Typography style={{ fontWeight: "bold", fontSize: 14, flexGrow: 1 }}>
+          {props.title?.toUpperCase()}
+        </Typography>
+        {props.headerButton}
+      </div>
+      {props.children}
+    </div>
+  );
+};
 
 function SharkTankSetup(): React.ReactNode {
   const {
@@ -67,7 +102,7 @@ function SharkTankSetup(): React.ReactNode {
     if (!activity && activities.length > 0) {
       setActivity(activities[activities.length - 1]._id);
     }
-  }, [activities]);
+  }, [activity, activities]);
 
   function startSession(): void {
     navigate("/shark-tank/chat");
@@ -243,4 +278,5 @@ function SharkTankSetup(): React.ReactNode {
   );
 }
 
-export default withAuthorizationOnly(SharkTankSetup);
+const Page = withAuthorizationOnly(SharkTankSetup);
+export default Page;

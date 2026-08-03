@@ -28,7 +28,6 @@ import type {
   PredefinedResponse,
   RequestUserInputActivityStep,
 } from "../../types";
-import { useEditActivityContext } from "../../activity-builder-context";
 import {
   ColumnCenterDiv,
   ColumnDiv,
@@ -41,24 +40,11 @@ import { FlowStepSelector } from "../../shared/flow-step-selector";
 import { JumpToAlternateStep } from "../../shared/jump-to-alternate-step";
 import type { StepVersion } from "../activity-flow-container";
 import { VersionsDropdown } from "./versions-dropdown";
-import { isContextDataString } from "../../helpers";
+import { isContextDataString, useEditActivityContext } from "../../helpers";
 import DropdownDisplay from "../../../dropdown-display";
 import { InfoTooltip } from "../../../info-tooltip";
 import { useWithPanels } from "../../../../store/slices/panels/use-with-panels";
 import type { Panelist } from "../../../../store/slices/panels/types";
-
-export function getDefaultRequestUserInputBuilder(): RequestUserInputActivityStep {
-  return {
-    stepId: uuid(),
-    stepType: "REQUEST_USER_INPUT",
-    message: "",
-    saveResponseVariableName: "",
-    systemCustomName: "",
-    saveAsIntention: false,
-    disableFreeInput: false,
-    predefinedResponses: [],
-  };
-}
 
 function ButtonActionUpdater(props: {
   buttonAction?: ButtonAction;
@@ -361,6 +347,7 @@ export function RequestUserInputStepBuilder(props: {
     attachedPanel?.panelists.includes(p.clientId),
   );
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
+  const [rerender, setRerender] = React.useState(0);
 
   const step = getStep(stepId) as RequestUserInputActivityStep;
   const flow = getFlowByStepId(stepId);
@@ -369,7 +356,6 @@ export function RequestUserInputStepBuilder(props: {
     return <div>Step not found</div>;
   }
 
-  const [rerender, setRerender] = React.useState(0);
   function replacePromptStepWithVersion(version: StepVersion) {
     if (flow) {
       updateStep(flow.clientId, version.step);

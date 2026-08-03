@@ -5,14 +5,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { loadUserDocs } from "./store/slices/state";
 import { useWithDocGoalsActivities } from "./store/slices/doc-goals-activities/use-with-doc-goals-activites";
 import { useWithEducationalManagement } from "./store/slices/education-management/use-with-educational-management";
 import { useWithPanels } from "./store/slices/panels/use-with-panels";
 
-export async function useReduxHydration() {
+export function useReduxHydration() {
   const userData = useAppSelector((state) => state.login.user);
   const loginStatus = useAppSelector((state) => state.login.loginStatus);
   const config = useAppSelector((state) => state.config).config;
@@ -20,18 +20,18 @@ export async function useReduxHydration() {
   const { loadActivities, loadDocGoals, loadBuiltActivities } =
     useWithDocGoalsActivities(userData?._id || "", config);
   const { loadAllEducationalDataWithUserData } = useWithEducationalManagement();
-  const [hydrated, setHydrated] = useState(false);
   const { fetchPanels, fetchPanelists } = useWithPanels();
+  const hydrated = useRef(false);
 
   useEffect(() => {
     if (loginStatus !== 3) {
-      setHydrated(false);
+      hydrated.current = false;
     }
   }, [loginStatus]);
 
   useEffect(() => {
-    if (!userData || hydrated || loginStatus !== 3) return;
-    setHydrated(true);
+    if (!userData || hydrated.current || loginStatus !== 3) return;
+    hydrated.current = true;
     const { _id: userId, educationalRole } = userData;
     dispatch(loadUserDocs({ userId }));
     fetchPanels();
@@ -42,5 +42,15 @@ export async function useReduxHydration() {
     if (educationalRole) {
       loadAllEducationalDataWithUserData(userId, educationalRole);
     }
-  }, [loginStatus]);
+  }, [
+    loginStatus,
+    userData,
+    dispatch,
+    fetchPanels,
+    fetchPanelists,
+    loadActivities,
+    loadBuiltActivities,
+    loadDocGoals,
+    loadAllEducationalDataWithUserData,
+  ]);
 }

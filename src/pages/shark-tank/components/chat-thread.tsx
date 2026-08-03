@@ -23,7 +23,6 @@ export function ChatThread(props: {
   const { coachResponsePending, setAiInfoToDisplay, sendMessage } = props;
   const { activePanel, activePanelist, panelists } = useWithPanels();
   const messageContainerRef = useRef<HTMLDivElement>(null);
-  const [messageElements, setMessageElements] = useState<React.ReactNode[]>([]);
   const [viewedMessages, setViewedMessages] = useState<string[]>([]);
   const [pingRef, setPingRef] = useState<NodeJS.Timeout>();
 
@@ -40,28 +39,69 @@ export function ChatThread(props: {
       return true;
     },
   );
+  const messageElements = chatMessages.map(
+    (message: ChatMessageTypes, index: number) => {
+      return (
+        <>
+          <Message
+            key={index}
+            message={message}
+            setAiInfoToDisplay={setAiInfoToDisplay}
+            messageIndex={index}
+            viewed={viewedMessages.includes(message.id)}
+          />
+          {message.mcqChoices && index === chatMessages.length - 1 && (
+            <div
+              key={`mcq-choices-${index}`}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                width: "98%",
+                justifyContent: "flex-end",
+                alignItems: "flex-end",
+                margin: "10px",
+              }}
+            >
+              {message.mcqChoices.map((choice: string, i: number) => {
+                return (
+                  <Button
+                    key={i}
+                    variant="outlined"
+                    color="secondary"
+                    style={{
+                      borderWidth: "2px",
+                      marginBottom: "5px",
+                    }}
+                    data-cy={`mcq-choice-${choice.replaceAll(" ", "-")}`}
+                    onClick={() => {
+                      sendMessage({
+                        id: uuidv4(),
+                        message: choice,
+                        sender: "USER",
+                        displayType: "TEXT",
+                        userInputType: "MCQ",
+                      });
+                      if (message.retryFunction) {
+                        message.retryFunction();
+                      }
+                    }}
+                  >
+                    {choice}
+                  </Button>
+                );
+              })}
+            </div>
+          )}
+        </>
+      );
+    },
+  );
 
   function scrollToElementById(id: string) {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }
-
-  async function addMessagesWithDelay() {
-    if (pingRef) return;
-    const unviewedMessage = chatMessages.find(
-      (m) => !viewedMessages.includes(m.id),
-    );
-    if (!unviewedMessage) return;
-    const timeoutId = setTimeout(
-      () => {
-        setPingRef(undefined);
-      },
-      unviewedMessage.message.split(" ").length * 100,
-    );
-    setPingRef(timeoutId);
-    setViewedMessages([...viewedMessages, unviewedMessage.id]);
   }
 
   function onClickMessage(id: string) {
@@ -76,11 +116,26 @@ export function ChatThread(props: {
         clearTimeout(pingRef);
       }
     };
-  }, []);
+  }, [pingRef]);
 
   useEffect(() => {
+    async function addMessagesWithDelay() {
+      if (pingRef) return;
+      const unviewedMessage = chatMessages.find(
+        (m) => !viewedMessages.includes(m.id),
+      );
+      if (!unviewedMessage) return;
+      const timeoutId = setTimeout(
+        () => {
+          setPingRef(undefined);
+        },
+        unviewedMessage.message.split(" ").length * 100,
+      );
+      setPingRef(timeoutId);
+      setViewedMessages([...viewedMessages, unviewedMessage.id]);
+    }
     addMessagesWithDelay();
-  }, [chatMessages.length, pingRef]);
+  }, [chatMessages, viewedMessages, pingRef]);
 
   useEffect(() => {
     if (messageContainerRef.current) {
@@ -89,68 +144,7 @@ export function ChatThread(props: {
       );
       scrollToElementById(msg?.id || "message-end-ref");
     }
-  }, [messageElements]);
-
-  useEffect(() => {
-    const _newMessageElements = chatMessages.map(
-      (message: ChatMessageTypes, index: number) => {
-        return (
-          <>
-            <Message
-              key={index}
-              message={message}
-              setAiInfoToDisplay={setAiInfoToDisplay}
-              messageIndex={index}
-              viewed={viewedMessages.includes(message.id)}
-            />
-            {message.mcqChoices && index === chatMessages.length - 1 && (
-              <div
-                key={`mcq-choices-${index}`}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  width: "98%",
-                  justifyContent: "flex-end",
-                  alignItems: "flex-end",
-                  margin: "10px",
-                }}
-              >
-                {message.mcqChoices.map((choice: string, i: number) => {
-                  return (
-                    <Button
-                      key={i}
-                      variant="outlined"
-                      color="secondary"
-                      style={{
-                        borderWidth: "2px",
-                        marginBottom: "5px",
-                      }}
-                      data-cy={`mcq-choice-${choice.replaceAll(" ", "-")}`}
-                      onClick={() => {
-                        sendMessage({
-                          id: uuidv4(),
-                          message: choice,
-                          sender: "USER",
-                          displayType: "TEXT",
-                          userInputType: "MCQ",
-                        });
-                        if (message.retryFunction) {
-                          message.retryFunction();
-                        }
-                      }}
-                    >
-                      {choice}
-                    </Button>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        );
-      },
-    );
-    setMessageElements(_newMessageElements);
-  }, [chatMessages.length, viewedMessages]);
+  }, [chatMessages, viewedMessages, messageElements]);
 
   return (
     <div
