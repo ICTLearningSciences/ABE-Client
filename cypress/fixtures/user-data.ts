@@ -11,7 +11,7 @@ export const testUser: User = {
     "googleId": "112851111131325081111",
     "name": "John Doe",
     "email": "johndoe@gmail.com",
-    "userRole": UserRole.USER,
+    "userRole": 'USER',
     "lastLoginAt": new Date(),
     "loginService": LoginService.GOOGLE,
     "classroomCode": {

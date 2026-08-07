@@ -4,30 +4,27 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { CircularProgress } from '@mui/material';
-import { useWithCurrentGoalActivity } from '../../hooks/use-with-current-goal-activity';
-import { useState } from 'react';
-import { useAppSelector } from '../../store/hooks';
-import { UserRole } from '../../store/slices/login';
-import { useWithState } from '../../store/slices/state/use-with-state';
-import { ActivityTypes } from '../../types';
-import { useWithWindowSize } from '../../hooks/use-with-window-size';
-import {
-  ActivityBuilderVisibility,
-  isActivityBuilder,
-} from '../activity-builder/types';
-import { ChatActivity } from './chat-activity';
-import { SingleNotificationDialog } from '../dialog';
-import { UserDocumentDisplay } from './user-document-display';
-import { ColumnCenterDiv, ColumnDiv } from '../../styled-components';
-import { ActivityBuilderPage } from '../activity-builder/activity-builder-page';
-import { useWithDocGoalsActivities } from '../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import { useWithActivityVersions } from '../../hooks/use-with-activity-versions';
-import { useWithExecutePrompt } from '../../hooks/use-with-execute-prompts';
-import { useWithPanels } from '../../store/slices/panels/use-with-panels';
-import { Panel, Panelist } from '../../store/slices/panels/types';
-import { v4 as uuidv4 } from 'uuid';
+
+import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { CircularProgress } from "@mui/material";
+
+import { useWithCurrentGoalActivity } from "../../hooks/use-with-current-goal-activity";
+import { useAppSelector } from "../../store/hooks";
+import { useWithState } from "../../store/slices/state/use-with-state";
+import type { ActivityTypes } from "../../types";
+import { useWithWindowSize } from "../../hooks/use-with-window-size";
+import { isActivityBuilder } from "../activity-builder/types";
+import { ChatActivity } from "./chat-activity";
+import { SingleNotificationDialog } from "../dialog";
+import { UserDocumentDisplay } from "./user-document-display";
+import { ColumnCenterDiv, ColumnDiv } from "../../styled-components";
+import { ActivityBuilderPage } from "../activity-builder/activity-builder-page";
+import { useWithDocGoalsActivities } from "../../store/slices/doc-goals-activities/use-with-doc-goals-activites";
+import { useWithActivityVersions } from "../../hooks/use-with-activity-versions";
+import { useWithExecutePrompt } from "../../hooks/use-with-execute-prompts";
+import { useWithPanels } from "../../store/slices/panels/use-with-panels";
+import type { Panel, Panelist } from "../../store/slices/panels/types";
 
 export function EditGoogleDoc(props: {
   docId: string;
@@ -36,7 +33,7 @@ export function EditGoogleDoc(props: {
   goalFromParams: string;
   isNewDoc: boolean;
   disableActivitySelector?: boolean;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     docId,
     docUrl,
@@ -57,9 +54,9 @@ export function EditGoogleDoc(props: {
   const user = useAppSelector((state) => state.login.user);
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const viewingAdmin =
-    viewingRole === UserRole.ADMIN || viewingRole === UserRole.CONTENT_MANAGER;
+    viewingRole === "ADMIN" || viewingRole === "CONTENT_MANAGER";
   const [previewingActivity, setPreviewingActivity] = useState<boolean>(false);
-  const [mobileView, setMobileView] = useState<'chat' | 'document'>('chat');
+  const [mobileView, setMobileView] = useState<"chat" | "document">("chat");
   const config = useAppSelector((state) => state.config).config;
   const {
     builtActivities,
@@ -68,7 +65,7 @@ export function EditGoogleDoc(props: {
     copyBuiltActivity,
     deleteBuiltActivity,
     educationReadyActivities,
-  } = useWithDocGoalsActivities(user?._id || '', config);
+  } = useWithDocGoalsActivities(user?._id || "", config);
   const { activityVersions, loadActivityVersions } = useWithActivityVersions();
   const { executePromptSteps } = useWithExecutePrompt();
   const {
@@ -83,20 +80,20 @@ export function EditGoogleDoc(props: {
   function goToActivityPreview(activity: ActivityTypes) {
     setPreviewingActivity(true);
     setGoalAndActivity(undefined, activity);
-    updateViewingUserRole(UserRole.USER);
+    updateViewingUserRole("USER");
   }
 
   function addNewLocalPanelist(): Panelist {
     const newPanelist: Panelist = {
       clientId: uuidv4(),
-      promptSegment: '',
-      roleSegment: '',
-      profilePicture: '',
-      panelistName: '',
-      panelistDescription: '',
-      introductionMessage: '',
+      promptSegment: "",
+      roleSegment: "",
+      profilePicture: "",
+      panelistName: "",
+      panelistDescription: "",
+      introductionMessage: "",
       ragConfig: {
-        ragQuery: '',
+        ragQuery: "",
         topN: 0,
         filters: {},
       },
@@ -108,8 +105,8 @@ export function EditGoogleDoc(props: {
   function addNewLocalPanel(): Panel {
     const newPanel: Panel = {
       clientId: uuidv4(),
-      panelName: '',
-      panelDescription: '',
+      panelName: "",
+      panelDescription: "",
       panelists: [],
     };
     addOrUpdatePanel(newPanel);
@@ -132,20 +129,20 @@ export function EditGoogleDoc(props: {
         : undefined;
 
     return (
-      <div style={{ height: '100%', display: 'flex', flexGrow: 1 }}>
+      <div style={{ height: "100%", display: "flex", flexGrow: 1 }}>
         <ColumnCenterDiv
           style={{
-            width: '100%',
-            height: '100%',
+            width: "100%",
+            height: "100%",
           }}
         >
           <ColumnDiv
             style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
             }}
           >
             <ActivityBuilderPage
@@ -153,7 +150,7 @@ export function EditGoogleDoc(props: {
               builtActivities={builtActivities}
               isActivityEducationReady={(activityId: string) => {
                 return educationReadyActivities.some(
-                  (a) => a._id === activityId
+                  (a) => a._id === activityId,
                 );
               }}
               addOrUpdateBuiltActivity={addOrUpdateBuiltActivity}
@@ -163,14 +160,13 @@ export function EditGoogleDoc(props: {
               canEditActivity={(activity) => {
                 return (
                   activity.user === user?._id ||
-                  user?.userRole === UserRole.ADMIN ||
-                  activity.visibility === ActivityBuilderVisibility.EDITABLE
+                  user?.userRole === "ADMIN" ||
+                  activity.visibility === "editable"
                 );
               }}
               canDeleteActivity={(activity) => {
                 return (
-                  user?.userRole === UserRole.ADMIN ||
-                  activity.user === user?._id
+                  user?.userRole === "ADMIN" || activity.user === user?._id
                 );
               }}
               curActivity={
@@ -204,25 +200,25 @@ export function EditGoogleDoc(props: {
 
   // User view - handle mobile vs desktop layout
   const smallWindowWidth = windowWidth < 1200;
-  const googleDocWidth = isMobile ? '100%' : smallWindowWidth ? '60%' : '55%';
-  const chatWidth = isMobile ? '100%' : smallWindowWidth ? '40%' : '45%';
+  const googleDocWidth = isMobile ? "100%" : smallWindowWidth ? "60%" : "55%";
+  const chatWidth = isMobile ? "100%" : smallWindowWidth ? "40%" : "45%";
 
   return (
     <div
       style={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
         flexGrow: 1,
       }}
     >
       {/* Main content area */}
       <div
         style={{
-          display: 'flex',
+          display: "flex",
           flexGrow: 1,
-          overflow: 'hidden',
+          overflow: "hidden",
           minHeight: 0,
         }}
       >
@@ -230,16 +226,16 @@ export function EditGoogleDoc(props: {
         <div
           style={{
             width: googleDocWidth,
-            height: '100%',
-            display: isMobile && mobileView !== 'document' ? 'none' : 'flex',
+            height: "100%",
+            display: isMobile && mobileView !== "document" ? "none" : "flex",
           }}
         >
           <UserDocumentDisplay
             docId={docId}
             docUrl={docUrl}
             width="100%"
-            currentActivityId={goalActivityState?.selectedActivity?._id || ''}
-            setToChatView={() => setMobileView('chat')}
+            currentActivityId={goalActivityState?.selectedActivity?._id || ""}
+            setToChatView={() => setMobileView("chat")}
           />
         </div>
 
@@ -248,7 +244,7 @@ export function EditGoogleDoc(props: {
           style={{
             width: chatWidth,
             maxWidth: chatWidth,
-            display: isMobile && mobileView !== 'chat' ? 'none' : 'block',
+            display: isMobile && mobileView !== "chat" ? "none" : "block",
           }}
         >
           <ChatActivity
@@ -259,7 +255,7 @@ export function EditGoogleDoc(props: {
             previewingActivity={previewingActivity}
             setPreviewingActivity={setPreviewingActivity}
             disableActivitySelector={disableActivitySelector}
-            setToDocView={() => setMobileView('document')}
+            setToDocView={() => setMobileView("document")}
           />
         </div>
       </div>

@@ -4,13 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import axios, {
+
+import axios from "axios";
+import type {
   AxiosRequestConfig,
   Method,
   AxiosResponse,
   CancelToken,
-} from 'axios';
-import {
+} from "axios";
+import { omit } from "lodash";
+
+import type {
   CreateGoogleDocResponse,
   DocData,
   DocVersion,
@@ -18,7 +22,6 @@ import {
   GoogleDocTextModifyActions,
   NewDocData,
   UserAccessToken,
-  UserActions,
   Config,
   Connection,
   AiPromptStep,
@@ -33,25 +36,19 @@ import {
   IGDocVersion,
   DocService,
   EducationalRole,
-} from '../types';
-import { AxiosMiddleware } from './axios-middlewares';
-import { ACCESS_TOKEN_KEY, localStorageGet } from '../store/local-storage';
-import { addQueryParam } from '../helpers';
-import { isBulletPointMessage } from '../store/slices/chat/helpers';
-import { activityQueryData } from './api-helpers';
-import { omit } from 'lodash';
-import { OpenAiServiceJobStatusResponseType } from '../ai-services/open-ai-service';
-import { UserRole } from '../store/slices/login';
-
-const API_ENDPOINT =
-  process.env.REACT_APP_GOOGLE_API_ENDPOINT || 'http://localhost:8000/docs';
-const GRAPHQL_ENDPOINT =
-  process.env.REACT_APP_GRAPHQL_ENDPOINT || '/graphql/graphql';
+} from "../types";
+import type { AxiosMiddleware } from "./axios-middlewares";
+import { ACCESS_TOKEN_KEY, localStorageGet } from "../store/local-storage";
+import { addQueryParam } from "../helpers";
+import { isBulletPointMessage } from "../store/slices/chat/helpers";
+import { activityQueryData } from "./api-helpers";
+import type { OpenAiServiceJobStatusResponseType } from "../ai-services/open-ai-service";
+import type { UserRole } from "../store/slices/login";
 
 const REQUEST_TIMEOUT_GRAPHQL_DEFAULT = 30000;
 
 // https://github.com/axios/axios/issues/4193#issuecomment-1158137489
-interface MyAxiosRequestConfig extends Omit<AxiosRequestConfig, 'headers'> {
+interface MyAxiosRequestConfig extends Omit<AxiosRequestConfig, "headers"> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   headers?: any; // this was "any" at v0.21.1 but now broken between 0.21.4 >= 0.27.2
 }
@@ -79,7 +76,7 @@ interface HttpRequestConfig {
 async function execHttp<T>(
   method: Method,
   query: string,
-  opts?: HttpRequestConfig
+  opts?: HttpRequestConfig,
 ): Promise<T> {
   const optsEffective: HttpRequestConfig = opts || {};
   const axiosConfig = opts?.axiosConfig || {};
@@ -122,15 +119,15 @@ function getDataFromAxiosResponse(res: AxiosResponse, path: string | string[]) {
   }
   const dataPath = Array.isArray(path)
     ? path
-    : typeof path === 'string'
-    ? [path]
-    : [];
+    : typeof path === "string"
+      ? [path]
+      : [];
   dataPath.forEach((pathPart) => {
     if (!data) {
       throw new Error(
         `unexpected response data shape for dataPath ${JSON.stringify(
-          dataPath
-        )} and request ${res.request} : ${res.data}`
+          dataPath,
+        )} and request ${res.request} : ${res.data}`,
       );
     }
     data = data[pathPart];
@@ -140,17 +137,21 @@ function getDataFromAxiosResponse(res: AxiosResponse, path: string | string[]) {
 
 export async function execGql<T>(
   query: GQLQuery,
-  opts?: HttpRequestConfig
+  opts?: HttpRequestConfig,
 ): Promise<T> {
-  return execHttp<T>('POST', GRAPHQL_ENDPOINT, {
-    // axiosMiddleware: applyAppTokenRefreshInterceptor,
-    ...(opts || {}),
-    axiosConfig: {
-      timeout: REQUEST_TIMEOUT_GRAPHQL_DEFAULT, // default timeout can be overriden by passed-in config
-      ...(opts?.axiosConfig || {}),
-      data: query,
+  return execHttp<T>(
+    "POST",
+    import.meta.env.VITE_GRAPHQL_ENDPOINT || "/graphql/graphql",
+    {
+      // axiosMiddleware: applyAppTokenRefreshInterceptor,
+      ...(opts || {}),
+      axiosConfig: {
+        timeout: REQUEST_TIMEOUT_GRAPHQL_DEFAULT, // default timeout can be overriden by passed-in config
+        ...(opts?.axiosConfig || {}),
+        data: query,
+      },
     },
-  });
+  );
 }
 
 /**
@@ -164,29 +165,29 @@ export async function createNewDoc(
   title?: string,
   isAdminDoc?: boolean,
   courseId?: string,
-  courseAssignmentId?: string
+  courseAssignmentId?: string,
 ): Promise<NewDocData> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
-  let url = `${API_ENDPOINT}/create_google_doc`;
-  url = addQueryParam(url, 'userId', userId);
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  if (!accessToken) throw new Error("No access token");
+  let url = `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/create_google_doc`;
+  url = addQueryParam(url, "userId", userId);
   if (userEmail) {
-    url = addQueryParam(url, 'emails', userEmail);
+    url = addQueryParam(url, "emails", userEmail);
   }
   if (docId) {
-    url = addQueryParam(url, 'copyFromDocId', docId);
+    url = addQueryParam(url, "copyFromDocId", docId);
   }
   if (title) {
-    url = addQueryParam(url, 'newDocTitle', title);
+    url = addQueryParam(url, "newDocTitle", title);
   }
   if (isAdminDoc) {
-    url = addQueryParam(url, 'isAdminDoc', isAdminDoc ? 'true' : 'false');
+    url = addQueryParam(url, "isAdminDoc", isAdminDoc ? "true" : "false");
   }
   if (courseId) {
-    url = addQueryParam(url, 'courseId', courseId);
+    url = addQueryParam(url, "courseId", courseId);
   }
   if (courseAssignmentId) {
-    url = addQueryParam(url, 'courseAssignmentId', courseAssignmentId);
+    url = addQueryParam(url, "courseAssignmentId", courseAssignmentId);
   }
   const res = await axios.post<CreateGoogleDocResponse>(
     url,
@@ -195,7 +196,7 @@ export async function createNewDoc(
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
   return res.data.data;
 }
@@ -204,38 +205,38 @@ export async function docTextAction(
   docId: string,
   textToHighlight: string,
   action: GoogleDocTextModifyActions,
-  insertAfterText?: string
+  insertAfterText?: string,
 ): Promise<void> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY);
   await axios.get<void>(
-    `${API_ENDPOINT}/google_doc_text_modify/?docId=${docId}&text=${textToHighlight}&action=${action}&insertAfterText=${insertAfterText}`,
+    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/google_doc_text_modify/?docId=${docId}&text=${textToHighlight}&action=${action}&insertAfterText=${insertAfterText}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
   return;
 }
 
 export async function getDocData(
   docId: string,
-  docService: DocService
+  docService: DocService,
 ): Promise<DocData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY);
   const res = await axios.get<DocData>(
-    `${API_ENDPOINT}/get_doc_data/${docId}/${docService}`,
+    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/get_doc_data/${docId}/${docService}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
   return res.data;
 }
 
 export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   return await execGql<void>(
     {
       query: `
@@ -292,13 +293,15 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
     },
     {
       accessToken,
-    }
+    },
   );
 }
 
 export async function fetchDocs(userId: string): Promise<UserDoc[]> {
-  const res = await axios.post(GRAPHQL_ENDPOINT, {
-    query: `
+  const res = await axios.post(
+    import.meta.env.VITE_GRAPHQL_ENDPOINT || "/graphql/graphql",
+    {
+      query: `
         query FetchGoogleDocs($userId: ID!) {
           fetchGoogleDocs(userId: $userId) {
             googleDocId
@@ -323,19 +326,20 @@ export async function fetchDocs(userId: string): Promise<UserDoc[]> {
           }
         }
       `,
-    variables: {
-      userId: userId,
+      variables: {
+        userId: userId,
+      },
     },
-  });
+  );
   return res.data.data.fetchGoogleDocs;
 }
 
 export async function deleteUserDoc(
   docId: string,
-  userId: string
+  userId: string,
 ): Promise<UserDoc> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  if (!accessToken) throw new Error("No access token");
   const data = await execGql<UserDoc>(
     {
       query: `
@@ -352,15 +356,15 @@ export async function deleteUserDoc(
       },
     },
     {
-      dataPath: 'deleteUserDoc',
+      dataPath: "deleteUserDoc",
       accessToken,
-    }
+    },
   );
   return data;
 }
 
 export async function updateDocStorage(
-  userDoc: StoreUserDoc
+  userDoc: StoreUserDoc,
 ): Promise<UserDoc> {
   // remove createdAt from storeData
   const storeData: StoreUserDoc = {
@@ -408,14 +412,14 @@ export async function updateDocStorage(
       },
     },
     {
-      dataPath: 'storeGoogleDoc',
-    }
+      dataPath: "storeGoogleDoc",
+    },
   );
   return data;
 }
 
 export async function loginGoogle(
-  accessToken: string
+  accessToken: string,
 ): Promise<UserAccessToken> {
   return await execGql<UserAccessToken>(
     {
@@ -435,11 +439,11 @@ export async function loginGoogle(
     },
     // login responds with set-cookie, w/o withCredentials it doesnt get stored
     {
-      dataPath: 'loginGoogle',
+      dataPath: "loginGoogle",
       axiosConfig: {
         withCredentials: true,
       },
-    }
+    },
   );
 }
 
@@ -510,8 +514,8 @@ export async function fetchConfig(subdomain?: string): Promise<Config> {
       },
     },
     {
-      dataPath: 'fetchConfig',
-    }
+      dataPath: "fetchConfig",
+    },
   );
 }
 
@@ -527,8 +531,8 @@ export async function fetchSystemPrompts(): Promise<string[]> {
         `,
     },
     {
-      dataPath: ['fetchConfig', 'aiSystemPrompt'],
-    }
+      dataPath: ["fetchConfig", "aiSystemPrompt"],
+    },
   );
 }
 
@@ -539,8 +543,8 @@ export async function fetchSystemPrompts(): Promise<string[]> {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateConfigByKey(key: string, value: any): Promise<any> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  if (!accessToken) throw new Error("No access token");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return execGql<any>(
     {
@@ -557,9 +561,9 @@ export async function updateConfigByKey(key: string, value: any): Promise<any> {
       },
     },
     {
-      dataPath: ['configUpdateByKey', key],
+      dataPath: ["configUpdateByKey", key],
       accessToken: accessToken,
-    }
+    },
   );
 }
 
@@ -597,17 +601,17 @@ export async function refreshAccessToken(): Promise<UserAccessToken> {
     },
     // login responds with set-cookie, w/o withCredentials it doesnt get stored
     {
-      dataPath: 'refreshAccessToken',
+      dataPath: "refreshAccessToken",
       axiosConfig: {
         withCredentials: true,
       },
-    }
+    },
   );
 }
 
 export async function updateUserInfo(userInfo: UpdateUserInfo): Promise<User> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  if (!accessToken) throw new Error("No access token");
   return execGql<User>(
     {
       query: `
@@ -622,9 +626,9 @@ mutation UpdateUserInfo($userInfo: UserInputType!) {
       },
     },
     {
-      dataPath: 'updateUserInfo',
+      dataPath: "updateUserInfo",
       accessToken: accessToken,
-    }
+    },
   );
 }
 
@@ -649,8 +653,8 @@ export async function fetchDocGoals(): Promise<DocGoalGQl[]> {
       `,
     },
     {
-      dataPath: 'fetchDocGoals',
-    }
+      dataPath: "fetchDocGoals",
+    },
   );
   return res.edges.map((edge) => edge.node);
 }
@@ -674,8 +678,8 @@ export async function fetchActivities(): Promise<ActivityGQL[]> {
       },
     },
     {
-      dataPath: 'fetchActivities',
-    }
+      dataPath: "fetchActivities",
+    },
   );
   return res.edges.map((edge) => edge.node);
 }
@@ -687,43 +691,43 @@ export async function asyncOpenAiRequest(
   aiPromptSteps: AiPromptStep[],
   userId: string,
   docService: DocService,
-  cancelToken?: CancelToken
+  cancelToken?: CancelToken,
 ): Promise<OpenAiJobId> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  if (!accessToken) throw new Error("No access token");
   const res = await execHttp<OpenAiJobId>(
-    'POST',
-    `${API_ENDPOINT}/async_open_ai_doc_question/?docId=${docsId}&userAction=${UserActions.MULTISTEP_PROMPTS}&userId=${userId}&docService=${docService}`,
+    "POST",
+    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/async_open_ai_doc_question/?docId=${docsId}&userAction=${"MULTISTEP_PROMPTS"}&userId=${userId}&docService=${docService}`,
     {
       accessToken: accessToken,
-      dataPath: ['response', 'jobId'],
+      dataPath: ["response", "jobId"],
       axiosConfig: {
         data: {
           aiPromptSteps: aiPromptSteps,
         },
         cancelToken: cancelToken,
       },
-    }
+    },
   );
   return res;
 }
 
 export async function asyncOpenAiJobStatus(
   jobId: string,
-  cancelToken?: CancelToken
+  cancelToken?: CancelToken,
 ): Promise<OpenAiServiceJobStatusResponseType> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  if (!accessToken) throw new Error("No access token");
   const res = await execHttp<OpenAiServiceJobStatusResponseType>(
-    'POST',
-    `${API_ENDPOINT}/async_open_ai_doc_question_status/?jobId=${jobId}`,
+    "POST",
+    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/async_open_ai_doc_question_status/?jobId=${jobId}`,
     {
       accessToken: accessToken,
-      dataPath: ['response'],
+      dataPath: ["response"],
       axiosConfig: {
         cancelToken: cancelToken,
       },
-    }
+    },
   );
   return res;
 }
@@ -735,43 +739,43 @@ export async function asyncRequestDocTimeline(
   docId: string,
   targetAiService: AiServiceModel,
   docService: DocService,
-  cancelToken?: CancelToken
+  cancelToken?: CancelToken,
 ): Promise<DocumentTimelineJobId> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  if (!accessToken) throw new Error("No access token");
   const res = await execHttp<DocumentTimelineJobId>(
-    'POST',
-    `${API_ENDPOINT}/async_get_document_timeline/?docId=${docId}&userId=${userId}&docService=${docService}`,
+    "POST",
+    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/async_get_document_timeline/?docId=${docId}&userId=${userId}&docService=${docService}`,
     {
       accessToken: accessToken,
-      dataPath: ['response', 'jobId'],
+      dataPath: ["response", "jobId"],
       axiosConfig: {
         cancelToken: cancelToken,
         data: {
           targetAiService: targetAiService,
         },
       },
-    }
+    },
   );
   return res;
 }
 
 export async function asyncRequestDocTimelineStatus(
   jobId: string,
-  cancelToken?: CancelToken
+  cancelToken?: CancelToken,
 ): Promise<DocumentTimelineJobStatus> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  if (!accessToken) throw new Error("No access token");
   const res = await execHttp<DocumentTimelineJobStatus>(
-    'POST',
-    `${API_ENDPOINT}/async_document_timeline_status/?jobId=${jobId}`,
+    "POST",
+    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/async_document_timeline_status/?jobId=${jobId}`,
     {
       accessToken: accessToken,
-      dataPath: ['response'],
+      dataPath: ["response"],
       axiosConfig: {
         cancelToken: cancelToken,
       },
-    }
+    },
   );
   return res;
 }
@@ -821,27 +825,27 @@ const storeDocTimelineMutation = `mutation StoreDocTimeline($docTimeline: DocTim
   }`;
 
 export async function storeDocTimeline(
-  docTimeline: GQLDocumentTimeline
+  docTimeline: GQLDocumentTimeline,
 ): Promise<GQLDocumentTimeline> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  if (!accessToken) throw new Error("No access token");
   const inputDocs = docTimeline.timelinePoints.map((timelinePoint) => {
     const omittedTimestamps = omit(timelinePoint.version, [
-      'createdAt',
-      'updatedAt',
+      "createdAt",
+      "updatedAt",
     ]);
     return {
       ...timelinePoint,
       version: {
         ...omittedTimestamps,
         dayIntention: timelinePoint.version.dayIntention
-          ? omit(timelinePoint.version.dayIntention, ['createdAt'])
+          ? omit(timelinePoint.version.dayIntention, ["createdAt"])
           : undefined,
         sessionIntention: timelinePoint.version.sessionIntention
-          ? omit(timelinePoint.version.sessionIntention, ['createdAt'])
+          ? omit(timelinePoint.version.sessionIntention, ["createdAt"])
           : undefined,
         documentIntention: timelinePoint.version.documentIntention
-          ? omit(timelinePoint.version.documentIntention, ['createdAt'])
+          ? omit(timelinePoint.version.documentIntention, ["createdAt"])
           : undefined,
       },
     };
@@ -857,9 +861,9 @@ export async function storeDocTimeline(
       },
     },
     {
-      dataPath: 'storeDocTimeline',
+      dataPath: "storeDocTimeline",
       accessToken: accessToken,
-    }
+    },
   );
   return res;
 }
@@ -900,7 +904,7 @@ query FetchVersionsById($ids: [String!]!) {
 }
 }`;
 export async function fetchDocVersions(
-  versionIds: string[]
+  versionIds: string[],
 ): Promise<IGDocVersion[]> {
   const res = await execGql<IGDocVersion[]>(
     {
@@ -910,8 +914,8 @@ export async function fetchDocVersions(
       },
     },
     {
-      dataPath: 'fetchVersionsById',
-    }
+      dataPath: "fetchVersionsById",
+    },
   );
   return res;
 }
@@ -919,10 +923,10 @@ export async function fetchDocVersions(
 export async function archiveDoc(
   googleDocId: string,
   userId: string,
-  archive: boolean
+  archive: boolean,
 ): Promise<UserDoc> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
-  if (!accessToken) throw new Error('No access token');
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  if (!accessToken) throw new Error("No access token");
   const data = await execGql<UserDoc>(
     {
       query: `
@@ -943,14 +947,14 @@ export async function archiveDoc(
       },
     },
     {
-      dataPath: 'addOrUpdateDoc',
-    }
+      dataPath: "addOrUpdateDoc",
+    },
   );
   return data;
 }
 
 export async function fetchUsers(): Promise<User[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const data = await execGql<User[]>(
     {
       query: `
@@ -962,9 +966,9 @@ export async function fetchUsers(): Promise<User[]> {
       `,
     },
     {
-      dataPath: 'fetchUsers',
+      dataPath: "fetchUsers",
       accessToken: accessToken || undefined,
-    }
+    },
   );
   return data;
 }
@@ -972,9 +976,9 @@ export async function fetchUsers(): Promise<User[]> {
 export async function updateUserRole(
   userId: string,
   userRole?: UserRole,
-  educationalRole?: EducationalRole
+  educationalRole?: EducationalRole,
 ): Promise<User> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const data = await execGql<User>(
     {
       query: `
@@ -991,9 +995,9 @@ export async function updateUserRole(
       },
     },
     {
-      dataPath: 'updateUserRole',
+      dataPath: "updateUserRole",
       accessToken: accessToken || undefined,
-    }
+    },
   );
   return data;
 }

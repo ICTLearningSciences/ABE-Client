@@ -4,23 +4,23 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+
+import React from "react";
 import {
   Card,
   CardContent,
   Typography,
   Stack,
   IconButton,
-} from '@mui/material';
-import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
-import {
+} from "@mui/material";
+import { KeyboardArrowUp, KeyboardArrowDown } from "@mui/icons-material";
+import type {
   Assignment,
   Section,
-} from '../../../store/slices/education-management/types';
-import { ColumnDiv, RowDiv } from '../../../styled-components';
-import { useAppSelector } from '../../../store/hooks';
-import { EducationalRole } from '../../../types';
-import { CheckBoxInput } from '../../../components/activity-builder/shared/input-components';
+} from "../../../store/slices/education-management/types";
+import { ColumnDiv, RowDiv } from "../../../styled-components";
+import { useAppSelector } from "../../../store/hooks";
+import { CheckBoxInput } from "../../../components/activity-builder/shared/input-components";
 
 interface AssignmentCardProps {
   assignment: Assignment;
@@ -34,14 +34,14 @@ interface AssignmentCardProps {
   isCompleted: boolean;
   onAssignmentOrderChange?: (
     assignmentId: string,
-    direction: 'up' | 'down'
+    direction: "up" | "down",
   ) => Promise<void>;
   isFirst?: boolean;
   isLast?: boolean;
   isAssignmentMandatory: boolean;
   onMandatoryChange: (
     assignmentId: string,
-    mandatory: boolean
+    mandatory: boolean,
   ) => Promise<Section>;
   updateInProgress: boolean;
 }
@@ -59,18 +59,18 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
   updateInProgress,
 }) => {
   const myRole = useAppSelector((state) => state.login.user?.educationalRole);
-  const isStudent = myRole === EducationalRole.STUDENT;
+  const isStudent = myRole === "STUDENT";
   return (
-    <RowDiv style={{ width: '100%' }}>
+    <RowDiv style={{ width: "100%" }}>
       <Card
         variant="outlined"
         data-cy={`assignment-card-${assignment._id}`}
         sx={{
-          width: '100%',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          '&:hover': {
-            borderColor: '#1B6A9C',
+          width: "100%",
+          cursor: "pointer",
+          transition: "all 0.2s ease",
+          "&:hover": {
+            borderColor: "#1B6A9C",
             boxShadow: 2,
           },
         }}
@@ -78,23 +78,25 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
       >
         <CardContent
           style={{
-            position: 'relative',
+            position: "relative",
           }}
         >
           <Stack
             direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            sx={{ mb: 1.5 }}
+            sx={{
+              mb: 1.5,
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
           >
-            <Stack direction="row" alignItems="center">
-              <Typography sx={{ fontSize: '20px', mr: 1.5 }}>📝</Typography>
+            <Stack direction="row" style={{ alignItems: "center" }}>
+              <Typography sx={{ fontSize: "20px", mr: 1.5 }}>📝</Typography>
               <Typography
                 variant="h6"
                 sx={{
-                  color: '#1B6A9C',
+                  color: "#1B6A9C",
                   fontWeight: 600,
-                  fontSize: '1rem',
+                  fontSize: "1rem",
                 }}
               >
                 {assignment.title}
@@ -111,7 +113,7 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
           </Typography>
           <ColumnDiv
             style={{
-              position: 'absolute',
+              position: "absolute",
               right: 20,
               top: 20,
             }}
@@ -119,9 +121,9 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
             {isStudent ? (
               isCompleted && assignmentGrade ? (
                 <Typography variant="body2">
-                  <span style={{ fontWeight: 600, color: 'darkgreen' }}>
+                  <span style={{ fontWeight: 600, color: "darkgreen" }}>
                     Grade:
-                  </span>{' '}
+                  </span>{" "}
                   {assignmentGrade.grade}/5
                 </Typography>
               ) : isCompleted ? (
@@ -129,7 +131,10 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
                   Waiting for grade
                 </Typography>
               ) : (
-                <Typography variant="body2" color="darkred" fontWeight={600}>
+                <Typography
+                  variant="body2"
+                  style={{ color: "darkred", fontWeight: 600 }}
+                >
                   Incomplete
                 </Typography>
               )
@@ -138,15 +143,17 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
           {isStudent && (
             <Typography
               variant="body2"
-              fontWeight={isAssignmentMandatory ? 600 : 400}
-              color={isAssignmentMandatory ? 'text.primary' : 'text.secondary'}
               style={{
-                position: 'absolute',
+                position: "absolute",
                 right: 20,
                 bottom: 20,
+                fontWeight: isAssignmentMandatory ? 600 : 400,
+                color: isAssignmentMandatory
+                  ? "text.primary"
+                  : "text.secondary",
               }}
             >
-              {isAssignmentMandatory ? 'Required' : 'Optional'}
+              {isAssignmentMandatory ? "Required" : "Optional"}
             </Typography>
           )}
         </CardContent>
@@ -156,7 +163,7 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
           <IconButton
             onClick={(e) => {
               e.stopPropagation();
-              onAssignmentOrderChange(assignment._id, 'up');
+              onAssignmentOrderChange(assignment._id, "up");
             }}
             disabled={isFirst || updateInProgress}
             size="small"
@@ -167,7 +174,7 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
           <IconButton
             onClick={(e) => {
               e.stopPropagation();
-              onAssignmentOrderChange(assignment._id, 'down');
+              onAssignmentOrderChange(assignment._id, "down");
             }}
             disabled={isLast || updateInProgress}
             size="small"

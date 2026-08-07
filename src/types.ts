@@ -4,14 +4,38 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { AiServicesResponseTypes } from './ai-services/ai-service-types';
-import {
+
+import type { AiServicesResponseTypes } from "./ai-services/ai-service-types";
+import type {
   ActivityBuilder,
   IActivity,
-} from './components/activity-builder/types';
-import { DisplayIcons } from './helpers/display-icon-helper';
-import { ChatMessageTypes, Sender, UserInputType } from './store/slices/chat';
-import { LoginService, UserRole } from './store/slices/login';
+} from "./components/activity-builder/types";
+import type { DisplayIcons } from "./helpers/display-icon-helper";
+import type {
+  ChatMessageTypes,
+  Sender,
+  UserInputType,
+} from "./store/slices/chat";
+import type { LoginService, UserRole } from "./store/slices/login";
+
+export type EducationalRole = "INSTRUCTOR" | "STUDENT";
+export type GoogleDocTextModifyActions = "HIGHLIGHT" | "INSERT" | "REMOVE";
+export type DocService = "GOOGLE_DOCS" | "MICROSOFT_WORD" | "RAW_TEXT";
+export type UserActions =
+  "ASK_QUESTION" | "MULTISTEP_PROMPTS" | "SINGLE_PROMPT";
+export type PromptRoles = "system" | "user" | "assistant" | "function";
+export type PromptOutputTypes = "TEXT" | "JSON";
+export type AiServiceNames = "AZURE_OPEN_AI" | "OPEN_AI" | "GEMINI";
+export type ActivityStepTypes =
+  | "FREE_RESPONSE_QUESTION"
+  | "MULTIPLE_CHOICE_QUESTIONS"
+  | "MESSAGE"
+  | "SHOULD_INCLUDE_ESSAY";
+export type JobStatus = "QUEUED" | "IN_PROGRESS" | "COMPLETE" | "FAILED";
+export type TimelinePointType =
+  "INTRO" | "START" | "MOST_RECENT" | "NEW_ACTIVITY" | "TIME_DIFFERENCE" | "";
+export type AiGenerationStatus =
+  "NONE" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
 
 export interface Connection<T> {
   edges: Edge<T>[];
@@ -42,11 +66,6 @@ export interface UpdateUserInfo {
   educationalRole?: EducationalRole;
 }
 
-export enum EducationalRole {
-  INSTRUCTOR = 'INSTRUCTOR',
-  STUDENT = 'STUDENT',
-}
-
 export interface User {
   _id: string;
   googleId: string;
@@ -75,12 +94,6 @@ export interface NewDocData {
   docUrl: string;
 }
 
-export enum GoogleDocTextModifyActions {
-  HIGHLIGHT = 'HIGHLIGHT',
-  INSERT = 'INSERT',
-  REMOVE = 'REMOVE',
-}
-
 export interface DocData {
   plainText: string;
   markdownText: string;
@@ -90,23 +103,17 @@ export interface DocData {
   modifiedTime: string;
 }
 
-export enum DocService {
-  GOOGLE_DOCS = 'GOOGLE_DOCS',
-  MICROSOFT_WORD = 'MICROSOFT_WORD',
-  RAW_TEXT = 'RAW_TEXT',
-}
-
 export function getDocServiceFromLoginService(
-  loginService?: LoginService
+  loginService?: LoginService,
 ): DocService {
   switch (loginService) {
-    case LoginService.GOOGLE:
-      return DocService.GOOGLE_DOCS;
-    case LoginService.MICROSOFT:
-      return DocService.MICROSOFT_WORD;
-    case LoginService.AMAZON_COGNITO:
+    case "GOOGLE":
+      return "GOOGLE_DOCS";
+    case "MICROSOFT":
+      return "MICROSOFT_WORD";
+    case "AMAZON_COGNITO":
     default:
-      return DocService.RAW_TEXT;
+      return "RAW_TEXT";
   }
 }
 
@@ -133,12 +140,6 @@ export interface DocVersion {
   courseAssignmentId: string;
 }
 
-export enum UserActions {
-  ASK_QUESTION = 'ASK_QUESTION',
-  MULTISTEP_PROMPTS = 'MULTISTEP_PROMPTS',
-  SINGLE_PROMPT = 'SINGLE_PROMPT',
-}
-
 export interface UserDoc {
   googleDocId: string;
   user: string;
@@ -155,10 +156,9 @@ export interface UserDoc {
   courseAssignmentId: string;
 }
 
-export interface StoreUserDoc
-  extends Partial<
-    Omit<UserDoc, 'createdAt' | 'updatedAt' | 'googleDocId' | 'user'>
-  > {
+export interface StoreUserDoc extends Partial<
+  Omit<UserDoc, "createdAt" | "updatedAt" | "googleDocId" | "user">
+> {
   googleDocId: string;
   user: string;
 }
@@ -169,13 +169,6 @@ export interface GQLPrompt {
   userInputIsIntention?: boolean;
   aiPromptSteps: AiPromptStep[];
   title: string;
-}
-
-export enum PromptRoles {
-  SYSTEM = 'system',
-  USER = 'user',
-  ASSISSANT = 'assistant',
-  FUNCTION = 'function',
 }
 
 export interface PromptConfiguration {
@@ -201,17 +194,6 @@ export interface AiPromptStep {
   webSearch?: boolean;
   editDoc?: boolean;
   ragConfiguration?: RagStoreConfiguration;
-}
-
-export enum PromptOutputTypes {
-  TEXT = 'TEXT',
-  JSON = 'JSON',
-}
-
-export enum AiServiceNames {
-  AZURE = 'AZURE_OPEN_AI',
-  OPEN_AI = 'OPEN_AI',
-  GEMINI = 'GEMINI',
 }
 
 export interface AiServiceModel {
@@ -285,13 +267,6 @@ export interface BannerConfig {
   bannerBgColor: string;
 }
 
-export enum ActivityStepTypes {
-  FREE_RESPONSE_QUESTION = 'FREE_RESPONSE_QUESTION',
-  MULTIPLE_CHOICE_QUESTIONS = 'MULTIPLE_CHOICE_QUESTIONS',
-  MESSAGE = 'MESSAGE',
-  SHOULD_INCLUDE_ESSAY = 'SHOULD_INCLUDE_ESSAY',
-}
-
 export interface ActiveActivityStep {
   id?: string;
   text: string;
@@ -317,7 +292,7 @@ export interface StepData {
   executePrompt: (
     prompt: (messages: ChatMessageTypes[]) => GQLPrompt,
     callback?: (response: AiServicesResponseTypes) => void,
-    customSystemRoleMessage?: string
+    customSystemRoleMessage?: string,
   ) => Promise<void>;
   openSelectActivityModal: () => void;
   sendMessage: (msg: ChatMessageTypes) => void;
@@ -350,7 +325,7 @@ export type ActivityTypes = ActivityBuilder | ActivityGQL;
 export interface ActivityGQL extends IActivity {
   _id: string;
   title: string;
-  activityType: 'gql';
+  activityType: "gql";
   attachedPanel?: string;
   introduction: string;
   description: string;
@@ -375,32 +350,9 @@ export interface DocGoal extends DocGoalGQl {
   builtActivities: ActivityBuilder[];
 }
 
-export enum JobStatus {
-  QUEUED = 'QUEUED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETE = 'COMPLETE',
-  FAILED = 'FAILED',
-}
-
 export interface DocumentTimelineJobStatus {
   jobStatus: JobStatus;
   documentTimeline?: DehydratedGQLDocumentTimeline;
-}
-
-export enum TimelinePointType {
-  INTRO = 'INTRO',
-  START = 'START',
-  MOST_RECENT = 'MOST_RECENT',
-  NEW_ACTIVITY = 'NEW_ACTIVITY',
-  TIME_DIFFERENCE = 'TIME_DIFFERENCE',
-  NONE = '',
-}
-
-export enum AiGenerationStatus {
-  NONE = 'NONE',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
 }
 
 export interface GQLTimelinePoint {
@@ -417,8 +369,10 @@ export interface GQLTimelinePoint {
   relatedFeedback: string;
 }
 
-export interface DehydratedGQLTimelinePoint
-  extends Omit<GQLTimelinePoint, 'version'> {
+export interface DehydratedGQLTimelinePoint extends Omit<
+  GQLTimelinePoint,
+  "version"
+> {
   version?: IGDocVersion;
 }
 
@@ -454,8 +408,10 @@ export interface GQLDocumentTimeline {
   timelinePoints: GQLTimelinePoint[];
 }
 
-export interface DehydratedGQLDocumentTimeline
-  extends Omit<GQLDocumentTimeline, 'timelinePoints'> {
+export interface DehydratedGQLDocumentTimeline extends Omit<
+  GQLDocumentTimeline,
+  "timelinePoints"
+> {
   timelinePoints: DehydratedGQLTimelinePoint[];
 }
 
@@ -465,9 +421,9 @@ export interface SortConfig {
 }
 
 export interface ReverseOutline {
-  'Thesis Statement': string;
-  'Supporting Claims': string[];
-  'Evidence Given for Each Claim': Record<string, string[]>[];
+  "Thesis Statement": string;
+  "Supporting Claims": string[];
+  "Evidence Given for Each Claim": Record<string, string[]>[];
   /**
    * {
    *  'Claim A': string;

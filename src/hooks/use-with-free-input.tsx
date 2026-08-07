@@ -4,31 +4,22 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect } from 'react';
-import { useAppSelector } from '../store/hooks';
-import { useWithChat } from '../store/slices/chat/use-with-chat';
-import {
-  DocGoal,
-  AiPromptStep,
-  PromptOutputTypes,
-  PromptRoles,
-  GQLPrompt,
-} from '../types';
-import {
-  ChatMessageTypes,
-  MessageDisplayType,
-  Sender,
-} from '../store/slices/chat';
-import { v4 as uuidv4 } from 'uuid';
-import { FREE_INPUT_GOAL_ID } from '../constants';
-import { useWithExecutePrompt } from './use-with-execute-prompts';
+
+import { useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { useAppSelector } from "../store/hooks";
+import { useWithChat } from "../store/slices/chat/use-with-chat";
+import type { DocGoal, AiPromptStep, GQLPrompt } from "../types";
+import type { ChatMessageTypes } from "../store/slices/chat";
+import { FREE_INPUT_GOAL_ID } from "../constants";
+import { useWithExecutePrompt } from "./use-with-execute-prompts";
 
 export default function useWithFreeInput(selectedGoal?: DocGoal) {
   const { state, sendMessage, chatLogToString, coachResponsePending } =
     useWithChat();
   const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const userId: string | undefined = useAppSelector(
-    (state) => state.login.user?._id
+    (state) => state.login.user?._id,
   );
   const messages = state.chatLogs[curDocId] || [];
   const isFreeInput = selectedGoal?._id === FREE_INPUT_GOAL_ID;
@@ -53,8 +44,8 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
       messagesToSend.push({
         id: uuidv4(),
         message: goalIntroduction,
-        sender: Sender.SYSTEM,
-        displayType: MessageDisplayType.TEXT,
+        sender: "SYSTEM",
+        displayType: "TEXT",
       });
     }
     if (messagesToSend.length) {
@@ -75,36 +66,36 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
       return;
     }
     const mostRecentMessage = messages[messages.length - 1];
-    if (mostRecentMessage.sender === Sender.USER) {
+    if (mostRecentMessage.sender === "USER") {
       const prompts: AiPromptStep[] = [
         {
           prompts: [
             {
-              promptText: 'Here is the users essay: ',
+              promptText: "Here is the users essay: ",
               includeEssay: true,
-              promptRole: PromptRoles.ASSISSANT,
+              promptRole: "assistant",
             },
             {
               promptText: `Here is the chat log with the user: ${chatLogToString(
-                curDocId
+                curDocId,
               )}`,
               includeEssay: false,
-              promptRole: PromptRoles.ASSISSANT,
+              promptRole: "assistant",
             },
             {
               promptText: `Please respond to the user's message: ${mostRecentMessage.message}`,
               includeEssay: false,
-              promptRole: PromptRoles.ASSISSANT,
+              promptRole: "assistant",
             },
           ],
-          outputDataType: PromptOutputTypes.TEXT,
+          outputDataType: "TEXT",
         },
       ];
       const prompt: GQLPrompt = {
         _id: uuidv4(),
         clientId: uuidv4(),
         aiPromptSteps: prompts,
-        title: '',
+        title: "",
       };
       coachResponsePending(true);
       executePromptSteps(prompt.aiPromptSteps, (response) => {
@@ -113,12 +104,12 @@ export default function useWithFreeInput(selectedGoal?: DocGoal) {
             id: uuidv4(),
             message: response.answer,
             sources: response.sources,
-            sender: Sender.SYSTEM,
-            displayType: MessageDisplayType.TEXT,
+            sender: "SYSTEM",
+            displayType: "TEXT",
             aiServiceStepData: response.aiAllStepsData,
           },
           false,
-          curDocId
+          curDocId,
         );
       })
         .catch((err) => {

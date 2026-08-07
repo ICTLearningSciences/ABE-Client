@@ -4,18 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect, useReducer, useState } from 'react';
-import { equals, extractErrorMessageFromError } from '../helpers';
+
+import { useEffect, useReducer, useState } from "react";
+import { equals, extractErrorMessageFromError } from "../helpers";
 import {
-  LoadingStatusType,
-  LoadingError,
+  type LoadingError,
   LoadingReducer,
-  LoadingState,
-  LoadingActionType,
-} from './loading-reducer';
+  type LoadingState,
+} from "./loading-reducer";
 
 const initialState: LoadingState = {
-  status: LoadingStatusType.LOADING,
+  status: "LOADING",
   error: undefined,
 };
 
@@ -39,7 +38,7 @@ export interface UseData<T> {
   saveData: (action: UpdateFunc<T>, e?: T) => Promise<void>;
   saveAndReturnData: (
     action: UpdateAndReturnFunc<T>,
-    e?: T
+    e?: T,
   ) => Promise<T | undefined>;
 }
 
@@ -47,8 +46,8 @@ export function useWithData<T>(fetch: () => Promise<T>): UseData<T> {
   const [data, setData] = useState<T>();
   const [editedData, setEditedData] = useState<T>();
   const [state, dispatch] = useReducer(LoadingReducer, initialState);
-  const loading = state.status === LoadingStatusType.LOADING;
-  const saving = state.status === LoadingStatusType.SAVING;
+  const loading = state.status === "LOADING";
+  const saving = state.status === "SAVING";
   const actionInProgress = loading || saving;
 
   useEffect(() => {
@@ -57,15 +56,15 @@ export function useWithData<T>(fetch: () => Promise<T>): UseData<T> {
     }
     fetch()
       .then((data) => {
-        dispatch({ type: LoadingActionType.LOADING_SUCCEEDED });
+        dispatch({ type: "LOADING_SUCCEEDED" });
         setData(data);
         setEditedData(data);
       })
       .catch((err) => {
         console.error(err);
         dispatch({
-          type: LoadingActionType.LOADING_FAILED,
-          payload: { message: 'Failed to load', error: err.message },
+          type: "LOADING_FAILED",
+          payload: { message: "Failed to load", error: err.message },
         });
       });
   }, [state.status]);
@@ -74,7 +73,7 @@ export function useWithData<T>(fetch: () => Promise<T>): UseData<T> {
     if (actionInProgress) {
       return;
     }
-    dispatch({ type: LoadingActionType.LOADING_STARTED });
+    dispatch({ type: "LOADING_STARTED" });
   }
 
   function editData(edits: Partial<T>) {
@@ -90,20 +89,20 @@ export function useWithData<T>(fetch: () => Promise<T>): UseData<T> {
 
   async function saveData(
     update: UpdateFunc<T>,
-    e = editedData
+    e = editedData,
   ): Promise<void> {
     if (actionInProgress || !e || !update) {
       return;
     }
 
-    dispatch({ type: LoadingActionType.SAVING_STARTED });
+    dispatch({ type: "SAVING_STARTED" });
     try {
       await update.action(e);
     } catch (err) {
       dispatch({
-        type: LoadingActionType.SAVING_FAILED,
+        type: "SAVING_FAILED",
         payload: {
-          message: 'Failed to save',
+          message: "Failed to save",
           error: extractErrorMessageFromError(err),
         },
       });
@@ -112,30 +111,30 @@ export function useWithData<T>(fetch: () => Promise<T>): UseData<T> {
     if (loading) {
       return;
     }
-    dispatch({ type: LoadingActionType.SAVING_SUCCEEDED });
+    dispatch({ type: "SAVING_SUCCEEDED" });
     setData(editedData);
     setEditedData(undefined);
   }
 
   async function saveAndReturnData(
     update: UpdateAndReturnFunc<T>,
-    e = editedData
+    e = editedData,
   ): Promise<T | undefined> {
     if (actionInProgress || !e || !update) {
       return;
     }
-    dispatch({ type: LoadingActionType.SAVING_STARTED });
+    dispatch({ type: "SAVING_STARTED" });
     try {
       const updated = await update.action(e);
-      dispatch({ type: LoadingActionType.SAVING_SUCCEEDED });
+      dispatch({ type: "SAVING_SUCCEEDED" });
       setData(updated);
       setEditedData(undefined);
       return updated;
     } catch (err) {
       dispatch({
-        type: LoadingActionType.SAVING_FAILED,
+        type: "SAVING_FAILED",
         payload: {
-          message: 'Failed to save',
+          message: "Failed to save",
           error: extractErrorMessageFromError(err),
         },
       });

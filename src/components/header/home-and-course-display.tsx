@@ -4,14 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
-import { IconButton, Divider, Drawer, Button } from '@mui/material';
-import { Home } from '@mui/icons-material';
-import SchoolIcon from '@mui/icons-material/School';
-import TextSnippetIcon from '@mui/icons-material/TextSnippet';
-import MenuIcon from '@mui/icons-material/Menu';
-import { RowDiv } from '../../styled-components';
-import { useWithWindowSize } from '../../hooks/use-with-window-size';
+
+import React, { useState } from "react";
+import { IconButton, Divider, Drawer, Button } from "@mui/material";
+import { Home, School, TextSnippet, Menu } from "@mui/icons-material";
+import { RowDiv } from "../../styled-components";
+import { useWithWindowSize } from "../../hooks/use-with-window-size";
 
 interface HomeAndCourseDisplayProps {
   defaultPath: string;
@@ -22,8 +20,8 @@ interface HomeAndCourseDisplayProps {
 }
 
 export function HomeAndCourseDisplay(
-  props: HomeAndCourseDisplayProps
-): JSX.Element {
+  props: HomeAndCourseDisplayProps,
+): React.ReactNode {
   const {
     defaultPath,
     courseNavPath,
@@ -47,7 +45,7 @@ export function HomeAndCourseDisplay(
           onClick={() => setDrawerOpen(true)}
           color="primary"
         >
-          <MenuIcon />
+          <Menu />
         </IconButton>
         <Drawer
           anchor="left"
@@ -56,11 +54,11 @@ export function HomeAndCourseDisplay(
         >
           <div
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              padding: '20px',
-              gap: '10px',
-              minWidth: '250px',
+              display: "flex",
+              flexDirection: "column",
+              padding: "20px",
+              gap: "10px",
+              minWidth: "250px",
             }}
             data-cy="navigation-drawer"
           >
@@ -70,8 +68,8 @@ export function HomeAndCourseDisplay(
               variant="contained"
               startIcon={<Home />}
               style={{
-                justifyContent: 'flex-start',
-                padding: '12px 16px',
+                justifyContent: "flex-start",
+                padding: "12px 16px",
               }}
             >
               Home
@@ -80,11 +78,11 @@ export function HomeAndCourseDisplay(
               data-cy="drawer-courses-button"
               onClick={() => handleNavigate(courseNavPath)}
               variant="contained"
-              startIcon={<SchoolIcon />}
+              startIcon={<School />}
               disabled={curPath === courseNavPath}
               style={{
-                justifyContent: 'flex-start',
-                padding: '12px 16px',
+                justifyContent: "flex-start",
+                padding: "12px 16px",
               }}
             >
               Courses
@@ -93,11 +91,11 @@ export function HomeAndCourseDisplay(
               data-cy="drawer-documents-button"
               onClick={() => handleNavigate(freeDocEditingNavPath)}
               variant="contained"
-              startIcon={<TextSnippetIcon />}
+              startIcon={<TextSnippet />}
               disabled={curPath === freeDocEditingNavPath}
               style={{
-                justifyContent: 'flex-start',
-                padding: '12px 16px',
+                justifyContent: "flex-start",
+                padding: "12px 16px",
               }}
             >
               Documents
@@ -117,8 +115,8 @@ export function HomeAndCourseDisplay(
         }}
         color="primary"
       >
-        {' '}
-        <Home />{' '}
+        {" "}
+        <Home />{" "}
       </IconButton>
       <Divider orientation="vertical" variant="middle" flexItem />
 
@@ -130,7 +128,7 @@ export function HomeAndCourseDisplay(
         color="primary"
         disabled={curPath === courseNavPath}
       >
-        <SchoolIcon />
+        <School />
       </IconButton>
       <IconButton
         data-cy="doc-home-button"
@@ -140,7 +138,7 @@ export function HomeAndCourseDisplay(
         color="primary"
         disabled={curPath === freeDocEditingNavPath}
       >
-        <TextSnippetIcon />
+        <TextSnippet />
       </IconButton>
     </RowDiv>
   );

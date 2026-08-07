@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+
+import React from "react";
 import {
   Box,
   Card,
@@ -14,8 +15,8 @@ import {
   CircularProgress,
   Stack,
   Chip,
-} from '@mui/material';
-import { Section } from '../../../store/slices/education-management/types';
+} from "@mui/material";
+import type { Section } from "../../../store/slices/education-management/types";
 
 interface SectionListProps {
   sections: Section[];
@@ -32,8 +33,8 @@ const SectionList: React.FC<SectionListProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <Box sx={{ textAlign: 'center', py: 5 }}>
-        <CircularProgress size={40} sx={{ color: '#1B6A9C' }} />
+      <Box sx={{ textAlign: "center", py: 5 }}>
+        <CircularProgress size={40} sx={{ color: "#1B6A9C" }} />
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
           Loading sections...
         </Typography>
@@ -43,8 +44,8 @@ const SectionList: React.FC<SectionListProps> = ({
 
   if (sections.length === 0) {
     return (
-      <Box sx={{ textAlign: 'center', py: 5 }}>
-        <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
+      <Box sx={{ textAlign: "center", py: 5 }}>
+        <Typography sx={{ fontSize: "48px", color: "grey.300", mb: 2 }}>
           📑
         </Typography>
         <Typography
@@ -61,38 +62,38 @@ const SectionList: React.FC<SectionListProps> = ({
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 800 }}>
+    <Box sx={{ width: "100%", maxWidth: 800 }}>
       <Grid container spacing={2}>
         {sections.map((section) => (
-          <Grid item xs={12} sm={6} key={section._id}>
+          <Grid size={{ xs: 12, sm: 6 }} key={section._id}>
             <Card
               variant="outlined"
               sx={{
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
+                cursor: "pointer",
+                transition: "all 0.2s ease",
                 border:
                   selectedSectionId === section._id
-                    ? '2px solid #1B6A9C'
-                    : '2px solid transparent',
+                    ? "2px solid #1B6A9C"
+                    : "2px solid transparent",
                 backgroundColor:
-                  selectedSectionId === section._id ? '#e3f2fd' : 'white',
+                  selectedSectionId === section._id ? "#e3f2fd" : "white",
                 boxShadow: selectedSectionId === section._id ? 2 : 1,
-                '&:hover': {
-                  borderColor: '#1B6A9C',
+                "&:hover": {
+                  borderColor: "#1B6A9C",
                   boxShadow: 3,
                 },
               }}
               onClick={() => onSectionSelect(section._id)}
             >
               <CardContent sx={{ p: 2.5 }}>
-                <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                  <Typography sx={{ fontSize: '24px', mr: 1.5 }}>📑</Typography>
+                <Stack direction="row" sx={{ mb: 1.5, alignItems: "center" }}>
+                  <Typography sx={{ fontSize: "24px", mr: 1.5 }}>📑</Typography>
                   <Typography
                     variant="h6"
                     sx={{
-                      color: '#1B6A9C',
+                      color: "#1B6A9C",
                       fontWeight: 600,
-                      fontSize: '1.125rem',
+                      fontSize: "1.125rem",
                     }}
                   >
                     {section.title}
@@ -107,22 +108,26 @@ const SectionList: React.FC<SectionListProps> = ({
                   {section.description}
                 </Typography>
 
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  style={{ alignItems: "center" }}
+                >
                   <Chip
                     label={section.sectionCode}
                     size="small"
                     variant="outlined"
-                    sx={{ fontSize: '11px' }}
+                    sx={{ fontSize: "11px" }}
                   />
                   <Typography variant="caption" color="text.disabled">
                     {section.assignments.length} assignment
-                    {section.assignments.length !== 1 ? 's' : ''}
+                    {section.assignments.length !== 1 ? "s" : ""}
                   </Typography>
                   <Chip
                     label={`${section.numOptionalAssignmentsRequired} optional required`}
                     size="small"
                     color="secondary"
-                    sx={{ fontSize: '10px' }}
+                    sx={{ fontSize: "10px" }}
                   />
                 </Stack>
               </CardContent>

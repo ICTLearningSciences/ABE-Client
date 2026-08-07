@@ -5,9 +5,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import * as React from 'react';
-import FlipMove from 'react-flip-move';
-import * as motion from 'motion/react-client';
+import * as React from "react";
+import FlipMove from "react-flip-move";
+import * as motion from "motion/react-client";
 import {
   Button,
   CircularProgress,
@@ -17,8 +17,9 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  SvgIcon,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 import {
   CheckBox,
   CheckBoxOutlineBlank,
@@ -28,19 +29,53 @@ import {
   PeopleOutlined,
   Person,
   PlayCircleOutlineOutlined,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
-import { CssCard } from './components';
-import { Header } from './components/header';
-import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
-import { useAppSelector } from '../../store/hooks';
-import { useWithPanels } from '../../store/slices/panels/use-with-panels';
-import { LoadStatus } from '../../store/slices/doc-goals-activities';
-import withAuthorizationOnly from './wrap-with-authorization-only';
+import { Header } from "./components/header";
+import { useNavigateWithParams } from "../../hooks/use-navigate-with-params";
+import { useAppSelector } from "../../store/hooks";
+import { useWithPanels } from "../../store/slices/panels/use-with-panels";
+import withAuthorizationOnly from "./wrap-with-authorization-only";
+import type { ActivityBuilder } from "../../exported-files";
 
-import './shark-tank.css';
+import "./shark-tank.css";
 
-function SharkTankSetup(): JSX.Element {
+const CssCard = (props: {
+  icon?: React.ReactNode;
+  title?: string;
+  headerButton?: React.ReactNode;
+  children?: React.ReactNode;
+  style?: React.CSSProperties;
+  alt?: boolean;
+}): React.ReactNode => {
+  return (
+    <div
+      className="box column spacing"
+      style={{
+        marginBottom: 20,
+        borderColor: props.alt ? "#5c8a69" : "",
+        backgroundImage: props.alt
+          ? "linear-gradient(110deg, rgba(121, 160, 117, 0.3) 60%, rgba(100, 87, 71, 0.3) 100%)"
+          : "linear-gradient(145deg, rgb(48, 53, 58) 30%, rgb(61, 67, 74) 80%, rgb(48, 53, 58) 100%)",
+        boxShadow: "-5px 5px 10px 0px rgba(0, 0, 0, 0.2)",
+        ...props.style,
+      }}
+    >
+      <div className="row spacing">
+        <SvgIcon fontSize="small" style={{ color: props.alt ? "" : "#5c8a69" }}>
+          {props.icon}
+        </SvgIcon>
+        <Typography style={{ fontWeight: "bold", fontSize: 14, flexGrow: 1 }}>
+          {props.title?.toUpperCase()}
+        </Typography>
+        {props.headerButton}
+      </div>
+      {props.children}
+    </div>
+  );
+};
+
+function SharkTankSetup(): React.ReactNode {
   const {
     usePanelMode,
     activity,
@@ -52,13 +87,14 @@ function SharkTankSetup(): JSX.Element {
     setActivePanel,
     setActivePanelist,
   } = useWithPanels();
-  const activities = useAppSelector((state) =>
+  const activities: ActivityBuilder[] = useAppSelector((state) =>
     state.docGoalsActivities.builtActivities.filter(
-      (a) => a.attachedPanel && a.title === 'CFT Panel Activity'
-    )
+      (a: ActivityBuilder) =>
+        a.attachedPanel && a.title === "CFT Panel Activity",
+    ),
   );
   const activitiesLoadStatus = useAppSelector(
-    (state) => state.docGoalsActivities.builtActivitiesLoadStatus
+    (state) => state.docGoalsActivities.builtActivitiesLoadStatus,
   );
   const navigate = useNavigateWithParams();
 
@@ -66,10 +102,10 @@ function SharkTankSetup(): JSX.Element {
     if (!activity && activities.length > 0) {
       setActivity(activities[activities.length - 1]._id);
     }
-  }, [activities]);
+  }, [activity, activities]);
 
   function startSession(): void {
-    navigate('/shark-tank/chat');
+    navigate("/shark-tank/chat");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,7 +114,7 @@ function SharkTankSetup(): JSX.Element {
       ref={ref}
       className="row spacing"
       whileHover={
-        !usePanelMode ? { scale: 1.01, filter: 'brightness(1.1)' } : {}
+        !usePanelMode ? { scale: 1.01, filter: "brightness(1.1)" } : {}
       }
       onClick={() => setActivePanelist(props.clientId)}
     >
@@ -86,14 +122,14 @@ function SharkTankSetup(): JSX.Element {
         className="box"
         style={{
           padding: 5,
-          borderColor: activePanelist === props.clientId ? '#5c8a69' : '',
+          borderColor: activePanelist === props.clientId ? "#5c8a69" : "",
           backgroundImage:
             activePanelist === props.clientId
-              ? 'linear-gradient(to right, #79a07530, #64574730)'
-              : '',
+              ? "linear-gradient(to right, #79a07530, #64574730)"
+              : "",
         }}
       >
-        <ListItemIcon style={{ color: 'white', marginLeft: 5 }}>
+        <ListItemIcon style={{ color: "white", marginLeft: 5 }}>
           <Person />
         </ListItemIcon>
         <ListItemText
@@ -128,20 +164,20 @@ function SharkTankSetup(): JSX.Element {
     <main className="root">
       <Header title="Configure Session" />
       <div className="page">
-        <Typography variant="h4" style={{ fontWeight: 'bold', marginTop: 20 }}>
+        <Typography variant="h4" style={{ fontWeight: "bold", marginTop: 20 }}>
           Configure Session
         </Typography>
         <Typography color="secondary">
           Choose your activity and panelists.
         </Typography>
-        {activitiesLoadStatus === LoadStatus.LOADING ? (
+        {activitiesLoadStatus === 1 ? (
           <CircularProgress
             size={40}
-            style={{ alignSelf: 'center', marginTop: 20 }}
+            style={{ alignSelf: "center", marginTop: 20 }}
           />
         ) : (
-          <Grid container style={{ width: '90%', marginTop: 20 }}>
-            <Grid xs={8} style={{ padding: 10 }}>
+          <Grid container style={{ width: "90%", marginTop: 20 }}>
+            <Grid size={8} style={{ padding: 10 }}>
               <CssCard title="Panel Name" icon={<InfoOutlined />}>
                 <div className="box">
                   <Typography>{activePanel?.panelName}</Typography>
@@ -170,7 +206,7 @@ function SharkTankSetup(): JSX.Element {
               </Button>
             </Grid>
 
-            <Grid xs={4} style={{ padding: 10 }}>
+            <Grid size={4} style={{ padding: 10 }}>
               {/* <CssCard alt title="Use Web Search" icon={<Search />}>
                 <CssTextField
                   select
@@ -185,26 +221,26 @@ function SharkTankSetup(): JSX.Element {
                 <List className="column spacing">
                   {activities.map((a) => {
                     const panel = panels.find(
-                      (p) => p.clientId === a.attachedPanel
+                      (p) => p.clientId === a.attachedPanel,
                     );
                     if (!panel) return <></>;
                     return (
                       <motion.div
                         id={a._id}
                         key={a._id}
-                        whileHover={{ scale: 1.01, filter: 'brightness(1.1)' }}
+                        whileHover={{ scale: 1.01, filter: "brightness(1.1)" }}
                         className="box column spacing"
                         style={{
-                          backgroundColor: 'rgb(100, 100, 100)',
+                          backgroundColor: "rgb(100, 100, 100)",
                         }}
                       >
                         <div
                           className="row"
-                          style={{ justifyContent: 'space-between' }}
+                          style={{ justifyContent: "space-between" }}
                         >
                           <Typography
                             color="secondary"
-                            style={{ fontWeight: 'bold' }}
+                            style={{ fontWeight: "bold" }}
                           >
                             {a.title}
                           </Typography>
@@ -227,7 +263,7 @@ function SharkTankSetup(): JSX.Element {
                           }}
                           disabled={activity?._id === a._id}
                         >
-                          {activity?._id === a._id ? 'Selected' : 'Select'}
+                          {activity?._id === a._id ? "Selected" : "Select"}
                         </Button>
                       </motion.div>
                     );
@@ -242,4 +278,5 @@ function SharkTankSetup(): JSX.Element {
   );
 }
 
-export default withAuthorizationOnly(SharkTankSetup);
+const Page = withAuthorizationOnly(SharkTankSetup);
+export default Page;

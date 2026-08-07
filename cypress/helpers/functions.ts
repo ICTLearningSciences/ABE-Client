@@ -25,7 +25,7 @@ import {
   GQLDocumentTimeline,
   IGDocVersion,
   JobStatus,
-  UserRole,
+  // UserRole,
   MockDefaultType,
   ActivityBuilderVisibility,
   DocService,
@@ -34,6 +34,7 @@ import {
 } from './types';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 import { createNewInstructorResponse, createNewStudentResponse, fetchAssignmentsResponseEmpty, fetchCoursesResponseEmpty, fetchSectionsResponseEmpty, fetchStudentsResponseEmpty } from '../fixtures/educational-management';
+import { UserRole } from '../../src/store/slices/login';
 
 export type CypressGlobal = Cypress.cy & CyEventEmitter;
 
@@ -207,7 +208,7 @@ export function cyMockDefault(
     //Defaults
     mockGQL(
       'RefreshAccessToken',
-      refreshAccessTokenResponse(args.userRole || UserRole.USER)
+      refreshAccessTokenResponse(args.userRole || 'USER')
     ),
     mockGQL('FetchVersionsById', fetchDocVersionsBuilder(docTimelineVersions)),
     mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.GOOGLE_DOCS)),
@@ -425,9 +426,9 @@ export function cyGetQueryVariables(query: Interception) {
 
 function roleDisplayText(userRole: UserRole) {
   switch (userRole) {
-    case UserRole.ADMIN:
+    case 'ADMIN':
       return 'Admin';
-    case UserRole.CONTENT_MANAGER:
+    case 'CONTENT_MANAGER':
       return 'Content Manager';
     default:
       return 'User';
@@ -441,7 +442,7 @@ export function visitMainPageSettled(cy: CypressGlobal){
 
 export function roleSwitch(cy: CypressGlobal, targetNewRole: UserRole){
   cy.get("[data-cy=profile-button]").click();
-  cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText(UserRole.USER))
+  cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText('USER'))
   cy.get("[data-cy=role-switch]").click();
   cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText(targetNewRole))
   // click center of screen to close drawer

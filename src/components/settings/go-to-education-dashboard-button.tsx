@@ -4,14 +4,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Button } from '@mui/material';
+
+import { Button } from "@mui/material";
 import {
   courseManagementUrl,
   studentCoursesUrl,
-} from '../../pages/instructor/course-management';
-import { EducationalRole } from '../../types';
-import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
+} from "../../pages/instructor/course-management";
+import type { EducationalRole } from "../../types";
+import { useNavigateWithParams } from "../../hooks/use-navigate-with-params";
 
 export default function GoToEducationDashboardButton(props: {
   userId: string;
@@ -24,7 +24,7 @@ export default function GoToEducationDashboardButton(props: {
   }
 
   const currentPath =
-    typeof window !== 'undefined' ? window.location.pathname : '';
+    typeof window !== "undefined" ? window.location.pathname : "";
   const isOnEducationDashboard =
     currentPath.includes(studentCoursesUrl) ||
     currentPath.includes(courseManagementUrl);
@@ -35,7 +35,7 @@ export default function GoToEducationDashboardButton(props: {
         variant="contained"
         color="primary"
         onClick={() => {
-          navigate('/docs');
+          navigate("/docs");
         }}
       >
         Free Doc Editing
@@ -43,7 +43,7 @@ export default function GoToEducationDashboardButton(props: {
     );
   }
 
-  if (props.educationalRole === EducationalRole.INSTRUCTOR) {
+  if (props.educationalRole === "INSTRUCTOR") {
     return (
       <Button
         variant="contained"

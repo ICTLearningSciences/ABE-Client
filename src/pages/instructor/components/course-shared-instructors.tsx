@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -17,14 +18,11 @@ import {
   ListItem,
   ListItemText,
   IconButton,
-} from '@mui/material';
-import { Delete as DeleteIcon, Share as ShareIcon } from '@mui/icons-material';
-import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import {
-  Instructor,
-  CourseOwnership,
-} from '../../../store/slices/education-management/types';
-import { useAppSelector } from '../../../store/hooks';
+} from "@mui/material";
+import { Delete, Share } from "@mui/icons-material";
+import { useWithEducationalManagement } from "../../../store/slices/education-management/use-with-educational-management";
+import type { Instructor } from "../../../store/slices/education-management/types";
+import { useAppSelector } from "../../../store/hooks";
 
 interface CourseSharedInstructorsProps {
   courseId: string;
@@ -37,24 +35,22 @@ const CourseSharedInstructors: React.FC<CourseSharedInstructorsProps> = ({
   const [selectedInstructor, setSelectedInstructor] =
     useState<Instructor | null>(null);
 
-  const availableInstructors = useAppSelector(
-    (state) => state.educationManagement.instructors
+  const availableInstructors: Instructor[] = useAppSelector(
+    (state) => state.educationManagement.instructors,
   );
   const sharedInstructors = availableInstructors.filter((instructor) =>
     instructor.courses.some(
       (courseData) =>
-        courseData.courseId === courseId &&
-        courseData.ownership === CourseOwnership.SHARED
-    )
+        courseData.courseId === courseId && courseData.ownership === "SHARED",
+    ),
   );
 
   const unsharedInstructors = availableInstructors.filter(
-    (instructor) =>
+    (instructor: Instructor) =>
       !instructor.courses.some(
         (courseData) =>
-          courseData.courseId === courseId &&
-          courseData.ownership === CourseOwnership.SHARED
-      )
+          courseData.courseId === courseId && courseData.ownership === "SHARED",
+      ),
   );
 
   const handleShareCourse = async () => {
@@ -63,11 +59,11 @@ const CourseSharedInstructors: React.FC<CourseSharedInstructorsProps> = ({
     try {
       await educationManagement.shareCourseWithInstructor(
         selectedInstructor.userId,
-        courseId
+        courseId,
       );
       setSelectedInstructor(null);
     } catch (error) {
-      console.error('Failed to share course:', error);
+      console.error("Failed to share course:", error);
     }
   };
 
@@ -75,10 +71,10 @@ const CourseSharedInstructors: React.FC<CourseSharedInstructorsProps> = ({
     try {
       await educationManagement.unshareCourseWithInstructor(
         instructorId,
-        courseId
+        courseId,
       );
     } catch (error) {
-      console.error('Failed to unshare course:', error);
+      console.error("Failed to unshare course:", error);
     }
   };
 
@@ -86,19 +82,19 @@ const CourseSharedInstructors: React.FC<CourseSharedInstructorsProps> = ({
     <Box>
       <Typography
         variant="h5"
-        sx={{ fontWeight: 600, color: 'text.primary', mb: 3 }}
+        sx={{ fontWeight: 600, color: "text.primary", mb: 3 }}
       >
         Share Course with Instructors
       </Typography>
 
       {/* Instructor Selector */}
       <Card sx={{ mb: 3, p: 3 }}>
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack direction="row" spacing={2} style={{ alignItems: "center" }}>
           <Autocomplete
             options={unsharedInstructors}
             getOptionLabel={(option) => option.name}
             value={selectedInstructor}
-            onChange={(event, newValue) => setSelectedInstructor(newValue)}
+            onChange={(_event, newValue) => setSelectedInstructor(newValue)}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -111,15 +107,15 @@ const CourseSharedInstructors: React.FC<CourseSharedInstructorsProps> = ({
           />
           <Button
             variant="contained"
-            startIcon={<ShareIcon />}
+            startIcon={<Share />}
             onClick={handleShareCourse}
             disabled={
               !selectedInstructor || educationManagement.isCourseModifying
             }
             sx={{
-              backgroundColor: '#1B6A9C',
-              '&:hover': {
-                backgroundColor: '#145a87',
+              backgroundColor: "#1B6A9C",
+              "&:hover": {
+                backgroundColor: "#145a87",
               },
             }}
           >
@@ -131,7 +127,7 @@ const CourseSharedInstructors: React.FC<CourseSharedInstructorsProps> = ({
       {/* Shared Instructors List */}
       <Typography
         variant="h6"
-        sx={{ fontWeight: 600, color: 'text.primary', mb: 2 }}
+        sx={{ fontWeight: 600, color: "text.primary", mb: 2 }}
       >
         Shared Instructors ({sharedInstructors.length})
       </Typography>
@@ -140,14 +136,14 @@ const CourseSharedInstructors: React.FC<CourseSharedInstructorsProps> = ({
         <Card
           variant="outlined"
           sx={{
-            border: '2px dashed',
-            borderColor: 'grey.300',
-            textAlign: 'center',
+            border: "2px dashed",
+            borderColor: "grey.300",
+            textAlign: "center",
             py: 5,
             px: 2.5,
           }}
         >
-          <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
+          <Typography sx={{ fontSize: "48px", color: "grey.300", mb: 2 }}>
             👥
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
@@ -160,21 +156,21 @@ const CourseSharedInstructors: React.FC<CourseSharedInstructorsProps> = ({
       ) : (
         <Card variant="outlined">
           <List>
-            {sharedInstructors.map((instructor, index) => (
+            {sharedInstructors.map((instructor: Instructor, index) => (
               <ListItem
                 key={instructor._id}
                 sx={{
                   borderBottom: index < sharedInstructors.length - 1 ? 1 : 0,
-                  borderColor: 'divider',
+                  borderColor: "divider",
                 }}
                 secondaryAction={
                   <IconButton
                     edge="end"
                     onClick={() => handleUnshareCourse(instructor.userId)}
                     disabled={educationManagement.isCourseModifying}
-                    sx={{ color: '#d32f2f' }}
+                    sx={{ color: "#d32f2f" }}
                   >
-                    <DeleteIcon />
+                    <Delete />
                   </IconButton>
                 }
               >

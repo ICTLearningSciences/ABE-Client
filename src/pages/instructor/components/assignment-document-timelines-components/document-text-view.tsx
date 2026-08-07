@@ -4,13 +4,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
-import { Box, Typography, Paper, Button } from '@mui/material';
-import { DehydratedGQLTimelinePoint } from '../../../../types';
-import { TextDiffResult } from '../assignment-document-timelines';
-import { RowDiv } from '../../../../styled-components';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+
+import React, { useState } from "react";
+import { Box, Typography, Paper, Button } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+
+import type { DehydratedGQLTimelinePoint } from "../../../../types";
+import { RowDiv } from "../../../../styled-components";
+import type { TextDiffResult } from "../../helpers";
 
 interface DocumentTextViewProps {
   timelinePoint: DehydratedGQLTimelinePoint | null;
@@ -19,7 +20,7 @@ interface DocumentTextViewProps {
 
 const getWordCount = (text: string | undefined): number => {
   if (!text) return 0;
-  return text.split(' ').filter((word) => word.trim().length > 0).length;
+  return text.split(" ").filter((word) => word.trim().length > 0).length;
 };
 
 export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
@@ -30,15 +31,15 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
   const currentText =
     timelinePoint?.version?.markdownText ||
     timelinePoint?.version?.plainText ||
-    '';
+    "";
   if (!timelinePoint) {
     return (
       <Box
         sx={{
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <Typography color="text.secondary">
@@ -54,52 +55,52 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
     <Paper
       data-cy="text-view-container"
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        overflow: 'hidden',
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        overflow: "hidden",
       }}
     >
       <Box
         data-cy="text-view-content"
         sx={{
           flex: 1,
-          overflow: 'hidden',
+          overflow: "hidden",
           pl: 1,
           pr: 1,
-          border: '1px solid',
-          borderColor: 'grey.200',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          border: "1px solid",
+          borderColor: "grey.200",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         }}
       >
         <RowDiv
           data-cy="text-view-header"
           style={{
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            textAlign: 'center',
-            height: '8%',
+            justifyContent: "space-between",
+            alignItems: "center",
+            textAlign: "center",
+            height: "8%",
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
             {wordCount} words
           </Typography>
           <Button onClick={() => setViewChanges(!viewChanges)}>
-            {viewChanges ? <VisibilityOffIcon /> : <VisibilityIcon />}{' '}
-            {viewChanges ? 'Hide Changes' : 'View Changes'}
+            {viewChanges ? <VisibilityOff /> : <Visibility />}{" "}
+            {viewChanges ? "Hide Changes" : "View Changes"}
           </Button>
         </RowDiv>
 
         <Box
           style={{
-            overflow: 'hidden',
-            height: '92%',
+            overflow: "hidden",
+            height: "92%",
           }}
         >
           {(() => {
             if (!currentText) {
               return (
-                <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
                   No document content available
                 </Typography>
               );
@@ -111,12 +112,12 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
                   data-cy="text-content"
                   component="pre"
                   style={{
-                    whiteSpace: 'pre-wrap',
-                    fontFamily: 'inherit',
-                    fontSize: 'inherit',
+                    whiteSpace: "pre-wrap",
+                    fontFamily: "inherit",
+                    fontSize: "inherit",
                     margin: 0,
-                    overflow: 'auto',
-                    height: '100%',
+                    overflow: "auto",
+                    height: "100%",
                   }}
                 >
                   {diffContent.diffContent}
@@ -128,12 +129,12 @@ export const DocumentTextView: React.FC<DocumentTextViewProps> = ({
                 data-cy="text-content"
                 component="pre"
                 style={{
-                  whiteSpace: 'pre-wrap',
-                  fontFamily: 'inherit',
-                  fontSize: 'inherit',
+                  whiteSpace: "pre-wrap",
+                  fontFamily: "inherit",
+                  fontSize: "inherit",
                   margin: 0,
-                  overflow: 'auto',
-                  height: '100%',
+                  overflow: "auto",
+                  height: "100%",
                 }}
               >
                 {currentText}

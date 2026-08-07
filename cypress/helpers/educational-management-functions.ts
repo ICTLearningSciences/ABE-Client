@@ -64,7 +64,7 @@ export function cyMockEducationalManagement(
 ): void {
   const {
     gqlQueries = [],
-    userRole = UserRole.USER,
+    userRole = 'USER',
     educationalRole = EducationalRole.INSTRUCTOR,
     emptyCourses = false,
     emptySections = false,

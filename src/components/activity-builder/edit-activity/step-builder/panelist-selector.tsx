@@ -1,12 +1,11 @@
 /*
-This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved.
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
 Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { useWithPanels } from '../../../../store/slices/panels/use-with-panels';
-import { useEditActivityContext } from '../../activity-builder-context';
+
+import React from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -15,9 +14,11 @@ import {
   FormControlLabel,
   Checkbox,
   Typography,
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Panelist } from '../../../../store/slices/panels/types';
+} from "@mui/material";
+import { ExpandMore } from "@mui/icons-material";
+import { useWithPanels } from "../../../../store/slices/panels/use-with-panels";
+import type { Panelist } from "../../../../store/slices/panels/types";
+import { useEditActivityContext } from "../../activity-builder-context";
 
 interface PanelistSelectorProps {
   selectedPanelistClientIds: string[];
@@ -25,8 +26,8 @@ interface PanelistSelectorProps {
 }
 
 export function PanelistSelector(
-  props: PanelistSelectorProps
-): JSX.Element | null {
+  props: PanelistSelectorProps,
+): React.ReactNode | null {
   const { selectedPanelistClientIds, onChange } = props;
   const { activity } = useEditActivityContext();
   const { panels, panelists } = useWithPanels();
@@ -38,7 +39,7 @@ export function PanelistSelector(
 
   // Find the attached panel
   const attachedPanel = panels.find(
-    (panel) => panel.clientId === activity.attachedPanel
+    (panel) => panel.clientId === activity.attachedPanel,
   );
 
   // If panel not found or has no panelists, don't render
@@ -55,7 +56,7 @@ export function PanelistSelector(
       }
       return acc;
     },
-    []
+    [],
   );
 
   // If no valid panelists found, don't render
@@ -77,13 +78,13 @@ export function PanelistSelector(
   const selectedCount = selectedPanelistClientIds.length;
   const summaryText =
     selectedCount === 0
-      ? 'Run for Panelists'
+      ? "Run for Panelists"
       : `Run for Panelists (${selectedCount} selected)`;
 
   return (
     <Accordion data-cy="panelist-selector">
       <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
+        expandIcon={<ExpandMore />}
         aria-controls="panelist-selector-content"
         id="panelist-selector-header"
       >
@@ -97,7 +98,7 @@ export function PanelistSelector(
               control={
                 <Checkbox
                   checked={selectedPanelistClientIds.includes(
-                    panelist.clientId
+                    panelist.clientId,
                   )}
                   onChange={() => handleTogglePanelist(panelist.clientId)}
                   data-cy={`panelist-checkbox-${panelist.clientId}`}

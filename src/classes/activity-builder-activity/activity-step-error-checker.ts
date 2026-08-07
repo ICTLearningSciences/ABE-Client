@@ -4,17 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import {
+
+import type {
   ActivityBuilder,
   ActivityBuilderStep,
-  ActivityBuilderStepType,
   ConditionalActivityStep,
   PromptActivityStep,
   RequestUserInputActivityStep,
   SystemMessageActivityStep,
-} from '../../components/activity-builder/types';
-import { getAllContextDataKeys } from '../../components/activity-builder/helpers';
-import { PromptOutputTypes } from '../../types';
+} from "../../components/activity-builder/types";
+import { getAllContextDataKeys } from "../../components/activity-builder/helpers";
+
 type FlowId = string;
 type StepId = string;
 export type StepErrors = Record<StepId, ErrorMessage[]>;
@@ -51,35 +51,35 @@ export class ActivityStepErrorChecker {
     step: ActivityBuilderStep,
     flowId: string,
     existingSteps: Set<string>,
-    isLastStep: boolean
+    isLastStep: boolean,
   ) {
-    if (step.stepType === ActivityBuilderStepType.SYSTEM_MESSAGE) {
+    if (step.stepType === "SYSTEM_MESSAGE") {
       this.checkMessageStepErrors(
         step as SystemMessageActivityStep,
         flowId,
         existingSteps,
-        isLastStep
+        isLastStep,
       );
-    } else if (step.stepType === ActivityBuilderStepType.CONDITIONAL) {
+    } else if (step.stepType === "CONDITIONAL") {
       this.checkConditionalStepErrors(
         step as ConditionalActivityStep,
         flowId,
         existingSteps,
-        isLastStep
+        isLastStep,
       );
-    } else if (step.stepType === ActivityBuilderStepType.REQUEST_USER_INPUT) {
+    } else if (step.stepType === "REQUEST_USER_INPUT") {
       this.checkRequestUserInputStepErrors(
         step as RequestUserInputActivityStep,
         flowId,
         existingSteps,
-        isLastStep
+        isLastStep,
       );
-    } else if (step.stepType === ActivityBuilderStepType.PROMPT) {
+    } else if (step.stepType === "PROMPT") {
       this.checkPromptStepErrors(
         step as PromptActivityStep,
         flowId,
         existingSteps,
-        isLastStep
+        isLastStep,
       );
     }
   }
@@ -100,7 +100,7 @@ export class ActivityStepErrorChecker {
     step: SystemMessageActivityStep,
     flowId: string,
     existingSteps: Set<string>,
-    isLastStep: boolean
+    isLastStep: boolean,
   ) {
     this.initializeStepErrors(flowId, step.stepId);
     const keys = getAllContextDataKeys(step.message);
@@ -114,7 +114,7 @@ export class ActivityStepErrorChecker {
     step: ConditionalActivityStep,
     flowId: string,
     existingSteps: Set<string>,
-    isLastStep: boolean
+    isLastStep: boolean,
   ) {
     this.initializeStepErrors(flowId, step.stepId);
     const conditions = step.conditionals;
@@ -123,7 +123,7 @@ export class ActivityStepErrorChecker {
     conditions.forEach((condition) => {
       if (!condition.targetStepId) {
         this.errors[flowId][step.stepId].push(
-          'One or more conditions are missing a target step'
+          "One or more conditions are missing a target step",
         );
       }
       if (
@@ -132,7 +132,7 @@ export class ActivityStepErrorChecker {
         !existingSteps.has(condition.targetStepId)
       ) {
         this.errors[flowId][step.stepId].push(
-          'One or more conditions are set to jump to a step that does not exist'
+          "One or more conditions are set to jump to a step that does not exist",
         );
         missingTargetStepFound = true;
       }
@@ -147,14 +147,14 @@ export class ActivityStepErrorChecker {
     step: RequestUserInputActivityStep,
     flowId: string,
     existingSteps: Set<string>,
-    isLastStep: boolean
+    isLastStep: boolean,
   ) {
     this.initializeStepErrors(flowId, step.stepId);
     const keys = getAllContextDataKeys(step.message);
 
     if (step.disableFreeInput && step.predefinedResponses.length === 0) {
       this.errors[flowId][step.stepId].push(
-        'Free input is disabled but no predefined responses are set'
+        "Free input is disabled but no predefined responses are set",
       );
     }
 
@@ -167,7 +167,7 @@ export class ActivityStepErrorChecker {
     step: PromptActivityStep,
     flowId: string,
     existingSteps: Set<string>,
-    isLastStep: boolean
+    isLastStep: boolean,
   ) {
     this.initializeStepErrors(flowId, step.stepId);
 
@@ -177,17 +177,17 @@ export class ActivityStepErrorChecker {
     // Validate each prompt configuration
     step.promptConfigurations.forEach((config, index) => {
       const configKeys = getAllContextDataKeys(config.promptText).concat(
-        getAllContextDataKeys(config.customSystemRole)
+        getAllContextDataKeys(config.customSystemRole),
       );
       allKeys.push(...configKeys);
 
       // Check JSON response data for JSON output type
       if (
-        config.outputDataType === PromptOutputTypes.JSON &&
+        config.outputDataType === "JSON" &&
         (!config.jsonResponseData || config.jsonResponseData.length === 0)
       ) {
         this.errors[flowId][step.stepId].push(
-          `Prompt ${index + 1}: No JSON response data is set`
+          `Prompt ${index + 1}: No JSON response data is set`,
         );
       }
     });
@@ -201,24 +201,24 @@ export class ActivityStepErrorChecker {
     step: ActivityBuilderStep,
     flowId: string,
     existingSteps: Set<string>,
-    isLastStep: boolean,
-    dataKeys: string[]
+    _isLastStep: boolean,
+    dataKeys: string[],
   ) {
     if (step.jumpToStepId && !existingSteps.has(step.jumpToStepId)) {
       this.errors[flowId][step.stepId].push(
-        'This step is set to jump to a step that does not exist'
+        "This step is set to jump to a step that does not exist",
       );
     }
 
     if (dataKeys.length > 0) {
       const invalidKeys = dataKeys.filter(
-        (key) => !this.globalStateKeys.includes(key)
+        (key) => !this.globalStateKeys.includes(key),
       );
       if (invalidKeys.length > 0) {
         this.errors[flowId][step.stepId].push(
           `Did not find the following variables in the state: ${invalidKeys.join(
-            ', '
-          )}`
+            ", ",
+          )}`,
         );
       }
     }

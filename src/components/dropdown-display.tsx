@@ -4,9 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
-import { Button, Box } from '@mui/material';
-import { ColumnDiv } from '../styled-components';
+
+import React, { useState } from "react";
+import { Button, Box } from "@mui/material";
+import { ColumnDiv } from "../styled-components";
 
 interface DropdownDisplayProps {
   buttonLabelOpen: string;
@@ -28,8 +29,8 @@ const DropdownDisplay: React.FC<DropdownDisplayProps> = ({
   return (
     <ColumnDiv
       style={{
-        width: '100%',
-        alignItems: 'center',
+        width: "100%",
+        alignItems: "center",
       }}
     >
       <Button onClick={toggleContent} variant="text">
@@ -43,9 +44,9 @@ const DropdownDisplay: React.FC<DropdownDisplayProps> = ({
             padding: 2,
             borderRadius: 2,
             boxShadow: 1,
-            backgroundColor: 'white',
+            backgroundColor: "white",
             maxWidth: 300,
-            border: '1px solid #e0e0e0',
+            border: "1px solid #e0e0e0",
           }}
         >
           {content}

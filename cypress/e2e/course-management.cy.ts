@@ -21,7 +21,7 @@ describe('Course Management', () => {
   describe('Initial View', () => {
     it('Instructors see course management page on login', () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.INSTRUCTOR
       });
       
@@ -41,7 +41,7 @@ describe('Course Management', () => {
 
     it('Students see course viewing page on login', () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.STUDENT
       });
       
@@ -63,7 +63,7 @@ describe('Course Management', () => {
   describe('Course CRUD Operations', () => {
     it('Instructors can CRUD a new course', () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.INSTRUCTOR,
         emptyCourses: true,
         gqlQueries: [
@@ -165,7 +165,7 @@ describe('Course Management', () => {
   describe('Section CRUD Operations', () => {
     it('Instructors can CRUD a new section', () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.INSTRUCTOR,
         gqlQueries: [
           mockGQL('AddOrUpdateSection', [
@@ -268,7 +268,7 @@ describe('Course Management', () => {
   describe('Assignment CRUD Operations', () => {
     it('Instructors can CRUD a new assignment', () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,  
+        userRole: 'USER',  
         educationalRole: EducationalRole.INSTRUCTOR,
         gqlQueries: [
           mockGQL('AddOrUpdateAssignment', [
@@ -358,7 +358,7 @@ describe('Course Management', () => {
   describe('Student Operations', () => {
     it('Students can add themselves to an existing course', () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.STUDENT,
         emptyCourses: true,
         gqlQueries: [
@@ -413,7 +413,7 @@ describe('Course Management', () => {
 
     it('Students can remove themselves from a section', () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.STUDENT,
         gqlQueries: [
           mockGQL('FetchCourses', [
@@ -460,7 +460,7 @@ describe('Course Management', () => {
   describe('Activity Progress', () => {
     it('When a student completes an activity, logs them completing that activity', () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.STUDENT,
         gqlQueries: [
           mockGQL('CreateNewStudent', createNewStudentWithIncompleteActivityResponse),
@@ -503,7 +503,7 @@ describe('Course Management', () => {
 
     it("assignment default LLM overrides course default LLM", () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.STUDENT,
         gqlQueries: [
           mockGQL('CreateNewStudent', createNewStudentWithIncompleteActivityResponse),
@@ -558,7 +558,7 @@ describe('Course Management', () => {
     it("student can set default LLM for an activity, overrides course default LLM", () => {
       // What I need is to perform a modify assignment progress action that returns with the student activity updated with the selected LLM
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.STUDENT,
         gqlQueries: [
           mockGQL('CreateNewStudent', createNewStudentWithIncompleteActivityResponse),
@@ -623,7 +623,7 @@ describe('Course Management', () => {
   describe('Doc CRUD Operations', () => {
     it('passes courseId to createNewDoc', () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.STUDENT
       });
 
@@ -656,7 +656,7 @@ describe('Course Management', () => {
 
     it("emits new doc created event when a student creates a new doc", () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.STUDENT
       });
 
@@ -699,7 +699,7 @@ describe('Course Management', () => {
 
     it("can set primary doc", () => {
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.STUDENT
       });
 
@@ -733,7 +733,7 @@ describe('Course Management', () => {
   describe("Student Timeline", () => {
     it("Can view students timeline", ()=>{
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.INSTRUCTOR,
         gqlQueries: [
           mockGQL('FetchVersionsById', [
@@ -801,7 +801,7 @@ describe('Course Management', () => {
 
     it("can switch between docs", () => {
     cyMockEducationalManagement(cy, {
-      userRole: UserRole.USER,
+      userRole: 'USER',
       educationalRole: EducationalRole.INSTRUCTOR,
       gqlQueries: [
         mockGQL('FetchVersionsById', [
@@ -846,7 +846,7 @@ describe('Course Management', () => {
 
     it("Can grade student assignment", ()=>{
       cyMockEducationalManagement(cy, {
-        userRole: UserRole.USER,
+        userRole: 'USER',
         educationalRole: EducationalRole.INSTRUCTOR,
         gqlQueries: [
           mockGQL('FetchVersionsById', [

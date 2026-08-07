@@ -24,7 +24,7 @@ function toPromptEditing(cy: CypressGlobal){
     cy.get('[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]').click();
     cy.get('[data-cy=activity-display-my-editable-activity]').click();
     cy.get('[data-cy=doc-goal-modal-next-button]').click();
-    roleSwitch(cy, UserRole.ADMIN);
+    roleSwitch(cy, 'ADMIN');
 }
 
 function runFirstAvailablePrompt(cy: CypressGlobal){
@@ -41,7 +41,7 @@ describe("prompt requests use proper model execution", ()=>{
     describe("prompt has no target model", ()=>{
     it("uses config override model if available", ()=>{
         cyMockDefault(cy, {
-            userRole: UserRole.ADMIN,
+            userRole: "ADMIN",
             gqlQueries:[
                 mockGQL("FetchConfig", {
                     fetchConfig: {
@@ -66,7 +66,7 @@ describe("prompt requests use proper model execution", ()=>{
 
         it("uses configs default model if available", ()=>{
             cyMockDefault(cy, {
-                userRole: UserRole.ADMIN,
+                userRole: 'ADMIN',
                 gqlQueries:[
                     mockGQL("FetchConfig", {
                         fetchConfig: {
@@ -91,7 +91,7 @@ describe("prompt requests use proper model execution", ()=>{
 
         it("uses the first available model as default model if no default provided", ()=>{
                         cyMockDefault(cy, {
-                            userRole: UserRole.ADMIN,
+                            userRole: 'ADMIN',
                             gqlQueries:[
                                 mockGQL("FetchConfig", {
                                     fetchConfig: {
@@ -113,7 +113,7 @@ describe("prompt requests use proper model execution", ()=>{
             
                     it("uses the override model over default if both available", ()=>{
                         cyMockDefault(cy, {
-                            userRole: UserRole.ADMIN,
+                            userRole: 'ADMIN',
                             gqlQueries:[
                                 mockGQL("FetchConfig", {
                                     fetchConfig: {
@@ -142,7 +142,7 @@ describe("prompt requests use proper model execution", ()=>{
 
         it("throws an error if no default model and no available models", ()=>{
             cyMockDefault(cy, {
-                userRole: UserRole.ADMIN,
+                userRole: 'ADMIN',
                 gqlQueries:[
                     mockGQL("FetchConfig", {
                         fetchConfig: {
@@ -163,7 +163,7 @@ describe("prompt requests use proper model execution", ()=>{
     describe("prompt has a target model", ()=>{
         it("uses the override model if available", ()=>{
             cyMockDefault(cy, {
-                userRole: UserRole.ADMIN,
+                userRole: 'ADMIN',
                 gqlQueries:[
                     mockGQL("FetchConfig", {
                         fetchConfig: {

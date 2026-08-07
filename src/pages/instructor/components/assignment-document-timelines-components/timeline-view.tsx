@@ -4,11 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Box, Typography, Chip } from '@mui/material';
-import { DehydratedGQLTimelinePoint } from '../../../../types';
-import { applyTextDiff } from '../assignment-document-timelines';
-import { useAppSelector } from '../../../../store/hooks';
+
+import React from "react";
+import { Box, Typography, Chip } from "@mui/material";
+import type { DehydratedGQLTimelinePoint } from "../../../../types";
+import { useAppSelector } from "../../../../store/hooks";
+import { applyTextDiff } from "../../helpers";
 
 interface TimelineViewProps {
   timelinePoints: DehydratedGQLTimelinePoint[];
@@ -23,16 +24,17 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   onTimelinePointSelect,
   isSidebarCollapsed,
 }) => {
+  const activities = useAppSelector(
+    (state) => state.docGoalsActivities.builtActivities,
+  );
+
   if (!timelinePoints.length) {
     return null;
   }
-  const activities = useAppSelector(
-    (state) => state.docGoalsActivities.builtActivities
-  );
 
   function getActivityTitle(activityId: string) {
     const activity = activities.find((a) => a._id === activityId);
-    return activity?.title || 'Unknown Activity';
+    return activity?.title || "Unknown Activity";
   }
 
   return (
@@ -40,49 +42,49 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
       data-cy="activity-document-timeline-notches"
       sx={{
         mb: 2,
-        backgroundColor: 'background.paper',
+        backgroundColor: "background.paper",
         padding: 2,
         pb: 1,
-        maxWidth: isSidebarCollapsed ? '95vw' : '82vw',
-        display: 'flex',
-        flexDirection: 'row',
-        overflowX: 'scroll',
-        whiteSpace: 'nowrap',
+        maxWidth: isSidebarCollapsed ? "95vw" : "82vw",
+        display: "flex",
+        flexDirection: "row",
+        overflowX: "scroll",
+        whiteSpace: "nowrap",
         gap: 10,
       }}
     >
       {timelinePoints.map((point, index) => {
         const previousPoint = timelinePoints[index - 1];
         const diffContent = applyTextDiff(
-          previousPoint?.version?.plainText || '',
-          point.version?.plainText || ''
+          previousPoint?.version?.plainText || "",
+          point.version?.plainText || "",
         );
         const charactersRemoved = diffContent.charactersRemoved;
         const charactersAdded = diffContent.charactersAdded;
-        const activityTitle = getActivityTitle(point.version?.activity || '');
+        const activityTitle = getActivityTitle(point.version?.activity || "");
         return (
           <Box
             data-cy={`activity-document-timeline-notch-${index}`}
             key={point.versionId}
-            sx={{ display: 'flex', alignItems: 'center' }}
+            sx={{ display: "flex", alignItems: "center" }}
           >
             <Box
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
                 minWidth: 200,
-                cursor: 'pointer',
+                cursor: "pointer",
                 p: 1,
                 borderRadius: 2,
                 opacity: index === selectedTimelineIndex ? 1 : 0.5,
                 backgroundColor:
                   index === selectedTimelineIndex
-                    ? 'primary.50'
-                    : 'transparent',
-                '&:hover': {
+                    ? "primary.50"
+                    : "transparent",
+                "&:hover": {
                   backgroundColor:
-                    index === selectedTimelineIndex ? 'primary.50' : 'grey.50',
+                    index === selectedTimelineIndex ? "primary.50" : "grey.50",
                 },
               }}
               onClick={() => onTimelinePointSelect(index)}
@@ -94,25 +96,25 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                   mb: 1,
                   backgroundColor:
                     index === selectedTimelineIndex
-                      ? 'primary.main'
-                      : 'primary.light',
-                  color: 'white',
-                  fontSize: '0.75rem',
+                      ? "primary.main"
+                      : "primary.light",
+                  color: "white",
+                  fontSize: "0.75rem",
                   maxWidth: 180,
-                  '& .MuiChip-label': {
+                  "& .MuiChip-label": {
                     px: 1,
                   },
                 }}
               />
 
-              <Box sx={{ display: 'flex', gap: 0.5 }}>
+              <Box sx={{ display: "flex", gap: 0.5 }}>
                 <Chip
                   label={`+${charactersAdded}`}
                   size="small"
                   sx={{
-                    backgroundColor: 'success.light',
-                    color: 'white',
-                    fontSize: '0.7rem',
+                    backgroundColor: "success.light",
+                    color: "white",
+                    fontSize: "0.7rem",
                     height: 20,
                   }}
                 />
@@ -120,9 +122,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                   label={`-${charactersRemoved}`}
                   size="small"
                   sx={{
-                    backgroundColor: 'error.light',
-                    color: 'white',
-                    fontSize: '0.7rem',
+                    backgroundColor: "error.light",
+                    color: "white",
+                    fontSize: "0.7rem",
                     height: 20,
                   }}
                 />
@@ -132,16 +134,16 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                 variant="caption"
                 sx={{
                   mt: 0.5,
-                  color: 'text.secondary',
-                  textAlign: 'center',
-                  fontSize: '0.7rem',
+                  color: "text.secondary",
+                  textAlign: "center",
+                  fontSize: "0.7rem",
                 }}
               >
-                {new Date(point.versionTime).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
+                {new Date(point.versionTime).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })}
               </Typography>
             </Box>
@@ -151,7 +153,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                 sx={{
                   width: 40,
                   height: 2,
-                  backgroundColor: 'primary.light',
+                  backgroundColor: "primary.light",
                   mx: 1,
                 }}
               />

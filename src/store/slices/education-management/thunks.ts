@@ -4,8 +4,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
+  type ModifyStudentAssignmentProgressActions,
   fetchCourses as _fetchCourses,
   fetchAssignments as _fetchAssignments,
   fetchSections as _fetchSections,
@@ -20,51 +21,49 @@ import {
   modifyCourseShareStatus as _modifyCourseShareStatus,
   fetchInstructors as _fetchInstructors,
   modifyStudentBanInSection as _modifyStudentBanInSection,
-  BanStudentFromSectionAction,
-  ModifyStudentAssignmentProgressActions,
   gradeStudentAssignment as _gradeStudentAssignment,
-} from './educational-api';
-import { Course, Assignment, Section } from './types';
-import { AiServiceModel } from '../../../types';
+} from "./educational-api";
+import type { Course, Assignment, Section } from "./types";
+import type { AiServiceModel } from "../../../types";
 
 // Fetch thunks
 export const fetchCourses = createAsyncThunk(
-  'educationManagement/fetchCourses',
+  "educationManagement/fetchCourses",
   async (forUserId: string) => {
     return await _fetchCourses(forUserId);
-  }
+  },
 );
 
 export const fetchAssignments = createAsyncThunk(
-  'educationManagement/fetchAssignments',
+  "educationManagement/fetchAssignments",
   async (forUserId: string) => {
     return await _fetchAssignments(forUserId);
-  }
+  },
 );
 
 export const fetchSections = createAsyncThunk(
-  'educationManagement/fetchSections',
+  "educationManagement/fetchSections",
   async (forUserId: string) => {
     return await _fetchSections(forUserId);
-  }
+  },
 );
 
 export const fetchStudentsInMyCourses = createAsyncThunk(
-  'educationManagement/fetchStudentsInMyCourses',
+  "educationManagement/fetchStudentsInMyCourses",
   async (instructorId: string) => {
     return await _fetchStudentsInMyCourses(instructorId);
-  }
+  },
 );
 
 export const fetchInstructors = createAsyncThunk(
-  'educationManagement/fetchInstructors',
+  "educationManagement/fetchInstructors",
   async () => {
     return await _fetchInstructors();
-  }
+  },
 );
 
 export const gradeStudentAssignment = createAsyncThunk(
-  'educationManagement/gradeStudentAssignment',
+  "educationManagement/gradeStudentAssignment",
   async (params: {
     studentId: string;
     assignmentId: string;
@@ -75,78 +74,78 @@ export const gradeStudentAssignment = createAsyncThunk(
       params.studentId,
       params.assignmentId,
       params.grade,
-      params.comment
+      params.comment,
     );
-  }
+  },
 );
 
 // Course thunks
 export const createCourse = createAsyncThunk(
-  'educationManagement/createCourse',
+  "educationManagement/createCourse",
   async (courseData?: Partial<Course>) => {
-    return await _addOrUpdateCourse(courseData, 'CREATE');
-  }
+    return await _addOrUpdateCourse(courseData, "CREATE");
+  },
 );
 
 export const updateCourse = createAsyncThunk(
-  'educationManagement/updateCourse',
+  "educationManagement/updateCourse",
   async (courseData: Partial<Course>) => {
-    return await _addOrUpdateCourse(courseData, 'MODIFY');
-  }
+    return await _addOrUpdateCourse(courseData, "MODIFY");
+  },
 );
 
 export const deleteCourse = createAsyncThunk(
-  'educationManagement/deleteCourse',
+  "educationManagement/deleteCourse",
   async (courseId: string) => {
-    return await _addOrUpdateCourse({ _id: courseId }, 'DELETE');
-  }
+    return await _addOrUpdateCourse({ _id: courseId }, "DELETE");
+  },
 );
 
 // Section thunks
 export const createSection = createAsyncThunk(
-  'educationManagement/createSection',
+  "educationManagement/createSection",
   async (params: { courseId: string; sectionData?: Partial<Section> }) => {
     const newSection = await _addOrUpdateSection(
       params.courseId,
       params.sectionData,
-      'CREATE'
+      "CREATE",
     );
     return {
       courseId: params.courseId,
       newSection,
     };
-  }
+  },
 );
 
 export const updateSection = createAsyncThunk(
-  'educationManagement/updateSection',
+  "educationManagement/updateSection",
   async (params: { courseId: string; sectionData: Partial<Section> }) => {
     return await _addOrUpdateSection(
       params.courseId,
       params.sectionData,
-      'MODIFY'
+      "MODIFY",
     );
-  }
+  },
 );
 
 export const deleteSection = createAsyncThunk(
-  'educationManagement/deleteSection',
+  "educationManagement/deleteSection",
   async (params: { courseId: string; sectionId: string }) => {
     await _addOrUpdateSection(
       params.courseId,
       { _id: params.sectionId },
-      'DELETE'
+      "DELETE",
     );
     return {
       courseId: params.courseId,
       sectionId: params.sectionId,
     };
-  }
+  },
 );
 
 // Assignment thunks
 export const createAssignment = createAsyncThunk(
-  'educationManagement/createAssignment',
+  "educationManagement/createAssignment",
   async (params: {
     courseId: string;
     assignmentData?: Partial<Assignment>;
@@ -154,49 +153,49 @@ export const createAssignment = createAsyncThunk(
     return await _addOrUpdateAssignment(
       params.courseId,
       params.assignmentData,
-      'CREATE'
+      "CREATE",
     );
-  }
+  },
 );
 
 export const updateAssignment = createAsyncThunk(
-  'educationManagement/updateAssignment',
+  "educationManagement/updateAssignment",
   async (params: { courseId: string; assignmentData: Partial<Assignment> }) => {
     return await _addOrUpdateAssignment(
       params.courseId,
       params.assignmentData,
-      'MODIFY'
+      "MODIFY",
     );
-  }
+  },
 );
 
 export const deleteAssignment = createAsyncThunk(
-  'educationManagement/deleteAssignment',
+  "educationManagement/deleteAssignment",
   async (params: { courseId: string; assignmentId: string }) => {
     return await _addOrUpdateAssignment(
       params.courseId,
       { _id: params.assignmentId },
-      'DELETE'
+      "DELETE",
     );
-  }
+  },
 );
 
 // Enrollment thunks
 export const enrollInSection = createAsyncThunk(
-  'educationManagement/enrollInSection',
+  "educationManagement/enrollInSection",
   async (params: { targetUserId: string; sectionCode: string }) => {
     return await _modifySectionEnrollment(
       params.targetUserId,
-      'ENROLL',
+      "ENROLL",
       undefined,
       undefined,
-      params.sectionCode
+      params.sectionCode,
     );
-  }
+  },
 );
 
 export const removeFromSection = createAsyncThunk(
-  'educationManagement/removeFromSection',
+  "educationManagement/removeFromSection",
   async (params: {
     targetUserId: string;
     courseId: string;
@@ -204,16 +203,16 @@ export const removeFromSection = createAsyncThunk(
   }) => {
     return await _modifySectionEnrollment(
       params.targetUserId,
-      'REMOVE',
+      "REMOVE",
       params.courseId,
       params.sectionId,
-      undefined
+      undefined,
     );
-  }
+  },
 );
 
 export const updateStudentAssignmentProgress = createAsyncThunk(
-  'educationManagement/updateStudentAssignmentProgress',
+  "educationManagement/updateStudentAssignmentProgress",
   async (params: {
     targetUserId: string;
     courseId: string;
@@ -232,76 +231,76 @@ export const updateStudentAssignmentProgress = createAsyncThunk(
       params.activityId,
       params.action,
       params.docId,
-      params.defaultLLM
+      params.defaultLLM,
     );
-  }
+  },
 );
 
 // User data thunks
 export const loadInstructorData = createAsyncThunk(
-  'educationManagement/loadInstructorData',
+  "educationManagement/loadInstructorData",
   async (userId: string) => {
     return await _createNewInstructor(userId);
-  }
+  },
 );
 
 export const loadStudentData = createAsyncThunk(
-  'educationManagement/loadStudentData',
+  "educationManagement/loadStudentData",
   async (userId: string) => {
     return await _createNewStudent(userId);
-  }
+  },
 );
 
 // Course sharing thunks
 export const shareCourseWithInstructor = createAsyncThunk(
-  'educationManagement/shareCourseWithInstructor',
+  "educationManagement/shareCourseWithInstructor",
   async (params: { instructorId: string; courseId: string }) => {
     return await _modifyCourseShareStatus(
       params.instructorId,
       params.courseId,
-      'SHARE'
+      "SHARE",
     );
-  }
+  },
 );
 
 export const unshareCourseWithInstructor = createAsyncThunk(
-  'educationManagement/unshareCourseWithInstructor',
+  "educationManagement/unshareCourseWithInstructor",
   async (params: { instructorId: string; courseId: string }) => {
     return await _modifyCourseShareStatus(
       params.instructorId,
       params.courseId,
-      'UNSHARE'
+      "UNSHARE",
     );
-  }
+  },
 );
 
 // Student ban/unban thunks
 export const banStudentFromSection = createAsyncThunk(
-  'educationManagement/banStudentFromSection',
+  "educationManagement/banStudentFromSection",
   async (params: { sectionId: string; studentId: string }) => {
     const updatedSection = await _modifyStudentBanInSection(
       params.sectionId,
       params.studentId,
-      BanStudentFromSectionAction.BAN
+      "BAN",
     );
     return {
       section: updatedSection,
       bannedStudentId: params.studentId,
     };
-  }
+  },
 );
 
 export const unbanStudentFromSection = createAsyncThunk(
-  'educationManagement/unbanStudentFromSection',
+  "educationManagement/unbanStudentFromSection",
   async (params: { sectionId: string; studentId: string }) => {
     const updatedSection = await _modifyStudentBanInSection(
       params.sectionId,
       params.studentId,
-      BanStudentFromSectionAction.UNBAN
+      "UNBAN",
     );
     return {
       section: updatedSection,
       bannedStudentId: params.studentId,
     };
-  }
+  },
 );

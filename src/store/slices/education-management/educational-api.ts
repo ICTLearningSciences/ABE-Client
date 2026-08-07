@@ -4,10 +4,26 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
-import { execGql } from '../../../hooks/api';
-import { Course, Assignment, Section, StudentData, Instructor } from './types';
-import { AiServiceModel, Connection, UserDoc } from '../../../types';
+
+import { ACCESS_TOKEN_KEY, localStorageGet } from "../../local-storage";
+import { execGql } from "../../../hooks/api";
+import type {
+  Course,
+  Assignment,
+  Section,
+  StudentData,
+  Instructor,
+} from "./types";
+import type { AiServiceModel, Connection, UserDoc } from "../../../types";
+
+export type ModifyStudentAssignmentProgressActions =
+  | "ACTIVITY_STARTED" // if activity not in list, add it with complete false
+  | "ACTIVITY_COMPLETED" // if activity in list, set complete to true
+  | "NEW_DOC_CREATED" // if doc not in list, add it with primaryDocument true IF only doc in list, else set primaryDocument to false
+  | "DOC_PRIMARY_STATUS_SET" // if doc in list, update it with primaryDocument
+  | "DOC_DELETED" // if doc in list, delete it
+  | "DEFAULT_LLM_SET"; // if activity in list, set defaultLLM
+export type BanStudentFromSectionAction = "BAN" | "UNBAN";
 
 // GraphQL query fragment for course data
 export const courseQueryData = `
@@ -90,7 +106,7 @@ export const instructorQueryData = `
 
 // Fetch courses for a specific user
 export async function fetchCourses(forUserId: string): Promise<Course[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Course[]>(
     {
       query: `
@@ -105,18 +121,18 @@ export async function fetchCourses(forUserId: string): Promise<Course[]> {
       },
     },
     {
-      dataPath: 'fetchCourses',
+      dataPath: "fetchCourses",
       accessToken,
-    }
+    },
   );
   return res;
 }
 
 // Fetch assignments for a specific user
 export async function fetchAssignments(
-  forUserId: string
+  forUserId: string,
 ): Promise<Assignment[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Assignment[]>(
     {
       query: `
@@ -131,16 +147,16 @@ export async function fetchAssignments(
       },
     },
     {
-      dataPath: 'fetchAssignments',
+      dataPath: "fetchAssignments",
       accessToken,
-    }
+    },
   );
   return res;
 }
 
 // Fetch sections for a specific user
 export async function fetchSections(forUserId: string): Promise<Section[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Section[]>(
     {
       query: `
@@ -155,18 +171,18 @@ export async function fetchSections(forUserId: string): Promise<Section[]> {
       },
     },
     {
-      dataPath: 'fetchSections',
+      dataPath: "fetchSections",
       accessToken,
-    }
+    },
   );
   return res;
 }
 
 // Fetch students in instructor's courses
 export async function fetchStudentsInMyCourses(
-  instructorId: string
+  instructorId: string,
 ): Promise<StudentData[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<StudentData[]>(
     {
       query: `
@@ -181,9 +197,9 @@ export async function fetchStudentsInMyCourses(
       },
     },
     {
-      dataPath: 'fetchStudentsInMyCourses',
+      dataPath: "fetchStudentsInMyCourses",
       accessToken,
-    }
+    },
   );
   return res;
 }
@@ -191,9 +207,9 @@ export async function fetchStudentsInMyCourses(
 // Create, modify, or delete a course
 export async function addOrUpdateCourse(
   courseData?: Partial<Course>,
-  action: 'CREATE' | 'MODIFY' | 'DELETE' = 'CREATE'
+  action: "CREATE" | "MODIFY" | "DELETE" = "CREATE",
 ): Promise<Course> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Course>(
     {
       query: `
@@ -209,9 +225,9 @@ export async function addOrUpdateCourse(
       },
     },
     {
-      dataPath: 'addOrUpdateCourse',
+      dataPath: "addOrUpdateCourse",
       accessToken,
-    }
+    },
   );
   return res;
 }
@@ -220,9 +236,9 @@ export async function addOrUpdateCourse(
 export async function addOrUpdateSection(
   courseId: string,
   sectionData?: Partial<Section>,
-  action: 'CREATE' | 'MODIFY' | 'DELETE' = 'CREATE'
+  action: "CREATE" | "MODIFY" | "DELETE" = "CREATE",
 ): Promise<Section> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Section>(
     {
       query: `
@@ -239,9 +255,9 @@ export async function addOrUpdateSection(
       },
     },
     {
-      dataPath: 'addOrUpdateSection',
+      dataPath: "addOrUpdateSection",
       accessToken,
-    }
+    },
   );
   return res;
 }
@@ -250,9 +266,9 @@ export async function addOrUpdateSection(
 export async function addOrUpdateAssignment(
   courseId: string,
   assignmentData?: Partial<Assignment>,
-  action: 'CREATE' | 'MODIFY' | 'DELETE' = 'CREATE'
+  action: "CREATE" | "MODIFY" | "DELETE" = "CREATE",
 ): Promise<Assignment> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Assignment>(
     {
       query: `
@@ -269,9 +285,9 @@ export async function addOrUpdateAssignment(
       },
     },
     {
-      dataPath: 'addOrUpdateAssignment',
+      dataPath: "addOrUpdateAssignment",
       accessToken,
-    }
+    },
   );
   return res;
 }
@@ -279,12 +295,12 @@ export async function addOrUpdateAssignment(
 // Modify section enrollment (enroll/remove student)
 export async function modifySectionEnrollment(
   targetUserId: string,
-  action: 'ENROLL' | 'REMOVE',
+  action: "ENROLL" | "REMOVE",
   courseId?: string,
   sectionId?: string,
-  sectionCode?: string
+  sectionCode?: string,
 ): Promise<StudentData> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<StudentData>(
     {
       query: `
@@ -303,22 +319,13 @@ export async function modifySectionEnrollment(
       },
     },
     {
-      dataPath: 'modifySectionEnrollment',
+      dataPath: "modifySectionEnrollment",
       accessToken,
-    }
+    },
   );
   return res;
 }
 
-export enum ModifyStudentAssignmentProgressActions {
-  ACTIVITY_STARTED = 'ACTIVITY_STARTED', // if activity not in list, add it with complete false
-  ACTIVITY_COMPLETED = 'ACTIVITY_COMPLETED', // if activity in list, set complete to true
-
-  NEW_DOC_CREATED = 'NEW_DOC_CREATED', // if doc not in list, add it with primaryDocument true IF only doc in list, else set primaryDocument to false
-  DOC_PRIMARY_STATUS_SET = 'DOC_PRIMARY_STATUS_SET', // if doc in list, update it with primaryDocument
-  DOC_DELETED = 'DOC_DELETED', // if doc in list, delete it
-  DEFAULT_LLM_SET = 'DEFAULT_LLM_SET', // if activity in list, set defaultLLM
-}
 // Modify student assignment progress
 export async function modifyStudentAssignmentProgress(
   targetUserId: string,
@@ -328,9 +335,9 @@ export async function modifyStudentAssignmentProgress(
   activityId: string,
   action: ModifyStudentAssignmentProgressActions,
   docId?: string,
-  defaultLLM?: AiServiceModel
+  defaultLLM?: AiServiceModel,
 ): Promise<StudentData> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<StudentData>(
     {
       query: `
@@ -352,15 +359,15 @@ export async function modifyStudentAssignmentProgress(
       },
     },
     {
-      dataPath: 'modifyStudentAssignmentProgress',
+      dataPath: "modifyStudentAssignmentProgress",
       accessToken,
-    }
+    },
   );
   return res;
 }
 
 export async function createNewStudent(userId: string): Promise<StudentData> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<StudentData>(
     {
       query: `
@@ -375,15 +382,15 @@ export async function createNewStudent(userId: string): Promise<StudentData> {
       },
     },
     {
-      dataPath: 'createNewStudent',
+      dataPath: "createNewStudent",
       accessToken,
-    }
+    },
   );
   return res;
 }
 
 export async function createNewInstructor(userId: string): Promise<Instructor> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Instructor>(
     {
       query: `
@@ -398,9 +405,9 @@ export async function createNewInstructor(userId: string): Promise<Instructor> {
       },
     },
     {
-      dataPath: 'createNewInstructor',
+      dataPath: "createNewInstructor",
       accessToken,
-    }
+    },
   );
   return res;
 }
@@ -416,9 +423,9 @@ mutation ModifyCourseShareStatus($instructorId: ID!, $courseId: ID!, $action: Sh
 export async function modifyCourseShareStatus(
   instructorId: string,
   courseId: string,
-  action: 'SHARE' | 'UNSHARE'
+  action: "SHARE" | "UNSHARE",
 ): Promise<Instructor> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Instructor>(
     {
       query: courseShareStatusMutation,
@@ -429,15 +436,15 @@ export async function modifyCourseShareStatus(
       },
     },
     {
-      dataPath: 'modifyCourseShareStatus',
+      dataPath: "modifyCourseShareStatus",
       accessToken,
-    }
+    },
   );
   return res;
 }
 
 export async function fetchInstructors(): Promise<Instructor[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Instructor[]>(
     {
       query: `
@@ -449,24 +456,19 @@ export async function fetchInstructors(): Promise<Instructor[]> {
       `,
     },
     {
-      dataPath: 'fetchInstructors',
+      dataPath: "fetchInstructors",
       accessToken,
-    }
+    },
   );
   return res;
-}
-
-export enum BanStudentFromSectionAction {
-  BAN = 'BAN',
-  UNBAN = 'UNBAN',
 }
 
 export async function modifyStudentBanInSection(
   sectionId: string,
   studentId: string,
-  action: BanStudentFromSectionAction
+  action: BanStudentFromSectionAction,
 ): Promise<Section> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Section>(
     {
       query: `mutation ModifyStudentBanInSection($sectionId: ID!, $studentId: ID!, $action: BanStudentFromSectionAction!) {
@@ -481,18 +483,18 @@ export async function modifyStudentBanInSection(
       },
     },
     {
-      dataPath: 'modifyStudentBanInSection',
+      dataPath: "modifyStudentBanInSection",
       accessToken,
-    }
+    },
   );
   return res;
 }
 
 export async function fetchStudentsGoogleDocIds(
   userId: string,
-  courseAssignmentId: string
+  courseAssignmentId: string,
 ): Promise<string[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Connection<UserDoc>>(
     {
       query: `query FindAllGoogleDocs($limit: Int, $filter: String, $filterObject: Object, $sortAscending: Boolean, $sortBy: String){
@@ -515,9 +517,9 @@ export async function fetchStudentsGoogleDocIds(
       },
     },
     {
-      dataPath: 'findAllGoogleDocs',
+      dataPath: "findAllGoogleDocs",
       accessToken,
-    }
+    },
   );
   return res.edges.map((edge) => edge.node.googleDocId);
 }
@@ -526,9 +528,9 @@ export async function gradeStudentAssignment(
   targetUserId: string,
   assignmentId: string,
   grade: number,
-  comment: string
+  comment: string,
 ): Promise<StudentData> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<StudentData>(
     {
       query: `
@@ -546,9 +548,9 @@ mutation GradeStudentAssignment($studentId: String!, $assignmentId: String!, $gr
       },
     },
     {
-      dataPath: 'gradeStudentAssignment',
+      dataPath: "gradeStudentAssignment",
       accessToken,
-    }
+    },
   );
   return res;
 }

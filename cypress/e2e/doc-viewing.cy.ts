@@ -14,7 +14,7 @@ describe('Doc Viewing', () => {
 
     it("Can sort by updated at", ()=>{
       cyMockDefault(cy, {
-        userRole: UserRole.ADMIN,
+        userRole: 'ADMIN',
         gqlQueries: [
           mockGQL('FetchGoogleDocs', fetchGoogleDocsDated(DocService.GOOGLE_DOCS))
         ]
@@ -37,7 +37,7 @@ describe('Doc Viewing', () => {
 
     it('can archive and unarchive a doc', ()=>{
       cyMockDefault(cy, {
-        userRole: UserRole.ADMIN,
+        userRole: 'ADMIN',
         gqlQueries: [
             mockGQL('AddOrUpdateDoc', [
               archiveDocResponse({

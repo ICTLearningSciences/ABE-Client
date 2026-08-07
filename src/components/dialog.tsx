@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -14,13 +15,13 @@ import {
   CircularProgress,
   DialogActions,
   Backdrop,
-} from '@mui/material';
-import { RowDiv } from '../styled-components';
+} from "@mui/material";
+import { RowDiv } from "../styled-components";
 
 export function ErrorDialog(props: {
   error?: string;
   clearError?: () => void;
-}): JSX.Element {
+}): React.ReactNode {
   const { error, clearError } = props;
   return (
     <Dialog
@@ -30,7 +31,7 @@ export function ErrorDialog(props: {
       open={Boolean(error)}
       onClose={clearError}
       style={{
-        textAlign: 'center',
+        textAlign: "center",
       }}
     >
       <DialogTitle data-cy="error-dialog-title">Error</DialogTitle>
@@ -41,7 +42,9 @@ export function ErrorDialog(props: {
         <Button
           data-cy="close-error-dialog"
           onClick={() => {
-            clearError && clearError();
+            if (clearError) {
+              clearError();
+            }
           }}
         >
           Close
@@ -61,17 +64,17 @@ export function TextDialog(props: {
   body: string;
   open: boolean;
   close: () => void;
-}): JSX.Element {
+}): React.ReactNode {
   const { title, open, close, body } = props;
   return (
     <Dialog data-cy="text-dialog" maxWidth="sm" fullWidth={true} open={open}>
-      <DialogTitle style={{ textAlign: 'center' }}>{title}</DialogTitle>
+      <DialogTitle style={{ textAlign: "center" }}>{title}</DialogTitle>
       <DialogContent
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
         <DialogContentText>{body}</DialogContentText>
@@ -89,7 +92,7 @@ export function TwoOptionDialog(props: {
   actionInProgress: boolean;
   option1: Option;
   option2: Option;
-}): JSX.Element {
+}): React.ReactNode {
   const { title, option1, option2, open, actionInProgress } = props;
   return (
     <Dialog
@@ -98,13 +101,13 @@ export function TwoOptionDialog(props: {
       fullWidth={true}
       open={open}
     >
-      <DialogTitle style={{ textAlign: 'center' }}>{title}</DialogTitle>
+      <DialogTitle style={{ textAlign: "center" }}>{title}</DialogTitle>
       <DialogContent
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
         {actionInProgress && <CircularProgress />}
@@ -114,7 +117,7 @@ export function TwoOptionDialog(props: {
             data-cy="option-1"
             variant="contained"
             style={{
-              marginRight: '10px',
+              marginRight: "10px",
             }}
             onClick={() => {
               option1.onClick();
@@ -142,7 +145,7 @@ export function SingleNotificationDialog(props: {
   open: boolean;
   title: string;
   notification: string;
-}): JSX.Element {
+}): React.ReactNode {
   const { open, title, notification } = props;
   const [alreadyShown, setAlreadyShown] = useState<boolean>(false);
 
@@ -158,9 +161,9 @@ export function SingleNotificationDialog(props: {
       fullWidth={true}
       open={open && !alreadyShown}
     >
-      <DialogTitle style={{ textAlign: 'center' }}>{title}</DialogTitle>
+      <DialogTitle style={{ textAlign: "center" }}>{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText style={{ textAlign: 'center' }}>
+        <DialogContentText style={{ textAlign: "center" }}>
           {notification}
         </DialogContentText>
       </DialogContent>
@@ -171,12 +174,12 @@ export function SingleNotificationDialog(props: {
   );
 }
 
-export function LoadingDialog(props: { isLoading: boolean }): JSX.Element {
+export function LoadingDialog(props: { isLoading: boolean }): React.ReactNode {
   const { isLoading } = props;
   return (
     <Backdrop
       open={isLoading}
-      sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
     >
       <CircularProgress color="inherit" />
     </Backdrop>

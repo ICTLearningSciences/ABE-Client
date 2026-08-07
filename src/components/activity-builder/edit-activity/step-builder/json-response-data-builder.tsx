@@ -1,14 +1,21 @@
-import React from 'react';
-import { Delete } from '@mui/icons-material';
-import { IconButton, Button, Box } from '@mui/material';
-import { RowDiv } from '../../../../styled-components';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import React from "react";
+import { IconButton, Button, Box } from "@mui/material";
+import { Delete } from "@mui/icons-material";
+import { RowDiv } from "../../../../styled-components";
 import {
   InputField,
   SelectInputField,
   CheckBoxInput,
-} from '../../shared/input-components';
-import { JsonResponseData, JsonResponseDataType } from '../../types';
-import { InfoTooltip } from '../../../info-tooltip';
+} from "../../shared/input-components";
+import type { JsonResponseData } from "../../types";
+import { InfoTooltip } from "../../../info-tooltip";
 
 export function JsonResponseDataUpdater(props: {
   jsonResponseData: JsonResponseData[];
@@ -17,14 +24,14 @@ export function JsonResponseDataUpdater(props: {
     clientId: string,
     field: string,
     value: string | boolean,
-    parentJsonResponseDataIds: string[]
+    parentJsonResponseDataIds: string[],
   ) => void;
   deleteJsonResponseData: (
     clientId: string,
-    parentJsonResponseDataIds: string[]
+    parentJsonResponseDataIds: string[],
   ) => void;
   parentJsonResponseDataIds: string[];
-}): JSX.Element {
+}): React.ReactNode {
   const {
     jsonResponseData,
     editDataField,
@@ -34,26 +41,26 @@ export function JsonResponseDataUpdater(props: {
   } = props;
   const isSubData = parentJsonResponseDataIds.length >= 1;
   const availableTypes = !isSubData
-    ? [...Object.values(JsonResponseDataType)]
-    : [JsonResponseDataType.STRING, JsonResponseDataType.ARRAY];
+    ? ["string", "object", "array"]
+    : ["string", "array"];
 
   return (
     <Box
       sx={{
-        marginBottom: '10px',
-        marginTop: '10px',
+        marginBottom: "10px",
+        marginTop: "10px",
         marginLeft: `${parentJsonResponseDataIds.length * 60}px`,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
       }}
     >
       {!parentJsonResponseDataIds.length && (
         <h3
           style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
           }}
         >
           Json Response Data
@@ -65,21 +72,21 @@ export function JsonResponseDataUpdater(props: {
           <Box
             key={index}
             sx={{
-              position: 'relative',
-              width: '95%',
+              position: "relative",
+              width: "95%",
               mt: 2,
               borderRadius: 2,
               boxShadow: 1,
-              backgroundColor: 'white',
-              border: '1px solid #e0e0e0',
-              display: 'flex',
-              flexDirection: 'column',
+              backgroundColor: "white",
+              border: "1px solid #e0e0e0",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <RowDiv
               style={{
-                width: '100%',
-                justifyContent: 'space-between',
+                width: "100%",
+                justifyContent: "space-between",
               }}
             >
               <RowDiv>
@@ -89,9 +96,9 @@ export function JsonResponseDataUpdater(props: {
                   onChange={(e) => {
                     editDataField(
                       jsonResponseData.clientId,
-                      'name',
+                      "name",
                       e,
-                      parentJsonResponseDataIds
+                      parentJsonResponseDataIds,
                     );
                   }}
                 />
@@ -102,9 +109,9 @@ export function JsonResponseDataUpdater(props: {
                   onChange={(e) => {
                     editDataField(
                       jsonResponseData.clientId,
-                      'type',
+                      "type",
                       e,
-                      parentJsonResponseDataIds
+                      parentJsonResponseDataIds,
                     );
                   }}
                 />
@@ -114,9 +121,9 @@ export function JsonResponseDataUpdater(props: {
                   onChange={(e) => {
                     editDataField(
                       jsonResponseData.clientId,
-                      'isRequired',
+                      "isRequired",
                       e,
-                      parentJsonResponseDataIds
+                      parentJsonResponseDataIds,
                     );
                   }}
                 />
@@ -126,7 +133,7 @@ export function JsonResponseDataUpdater(props: {
                 onClick={() => {
                   deleteJsonResponseData(
                     jsonResponseData.clientId,
-                    parentJsonResponseDataIds
+                    parentJsonResponseDataIds,
                   );
                 }}
               >
@@ -136,17 +143,17 @@ export function JsonResponseDataUpdater(props: {
             <InputField
               label="Additional Info"
               maxRows={4}
-              value={jsonResponseData.additionalInfo || ''}
+              value={jsonResponseData.additionalInfo || ""}
               onChange={(e) => {
                 editDataField(
                   jsonResponseData.clientId,
-                  'additionalInfo',
+                  "additionalInfo",
                   e,
-                  parentJsonResponseDataIds
+                  parentJsonResponseDataIds,
                 );
               }}
             />
-            {jsonResponseData.type === JsonResponseDataType.OBJECT && (
+            {jsonResponseData.type === "object" && (
               <JsonResponseDataUpdater
                 jsonResponseData={jsonResponseData.subData || []}
                 editDataField={editDataField}
@@ -166,7 +173,7 @@ export function JsonResponseDataUpdater(props: {
           addNewJsonResponseData(parentJsonResponseDataIds);
         }}
       >
-        {isSubData ? 'Add Subfield' : '+ Add JSON Field'}
+        {isSubData ? "Add Subfield" : "+ Add JSON Field"}
       </Button>
     </Box>
   );

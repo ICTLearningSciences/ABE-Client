@@ -4,47 +4,19 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import {
-  ActivityBuilderStepType,
-  FlowItem,
-  PredefinedResponse,
-  RequestUserInputActivityStep,
-  RequestUserInputSpecialType,
-} from '../../types';
-import { useEditActivityContext } from '../../activity-builder-context';
-import { RoundedBorderDiv, TopLeftText } from '../../../../styled-components';
-import { CheckBoxInput, InputField } from '../../shared/input-components';
-import { IconButton } from '@mui/material';
-import { v4 as uuid } from 'uuid';
-import { Delete } from '@mui/icons-material';
-import Collapse from '@mui/material/Collapse';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { StepVersion } from '../activity-flow-container';
-import { VersionsDropdown } from './versions-dropdown';
-import { InfoTooltip } from '../../../info-tooltip';
-import { GO_HOME_BUTTON_MESSAGE } from '../../../../classes/activity-builder-activity/built-activity-handler';
 
-const goHomePredefinedResponse: PredefinedResponse = {
-  clientId: 'go-home-predefined-response',
-  message: GO_HOME_BUTTON_MESSAGE,
-};
+import React from "react";
+import { Collapse, IconButton } from "@mui/material";
+import { Delete, ExpandMore, ExpandLess } from "@mui/icons-material";
 
-export function getDefaultEndActivityStepBuilder(): RequestUserInputActivityStep {
-  return {
-    stepId: uuid(),
-    stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
-    message: '',
-    saveResponseVariableName: '',
-    systemCustomName: '',
-    saveAsIntention: false,
-    disableFreeInput: true,
-    setStudentActivityComplete: true,
-    predefinedResponses: [goHomePredefinedResponse],
-    specialType: RequestUserInputSpecialType.END_ACTIVITY,
-  };
-}
+import type { FlowItem, RequestUserInputActivityStep } from "../../types";
+import { RoundedBorderDiv, TopLeftText } from "../../../../styled-components";
+import { CheckBoxInput, InputField } from "../../shared/input-components";
+import type { StepVersion } from "../activity-flow-container";
+import { VersionsDropdown } from "./versions-dropdown";
+import { InfoTooltip } from "../../../info-tooltip";
+import { goHomePredefinedResponse } from "../../../../helpers";
+import { useEditActivityContext } from "../../activity-builder-context";
 
 export function EndActivityStepBuilder(props: {
   stepId: string;
@@ -54,7 +26,7 @@ export function EndActivityStepBuilder(props: {
   width?: string;
   height?: string;
   versions: StepVersion[];
-}): JSX.Element {
+}): React.ReactNode {
   const { stepId, stepIndex, versions } = props;
   const { getStep, getFlowByStepId, updateStep, updateStepField } =
     useEditActivityContext();
@@ -63,14 +35,10 @@ export function EndActivityStepBuilder(props: {
   const step = getStep(stepId) as RequestUserInputActivityStep;
   const flow = getFlowByStepId(stepId);
 
-  if (!step || !flow) {
-    return <div>Step not found</div>;
-  }
-
   const hasGoHomeButton = Boolean(
     step.predefinedResponses.find(
-      (step) => step.clientId === goHomePredefinedResponse.clientId
-    )
+      (step) => step.clientId === goHomePredefinedResponse.clientId,
+    ),
   );
 
   const [rerender, setRerender] = React.useState(0);
@@ -83,28 +51,31 @@ export function EndActivityStepBuilder(props: {
 
   function updateField<K extends keyof RequestUserInputActivityStep>(
     field: K,
-    value: RequestUserInputActivityStep[K]
+    value: RequestUserInputActivityStep[K],
   ) {
     updateStepField(stepId, field, value);
   }
 
+  if (!step || !flow) {
+    return <div>Step not found</div>;
+  }
   return (
     <RoundedBorderDiv
       key={rerender}
       style={{
-        width: props.width || '100%',
-        height: props.height || '100%',
-        display: 'flex',
-        position: 'relative',
-        flexDirection: 'column',
+        width: props.width || "100%",
+        height: props.height || "100%",
+        display: "flex",
+        position: "relative",
+        flexDirection: "column",
         padding: 10,
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
       }}
     >
       <TopLeftText>{`Step ${stepIndex + 1}`}</TopLeftText>
       <IconButton
         style={{
-          position: 'absolute',
+          position: "absolute",
           right: 10,
           top: 10,
         }}
@@ -114,22 +85,22 @@ export function EndActivityStepBuilder(props: {
       </IconButton>
       <IconButton
         style={{
-          width: 'fit-content',
-          position: 'absolute',
+          width: "fit-content",
+          position: "absolute",
           left: 10,
           top: 40,
         }}
         onClick={() => setCollapsed(!collapsed)}
       >
-        {collapsed ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        {collapsed ? <ExpandLess /> : <ExpandMore />}
       </IconButton>
-      <h4 style={{ alignSelf: 'center' }}>
-        End Activity Message{' '}
+      <h4 style={{ alignSelf: "center" }}>
+        End Activity Message{" "}
         <InfoTooltip title="The activity will stop here. You may supply a final message to the user, and optionally enable a 'Return To Home' button." />
       </h4>
       <div
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 60,
         }}
@@ -144,7 +115,7 @@ export function EndActivityStepBuilder(props: {
           label="Final message"
           value={step.message}
           onChange={(e) => {
-            updateField('message', e);
+            updateField("message", e);
           }}
         />
         <CheckBoxInput
@@ -152,8 +123,8 @@ export function EndActivityStepBuilder(props: {
           value={hasGoHomeButton}
           onChange={(checked) => {
             updateField(
-              'predefinedResponses',
-              checked ? [goHomePredefinedResponse] : []
+              "predefinedResponses",
+              checked ? [goHomePredefinedResponse] : [],
             );
           }}
         />
@@ -162,7 +133,7 @@ export function EndActivityStepBuilder(props: {
           value={step.setStudentActivityComplete ?? false}
           disabled={true}
           onChange={(e) => {
-            updateField('setStudentActivityComplete', e);
+            updateField("setStudentActivityComplete", e);
           }}
         />
       </Collapse>

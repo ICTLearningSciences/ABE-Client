@@ -4,20 +4,21 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
   Button,
-} from '@mui/material';
-import { useWithBrowserDetection } from '../hooks/use-with-browser-detection';
+} from "@mui/material";
+import { useWithBrowserDetection } from "../hooks/use-with-browser-detection";
 
-const STORAGE_KEY = 'firefox-cookie-warning-last-shown';
+const STORAGE_KEY = "firefox-cookie-warning-last-shown";
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-export function FirefoxCookieWarningDialog(): JSX.Element {
+export function FirefoxCookieWarningDialog(): React.ReactNode {
   const { warnFirefoxWithGoogleLogin } = useWithBrowserDetection();
 
   const [open, setOpen] = useState(false);
@@ -56,7 +57,7 @@ export function FirefoxCookieWarningDialog(): JSX.Element {
       open={open}
       onClose={handleClose}
       style={{
-        textAlign: 'center',
+        textAlign: "center",
       }}
     >
       <DialogTitle data-cy="firefox-cookie-warning-title">
@@ -75,7 +76,7 @@ export function FirefoxCookieWarningDialog(): JSX.Element {
           data-cy="close-firefox-warning-dialog"
           onClick={handleClose}
           style={{
-            color: 'blue',
+            color: "blue",
           }}
           variant="contained"
         >

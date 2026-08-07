@@ -1,16 +1,26 @@
-import React from 'react';
-import { Button, Divider } from '@mui/material';
-import { ChatHeader, ColumnDiv, RowDiv } from '../../../styled-components';
-import { DocGoal, ActivityTypes } from '../../../types';
-import ChangeIcon from '@mui/icons-material/Construction';
-import ReplayIcon from '@mui/icons-material/Replay';
-import { useAppSelector } from '../../../store/hooks';
-import { useWithChat } from '../../../store/slices/chat/use-with-chat';
-import DownloadIcon from '@mui/icons-material/Download';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import DescriptionIcon from '@mui/icons-material/Description';
-import { useWithWindowSize } from '../../../hooks/use-with-window-size';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import React from "react";
+import { Button, Divider } from "@mui/material";
+import {
+  Construction,
+  Replay,
+  Download,
+  Visibility,
+  VisibilityOff,
+  Description,
+} from "@mui/icons-material";
+
+import { ChatHeader, ColumnDiv, RowDiv } from "../../../styled-components";
+import type { DocGoal, ActivityTypes } from "../../../types";
+import { useAppSelector } from "../../../store/hooks";
+import { useWithChat } from "../../../store/slices/chat/use-with-chat";
+import { useWithWindowSize } from "../../../hooks/use-with-window-size";
 
 export function ChatHeaderGenerator(props: {
   incrementActivityCounter: () => void;
@@ -21,7 +31,7 @@ export function ChatHeaderGenerator(props: {
   displayMarkdown: boolean;
   setDisplayMarkdown: (displayMarkdown: boolean) => void;
   setToDocView: () => void;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     incrementActivityCounter,
     editDocGoal,
@@ -33,49 +43,49 @@ export function ChatHeaderGenerator(props: {
     setToDocView,
   } = props;
   const viewingAdvancedOptions = useAppSelector(
-    (state) => state.state.viewingAdvancedOptions
+    (state) => state.state.viewingAdvancedOptions,
   );
   const { downloadChatLog } = useWithChat();
   const { isMobile, width: screenWidth } = useWithWindowSize();
-  let title = selectedGoal?.title || '';
-  title += selectedGoal && selectedActivity ? ' - ' : '';
-  title += selectedActivity?.title || '';
-  if (!title) title = 'Coach';
+  let title = selectedGoal?.title || "";
+  title += selectedGoal && selectedActivity ? " - " : "";
+  title += selectedActivity?.title || "";
+  if (!title) title = "Coach";
   return (
     <ChatHeader
       style={{
-        width: '100%',
+        width: "100%",
       }}
     >
       <ColumnDiv
         style={{
-          width: '100%',
+          width: "100%",
         }}
       >
         <RowDiv
           style={{
-            width: '100%',
-            justifyContent: 'space-around',
-            marginBottom: '10px',
+            width: "100%",
+            justifyContent: "space-around",
+            marginBottom: "10px",
           }}
         >
           <Button
             onClick={setToDocView}
             style={{
               flex: 0.2,
-              display: isMobile ? 'flex' : 'none',
-              fontSize: screenWidth < 500 ? '10px' : '12px',
+              display: isMobile ? "flex" : "none",
+              fontSize: screenWidth < 500 ? "10px" : "12px",
             }}
             variant="contained"
           >
-            {' '}
-            <DescriptionIcon
-              sx={{ fontSize: screenWidth < 500 ? '16px' : '20px' }}
-            />{' '}
-            Document{' '}
+            {" "}
+            <Description
+              sx={{ fontSize: screenWidth < 500 ? "16px" : "20px" }}
+            />{" "}
+            Document{" "}
           </Button>
           <span
-            style={{ textAlign: 'center', marginBottom: '10px', flex: 1 }}
+            style={{ textAlign: "center", marginBottom: "10px", flex: 1 }}
             data-cy="chat-header"
           >
             {title}
@@ -86,8 +96,8 @@ export function ChatHeaderGenerator(props: {
         <Divider />
         <RowDiv
           style={{
-            width: '100%',
-            justifyContent: 'space-around',
+            width: "100%",
+            justifyContent: "space-around",
           }}
         >
           {!disableActivitySelector && (
@@ -98,17 +108,17 @@ export function ChatHeaderGenerator(props: {
                 padding: 3,
                 marginBottom: 5,
                 marginLeft: 5,
-                gap: '5px',
+                gap: "5px",
                 flex: 1,
-                fontSize: '12px',
-                width: 'fit-content',
+                fontSize: "12px",
+                width: "fit-content",
               }}
             >
-              <ChangeIcon
+              <Construction
                 sx={{
-                  fontSize: '20px',
+                  fontSize: "20px",
                 }}
-              />{' '}
+              />{" "}
               Edit Goal/Activity
             </Button>
           )}
@@ -120,16 +130,16 @@ export function ChatHeaderGenerator(props: {
               padding: 3,
               marginBottom: 5,
               marginLeft: 5,
-              gap: '5px',
+              gap: "5px",
               flex: 1,
-              fontSize: '12px',
+              fontSize: "12px",
             }}
           >
-            <ReplayIcon
+            <Replay
               sx={{
-                fontSize: '20px',
+                fontSize: "20px",
               }}
-            />{' '}
+            />{" "}
             Reset Activity
           </Button>
           <Divider orientation="vertical" flexItem />
@@ -137,48 +147,48 @@ export function ChatHeaderGenerator(props: {
             onClick={() => setDisplayMarkdown(!displayMarkdown)}
             data-cy="display-markdown-button"
             style={{
-              fontSize: '12px',
-              gap: '5px',
+              fontSize: "12px",
+              gap: "5px",
               opacity: displayMarkdown ? 1 : 0.3,
               padding: 0,
               flex: 1,
             }}
           >
             {displayMarkdown ? (
-              <VisibilityIcon
+              <Visibility
                 sx={{
-                  fontSize: '20px',
+                  fontSize: "20px",
                 }}
               />
             ) : (
-              <VisibilityOffIcon
+              <VisibilityOff
                 sx={{
-                  fontSize: '20px',
+                  fontSize: "20px",
                 }}
               />
             )}
-            {displayMarkdown ? 'Hide Markdown' : 'Show Markdown'}
+            {displayMarkdown ? "Hide Markdown" : "Show Markdown"}
           </Button>
 
           {viewingAdvancedOptions && (
             <>
-              {' '}
+              {" "}
               <Divider orientation="vertical" flexItem />
               <Button
                 data-cy="download-chat-log-button"
-                onClick={() => downloadChatLog('')}
+                onClick={() => downloadChatLog("")}
                 style={{
                   padding: 3,
                   marginBottom: 5,
                   marginLeft: 5,
-                  gap: '5px',
+                  gap: "5px",
                   flex: 1,
-                  fontSize: '12px',
+                  fontSize: "12px",
                 }}
               >
-                <DownloadIcon
+                <Download
                   sx={{
-                    fontSize: '20px',
+                    fontSize: "20px",
                   }}
                 />
               </Button>

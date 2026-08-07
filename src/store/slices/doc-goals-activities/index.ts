@@ -4,12 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { ActivityGQL, DocGoalGQl } from '../../../types';
+
+import {
+  type PayloadAction,
+  createAsyncThunk,
+  createSlice,
+} from "@reduxjs/toolkit";
+import type { ActivityGQL, DocGoalGQl } from "../../../types";
 import {
   fetchDocGoals as _fetchDocGoals,
   fetchActivities as _fetchActivities,
-} from '../../../hooks/api';
+} from "../../../hooks/api";
 import {
   fetchBuiltActivities as _fetchBuiltActivities,
   addOrUpdateBuiltActivity as _addOrUpdateBuiltActivity,
@@ -17,18 +22,13 @@ import {
   fetchActivityVersions as _fetchActivityVersions,
   copyBuiltActivity as _copyBuiltActivity,
   deleteBuiltActivity as _deleteBuiltActivity,
-} from '../../../hooks/built-activity-api';
-import {
+} from "../../../hooks/built-activity-api";
+import type {
   ActivityBuilder,
   BuiltActivityVersion,
-} from '../../../components/activity-builder/types';
+} from "../../../components/activity-builder/types";
 
-export enum LoadStatus {
-  NONE,
-  LOADING,
-  SUCCEEDED,
-  FAILED,
-}
+export type LoadStatus = 0 | 1 | 2 | 3;
 
 export interface State {
   docGoals: DocGoalGQl[];
@@ -43,83 +43,83 @@ export interface State {
 
 const initialState: State = {
   docGoals: [],
-  docGoalsLoadStatus: LoadStatus.NONE,
+  docGoalsLoadStatus: 0,
   activities: [],
-  activitiesLoadStatus: LoadStatus.NONE,
+  activitiesLoadStatus: 0,
   builtActivities: [],
-  builtActivitiesLoadStatus: LoadStatus.NONE,
+  builtActivitiesLoadStatus: 0,
   builtActivityVersions: {},
-  builtActivityVersionsLoadStatus: LoadStatus.NONE,
+  builtActivityVersionsLoadStatus: 0,
 };
 
 export const fetchDocGoals = createAsyncThunk(
-  'state/fetchDocGoals',
+  "state/fetchDocGoals",
   async () => {
     return await _fetchDocGoals();
-  }
+  },
 );
 
 export const fetchActivities = createAsyncThunk(
-  'state/fetchActivities',
+  "state/fetchActivities",
   async () => {
     return await _fetchActivities();
-  }
+  },
 );
 
 export const fetchBuiltActivities = createAsyncThunk(
-  'state/fetchBuiltActivities',
+  "state/fetchBuiltActivities",
   async () => {
     return await _fetchBuiltActivities();
-  }
+  },
 );
 
 export const copyBuiltActivity = createAsyncThunk(
-  'state/copyBuiltActivity',
+  "state/copyBuiltActivity",
   async (activityId: string) => {
     return await _copyBuiltActivity(activityId);
-  }
+  },
 );
 
 export const addOrUpdateBuiltActivity = createAsyncThunk(
-  'state/addOrUpdateBuiltActivity',
+  "state/addOrUpdateBuiltActivity",
   async (activity: ActivityBuilder) => {
     return await _addOrUpdateBuiltActivity(activity);
-  }
+  },
 );
 
 export const storeActivityVersionForActivity = createAsyncThunk(
-  'state/storeActivityVersionForActivity',
+  "state/storeActivityVersionForActivity",
   async (activity: ActivityBuilder) => {
     return await storeActivityVersion(activity);
-  }
+  },
 );
 
 export const fetchActivityVersions = createAsyncThunk(
-  'state/fetchActivityVersions',
+  "state/fetchActivityVersions",
   async (activityClientId: string) => {
     const versions = await _fetchActivityVersions(activityClientId);
     return {
       activityClientId,
       versions,
     };
-  }
+  },
 );
 
 export const deleteBuiltActivity = createAsyncThunk(
-  'state/deleteBuiltActivity',
+  "state/deleteBuiltActivity",
   async (activityId: string) => {
     return await _deleteBuiltActivity(activityId);
-  }
+  },
 );
 
 /** Reducer */
 export const stateSlice = createSlice({
-  name: 'state',
+  name: "state",
   initialState,
   reducers: {
     addNewLocalBuiltActivity: (
       state,
-      action: PayloadAction<ActivityBuilder>
+      action: PayloadAction<ActivityBuilder>,
     ) => {
       state.builtActivities.push(action.payload);
     },
@@ -127,41 +127,41 @@ export const stateSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchDocGoals.pending, (state) => {
-        state.docGoalsLoadStatus = LoadStatus.LOADING;
+        state.docGoalsLoadStatus = 1;
       })
       .addCase(fetchDocGoals.fulfilled, (state, action) => {
         state.docGoals = action.payload;
-        state.docGoalsLoadStatus = LoadStatus.SUCCEEDED;
+        state.docGoalsLoadStatus = 2;
       })
       .addCase(fetchDocGoals.rejected, (state) => {
-        state.docGoalsLoadStatus = LoadStatus.FAILED;
+        state.docGoalsLoadStatus = 3;
       })
 
       .addCase(fetchActivities.pending, (state) => {
-        state.activitiesLoadStatus = LoadStatus.LOADING;
+        state.activitiesLoadStatus = 1;
       })
       .addCase(fetchActivities.fulfilled, (state, action) => {
         state.activities = action.payload;
-        state.activitiesLoadStatus = LoadStatus.SUCCEEDED;
+        state.activitiesLoadStatus = 2;
       })
       .addCase(fetchActivities.rejected, (state) => {
-        state.activitiesLoadStatus = LoadStatus.FAILED;
+        state.activitiesLoadStatus = 3;
       })
 
       .addCase(fetchBuiltActivities.pending, (state) => {
-        state.builtActivitiesLoadStatus = LoadStatus.LOADING;
+        state.builtActivitiesLoadStatus = 1;
       })
       .addCase(fetchBuiltActivities.fulfilled, (state, action) => {
         state.builtActivities = action.payload;
-        state.builtActivitiesLoadStatus = LoadStatus.SUCCEEDED;
+        state.builtActivitiesLoadStatus = 2;
       })
       .addCase(fetchBuiltActivities.rejected, (state) => {
-        state.builtActivitiesLoadStatus = LoadStatus.FAILED;
+        state.builtActivitiesLoadStatus = 3;
       })
 
       .addCase(addOrUpdateBuiltActivity.fulfilled, (state, action) => {
         const activityIndex = state.builtActivities.findIndex(
-          (a) => a.clientId === action.payload.clientId
+          (a) => a.clientId === action.payload.clientId,
         );
         if (activityIndex >= 0) {
           state.builtActivities[activityIndex] = action.payload;
@@ -171,11 +171,11 @@ export const stateSlice = createSlice({
       })
 
       .addCase(fetchActivityVersions.pending, (state) => {
-        state.builtActivityVersionsLoadStatus = LoadStatus.LOADING;
+        state.builtActivityVersionsLoadStatus = 1;
       })
 
       .addCase(fetchActivityVersions.fulfilled, (state, action) => {
-        state.builtActivityVersionsLoadStatus = LoadStatus.SUCCEEDED;
+        state.builtActivityVersionsLoadStatus = 2;
         state.builtActivityVersions[action.payload.activityClientId] =
           action.payload.versions.sort((a, b) => {
             return (
@@ -186,7 +186,7 @@ export const stateSlice = createSlice({
       })
 
       .addCase(fetchActivityVersions.rejected, (state) => {
-        state.builtActivityVersionsLoadStatus = LoadStatus.FAILED;
+        state.builtActivityVersionsLoadStatus = 3;
       })
 
       .addCase(storeActivityVersionForActivity.fulfilled, (state, action) => {
@@ -210,7 +210,7 @@ export const stateSlice = createSlice({
 
       .addCase(deleteBuiltActivity.fulfilled, (state, action) => {
         state.builtActivities = state.builtActivities.filter(
-          (a) => a._id !== action.payload
+          (a) => a._id !== action.payload,
         );
       });
   },

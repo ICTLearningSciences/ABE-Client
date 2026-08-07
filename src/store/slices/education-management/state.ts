@@ -4,24 +4,25 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { ActivityBuilder } from '../../../components/activity-builder/types';
-import { Course, Assignment, Section, StudentData, Instructor } from './types';
 
-export enum LoadStatus {
-  NONE,
-  LOADING,
-  SUCCEEDED,
-  FAILED,
-}
+import type { ActivityBuilder } from "../../../components/activity-builder/types";
+import type { LoadStatus } from "../doc-goals-activities";
+import type {
+  Course,
+  Assignment,
+  Section,
+  StudentData,
+  Instructor,
+} from "./types";
 
 export type CourseViews =
-  | 'dashboard'
-  | 'course'
-  | 'section'
-  | 'assignment'
-  | 'activity'
-  | 'student-info'
-  | 'activity-document-timelines';
+  | "dashboard"
+  | "course"
+  | "section"
+  | "assignment"
+  | "activity"
+  | "student-info"
+  | "activity-document-timelines";
 
 export interface CourseManagementState {
   view: CourseViews;
@@ -64,25 +65,25 @@ export interface State {
 
 export const initialState: State = {
   courses: [],
-  coursesLoadStatus: LoadStatus.NONE,
-  courseModificationStatus: LoadStatus.NONE,
+  coursesLoadStatus: 0,
+  courseModificationStatus: 0,
   assignments: [],
-  assignmentsLoadStatus: LoadStatus.NONE,
-  assignmentModificationStatus: LoadStatus.NONE,
+  assignmentsLoadStatus: 0,
+  assignmentModificationStatus: 0,
   sections: [],
-  sectionsLoadStatus: LoadStatus.NONE,
-  sectionModificationStatus: LoadStatus.NONE,
+  sectionsLoadStatus: 0,
+  sectionModificationStatus: 0,
   students: [],
-  studentsLoadStatus: LoadStatus.NONE,
-  enrollmentModificationStatus: LoadStatus.NONE,
+  studentsLoadStatus: 0,
+  enrollmentModificationStatus: 0,
   instructorData: undefined,
   studentData: undefined,
-  educationalDataLoadStatus: LoadStatus.NONE,
+  educationalDataLoadStatus: 0,
   instructors: [],
-  instructorsLoadStatus: LoadStatus.NONE,
+  instructorsLoadStatus: 0,
   viewState: {
-    view: 'dashboard',
-    previousView: 'dashboard',
+    view: "dashboard",
+    previousView: "dashboard",
   },
   errorMessage: undefined,
 };

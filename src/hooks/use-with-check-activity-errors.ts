@@ -4,28 +4,33 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect, useRef, useState } from 'react';
-import { ActivityStepErrorChecker } from '../classes/activity-builder-activity/activity-step-error-checker';
-import { ActivityBuilder } from '../components/activity-builder/types';
+
+import { useEffect, useRef, useState } from "react";
+import {
+  ActivityStepErrorChecker,
+  type FlowErrors,
+} from "../classes/activity-builder-activity/activity-step-error-checker";
+import type { ActivityBuilder } from "../components/activity-builder/types";
 
 export function useWithCheckActivityErrors(
   globalStateKeys: string[],
-  localActivityCopy: ActivityBuilder
+  localActivityCopy: ActivityBuilder,
 ) {
   const errorChecker = useRef<ActivityStepErrorChecker>(
-    new ActivityStepErrorChecker()
+    new ActivityStepErrorChecker(),
   );
-  const [errors, setErrors] = useState(errorChecker.current.errors);
+  const curErrorChecker = errorChecker.current;
+  const [errors, setErrors] = useState<FlowErrors>();
 
   useEffect(() => {
-    errorChecker.current.setGlobalStateKeys(globalStateKeys);
-    errorChecker.current.checkErrors(localActivityCopy);
-    setErrors(errorChecker.current.errors);
+    curErrorChecker.setGlobalStateKeys(globalStateKeys);
+    curErrorChecker.checkErrors(localActivityCopy);
+    setErrors(curErrorChecker.errors);
   }, [globalStateKeys]);
 
   useEffect(() => {
-    errorChecker.current.checkErrors(localActivityCopy);
-    setErrors(errorChecker.current.errors);
+    curErrorChecker.checkErrors(localActivityCopy);
+    setErrors(curErrorChecker.errors);
   }, [localActivityCopy]);
 
   return { errors };

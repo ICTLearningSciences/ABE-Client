@@ -5,24 +5,24 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import * as React from 'react';
-import { Button, Grid } from '@mui/material';
-import { TextSnippet } from '@mui/icons-material';
+import * as React from "react";
+import { Button, Grid } from "@mui/material";
+import { TextSnippet } from "@mui/icons-material";
 
-import UserDocumentDisplay from './components/doc-display';
-import { Header } from './components/header';
-import { Chat } from './components/chat';
-import { ReferencesButton } from './components/references-button';
-import { ChatPanelists } from './components/chat-panelists';
-import { useWithState } from '../../exported-files';
-import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
-import { useWithPanels } from '../../store/slices/panels/use-with-panels';
-import withAuthorizationOnly from './wrap-with-authorization-only';
-import { Source } from '../../ai-services/ai-service-types';
+import UserDocumentDisplay from "./components/doc-display";
+import { Header } from "./components/header";
+import { Chat } from "./components/chat";
+import { ReferencesButton } from "./components/references-button";
+import { ChatPanelists } from "./components/chat-panelists";
+import { useWithState } from "../../exported-files";
+import { useNavigateWithParams } from "../../hooks/use-navigate-with-params";
+import { useWithPanels } from "../../store/slices/panels/use-with-panels";
+import withAuthorizationOnly from "./wrap-with-authorization-only";
+import type { Source } from "../../ai-services/ai-service-types";
 
-import './shark-tank.css';
+import "./shark-tank.css";
 
-function SharkTankChat(): JSX.Element {
+function SharkTankChat(): React.ReactNode {
   const navigate = useNavigateWithParams();
   const { state: docState, updateCurrentDocId } = useWithState();
   const useWithPanelActivity = useWithPanels();
@@ -41,7 +41,7 @@ function SharkTankChat(): JSX.Element {
   }
 
   if (!activePanel || !activity) {
-    navigate('/shark-tank');
+    navigate("/shark-tank");
     return <></>;
   }
 
@@ -49,13 +49,13 @@ function SharkTankChat(): JSX.Element {
     <main className="root">
       <Header title="Chat" />
       <div className="page">
-        <Grid container style={{ width: '100%', height: '100%' }}>
+        <Grid container style={{ width: "100%", height: "100%" }}>
           <Grid
-            xs={8}
+            size={8}
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
             }}
           >
             <ChatPanelists useWithPanelActivity={useWithPanelActivity} />
@@ -63,7 +63,7 @@ function SharkTankChat(): JSX.Element {
               className="column center-div"
               style={{
                 flexGrow: 1,
-                background: 'rgb(48, 53, 58)',
+                background: "rgb(48, 53, 58)",
                 margin: 10,
               }}
             >
@@ -79,9 +79,9 @@ function SharkTankChat(): JSX.Element {
             </div>
             <div className="row spacing center-div" style={{ padding: 20 }}>
               <Button
-                variant={reference ? 'outlined' : 'contained'}
+                variant={reference ? "outlined" : "contained"}
                 startIcon={<TextSnippet />}
-                onClick={() => onSelectDocument('')}
+                onClick={() => onSelectDocument("")}
               >
                 My Documents
               </Button>
@@ -93,8 +93,8 @@ function SharkTankChat(): JSX.Element {
             </div>
           </Grid>
           <Grid
-            xs={4}
-            style={{ height: '100%', paddingRight: 20, paddingLeft: 20 }}
+            size={4}
+            style={{ height: "100%", paddingRight: 20, paddingLeft: 20 }}
           >
             <Chat
               selectedActivity={activity}
@@ -109,4 +109,5 @@ function SharkTankChat(): JSX.Element {
   );
 }
 
-export default withAuthorizationOnly(SharkTankChat);
+const Page = withAuthorizationOnly(SharkTankChat);
+export default Page;

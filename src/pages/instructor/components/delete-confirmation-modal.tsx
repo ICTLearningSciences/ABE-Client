@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
+
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -14,16 +15,12 @@ import {
   Button,
   IconButton,
   Box,
-} from '@mui/material';
-import {
-  Close as CloseIcon,
-  Warning as WarningIcon,
-  Delete as TrashIcon,
-} from '@mui/icons-material';
+} from "@mui/material";
+import { Close, Warning, Delete } from "@mui/icons-material";
 
 interface DeleteConfirmationModalProps {
   onDelete: () => void;
-  entityType: 'course' | 'section' | 'assignment';
+  entityType: "course" | "section" | "assignment";
   entityName: string;
   isLoading?: boolean;
 }
@@ -37,14 +34,14 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const getEntityIcon = () => {
     switch (entityType) {
-      case 'course':
-        return '📚';
-      case 'section':
-        return '📑';
-      case 'assignment':
-        return '📝';
+      case "course":
+        return "📚";
+      case "section":
+        return "📑";
+      case "assignment":
+        return "📝";
       default:
-        return '🗑️';
+        return "🗑️";
     }
   };
 
@@ -56,41 +53,43 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
         maxWidth="sm"
         fullWidth
         data-cy="delete-confirmation-modal"
-        PaperProps={{
-          sx: {
-            borderRadius: 2,
-            p: 1,
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: 2,
+              p: 1,
+            },
           },
         }}
       >
         <DialogTitle
           sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            color: '#d32f2f',
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            color: "#d32f2f",
             fontWeight: 600,
-            fontSize: '1.25rem',
+            fontSize: "1.25rem",
           }}
         >
           <div />
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <WarningIcon sx={{ color: '#d32f2f' }} />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Warning sx={{ color: "#d32f2f" }} />
             Delete {entityType.charAt(0).toUpperCase() + entityType.slice(1)}
           </Box>
           <IconButton
             onClick={() => setIsOpen(false)}
             disabled={isLoading}
             size="small"
-            sx={{ color: 'grey.500' }}
+            sx={{ color: "grey.500" }}
           >
-            <CloseIcon />
+            <Close />
           </IconButton>
         </DialogTitle>
 
         <DialogContent>
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <Typography sx={{ fontSize: '64px', mb: 2 }}>
+          <Box sx={{ textAlign: "center", mb: 3 }}>
+            <Typography sx={{ fontSize: "64px", mb: 2 }}>
               {getEntityIcon()}
             </Typography>
 
@@ -98,7 +97,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
               variant="h6"
               sx={{
                 mb: 2,
-                color: 'text.primary',
+                color: "text.primary",
                 fontWeight: 500,
               }}
             >
@@ -119,8 +118,8 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
             variant="body2"
             color="text.disabled"
             sx={{
-              textAlign: 'center',
-              fontStyle: 'italic',
+              textAlign: "center",
+              fontStyle: "italic",
             }}
           >
             This action cannot be undone.
@@ -134,11 +133,11 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
             variant="outlined"
             data-cy="delete-cancel-button"
             sx={{
-              color: 'grey.600',
-              borderColor: 'grey.300',
-              '&:hover': {
-                borderColor: 'grey.400',
-                backgroundColor: 'grey.50',
+              color: "grey.600",
+              borderColor: "grey.300",
+              "&:hover": {
+                borderColor: "grey.400",
+                backgroundColor: "grey.50",
               },
             }}
           >
@@ -151,14 +150,14 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
             color="error"
             data-cy="delete-confirm-button"
             sx={{
-              backgroundColor: '#d32f2f',
-              '&:hover': {
-                backgroundColor: '#b71c1c',
+              backgroundColor: "#d32f2f",
+              "&:hover": {
+                backgroundColor: "#b71c1c",
               },
             }}
           >
             {isLoading
-              ? 'Deleting...'
+              ? "Deleting..."
               : `Delete ${
                   entityType.charAt(0).toUpperCase() + entityType.slice(1)
                 }`}
@@ -167,19 +166,19 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
       </Dialog>
       <IconButton
         sx={{
-          color: 'red',
-          borderColor: 'red',
-          '&:hover': {
-            backgroundColor: 'red',
-            color: 'white',
+          color: "red",
+          borderColor: "red",
+          "&:hover": {
+            backgroundColor: "red",
+            color: "white",
           },
           marginLeft: 2,
         }}
         onClick={() => setIsOpen(true)}
         data-cy={`delete-${entityType}-button`}
       >
-        {' '}
-        <TrashIcon />{' '}
+        {" "}
+        <Delete />{" "}
       </IconButton>
     </div>
   );

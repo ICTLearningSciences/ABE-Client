@@ -4,25 +4,26 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import ViewUserGoogleDocs from '../../../components/admin-view/admin-view-docs';
-import { useWithStoreDocVersions } from '../../../hooks/use-with-google-doc-versions';
-import { useAppSelector } from '../../../store/hooks';
-import { useNavigateWithParams } from '../../../hooks/use-navigate-with-params';
+
+import React from "react";
+import ViewUserGoogleDocs from "../../../components/admin-view/admin-view-docs";
+import { useWithStoreDocVersions } from "../../../hooks/use-with-google-doc-versions";
+import { useAppSelector } from "../../../store/hooks";
+import { useNavigateWithParams } from "../../../hooks/use-navigate-with-params";
 
 export default function UserDocumentDisplay(props: {
   docId?: string;
   activityId?: string;
   onOpenDoc: (id: string) => void;
-}): JSX.Element {
+}): React.ReactNode {
   const { docId, activityId, onOpenDoc } = props;
   const { user } = useAppSelector((state) => state.login);
   const navigate = useNavigateWithParams();
-  useWithStoreDocVersions(activityId || '');
+  useWithStoreDocVersions(activityId || "");
 
   function onHistoryClicked(docId: string) {
     if (!docId) {
-      console.warn('onHistoryClicked no docId');
+      console.warn("onHistoryClicked no docId");
       return;
     }
     navigate(`/docs/history/${docId}`);

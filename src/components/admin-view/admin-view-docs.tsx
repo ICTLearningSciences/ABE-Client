@@ -4,16 +4,16 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { UseWithUsersDocs } from '../../hooks/use-with-users-docs';
-import { ColumnCenterDiv } from '../../styled-components';
-import SelectCreateDocs from '../user-view/select-create-docs';
-import { useAppSelector } from '../../store/hooks';
-import { UserRole } from '../../store/slices/login';
-import ExampleGoogleDocModal from '../user-view/example-google-docs-modal';
-import { useWithUsersDocs as useWithUsersDocsHook } from '../../hooks/use-with-users-docs';
-import { EducationalSettingProvider } from '../../contexts/educational-setting-context';
-import { useWithWindowSize } from '../../hooks/use-with-window-size';
+
+import React from "react";
+import type { UseWithUsersDocs } from "../../hooks/use-with-users-docs";
+import { ColumnCenterDiv } from "../../styled-components";
+import SelectCreateDocs from "../user-view/select-create-docs";
+import { useAppSelector } from "../../store/hooks";
+import ExampleGoogleDocModal from "../user-view/example-google-docs-modal";
+import { useWithUsersDocs as useWithUsersDocsHook } from "../../hooks/use-with-users-docs";
+import { EducationalSettingProvider } from "../../contexts/educational-setting-context";
+import { useWithWindowSize } from "../../hooks/use-with-window-size";
 
 export interface AdminViewUserGoogleDocsProps {
   useWithUsersDocs: UseWithUsersDocs;
@@ -23,11 +23,11 @@ export default function ViewUserGoogleDocs(props: {
   goToDoc: (docId: string, newDoc?: boolean) => void;
   onHistoryClicked: (docId: string) => void;
   isEducationalSetting: boolean;
-}): JSX.Element {
+}): React.ReactNode {
   const { goToDoc, onHistoryClicked, isEducationalSetting } = props;
   const useWithUsersDocs = useWithUsersDocsHook();
   const viewState = useAppSelector(
-    (state) => state.educationManagement.viewState
+    (state) => state.educationManagement.viewState,
   );
   const {
     googleDocs,
@@ -49,9 +49,9 @@ export default function ViewUserGoogleDocs(props: {
     <EducationalSettingProvider isEducationalSetting={isEducationalSetting}>
       <ColumnCenterDiv
         style={{
-          width: '100%',
-          height: '100%',
-          overflowY: 'auto',
+          width: "100%",
+          height: "100%",
+          overflowY: "auto",
         }}
       >
         <SelectCreateDocs
@@ -69,11 +69,11 @@ export default function ViewUserGoogleDocs(props: {
           onHistoryClicked={onHistoryClicked}
           setExampleDocsOpen={setExampleDocsOpen}
           sx={{
-            width: isMobile ? '95%' : '75%',
+            width: isMobile ? "95%" : "75%",
           }}
         />
         <ExampleGoogleDocModal
-          viewingAsAdmin={userRole === UserRole.ADMIN}
+          viewingAsAdmin={userRole === "ADMIN"}
           open={exampleDocsOpen}
           close={() => {
             setExampleDocsOpen(false);
@@ -82,7 +82,7 @@ export default function ViewUserGoogleDocs(props: {
           onCreateDoc={(
             docIdtoCopy?: string,
             title?: string,
-            isAdminDoc?: boolean
+            isAdminDoc?: boolean,
           ) => {
             handleCreateDoc(
               docIdtoCopy,
@@ -92,7 +92,7 @@ export default function ViewUserGoogleDocs(props: {
               viewState.selectedAssignmentId,
               (data) => {
                 goToDoc(data.docId, true);
-              }
+              },
             );
           }}
           goToDoc={goToDoc}

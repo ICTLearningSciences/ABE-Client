@@ -1,26 +1,33 @@
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import React, { useEffect } from "react";
 import {
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Button,
-} from '@mui/material';
-import React, { useEffect } from 'react';
-import { FlowItem } from '../types';
-import { getFlowForStepId } from '../helpers';
+} from "@mui/material";
+import type { FlowItem } from "../types";
+import { getFlowForStepId } from "../helpers";
 
 export function FlowStepSelector(props: {
   flowsList: FlowItem[];
   currentJumpToStepId?: string;
   onStepSelected: (stepId: string) => void;
-  rowOrColumn?: 'row' | 'column';
+  rowOrColumn?: "row" | "column";
   disableStepsList?: string[];
   width?: string;
   title?: string;
-}): JSX.Element {
+}): React.ReactNode {
   const { flowsList, onStepSelected, currentJumpToStepId } = props;
-  const [selectedFlowId, setSelectedFlowId] = React.useState<string>('');
-  const [selectedStepId, setSelectedStepId] = React.useState<string>('');
+  const [selectedFlowId, setSelectedFlowId] = React.useState<string>("");
+  const [selectedStepId, setSelectedStepId] = React.useState<string>("");
   useEffect(() => {
     if (currentJumpToStepId) {
       const flow = getFlowForStepId(flowsList, currentJumpToStepId);
@@ -35,18 +42,18 @@ export function FlowStepSelector(props: {
   return (
     <div
       style={{
-        display: 'flex',
+        display: "flex",
         flex: 1,
-        width: props.width || '100%',
-        maxWidth: props.width || '100%',
-        flexDirection: 'column',
-        alignItems: 'center',
+        width: props.width || "100%",
+        maxWidth: props.width || "100%",
+        flexDirection: "column",
+        alignItems: "center",
       }}
     >
       {props.title && (
         <span
           style={{
-            alignSelf: 'center',
+            alignSelf: "center",
             margin: 0,
             padding: 0,
           }}
@@ -56,11 +63,11 @@ export function FlowStepSelector(props: {
       )}
       <div
         style={{
-          width: '100%',
-          display: 'flex',
-          flexDirection: props.rowOrColumn || 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
+          width: "100%",
+          display: "flex",
+          flexDirection: props.rowOrColumn || "column",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <FormControl variant="standard" sx={{ minWidth: 120 }}>
@@ -71,7 +78,7 @@ export function FlowStepSelector(props: {
             onChange={(e) => {
               if (selectedFlowId !== e.target.value) {
                 setSelectedFlowId(e.target.value);
-                setSelectedStepId('');
+                setSelectedStepId("");
               }
             }}
             label="Output Data Type"
@@ -122,9 +129,9 @@ export function FlowStepSelector(props: {
           }}
           disabled={!selectedFlowId && !selectedStepId}
           onClick={() => {
-            setSelectedFlowId('');
-            setSelectedStepId('');
-            onStepSelected('');
+            setSelectedFlowId("");
+            setSelectedStepId("");
+            onStepSelected("");
           }}
         >
           Clear

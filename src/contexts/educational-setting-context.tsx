@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { createContext, useContext, ReactNode } from 'react';
+
+import React, { createContext, useContext, type ReactNode } from "react";
 
 interface EducationalSettingContextType {
   isEducationalSetting: boolean;
@@ -22,7 +23,7 @@ export interface EducationalSettingProviderProps {
 export function EducationalSettingProvider({
   children,
   isEducationalSetting,
-}: EducationalSettingProviderProps): JSX.Element {
+}: EducationalSettingProviderProps): React.ReactNode {
   const value = { isEducationalSetting };
 
   return (
@@ -32,11 +33,12 @@ export function EducationalSettingProvider({
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useEducationalSetting(): EducationalSettingContextType {
   const context = useContext(EducationalSettingContext);
   if (context === undefined) {
     throw new Error(
-      'useEducationalSetting must be used within an EducationalSettingProvider'
+      "useEducationalSetting must be used within an EducationalSettingProvider",
     );
   }
   return context;

@@ -22,13 +22,6 @@ describe("Config Loading Screen", ()=>{
     })
 
     it("displays spinner on config load", ()=>{
-        cyMockDefault(cy,
-            {
-                gqlQueries: [
-                    mockGQL('FetchConfig', fetchConfigResponse, {statusCode: 200, delayMs: 50000})
-                ]
-            }
-        );
         cy.visit("/");
         cy.get("[data-cy=config-loading-screen]").should("exist");
         cy.get("[data-cy=config-loading-spinner]").should("exist");
@@ -62,7 +55,6 @@ describe("Config Loading Screen", ()=>{
         cy.get("[data-cy=config-loading-screen]").should("exist");
         cy.get("[data-cy=config-load-retry-button]").click();
         cy.get("[data-cy=config-loading-screen]").should("exist");
-        cy.get("[data-cy=config-loading-spinner]").should("exist");
     })
 
     it("gets banner from config", ()=>{

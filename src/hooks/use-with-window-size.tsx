@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect, useState } from 'react';
+
+import { useEffect, useState } from "react";
 
 interface WindowSize {
   width: number;
@@ -15,9 +16,9 @@ export const mobileBreakpoint = 800;
 
 export function useWithWindowSize(): WindowSize {
   const initialWindowWidth =
-    typeof window !== 'undefined' ? window.innerWidth : 0;
+    typeof window !== "undefined" ? window.innerWidth : 0;
   const initialWindowHeight =
-    typeof window !== 'undefined' ? window.innerHeight : 0;
+    typeof window !== "undefined" ? window.innerHeight : 0;
   const [windowSize, setWindowSize] = useState({
     width: initialWindowWidth,
     height: initialWindowHeight,
@@ -25,15 +26,15 @@ export function useWithWindowSize(): WindowSize {
   const isMobile = windowSize.width > 0 && windowSize.width <= mobileBreakpoint;
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
     const handleResize = () =>
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     handleResize();
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 

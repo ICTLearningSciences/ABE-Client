@@ -37,10 +37,10 @@ describe('activity builder', () => {
 
         it("can edit all activities, despite ownership", ()=>{
             cyMockDefault(cy, {
-              userRole: UserRole.ADMIN
+              userRole: 'ADMIN'
             });
             visitMainPageSettled(cy)
-            roleSwitch(cy, UserRole.ADMIN)
+            roleSwitch(cy, 'ADMIN')
             cy.get("[data-cy=doc-list-item-Aliens").click()
             cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
             cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
@@ -65,7 +65,7 @@ describe('activity builder', () => {
 
           it("can delete any activity", ()=>{
             cyMockDefault(cy, {
-                userRole: UserRole.ADMIN,
+                userRole: 'ADMIN',
                 gqlQueries: [
                     mockGQL('DeleteBuiltActivity', [
                         {deleteBuiltActivity: "my-editable-activity"},
@@ -75,7 +75,7 @@ describe('activity builder', () => {
                 ]
               });
               visitMainPageSettled(cy)
-              roleSwitch(cy, UserRole.ADMIN)
+              roleSwitch(cy, 'ADMIN')
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-delete-my-editable-activity]").click()
@@ -100,18 +100,18 @@ describe('activity builder', () => {
     describe("content managers", ()=>{
         it("can see all activities", ()=>{
             cyMockDefault(cy, {
-                userRole: UserRole.CONTENT_MANAGER
+                userRole: 'CONTENT_MANAGER'
               });
               visitMainPageSettled(cy)
-              roleSwitch(cy, UserRole.CONTENT_MANAGER)
+              roleSwitch(cy, 'CONTENT_MANAGER')
         })
         
         it("can edit their own activities", ()=>{
             cyMockDefault(cy, {
-                userRole: UserRole.CONTENT_MANAGER
+                userRole: 'CONTENT_MANAGER'
               });
               visitMainPageSettled(cy)
-              roleSwitch(cy, UserRole.CONTENT_MANAGER)
+              roleSwitch(cy, 'CONTENT_MANAGER')
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
@@ -129,10 +129,10 @@ describe('activity builder', () => {
 
         it("can edit other users 'editable' set activities", ()=>{
             cyMockDefault(cy, {
-                userRole: UserRole.CONTENT_MANAGER
+                userRole: 'CONTENT_MANAGER'
               });
               visitMainPageSettled(cy)
-              roleSwitch(cy, UserRole.CONTENT_MANAGER)
+              roleSwitch(cy, 'CONTENT_MANAGER')
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-other-user-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-edit-other-user-editable-activity]").should("exist").click()
@@ -142,10 +142,10 @@ describe('activity builder', () => {
 
         it("cannot edit other users read-only activities", ()=>{
             cyMockDefault(cy, {
-                userRole: UserRole.CONTENT_MANAGER
+                userRole: 'CONTENT_MANAGER'
               });
               visitMainPageSettled(cy)
-              roleSwitch(cy, UserRole.CONTENT_MANAGER)
+              roleSwitch(cy, 'CONTENT_MANAGER')
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-edit-my-editable-activity]").click()
@@ -159,7 +159,7 @@ describe('activity builder', () => {
 
         it.only("can only delete their own activities", ()=>{
             cyMockDefault(cy, {
-                userRole: UserRole.CONTENT_MANAGER,
+                userRole: 'CONTENT_MANAGER',
                 gqlQueries: [
                     mockGQL('DeleteBuiltActivity', [
                         {deleteBuiltActivity: "my-editable-activity"},
@@ -167,7 +167,7 @@ describe('activity builder', () => {
                 ]
               });
               visitMainPageSettled(cy)
-              roleSwitch(cy, UserRole.CONTENT_MANAGER)
+              roleSwitch(cy, 'CONTENT_MANAGER')
               cy.get("[data-cy=doc-list-item-Aliens").click()
               cy.get("[data-cy=activity-item-my-editable-activity]").should("exist")
               cy.get("[data-cy=activity-item-delete-my-editable-activity]").click()
@@ -186,10 +186,10 @@ describe('activity builder', () => {
     describe("admins and content managers", ()=>{
         it("can copy activities", ()=>{
             cyMockDefault(cy, {
-                userRole: UserRole.CONTENT_MANAGER
+                userRole: 'CONTENT_MANAGER'
             });
             visitMainPageSettled(cy)
-            roleSwitch(cy, UserRole.CONTENT_MANAGER)
+            roleSwitch(cy, 'CONTENT_MANAGER')
             cy.get("[data-cy=doc-list-item-Aliens").click();
             cy.get("[data-cy=activity-item-copied-activity]").should("not.exist");
             cy.get("[data-cy=activity-item-other-user-read-only-activity]").should("exist");

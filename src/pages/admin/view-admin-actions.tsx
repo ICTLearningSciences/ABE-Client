@@ -4,9 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Button } from '@mui/material';
-import { ColumnDiv, RowDivSB } from '../../styled-components';
+
+import React from "react";
+import { Button } from "@mui/material";
+import { ColumnDiv, RowDivSB } from "../../styled-components";
 
 export interface ViewAdminActionProps {
   returnToAdminActions: () => void;
@@ -17,19 +18,19 @@ export interface ViewAdminActionProps {
 function AdminActionItem(props: {
   title: string;
   onClick: () => void;
-}): JSX.Element {
+}): React.ReactNode {
   const { title, onClick } = props;
   return (
     <RowDivSB
       style={{
-        alignItems: 'center',
+        alignItems: "center",
       }}
     >
       <h3>{title}</h3>
       <Button
         variant="outlined"
         onClick={onClick}
-        style={{ height: 'fit-content' }}
+        style={{ height: "fit-content" }}
       >
         Go
       </Button>
@@ -37,14 +38,14 @@ function AdminActionItem(props: {
   );
 }
 
-export function ViewAdminActions(props: ViewAdminActionProps): JSX.Element {
+export function ViewAdminActions(props: ViewAdminActionProps): React.ReactNode {
   return (
     <ColumnDiv
       style={{
-        width: '20%',
-        borderBottom: '1px solid black',
-        padding: '10px',
-        alignItems: 'center',
+        width: "20%",
+        borderBottom: "1px solid black",
+        padding: "10px",
+        alignItems: "center",
       }}
     >
       <h3>Admin Actions</h3>

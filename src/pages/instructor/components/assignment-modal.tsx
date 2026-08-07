@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -18,23 +19,16 @@ import {
   FormControlLabel,
   Checkbox,
   Collapse,
-} from '@mui/material';
-import {
-  Close as CloseIcon,
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
-} from '@mui/icons-material';
-import {
+} from "@mui/material";
+import { Close, ExpandMore, ExpandLess } from "@mui/icons-material";
+import type {
   Assignment,
   Section,
-} from '../../../store/slices/education-management/types';
-import { LLMSelector } from './assignment-view/llm-selector';
-import { AiServiceModel } from '../../../types';
+} from "../../../store/slices/education-management/types";
+import { LLMSelector } from "./assignment-view/llm-selector";
+import type { AiServiceModel } from "../../../types";
 
-export enum AssignmentModalMode {
-  CREATE = 'create',
-  EDIT = 'edit',
-}
+export type AssignmentModalMode = "create" | "edit";
 
 interface AssignmentModalProps {
   isOpen: boolean;
@@ -56,13 +50,13 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   isLoading = false,
 }) => {
   const [formData, setFormData] = useState<Partial<Assignment>>({
-    title: '',
-    description: '',
+    title: "",
+    description: "",
     defaultLLM: undefined,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const _initialMandatory = section.assignments.find(
-    (a) => a.assignmentId === initialData?._id
+    (a) => a.assignmentId === initialData?._id,
   )?.mandatory;
   const initialMandatory =
     _initialMandatory !== undefined ? _initialMandatory : true;
@@ -71,17 +65,17 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      if (mode === AssignmentModalMode.EDIT && initialData) {
+      if (mode === "edit" && initialData) {
         setFormData({
-          title: initialData.title || '',
-          description: initialData.description || '',
+          title: initialData.title || "",
+          description: initialData.description || "",
           defaultLLM: initialData.defaultLLM || undefined,
         });
         setMandatory(initialMandatory);
       } else {
         setFormData({
-          title: '',
-          description: '',
+          title: "",
+          description: "",
           defaultLLM: undefined,
         });
         setMandatory(initialMandatory);
@@ -95,11 +89,11 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.title?.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = "Title is required";
     }
 
     if (!formData.description?.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = "Description is required";
     }
 
     setErrors(newErrors);
@@ -114,14 +108,13 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
     }
 
     const submitData: Partial<Assignment> = {
-      title: formData.title?.trim() || '',
-      description: formData.description?.trim() || '',
-      activityIds:
-        mode === AssignmentModalMode.EDIT ? initialData?.activityIds || [] : [],
+      title: formData.title?.trim() || "",
+      description: formData.description?.trim() || "",
+      activityIds: mode === "edit" ? initialData?.activityIds || [] : [],
       defaultLLM: formData.defaultLLM || undefined,
     };
 
-    if (mode === AssignmentModalMode.EDIT && initialData) {
+    if (mode === "edit" && initialData) {
       submitData._id = initialData._id;
     }
 
@@ -138,7 +131,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
     if (errors[field]) {
       setErrors((prev) => ({
         ...prev,
-        [field]: '',
+        [field]: "",
       }));
     }
   };
@@ -157,49 +150,49 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
       maxWidth="sm"
       fullWidth
       data-cy="assignment-modal"
-      PaperProps={{
-        sx: {
-          borderRadius: 2,
-          p: 1,
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: 2,
+            p: 1,
+          },
         },
       }}
     >
       <DialogTitle
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          color: '#1B6A9C',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          color: "#1B6A9C",
           fontWeight: 600,
-          fontSize: '1.25rem',
+          fontSize: "1.25rem",
         }}
         data-cy="assignment-modal-title"
       >
-        {mode === AssignmentModalMode.CREATE
-          ? 'Create New Assignment'
-          : 'Edit Assignment'}
+        {mode === "create" ? "Create New Assignment" : "Edit Assignment"}
         <IconButton
           onClick={onClose}
           disabled={isLoading}
           size="small"
-          sx={{ color: 'grey.500' }}
+          sx={{ color: "grey.500" }}
           data-cy="assignment-modal-close-button"
         >
-          <CloseIcon />
+          <Close />
         </IconButton>
       </DialogTitle>
 
       <DialogContent
         style={{
-          display: 'flex',
-          flexDirection: 'column',
+          display: "flex",
+          flexDirection: "column",
           gap: 2,
         }}
       >
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          {mode === AssignmentModalMode.CREATE
-            ? 'Create a new assignment with activities and learning objectives. You can add activities later.'
-            : 'Update the assignment information below.'}
+          {mode === "create"
+            ? "Create a new assignment with activities and learning objectives. You can add activities later."
+            : "Update the assignment information below."}
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
@@ -208,23 +201,25 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             required
             label="Title"
             placeholder="e.g., Introduction to Variables"
-            value={formData.title || ''}
-            onChange={(e) => handleInputChange('title', e.target.value)}
+            value={formData.title || ""}
+            onChange={(e) => handleInputChange("title", e.target.value)}
             error={!!errors.title}
             helperText={errors.title}
             disabled={isLoading}
             sx={{ mb: 2.5 }}
-            InputProps={{
-              sx: {
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1B6A9C',
+            slotProps={{
+              input: {
+                sx: {
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#1B6A9C",
+                  },
                 },
               },
-            }}
-            InputLabelProps={{
-              sx: {
-                '&.Mui-focused': {
-                  color: '#1B6A9C',
+              inputLabel: {
+                sx: {
+                  "&.Mui-focused": {
+                    color: "#1B6A9C",
+                  },
                 },
               },
             }}
@@ -238,23 +233,25 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             rows={4}
             label="Description"
             placeholder="Brief description of the assignment objectives and content..."
-            value={formData.description || ''}
-            onChange={(e) => handleInputChange('description', e.target.value)}
+            value={formData.description || ""}
+            onChange={(e) => handleInputChange("description", e.target.value)}
             error={!!errors.description}
             helperText={errors.description}
             disabled={isLoading}
             sx={{ mb: 2.5 }}
-            InputProps={{
-              sx: {
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1B6A9C',
+            slotProps={{
+              input: {
+                sx: {
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#1B6A9C",
+                  },
                 },
               },
-            }}
-            InputLabelProps={{
-              sx: {
-                '&.Mui-focused': {
-                  color: '#1B6A9C',
+              inputLabel: {
+                sx: {
+                  "&.Mui-focused": {
+                    color: "#1B6A9C",
+                  },
                 },
               },
             }}
@@ -269,9 +266,9 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                   onChange={(e) => setMandatory(e.target.checked)}
                   disabled={isLoading}
                   sx={{
-                    color: '#1B6A9C',
-                    '&.Mui-checked': {
-                      color: '#1B6A9C',
+                    color: "#1B6A9C",
+                    "&.Mui-checked": {
+                      color: "#1B6A9C",
                     },
                   }}
                 />
@@ -290,11 +287,11 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             fullWidth
             variant="text"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            startIcon={showAdvanced ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            startIcon={showAdvanced ? <ExpandLess /> : <ExpandMore />}
             sx={{
-              color: '#1B6A9C',
-              textTransform: 'none',
-              justifyContent: 'flex-start',
+              color: "#1B6A9C",
+              textTransform: "none",
+              justifyContent: "flex-start",
               mb: 1,
             }}
             data-cy="assignment-modal-advanced-toggle"
@@ -318,11 +315,11 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
           disabled={isLoading}
           variant="outlined"
           sx={{
-            color: 'grey.600',
-            borderColor: 'grey.300',
-            '&:hover': {
-              borderColor: 'grey.400',
-              backgroundColor: 'grey.50',
+            color: "grey.600",
+            borderColor: "grey.300",
+            "&:hover": {
+              borderColor: "grey.400",
+              backgroundColor: "grey.50",
             },
           }}
           data-cy="assignment-modal-cancel-button"
@@ -334,18 +331,18 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
           disabled={isLoading}
           variant="contained"
           sx={{
-            backgroundColor: '#1B6A9C',
-            '&:hover': {
-              backgroundColor: '#145a87',
+            backgroundColor: "#1B6A9C",
+            "&:hover": {
+              backgroundColor: "#145a87",
             },
           }}
           data-cy="assignment-modal-submit-button"
         >
           {isLoading
-            ? 'Saving...'
-            : mode === AssignmentModalMode.CREATE
-            ? 'Create Assignment'
-            : 'Update Assignment'}
+            ? "Saving..."
+            : mode === "create"
+              ? "Create Assignment"
+              : "Update Assignment"}
         </Button>
       </DialogActions>
     </Dialog>

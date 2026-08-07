@@ -4,10 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Box, Typography, Button, Paper, IconButton } from '@mui/material';
-import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import CollapsibleTree, { TreeSection } from './collapsible-tree';
+
+import React from "react";
+import { Box, Typography, Button, Paper, IconButton } from "@mui/material";
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import CollapsibleTree, { type TreeSection } from "./collapsible-tree";
 
 interface CourseManagementSidebarProps {
   isStudent: boolean;
@@ -38,30 +39,30 @@ export const CourseManagementSidebar: React.FC<
     <Paper
       elevation={0}
       sx={{
-        width: isSidebarCollapsed ? '1vw' : '15vw',
-        backgroundColor: '#f8f9fa',
-        borderRadius: '8px 0 0 8px',
-        borderRight: '1px solid #e9ecef',
-        padding: isSidebarCollapsed ? '24px 12px' : '24px 16px',
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'width 0.3s ease-in-out, padding 0.3s ease-in-out',
+        width: isSidebarCollapsed ? "1vw" : "15vw",
+        backgroundColor: "#f8f9fa",
+        borderRadius: "8px 0 0 8px",
+        borderRight: "1px solid #e9ecef",
+        padding: isSidebarCollapsed ? "24px 12px" : "24px 16px",
+        position: "relative",
+        overflow: "hidden",
+        transition: "width 0.3s ease-in-out, padding 0.3s ease-in-out",
       }}
     >
       {/* Collapse/Expand Button */}
       <IconButton
         onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         sx={{
-          position: 'absolute',
-          top: '16px',
-          right: '8px',
+          position: "absolute",
+          top: "16px",
+          right: "8px",
           zIndex: 1,
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          backgroundColor: "rgba(255, 255, 255, 0.8)",
+          "&:hover": {
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
           },
-          width: '32px',
-          height: '32px',
+          width: "32px",
+          height: "32px",
         }}
       >
         {isSidebarCollapsed ? <ChevronRight /> : <ChevronLeft />}
@@ -71,7 +72,7 @@ export const CourseManagementSidebar: React.FC<
         sx={{
           mb: 3,
           opacity: isSidebarCollapsed ? 0 : 1,
-          transition: 'opacity 0.3s ease-in-out',
+          transition: "opacity 0.3s ease-in-out",
         }}
       >
         <Typography
@@ -79,11 +80,11 @@ export const CourseManagementSidebar: React.FC<
           data-cy="course-management-title"
           sx={{
             mb: 1,
-            color: '#1B6A9C',
+            color: "#1B6A9C",
             fontWeight: 600,
           }}
         >
-          {isStudent ? 'My Courses' : 'Course Management'}
+          {isStudent ? "My Courses" : "Course Management"}
         </Typography>
         <Typography
           variant="body2"
@@ -91,8 +92,8 @@ export const CourseManagementSidebar: React.FC<
           data-cy="course-management-description"
         >
           {isStudent
-            ? 'View your enrolled courses, sections, and assignments'
-            : 'Manage your courses, sections, and assignments'}
+            ? "View your enrolled courses, sections, and assignments"
+            : "Manage your courses, sections, and assignments"}
         </Typography>
       </Box>
 
@@ -105,11 +106,11 @@ export const CourseManagementSidebar: React.FC<
           data-cy="join-section-button"
           sx={{
             mb: 3,
-            backgroundColor: '#1B6A9C',
+            backgroundColor: "#1B6A9C",
             opacity: isSidebarCollapsed ? 0 : 1,
-            transition: 'opacity 0.3s ease-in-out',
-            '&:hover': {
-              backgroundColor: '#145a87',
+            transition: "opacity 0.3s ease-in-out",
+            "&:hover": {
+              backgroundColor: "#145a87",
             },
           }}
         >
@@ -124,11 +125,11 @@ export const CourseManagementSidebar: React.FC<
           data-cy="new-course-button"
           sx={{
             mb: 3,
-            backgroundColor: '#1B6A9C',
+            backgroundColor: "#1B6A9C",
             opacity: isSidebarCollapsed ? 0 : 1,
-            transition: 'opacity 0.3s ease-in-out',
-            '&:hover': {
-              backgroundColor: '#145a87',
+            transition: "opacity 0.3s ease-in-out",
+            "&:hover": {
+              backgroundColor: "#145a87",
             },
           }}
         >
@@ -139,22 +140,22 @@ export const CourseManagementSidebar: React.FC<
       <Box
         sx={{
           opacity: isSidebarCollapsed ? 0 : 1,
-          transition: 'opacity 0.3s ease-in-out',
+          transition: "opacity 0.3s ease-in-out",
         }}
       >
         {treeSections.length === 0 ||
         treeSections.every((section) => section.items.length === 0) ? (
           <Box
             sx={{
-              textAlign: 'center',
+              textAlign: "center",
               py: 5,
               px: 2.5,
             }}
           >
             <Typography
               sx={{
-                fontSize: '48px',
-                color: '#dee2e6',
+                fontSize: "48px",
+                color: "#dee2e6",
                 mb: 2,
               }}
             >

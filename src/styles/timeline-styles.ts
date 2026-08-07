@@ -4,11 +4,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Stepper from '@mui/material/Stepper';
-import { Paper } from '@mui/material';
-import { createGlobalStyle } from 'styled-components';
+
+import { Box, Stepper, Paper, styled } from "@mui/material";
+import { createGlobalStyle } from "styled-components";
 
 export const GlobalStyles = createGlobalStyle`
   :root {
@@ -152,40 +150,40 @@ export const GlobalStyles = createGlobalStyle`
 `;
 
 export const TimelineTestContainer = styled(Box)(() => ({
-  height: '115px',
-  position: 'absolute',
-  bottom: '0px',
-  maxWidth: '100%',
-  overflowX: 'auto',
-  overflowY: 'hidden',
-  display: 'flex',
+  height: "115px",
+  position: "absolute",
+  bottom: "0px",
+  maxWidth: "100%",
+  overflowX: "auto",
+  overflowY: "hidden",
+  display: "flex",
 }));
 
 export const TimelineBar = styled(Stepper)(() => ({
-  position: 'absolute',
-  display: 'flex',
-  bottom: '60px',
-  left: '0px',
-  height: '15px',
+  position: "absolute",
+  display: "flex",
+  bottom: "60px",
+  left: "0px",
+  height: "15px",
 }));
 
-export const TimelineItemTest = styled('div')(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginRight: '10px',
-  justifyContent: 'center',
-  alignItems: 'center',
+export const TimelineItemTest = styled("div")(() => ({
+  display: "flex",
+  flexDirection: "column",
+  marginRight: "10px",
+  justifyContent: "center",
+  alignItems: "center",
 }));
 
 export const TimelineFooterItemCard = styled(Paper, {
-  shouldForwardProp: (prop) => prop !== 'hovered',
+  shouldForwardProp: (prop) => prop !== "hovered",
 })<{ hovered?: boolean }>(({ hovered }) => ({
-  minWidth: hovered ? '150px' : '140px',
-  padding: hovered ? '2px 10px !important' : '2px 0px !important',
-  backgroundColor: 'var(--timeline-bg) !important',
-  boxShadow: 'var(--content-shadow) !important',
-  borderRadius: '15px !important',
+  minWidth: hovered ? "150px" : "140px",
+  padding: hovered ? "2px 10px !important" : "2px 0px !important",
+  backgroundColor: "var(--timeline-bg) !important",
+  boxShadow: "var(--content-shadow) !important",
+  borderRadius: "15px !important",
   zIndex: 100,
-  transition: 'min-width 0.9s ease, padding 0.9s ease, opacity 0.9s ease',
+  transition: "min-width 0.9s ease, padding 0.9s ease, opacity 0.9s ease",
   opacity: 1,
 }));

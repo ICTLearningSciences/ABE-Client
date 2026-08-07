@@ -4,28 +4,29 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+
 import {
   courseManagementUrl,
   studentCoursesUrl,
-} from '../pages/instructor/course-management';
-import { freeDocEditingNavPath } from '../App';
+} from "../pages/instructor/course-management";
+import { freeDocEditingNavPath } from "../App";
 
 export function useWithPath() {
-  const path = typeof window !== 'undefined' ? window.location.pathname : '';
-  const isOnLoginPage = typeof window !== 'undefined' && path == '/';
+  const path = typeof window !== "undefined" ? window.location.pathname : "";
+  const isOnLoginPage = typeof window !== "undefined" && path == "/";
   const isOnDocsPage =
-    typeof window !== 'undefined' && path.includes(freeDocEditingNavPath);
+    typeof window !== "undefined" && path.includes(freeDocEditingNavPath);
   const isOnCourseManagementPage =
-    typeof window !== 'undefined' && path.includes(courseManagementUrl);
+    typeof window !== "undefined" && path.includes(courseManagementUrl);
   const isOnStudentCoursesPage =
-    typeof window !== 'undefined' && path.includes(studentCoursesUrl);
+    typeof window !== "undefined" && path.includes(studentCoursesUrl);
   const defaultHome = isOnDocsPage
     ? freeDocEditingNavPath
     : isOnCourseManagementPage
-    ? courseManagementUrl
-    : isOnStudentCoursesPage
-    ? studentCoursesUrl
-    : '/';
+      ? courseManagementUrl
+      : isOnStudentCoursesPage
+        ? studentCoursesUrl
+        : "/";
   return {
     path,
     isOnLoginPage,

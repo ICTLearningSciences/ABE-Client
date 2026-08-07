@@ -4,17 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { useWithLogin } from '../../store/slices/login/use-with-login';
-import { Button, Box, Typography, Paper, Stack } from '@mui/material';
-import { useWithConfig } from '../../exported-files';
-import { AdminControls } from './admin-controls';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import GoToEducationDashboardButton from './go-to-education-dashboard-button';
-import { UserRole } from '../../store/slices/login';
-import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 
-export function UserInfoSettings(): JSX.Element {
+import React from "react";
+import { Button, Box, Typography, Paper, Stack } from "@mui/material";
+import { Assignment } from "@mui/icons-material";
+import { useWithLogin } from "../../store/slices/login/use-with-login";
+import { useWithConfig } from "../../exported-files";
+import { AdminControls } from "./admin-controls";
+import GoToEducationDashboardButton from "./go-to-education-dashboard-button";
+import { useNavigateWithParams } from "../../hooks/use-navigate-with-params";
+
+export function UserInfoSettings(): React.ReactNode {
   const { state } = useWithLogin();
   const { state: configState } = useWithConfig();
   const navigate = useNavigateWithParams();
@@ -27,7 +27,7 @@ export function UserInfoSettings(): JSX.Element {
     configState.config?.surveyConfig?.surveyClassroomParam;
 
   function takeSurvey() {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
     if (surveyUrl) {
@@ -38,7 +38,7 @@ export function UserInfoSettings(): JSX.Element {
       if (classroomCode?.code && surveyClassroomParam) {
         url.searchParams.set(surveyClassroomParam, classroomCode?.code);
       }
-      window.open(url.toString(), '_blank');
+      window.open(url.toString(), "_blank");
     }
   }
 
@@ -46,12 +46,12 @@ export function UserInfoSettings(): JSX.Element {
     <Box
       data-cy="user-info-settings"
       sx={{
-        height: '100%',
+        height: "100%",
         p: 3,
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
         gap: 3,
-        overflowY: 'auto',
+        overflowY: "auto",
       }}
     >
       {/* User Profile Section */}
@@ -67,8 +67,8 @@ export function UserInfoSettings(): JSX.Element {
       )}
 
       {/* Admin Controls Section */}
-      {(state.user?.userRole === UserRole.ADMIN ||
-        state.user?.userRole === UserRole.CONTENT_MANAGER) && (
+      {(state.user?.userRole === "ADMIN" ||
+        state.user?.userRole === "CONTENT_MANAGER") && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
             Admin Settings
@@ -77,7 +77,7 @@ export function UserInfoSettings(): JSX.Element {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => navigate('/admin')}
+            onClick={() => navigate("/admin")}
             fullWidth
           >
             Manage Users
@@ -97,7 +97,7 @@ export function UserInfoSettings(): JSX.Element {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => navigate('/shark-tank')}
+              onClick={() => navigate("/shark-tank")}
               fullWidth
             >
               Shark Tank Panel
@@ -116,7 +116,7 @@ export function UserInfoSettings(): JSX.Element {
             variant="contained"
             color="primary"
             onClick={takeSurvey}
-            startIcon={<AssignmentIcon />}
+            startIcon={<Assignment />}
             fullWidth
           >
             Take Survey

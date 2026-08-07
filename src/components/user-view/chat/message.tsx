@@ -1,41 +1,43 @@
-import React from 'react';
-import { Button } from '@mui/material';
-import { DEFAULT_COLOR_THEME } from '../../../constants';
-import {
-  ChatMessageTypes,
-  MessageDisplayType,
-  Sender,
-} from '../../../store/slices/chat';
-import { useAppSelector } from '../../../store/hooks';
-import { UserRole } from '../../../store/slices/login';
-import { useEffect, useState } from 'react';
-import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
-import { StyledFadingText } from './message-styles';
-import ReactMarkdown from 'react-markdown';
-import './message.css';
-import remarkBreaks from 'remark-breaks';
-import rehypeRaw from 'rehype-raw';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import React, { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
+import rehypeRaw from "rehype-raw";
+import { Button } from "@mui/material";
+import { DEFAULT_COLOR_THEME } from "../../../constants";
+import type { ChatMessageTypes } from "../../../store/slices/chat";
+import { useAppSelector } from "../../../store/hooks";
+import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-types";
+import { StyledFadingText } from "./message-styles";
+
+import "./message.css";
 
 const baseMessageStyle: React.CSSProperties = {
-  borderRadius: '1rem',
-  padding: '1rem',
+  borderRadius: "1rem",
+  padding: "1rem",
   margin: 5,
-  maxWidth: '70%',
-  maxInlineSize: '70%',
-  whiteSpace: 'pre-wrap',
-  overflowWrap: 'break-word',
+  maxWidth: "70%",
+  maxInlineSize: "70%",
+  whiteSpace: "pre-wrap",
+  overflowWrap: "break-word",
 };
 
 export function DisplayOpenAiInfoButton(props: {
   chatMessage: ChatMessageTypes;
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
-}): JSX.Element {
+}): React.ReactNode {
   const { chatMessage, setAiInfoToDisplay } = props;
   const userRole = useAppSelector((state) => state.login.userRole);
   const showAdvancedOptions = useAppSelector(
-    (state) => state.state.viewingAdvancedOptions
+    (state) => state.state.viewingAdvancedOptions,
   );
-  const isAdmin = userRole === UserRole.ADMIN;
+  const isAdmin = userRole === "ADMIN";
   if (!chatMessage.aiServiceStepData || !isAdmin || !showAdvancedOptions) {
     return <></>;
   }
@@ -55,27 +57,27 @@ export const FadingText: React.FC<{ strings: string[]; time?: number }> = ({
   time,
 }) => {
   const [currentStringIndex, setCurrentStringIndex] = useState(0);
-  const [fadeState, setFadeState] = useState<'fading-out' | 'fading-in'>(
-    'fading-in'
+  const [fadeState, setFadeState] = useState<"fading-out" | "fading-in">(
+    "fading-in",
   );
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      setFadeState('fading-out');
+      setFadeState("fading-out");
     }, time || 3000); // Change the duration as needed
     return () => clearTimeout(timeoutId);
   }, [currentStringIndex]);
 
   useEffect(() => {
-    if (fadeState === 'fading-out') {
+    if (fadeState === "fading-out") {
       const timeoutId = setTimeout(
         () => {
           setCurrentStringIndex(
-            (prevIndex) => (prevIndex + 1) % strings.length
+            (prevIndex) => (prevIndex + 1) % strings.length,
           );
-          setFadeState('fading-in');
+          setFadeState("fading-in");
         },
-        time ? time / 3 : 1000
+        time ? time / 3 : 1000,
       ); // Adjust the delay before fading in the next string
       return () => clearTimeout(timeoutId);
     }
@@ -83,8 +85,8 @@ export const FadingText: React.FC<{ strings: string[]; time?: number }> = ({
 
   return (
     <StyledFadingText
-      isFadingIn={fadeState === 'fading-in'}
-      isFadingOut={fadeState === 'fading-out'}
+      isFadingIn={fadeState === "fading-in"}
+      isFadingOut={fadeState === "fading-out"}
     >
       {strings[currentStringIndex]}
     </StyledFadingText>
@@ -96,21 +98,21 @@ export default function Message(props: {
   setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
   messageIndex: number;
   displayMarkdown: boolean;
-}): JSX.Element {
+}): React.ReactNode {
   const config = useAppSelector((state) => state.config);
   const colorTheme = config.config?.colorTheme || DEFAULT_COLOR_THEME;
   const { message, setAiInfoToDisplay, messageIndex, displayMarkdown } = props;
   const backgroundColor =
-    message.sender === Sender.USER
+    message.sender === "USER"
       ? colorTheme.chatUserBubbleColor
       : colorTheme.chatSystemBubbleColor;
-  const alignSelf = message.sender === Sender.USER ? 'flex-end' : 'flex-start';
+  const alignSelf = message.sender === "USER" ? "flex-end" : "flex-start";
   const textColor =
-    message.sender === Sender.USER
+    message.sender === "USER"
       ? colorTheme.chatUserTextColor
       : colorTheme.chatSystemTextColor;
 
-  if (message.message === '') {
+  if (message.message === "") {
     return <></>;
   }
 
@@ -121,7 +123,7 @@ export default function Message(props: {
     // \n\n\n\n = paragraph break + 2 <br /> (3 blank lines), etc.
     return message.replace(/\n{3,}/g, (match) => {
       const extraNewlines = match.length - 2;
-      return '\n\n' + '<br />'.repeat(extraNewlines);
+      return "\n\n" + "<br />".repeat(extraNewlines);
     });
   }
 
@@ -140,10 +142,10 @@ export default function Message(props: {
       {message.systemCustomName && (
         <div
           style={{
-            fontWeight: 'bold',
-            marginBottom: '0.5rem',
+            fontWeight: "bold",
+            marginBottom: "0.5rem",
             borderBottom: `1px solid ${textColor}40`,
-            paddingBottom: '0.25rem',
+            paddingBottom: "0.25rem",
           }}
         >
           {message.systemCustomName}
@@ -156,38 +158,38 @@ export default function Message(props: {
           components={{
             h1: ({ children }) => (
               <h1
-                style={{ marginTop: '0', marginBottom: '0', lineHeight: '1' }}
+                style={{ marginTop: "0", marginBottom: "0", lineHeight: "1" }}
               >
                 {children}
               </h1>
             ),
             h2: ({ children }) => (
-              <h2 style={{ marginTop: '0', marginBottom: '0' }}>{children}</h2>
+              <h2 style={{ marginTop: "0", marginBottom: "0" }}>{children}</h2>
             ),
             h3: ({ children }) => (
-              <h3 style={{ marginTop: '0', marginBottom: '0' }}>{children}</h3>
+              <h3 style={{ marginTop: "0", marginBottom: "0" }}>{children}</h3>
             ),
             h4: ({ children }) => (
-              <h4 style={{ marginTop: '0', marginBottom: '0' }}>{children}</h4>
+              <h4 style={{ marginTop: "0", marginBottom: "0" }}>{children}</h4>
             ),
             h5: ({ children }) => (
-              <h5 style={{ marginTop: '0', marginBottom: '0' }}>{children}</h5>
+              <h5 style={{ marginTop: "0", marginBottom: "0" }}>{children}</h5>
             ),
             h6: ({ children }) => (
-              <h6 style={{ marginTop: '0', marginBottom: '0' }}>{children}</h6>
+              <h6 style={{ marginTop: "0", marginBottom: "0" }}>{children}</h6>
             ),
             p: ({ children }) => (
-              <p style={{ marginTop: '0', marginBottom: '0', lineHeight: '1' }}>
+              <p style={{ marginTop: "0", marginBottom: "0", lineHeight: "1" }}>
                 {children}
               </p>
             ),
             li: ({ children }) => (
               <li
                 style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  marginTop: '0',
-                  marginBottom: '0',
+                  display: "flex",
+                  alignItems: "baseline",
+                  marginTop: "0",
+                  marginBottom: "0",
                 }}
               >
                 {children}
@@ -196,10 +198,10 @@ export default function Message(props: {
             ul: ({ children }) => (
               <ul
                 style={{
-                  marginTop: '0',
-                  marginBottom: '0',
-                  lineHeight: '1',
-                  paddingLeft: '10px',
+                  marginTop: "0",
+                  marginBottom: "0",
+                  lineHeight: "1",
+                  paddingLeft: "10px",
                 }}
               >
                 {children}
@@ -208,10 +210,10 @@ export default function Message(props: {
             ol: ({ children }) => (
               <ol
                 style={{
-                  marginTop: '0',
-                  marginBottom: '0',
-                  lineHeight: '1',
-                  paddingLeft: '10px',
+                  marginTop: "0",
+                  marginBottom: "0",
+                  lineHeight: "1",
+                  paddingLeft: "10px",
                 }}
               >
                 {children}
@@ -219,21 +221,17 @@ export default function Message(props: {
             ),
           }}
         >
-          {message.displayType === MessageDisplayType.TEXT
+          {message.displayType === "TEXT"
             ? formatMessage(message.message).trim()
-            : ''}
+            : ""}
         </ReactMarkdown>
       )}
       {!displayMarkdown && (
-        <span>
-          {message.displayType === MessageDisplayType.TEXT
-            ? message.message
-            : ''}
-        </span>
+        <span>{message.displayType === "TEXT" ? message.message : ""}</span>
       )}
-      {message.displayType === MessageDisplayType.PENDING_MESSAGE && (
+      {message.displayType === "PENDING_MESSAGE" && (
         <FadingText
-          strings={['Reading...', 'Analyzing...', 'Thinking carefully...']}
+          strings={["Reading...", "Analyzing...", "Thinking carefully..."]}
         />
       )}
       <DisplayOpenAiInfoButton

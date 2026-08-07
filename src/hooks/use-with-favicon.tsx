@@ -4,12 +4,13 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect } from 'react';
-import { useWithConfig } from '../store/slices/config/use-with-config';
+
+import { useEffect } from "react";
+import { useWithConfig } from "../store/slices/config/use-with-config";
 
 export function useWithFavicon() {
   const config = useWithConfig();
-  const orgName = config.state.config?.orgName || 'abe';
+  const orgName = config.state.config?.orgName || "abe";
   const configLoaded = config.isConfigLoaded();
 
   useEffect(() => {
@@ -26,15 +27,15 @@ export function useWithFavicon() {
     });
 
     // Add new favicon
-    const link = document.createElement('link');
-    link.id = 'favicon';
-    link.rel = 'icon';
+    const link = document.createElement("link");
+    link.id = "favicon";
+    link.rel = "icon";
     link.href = `/${orgName}-favicon.ico`;
     document.head.appendChild(link);
 
     return () => {
       // Cleanup on unmount
-      const favicon = document.getElementById('favicon');
+      const favicon = document.getElementById("favicon");
       if (favicon && favicon.parentNode) {
         favicon.parentNode.removeChild(favicon);
       }

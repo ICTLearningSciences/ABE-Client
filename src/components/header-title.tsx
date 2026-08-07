@@ -4,30 +4,31 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { useAppSelector } from '../store/hooks';
-import { RowDiv } from '../styled-components';
 
-export const DEFAULT_HEADER_TITLE = 'USC Center for Generative AI and Society';
+import React from "react";
+import { useAppSelector } from "../store/hooks";
+import { RowDiv } from "../styled-components";
 
-export function HeaderTitle(): JSX.Element {
+export const DEFAULT_HEADER_TITLE = "USC Center for Generative AI and Society";
+
+export function HeaderTitle(): React.ReactNode {
   const config = useAppSelector((state) => state.config);
   const title = config.config?.headerTitle || DEFAULT_HEADER_TITLE;
-  const goldTitleWord = title.split(' ').length > 0 ? title.split(' ')[0] : '';
+  const goldTitleWord = title.split(" ").length > 0 ? title.split(" ")[0] : "";
   const restOfTitle =
-    title.split(' ').length > 1 ? title.split(' ').slice(1).join(' ') : '';
+    title.split(" ").length > 1 ? title.split(" ").slice(1).join(" ") : "";
   return (
     <RowDiv
       style={{
-        height: '100%',
-        fontSize: '2.5vw',
-        fontFamily: 'serif',
+        height: "100%",
+        fontSize: "2.5vw",
+        fontFamily: "serif",
       }}
     >
       <div
         style={{
-          color: 'gold',
-          marginRight: '5px',
+          color: "gold",
+          marginRight: "5px",
         }}
       >
         {goldTitleWord}

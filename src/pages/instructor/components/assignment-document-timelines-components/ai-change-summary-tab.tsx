@@ -4,8 +4,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Typography } from '@mui/material';
+
+import React from "react";
+import { Typography } from "@mui/material";
 
 interface AiChangeSummaryTabProps {
   changeSummary: string;
@@ -16,7 +17,7 @@ export const AiChangeSummaryTab: React.FC<AiChangeSummaryTabProps> = ({
 }) => {
   if (!changeSummary) {
     return (
-      <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>
+      <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
         No AI change summary available
       </Typography>
     );
@@ -27,7 +28,7 @@ export const AiChangeSummaryTab: React.FC<AiChangeSummaryTabProps> = ({
       data-cy="ai-change-summary-container"
       variant="body2"
       sx={{
-        whiteSpace: 'pre-wrap',
+        whiteSpace: "pre-wrap",
         lineHeight: 1.6,
         padding: 0,
       }}

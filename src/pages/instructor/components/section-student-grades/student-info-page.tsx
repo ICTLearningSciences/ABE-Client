@@ -1,19 +1,22 @@
-import React from 'react';
-import { AssignmentsInSection } from '../../helpers';
-import {
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { Box, Typography, Stack, Divider, Button } from "@mui/material";
+import { Block, ArrowBack } from "@mui/icons-material";
+import type { AssignmentsInSection } from "../../helpers";
+import type {
   SectionStudentsProgress,
   UseWithEducationalManagement,
-} from '../../../../store/slices/education-management/use-with-educational-management';
-import {
+} from "../../../../store/slices/education-management/use-with-educational-management";
+import type {
   Section,
   StudentData,
-} from '../../../../store/slices/education-management/types';
-import {
-  Block as BanIcon,
-  ArrowBack as ArrowBackIcon,
-} from '@mui/icons-material';
-import { Box, Typography, Stack, Divider, Button } from '@mui/material';
-import { StudentAssignmentsSection } from './student-assignments-section';
+} from "../../../../store/slices/education-management/types";
+import { StudentAssignmentsSection } from "./student-assignments-section";
 
 export function StudentInfoPage(props: {
   selectedStudent: StudentData;
@@ -45,24 +48,22 @@ export function StudentInfoPage(props: {
     onViewStudentTimelines(selectedStudent.userId, assignmentId);
   };
   return (
-    <Box sx={{ p: 3, width: '80%' }}>
+    <Box sx={{ p: 3, width: "80%" }}>
       <Button
-        startIcon={<ArrowBackIcon />}
+        startIcon={<ArrowBack />}
         onClick={onBackToSection}
-        sx={{ mb: 2, color: 'text.secondary' }}
+        sx={{ mb: 2, color: "text.secondary" }}
       >
         Back to Students
       </Button>
       <Stack
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 3 }}
+        sx={{ mb: 3, alignItems: "center", justifyContent: "space-between" }}
       >
         <Box>
           <Typography
             variant="h5"
-            sx={{ fontWeight: 600, color: 'text.primary' }}
+            sx={{ fontWeight: 600, color: "text.primary" }}
           >
             {selectedStudent.name}
           </Typography>
@@ -122,21 +123,21 @@ export function StudentInfoPage(props: {
       <Box
         sx={{
           mb: 3,
-          display: 'flex',
+          display: "flex",
           gap: 2,
-          justifyContent: 'center',
-          flexWrap: 'wrap',
+          justifyContent: "center",
+          flexWrap: "wrap",
         }}
       >
         <Button
           variant="contained"
-          startIcon={<BanIcon />}
+          startIcon={<Block />}
           onClick={() => handleBanStudent(selectedStudent.userId)}
           disabled={educationManagement.isSectionModifying}
           sx={{
-            backgroundColor: '#d32f2f',
-            '&:hover': {
-              backgroundColor: '#c62828',
+            backgroundColor: "#d32f2f",
+            "&:hover": {
+              backgroundColor: "#c62828",
             },
             fontWeight: 600,
             px: 3,

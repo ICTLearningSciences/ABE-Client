@@ -4,11 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { UserAccessToken } from '../types';
-import { execGql, userDataQuery } from './api';
+
+import type { UserAccessToken } from "../types";
+import { execGql, userDataQuery } from "./api";
 
 export async function loginAmazonCognito(
-  idToken: string
+  idToken: string,
 ): Promise<UserAccessToken> {
   return await execGql<UserAccessToken>(
     {
@@ -28,10 +29,10 @@ export async function loginAmazonCognito(
     },
     // login responds with set-cookie, w/o withCredentials it doesnt get stored
     {
-      dataPath: 'loginAmazonCognito',
+      dataPath: "loginAmazonCognito",
       axiosConfig: {
         withCredentials: true,
       },
-    }
+    },
   );
 }

@@ -5,32 +5,32 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { ColorThemeConfig } from './types';
+import type { ColorThemeConfig } from "./types";
 
-export const LS_GOOGLE_DOC_IDS_KEY = 'LS_GOOGLE_DOC_IDS_KEY';
+export const LS_GOOGLE_DOC_IDS_KEY = "LS_GOOGLE_DOC_IDS_KEY";
 
-export const URL_PARAM_NEW_DOC = 'newDoc';
+export const URL_PARAM_NEW_DOC = "newDoc";
 
-export const BLUE_HEX = '#1B6A9C';
-export const DARK_BLUE_HEX = '#42A5F5';
-export const LIGHT_BLUE_HEX = '#a6e3ff';
+export const BLUE_HEX = "#1B6A9C";
+export const DARK_BLUE_HEX = "#42A5F5";
+export const LIGHT_BLUE_HEX = "#a6e3ff";
 
 export const DEFAULT_COLOR_THEME: ColorThemeConfig = {
   headerColor: BLUE_HEX,
   headerButtonsColor: LIGHT_BLUE_HEX,
   chatSystemBubbleColor: DARK_BLUE_HEX,
-  chatSystemTextColor: 'white',
+  chatSystemTextColor: "white",
   chatUserBubbleColor: LIGHT_BLUE_HEX,
-  chatUserTextColor: 'black',
+  chatUserTextColor: "black",
 };
 
-export const LOADING_NAME = 'Loading';
+export const LOADING_NAME = "Loading";
 
 export const MOBILE_CUTOFF_SIZE = 1300;
 
-export const FREE_INPUT_GOAL_ID = '65823a8799045156193339b2';
+export const FREE_INPUT_GOAL_ID = "65823a8799045156193339b2";
 
-export const STRONGER_HOOK_ID = '658230f699045156193339ac';
-export const STRONGER_CONCLUSION_ID = '66144d071e930b07906a7833';
-export const LIMITS_TO_YOUR_ARGUMENT_ID = '6619c3fe9965e7b71fd2f215';
-export const THESIS_SUPPORT_ID = '6616fe864eba4870d62f3f3c';
+export const STRONGER_HOOK_ID = "658230f699045156193339ac";
+export const STRONGER_CONCLUSION_ID = "66144d071e930b07906a7833";
+export const LIMITS_TO_YOUR_ARGUMENT_ID = "6619c3fe9965e7b71fd2f215";
+export const THESIS_SUPPORT_ID = "6616fe864eba4870d62f3f3c";

@@ -4,16 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Box, Typography, List, Card, Stack } from '@mui/material';
-import {
+
+import React from "react";
+import { Box, Typography, List, Card, Stack } from "@mui/material";
+import type {
   Section,
   StudentData,
   Assignment,
-} from '../../../../store/slices/education-management/types';
-import { SectionStudentsProgress } from '../../../../store/slices/education-management/use-with-educational-management';
-import { getAssignmentsInSection } from '../../helpers';
-import { StudentListItem } from './student-list-item';
+} from "../../../../store/slices/education-management/types";
+import type { SectionStudentsProgress } from "../../../../store/slices/education-management/use-with-educational-management";
+import { getAssignmentsInSection } from "../../helpers";
+import { StudentListItem } from "./student-list-item";
 
 interface SectionStudentsGradesProps {
   sectionStudentsProgress: SectionStudentsProgress;
@@ -35,10 +36,10 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
     if (!studentProgress) return { requiredCompleted: 0, optionalCompleted: 0 };
 
     const requiredCompleted = Object.values(
-      studentProgress.requiredAssignmentsProgress
+      studentProgress.requiredAssignmentsProgress,
     ).filter(Boolean).length;
     const optionalCompleted = Object.values(
-      studentProgress.optionalAssignmentsProgress
+      studentProgress.optionalAssignmentsProgress,
     ).filter(Boolean).length;
 
     return { requiredCompleted, optionalCompleted };
@@ -55,21 +56,21 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
       <Box>
         <Typography
           variant="h5"
-          sx={{ fontWeight: 600, color: 'text.primary', mb: 3 }}
+          sx={{ fontWeight: 600, color: "text.primary", mb: 3 }}
         >
           Students and Grades
         </Typography>
         <Card
           variant="outlined"
           sx={{
-            border: '2px dashed',
-            borderColor: 'grey.300',
-            textAlign: 'center',
+            border: "2px dashed",
+            borderColor: "grey.300",
+            textAlign: "center",
             py: 5,
             px: 2.5,
           }}
         >
-          <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
+          <Typography sx={{ fontSize: "48px", color: "grey.300", mb: 2 }}>
             👥
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
@@ -87,23 +88,21 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
     <Box>
       <Stack
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 3 }}
+        sx={{ mb: 3, alignItems: "center", justifyContent: "space-between" }}
       >
         <Typography
           variant="h5"
-          sx={{ fontWeight: 600, color: 'text.primary' }}
+          sx={{ fontWeight: 600, color: "text.primary" }}
         >
           Students and Grades
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {Object.keys(sectionStudentsProgress).length} student
-          {Object.keys(sectionStudentsProgress).length !== 1 ? 's' : ''}
+          {Object.keys(sectionStudentsProgress).length !== 1 ? "s" : ""}
         </Typography>
       </Stack>
 
-      <Box sx={{ width: '100%' }}>
+      <Box sx={{ width: "100%" }}>
         {/* Traditional Student List */}
         <List sx={{ mb: 3 }}>
           {Object.entries(sectionStudentsProgress).map(
@@ -118,9 +117,9 @@ const SectionStudentsGrades: React.FC<SectionStudentsGradesProps> = ({
                 optionalCompleted,
                 assignmentsInSection,
                 handleStudentClick,
-                section.numOptionalAssignmentsRequired
+                section.numOptionalAssignmentsRequired,
               );
-            }
+            },
           )}
         </List>
       </Box>

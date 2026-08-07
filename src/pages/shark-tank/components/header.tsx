@@ -5,18 +5,18 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import React from 'react';
-import { Button, Divider, Menu, MenuItem, Typography } from '@mui/material';
+import React from "react";
+import { Button, Divider, Menu, MenuItem, Typography } from "@mui/material";
 import {
   AccountCircleOutlined,
   Home,
   KeyboardArrowRight,
-} from '@mui/icons-material';
-import { useNavigateWithParams } from '../../../hooks/use-navigate-with-params';
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { logout } from '../../../store/slices/login';
+} from "@mui/icons-material";
+import { useNavigateWithParams } from "../../../hooks/use-navigate-with-params";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { logout } from "../../../store/slices/login";
 
-import sharkIcon from '../../../static-images/shark-icon.png';
+import sharkIcon from "../../../static-images/shark-icon.png";
 
 export function Header(props: { title?: string }) {
   const dispatch = useAppDispatch();
@@ -39,14 +39,14 @@ export function Header(props: { title?: string }) {
   return (
     <header
       className="row center-div header"
-      style={{ position: 'fixed', top: 0, justifyContent: 'space-between' }}
+      style={{ position: "fixed", top: 0, justifyContent: "space-between" }}
     >
       <div className="row center-div" style={{ marginLeft: 10 }}>
         <Button
           color="inherit"
-          style={{ fontWeight: 'bold' }}
+          style={{ fontWeight: "bold" }}
           startIcon={<img src={sharkIcon} width={28} height={28} />}
-          onClick={() => navigate('/shark-tank')}
+          onClick={() => navigate("/shark-tank")}
         >
           Shark Tank
         </Button>
@@ -67,7 +67,7 @@ export function Header(props: { title?: string }) {
         <Button
           color="inherit"
           startIcon={<Home />}
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
         >
           ABE
         </Button>

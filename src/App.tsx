@@ -4,66 +4,66 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import AdminView from './pages/admin/admin-view';
-import Login from './pages/login/login';
-import { Provider } from 'react-redux';
-import { store } from './store/store';
-import Header from './components/header/header';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import DocView from './components/doc-view';
-import { useWithLogin } from './store/slices/login/use-with-login';
-import { useReduxHydration } from './use-redux-hydration';
-import { useConfigLoader } from './components/config-loading/use-config-loader';
-import DocHistoryContainer from './components/user-view/document-timeline/doc-history-container';
-import { useWithFavicon } from './hooks/use-with-favicon';
+
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import {
-  AuthProviderProps,
+  type AuthProviderProps,
   AuthProvider as CognitoAuthProvider,
-} from 'react-oidc-context';
-import CourseManagement from './pages/instructor/course-management';
+} from "react-oidc-context";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+import AdminView from "./pages/admin/admin-view";
+import Login from "./pages/login/login";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
+import Header from "./components/header/header";
+import DocView from "./components/doc-view";
+import { useWithLogin } from "./store/slices/login/use-with-login";
+import { useReduxHydration } from "./use-redux-hydration";
+import { useConfigLoader } from "./components/config-loading/use-config-loader";
+import DocHistoryContainer from "./components/user-view/document-timeline/doc-history-container";
+import { useWithFavicon } from "./hooks/use-with-favicon";
+import CourseManagement from "./pages/instructor/course-management";
 import {
   courseManagementUrl,
   studentCoursesUrl,
-} from './pages/instructor/course-management';
-import { EducationalRole } from './types';
-import { useWithRouteChangeRerender } from './hooks/use-with-route-change-rerender';
-import SharkTankSetup from './pages/shark-tank/shark-tank-setup';
-import SharkTankChat from './pages/shark-tank/shark-tank-chat';
-import './App.css';
-import AdminManageUsers from './pages/admin/manage-users';
+} from "./pages/instructor/course-management";
+import { useWithRouteChangeRerender } from "./hooks/use-with-route-change-rerender";
+import SharkTankSetup from "./pages/shark-tank/shark-tank-setup";
+import SharkTankChat from "./pages/shark-tank/shark-tank-chat";
+import AdminManageUsers from "./pages/admin/manage-users";
+import "./App.css";
 
-export const freeDocEditingNavPath = '/docs';
+export const freeDocEditingNavPath = "/docs";
 
 const sharkTankTheme = createTheme({
   palette: {
     primary: {
-      main: '#5c8a69',
-      light: '#79a075',
+      main: "#5c8a69",
+      light: "#79a075",
     },
     secondary: {
-      main: '#dfd79f',
+      main: "#dfd79f",
     },
   },
 });
 
 function MainApp() {
-  const MAIN_APP_HEIGHT = '94vh';
+  const MAIN_APP_HEIGHT = "94vh";
   const useLogin = useWithLogin();
   const { stateCounter } = useWithRouteChangeRerender();
 
   const courseNavPath =
-    useLogin.state.user?.educationalRole === EducationalRole.INSTRUCTOR
+    useLogin.state.user?.educationalRole === "INSTRUCTOR"
       ? courseManagementUrl
-      : useLogin.state.user?.educationalRole === EducationalRole.STUDENT
-      ? studentCoursesUrl
-      : '';
+      : useLogin.state.user?.educationalRole === "STUDENT"
+        ? studentCoursesUrl
+        : "";
 
   const router = createBrowserRouter([
     {
-      path: '/',
+      path: "/",
       element: (
         <>
           <Header
@@ -73,11 +73,11 @@ function MainApp() {
           />
           <div
             style={{
-              width: '100%',
+              width: "100%",
               height: MAIN_APP_HEIGHT,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <Login useLogin={useLogin} />
@@ -86,7 +86,7 @@ function MainApp() {
       ),
     },
     {
-      path: '/docs',
+      path: "/docs",
       element: (
         <>
           <Header
@@ -96,11 +96,11 @@ function MainApp() {
           />
           <div
             style={{
-              width: '100%',
+              width: "100%",
               height: MAIN_APP_HEIGHT,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <AdminView />
@@ -109,7 +109,7 @@ function MainApp() {
       ),
     },
     {
-      path: '/docs/:docId',
+      path: "/docs/:docId",
       element: (
         <>
           <Header
@@ -119,11 +119,11 @@ function MainApp() {
           />
           <div
             style={{
-              width: '100%',
+              width: "100%",
               height: MAIN_APP_HEIGHT,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <DocView />
@@ -132,7 +132,7 @@ function MainApp() {
       ),
     },
     {
-      path: '/docs/history/:docId',
+      path: "/docs/history/:docId",
       element: <DocHistoryContainer useLogin={useLogin} />,
     },
     {
@@ -146,14 +146,14 @@ function MainApp() {
           />
           <div
             style={{
-              width: '100%',
+              width: "100%",
               height: MAIN_APP_HEIGHT,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <CourseManagement userRole={EducationalRole.INSTRUCTOR} />
+            <CourseManagement userRole={"INSTRUCTOR"} />
           </div>
         </>
       ),
@@ -169,20 +169,20 @@ function MainApp() {
           />
           <div
             style={{
-              width: '100%',
+              width: "100%",
               height: MAIN_APP_HEIGHT,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <CourseManagement userRole={EducationalRole.STUDENT} />
+            <CourseManagement userRole={"STUDENT"} />
           </div>
         </>
       ),
     },
     {
-      path: '/shark-tank',
+      path: "/shark-tank",
       element: (
         <>
           <ThemeProvider theme={sharkTankTheme}>
@@ -192,7 +192,7 @@ function MainApp() {
       ),
     },
     {
-      path: '/shark-tank/chat',
+      path: "/shark-tank/chat",
       element: (
         <>
           <ThemeProvider theme={sharkTankTheme}>
@@ -202,7 +202,7 @@ function MainApp() {
       ),
     },
     {
-      path: '/admin',
+      path: "/admin",
       element: (
         <>
           <Header
@@ -212,11 +212,11 @@ function MainApp() {
           />
           <div
             style={{
-              width: '100%',
+              width: "100%",
               height: MAIN_APP_HEIGHT,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <AdminManageUsers />
@@ -235,17 +235,17 @@ function MainApp() {
 }
 
 function App() {
-  const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '123';
+  const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "123";
   const cognitoAuthConfig: AuthProviderProps = {
-    authority: process.env.REACT_APP_COGNITO_AUTHORITY || '',
-    client_id: process.env.REACT_APP_COGNITO_CLIENT_ID || '',
-    redirect_uri: typeof window === 'undefined' ? '' : window.location.origin,
-    response_type: 'code',
-    scope: 'email openid phone',
+    authority: import.meta.env.VITE_COGNITO_AUTHORITY || "",
+    client_id: import.meta.env.VITE_COGNITO_CLIENT_ID || "",
+    redirect_uri: typeof window === "undefined" ? "" : window.location.origin,
+    response_type: "code",
+    scope: "email openid phone",
   };
   return (
     <Provider store={store}>
-      <div style={{ height: '100vh' }}>
+      <div style={{ height: "100vh" }}>
         <CognitoAuthProvider {...cognitoAuthConfig}>
           <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
             <MainApp />

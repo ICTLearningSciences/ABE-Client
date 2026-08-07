@@ -4,33 +4,38 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { createTheme, Switch, ThemeProvider } from '@mui/material';
 
-import { FormControlLabel } from '@mui/material';
-import { UserRole } from '../../store/slices/login';
-import { ColumnDiv } from '../../styled-components';
-import { useAppSelector } from '../../store/hooks';
-import { useWithState } from '../../store/slices/state/use-with-state';
-export function AdminControls(): JSX.Element {
+import React from "react";
+import {
+  createTheme,
+  Switch,
+  ThemeProvider,
+  FormControlLabel,
+} from "@mui/material";
+import { ColumnDiv } from "../../styled-components";
+import { useAppSelector } from "../../store/hooks";
+import { useWithState } from "../../store/slices/state/use-with-state";
+import type { UserRole } from "../../store/slices/login";
+
+export function AdminControls(): React.ReactNode {
   const { updateViewingUserRole, updateViewingAdvancedOptions, state } =
     useWithState();
   const viewingRole = useAppSelector((state) => state.state.viewingRole);
   const userRole = useAppSelector((state) => state.login.userRole);
   const isAdminOrContentManager =
-    userRole === UserRole.ADMIN || userRole === UserRole.CONTENT_MANAGER;
+    userRole === "ADMIN" || userRole === "CONTENT_MANAGER";
   function roleDisplayText(userRole: UserRole) {
     switch (userRole) {
-      case UserRole.ADMIN:
-        return 'Admin';
-      case UserRole.CONTENT_MANAGER:
-        return 'Content Manager';
+      case "ADMIN":
+        return "Admin";
+      case "CONTENT_MANAGER":
+        return "Content Manager";
       default:
-        return 'User';
+        return "User";
     }
   }
 
-  const roleSwitchChecked = viewingRole !== UserRole.USER;
+  const roleSwitchChecked = viewingRole !== "USER";
   const switchTheme = () => createTheme({});
 
   return (
@@ -39,7 +44,7 @@ export function AdminControls(): JSX.Element {
         <ColumnDiv
           style={{
             marginRight: 20,
-            alignItems: 'flex-start',
+            alignItems: "flex-start",
           }}
         >
           <ThemeProvider theme={() => switchTheme()}>
@@ -52,7 +57,7 @@ export function AdminControls(): JSX.Element {
                   checked={roleSwitchChecked}
                   onChange={() => {
                     updateViewingUserRole(
-                      viewingRole !== UserRole.USER ? UserRole.USER : userRole
+                      viewingRole !== "USER" ? "USER" : userRole,
                     );
                   }}
                 />

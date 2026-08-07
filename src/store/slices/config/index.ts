@@ -4,17 +4,13 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import * as api from '../../../hooks/api';
-import { AiServiceModel, ColorThemeConfig, Config } from '../../../types';
-import { DEFAULT_COLOR_THEME } from '../../../constants';
 
-export enum ConfigStatus {
-  NONE = 0,
-  IN_PROGRESS = 1,
-  SUCCEEDED = 2,
-  FAILED = 3,
-}
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import * as api from "../../../hooks/api";
+import type { AiServiceModel, ColorThemeConfig, Config } from "../../../types";
+import { DEFAULT_COLOR_THEME } from "../../../constants";
+
+export type ConfigStatus = 0 | 1 | 2 | 3;
 
 export interface ConfigState {
   config?: Config;
@@ -22,14 +18,14 @@ export interface ConfigState {
 }
 
 const initialState: ConfigState = {
-  status: ConfigStatus.NONE,
+  status: 0,
 };
 
 export const getConfig = createAsyncThunk(
-  'config/config',
+  "config/config",
   async (subdomain?: string) => {
     return await api.fetchConfig(subdomain);
-  }
+  },
 );
 
 export interface UpdateConfigParams {
@@ -38,27 +34,27 @@ export interface UpdateConfigParams {
 }
 
 export const updateConfig = createAsyncThunk(
-  'config/updateConfig',
+  "config/updateConfig",
   async (params: UpdateConfigParams) => {
     return await api.updateConfigByKey(params.key, params.value);
-  }
+  },
 );
 
 export const configSlice = createSlice({
-  name: 'config',
+  name: "config",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(updateConfig.pending, (state) => {
-        state.status = ConfigStatus.IN_PROGRESS;
+        state.status = 1;
       })
       .addCase(updateConfig.fulfilled, (state, action) => {
         state.config = action.payload;
-        state.status = ConfigStatus.SUCCEEDED;
+        state.status = 2;
       })
       .addCase(getConfig.pending, (state) => {
-        state.status = ConfigStatus.IN_PROGRESS;
+        state.status = 1;
       })
       .addCase(getConfig.fulfilled, (state, action) => {
         const aiServiceModelConfigs = action.payload.aiServiceModelConfigs;
@@ -85,10 +81,10 @@ export const configSlice = createSlice({
           colorTheme,
         };
 
-        state.status = ConfigStatus.SUCCEEDED;
+        state.status = 2;
       })
       .addCase(getConfig.rejected, (state) => {
-        state.status = ConfigStatus.FAILED;
+        state.status = 3;
       });
   },
 });

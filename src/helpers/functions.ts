@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { GQLTimelinePoint } from '../types';
+
+import type { GQLTimelinePoint } from "../types";
 
 /**
  * The function `formatTimeDifference` calculates the time difference between the current time and a
@@ -20,7 +21,7 @@ export function formatTimeDifference(specifiedTime: string) {
   const specifiedTimeFormatted = new Date(specifiedTime);
 
   const diffTime = Math.abs(
-    currentTime.getTime() - specifiedTimeFormatted.getTime()
+    currentTime.getTime() - specifiedTimeFormatted.getTime(),
   );
   const diffSeconds = Math.floor(diffTime / 1000);
   const diffMinutes = Math.floor(diffTime / (1000 * 60));
@@ -84,11 +85,11 @@ export const formatTimeDifferenceToReadable = (timeDifference: string) => {
  */
 export const getIntentionText = (timelinePoint: GQLTimelinePoint): string => {
   if (timelinePoint.version?.sessionIntention?.description) {
-    return timelinePoint.version?.sessionIntention?.description || '';
+    return timelinePoint.version?.sessionIntention?.description || "";
   } else if (timelinePoint.version?.dayIntention?.description) {
-    return timelinePoint.version?.dayIntention?.description || '';
+    return timelinePoint.version?.dayIntention?.description || "";
   } else if (timelinePoint.version?.documentIntention?.description) {
-    return timelinePoint.version?.documentIntention?.description || '';
+    return timelinePoint.version?.documentIntention?.description || "";
   }
-  return 'No Intention text';
+  return "No Intention text";
 };

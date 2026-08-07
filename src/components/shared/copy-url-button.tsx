@@ -4,14 +4,15 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState } from 'react';
-import { IconButton, Tooltip } from '@mui/material';
-import { ContentCopy as CopyIcon } from '@mui/icons-material';
+
+import React, { useState } from "react";
+import { IconButton, Tooltip } from "@mui/material";
+import { ContentCopy } from "@mui/icons-material";
 
 interface CopyUrlButtonProps {
   copyUrl: string;
   tooltip: string;
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
   color?: string;
   hoverBackgroundColor?: string;
 }
@@ -19,9 +20,9 @@ interface CopyUrlButtonProps {
 const CopyUrlButton: React.FC<CopyUrlButtonProps> = ({
   copyUrl,
   tooltip,
-  size = 'small',
-  color = '#1B6A9C',
-  hoverBackgroundColor = 'rgba(27, 106, 156, 0.1)',
+  size = "small",
+  color = "#1B6A9C",
+  hoverBackgroundColor = "rgba(27, 106, 156, 0.1)",
 }) => {
   const [showSuccessTooltip, setShowSuccessTooltip] = useState(false);
 
@@ -31,23 +32,23 @@ const CopyUrlButton: React.FC<CopyUrlButtonProps> = ({
       setShowSuccessTooltip(true);
       setTimeout(() => setShowSuccessTooltip(false), 2000);
     } catch (error) {
-      console.error('Failed to copy URL:', error);
+      console.error("Failed to copy URL:", error);
     }
   };
 
   return (
-    <Tooltip title={showSuccessTooltip ? 'Copied URL!' : tooltip}>
+    <Tooltip title={showSuccessTooltip ? "Copied URL!" : tooltip}>
       <IconButton
         onClick={handleCopyUrl}
         size={size}
         sx={{
           color: color,
-          '&:hover': {
+          "&:hover": {
             backgroundColor: hoverBackgroundColor,
           },
         }}
       >
-        <CopyIcon fontSize="small" />
+        <ContentCopy fontSize="small" />
       </IconButton>
     </Tooltip>
   );

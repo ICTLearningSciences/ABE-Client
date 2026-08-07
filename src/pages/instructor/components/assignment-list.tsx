@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+
+import React from "react";
 import {
   Box,
   Card,
@@ -14,8 +15,8 @@ import {
   CircularProgress,
   Stack,
   Chip,
-} from '@mui/material';
-import { Assignment } from '../../../store/slices/education-management/types';
+} from "@mui/material";
+import type { Assignment } from "../../../store/slices/education-management/types";
 
 interface AssignmentListProps {
   assignments: Assignment[];
@@ -34,8 +35,8 @@ const AssignmentList: React.FC<AssignmentListProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <Box sx={{ textAlign: 'center', py: 5 }}>
-        <CircularProgress size={40} sx={{ color: '#1B6A9C' }} />
+      <Box sx={{ textAlign: "center", py: 5 }}>
+        <CircularProgress size={40} sx={{ color: "#1B6A9C" }} />
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
           Loading assignments...
         </Typography>
@@ -45,8 +46,8 @@ const AssignmentList: React.FC<AssignmentListProps> = ({
 
   if (assignments.length === 0) {
     return (
-      <Box sx={{ textAlign: 'center', py: 5 }}>
-        <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
+      <Box sx={{ textAlign: "center", py: 5 }}>
+        <Typography sx={{ fontSize: "48px", color: "grey.300", mb: 2 }}>
           📝
         </Typography>
         <Typography
@@ -64,44 +65,44 @@ const AssignmentList: React.FC<AssignmentListProps> = ({
 
   const getAssignmentMandatory = (assignmentId: string): boolean => {
     const sectionAssignment = sectionAssignments.find(
-      (sa) => sa.assignmentId === assignmentId
+      (sa) => sa.assignmentId === assignmentId,
     );
     return sectionAssignment?.mandatory ?? false;
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 800 }}>
+    <Box sx={{ width: "100%", maxWidth: 800 }}>
       <Grid container spacing={2}>
         {assignments.map((assignment) => (
-          <Grid item xs={12} sm={6} key={assignment._id}>
+          <Grid size={{ xs: 12, sm: 6 }} key={assignment._id}>
             <Card
               variant="outlined"
               sx={{
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
+                cursor: "pointer",
+                transition: "all 0.2s ease",
                 border:
                   selectedAssignmentId === assignment._id
-                    ? '2px solid #1B6A9C'
-                    : '2px solid transparent',
+                    ? "2px solid #1B6A9C"
+                    : "2px solid transparent",
                 backgroundColor:
-                  selectedAssignmentId === assignment._id ? '#e3f2fd' : 'white',
+                  selectedAssignmentId === assignment._id ? "#e3f2fd" : "white",
                 boxShadow: selectedAssignmentId === assignment._id ? 2 : 1,
-                '&:hover': {
-                  borderColor: '#1B6A9C',
+                "&:hover": {
+                  borderColor: "#1B6A9C",
                   boxShadow: 3,
                 },
               }}
               onClick={() => onAssignmentSelect(assignment._id)}
             >
               <CardContent sx={{ p: 2.5 }}>
-                <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                  <Typography sx={{ fontSize: '24px', mr: 1.5 }}>📝</Typography>
+                <Stack direction="row" sx={{ mb: 1.5, alignItems: "center" }}>
+                  <Typography sx={{ fontSize: "24px", mr: 1.5 }}>📝</Typography>
                   <Typography
                     variant="h6"
                     sx={{
-                      color: '#1B6A9C',
+                      color: "#1B6A9C",
                       fontWeight: 600,
-                      fontSize: '1.125rem',
+                      fontSize: "1.125rem",
                     }}
                   >
                     {assignment.title}
@@ -116,24 +117,28 @@ const AssignmentList: React.FC<AssignmentListProps> = ({
                   {assignment.description}
                 </Typography>
 
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  style={{ alignItems: "center" }}
+                >
                   <Typography variant="caption" color="text.disabled">
                     {assignment.activityIds.length} activit
-                    {assignment.activityIds.length !== 1 ? 'ies' : 'y'}
+                    {assignment.activityIds.length !== 1 ? "ies" : "y"}
                   </Typography>
                   <Chip
                     label={
                       getAssignmentMandatory(assignment._id)
-                        ? 'Required'
-                        : 'Optional'
+                        ? "Required"
+                        : "Optional"
                     }
                     size="small"
                     color={
                       getAssignmentMandatory(assignment._id)
-                        ? 'primary'
-                        : 'secondary'
+                        ? "primary"
+                        : "secondary"
                     }
-                    sx={{ fontSize: '10px' }}
+                    sx={{ fontSize: "10px" }}
                   />
                 </Stack>
               </CardContent>

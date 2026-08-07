@@ -4,94 +4,34 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState, useEffect, useMemo } from 'react';
-import { Box, CircularProgress, Grid, Typography } from '@mui/material';
-import {
+
+import React, { useState, useEffect, useMemo } from "react";
+import { Box, CircularProgress, Grid, Typography } from "@mui/material";
+import type {
   LoadingError,
   LoadingStatusType,
-} from '../../../hooks/generic-loading-reducer';
-import {
+} from "../../../hooks/loading-reducer";
+import type {
   DehydratedGQLDocumentTimeline,
   GQLDocumentTimeline,
-} from '../../../types';
-import { AssignmentHeader } from './assignment-document-timelines-components/assignment-header';
-import { TimelineView } from './assignment-document-timelines-components/timeline-view';
-import { DocumentTextView } from './assignment-document-timelines-components/document-text-view';
-import { TabbedInfoPanel } from './assignment-document-timelines-components/tabbed-info-panel';
-import createPatch from 'textdiff-create';
-import {
+} from "../../../types";
+import { AssignmentHeader } from "./assignment-document-timelines-components/assignment-header";
+import { TimelineView } from "./assignment-document-timelines-components/timeline-view";
+import { DocumentTextView } from "./assignment-document-timelines-components/document-text-view";
+import { TabbedInfoPanel } from "./assignment-document-timelines-components/tabbed-info-panel";
+import type {
   Assignment,
   StudentData,
-} from '../../../store/slices/education-management/types';
+} from "../../../store/slices/education-management/types";
 import {
   getStudentAssignmentDocs,
   getStudentsByAssignmentCompletionStatus,
   getAssignmentsByStudentCompletionStatus,
-} from '../../../helpers';
-import { RootState } from '../../../store/store';
-import { useAppSelector } from '../../../store/hooks';
-import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-
-export interface TextDiffResult {
-  diffContent: React.ReactNode[];
-  charactersRemoved: number;
-  charactersAdded: number;
-}
-
-export const applyTextDiff = (
-  prevText: string,
-  currentText: string
-): TextDiffResult => {
-  const delta = createPatch(prevText, currentText);
-  const result: React.ReactNode[] = [];
-  let prevIndex = 0;
-  let key = 0;
-
-  for (const operation of delta) {
-    const [type, value] = operation;
-
-    if (type === 0) {
-      const unchangedText = prevText.slice(prevIndex, prevIndex + value);
-      result.push(unchangedText);
-      prevIndex += value;
-    } else if (type === -1) {
-      const deletedText = prevText.slice(prevIndex, prevIndex + value);
-      result.push(
-        <span
-          key={`deleted-${key++}`}
-          style={{
-            backgroundColor: '#ffebee',
-            color: '#c62828',
-            textDecoration: 'line-through',
-          }}
-        >
-          {deletedText}
-        </span>
-      );
-      prevIndex += value;
-    } else if (type === 1) {
-      const insertedText = value as string;
-      result.push(
-        <span
-          key={`inserted-${key++}`}
-          style={{ backgroundColor: '#e8f5e8', color: '#2e7d32' }}
-        >
-          {insertedText}
-        </span>
-      );
-    }
-  }
-
-  return {
-    diffContent: result,
-    charactersRemoved: delta
-      .filter((operation) => operation[0] === -1)
-      .reduce((acc, operation) => acc + (operation[1] as number), 0),
-    charactersAdded: delta
-      .filter((operation) => operation[0] === 1)
-      .reduce((acc, operation) => acc + (operation[1] as string).length, 0),
-  };
-};
+} from "../../../helpers";
+import type { RootState } from "../../../store/store";
+import { useAppSelector } from "../../../store/hooks";
+import { useWithEducationalManagement } from "../../../store/slices/education-management/use-with-educational-management";
+import { applyTextDiff } from "../helpers";
 
 interface AssignmentDocumentTimelinesProps {
   sectionId: string;
@@ -139,16 +79,16 @@ export const AssignmentDocumentTimelines: React.FC<
     : undefined;
   const [selectedTimelineIndex, setSelectedTimelineIndex] = useState(0);
   const allStudents = useAppSelector(
-    (state: RootState) => state.educationManagement.students
+    (state: RootState) => state.educationManagement.students,
   );
-  const studentsInSection = allStudents.filter((student) =>
-    student.enrolledSections.includes(sectionId)
+  const studentsInSection = allStudents.filter((student: StudentData) =>
+    student.enrolledSections.includes(sectionId),
   );
   const studentAssignmentCompletionStatuses =
     getStudentsByAssignmentCompletionStatus(studentsInSection, assignment);
   const studentAssignmentDocs = useMemo(
     () => getStudentAssignmentDocs(student, assignment._id),
-    [student, assignment._id]
+    [student, assignment._id],
   );
   const { sections, assignments } = useWithEducationalManagement();
   const section = sections.find((section) => section._id === sectionId);
@@ -156,25 +96,24 @@ export const AssignmentDocumentTimelines: React.FC<
     () =>
       section
         ? assignments.filter((assignment) =>
-            section.assignments.some((sa) => sa.assignmentId === assignment._id)
+            section.assignments.some(
+              (sa) => sa.assignmentId === assignment._id,
+            ),
           )
         : [],
-    [section, assignments]
+    [section, assignments],
   );
   const assignmentCompletionStatuses = useMemo(
     () =>
       getAssignmentsByStudentCompletionStatus(student, assignmentsInSection),
-    [student, assignmentsInSection]
+    [student, assignmentsInSection],
   );
   console.log(
-    'studentAssignmentCompletionStatuses',
-    studentAssignmentCompletionStatuses
+    "studentAssignmentCompletionStatuses",
+    studentAssignmentCompletionStatuses,
   );
   const currentTimeline = useMemo(() => {
-    if (
-      selectedDocId &&
-      currentDocState?.status === LoadingStatusType.SUCCESS
-    ) {
+    if (selectedDocId && currentDocState?.status === "SUCCESS") {
       return getHydratedTimeline(selectedDocId);
     }
     return undefined;
@@ -189,11 +128,11 @@ export const AssignmentDocumentTimelines: React.FC<
   const currentText =
     currentTimelinePoint?.version?.markdownText ||
     currentTimelinePoint?.version?.plainText ||
-    '';
+    "";
   const previousText =
     previousTimelinePoint?.version?.markdownText ||
     previousTimelinePoint?.version?.plainText ||
-    '';
+    "";
   const diffContent = applyTextDiff(previousText, currentText);
 
   useEffect(() => {
@@ -203,12 +142,12 @@ export const AssignmentDocumentTimelines: React.FC<
   return (
     <Box
       sx={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
       }}
-      height="100%"
       key={selectedDocId}
       data-cy="activity-document-timelines"
     >
@@ -235,34 +174,34 @@ export const AssignmentDocumentTimelines: React.FC<
       />
 
       {errorMessage && (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
+        <Box sx={{ textAlign: "center", py: 4 }}>
           <Typography color="error">{errorMessage}</Typography>
         </Box>
       )}
 
       {loadInProgress && selectedDocId ? (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
+        <Box sx={{ textAlign: "center", py: 4 }}>
           <CircularProgress size={32} sx={{ mb: 2 }} />
           <Typography>Loading document timeline...</Typography>
         </Box>
       ) : !currentTimeline ? (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
+        <Box sx={{ textAlign: "center", py: 4 }}>
           <Typography color="text.secondary">
             {documentIds.length === 0 || !selectedDocId
-              ? 'Student has no documents for this assignment'
-              : 'No timeline data available for this document'}
+              ? "Student has no documents for this assignment"
+              : "No timeline data available for this document"}
           </Typography>
         </Box>
       ) : (
         <>
-          <Grid container spacing={3} sx={{ flex: 1, mb: 1 }} height="60%">
-            <Grid item xs={6} style={{ height: '100%' }}>
+          <Grid container spacing={3} sx={{ flex: 1, mb: 1, height: "60%" }}>
+            <Grid size={6} style={{ height: "100%" }}>
               <DocumentTextView
                 timelinePoint={currentTimelinePoint}
                 diffContent={diffContent}
               />
             </Grid>
-            <Grid item xs={6} style={{ height: '100%' }}>
+            <Grid size={6} style={{ height: "100%" }}>
               <TabbedInfoPanel
                 timelinePoint={currentTimelinePoint}
                 studentName={student.name}

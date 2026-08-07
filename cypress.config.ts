@@ -1,4 +1,5 @@
 import { defineConfig } from "cypress";
+import dotenvCypress from 'cypress-dotenv';
 
 export default defineConfig({
   e2e: {
@@ -7,14 +8,17 @@ export default defineConfig({
 
   env: {
     REFRESH_TOKEN_NAME: "refreshTokenDev",
-    REACT_APP_GRAPHQL_ENDPOINT: "http://localhost:8000/graphql/graphql",
-    REACT_APP_GOOGLE_API_ENDPOINT: "http://localhost:8000/docs"
+    VITE_GRAPHQL_ENDPOINT: "http://localhost:8000/graphql/graphql",
+    VITE_GOOGLE_API_ENDPOINT: "http://localhost:8000/docs"
   },
 
   component: {
     devServer: {
-      framework: "create-react-app",
-      bundler: "webpack",
+      framework: "vue",
+      bundler: "vite",
+    },
+    setupNodeEvents(on, config) {
+      return dotenvCypress(config, undefined, true);
     },
   },
 });

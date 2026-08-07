@@ -4,28 +4,29 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import ViewUserGoogleDocs from '../../components/admin-view/admin-view-docs';
-import withAuthorizationOnly from '../../hooks/wrap-with-authorization-only';
-import { useWithState } from '../../store/slices/state/use-with-state';
-import { URL_PARAM_NEW_DOC } from '../../constants';
-import { useNavigateWithParams } from '../../hooks/use-navigate-with-params';
 
-function AdminView(): JSX.Element {
+import React from "react";
+import ViewUserGoogleDocs from "../../components/admin-view/admin-view-docs";
+import withAuthorizationOnly from "../../hooks/wrap-with-authorization-only";
+import { useWithState } from "../../store/slices/state/use-with-state";
+import { URL_PARAM_NEW_DOC } from "../../constants";
+import { useNavigateWithParams } from "../../hooks/use-navigate-with-params";
+
+function AdminView(): React.ReactNode {
   const { updateCurrentDocId } = useWithState();
   const navigate = useNavigateWithParams();
   function goToDoc(docId: string, newDoc?: boolean) {
     if (!docId) {
-      console.warn('goToDoc no docId');
+      console.warn("goToDoc no docId");
       return;
     }
     updateCurrentDocId(docId);
-    navigate(`/docs/${docId}?${newDoc ? `${URL_PARAM_NEW_DOC}=true` : ''}`);
+    navigate(`/docs/${docId}?${newDoc ? `${URL_PARAM_NEW_DOC}=true` : ""}`);
   }
 
   function onHistoryClicked(docId: string) {
     if (!docId) {
-      console.warn('onHistoryClicked no docId');
+      console.warn("onHistoryClicked no docId");
       return;
     }
     navigate(`/docs/history/${docId}`);
@@ -40,4 +41,5 @@ function AdminView(): JSX.Element {
   );
 }
 
-export default withAuthorizationOnly(AdminView);
+const Page = withAuthorizationOnly(AdminView);
+export default Page;

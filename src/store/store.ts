@@ -4,16 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { logger } from 'redux-logger';
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import loginReducer from './slices/login';
-import chatReducer from './slices/chat';
-import stateReducer from './slices/state';
-import configReducer from './slices/config';
-import docGoalsActivitiesReducer from './slices/doc-goals-activities';
-import educationManagementReducer from './slices/education-management';
-import panelsReducer from './slices/panels';
-import * as Sentry from '@sentry/react';
+
+import { logger } from "redux-logger";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import * as Sentry from "@sentry/react";
+import loginReducer from "./slices/login";
+import chatReducer from "./slices/chat";
+import stateReducer from "./slices/state";
+import configReducer from "./slices/config";
+import docGoalsActivitiesReducer from "./slices/doc-goals-activities";
+import educationManagementReducer from "./slices/education-management";
+import panelsReducer from "./slices/panels";
 
 const sentryEnhancer = Sentry.createReduxEnhancer({
   actionTransformer: (action) => {
@@ -37,7 +38,7 @@ const appReducer = combineReducers({
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rootReducer = (state: any, action: any) => {
-  if (action.type === 'login/logout/fulfilled') {
+  if (action.type === "login/logout/fulfilled") {
     // preserve just config on logout
     return appReducer(
       {
@@ -49,7 +50,7 @@ const rootReducer = (state: any, action: any) => {
         state: stateReducer(undefined, action),
         panels: panelsReducer(undefined, action),
       },
-      action
+      action,
     );
   }
   return appReducer(state, action);
@@ -58,7 +59,7 @@ const rootReducer = (state: any, action: any) => {
 export const store = configureStore({
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
   reducer: rootReducer,
-  enhancers: (defaultEhancers) => defaultEhancers.concat(sentryEnhancer),
+  enhancers: (defaultEhancers) => defaultEhancers().concat(sentryEnhancer),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

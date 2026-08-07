@@ -11,17 +11,17 @@ import { UserRole } from "../helpers/types";
 describe('role viewing', () => {
     it("Can switch roles as admin", ()=>{
       cyMockDefault(cy, {
-        userRole: UserRole.ADMIN
+        userRole: 'ADMIN'
       });
       visitMainPageSettled(cy)
-      roleSwitch(cy, UserRole.ADMIN)
+      roleSwitch(cy, 'ADMIN')
     })
 
     it("Can switch roles as content manager", ()=>{
       cyMockDefault(cy, {
-        userRole: UserRole.CONTENT_MANAGER
+        userRole: 'CONTENT_MANAGER'
       });
       visitMainPageSettled(cy)
-      roleSwitch(cy, UserRole.CONTENT_MANAGER)
+      roleSwitch(cy, 'CONTENT_MANAGER')
     })
   });

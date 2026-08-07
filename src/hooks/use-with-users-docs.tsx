@@ -4,31 +4,22 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useEffect, useMemo, useState } from 'react';
-import { createNewDoc } from './api';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { useWithState } from '../store/slices/state/use-with-state';
-import {
-  UserDoc,
-  NewDocData,
-  StoreUserDoc,
-  DocService,
-  getDocServiceFromLoginService,
-} from '../types';
-import { v4 as uuidv4 } from 'uuid';
 
+import React, { useEffect, useMemo, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { createNewDoc } from "./api";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { useWithState } from "../store/slices/state/use-with-state";
+import { getDocServiceFromLoginService } from "../types";
+import type { UserDoc, NewDocData, StoreUserDoc, DocService } from "../types";
 import {
-  UserDocsLoadStatus,
   loadUserDocs,
   updateUserDoc as _updateUserDoc,
   deleteUserDoc,
   updateDocTitleLocally as _updateDocTitle,
   setArchiveUserDoc,
-} from '../store/slices/state';
-import {
-  EducationalEvents,
-  educationalEventsEmitter,
-} from '../store/slices/education-management/use-with-educational-events';
+} from "../store/slices/state";
+import { educationalEventsEmitter } from "../store/slices/education-management/use-with-educational-events";
 
 export interface SortConfig {
   field: string;
@@ -47,7 +38,7 @@ export interface UseWithUsersDocs {
     courseId?: string,
     courseAssignmentId?: string,
     callback?: (newDocData: NewDocData) => void,
-    docService?: DocService
+    docService?: DocService,
   ) => Promise<void>;
   docsLoading: boolean;
   updateUserDoc: (googleDoc: StoreUserDoc) => Promise<UserDoc>;
@@ -64,7 +55,7 @@ export interface UseWithUsersDocs {
 export function useWithUsersDocs(): UseWithUsersDocs {
   const { updateCurrentDocId } = useWithState();
   const [sortBy, setSortByState] = useState<SortConfig>({
-    field: 'updatedAt',
+    field: "updatedAt",
     ascend: false,
   });
   const setSortBy = (config: SortConfig) => {
@@ -76,32 +67,34 @@ export function useWithUsersDocs(): UseWithUsersDocs {
 
   const curDocId = useAppSelector((state) => state.state.curDocId);
   const userEmail = useAppSelector((state) => state.login.user?.email);
-  const userId = useAppSelector((state) => state.login.user?._id) || '';
+  const userId = useAppSelector((state) => state.login.user?._id) || "";
   const _googleDocs = useAppSelector((state) => state.state.userDocs);
   const loginService = useAppSelector(
-    (state) => state.login.user?.loginService
+    (state) => state.login.user?.loginService,
   );
   const docService = getDocServiceFromLoginService(loginService);
-  const googleDocs = _googleDocs.filter((doc) => doc.service === docService);
+  const googleDocs = _googleDocs.filter(
+    (doc: UserDoc) => doc.service === docService,
+  );
   const googleDocsLoadStatus = useAppSelector(
-    (state) => state.state.userDocsLoadStatus
+    (state) => state.state.userDocsLoadStatus,
   );
   const dispatch = useAppDispatch();
   const config = useAppSelector((state) => state.config);
-  const isLoading = googleDocsLoadStatus === UserDocsLoadStatus.LOADING;
+  const isLoading = googleDocsLoadStatus === 1;
 
   const userDocs = useMemo(() => {
-    const filteredDocs = googleDocs?.filter((doc) => !doc.admin) || [];
+    const filteredDocs = googleDocs?.filter((doc: UserDoc) => !doc.admin) || [];
     return [...filteredDocs].sort((a, b) => {
       let comparison = 0;
 
-      if (sortBy.field === 'title') {
-        comparison = (a.title || '').localeCompare(b.title || '');
-      } else if (sortBy.field === 'createdAt') {
+      if (sortBy.field === "title") {
+        comparison = (a.title || "").localeCompare(b.title || "");
+      } else if (sortBy.field === "createdAt") {
         comparison =
           new Date(b.createdAt || 0).getTime() -
           new Date(a.createdAt || 0).getTime();
-      } else if (sortBy.field === 'updatedAt') {
+      } else if (sortBy.field === "updatedAt") {
         comparison =
           new Date(b.updatedAt || 0).getTime() -
           new Date(a.updatedAt || 0).getTime();
@@ -112,7 +105,7 @@ export function useWithUsersDocs(): UseWithUsersDocs {
   }, [googleDocs, sortBy]);
 
   const exampleDocs = config.config?.exampleGoogleDocs || [];
-  const copyDocs = googleDocs?.filter((doc) => {
+  const copyDocs = googleDocs?.filter((doc: UserDoc) => {
     return exampleDocs.includes(doc.googleDocId);
   });
 
@@ -120,11 +113,11 @@ export function useWithUsersDocs(): UseWithUsersDocs {
     React.useState<boolean>(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
     const queryParameters = new URLSearchParams(window.location.search);
-    const targetDocId = queryParameters.get('docId');
+    const targetDocId = queryParameters.get("docId");
     if (targetDocId) {
       updateCurrentDocId(targetDocId);
     }
@@ -146,32 +139,29 @@ export function useWithUsersDocs(): UseWithUsersDocs {
     isAdminDoc?: boolean,
     courseId?: string,
     courseAssignmentId?: string,
-    callback?: (newDocData: NewDocData) => void
+    callback?: (newDocData: NewDocData) => void,
   ) {
     setCreationInProgress(true);
 
     try {
       // For raw text documents, create it locally and save to backend
-      if (docService === DocService.RAW_TEXT) {
+      if (docService === "RAW_TEXT") {
         const docId = uuidv4();
         const newDocData: NewDocData = {
           docId,
-          docUrl: '', // Raw text doesn't have a URL
+          docUrl: "", // Raw text doesn't have a URL
         };
 
         // Create new doc in backend via updateUserDoc
         await updateUserDoc({
           googleDocId: docId,
           user: userId,
-          title: title || 'New Document',
+          title: title || "New Document",
           admin: isAdminDoc || false,
-          service: DocService.RAW_TEXT,
+          service: "RAW_TEXT",
           courseAssignmentId: courseAssignmentId || undefined,
         });
-        educationalEventsEmitter.emit(
-          EducationalEvents.NEW_DOC_CREATED,
-          newDocData
-        );
+        educationalEventsEmitter.emit("NEW_DOC_CREATED", newDocData);
         loadUsersDocs();
         if (callback) {
           callback(newDocData);
@@ -185,19 +175,16 @@ export function useWithUsersDocs(): UseWithUsersDocs {
           title,
           isAdminDoc,
           courseId,
-          courseAssignmentId
+          courseAssignmentId,
         );
-        educationalEventsEmitter.emit(
-          EducationalEvents.NEW_DOC_CREATED,
-          newDocData
-        );
+        educationalEventsEmitter.emit("NEW_DOC_CREATED", newDocData);
         if (callback) {
           callback(newDocData);
         }
         loadUsersDocs(); //reload the user's docs since have new ones
       }
     } catch (err) {
-      console.error('Error creating doc');
+      console.error("Error creating doc");
       console.error(err);
     } finally {
       setCreationInProgress(false);

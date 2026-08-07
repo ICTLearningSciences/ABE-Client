@@ -4,10 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useEffect, MutableRefObject } from 'react';
+
+import { useEffect, type RefObject } from "react";
 
 interface UseOutsideClickProps {
-  ref: MutableRefObject<HTMLElement | null>;
+  ref: RefObject<HTMLElement | null>;
   onOutsideClick: () => void;
 }
 
@@ -19,7 +20,7 @@ const useOutsideClick = ({ ref, onOutsideClick }: UseOutsideClickProps) => {
   };
 
   useEffect(() => {
-    if (typeof document === 'undefined') {
+    if (typeof document === "undefined") {
       return;
     }
 
@@ -27,10 +28,10 @@ const useOutsideClick = ({ ref, onOutsideClick }: UseOutsideClickProps) => {
       handleClickOutside(event);
     };
 
-    document.addEventListener('mousedown', handleClick);
+    document.addEventListener("mousedown", handleClick);
 
     return () => {
-      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener("mousedown", handleClick);
     };
   }, [ref, onOutsideClick]);
 };

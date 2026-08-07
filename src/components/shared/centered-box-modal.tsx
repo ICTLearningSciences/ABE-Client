@@ -4,31 +4,32 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Box, Modal, SxProps, Theme } from '@mui/material';
+
+import React from "react";
+import { Box, Modal, type SxProps, type Theme } from "@mui/material";
 
 const style: SxProps<Theme> = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  WebkitTransform: 'translate(-50%, -50%)',
-  transform: 'translate(-50%, -50%)',
-  width: 'fit-content',
-  height: 'fit-content',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  WebkitTransform: "translate(-50%, -50%)",
+  transform: "translate(-50%, -50%)",
+  width: "fit-content",
+  height: "fit-content",
   p: 4,
-  display: 'flex',
-  boxSizing: 'border-box',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  backgroundColor: 'white',
-  borderRadius: '20px',
-  border: '5px solid black',
+  display: "flex",
+  boxSizing: "border-box",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  backgroundColor: "white",
+  borderRadius: "20px",
+  border: "5px solid black",
 };
 
 export function CenteredBoxModal(props: {
   open: boolean;
   children: React.ReactNode;
-}): JSX.Element {
+}): React.ReactNode {
   return (
     <div>
       <Modal open={Boolean(props.open)}>

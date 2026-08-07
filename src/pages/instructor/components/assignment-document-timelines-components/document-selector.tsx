@@ -4,9 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { FormControl, Select, MenuItem } from '@mui/material';
-import { RelevantGoogleDoc } from '../../../../store/slices/education-management/types';
+
+import React from "react";
+import { FormControl, Select, MenuItem } from "@mui/material";
+import type { RelevantGoogleDoc } from "../../../../store/slices/education-management/types";
 
 interface DocumentSelectorProps {
   docData?: RelevantGoogleDoc[];
@@ -24,8 +25,8 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
       sx={{
         minWidth: 300,
         padding: 0,
-        height: 'fit-content',
-        width: 'fit-content',
+        height: "fit-content",
+        width: "fit-content",
       }}
       style={{
         padding: 0,
@@ -34,20 +35,20 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
       <Select
         data-cy="document-select"
         labelId="document-select-label"
-        value={selectedDocId || ''}
+        value={selectedDocId || ""}
         onChange={(e) => onDocumentChange(e.target.value)}
         disabled={!docData || docData.length === 0}
         sx={{
-          '& .MuiOutlinedInput-root': {
-            '&.Mui-focused fieldset': {
-              borderColor: '#1976d2',
+          "& .MuiOutlinedInput-root": {
+            "&.Mui-focused fieldset": {
+              borderColor: "#1976d2",
             },
           },
-          '& .MuiSelect-select': {
+          "& .MuiSelect-select": {
             padding: 0,
           },
-          '& .MuiInputLabel-root.Mui-focused': {
-            color: '#1976d2',
+          "& .MuiInputLabel-root.Mui-focused": {
+            color: "#1976d2",
           },
           padding: 0,
         }}
@@ -58,8 +59,8 @@ export const DocumentSelector: React.FC<DocumentSelectorProps> = ({
             <MenuItem key={doc.docId} value={doc.docId}>
               {doc.primaryDocument ? (
                 <span style={{ fontWeight: 600 }}>Main Document: </span>
-              ) : null}{' '}
-              <span> </span> {doc.docData.title || 'Untitled'}
+              ) : null}{" "}
+              <span> </span> {doc.docData.title || "Untitled"}
             </MenuItem>
           ))}
       </Select>

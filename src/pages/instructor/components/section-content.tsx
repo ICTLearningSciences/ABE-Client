@@ -4,17 +4,18 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useState, useMemo } from 'react';
-import { Box, Typography, Button, Card } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
-import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
+
+import React, { useState, useMemo } from "react";
+import { Box, Typography, Button, Card } from "@mui/material";
+import { Add } from "@mui/icons-material";
+import { useWithEducationalManagement } from "../../../store/slices/education-management/use-with-educational-management";
 import {
-  Assignment,
+  type Assignment,
   isStudentData,
-} from '../../../store/slices/education-management/types';
-import AssignmentModal, { AssignmentModalMode } from './assignment-modal';
-import { getAssignmentsDataInSection } from '../helpers';
-import { SectionAssignmentList } from './section-assignments/section-assignment-list';
+} from "../../../store/slices/education-management/types";
+import AssignmentModal from "./assignment-modal";
+import { getAssignmentsDataInSection } from "../helpers";
+import { SectionAssignmentList } from "./section-assignments/section-assignment-list";
 
 interface SectionContentProps {
   sectionId: string;
@@ -35,27 +36,27 @@ const SectionContent: React.FC<SectionContentProps> = ({
   const section = educationManagement.sections.find((s) => s._id === sectionId);
   const assignmentsInSection = useMemo(
     () => getAssignmentsDataInSection(educationManagement.assignments, section),
-    [educationManagement.assignments, section]
+    [educationManagement.assignments, section],
   );
 
   const handleAddAssignment = async (
     assignmentData: Partial<Assignment>,
-    mandatory = true
+    mandatory = true,
   ) => {
     try {
       const newAssignment = await educationManagement.createAssignment(
         courseId,
-        assignmentData
+        assignmentData,
       );
       await educationManagement.addAssignmentToSection(
         courseId,
         sectionId,
         newAssignment._id,
-        mandatory
+        mandatory,
       );
       setShowAssignmentModal(false);
     } catch (error) {
-      console.error('Failed to create assignment:', error);
+      console.error("Failed to create assignment:", error);
     }
   };
 
@@ -64,7 +65,7 @@ const SectionContent: React.FC<SectionContentProps> = ({
       const myData = educationManagement.myData;
       if (!myData || !isStudentData(myData)) return undefined;
       const assignmentProgress = myData.assignmentProgress.find(
-        (ap) => ap.assignmentId === assignmentId
+        (ap) => ap.assignmentId === assignmentId,
       );
       return assignmentProgress?.instructorGrade || undefined;
     };
@@ -87,7 +88,7 @@ const SectionContent: React.FC<SectionContentProps> = ({
       {!isStudentView && (
         <Button
           variant="contained"
-          startIcon={<AddIcon />}
+          startIcon={<Add />}
           onClick={handleOpenAssignmentModal}
           disabled={educationManagement.isAssignmentModifying}
           fullWidth
@@ -95,9 +96,9 @@ const SectionContent: React.FC<SectionContentProps> = ({
           sx={{
             py: 2,
             mb: 3,
-            backgroundColor: '#1B6A9C',
-            '&:hover': {
-              backgroundColor: '#145a87',
+            backgroundColor: "#1B6A9C",
+            "&:hover": {
+              backgroundColor: "#145a87",
             },
           }}
         >
@@ -109,14 +110,14 @@ const SectionContent: React.FC<SectionContentProps> = ({
         <Card
           variant="outlined"
           sx={{
-            border: '2px dashed',
-            borderColor: 'grey.300',
-            textAlign: 'center',
+            border: "2px dashed",
+            borderColor: "grey.300",
+            textAlign: "center",
             py: 5,
             px: 2.5,
           }}
         >
-          <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
+          <Typography sx={{ fontSize: "48px", color: "grey.300", mb: 2 }}>
             📝
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
@@ -148,7 +149,7 @@ const SectionContent: React.FC<SectionContentProps> = ({
         isOpen={showAssignmentModal}
         onClose={handleCloseAssignmentModal}
         onSubmit={handleAddAssignment}
-        mode={AssignmentModalMode.CREATE}
+        mode={"create"}
         section={section}
         isLoading={educationManagement.isAssignmentModifying}
       />

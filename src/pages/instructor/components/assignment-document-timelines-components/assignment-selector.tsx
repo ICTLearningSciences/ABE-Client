@@ -1,10 +1,11 @@
 /*
-This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved.
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
 Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+
+import React from "react";
 import {
   FormControl,
   Select,
@@ -13,14 +14,11 @@ import {
   Typography,
   ListSubheader,
   Box,
-} from '@mui/material';
-import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
-import { useWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
-import { isStudentData } from '../../../../store/slices/education-management/types';
-import {
-  AssignmentCompletionStatusForStudent,
-  AssignmentCompletionStatus,
-} from '../../../../helpers';
+} from "@mui/material";
+import { CheckCircle } from "@mui/icons-material";
+import { useWithEducationalManagement } from "../../../../store/slices/education-management/use-with-educational-management";
+import { isStudentData } from "../../../../store/slices/education-management/types";
+import type { AssignmentCompletionStatusForStudent } from "../../../../helpers";
 
 interface AssignmentSelectorProps {
   assignmentStatuses: AssignmentCompletionStatusForStudent[];
@@ -40,17 +38,17 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
 
   // Group assignments by completion status
   const completedAssignments = assignmentStatuses.filter(
-    (a) => a.status === AssignmentCompletionStatus.ASSIGNMENT_COMPLETE
+    (a) => a.status === "ASSIGNMENT_COMPLETE",
   );
   const incompleteAssignments = assignmentStatuses.filter(
-    (a) => a.status === AssignmentCompletionStatus.IN_PROGRESS
+    (a) => a.status === "IN_PROGRESS",
   );
   const notStartedAssignments = assignmentStatuses.filter(
-    (a) => a.status === AssignmentCompletionStatus.NOT_STARTED
+    (a) => a.status === "NOT_STARTED",
   );
 
   const currentAssignment = assignmentStatuses.find(
-    (a) => a.assignmentId === currentAssignmentId
+    (a) => a.assignmentId === currentAssignmentId,
   );
 
   return (
@@ -58,8 +56,8 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
       sx={{
         minWidth: 300,
         padding: 0,
-        height: 'fit-content',
-        width: 'fit-content',
+        height: "fit-content",
+        width: "fit-content",
       }}
       style={{
         padding: 0,
@@ -67,7 +65,7 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
     >
       {isStudentViewer ? (
         <Typography data-cy="assignment-header-assignment-title">
-          {currentAssignment?.assignmentTitle || ''}
+          {currentAssignment?.assignmentTitle || ""}
         </Typography>
       ) : (
         <Select
@@ -76,23 +74,23 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
           value={currentAssignmentId}
           onChange={(e) => onAssignmentChange(studentId, e.target.value)}
           sx={{
-            '& .MuiOutlinedInput-root': {
-              '&.Mui-focused fieldset': {
-                borderColor: '#1976d2',
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused fieldset": {
+                borderColor: "#1976d2",
               },
             },
-            '& .MuiSelect-select': {
+            "& .MuiSelect-select": {
               padding: 0,
             },
-            '& .MuiInputLabel-root.Mui-focused': {
-              color: '#1976d2',
+            "& .MuiInputLabel-root.Mui-focused": {
+              color: "#1976d2",
             },
             padding: 0,
           }}
         >
           {/* Completed Assignments */}
           {completedAssignments.length > 0 && (
-            <ListSubheader sx={{ fontWeight: 600, color: '#1976d2' }}>
+            <ListSubheader sx={{ fontWeight: 600, color: "#1976d2" }}>
               Completed
             </ListSubheader>
           )}
@@ -107,28 +105,28 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
                     : 400,
                 backgroundColor:
                   assignmentStatus.assignmentId === currentAssignmentId
-                    ? 'rgba(25, 118, 210, 0.08)'
-                    : 'transparent',
-                '&:hover': {
+                    ? "rgba(25, 118, 210, 0.08)"
+                    : "transparent",
+                "&:hover": {
                   backgroundColor:
                     assignmentStatus.assignmentId === currentAssignmentId
-                      ? 'rgba(25, 118, 210, 0.12)'
+                      ? "rgba(25, 118, 210, 0.12)"
                       : undefined,
                 },
               }}
             >
               <Box
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
+                  display: "flex",
+                  alignItems: "center",
                   gap: 1,
-                  width: '100%',
+                  width: "100%",
                 }}
               >
                 <ListItemText
                   data-cy="assignment-header-assignment-title"
                   primary={assignmentStatus.assignmentTitle}
-                  primaryTypographyProps={{
+                  style={{
                     fontWeight:
                       assignmentStatus.assignmentId === currentAssignmentId
                         ? 600
@@ -136,9 +134,7 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
                   }}
                 />
                 {assignmentStatus.isGraded && (
-                  <CheckCircleIcon
-                    sx={{ color: '#4caf50', fontSize: '1.2rem' }}
-                  />
+                  <CheckCircle sx={{ color: "#4caf50", fontSize: "1.2rem" }} />
                 )}
               </Box>
             </MenuItem>
@@ -146,7 +142,7 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
 
           {/* Incomplete Assignments */}
           {incompleteAssignments.length > 0 && (
-            <ListSubheader sx={{ fontWeight: 600, color: '#1976d2' }}>
+            <ListSubheader sx={{ fontWeight: 600, color: "#1976d2" }}>
               Incomplete
             </ListSubheader>
           )}
@@ -161,27 +157,27 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
                     : 400,
                 backgroundColor:
                   assignmentStatus.assignmentId === currentAssignmentId
-                    ? 'rgba(25, 118, 210, 0.08)'
-                    : 'transparent',
-                '&:hover': {
+                    ? "rgba(25, 118, 210, 0.08)"
+                    : "transparent",
+                "&:hover": {
                   backgroundColor:
                     assignmentStatus.assignmentId === currentAssignmentId
-                      ? 'rgba(25, 118, 210, 0.12)'
+                      ? "rgba(25, 118, 210, 0.12)"
                       : undefined,
                 },
               }}
             >
               <Box
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
+                  display: "flex",
+                  alignItems: "center",
                   gap: 1,
-                  width: '100%',
+                  width: "100%",
                 }}
               >
                 <ListItemText
                   primary={assignmentStatus.assignmentTitle}
-                  primaryTypographyProps={{
+                  style={{
                     fontWeight:
                       assignmentStatus.assignmentId === currentAssignmentId
                         ? 600
@@ -189,9 +185,7 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
                   }}
                 />
                 {assignmentStatus.isGraded && (
-                  <CheckCircleIcon
-                    sx={{ color: '#4caf50', fontSize: '1.2rem' }}
-                  />
+                  <CheckCircle sx={{ color: "#4caf50", fontSize: "1.2rem" }} />
                 )}
               </Box>
             </MenuItem>
@@ -199,7 +193,7 @@ export const AssignmentSelector: React.FC<AssignmentSelectorProps> = ({
 
           {/* Not Started Assignments */}
           {notStartedAssignments.length > 0 && (
-            <ListSubheader sx={{ fontWeight: 600, color: '#1976d2' }}>
+            <ListSubheader sx={{ fontWeight: 600, color: "#1976d2" }}>
               Not Started
             </ListSubheader>
           )}

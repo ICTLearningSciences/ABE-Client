@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useMemo, useState } from 'react';
+
+import React, { useMemo, useState } from "react";
 import {
   Box,
   Typography,
@@ -13,20 +14,20 @@ import {
   CardContent,
   Stack,
   Chip,
-} from '@mui/material';
-import { Edit as EditIcon } from '@mui/icons-material';
-import { useWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
+} from "@mui/material";
+import { Edit as Edit } from "@mui/icons-material";
+import { useWithEducationalManagement } from "../../../../store/slices/education-management/use-with-educational-management";
 import {
-  Assignment,
+  type Assignment,
   isStudentData,
-} from '../../../../store/slices/education-management/types';
-import AssignmentModal, { AssignmentModalMode } from '../assignment-modal';
-import DeleteConfirmationModal from '../delete-confirmation-modal';
-import AssignmentActivitiesDisplay from '../assignment-activities-display';
-import { AssignmentCompleteStatus } from './assignment-complete-status';
-import { aiServiceModelToString } from '../../../../helpers';
-import { useAppSelector } from '../../../../store/hooks';
-import { UseWithDocGoalsActivities } from '../../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
+} from "../../../../store/slices/education-management/types";
+import AssignmentModal from "../assignment-modal";
+import DeleteConfirmationModal from "../delete-confirmation-modal";
+import AssignmentActivitiesDisplay from "../assignment-activities-display";
+import { AssignmentCompleteStatus } from "./assignment-complete-status";
+import { aiServiceModelToString } from "../../../../helpers";
+import { useAppSelector } from "../../../../store/hooks";
+import type { UseWithDocGoalsActivities } from "../../../../store/slices/doc-goals-activities/use-with-doc-goals-activites";
 
 interface AssignmentViewProps {
   assignmentId: string;
@@ -52,19 +53,19 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
   const assignment = educationManagement.assignments.find(
-    (a) => a._id === assignmentId
+    (a) => a._id === assignmentId,
   );
   const section = sectionId
     ? educationManagement.sections.find((s) => s._id === sectionId)
     : null;
 
   const sectionAssignment = section?.assignments.find(
-    (sa) => sa.assignmentId === assignmentId
+    (sa) => sa.assignmentId === assignmentId,
   );
   const isMandatory = sectionAssignment?.mandatory ?? false;
 
   const globalDefaultAiServiceModel = useAppSelector(
-    (state) => state.config.config?.defaultAiModel
+    (state) => state.config.config?.defaultAiModel,
   );
 
   const activityIdToCompletionStatus = useMemo(() => {
@@ -76,17 +77,17 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
       return {};
     const assignmentProgress =
       educationManagement.myData.assignmentProgress.find(
-        (progress) => progress.assignmentId === assignmentId
+        (progress) => progress.assignmentId === assignmentId,
       );
     return assignment.activityIds.reduce(
       (acc, activityId) => {
         const completion = assignmentProgress?.activityCompletions.find(
-          (completion) => completion.activityId === activityId
+          (completion) => completion.activityId === activityId,
         );
         acc[activityId] = completion?.complete ?? false;
         return acc;
       },
-      {} as Record<string, boolean>
+      {} as Record<string, boolean>,
     );
   }, [assignment, educationManagement.myData]);
 
@@ -97,24 +98,24 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
     )
       return undefined;
     return educationManagement.myData.assignmentProgress.find(
-      (progress) => progress.assignmentId === assignmentId
+      (progress) => progress.assignmentId === assignmentId,
     )?.instructorGrade;
   }, [assignmentId, educationManagement.myData]);
 
   const isAssignmentComplete = useMemo(() => {
     if (!activityIdToCompletionStatus) return false;
     return Object.values(activityIdToCompletionStatus).every(
-      (complete) => complete
+      (complete) => complete,
     );
   }, [activityIdToCompletionStatus]);
 
   const handleEditAssignment = async (
     assignmentData: Partial<Assignment>,
-    mandatory: boolean
+    mandatory: boolean,
   ) => {
     await educationManagement.updateAssignmentMandatory(
       assignmentId,
-      mandatory
+      mandatory,
     );
     await educationManagement.updateAssignment(courseId, assignmentData);
     setShowEditModal(false);
@@ -130,7 +131,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
         activityIds: updatedActivityIds,
       });
     } catch (error) {
-      console.error('Failed to add activity to assignment:', error);
+      console.error("Failed to add activity to assignment:", error);
     }
   };
 
@@ -139,14 +140,14 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
 
     try {
       const updatedActivityIds = assignment.activityIds.filter(
-        (id) => id !== activityIdToRemove
+        (id) => id !== activityIdToRemove,
       );
       await educationManagement.updateAssignment(courseId, {
         _id: assignmentId,
         activityIds: updatedActivityIds,
       });
     } catch (error) {
-      console.error('Failed to remove activity from assignment:', error);
+      console.error("Failed to remove activity from assignment:", error);
     }
   };
 
@@ -157,7 +158,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
         onAssignmentDeleted?.(sectionId);
       }
     } catch (error) {
-      console.error('Failed to delete assignment:', error);
+      console.error("Failed to delete assignment:", error);
     }
   };
 
@@ -165,16 +166,16 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
     return (
       <Box
         sx={{
-          textAlign: 'center',
+          textAlign: "center",
           maxWidth: 400,
-          mx: 'auto',
+          mx: "auto",
           py: 8,
         }}
       >
-        <Typography variant="h1" sx={{ fontSize: '48px', mb: 3 }}>
+        <Typography variant="h1" sx={{ fontSize: "48px", mb: 3 }}>
           ❌
         </Typography>
-        <Typography variant="h4" sx={{ mb: 2, color: 'text.primary' }}>
+        <Typography variant="h4" sx={{ mb: 2, color: "text.primary" }}>
           Assignment Not Found
         </Typography>
         <Typography variant="body1" color="text.secondary">
@@ -185,23 +186,25 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 800, px: 2.5 }}>
-      <Card sx={{ mb: 4, backgroundColor: 'grey.50' }}>
+    <Box sx={{ width: "100%", maxWidth: 800, px: 2.5 }}>
+      <Card sx={{ mb: 4, backgroundColor: "grey.50" }}>
         <CardContent sx={{ p: 3 }}>
           <Stack
             direction="row"
-            justifyContent="space-between"
-            alignItems="flex-start"
+            style={{
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+            }}
           >
             <Box sx={{ flex: 1 }}>
-              <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                <Typography sx={{ fontSize: '32px', mr: 2 }}>📝</Typography>
+              <Stack direction="row" sx={{ mb: 1.5, alignItems: "center" }}>
+                <Typography sx={{ fontSize: "32px", mr: 2 }}>📝</Typography>
                 <Typography
                   variant="h4"
                   sx={{
-                    color: '#1B6A9C',
+                    color: "#1B6A9C",
                     fontWeight: 600,
-                    fontSize: '1.75rem',
+                    fontSize: "1.75rem",
                   }}
                 >
                   {assignment.title}
@@ -224,27 +227,25 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
               <Stack
                 direction="column"
                 spacing={1}
-                alignItems="flex-start"
-                sx={{ mb: 1 }}
-                width="fit-content"
+                sx={{ mb: 1, alignItems: "flex-start", width: "fit-content" }}
               >
                 {sectionId && (
                   <Chip
-                    label={isMandatory ? 'Required' : 'Optional'}
+                    label={isMandatory ? "Required" : "Optional"}
                     size="small"
-                    color={isMandatory ? 'primary' : 'secondary'}
-                    sx={{ fontSize: '10px' }}
+                    color={isMandatory ? "primary" : "secondary"}
+                    sx={{ fontSize: "10px" }}
                   />
                 )}
                 {(assignment.defaultLLM || globalDefaultAiServiceModel) && (
                   <Chip
                     data-cy="assignment-view-default-llm-chip"
                     label={`Default LLM: ${aiServiceModelToString(
-                      assignment.defaultLLM || globalDefaultAiServiceModel
+                      assignment.defaultLLM || globalDefaultAiServiceModel,
                     )}`}
                     size="small"
                     color="primary"
-                    sx={{ fontSize: '10px' }}
+                    sx={{ fontSize: "10px" }}
                   />
                 )}
               </Stack>
@@ -259,16 +260,16 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
               <>
                 <Button
                   variant="outlined"
-                  startIcon={<EditIcon />}
+                  startIcon={<Edit />}
                   onClick={() => setShowEditModal(true)}
                   disabled={educationManagement.isAssignmentModifying}
                   data-cy="edit-assignment-button"
                   sx={{
-                    color: '#1B6A9C',
-                    borderColor: '#1B6A9C',
-                    '&:hover': {
-                      backgroundColor: '#1B6A9C',
-                      color: 'white',
+                    color: "#1B6A9C",
+                    borderColor: "#1B6A9C",
+                    "&:hover": {
+                      backgroundColor: "#1B6A9C",
+                      color: "white",
                     },
                   }}
                 >
@@ -302,7 +303,7 @@ const AssignmentView: React.FC<AssignmentViewProps> = ({
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
           onSubmit={handleEditAssignment}
-          mode={AssignmentModalMode.EDIT}
+          mode={"edit"}
           section={section}
           initialData={assignment}
           isLoading={educationManagement.isAssignmentModifying}

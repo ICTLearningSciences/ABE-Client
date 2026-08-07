@@ -1,10 +1,14 @@
-import React from 'react';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
 
-import { StepIconProps, styled } from '@mui/material';
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { styled } from "@mui/material";
 import StepConnector, {
   stepConnectorClasses,
-} from '@mui/material/StepConnector';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+} from "@mui/material/StepConnector";
 
 /* The `const ColorlibConnector` declaration is using the `styled` function from Material-UI to create
 a styled component for the `StepConnector` component. This styled component is defining the styles
@@ -16,34 +20,9 @@ export const ColorlibConnector = styled(StepConnector)(() => ({
   [`& .${stepConnectorClasses.line}`]: {
     height: 10,
     border: 0,
-    backgroundColor: '#fff',
-    boxShadow: '0px 2px 15px 0px rgba(90, 82, 128, 0.2)',
+    backgroundColor: "#fff",
+    boxShadow: "0px 2px 15px 0px rgba(90, 82, 128, 0.2)",
     borderRadius: 5,
-  },
-}));
-/* The `const QontoStepIconRoot` is using Emotion's styled function to create a styled component for a
- `div` element. This styled component accepts props with a specific structure defined by `{
- ownerState: { active?: boolean } }`. */
-export const QontoStepIconRoot = styled('div')<{
-  ownerState: { active?: boolean };
-}>(({ theme, ownerState }) => ({
-  color: theme.palette.mode === 'dark' ? theme.palette.grey[700] : '#eaeaf0',
-  display: 'flex',
-  height: 22,
-  alignItems: 'center',
-  ...(ownerState.active && {
-    color: '#1b6a9c',
-  }),
-  '& .QontoStepIcon-completedIcon': {
-    color: '#784af4',
-    zIndex: 1,
-    fontSize: 18,
-  },
-  '& .QontoStepIcon-circle': {
-    width: 8,
-    height: 8,
-    borderRadius: '50%',
-    backgroundColor: 'currentColor',
   },
 }));
 
@@ -51,28 +30,11 @@ export const QontoStepIconRoot = styled('div')<{
 Emotion's CSS prop. In this case, it is defining styles for the `Stepper` component in the React
 code snippet. */
 export const StepperSx = {
-  '& .MuiStepConnector-root': {
-    left: 'calc(-50% + 15px)',
-    right: 'calc(50% + 15px)',
+  "& .MuiStepConnector-root": {
+    left: "calc(-50% + 15px)",
+    right: "calc(50% + 15px)",
   },
-  '& .MuiStepConnector-line': {
-    marginTop: '35px', // To position the line lower
+  "& .MuiStepConnector-line": {
+    marginTop: "35px", // To position the line lower
   },
 };
-
-/* The `QontoStepIcon` function is a custom component used as the `StepIconComponent` in the
-`StepLabel` component within the `Stepper` component. This custom component is responsible for
-rendering the icons displayed for each step in the timeline. */
-export function QontoStepIcon(props: StepIconProps) {
-  const { active, className } = props;
-
-  return (
-    <QontoStepIconRoot
-      ownerState={{ active }}
-      className={className}
-      style={{ marginTop: 8 }}
-    >
-      <FiberManualRecordIcon />
-    </QontoStepIconRoot>
-  );
-}

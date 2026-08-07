@@ -1,5 +1,11 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { useState, useEffect } from "react";
 import {
   Button,
   CircularProgress,
@@ -7,38 +13,37 @@ import {
   InputLabel,
   MenuItem,
   Select,
-} from '@mui/material';
-import { useWithChat } from '../../../store/slices/chat/use-with-chat';
-import { ChatHeader, RowDiv, SmallGreyText } from '../../../styled-components';
-import { useAppSelector } from '../../../store/hooks';
-import {
+} from "@mui/material";
+import { useWithChat } from "../../../store/slices/chat/use-with-chat";
+import { ChatHeader, RowDiv, SmallGreyText } from "../../../styled-components";
+import { useAppSelector } from "../../../store/hooks";
+import type {
   ActivityGQL,
   ActivityTypes,
   AiServiceModel,
   DocGoal,
-} from '../../../types';
-import SystemPromptModal from './system-prompt-modal';
-import { useWithSystemPromptsConfig } from '../../../hooks/use-with-system-prompts-config';
-import { UserRole } from '../../../store/slices/login';
-import useWithFreeInput from '../../../hooks/use-with-free-input';
-import { useWithState } from '../../../store/slices/state/use-with-state';
-import { AiServiceStepDataTypes } from '../../../ai-services/ai-service-types';
+} from "../../../types";
+import SystemPromptModal from "./system-prompt-modal";
+import { useWithSystemPromptsConfig } from "../../../hooks/use-with-system-prompts-config";
+import useWithFreeInput from "../../../hooks/use-with-free-input";
+import { useWithState } from "../../../store/slices/state/use-with-state";
+import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-types";
 import {
   aiServiceModelStringParse,
   aiServiceModelToString,
-} from '../../../helpers';
-import ViewPreviousRunModal from '../../admin-view/view-previous-run-modal';
+} from "../../../helpers";
+import ViewPreviousRunModal from "../../admin-view/view-previous-run-modal";
 
-import { ChatMessagesContainer } from './chat-message-container';
-import { ChatInput } from './chat-input';
-import { ChatHeaderGenerator } from './chat-header-generator';
-import { useWithBuiltActivityHandler } from '../../../hooks/use-with-built-activity-handler';
-import { isActivityBuilder } from '../../activity-builder/types';
-import { createGlobalStyle } from 'styled-components';
-import { useWithConfig } from '../../../store/slices/config/use-with-config';
-import { ChatMessageTypes } from '../../../store/slices/chat';
+import { ChatMessagesContainer } from "./chat-message-container";
+import { ChatInput } from "./chat-input";
+import { ChatHeaderGenerator } from "./chat-header-generator";
+import { useWithBuiltActivityHandler } from "../../../hooks/use-with-built-activity-handler";
+import { isActivityBuilder } from "../../activity-builder/types";
+import { createGlobalStyle } from "styled-components";
+import { useWithConfig } from "../../../store/slices/config/use-with-config";
+import type { ChatMessageTypes } from "../../../store/slices/chat";
 
-export const GlobalChatStyles = createGlobalStyle`
+const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
     border-color: rgb(0, 0, 0) !important;
     border-width: 1px !important;
@@ -73,10 +78,10 @@ export function Chat(props: {
   const { overrideAiModel, state } = useWithState();
   const { curDocId } = state;
   const coachResponsePending = useAppSelector(
-    (state) => state.chat.coachResponsePending
+    (state) => state.chat.coachResponsePending,
   );
   const userRole = useAppSelector((state) => state.login.userRole);
-  const userIsAdmin = userRole === UserRole.ADMIN;
+  const userIsAdmin = userRole === "ADMIN";
   const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
   useWithFreeInput(!selectedActivity ? selectedGoal : undefined);
   const { activityReady: builtActivityReady } = useWithBuiltActivityHandler(
@@ -84,7 +89,7 @@ export function Chat(props: {
     editDocGoal,
     selectedActivity && isActivityBuilder(selectedActivity)
       ? selectedActivity
-      : undefined
+      : undefined,
   );
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
   const goalHasActivities =
@@ -92,7 +97,7 @@ export function Chat(props: {
   const disableInput =
     coachResponsePending ||
     Boolean(
-      messages?.length > 0 && messages[messages.length - 1].disableUserInput
+      messages?.length > 0 && messages[messages.length - 1].disableUserInput,
     );
   const [openAiInfoToDisplay, setAiInfoToDisplay] =
     useState<AiServiceStepDataTypes[]>();
@@ -100,7 +105,7 @@ export function Chat(props: {
   const [targetSystemPrompt, setTargetSystemPrompt] = useState<number>(0);
   const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
-    : '';
+    : "";
   const [displayMarkdown, setDisplayMarkdown] = useState(false);
 
   useEffect(() => {
@@ -115,11 +120,11 @@ export function Chat(props: {
     <div
       data-cy="chat-container-parent"
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        width: '100%',
-        alignItems: 'center',
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        width: "100%",
+        alignItems: "center",
       }}
     >
       <GlobalChatStyles />
@@ -128,22 +133,22 @@ export function Chat(props: {
           <div
             data-cy="chat-box"
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              width: '90%',
-              justifyContent: 'space-around',
-              alignItems: 'center',
-              margin: '1rem',
-              borderRadius: '1rem',
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
+              width: "90%",
+              justifyContent: "space-around",
+              alignItems: "center",
+              margin: "1rem",
+              borderRadius: "1rem",
             }}
           >
             <ChatHeader
               style={{
-                position: 'relative',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'center',
+                position: "relative",
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
               }}
             >
               <ChatHeaderGenerator
@@ -182,18 +187,18 @@ export function Chat(props: {
                     value={
                       state.overrideAiServiceModel
                         ? aiServiceModelToString(state.overrideAiServiceModel)
-                        : ''
+                        : ""
                     }
                     onChange={(e) => {
                       const targetAiServiceModel: AiServiceModel | undefined =
-                        e.target.value == 'CLEAR'
+                        e.target.value == "CLEAR"
                           ? undefined
                           : aiServiceModelStringParse(e.target.value);
                       overrideAiModel(targetAiServiceModel);
                     }}
                     label="Output Data Type"
                   >
-                    <MenuItem value={'CLEAR'}>CLEAR</MenuItem>
+                    <MenuItem value={"CLEAR"}>CLEAR</MenuItem>
                     {availableAiServiceModels?.map((serviceAndModels) => {
                       return serviceAndModels.models.map((model, j) => {
                         return (
@@ -216,11 +221,11 @@ export function Chat(props: {
                 </FormControl>
                 <RowDiv
                   style={{
-                    justifyContent: 'center',
-                    width: 'fit-content',
+                    justifyContent: "center",
+                    width: "fit-content",
                   }}
                 >
-                  <h5>{'System Prompt: '}</h5>
+                  <h5>{"System Prompt: "}</h5>
                   <SmallGreyText>{systemRole}</SmallGreyText>
                   <Button
                     onClick={() => {

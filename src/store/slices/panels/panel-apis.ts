@@ -1,7 +1,14 @@
-import { execGql } from '../../../hooks/api';
-import { Connection } from '../../../types';
-import { ACCESS_TOKEN_KEY, localStorageGet } from '../../local-storage';
-import { Panel, Panelist } from './types';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { execGql } from "../../../hooks/api";
+import type { Connection } from "../../../types";
+import { ACCESS_TOKEN_KEY, localStorageGet } from "../../local-storage";
+import type { Panel, Panelist } from "./types";
 
 export const fullPanelData = `
 clientId
@@ -22,59 +29,63 @@ query FetchPanels($limit: Int, $filter: String, $filterObject: Object, $sortAsce
 }
 `;
 
-export const deletePanelMutation = `mutation DeletePanel($panelClientId: String!) {
-          deletePanel(panelClientId: $panelClientId) {
-            ${fullPanelData}
-          }
-        }
-      `;
+export const deletePanelMutation = `
+mutation DeletePanel($panelClientId: String!) {
+  deletePanel(panelClientId: $panelClientId) {
+    ${fullPanelData}
+  }
+}
+`;
 
-export const addOrUpdatePanelMutation = `mutation AddOrUpdatePanel($panel: PanelInputType!) {
-    addOrUpdatePanel(panel: $panel) {
-            ${fullPanelData}
-    }
-   }`;
+export const addOrUpdatePanelMutation = `
+mutation AddOrUpdatePanel($panel: PanelInputType!) {
+  addOrUpdatePanel(panel: $panel) {
+    ${fullPanelData}
+  }
+}`;
 
 export const fullPanelistData = `
-        clientId
-        panelistName
-        panelistDescription
-        promptSegment
-        roleSegment
-        profilePicture
-        introductionMessage
-        ragConfig {
-          ragQuery
-          topN
-          filters
-        }`;
+clientId
+panelistName
+panelistDescription
+promptSegment
+roleSegment
+profilePicture
+introductionMessage
+ragConfig {
+  ragQuery
+  topN
+  filters
+}`;
 
 export const fetchPanelistsQuery = `
-        query FetchPanelists($limit: Int, $filter: String, $filterObject: Object, $sortAscending: Boolean, $sortBy: String){
-          fetchPanelists(limit: $limit, filter: $filter, filterObject: $filterObject, sortAscending: $sortAscending, sortBy: $sortBy) {
-            edges {
-              node {
-                ${fullPanelistData}
-              }
-            }
-          }
-        }
-        `;
-
-export const deletePanelistMutation = `mutation DeletePanelist($panelistClientId: String!) {
-    deletePanelist(panelistClientId: $panelistClientId) {
+query FetchPanelists($limit: Int, $filter: String, $filterObject: Object, $sortAscending: Boolean, $sortBy: String){
+  fetchPanelists(limit: $limit, filter: $filter, filterObject: $filterObject, sortAscending: $sortAscending, sortBy: $sortBy) {
+    edges {
+      node {
         ${fullPanelistData}
+      }
     }
-    }`;
+  }
+}
+`;
 
-export const addOrUpdatePanelistMutation = `mutation AddOrUpdatePanelist($panelist: PanelistInputType!) {
-          addOrUpdatePanelist(panelist: $panelist) {
-            ${fullPanelistData}
-          }
-         }`;
+export const deletePanelistMutation = `
+mutation DeletePanelist($panelistClientId: String!) {
+  deletePanelist(panelistClientId: $panelistClientId) {
+      ${fullPanelistData}
+  }
+}`;
+
+export const addOrUpdatePanelistMutation = `
+mutation AddOrUpdatePanelist($panelist: PanelistInputType!) {
+  addOrUpdatePanelist(panelist: $panelist) {
+    ${fullPanelistData}
+  }
+}`;
 
 export async function fetchPanels(): Promise<Panel[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Connection<Panel>>(
     {
       query: fetchPanelsQuery,
@@ -83,15 +94,15 @@ export async function fetchPanels(): Promise<Panel[]> {
       },
     },
     {
-      dataPath: 'fetchPanels',
+      dataPath: "fetchPanels",
       accessToken: accessToken,
-    }
+    },
   );
   return res.edges.map((edge) => edge.node);
 }
 
 export async function deletePanel(panelClientId: string): Promise<Panel> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Panel>(
     {
       query: deletePanelMutation,
@@ -100,15 +111,15 @@ export async function deletePanel(panelClientId: string): Promise<Panel> {
       },
     },
     {
-      dataPath: 'deletePanel',
+      dataPath: "deletePanel",
       accessToken: accessToken,
-    }
+    },
   );
   return res;
 }
 
 export async function addOrUpdatePanel(panel: Panel): Promise<Panel> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Panel>(
     {
       query: addOrUpdatePanelMutation,
@@ -117,31 +128,31 @@ export async function addOrUpdatePanel(panel: Panel): Promise<Panel> {
       },
     },
     {
-      dataPath: 'addOrUpdatePanel',
+      dataPath: "addOrUpdatePanel",
       accessToken: accessToken,
-    }
+    },
   );
   return res;
 }
 
 export async function fetchPanelists(): Promise<Panelist[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Connection<Panelist>>(
     {
       query: fetchPanelistsQuery,
     },
     {
-      dataPath: 'fetchPanelists',
+      dataPath: "fetchPanelists",
       accessToken: accessToken,
-    }
+    },
   );
   return res.edges.map((edge) => edge.node);
 }
 
 export async function deletePanelist(
-  panelistClientId: string
+  panelistClientId: string,
 ): Promise<Panelist> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Panelist>(
     {
       query: deletePanelistMutation,
@@ -150,17 +161,17 @@ export async function deletePanelist(
       },
     },
     {
-      dataPath: 'deletePanelist',
+      dataPath: "deletePanelist",
       accessToken: accessToken,
-    }
+    },
   );
   return res;
 }
 
 export async function addOrUpdatePanelist(
-  panelist: Panelist
+  panelist: Panelist,
 ): Promise<Panelist> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || '';
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const res = await execGql<Panelist>(
     {
       query: addOrUpdatePanelistMutation,
@@ -169,9 +180,9 @@ export async function addOrUpdatePanelist(
       },
     },
     {
-      dataPath: 'addOrUpdatePanelist',
+      dataPath: "addOrUpdatePanelist",
       accessToken: accessToken,
-    }
+    },
   );
   return res;
 }

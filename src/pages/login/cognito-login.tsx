@@ -4,9 +4,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { Button } from '@mui/material';
-import React from 'react';
-import { AuthContextProps } from 'react-oidc-context';
+
+import { Button } from "@mui/material";
+import type { AuthContextProps } from "react-oidc-context";
 
 function CognitoLogin(props: { awsCognitoAuth: AuthContextProps }) {
   const { awsCognitoAuth } = props;

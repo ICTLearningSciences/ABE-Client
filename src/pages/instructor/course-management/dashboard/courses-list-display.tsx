@@ -1,12 +1,17 @@
-import React from 'react';
-import { Paper } from '@mui/material';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
 
-import { Course } from '../../../../store/slices/education-management/types';
-import { ColumnDiv } from '../../../../styled-components';
-import { CourseListItem } from './course-list-item';
-import { NoCoursesDisplay } from './no-courses-display';
-import { Button } from '@mui/material';
-import { useWithWindowSize } from '../../../../hooks/use-with-window-size';
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { Button, Paper } from "@mui/material";
+import type { Course } from "../../../../store/slices/education-management/types";
+import { ColumnDiv } from "../../../../styled-components";
+import { CourseListItem } from "./course-list-item";
+import { NoCoursesDisplay } from "./no-courses-display";
+import { useWithWindowSize } from "../../../../hooks/use-with-window-size";
+
 export function CoursesListDisplay(props: {
   isStudent: boolean;
   courses: Course[];
@@ -36,17 +41,17 @@ export function CoursesListDisplay(props: {
     <Paper
       elevation={2}
       sx={{
-        width: isMobile ? '95%' : '50%',
-        height: '100%',
+        width: isMobile ? "95%" : "50%",
+        height: "100%",
         p: 3,
         borderRadius: 2,
-        backgroundColor: '#fafafa',
+        backgroundColor: "#fafafa",
       }}
     >
       <ColumnDiv
         style={{
-          gap: '20px',
-          height: '100%',
+          gap: "20px",
+          height: "100%",
         }}
       >
         <h1>Courses</h1>

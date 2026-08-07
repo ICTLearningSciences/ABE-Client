@@ -1,9 +1,11 @@
-import React, { useMemo } from 'react';
-import {
-  CheckCircle as CheckCircleIcon,
-  RadioButtonUnchecked as UncheckedIcon,
-  ExpandMore as ExpandMoreIcon,
-} from '@mui/icons-material';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { useMemo } from "react";
 import {
   Box,
   Typography,
@@ -13,16 +15,22 @@ import {
   Accordion,
   AccordionSummary,
   Button,
-} from '@mui/material';
+} from "@mui/material";
 import {
-  Assignment,
+  CheckCircle,
+  RadioButtonUnchecked,
+  ExpandMore,
+} from "@mui/icons-material";
+
+import {
+  type Assignment,
+  type StudentData,
   isInstructorData,
   isStudentData,
-  StudentData,
-} from '../../../../store/slices/education-management/types';
-import { AssignmentDocsDisplay } from './assignment-docs-display';
-import { getStudentAssignmentDocs } from '../../../../helpers';
-import { useWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
+} from "../../../../store/slices/education-management/types";
+import { AssignmentDocsDisplay } from "./assignment-docs-display";
+import { getStudentAssignmentDocs } from "../../../../helpers";
+import { useWithEducationalManagement } from "../../../../store/slices/education-management/use-with-educational-management";
 
 export interface AssignmentGrade {
   grade: number;
@@ -53,7 +61,7 @@ export function StudentAssignmentsSection({
   const getAssignmentGrade = useMemo(() => {
     return (assignment: Assignment) => {
       const assignmentProgress = student.assignmentProgress.find(
-        (ap) => ap.assignmentId === assignment._id
+        (ap) => ap.assignmentId === assignment._id,
       );
       return assignmentProgress?.instructorGrade;
     };
@@ -63,12 +71,11 @@ export function StudentAssignmentsSection({
     return (assignment: Assignment) => {
       return getStudentAssignmentDocs(student, assignment._id);
     };
-  }, [student, assignments]);
+  }, [student]);
 
   function getGradeDisplay(
     assignment: Assignment,
-    isCompleted: boolean,
-    assignmentGrade?: AssignmentGrade
+    assignmentGrade?: AssignmentGrade,
   ) {
     const assignmentDocs = getAssignmentDocs(assignment);
     const hasDocs = assignmentDocs.length > 0;
@@ -79,24 +86,24 @@ export function StudentAssignmentsSection({
       return (
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '10%',
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "10%",
           }}
         >
           {assignmentGrade ? (
             <Typography variant="body2">
-              <span style={{ fontWeight: 'bold', color: 'darkgreen' }}>
+              <span style={{ fontWeight: "bold", color: "darkgreen" }}>
                 Grade:
-              </span>{' '}
+              </span>{" "}
               {assignmentGrade.grade}/5
             </Typography>
           ) : (
             <Typography variant="body2">
-              <span style={{ fontWeight: 'bold', color: 'darkred' }}>
-                {!hasDocs ? 'No docs' : 'Not Graded'}
+              <span style={{ fontWeight: "bold", color: "darkred" }}>
+                {!hasDocs ? "No docs" : "Not Graded"}
               </span>
             </Typography>
           )}
@@ -115,30 +122,30 @@ export function StudentAssignmentsSection({
       return assignmentGrade ? (
         <Box
           sx={{
-            width: '10%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            width: "10%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           <Typography variant="body2">
-            <span style={{ fontWeight: 'bold', color: 'darkgreen' }}>
+            <span style={{ fontWeight: "bold", color: "darkgreen" }}>
               Grade:
-            </span>{' '}
+            </span>{" "}
             {assignmentGrade.grade}/5
           </Typography>
         </Box>
       ) : (
         <Box
           sx={{
-            width: '10%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            width: "10%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           <Typography variant="body2">
-            <span style={{ fontWeight: 'bold' }}>Not Graded</span>
+            <span style={{ fontWeight: "bold" }}>Not Graded</span>
           </Typography>
         </Box>
       );
@@ -149,9 +156,7 @@ export function StudentAssignmentsSection({
     <>
       <Stack
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 2 }}
+        sx={{ mb: 2, alignItems: "center", justifyContent: "space-between" }}
       >
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
           {title}
@@ -169,11 +174,11 @@ export function StudentAssignmentsSection({
           return (
             <div
               style={{
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
+                width: "100%",
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
               data-cy={`assignments-section-${assignment._id}`}
               key={assignment._id}
@@ -181,32 +186,32 @@ export function StudentAssignmentsSection({
               <Accordion
                 key={assignment._id}
                 sx={{
-                  width: '90%',
-                  border: '1px solid',
-                  borderColor: isCompleted ? '#4caf50' : 'grey.200',
+                  width: "90%",
+                  border: "1px solid",
+                  borderColor: isCompleted ? "#4caf50" : "grey.200",
                   backgroundColor: isCompleted
-                    ? 'rgba(76, 175, 80, 0.04)'
-                    : 'transparent',
-                  borderRadius: '8px !important',
-                  '&:before': {
-                    display: 'none',
+                    ? "rgba(76, 175, 80, 0.04)"
+                    : "transparent",
+                  borderRadius: "8px !important",
+                  "&:before": {
+                    display: "none",
                   },
                 }}
               >
                 <AccordionSummary
-                  data-cy={`${title.replaceAll(' ', '-')}-assignments-section`}
-                  expandIcon={<ExpandMoreIcon />}
+                  data-cy={`${title.replaceAll(" ", "-")}-assignments-section`}
+                  expandIcon={<ExpandMore />}
                   sx={{
-                    '& .MuiAccordionSummary-content': {
-                      alignItems: 'center',
+                    "& .MuiAccordionSummary-content": {
+                      alignItems: "center",
                     },
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: 40, mr: 1 }}>
                     {isCompleted ? (
-                      <CheckCircleIcon sx={{ color: '#4caf50' }} />
+                      <CheckCircle sx={{ color: "#4caf50" }} />
                     ) : (
-                      <UncheckedIcon sx={{ color: 'grey.400' }} />
+                      <RadioButtonUnchecked sx={{ color: "grey.400" }} />
                     )}
                   </ListItemIcon>
                   <Box sx={{ flex: 1 }}>
@@ -214,7 +219,7 @@ export function StudentAssignmentsSection({
                       variant="body1"
                       sx={{
                         fontWeight: 500,
-                        color: isCompleted ? 'text.primary' : 'text.secondary',
+                        color: isCompleted ? "text.primary" : "text.secondary",
                       }}
                     >
                       {assignment.title}
@@ -228,11 +233,11 @@ export function StudentAssignmentsSection({
                     </Typography>
                   </Box>
                   <Chip
-                    label={isCompleted ? 'Complete' : 'Incomplete'}
+                    label={isCompleted ? "Complete" : "Incomplete"}
                     size="small"
                     sx={{
-                      backgroundColor: isCompleted ? '#4caf50' : 'grey.200',
-                      color: isCompleted ? 'white' : 'text.secondary',
+                      backgroundColor: isCompleted ? "#4caf50" : "grey.200",
+                      color: isCompleted ? "white" : "text.secondary",
                       fontWeight: 500,
                       ml: 1,
                     }}
@@ -240,7 +245,7 @@ export function StudentAssignmentsSection({
                 </AccordionSummary>
                 <AssignmentDocsDisplay assignmentDocs={docData} />
               </Accordion>
-              {getGradeDisplay(assignment, isCompleted, assignmentGrade)}
+              {getGradeDisplay(assignment, assignmentGrade)}
             </div>
           );
         })}

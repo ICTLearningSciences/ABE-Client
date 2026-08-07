@@ -4,8 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { useAppSelector } from '../../store/hooks';
+
+import { useAppSelector } from "../../store/hooks";
 
 export function CuiHeader() {
   const config = useAppSelector((state) => state.config);
@@ -26,19 +26,19 @@ export function CuiHeader() {
       style={{
         backgroundColor: cuiBanner.bannerBgColor,
         color: cuiBanner.bannerTextColor,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        fontSize: 'clamp(14px, 2vw, 18px)',
-        height: '3vh',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        padding: '0 10px',
-        boxSizing: 'border-box',
+        fontWeight: "bold",
+        textAlign: "center",
+        fontSize: "clamp(14px, 2vw, 18px)",
+        height: "3vh",
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        padding: "0 10px",
+        boxSizing: "border-box",
       }}
     >
       {cuiBanner.bannerText}

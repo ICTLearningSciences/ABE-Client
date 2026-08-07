@@ -4,9 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useAppSelector, useAppDispatch } from '../../hooks';
+
+import { useAppSelector, useAppDispatch } from "../../hooks";
 import {
-  State,
+  type State,
   updateDocId,
   overrideAiModel as _overrideOpenAiModel,
   updateViewingUserRole,
@@ -15,9 +16,9 @@ import {
   setSessionIntention,
   storeMostRecentDocVersion,
   setWarnExpiredAccessToken,
-} from '.';
-import { AiServiceModel, DocData, Intention } from '../../../types';
-import { UserRole } from '../login';
+} from ".";
+import type { AiServiceModel, DocData, Intention } from "../../../types";
+import type { UserRole } from "../login";
 
 interface UseWithState {
   state: State;

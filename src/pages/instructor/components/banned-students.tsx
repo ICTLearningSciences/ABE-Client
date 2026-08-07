@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+
+import React from "react";
 import {
   Box,
   Typography,
@@ -15,16 +16,13 @@ import {
   Card,
   Button,
   Stack,
-} from '@mui/material';
-import {
-  PersonOff as PersonOffIcon,
-  LockOpen as UnbanIcon,
-} from '@mui/icons-material';
-import {
+} from "@mui/material";
+import { PersonOff, LockOpen } from "@mui/icons-material";
+import type {
   Section,
   StudentData,
-} from '../../../store/slices/education-management/types';
-import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
+} from "../../../store/slices/education-management/types";
+import { useWithEducationalManagement } from "../../../store/slices/education-management/use-with-educational-management";
 
 interface BannedStudentsProps {
   section: Section;
@@ -37,18 +35,18 @@ const BannedStudents: React.FC<BannedStudentsProps> = ({
 }) => {
   const educationManagement = useWithEducationalManagement();
 
-  const bannedStudents = students.filter(
-    (student) => section.bannedStudentUserIds?.includes(student.userId)
+  const bannedStudents = students.filter((student) =>
+    section.bannedStudentUserIds?.includes(student.userId),
   );
 
   const handleUnbanStudent = async (studentUserId: string) => {
     try {
       await educationManagement.unbanStudentFromSection(
         section._id,
-        studentUserId
+        studentUserId,
       );
     } catch (error) {
-      console.error('Failed to unban student:', error);
+      console.error("Failed to unban student:", error);
     }
   };
 
@@ -57,21 +55,21 @@ const BannedStudents: React.FC<BannedStudentsProps> = ({
       <Box>
         <Typography
           variant="h5"
-          sx={{ fontWeight: 600, color: 'text.primary', mb: 3 }}
+          sx={{ fontWeight: 600, color: "text.primary", mb: 3 }}
         >
           Blocked Students
         </Typography>
         <Card
           variant="outlined"
           sx={{
-            border: '2px dashed',
-            borderColor: 'grey.300',
-            textAlign: 'center',
+            border: "2px dashed",
+            borderColor: "grey.300",
+            textAlign: "center",
             py: 5,
             px: 2.5,
           }}
         >
-          <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
+          <Typography sx={{ fontSize: "48px", color: "grey.300", mb: 2 }}>
             🚫
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
@@ -89,42 +87,40 @@ const BannedStudents: React.FC<BannedStudentsProps> = ({
     <Box>
       <Stack
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 3 }}
+        sx={{ mb: 3, alignItems: "center", justifyContent: "space-between" }}
       >
         <Typography
           variant="h5"
-          sx={{ fontWeight: 600, color: 'text.primary' }}
+          sx={{ fontWeight: 600, color: "text.primary" }}
         >
           Blocked Students
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {bannedStudents.length} blocked student
-          {bannedStudents.length !== 1 ? 's' : ''}
+          {bannedStudents.length !== 1 ? "s" : ""}
         </Typography>
       </Stack>
 
-      <List sx={{ width: '100%' }}>
+      <List sx={{ width: "100%" }}>
         {bannedStudents.map((student) => (
           <ListItem
             key={student._id}
             sx={{
               borderRadius: 2,
               mb: 1,
-              border: '1px solid',
-              borderColor: '#d32f2f',
-              backgroundColor: 'rgba(211, 47, 47, 0.04)',
+              border: "1px solid",
+              borderColor: "#d32f2f",
+              backgroundColor: "rgba(211, 47, 47, 0.04)",
             }}
           >
             <ListItemIcon>
-              <PersonOffIcon sx={{ color: '#d32f2f' }} />
+              <PersonOff sx={{ color: "#d32f2f" }} />
             </ListItemIcon>
             <ListItemText
               primary={
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: 600, color: 'text.primary' }}
+                  sx={{ fontWeight: 600, color: "text.primary" }}
                 >
                   {student.name}
                 </Typography>
@@ -138,13 +134,13 @@ const BannedStudents: React.FC<BannedStudentsProps> = ({
             <Button
               variant="contained"
               size="small"
-              startIcon={<UnbanIcon />}
+              startIcon={<LockOpen />}
               onClick={() => handleUnbanStudent(student.userId)}
               disabled={educationManagement.isSectionModifying}
               sx={{
-                backgroundColor: '#d32f2f',
-                '&:hover': {
-                  backgroundColor: '#c62828',
+                backgroundColor: "#d32f2f",
+                "&:hover": {
+                  backgroundColor: "#c62828",
                 },
                 fontWeight: 600,
               }}

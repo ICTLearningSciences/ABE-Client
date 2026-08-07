@@ -4,13 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useEffect } from 'react';
-import { CircularProgress } from '@mui/material';
-import { LoginStatus } from '../store/slices/login';
-import { useNavigateWithParams } from './use-navigate-with-params';
-import { useAppSelector } from '../store/hooks';
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+import { useEffect } from "react";
+import { CircularProgress } from "@mui/material";
+import { useNavigateWithParams } from "./use-navigate-with-params";
+import { useAppSelector } from "../store/hooks";
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const withAuthorizationOnly = (Component: any) => (props: any) => {
   const loginState = useAppSelector((state) => state.login);
@@ -18,21 +17,17 @@ const withAuthorizationOnly = (Component: any) => (props: any) => {
 
   useEffect(() => {
     if (
-      (loginState.loginStatus === LoginStatus.NOT_LOGGED_IN ||
-        loginState.loginStatus === LoginStatus.FAILED) &&
+      (loginState.loginStatus === 1 || loginState.loginStatus === 4) &&
       !loginState.accessToken
     ) {
-      if (typeof window !== 'undefined') {
-        navigate('/');
+      if (typeof window !== "undefined") {
+        navigate("/");
       }
-      navigate('/');
+      navigate("/");
     }
   }, [loginState]);
 
-  if (
-    loginState.loginStatus === LoginStatus.NONE ||
-    loginState.loginStatus === LoginStatus.IN_PROGRESS
-  ) {
+  if (loginState.loginStatus === 0 || loginState.loginStatus === 2) {
     return (
       <div>
         <CircularProgress />
@@ -40,7 +35,7 @@ const withAuthorizationOnly = (Component: any) => (props: any) => {
     );
   }
 
-  return loginState.loginStatus === LoginStatus.AUTHENTICATED ? (
+  return loginState.loginStatus === 3 ? (
     <Component
       {...props}
       accessToken={loginState.accessToken}

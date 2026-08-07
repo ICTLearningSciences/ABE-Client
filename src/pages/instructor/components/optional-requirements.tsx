@@ -4,8 +4,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
-import { Typography, Stack, TextField } from '@mui/material';
+
+import React from "react";
+import { Typography, Stack, TextField } from "@mui/material";
 
 interface OptionalRequirementsProps {
   isStudentView: boolean;
@@ -32,7 +33,7 @@ const OptionalRequirements: React.FC<OptionalRequirementsProps> = ({
   }
 
   return (
-    <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+    <Stack direction="row" spacing={2} sx={{ mb: 2, alignItems: "center" }}>
       <Typography variant="body2" color="text.secondary">
         Students are required to complete
       </Typography>
@@ -46,7 +47,14 @@ const OptionalRequirements: React.FC<OptionalRequirementsProps> = ({
         }}
         onBlur={() => onRequiredUpdate(optionalAssignmentsRequired)}
         sx={{ width: 80 }}
-        inputProps={{ min: 0, max: totalOptionalAssignments }}
+        slotProps={{
+          input: {
+            sx: {
+              min: 0,
+              max: totalOptionalAssignments,
+            },
+          },
+        }}
       />
       <Typography variant="body2" color="text.secondary">
         optional assignments

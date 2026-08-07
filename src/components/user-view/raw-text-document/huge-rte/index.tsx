@@ -1,23 +1,30 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { Editor } from '@hugerte/hugerte-react';
-import { ColumnDiv } from '../../../../styled-components';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { useEffect, useRef, useState, useMemo } from "react";
+import debounce from "lodash/debounce";
+import Showdown from "showdown";
+import { Editor } from "@hugerte/hugerte-react";
 import {
   CircularProgress,
   TextField,
   IconButton,
   Typography,
   Box,
-} from '@mui/material';
-import { DocData, DocService } from '../../../../types';
-import { useWithRawTextDocVersions } from '../../../../hooks/use-with-raw-text-doc-versions';
-import { getDocData } from '../../../../hooks/api';
-import debounce from 'lodash/debounce';
-import { useWithUsersDocs } from '../../../../exported-files';
-import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Cancel';
-import './huge-rte.css';
-import Showdown from 'showdown';
+} from "@mui/material";
+import { Edit, Save, Cancel } from "@mui/icons-material";
+
+import { ColumnDiv } from "../../../../styled-components";
+import type { DocData } from "../../../../types";
+import { useWithRawTextDocVersions } from "../../../../hooks/use-with-raw-text-doc-versions";
+import { getDocData } from "../../../../hooks/api";
+import { useWithUsersDocs } from "../../../../exported-files";
+
+import "./huge-rte.css";
 
 interface RawTextDocumentProps {
   docId?: string;
@@ -33,7 +40,7 @@ export function HugeRTEEditor({
   const [initialDocData, setInitialDocData] = useState<DocData | undefined>();
   const [loading, setLoading] = useState<boolean>(!!docId);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [tempTitle, setTempTitle] = useState('');
+  const [tempTitle, setTempTitle] = useState("");
   useWithRawTextDocVersions(currentActivityId, docData);
   const { updateDocTitleLocally } = useWithUsersDocs();
   const converter = new Showdown.Converter({
@@ -44,49 +51,50 @@ export function HugeRTEEditor({
 
   const editorConfig = useMemo(
     () => ({
-      plugins: ['markdown', 'lists'],
+      plugins: ["markdown", "lists"],
       toolbar: [
-        { name: 'history', items: ['undo', 'redo'] },
-        { name: 'styles', items: ['styles'] },
-        { name: 'formatting', items: ['bold', 'italic'] },
+        { name: "history", items: ["undo", "redo"] },
+        { name: "styles", items: ["styles"] },
+        { name: "formatting", items: ["bold", "italic"] },
         {
-          name: 'alignment',
-          items: ['alignleft', 'aligncenter', 'alignright', 'alignjustify'],
+          name: "alignment",
+          items: ["alignleft", "aligncenter", "alignright", "alignjustify"],
         },
-        { name: 'indentation', items: ['outdent', 'indent'] },
-        { name: 'lists', items: ['unordered', 'ordered'] },
+        { name: "indentation", items: ["outdent", "indent"] },
+        { name: "lists", items: ["unordered", "ordered"] },
       ],
     }),
-    []
+    [],
   );
 
   const debouncedUpdate = useMemo(
     () =>
+      // eslint-disable-next-line react-hooks/refs
       debounce((htmlText: string) => {
-        const rawText = editor.current?.editor?.getContent({ format: 'text' });
+        const rawText = editor.current?.editor?.getContent({ format: "text" });
         const mdText = converter.makeMarkdown(htmlText);
         if (docData) {
-          console.log('debouncedUpdate', rawText, mdText);
+          console.log("debouncedUpdate", rawText, mdText);
           setDocData((prevValue) => {
             if (prevValue) {
               return {
                 ...prevValue,
                 plainText: rawText || mdText,
                 markdownText: mdText,
-                lastChangedId: docData.lastChangedId || '',
+                lastChangedId: docData.lastChangedId || "",
               };
             }
             return prevValue;
           });
         }
       }, 500),
-    [docData, editor]
+    [docData, editor],
   );
 
   useEffect(() => {
     if (docId) {
       setLoading(true);
-      getDocData(docId, DocService.RAW_TEXT)
+      getDocData(docId, "RAW_TEXT")
         .then((docData) => {
           setDocData(docData);
           setInitialDocData(docData);
@@ -115,7 +123,7 @@ export function HugeRTEEditor({
         setIsEditingTitle(false);
         updateDocTitleLocally(docId, newTitle);
       } catch (error) {
-        console.error('Error updating document title:', error);
+        console.error("Error updating document title:", error);
       }
     }
   };
@@ -134,7 +142,7 @@ export function HugeRTEEditor({
   const MemoizedEditor = useMemo(
     () => (
       <Editor
-        initialValue={converter.makeHtml(initialDocData?.markdownText || '')}
+        initialValue={converter.makeHtml(initialDocData?.markdownText || "")}
         ref={editor}
         onChange={(value) => {
           console.log(value.target);
@@ -149,7 +157,7 @@ export function HugeRTEEditor({
         // }}
       />
     ),
-    [initialDocData, editor, handleEditorChange]
+    [initialDocData, editor, handleEditorChange],
   );
 
   if (loading || !docData) {
@@ -164,21 +172,21 @@ export function HugeRTEEditor({
     <ColumnDiv
       data-cy="hugerte-container"
       style={{
-        height: '95%',
-        width: '95%',
+        height: "95%",
+        width: "95%",
       }}
     >
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           mb: 2,
-          position: 'relative',
+          position: "relative",
         }}
       >
         {isEditingTitle ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <TextField
               value={tempTitle}
               onChange={(e) => setTempTitle(e.target.value)}
@@ -186,20 +194,20 @@ export function HugeRTEEditor({
               autoFocus
             />
             <IconButton onClick={handleSaveEdit} color="primary">
-              <SaveIcon />
+              <Save />
             </IconButton>
             <IconButton onClick={handleCancelEdit} color="error">
-              <CancelIcon />
+              <Cancel />
             </IconButton>
           </Box>
         ) : (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography
               variant="h5"
               component="h1"
-              sx={{ textAlign: 'center' }}
+              sx={{ textAlign: "center" }}
             >
-              {docData.title || 'New Document'}
+              {docData.title || "New Document"}
             </Typography>
             <IconButton
               onClick={() => {
@@ -208,7 +216,7 @@ export function HugeRTEEditor({
               }}
               size="small"
             >
-              <EditIcon />
+              <Edit />
             </IconButton>
           </Box>
         )}

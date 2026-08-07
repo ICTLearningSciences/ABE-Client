@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useEffect, useState } from 'react';
+
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -15,20 +16,20 @@ import {
   Chip,
   Tabs,
   Tab,
-} from '@mui/material';
-import { Edit as EditIcon, ExitToApp as ExitIcon } from '@mui/icons-material';
-import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
+} from "@mui/material";
+import { Edit, ExitToApp } from "@mui/icons-material";
+import { useWithEducationalManagement } from "../../../store/slices/education-management/use-with-educational-management";
 import {
   isInstructorData,
-  Section,
-} from '../../../store/slices/education-management/types';
-import SectionModal, { SectionModalMode } from './section-modal';
-import DeleteConfirmationModal from './delete-confirmation-modal';
-import SectionContent from './section-content';
-import SectionStudentsGrades from './section-student-grades/section-students-grades';
-import BannedStudents from './banned-students';
-import { addQueryParamToUrl, removeQueryParamFromUrl } from '../../../helpers';
-import CopyUrlButton from '../../../components/shared/copy-url-button';
+  type Section,
+} from "../../../store/slices/education-management/types";
+import SectionModal from "./section-modal";
+import DeleteConfirmationModal from "./delete-confirmation-modal";
+import SectionContent from "./section-content";
+import SectionStudentsGrades from "./section-student-grades/section-students-grades";
+import BannedStudents from "./banned-students";
+import { addQueryParamToUrl, removeQueryParamFromUrl } from "../../../helpers";
+import CopyUrlButton from "../../../components/shared/copy-url-button";
 
 interface SectionViewProps {
   sectionId: string;
@@ -40,7 +41,7 @@ interface SectionViewProps {
   onViewStudentInfo?: (studentId: string) => void;
 }
 
-export const queryParamSectionTab = 'sectionTab';
+export const queryParamSectionTab = "sectionTab";
 
 const SectionView: React.FC<SectionViewProps> = ({
   sectionId,
@@ -54,12 +55,12 @@ const SectionView: React.FC<SectionViewProps> = ({
   const educationManagement = useWithEducationalManagement();
   const [showEditModal, setShowEditModal] = useState(false);
   const urlParams =
-    typeof window === 'undefined'
+    typeof window === "undefined"
       ? new URLSearchParams()
       : new URLSearchParams(window.location.search);
   const sectionTab = urlParams.get(queryParamSectionTab);
   const [selectedTab, setSelectedTab] = useState(
-    sectionTab ? parseInt(sectionTab) : 0
+    sectionTab ? parseInt(sectionTab) : 0,
   );
   const section = educationManagement.getSectionForSectionId(sectionId);
   const currentSectionStudentsProgress =
@@ -84,7 +85,7 @@ const SectionView: React.FC<SectionViewProps> = ({
     onViewStudentInfo?.(studentId);
   }
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
 
@@ -93,7 +94,7 @@ const SectionView: React.FC<SectionViewProps> = ({
       await educationManagement.deleteSection(courseId, sectionId);
       onSectionDeleted?.(courseId);
     } catch (error) {
-      console.error('Failed to delete section:', error);
+      console.error("Failed to delete section:", error);
     }
   };
 
@@ -107,16 +108,16 @@ const SectionView: React.FC<SectionViewProps> = ({
     return (
       <Box
         sx={{
-          textAlign: 'center',
+          textAlign: "center",
           maxWidth: 400,
-          mx: 'auto',
+          mx: "auto",
           py: 8,
         }}
       >
-        <Typography variant="h1" sx={{ fontSize: '48px', mb: 3 }}>
+        <Typography variant="h1" sx={{ fontSize: "48px", mb: 3 }}>
           ❌
         </Typography>
-        <Typography variant="h4" sx={{ mb: 2, color: 'text.primary' }}>
+        <Typography variant="h4" sx={{ mb: 2, color: "text.primary" }}>
           Section Not Found
         </Typography>
         <Typography variant="body1" color="text.secondary">
@@ -129,28 +130,30 @@ const SectionView: React.FC<SectionViewProps> = ({
   return (
     <Box
       sx={{
-        width: '100%',
+        width: "100%",
         maxWidth: 800,
         px: 2.5,
       }}
     >
       {/* Section Header */}
-      <Card sx={{ mb: 4, backgroundColor: 'grey.50' }}>
+      <Card sx={{ mb: 4, backgroundColor: "grey.50" }}>
         <CardContent sx={{ p: 3 }}>
           <Stack
             direction="row"
-            justifyContent="space-between"
-            alignItems="flex-start"
+            style={{
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+            }}
           >
             <Box sx={{ flex: 1 }}>
-              <Stack direction="row" alignItems="center" sx={{ mb: 1.5 }}>
-                <Typography sx={{ fontSize: '32px', mr: 2 }}>📑</Typography>
+              <Stack direction="row" sx={{ mb: 1.5, alignItems: "center" }}>
+                <Typography sx={{ fontSize: "32px", mr: 2 }}>📑</Typography>
                 <Typography
                   variant="h4"
                   sx={{
-                    color: '#1B6A9C',
+                    color: "#1B6A9C",
                     fontWeight: 600,
-                    fontSize: '1.75rem',
+                    fontSize: "1.75rem",
                   }}
                 >
                   {section.title}
@@ -168,20 +171,22 @@ const SectionView: React.FC<SectionViewProps> = ({
               <Stack
                 direction="row"
                 spacing={1}
-                alignItems="center"
-                sx={{ mb: 1 }}
+                sx={{
+                  mb: 1,
+                  alignItems: "center",
+                }}
               >
                 <Chip
                   label={`Section Code: ${section.sectionCode}`}
                   size="small"
                   variant="outlined"
-                  sx={{ fontSize: '11px' }}
+                  sx={{ fontSize: "11px" }}
                 />
                 {isInstructor && (
                   <CopyUrlButton
                     copyUrl={`${
-                      typeof window === 'undefined'
-                        ? ''
+                      typeof window === "undefined"
+                        ? ""
                         : window.location.origin
                     }?sectionCode=${section.sectionCode}`}
                     tooltip="Copy Section Join URL"
@@ -194,16 +199,16 @@ const SectionView: React.FC<SectionViewProps> = ({
               <>
                 <Button
                   variant="outlined"
-                  startIcon={<EditIcon />}
+                  startIcon={<Edit />}
                   onClick={() => setShowEditModal(true)}
                   disabled={educationManagement.isSectionModifying}
                   data-cy="edit-section-button"
                   sx={{
-                    color: '#1B6A9C',
-                    borderColor: '#1B6A9C',
-                    '&:hover': {
-                      backgroundColor: '#1B6A9C',
-                      color: 'white',
+                    color: "#1B6A9C",
+                    borderColor: "#1B6A9C",
+                    "&:hover": {
+                      backgroundColor: "#1B6A9C",
+                      color: "white",
                     },
                   }}
                 >
@@ -219,16 +224,16 @@ const SectionView: React.FC<SectionViewProps> = ({
             {isStudentView && (
               <Button
                 variant="outlined"
-                startIcon={<ExitIcon />}
+                startIcon={<ExitToApp />}
                 onClick={handleRemoveFromSection}
                 disabled={educationManagement.isEnrollmentModifying}
                 data-cy="remove-from-section-button"
                 sx={{
-                  color: '#d32f2f',
-                  borderColor: '#d32f2f',
-                  '&:hover': {
-                    backgroundColor: '#d32f2f',
-                    color: 'white',
+                  color: "#d32f2f",
+                  borderColor: "#d32f2f",
+                  "&:hover": {
+                    backgroundColor: "#d32f2f",
+                    color: "white",
                   },
                 }}
               >
@@ -247,16 +252,16 @@ const SectionView: React.FC<SectionViewProps> = ({
             onChange={handleTabChange}
             sx={{
               borderBottom: 1,
-              borderColor: 'divider',
+              borderColor: "divider",
               mb: 3,
-              '& .MuiTab-root': {
-                color: '#666',
-                '&.Mui-selected': {
-                  color: '#1B6A9C',
+              "& .MuiTab-root": {
+                color: "#666",
+                "&.Mui-selected": {
+                  color: "#1B6A9C",
                 },
               },
-              '& .MuiTabs-indicator': {
-                backgroundColor: '#1B6A9C',
+              "& .MuiTabs-indicator": {
+                backgroundColor: "#1B6A9C",
               },
             }}
           >
@@ -303,7 +308,7 @@ const SectionView: React.FC<SectionViewProps> = ({
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSubmit={handleEditSection}
-        mode={SectionModalMode.EDIT}
+        mode={"edit"}
         initialData={section}
         isLoading={educationManagement.isSectionModifying}
       />

@@ -12,7 +12,7 @@ import { UserRole } from '../helpers/types';
 describe('Course Management Fixtures Test', () => {
   it('Should load all fixtures without errors - Instructor', () => {
     cyMockEducationalManagement(cy, {
-      userRole: UserRole.USER,
+      userRole: 'USER',
       educationalRole: EducationalRole.INSTRUCTOR
     });
     
@@ -34,7 +34,7 @@ describe('Course Management Fixtures Test', () => {
 
   it('Should load all fixtures without errors - Student', () => {
     cyMockEducationalManagement(cy, {
-      userRole: UserRole.USER,
+      userRole: 'USER',
       educationalRole: EducationalRole.STUDENT
     });
     
@@ -55,7 +55,7 @@ describe('Course Management Fixtures Test', () => {
 
   it('Should load empty state fixtures without errors', () => {
     cyMockEducationalManagement(cy, {
-      userRole: UserRole.USER,
+      userRole: 'USER',
       educationalRole: EducationalRole.STUDENT,
       emptyCourses: true,
       emptySections: true,

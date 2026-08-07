@@ -4,8 +4,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { AxiosInstance } from 'axios';
-import { localStorageStore } from '../store/local-storage';
+
+import type { AxiosInstance } from "axios";
+import { localStorageStore } from "../store/local-storage";
 
 /**
  * Middleware function takes some action on an axios instance
@@ -15,20 +16,20 @@ export interface AxiosMiddleware {
 }
 
 export const extractAndStoreAccessToken: AxiosMiddleware = (
-  axiosInstance: AxiosInstance
+  axiosInstance: AxiosInstance,
 ) => {
   axiosInstance.interceptors.response.use(
     function (response) {
       if (response?.data?.extensions?.newToken?.accessToken) {
         localStorageStore(
-          'accessToken',
-          response.data.extensions.newToken.accessToken
+          "accessToken",
+          response.data.extensions.newToken.accessToken,
         );
       }
       return response;
     },
     function (error) {
       return error;
-    }
+    },
   );
 };

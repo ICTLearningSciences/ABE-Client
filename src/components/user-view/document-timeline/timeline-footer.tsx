@@ -1,40 +1,38 @@
-import React, { RefObject, useEffect, useState } from 'react';
-import { Box } from '@mui/material';
-import { useParams } from 'react-router-dom';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
 
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import AssistantPhotoIcon from '@mui/icons-material/AssistantPhoto';
-import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
 
-import { motion } from 'framer-motion';
+import React, { type RefObject, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Box, Step, StepLabel } from "@mui/material";
+import { AssistantPhoto, DoubleArrow } from "@mui/icons-material";
 
-import { GQLTimelinePoint } from '../../../types';
+import type { GQLTimelinePoint } from "../../../types";
 import {
   formatISODateToReadable,
   convertDateTimelinePointTime,
   isTimelinePointFullyLoaded,
-} from '../../../helpers';
-import { useWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
-import { useWithUsersDocs } from '../../../hooks/use-with-users-docs';
-import {
-  ColorlibConnector,
-  QontoStepIcon,
-  StepperSx,
-} from './ColorlibConnector';
+} from "../../../helpers";
+import { useWithDocGoalsActivities } from "../../../store/slices/doc-goals-activities/use-with-doc-goals-activites";
+import { useWithUsersDocs } from "../../../hooks/use-with-users-docs";
+import { ColorlibConnector, StepperSx } from "./ColorlibConnector";
 import {
   Text2Typography,
   Text3,
   Text3NoIndent,
-} from '../../../styles/content-revision-styles';
+} from "../../../styles/content-revision-styles";
 import {
   GlobalStyles,
   TimelineBar,
   TimelineFooterItemCard,
   TimelineItemTest,
   TimelineTestContainer,
-} from '../../../styles/timeline-styles';
-import { useAppSelector } from '../../../store/hooks';
+} from "../../../styles/timeline-styles";
+import { useAppSelector } from "../../../store/hooks";
 
 /* The `TimeLineCard` component is a functional component that takes in a prop `timelinePoint` of type
 `GQLTimelinePoint`. Inside the component, it retrieves the `getActivitById` function from the
@@ -45,22 +43,22 @@ const TimeLineCard = (props: { timelinePoint: GQLTimelinePoint }) => {
   const user = useAppSelector((state) => state.login.user);
   const config = useAppSelector((state) => state.config).config;
   const { getActivityById } = useWithDocGoalsActivities(
-    user?._id || '',
-    config
+    user?._id || "",
+    config,
   );
   const { getCurrentDoc } = useWithUsersDocs();
   const { docId } = useParams<Record<string, string>>();
 
-  const activity = getActivityById(timelinePoint.version.activity || '');
+  const activity = getActivityById(timelinePoint.version.activity || "");
   const googleDoc = getCurrentDoc(docId);
-  const title = activity?.title || googleDoc?.title || '';
+  const title = activity?.title || googleDoc?.title || "";
 
   return (
     <Box>
       <Text2Typography>{title}</Text2Typography>
 
-      <Text3NoIndent style={{ textAlign: 'right' }}>
-        {convertDateTimelinePointTime(timelinePoint.versionTime) || ''}
+      <Text3NoIndent style={{ textAlign: "right" }}>
+        {convertDateTimelinePointTime(timelinePoint.versionTime) || ""}
       </Text3NoIndent>
     </Box>
   );
@@ -72,7 +70,7 @@ export default function TimelineFooter(props: {
   footerTimelineRef: RefObject<HTMLElement>;
   setHasOverflowX: (hasOverflow: boolean) => void;
   currentTimelinePoint?: GQLTimelinePoint;
-}): JSX.Element {
+}): React.ReactNode {
   const {
     timelinePoints,
     currentTimelinePoint,
@@ -105,19 +103,21 @@ export default function TimelineFooter(props: {
     const footerTimelineElement = footerTimelineRef?.current;
     if (footerTimelineElement) {
       setHasOverflowX(
-        footerTimelineElement.scrollWidth > footerTimelineElement.clientWidth
+        footerTimelineElement.scrollWidth > footerTimelineElement.clientWidth,
       );
     }
   }, [footerTimelineRef]);
 
   const currentVersionIndex = timelinePoints.length - 1;
-  const innerWidth = typeof window === 'undefined' ? 0 : window.innerWidth;
+  const innerWidth = typeof window === "undefined" ? 0 : window.innerWidth;
 
   return (
     <TimelineTestContainer
       data-cy="timeline-footer-wrapper"
       ref={footerTimelineRef}
+      // eslint-disable-next-line react-hooks/refs
       style={{
+        // eslint-disable-next-line react-hooks/refs
         width: footerTimelineRef.current?.scrollWidth || innerWidth,
       }}
     >
@@ -126,8 +126,10 @@ export default function TimelineFooter(props: {
         alternativeLabel
         connector={<ColorlibConnector />}
         sx={StepperSx}
+        // eslint-disable-next-line react-hooks/refs
         style={{
-          width: footerTimelineRef.current?.scrollWidth || innerWidth || '100%',
+          // eslint-disable-next-line react-hooks/refs
+          width: footerTimelineRef.current?.scrollWidth || innerWidth || "100%",
         }}
       >
         {timelinePoints.map((timelinePoint, i) => {
@@ -153,7 +155,7 @@ export default function TimelineFooter(props: {
                     onClick={() => props.onSelectTimepoint(timelinePoint)}
                     elevation={1}
                     style={{
-                      padding: '1rem',
+                      padding: "1rem",
                       opacity: isFullyLoaded ? 1 : 0.5,
                     }}
                     hovered={hoverIndex === i}
@@ -164,33 +166,33 @@ export default function TimelineFooter(props: {
                     {hoverIndex !== i ? (
                       <div
                         style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'center',
-                          alignItems: 'center',
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
                         }}
                       >
                         <Text2Typography
                           style={{
-                            textAlign: 'center',
-                            display: 'flex',
-                            alignItems: 'center',
+                            textAlign: "center",
+                            display: "flex",
+                            alignItems: "center",
                           }}
                         >
                           {formatISODateToReadable(timelinePoint.versionTime)}
                           {i === 0 ? (
-                            <DoubleArrowIcon
+                            <DoubleArrow
                               style={{ marginLeft: 5, fontSize: 18 }}
                             />
                           ) : i === currentVersionIndex ? (
-                            <AssistantPhotoIcon
+                            <AssistantPhoto
                               style={{ marginLeft: 5, fontSize: 18 }}
                             />
                           ) : null}
                         </Text2Typography>
                         <Text3>
                           {convertDateTimelinePointTime(
-                            timelinePoint.versionTime
+                            timelinePoint.versionTime,
                           )}
                         </Text3>
                       </div>
@@ -200,7 +202,7 @@ export default function TimelineFooter(props: {
                   </TimelineFooterItemCard>
                 </motion.div>
               </TimelineItemTest>
-              <StepLabel StepIconComponent={QontoStepIcon} />
+              <StepLabel />
             </Step>
           );
         })}

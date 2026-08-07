@@ -4,26 +4,30 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+
+import React from "react";
 import {
   IconButton,
   Tooltip,
   TableCell,
   CircularProgress,
   Checkbox,
-} from '@mui/material';
-import { UserDoc } from '../../types';
-import { RowDiv } from '../../styled-components';
-import DescriptionIcon from '@mui/icons-material/Description';
-import { Delete } from '@mui/icons-material';
-import RestoreIcon from '@mui/icons-material/Restore';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import UnarchiveIcon from '@mui/icons-material/Unarchive';
-import { formatISODateToReadable } from '../../helpers';
+} from "@mui/material";
+import {
+  Delete,
+  Description,
+  Restore,
+  Archive,
+  Unarchive,
+} from "@mui/icons-material";
+
+import type { UserDoc } from "../../types";
+import { RowDiv } from "../../styled-components";
+import { formatISODateToReadable } from "../../helpers";
 import {
   GoogleDocItemName,
   StyledGoogleDocItemRow,
-} from './select-create-docs-styles';
+} from "./select-create-docs-styles";
 
 interface GoogleDocItemRowProps {
   doc: UserDoc;
@@ -53,7 +57,7 @@ export function GoogleDocItemRow({
   onPrimaryDocSet,
   isPrimaryDoc,
   loadInProgress,
-}: GoogleDocItemRowProps): JSX.Element {
+}: GoogleDocItemRowProps): React.ReactNode {
   const [archivingInProgress, setArchivingInProgress] = React.useState(false);
 
   const handleArchiveClick = async () => {
@@ -83,25 +87,25 @@ export function GoogleDocItemRow({
             opacity: doc.archived ? 0.5 : 1,
           }}
         >
-          <DescriptionIcon />
+          <Description />
           <GoogleDocItemName
-            data-cy={`doc-list-item-${doc.title.replaceAll(' ', '-')}`}
+            data-cy={`doc-list-item-${doc.title.replaceAll(" ", "-")}`}
             onClick={onDoubleClick}
           >
-            {doc.title || 'My Document'}
+            {doc.title || "My Document"}
           </GoogleDocItemName>
         </RowDiv>
       </TableCell>
-      <TableCell style={{ textAlign: 'center' }}>
+      <TableCell style={{ textAlign: "center" }}>
         {formatISODateToReadable(doc.createdAt)}
       </TableCell>
-      <TableCell style={{ textAlign: 'center' }}>
+      <TableCell style={{ textAlign: "center" }}>
         {formatISODateToReadable(doc.updatedAt)}
       </TableCell>
       {isStudent && (
-        <TableCell style={{ textAlign: 'center' }}>
+        <TableCell style={{ textAlign: "center" }}>
           <Checkbox
-            data-cy={`primary-doc-checkbox-${doc.title.replaceAll(' ', '-')}`}
+            data-cy={`primary-doc-checkbox-${doc.title.replaceAll(" ", "-")}`}
             checked={isPrimaryDoc}
             disabled={loadInProgress}
             onChange={onPrimaryDocSet}
@@ -110,51 +114,51 @@ export function GoogleDocItemRow({
       )}
       <TableCell
         style={{
-          display: 'flex',
-          gap: '8px',
+          display: "flex",
+          gap: "8px",
         }}
       >
         {!viewingArchived && (
-          <RowDiv style={{ gap: '8px' }}>
+          <RowDiv style={{ gap: "8px" }}>
             <Tooltip title="View History">
               <IconButton onClick={onHistoryClick}>
-                <RestoreIcon />
+                <Restore />
               </IconButton>
             </Tooltip>
             <Tooltip title="Archive">
               <IconButton
                 disabled={archivingInProgress}
-                data-cy={`archive-doc-${doc.title.replaceAll(' ', '-')}`}
+                data-cy={`archive-doc-${doc.title.replaceAll(" ", "-")}`}
                 onClick={handleArchiveClick}
               >
                 {archivingInProgress ? (
                   <CircularProgress size={20} />
                 ) : (
-                  <ArchiveIcon />
+                  <Archive />
                 )}
               </IconButton>
             </Tooltip>
           </RowDiv>
         )}
         {viewingArchived && (
-          <RowDiv style={{ gap: '8px' }}>
+          <RowDiv style={{ gap: "8px" }}>
             <Tooltip title="Unarchive">
               <IconButton
                 disabled={archivingInProgress}
-                data-cy={`unarchive-doc-${doc.title.replaceAll(' ', '-')}`}
+                data-cy={`unarchive-doc-${doc.title.replaceAll(" ", "-")}`}
                 onClick={handleUnarchiveClick}
               >
                 {archivingInProgress ? (
                   <CircularProgress size={20} />
                 ) : (
-                  <UnarchiveIcon />
+                  <Unarchive />
                 )}
               </IconButton>
             </Tooltip>
 
             <Tooltip title="Delete">
               <IconButton
-                data-cy={`delete-doc-${doc.title.replaceAll(' ', '-')}`}
+                data-cy={`delete-doc-${doc.title.replaceAll(" ", "-")}`}
                 onClick={onDeleteClick}
               >
                 <Delete />

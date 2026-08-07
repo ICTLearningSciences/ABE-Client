@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React, { useMemo, useState } from 'react';
+
+import React, { useMemo, useState } from "react";
 import {
   Box,
   Typography,
@@ -17,22 +18,22 @@ import {
   Select,
   MenuItem,
   Modal,
-} from '@mui/material';
+} from "@mui/material";
+import { Add as Add, TextSnippet } from "@mui/icons-material";
 import {
-  Add as AddIcon,
-  TextSnippet as ViewDocumentTimelineIcon,
-} from '@mui/icons-material';
-import {
-  Assignment,
+  type Assignment,
   isStudentData,
-} from '../../../store/slices/education-management/types';
-import { LLMSelector } from './assignment-view/llm-selector';
-import { useWithEducationalManagement } from '../../../store/slices/education-management/use-with-educational-management';
-import { AiServiceModel } from '../../../types';
-import { getStudentActivityCompletionData, reorderArray } from '../helpers';
-import { AssignmentActivityListItem } from './assignment-view/assignment-activity-list-item';
-import { RowDiv } from '../../../styled-components';
-import { UseWithDocGoalsActivities } from '../../../store/slices/doc-goals-activities/use-with-doc-goals-activites';
+} from "../../../store/slices/education-management/types";
+import { LLMSelector } from "./assignment-view/llm-selector";
+import { useWithEducationalManagement } from "../../../store/slices/education-management/use-with-educational-management";
+import type { AiServiceModel } from "../../../types";
+import { getStudentActivityCompletionData, reorderArray } from "../helpers";
+import { AssignmentActivityListItem } from "./assignment-view/assignment-activity-list-item";
+import { RowDiv } from "../../../styled-components";
+import type { UseWithDocGoalsActivities } from "../../../store/slices/doc-goals-activities/use-with-doc-goals-activites";
+
+export type ViewActivitiesSetting =
+  "Standard" | "All Activities" | "My Activities Only";
 
 interface AssignmentActivitiesDisplayProps {
   assignment: Assignment;
@@ -44,12 +45,6 @@ interface AssignmentActivitiesDisplayProps {
   onActivitySelect: (activityId: string) => void;
   activityIdToCompletionStatus: Record<string, boolean>;
   onViewDocumentTimeline: (studentId: string, assignmentId: string) => void;
-}
-
-export enum ViewActivitiesSetting {
-  STANDARD = 'Standard',
-  ALL = 'All Activities',
-  MINE = 'My Activities Only',
 }
 
 const AssignmentActivitiesDisplay: React.FC<
@@ -65,21 +60,20 @@ const AssignmentActivitiesDisplay: React.FC<
   activityIdToCompletionStatus,
   onViewDocumentTimeline,
 }) => {
-  const [selectedActivityId, setSelectedActivityId] = useState<string>('');
+  const [selectedActivityId, setSelectedActivityId] = useState<string>("");
   const { myData, studentActivityDefaultLLMSet, viewState, updateAssignment } =
     useWithEducationalManagement();
   const [llmChangeLoading, setLlmChangeLoading] = useState(false);
   const [llmModalOpen, setLlmModalOpen] = useState(false);
   const [selectedActivityForLLM, setSelectedActivityForLLM] =
-    useState<string>('');
+    useState<string>("");
   const hasRelevantGoogleDocs =
     myData &&
     isStudentData(myData) &&
     (myData.assignmentProgress.find((a) => a.assignmentId === assignment._id)
       ?.relevantGoogleDocs.length || 0) > 0;
-  const [viewActivitiesSetting, setViewActivitiesSetting] = useState<string>(
-    ViewActivitiesSetting.STANDARD
-  );
+  const [viewActivitiesSetting, setViewActivitiesSetting] =
+    useState<string>("Standard");
   const {
     educationReadyActivities,
     frontPageActivities: _frontPageActivities,
@@ -89,32 +83,32 @@ const AssignmentActivitiesDisplay: React.FC<
   const frontPageActivities = useMemo(
     () =>
       _frontPageActivities.filter((activity) =>
-        educationReadyActivities.some((a) => a._id === activity._id)
+        educationReadyActivities.some((a) => a._id === activity._id),
       ),
-    [educationReadyActivities, _frontPageActivities]
+    [educationReadyActivities, _frontPageActivities],
   );
 
   const unusedActivities = useMemo(
     () =>
       educationReadyActivities.filter(
-        (activity) => !assignment?.activityIds.includes(activity._id)
+        (activity) => !assignment?.activityIds.includes(activity._id),
       ),
-    [educationReadyActivities, assignment]
+    [educationReadyActivities, assignment],
   );
 
   const displayedActivities = useMemo(() => {
     const myActivities = unusedActivities.filter(
-      (activity) => activity.user === myData?.userId
+      (activity) => activity.user === myData?.userId,
     );
-    if (viewActivitiesSetting === ViewActivitiesSetting.ALL) {
+    if (viewActivitiesSetting === "All Activities") {
       return unusedActivities;
     }
-    if (viewActivitiesSetting === ViewActivitiesSetting.MINE) {
+    if (viewActivitiesSetting === "My Activities Only") {
       return myActivities;
     }
     // Standard
     const myActivitiesNotOnFrontPage = myActivities.filter(
-      (activity) => !frontPageActivities.some((a) => a._id === activity._id)
+      (activity) => !frontPageActivities.some((a) => a._id === activity._id),
     );
     return [...frontPageActivities, ...myActivitiesNotOnFrontPage];
   }, [viewActivitiesSetting, unusedActivities, frontPageActivities, myData]);
@@ -125,19 +119,19 @@ const AssignmentActivitiesDisplay: React.FC<
         ? getStudentActivityCompletionData(
             myData,
             assignment._id,
-            selectedActivityForLLM
+            selectedActivityForLLM,
           )?.defaultLLM
         : undefined,
-    [selectedActivityForLLM, myData, assignment._id]
+    [selectedActivityForLLM, myData, assignment._id],
   );
   const handleAddActivity = async () => {
     if (!selectedActivityId) return;
 
     try {
       await onAddActivity(selectedActivityId);
-      setSelectedActivityId(''); // Reset selection
+      setSelectedActivityId(""); // Reset selection
     } catch (error) {
-      console.error('Failed to add activity to assignment:', error);
+      console.error("Failed to add activity to assignment:", error);
     }
   };
 
@@ -145,7 +139,7 @@ const AssignmentActivitiesDisplay: React.FC<
     try {
       await onRemoveActivity(activityIdToRemove);
     } catch (error) {
-      console.error('Failed to remove activity from assignment:', error);
+      console.error("Failed to remove activity from assignment:", error);
     }
   };
 
@@ -158,18 +152,18 @@ const AssignmentActivitiesDisplay: React.FC<
         !viewState.selectedSectionId ||
         !viewState.selectedAssignmentId
       )
-        throw new Error('View state not found');
+        throw new Error("View state not found");
       await studentActivityDefaultLLMSet(
         myData.userId,
         viewState.selectedCourseId,
         viewState.selectedSectionId,
         viewState.selectedAssignmentId,
         selectedActivityForLLM,
-        defaultLLM
+        defaultLLM,
       );
       setLlmModalOpen(false);
     } catch (error) {
-      console.error('Failed to change activity default LLM:', error);
+      console.error("Failed to change activity default LLM:", error);
     } finally {
       setLlmChangeLoading(false);
     }
@@ -177,13 +171,13 @@ const AssignmentActivitiesDisplay: React.FC<
 
   async function handleActivityOrderChange(
     activityId: string,
-    upOrDown: 'up' | 'down'
+    upOrDown: "up" | "down",
   ) {
     if (!viewState.selectedCourseId || !assignment._id) return;
     const newActivityOrder = reorderArray(
       assignment.activityOrder,
       activityId,
-      upOrDown
+      upOrDown,
     );
     try {
       await updateAssignment(viewState.selectedCourseId, {
@@ -191,7 +185,7 @@ const AssignmentActivitiesDisplay: React.FC<
         activityOrder: newActivityOrder,
       });
     } catch (error) {
-      console.error('Failed to change activity order:', error);
+      console.error("Failed to change activity order:", error);
     }
   }
 
@@ -204,19 +198,17 @@ const AssignmentActivitiesDisplay: React.FC<
     <Box>
       <Stack
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 2.5 }}
+        sx={{ mb: 2.5, alignItems: "center", justifyContent: "space-between" }}
       >
         <Typography
           variant="h5"
-          sx={{ fontWeight: 600, color: 'text.primary' }}
+          sx={{ fontWeight: 600, color: "text.primary" }}
         >
           Activities
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {assignment.activityIds.length} activit
-          {assignment.activityIds.length !== 1 ? 'ies' : 'y'}
+          {assignment.activityIds.length !== 1 ? "ies" : "y"}
         </Typography>
       </Stack>
 
@@ -232,14 +224,14 @@ const AssignmentActivitiesDisplay: React.FC<
           }
           style={{
             marginBottom: 10,
-            textTransform: 'none',
+            textTransform: "none",
           }}
           onClick={() => {
             if (!myData || !myData.userId) return;
             onViewDocumentTimeline(myData.userId, assignment._id);
           }}
         >
-          <ViewDocumentTimelineIcon />
+          <TextSnippet />
           View Document Timeline
         </Button>
       )}
@@ -249,21 +241,20 @@ const AssignmentActivitiesDisplay: React.FC<
         <Card variant="outlined" sx={{ mb: 3, p: 2.5 }}>
           <RowDiv
             style={{
-              marginBottom: '20px',
-              justifyContent: 'space-between',
+              marginBottom: "20px",
+              justifyContent: "space-between",
             }}
           >
             <Typography
               variant="h6"
-              sx={{ color: 'text.primary' }}
-              textAlign={'center'}
+              sx={{ color: "text.primary", textAlign: "center" }}
             >
               Add Activity
             </Typography>
 
             <FormControl sx={{ minWidth: 200 }} size="small">
               <InputLabel id="view-activities-setting-label">
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <span>Filter</span>
                 </Box>
               </InputLabel>
@@ -274,14 +265,10 @@ const AssignmentActivitiesDisplay: React.FC<
                 onChange={(e) => setViewActivitiesSetting(e.target.value)}
                 data-cy="view-activities-setting-dropdown"
               >
-                <MenuItem value={ViewActivitiesSetting.STANDARD}>
-                  {ViewActivitiesSetting.STANDARD}
-                </MenuItem>
-                <MenuItem value={ViewActivitiesSetting.ALL}>
-                  {ViewActivitiesSetting.ALL}
-                </MenuItem>
-                <MenuItem value={ViewActivitiesSetting.MINE}>
-                  {ViewActivitiesSetting.MINE}
+                <MenuItem value={"Standard"}>{"Standard"}</MenuItem>
+                <MenuItem value={"All Activities"}>{"All Activities"}</MenuItem>
+                <MenuItem value={"My Activities Only"}>
+                  {"My Activities Only"}
                 </MenuItem>
               </Select>
             </FormControl>
@@ -289,13 +276,13 @@ const AssignmentActivitiesDisplay: React.FC<
 
           {displayedActivities.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
-              No more activities available to add to this assignment.{' '}
-              {viewActivitiesSetting === ViewActivitiesSetting.MINE
-                ? 'Try setting the view activities setting to ALL ACTIVITIES.'
-                : ''}
+              No more activities available to add to this assignment.{" "}
+              {viewActivitiesSetting === "My Activities Only"
+                ? "Try setting the view activities setting to ALL ACTIVITIES."
+                : ""}
             </Typography>
           ) : (
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={2} style={{ alignItems: "center" }}>
               <FormControl fullWidth>
                 <InputLabel id="activity-select-label">
                   Select Activity
@@ -318,17 +305,17 @@ const AssignmentActivitiesDisplay: React.FC<
 
               <Button
                 variant="contained"
-                startIcon={<AddIcon />}
+                startIcon={<Add />}
                 onClick={handleAddActivity}
                 disabled={!selectedActivityId || isAssignmentModifying}
                 data-cy="add-activity-to-assignment-button"
                 sx={{
-                  backgroundColor: '#1B6A9C',
-                  '&:hover': {
-                    backgroundColor: '#145a87',
+                  backgroundColor: "#1B6A9C",
+                  "&:hover": {
+                    backgroundColor: "#145a87",
                   },
-                  '&:disabled': {
-                    backgroundColor: 'grey.300',
+                  "&:disabled": {
+                    backgroundColor: "grey.300",
                   },
                 }}
               >
@@ -343,14 +330,14 @@ const AssignmentActivitiesDisplay: React.FC<
         <Card
           variant="outlined"
           sx={{
-            border: '2px dashed',
-            borderColor: 'grey.300',
-            textAlign: 'center',
+            border: "2px dashed",
+            borderColor: "grey.300",
+            textAlign: "center",
             py: 5,
             px: 2.5,
           }}
         >
-          <Typography sx={{ fontSize: '48px', color: 'grey.300', mb: 2 }}>
+          <Typography sx={{ fontSize: "48px", color: "grey.300", mb: 2 }}>
             🎯
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
@@ -394,14 +381,14 @@ const AssignmentActivitiesDisplay: React.FC<
         open={llmModalOpen}
         onClose={() => setLlmModalOpen(false)}
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <Box
           sx={{
-            backgroundColor: 'background.paper',
+            backgroundColor: "background.paper",
             borderRadius: 2,
             boxShadow: 24,
             p: 4,
@@ -416,7 +403,7 @@ const AssignmentActivitiesDisplay: React.FC<
               loading={llmChangeLoading}
             />
           )}
-          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
             <Button
               data-cy="llm-settings-modal-close-button"
               onClick={() => setLlmModalOpen(false)}

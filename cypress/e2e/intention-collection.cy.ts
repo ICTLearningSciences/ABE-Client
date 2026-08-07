@@ -376,7 +376,7 @@ describe('collectin user intentions', () => {
   const extraGqlQueries = [
       mockGQL(
           'RefreshAccessToken',
-          refreshAccessTokenResponse(UserRole.USER, loginService)
+          refreshAccessTokenResponse('USER', loginService)
           ),
   ]
   const docService = getDocServiceFromLoginService(loginService)

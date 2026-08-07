@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import React from 'react';
+
+import React from "react";
 
 interface CancellableFunc {
   (isCancelled: () => boolean): void;
@@ -12,9 +13,9 @@ interface CancellableFunc {
 
 export function useInterval(
   callback: CancellableFunc,
-  delay: number | null
+  delay: number | null,
 ): void {
-  const savedCallback = React.useRef<CancellableFunc>();
+  const savedCallback = React.useRef<CancellableFunc>(undefined);
   React.useEffect(() => {
     savedCallback.current = callback;
   });

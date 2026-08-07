@@ -4,9 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import * as config from '.';
-import { AvailableAiServiceModels } from '../../../types';
-import { useAppDispatch, useAppSelector } from '../../hooks';
+
+import * as config from ".";
+import type { AvailableAiServiceModels } from "../../../types";
+import { useAppDispatch, useAppSelector } from "../../hooks";
 
 export interface UseWithConfig {
   state: config.ConfigState;
@@ -19,7 +20,7 @@ export interface UseWithConfig {
 
 export function useWithConfig(): UseWithConfig {
   const dispatch = useAppDispatch();
-  const state = useAppSelector((state) => state.config);
+  const state: config.ConfigState = useAppSelector((state) => state.config);
   const userEmail = useAppSelector((state) => state.login.user?.email);
   const approvedEmailsForAiModels = state.config?.approvedEmailsForAiModels;
   const isApprovedEmail =
@@ -34,19 +35,15 @@ export function useWithConfig(): UseWithConfig {
       }));
 
   function isConfigLoaded(): boolean {
-    return state.status === config.ConfigStatus.SUCCEEDED;
+    return state.status === 2;
   }
 
   function loadFailed(): boolean {
-    return state.status === config.ConfigStatus.FAILED;
+    return state.status === 3;
   }
 
   function loadConfig(subdomain?: string) {
-    if (
-      state.status === config.ConfigStatus.NONE ||
-      state.status === config.ConfigStatus.FAILED ||
-      state.status === config.ConfigStatus.SUCCEEDED
-    ) {
+    if (state.status === 0 || state.status === 3 || state.status === 2) {
       dispatch(config.getConfig(subdomain));
     }
   }

@@ -1,4 +1,11 @@
-import React, { useState } from 'react';
+/*
+This software is Copyright ©️ 2020 The University of Southern California. All Rights Reserved. 
+Permission to use, copy, modify, and distribute this software and its documentation for educational, research and non-profit purposes, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and subject to the full license file found in the root of this software deliverable. Permission to make commercial use of this software may be obtained by contacting:  USC Stevens Center for Innovation University of Southern California 1150 S. Olive Street, Suite 2300, Los Angeles, CA 90115, USA Email: accounting@stevens.usc.edu
+
+The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
+*/
+
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -7,14 +14,14 @@ import {
   TextField,
   Rating,
   Stack,
-} from '@mui/material';
-import { useWithEducationalManagement } from '../../../../store/slices/education-management/use-with-educational-management';
+} from "@mui/material";
+import { useWithEducationalManagement } from "../../../../store/slices/education-management/use-with-educational-management";
 import {
-  Assignment,
+  type Assignment,
+  type StudentData,
   isInstructorData,
-  StudentData,
-} from '../../../../store/slices/education-management';
-import { extractErrorMessageFromError } from '../../../../helpers';
+} from "../../../../store/slices/education-management";
+import { extractErrorMessageFromError } from "../../../../helpers";
 
 export interface AssignmentGraderProps {
   student: StudentData;
@@ -27,17 +34,17 @@ export function AssignmentGrader({
 }: AssignmentGraderProps) {
   const { gradeStudentAssignment, myData } = useWithEducationalManagement();
   const assignmentGrade = student.assignmentProgress.find(
-    (a) => a.assignmentId === assignment._id
+    (a) => a.assignmentId === assignment._id,
   )?.instructorGrade;
   const [grade, setGrade] = useState(assignmentGrade?.grade || 5);
-  const [comment, setComment] = useState(assignmentGrade?.comment || '');
+  const [comment, setComment] = useState(assignmentGrade?.comment || "");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleGrade = async () => {
     setIsLoading(true);
-    setErrorMessage('');
+    setErrorMessage("");
 
     try {
       await gradeStudentAssignment(grade, comment);
@@ -52,11 +59,11 @@ export function AssignmentGrader({
   return (
     <Box
       style={{
-        border: '2px dashed #000',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
+        border: "2px dashed #000",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         padding: 1,
         margin: 2,
       }}
@@ -92,13 +99,13 @@ export function AssignmentGrader({
       <Modal open={isModalOpen} aria-labelledby="grade-assignment-modal">
         <Box
           sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
             width: 400,
-            bgcolor: 'background.paper',
-            border: '2px solid #000',
+            bgcolor: "background.paper",
+            border: "2px solid #000",
             boxShadow: 24,
             p: 4,
           }}
@@ -108,7 +115,7 @@ export function AssignmentGrader({
             variant="h6"
             component="h2"
             gutterBottom
-            textAlign="center"
+            style={{ textAlign: "center" }}
           >
             Review Assignment
           </Typography>
@@ -120,7 +127,7 @@ export function AssignmentGrader({
                 data-cy="grade-rating"
                 name="grade-rating"
                 value={grade}
-                onChange={(event, newValue) => {
+                onChange={(_event, newValue) => {
                   setGrade(newValue || 5);
                 }}
                 max={5}
@@ -130,9 +137,7 @@ export function AssignmentGrader({
             </Box>
 
             <TextField
-              inputProps={{
-                'data-cy': 'grade-comment-input',
-              }}
+              data-cy="grade-comment-input"
               fullWidth
               label="Comment"
               multiline
@@ -148,7 +153,11 @@ export function AssignmentGrader({
               </Typography>
             )}
 
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Stack
+              direction="row"
+              spacing={2}
+              style={{ justifyContent: "flex-end" }}
+            >
               <Button
                 onClick={() => setIsModalOpen(false)}
                 disabled={isLoading}
@@ -161,7 +170,7 @@ export function AssignmentGrader({
                 disabled={isLoading}
                 data-cy="grade-assignment-submit-button"
               >
-                {isLoading ? 'Submitting...' : 'Submit Review'}
+                {isLoading ? "Submitting..." : "Submit Review"}
               </Button>
             </Stack>
           </Stack>

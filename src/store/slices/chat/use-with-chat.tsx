@@ -4,28 +4,29 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { useAppSelector, useAppDispatch } from '../../hooks';
+
+import { useAppSelector, useAppDispatch } from "../../hooks";
 import {
-  ChatState,
+  type ChatState,
+  type ChatMessageTypes,
   addMessage,
   addMessages,
   setCoachResponsePending,
   clearChat,
-  ChatMessageTypes,
   updateSystemPrompt,
-} from '.';
+} from ".";
 
 interface UseWithChat {
   state: ChatState;
   sendMessage: (
     msg: ChatMessageTypes,
     clearChat: boolean,
-    docId: string
+    docId: string,
   ) => void;
   sendMessages: (
     msgs: ChatMessageTypes[],
     clearChat: boolean,
-    docId: string
+    docId: string,
   ) => void;
   coachResponsePending: (waiting: boolean) => void;
   clearChatLog: (docId: string) => void;
@@ -42,7 +43,7 @@ export function useWithChat(): UseWithChat {
   function sendMessage(
     msg: ChatMessageTypes,
     clearChat = false,
-    docId: string
+    docId: string,
   ) {
     dispatch(addMessage({ message: msg, clearChat, docId }));
   }
@@ -50,7 +51,7 @@ export function useWithChat(): UseWithChat {
   function sendMessages(
     msgs: ChatMessageTypes[],
     clearChat = false,
-    docId: string
+    docId: string,
   ) {
     dispatch(addMessages({ messages: msgs, clearChat, docId }));
   }
@@ -69,12 +70,12 @@ export function useWithChat(): UseWithChat {
 
   function chatLogToString(docId: string) {
     const chatLog = chatState.chatLogs[docId];
-    let chatLogString = '';
+    let chatLogString = "";
     for (let i = 0; i < chatLog.length; i++) {
       const tokenUsage =
         chatLog[i].aiServiceStepData?.[0].tokenUsage.totalUsage;
       chatLogString += `${chatLog[i].sender}${
-        tokenUsage ? ` (Token Usage: ${tokenUsage})` : ''
+        tokenUsage ? ` (Token Usage: ${tokenUsage})` : ""
       }: ${chatLog[i].message}\n`;
     }
     return chatLogString;
@@ -88,13 +89,13 @@ export function useWithChat(): UseWithChat {
           acc + (chatLogItem.aiServiceStepData?.[0].tokenUsage.totalUsage || 0)
         );
       },
-      0
+      0,
     );
     chatLog += `\nTotal Token Usage: ${totalTokenUsage}`;
-    const element = document.createElement('a');
-    const file = new Blob([chatLog], { type: 'text/plain' });
+    const element = document.createElement("a");
+    const file = new Blob([chatLog], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
-    element.download = 'chat-log.txt';
+    element.download = "chat-log.txt";
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
   }

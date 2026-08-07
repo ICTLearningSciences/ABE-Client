@@ -4,28 +4,17 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Activity, DocGoal } from '../../../types';
-import {
+
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { Activity, DocGoal } from "../../../types";
+import type {
   AiServiceStepDataTypes,
   Source,
-} from '../../../ai-services/ai-service-types';
+} from "../../../ai-services/ai-service-types";
 
-export enum Sender {
-  USER = 'USER',
-  SYSTEM = 'SYSTEM',
-}
-
-export enum MessageDisplayType {
-  TEXT = 'TEXT',
-  PENDING_MESSAGE = 'PENDING_MESSAGE',
-}
-
-export enum UserInputType {
-  FREE_INPUT = 'FREE_INPUT',
-  MCQ = 'MCQ',
-  NONE = 'NONE',
-}
+export type Sender = "USER" | "SYSTEM";
+export type MessageDisplayType = "TEXT" | "PENDING_MESSAGE";
+export type UserInputType = "FREE_INPUT" | "MCQ" | "NONE";
 
 export interface ChatMessage {
   id: string;
@@ -42,9 +31,7 @@ export interface ChatMessage {
 }
 
 export type ChatMessageTypes =
-  | TextMessage
-  | BulletPointMessage
-  | PendingMessage;
+  TextMessage | BulletPointMessage | PendingMessage;
 
 export interface PendingMessage extends ChatMessage {
   message: string;
@@ -72,13 +59,13 @@ export interface ChatState {
 const initialState: ChatState = {
   chatLogs: {},
   coachResponsePending: false,
-  systemRole: '',
+  systemRole: "",
 };
 
 /** Reducer */
 
 export const chatSlice = createSlice({
-  name: 'chat',
+  name: "chat",
   initialState,
   reducers: {
     updateSystemPrompt: (state: ChatState, action: PayloadAction<string>) => {
@@ -90,7 +77,7 @@ export const chatSlice = createSlice({
         message: ChatMessageTypes;
         clearChat: boolean;
         docId: string;
-      }>
+      }>,
     ) => {
       const { message, clearChat, docId } = action.payload;
       if (clearChat) {
@@ -99,7 +86,7 @@ export const chatSlice = createSlice({
           [docId]: [],
         };
       }
-      if (message.sender === Sender.SYSTEM) {
+      if (message.sender === "SYSTEM") {
         state.coachResponsePending = false;
       }
 
@@ -109,7 +96,7 @@ export const chatSlice = createSlice({
       // TODO FIX: This is a hack to prevent duplicate messages from being added to the chat log
       if (
         messages.length <= 3 &&
-        message.sender === Sender.SYSTEM &&
+        message.sender === "SYSTEM" &&
         mostRecentMessage?.message === message.message
       ) {
         return;
@@ -125,7 +112,7 @@ export const chatSlice = createSlice({
         messages: ChatMessageTypes[];
         clearChat: boolean;
         docId: string;
-      }>
+      }>,
     ) => {
       const { messages, clearChat, docId } = action.payload;
       if (clearChat) {
@@ -148,7 +135,7 @@ export const chatSlice = createSlice({
     },
     setCoachResponsePending: (
       state: ChatState,
-      action: PayloadAction<boolean>
+      action: PayloadAction<boolean>,
     ) => {
       state.coachResponsePending = action.payload;
     },
