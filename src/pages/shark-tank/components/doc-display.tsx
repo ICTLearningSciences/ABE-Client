@@ -14,6 +14,7 @@ import { useNavigateWithParams } from "../../../hooks/use-navigate-with-params";
 export default function UserDocumentDisplay(props: {
   docId?: string;
   activityId?: string;
+  selectingDoc?: boolean;
   onOpenDoc: (id: string) => void;
 }): React.ReactNode {
   const { docId, activityId, onOpenDoc } = props;
@@ -29,17 +30,20 @@ export default function UserDocumentDisplay(props: {
     navigate(`/docs/history/${docId}`);
   }
 
-  return docId ? (
+  if (!docId || props.selectingDoc) {
+    return (
+      <ViewUserGoogleDocs
+        goToDoc={onOpenDoc}
+        onHistoryClicked={onHistoryClicked}
+        isEducationalSetting={false}
+      />
+    );
+  }
+  return (
     <iframe
       width="100%"
       height="100%"
       src={`https://docs.google.com/document/d/${docId}/edit?authuser=${user?.email}`}
-    />
-  ) : (
-    <ViewUserGoogleDocs
-      goToDoc={onOpenDoc}
-      onHistoryClicked={onHistoryClicked}
-      isEducationalSetting={false}
     />
   );
 }

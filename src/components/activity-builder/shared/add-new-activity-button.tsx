@@ -18,6 +18,16 @@ export type AddNewActivityStepType =
   | "EDIT_DOC_PROMPT"
   | "END_ACTIVITY_MESSAGE";
 
+function getButtonText(t: AddNewActivityStepType): string {
+  if (t === "SYSTEM_MESSAGE") return "Basic Message";
+  if (t === "REQUEST_USER_INPUT") return "User Input";
+  if (t === "PROMPT") return "AI Prompt";
+  if (t === "CONDITIONAL") return "If / Then Go-To";
+  if (t === "EDIT_DOC_PROMPT") return "AI Edits Doc";
+  if (t === "END_ACTIVITY_MESSAGE") return "End Activity Message";
+  return "";
+}
+
 export function AddNewActivityButton(props: {
   insertNewActivityStep: (stepType: AddNewActivityStepType) => void;
 }): React.ReactNode {
@@ -58,7 +68,7 @@ export function AddNewActivityButton(props: {
                   setDisplayOptions(false);
                 }}
               >
-                {option}
+                {getButtonText(option as AddNewActivityStepType)}
               </Button>
             );
           })}
