@@ -20,8 +20,9 @@ import {
   mockGQL,
   sendChatMessage,
 } from '../helpers/functions';
-import { DocVersion, LoginService, UserRole, testGoogleDocId } from '../helpers/types';
+import { testGoogleDocId } from '../helpers/types';
 import { myEditableActivityResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
+import { DocVersion } from '../../src/types';
 
 function writeDocumentIntention(cy: CypressGlobal, input: string) {
   cy.get('[data-cy=input-document-intention]')
@@ -372,7 +373,7 @@ describe('collectin user intentions', () => {
       );
     });
   });
-[LoginService.AMAZON_COGNITO, LoginService.GOOGLE].forEach((loginService) => {
+['AMAZON_COGNITO', 'GOOGLE'].forEach((loginService) => {
   const extraGqlQueries = [
       mockGQL(
           'RefreshAccessToken',

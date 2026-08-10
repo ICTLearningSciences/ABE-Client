@@ -4,6 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+
 import { Interception } from 'cypress/types/net-stubbing';
 import { asyncStartRequestRes } from '../fixtures/async-start-request';
 import { eightHoursBetweenSessions, eightHoursBetweenSessionsDocVersions } from '../fixtures/document-timeline/eight-hours-difference';
@@ -21,20 +22,13 @@ import { updateUserInfoResponse } from '../fixtures/update-user-info';
 import { testUser } from '../fixtures/user-data';
 import { ACCESS_TOKEN_KEY } from './local-storage';
 import {
-  DocData,
-  GQLDocumentTimeline,
-  IGDocVersion,
-  JobStatus,
-  // UserRole,
   MockDefaultType,
-  ActivityBuilderVisibility,
-  DocService,
-  LoginService,
   testGoogleDocId,
 } from './types';
 import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
 import { createNewInstructorResponse, createNewStudentResponse, fetchAssignmentsResponseEmpty, fetchCoursesResponseEmpty, fetchSectionsResponseEmpty, fetchStudentsResponseEmpty } from '../fixtures/educational-management';
-import { UserRole } from '../../src/store/slices/login';
+import { LoginService, UserRole } from '../../src/store/slices/login';
+import { DocData, DocService, GQLDocumentTimeline, IGDocVersion, JobStatus } from '../../src/types';
 
 export type CypressGlobal = Cypress.cy & CyEventEmitter;
 
@@ -80,7 +74,7 @@ export interface MockGraphQLQuery {
 }
 
 function staticResponse(s: StaticResponse): StaticResponse {
-  if(typeof window === 'undefined') {
+  if (typeof window === 'undefined') {
     return {
       ...s,
     };
@@ -211,31 +205,33 @@ export function cyMockDefault(
       refreshAccessTokenResponse(args.userRole || 'USER')
     ),
     mockGQL('FetchVersionsById', fetchDocVersionsBuilder(docTimelineVersions)),
-    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.GOOGLE_DOCS)),
+    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse('GOOGLE_DOCS')),
     mockGQL('FetchConfig', fetchConfigResponse),
     mockGQL('FetchDocGoals', fetchDocGoalsResponse),
     mockGQL('FetchSystemPrompts', fetchConfigResponse),
     mockGQL('StoreUserDoc', storeUserDocResponse(gDocWithAllIntentions)),
     mockGQL('FetchActivities', fetchActivitiesResponse),
     mockGQL('FetchBuiltActivities', fetchBuiltActivitiesResponse),
-    mockGQL('FetchBuiltActivityVersions', {fetchBuiltActivityVersions: {
-      edges: []
-    }}),
+    mockGQL('FetchBuiltActivityVersions', {
+      fetchBuiltActivityVersions: {
+        edges: []
+      }
+    }),
     mockGQL('AddOrUpdateBuiltActivity', {}),
-    mockGQL('StoreBuiltActivityVersion', {storeBuiltActivityVersion:{activity:{}}}),
+    mockGQL('StoreBuiltActivityVersion', { storeBuiltActivityVersion: { activity: {} } }),
     mockGQL('SubmitDocVersion', {}),
-    mockGQL('CopyBuiltActivity', {copyBuiltActivity:createActivityBuilder(testUser._id, 'Copied Activity', 'copied-activity', ActivityBuilderVisibility.EDITABLE)}, {delayMs:1000}),
-    mockGQL('DeleteBuiltActivity', {deleteBuiltActivity: ""}),
+    mockGQL('CopyBuiltActivity', { copyBuiltActivity: createActivityBuilder(testUser._id, 'Copied Activity', 'copied-activity', 'editable') }, { delayMs: 1000 }),
+    mockGQL('DeleteBuiltActivity', { deleteBuiltActivity: "" }),
     mockGQL('UpdateUserInfo', updateUserInfoResponse("123")),
-        // Educational Management - Fetch Operations
-        mockGQL('FetchCourses', fetchCoursesResponseEmpty),
-        mockGQL('FetchSections', fetchSectionsResponseEmpty),
-        mockGQL('FetchAssignments', fetchAssignmentsResponseEmpty),
-        mockGQL('FetchStudentsInMyCourses', fetchStudentsResponseEmpty),
-        
-        // User Data
-        mockGQL('CreateNewInstructor', createNewInstructorResponse),
-        mockGQL('CreateNewStudent', createNewStudentResponse),
+    // Educational Management - Fetch Operations
+    mockGQL('FetchCourses', fetchCoursesResponseEmpty),
+    mockGQL('FetchSections', fetchSectionsResponseEmpty),
+    mockGQL('FetchAssignments', fetchAssignmentsResponseEmpty),
+    mockGQL('FetchStudentsInMyCourses', fetchStudentsResponseEmpty),
+
+    // User Data
+    mockGQL('CreateNewInstructor', createNewInstructorResponse),
+    mockGQL('CreateNewStudent', createNewStudentResponse),
   ]);
 }
 
@@ -264,7 +260,7 @@ export function cyMockGetDocTimeline(
     );
   });
   cy.intercept('**/async_document_timeline_status/**', (req) => {
-    req.alias='FetchDocumentTimelineStatus';
+    req.alias = 'FetchDocumentTimelineStatus';
     req.reply(
       staticResponse({
         statusCode: params.statusCode || 200,
@@ -272,7 +268,7 @@ export function cyMockGetDocTimeline(
           data: {
             response: {
               documentTimeline: params.response || '',
-              jobStatus: params.jobStatus || JobStatus.COMPLETE,
+              jobStatus: params.jobStatus || 'COMPLETE',
             },
           },
         },
@@ -298,12 +294,10 @@ export function cyMockGetDocData(
     lastModifyingUser: '',
     modifiedTime: '',
   };
-
   const docData = {
     ...defaultDocData,
     ...params,
   };
-
   cy.intercept('**/get_doc_data/**', (req) => {
     req.reply(
       staticResponse({
@@ -343,7 +337,6 @@ export function cyMockCreateNewDoc(
 export function cyMockGoogleDoc(
   cy: CypressGlobal,
 ) {
-
   cy.intercept('**/docs.google.com/**', (req) => {
     req.reply(
       staticResponse({
@@ -402,14 +395,12 @@ export function sendChatMessage(cy: CypressGlobal, message: string) {
   cy.get('[data-cy=send-input-button]').click();
 }
 
-
-
 export function toMyEditableActivity(cy: CypressGlobal) {
-  const key = cy
+  cy
     .getLocalStorage(ACCESS_TOKEN_KEY)
     .should('exist')
     .should('equal', 'fake-access-token');
-  const cookie = cy
+  cy
     .getCookie('refreshTokenDev')
     .should('exist')
     .should('have.property', 'value', 'fake-refresh-token');
@@ -435,12 +426,12 @@ function roleDisplayText(userRole: UserRole) {
   }
 }
 
-export function visitMainPageSettled(cy: CypressGlobal){
+export function visitMainPageSettled(cy: CypressGlobal) {
   cy.visit("/")
   cy.get("[data-cy=toggle-view-archived]").should("be.visible")
 }
 
-export function roleSwitch(cy: CypressGlobal, targetNewRole: UserRole){
+export function roleSwitch(cy: CypressGlobal, targetNewRole: UserRole) {
   cy.get("[data-cy=profile-button]").click();
   cy.get("[data-cy=role-switch]").should("contain.text", roleDisplayText('USER'))
   cy.get("[data-cy=role-switch]").click();
@@ -453,12 +444,12 @@ export function getDocServiceFromLoginService(
   loginService?: LoginService
 ): DocService {
   switch (loginService) {
-    case LoginService.GOOGLE:
-      return DocService.GOOGLE_DOCS;
-    case LoginService.MICROSOFT:
-      return DocService.MICROSOFT_WORD;
-    case LoginService.AMAZON_COGNITO:
+    case 'GOOGLE':
+      return 'GOOGLE_DOCS';
+    case 'MICROSOFT':
+      return 'MICROSOFT_WORD';
+    case 'AMAZON_COGNITO':
     default:
-      return DocService.RAW_TEXT;
+      return 'RAW_TEXT';
   }
 }

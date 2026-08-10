@@ -9,7 +9,7 @@ import { refreshAccessTokenResponse } from "../fixtures/refresh-access-token";
 import { analyzeHookResponse } from "../fixtures/stronger-hook-activity/analyze-hook-response";
 import { myEditableActivityResponse } from "../fixtures/stronger-hook-activity/basic-text-response";
 import { cyMockDefault, cyMockOpenAiCall, CypressGlobal, mockGQL, toMyEditableActivity } from "../helpers/functions";
-import { DocService, JobStatus, LoginService, UserRole, testGoogleDocId } from "../helpers/types";
+import { testGoogleDocId } from "../helpers/types";
 
 export function runInEditor(cy: CypressGlobal, callback: () => void) {
     return cy
@@ -22,10 +22,10 @@ export function runInEditor(cy: CypressGlobal, callback: () => void) {
 
 describe("User Doc Versioning", () => {
     const gqlQueries = [
-        mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.RAW_TEXT)),
+        mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse('RAW_TEXT')),
         mockGQL(
             'RefreshAccessToken',
-            refreshAccessTokenResponse('USER', LoginService.AMAZON_COGNITO)
+            refreshAccessTokenResponse('USER', 'AMAZON_COGNITO')
             ),
     ]
     describe(`Saves a version for raw text document when`, ()=>{
@@ -53,7 +53,7 @@ describe("User Doc Versioning", () => {
 
     it("Does not store if no changes made", ()=>{
         cyMockDefault(cy, {gqlQueries});
-        cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
+        cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, 'COMPLETE')});
         toMyEditableActivity(cy);
         // stores on first load
         cy.wait("@SubmitDocVersion", {timeout: 8000});
@@ -84,7 +84,7 @@ describe("User Doc Versioning", () => {
 
     it("properly saves activity id on activity change", ()=>{
         cyMockDefault(cy, {gqlQueries});
-        cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, JobStatus.COMPLETE)});
+        cyMockOpenAiCall(cy, {response: analyzeHookResponse(2,2, 'COMPLETE')});
         toMyEditableActivity(cy);
         cy.wait("@SubmitDocVersion", {timeout: 8000}).then((xhr)=>{
             const data = xhr.request.body.variables;

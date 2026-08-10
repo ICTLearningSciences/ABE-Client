@@ -5,36 +5,35 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { DehydratedGQLDocumentTimeline, AiGenerationStatus, TimelinePointType, IGDocVersion } from '../../helpers/types';
+import { DehydratedGQLDocumentTimeline, IGDocVersion } from "../../../src/types";
 
 export const generationInProgress: DehydratedGQLDocumentTimeline = {
   docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
   user: '653972706e601e65dbc3acea',
   timelinePoints: [
     {
-      type: TimelinePointType.START,
+      type: 'START',
       versionTime: '2024-03-27T05:00:02.587Z',
       versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       intent: '',
       changeSummary: '',
-      changeSummaryStatus: AiGenerationStatus.IN_PROGRESS,
-      reverseOutline:
-        '',
-      reverseOutlineStatus: AiGenerationStatus.IN_PROGRESS,
+      changeSummaryStatus: 'IN_PROGRESS',
+      reverseOutline: '',
+      reverseOutlineStatus: 'IN_PROGRESS',
       relatedFeedback: '',
+      userInputSummary: ""
     },
     {
-      type: TimelinePointType.TIME_DIFFERENCE,
+      type: 'TIME_DIFFERENCE',
       versionTime: '2024-03-27T20:00:57.804Z',
       versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
       intent: '',
-      changeSummary:
-        "",
-      changeSummaryStatus: AiGenerationStatus.IN_PROGRESS,
-        reverseOutline:
-        '',
-      reverseOutlineStatus: AiGenerationStatus.IN_PROGRESS,
-        relatedFeedback: '',
+      changeSummary: "",
+      changeSummaryStatus: 'IN_PROGRESS',
+      reverseOutline: '',
+      reverseOutlineStatus: 'IN_PROGRESS',
+      relatedFeedback: '',
+      userInputSummary: ""
     },
   ],
 };
@@ -45,8 +44,7 @@ export const generationsInProgressDocVersions: IGDocVersion[] = [
     docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
     plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
     markdownText: 'Hello, world! What’s going on ? I’m making more changes\n',
-    lastChangedId:
-      'ALBJ4LvpUjPG6iVXa8vibKE0FafnztNmt9B3Qmmn8h0Z5SfAgNZSjfH1Dk33Ygrte_B_WuN1EIxZ4uBJoekEju8',
+    lastChangedId: 'ALBJ4LvpUjPG6iVXa8vibKE0FafnztNmt9B3Qmmn8h0Z5SfAgNZSjfH1Dk33Ygrte_B_WuN1EIxZ4uBJoekEju8',
     sessionIntention: {
       description: 'This activity is to work on the hook of the essay.',
       createdAt: '2024-03-27T05:00:02.587Z',
@@ -54,13 +52,11 @@ export const generationsInProgressDocVersions: IGDocVersion[] = [
     chatLog: [
       {
         sender: 'SYSTEM',
-        message:
-          'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
+        message: 'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
       },
       {
         sender: 'SYSTEM',
-        message:
-          "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
+        message: "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
       },
       {
         sender: 'USER',
@@ -68,8 +64,7 @@ export const generationsInProgressDocVersions: IGDocVersion[] = [
       },
       {
         sender: 'SYSTEM',
-        message:
-          'Based on the absence of emotional evocativeness and narrativity, the hook in this essay is weak. It does not engage the reader or provide any narrative context. To improve the hook, it could benefit from incorporating emotions and narrative elements to create a more engaging and captivating introduction. The current rating for emotions is 1 and for narrativity is 1.',
+        message: 'Based on the absence of emotional evocativeness and narrativity, the hook in this essay is weak. It does not engage the reader or provide any narrative context. To improve the hook, it could benefit from incorporating emotions and narrative elements to create a more engaging and captivating introduction. The current rating for emotions is 1 and for narrativity is 1.',
       },
       {
         sender: 'SYSTEM',
@@ -84,6 +79,7 @@ export const generationsInProgressDocVersions: IGDocVersion[] = [
     modifiedTime: '2024-03-27T04:53:41.735Z',
     createdAt: '2024-03-27T04:53:41.735Z',
     updatedAt: '2024-03-27T04:53:41.735Z',
+    courseAssignmentId: ""
   },
 ];
 
@@ -92,29 +88,28 @@ export const generationCompleted: DehydratedGQLDocumentTimeline = {
     user: '653972706e601e65dbc3acea',
     timelinePoints: [
       {
-        type: TimelinePointType.START,
+        type: 'START',
         versionTime: '2024-03-27T05:00:02.587Z',
         versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         intent: '',
         changeSummary: '',
-        changeSummaryStatus: AiGenerationStatus.COMPLETED,
-        reverseOutline:
-          '{\n  "Thesis Statement": "The impact of climate change on global food security",\n  "Supporting Claims": [\n    "Decreased crop yields",\n    "Altered growing conditions",\n    "Water scarcity"\n  ],\n  "Evidence Given for Each Claim": [\n    {\n      "Claim A": "Decreased crop yields",\n      "Claim A Evidence": [\n        "Studies show that global warming leads to a decline in crop yields.",\n        "Extreme weather events caused by climate change have a negative impact on crop production.",\n      "Rising temperatures affect the nutritional value and quality of crops."\n      ]\n    },\n    {\n      "Claim B": "Altered growing conditions",\n      "Claim B Evidence": [\n        "Changing rainfall patterns affect the timing and success of planting.",\n        "Increasing temperatures and heatwaves reduce the viability of certain crops.",\n      "Shifts in temperature and humidity create new challenges for farmers."\n      ]\n    },\n    {\n      "Claim C": "Water scarcity",\n      "Claim C Evidence": [\n        "Rising temperatures cause higher rates of evaporation, leading to water scarcity.",\n        "Decreased snowpack and glacier melt reduce available water for agriculture.",\n      "Droughts and extreme weather events disrupt irrigation and water supply."\n      ]\n    }\n  ]\n}',
-        reverseOutlineStatus: AiGenerationStatus.COMPLETED,
+        changeSummaryStatus: 'COMPLETED',
+        reverseOutline: '{\n  "Thesis Statement": "The impact of climate change on global food security",\n  "Supporting Claims": [\n    "Decreased crop yields",\n    "Altered growing conditions",\n    "Water scarcity"\n  ],\n  "Evidence Given for Each Claim": [\n    {\n      "Claim A": "Decreased crop yields",\n      "Claim A Evidence": [\n        "Studies show that global warming leads to a decline in crop yields.",\n        "Extreme weather events caused by climate change have a negative impact on crop production.",\n      "Rising temperatures affect the nutritional value and quality of crops."\n      ]\n    },\n    {\n      "Claim B": "Altered growing conditions",\n      "Claim B Evidence": [\n        "Changing rainfall patterns affect the timing and success of planting.",\n        "Increasing temperatures and heatwaves reduce the viability of certain crops.",\n      "Shifts in temperature and humidity create new challenges for farmers."\n      ]\n    },\n    {\n      "Claim C": "Water scarcity",\n      "Claim C Evidence": [\n        "Rising temperatures cause higher rates of evaporation, leading to water scarcity.",\n        "Decreased snowpack and glacier melt reduce available water for agriculture.",\n      "Droughts and extreme weather events disrupt irrigation and water supply."\n      ]\n    }\n  ]\n}',
+        reverseOutlineStatus: 'COMPLETED',
         relatedFeedback: '',
+        userInputSummary: ""
       },
       {
-        type: TimelinePointType.TIME_DIFFERENCE,
+        type: 'TIME_DIFFERENCE',
         versionTime: '2024-03-27T20:00:57.804Z',
         versionId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
         intent: '',
-        changeSummary:
-          "Complete Summary",
-        changeSummaryStatus: AiGenerationStatus.COMPLETED,
-          reverseOutline:
-          '{\n  "Thesis Statement": "The impact of climate change on global food security",\n  "Supporting Claims": [\n    "Decreased crop yields",\n    "Altered growing conditions",\n    "Water scarcity"\n  ],\n  "Evidence Given for Each Claim": [\n    {\n      "Claim A": "Decreased crop yields",\n      "Claim A Evidence": [\n        "Studies show that global warming leads to a decline in crop yields.",\n        "Extreme weather events caused by climate change have a negative impact on crop production.",\n      "Rising temperatures affect the nutritional value and quality of crops."\n      ]\n    },\n    {\n      "Claim B": "Altered growing conditions",\n      "Claim B Evidence": [\n        "Changing rainfall patterns affect the timing and success of planting.",\n        "Increasing temperatures and heatwaves reduce the viability of certain crops.",\n      "Shifts in temperature and humidity create new challenges for farmers."\n      ]\n    },\n    {\n      "Claim C": "Water scarcity",\n      "Claim C Evidence": [\n        "Rising temperatures cause higher rates of evaporation, leading to water scarcity.",\n        "Decreased snowpack and glacier melt reduce available water for agriculture.",\n      "Droughts and extreme weather events disrupt irrigation and water supply."\n      ]\n    }\n  ]\n}',
-        reverseOutlineStatus: AiGenerationStatus.COMPLETED,
-          relatedFeedback: '',
+        changeSummary: "Complete Summary",
+        changeSummaryStatus: 'COMPLETED',
+        reverseOutline: '{\n  "Thesis Statement": "The impact of climate change on global food security",\n  "Supporting Claims": [\n    "Decreased crop yields",\n    "Altered growing conditions",\n    "Water scarcity"\n  ],\n  "Evidence Given for Each Claim": [\n    {\n      "Claim A": "Decreased crop yields",\n      "Claim A Evidence": [\n        "Studies show that global warming leads to a decline in crop yields.",\n        "Extreme weather events caused by climate change have a negative impact on crop production.",\n      "Rising temperatures affect the nutritional value and quality of crops."\n      ]\n    },\n    {\n      "Claim B": "Altered growing conditions",\n      "Claim B Evidence": [\n        "Changing rainfall patterns affect the timing and success of planting.",\n        "Increasing temperatures and heatwaves reduce the viability of certain crops.",\n      "Shifts in temperature and humidity create new challenges for farmers."\n      ]\n    },\n    {\n      "Claim C": "Water scarcity",\n      "Claim C Evidence": [\n        "Rising temperatures cause higher rates of evaporation, leading to water scarcity.",\n        "Decreased snowpack and glacier melt reduce available water for agriculture.",\n      "Droughts and extreme weather events disrupt irrigation and water supply."\n      ]\n    }\n  ]\n}',
+        reverseOutlineStatus: 'COMPLETED',
+        relatedFeedback: '',
+        userInputSummary: ""
       },
     ],
   };
@@ -125,8 +120,7 @@ export const generationsCompletedDocVersions: IGDocVersion[] = [
     docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
     plainText: 'Hello, world! What’s going on ? I’m making more changes\n',
     markdownText: 'Hello, world! What’s going on ? I’m making more changes\n',
-    lastChangedId:
-      'ALBJ4LvpUjPG6iVXa8vibKE0FafnztNmt9B3Qmmn8h0Z5SfAgNZSjfH1Dk33Ygrte_B_WuN1EIxZ4uBJoekEju8',
+    lastChangedId: 'ALBJ4LvpUjPG6iVXa8vibKE0FafnztNmt9B3Qmmn8h0Z5SfAgNZSjfH1Dk33Ygrte_B_WuN1EIxZ4uBJoekEju8',
     sessionIntention: {
       description: 'This activity is to work on the hook of the essay.',
       createdAt: '2024-03-27T05:00:02.587Z',
@@ -134,13 +128,11 @@ export const generationsCompletedDocVersions: IGDocVersion[] = [
     chatLog: [
       {
         sender: 'SYSTEM',
-        message:
-          'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
+        message: 'This activity is to work on the hook that gets the readers interest at the start of the paper. We are going to consider the narrativity and the emotions that are connected with the intro.',
       },
       {
         sender: 'SYSTEM',
-        message:
-          "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
+        message: "Feel free to edit the intro to your paper, and tell me when it's ready for me to review.",
       },
       {
         sender: 'USER',
@@ -148,8 +140,7 @@ export const generationsCompletedDocVersions: IGDocVersion[] = [
       },
       {
         sender: 'SYSTEM',
-        message:
-          'Based on the absence of emotional evocativeness and narrativity, the hook in this essay is weak. It does not engage the reader or provide any narrative context. To improve the hook, it could benefit from incorporating emotions and narrative elements to create a more engaging and captivating introduction. The current rating for emotions is 1 and for narrativity is 1.',
+        message: 'Based on the absence of emotional evocativeness and narrativity, the hook in this essay is weak. It does not engage the reader or provide any narrative context. To improve the hook, it could benefit from incorporating emotions and narrative elements to create a more engaging and captivating introduction. The current rating for emotions is 1 and for narrativity is 1.',
       },
       {
         sender: 'SYSTEM',
@@ -164,5 +155,6 @@ export const generationsCompletedDocVersions: IGDocVersion[] = [
     modifiedTime: '2024-03-27T04:53:41.735Z',
     createdAt: '2024-03-27T04:53:41.735Z',
     updatedAt: '2024-03-27T04:53:41.735Z',
+    courseAssignmentId: ""
   }
 ];

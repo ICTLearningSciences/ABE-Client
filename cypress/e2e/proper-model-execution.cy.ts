@@ -4,10 +4,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
+import { AiPromptStep, AiServiceModel } from "../../src/types";
 import { fetchConfigResponse } from "../fixtures/fetch-config";
 import { openAiTextResponse } from "../fixtures/stronger-hook-activity/basic-text-response";
 import { cyMockDefault, cyMockOpenAiCall, CypressGlobal, mockGQL, roleSwitch } from "../helpers/functions";
-import { AiPromptStep, AiServiceModel, AiServiceNames, testGoogleDocId, UserRole } from "../helpers/types";
+import { testGoogleDocId } from "../helpers/types";
 
 function confirmModelInAiRequest(model: AiServiceModel){
     cy.wait("@openAiStartCall").then((xhr)=>{
@@ -58,7 +59,7 @@ describe("prompt requests use proper model execution", ()=>{
         toPromptEditing(cy);
         runFirstAvailablePrompt(cy);
         confirmModelInAiRequest({
-            serviceName: AiServiceNames.OPEN_AI,
+            serviceName: 'OPEN_AI',
             model: "gpt-4"
         });
     });
@@ -84,7 +85,7 @@ describe("prompt requests use proper model execution", ()=>{
             toPromptEditing(cy);
             runFirstAvailablePrompt(cy);
             confirmModelInAiRequest({
-                serviceName: AiServiceNames.OPEN_AI,
+                serviceName: 'OPEN_AI',
                 model: "test-model"
             });
         })
@@ -106,7 +107,7 @@ describe("prompt requests use proper model execution", ()=>{
                         toPromptEditing(cy);
                         runFirstAvailablePrompt(cy);
                         confirmModelInAiRequest({
-                            serviceName: AiServiceNames.OPEN_AI,
+                            serviceName: 'OPEN_AI',
                             model: fetchConfigResponse.fetchConfig.aiServiceModelConfigs![0].modelList![0].name
                         });
                     })
@@ -134,7 +135,7 @@ describe("prompt requests use proper model execution", ()=>{
                         toPromptEditing(cy);
                         runFirstAvailablePrompt(cy);
                         confirmModelInAiRequest({
-                            serviceName: AiServiceNames.OPEN_AI,
+                            serviceName: 'OPEN_AI',
                             model: "gpt-4"
                         });
                     })
@@ -180,7 +181,7 @@ describe("prompt requests use proper model execution", ()=>{
             toPromptEditing(cy);
             runFirstAvailablePrompt(cy);
             confirmModelInAiRequest({
-                serviceName: AiServiceNames.OPEN_AI,
+                serviceName: 'OPEN_AI',
                 model: "gpt-4"
             });
         })

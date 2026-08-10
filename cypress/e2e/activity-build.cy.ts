@@ -5,7 +5,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { cyMockDefault, CypressGlobal, mockGQL, roleSwitch, visitMainPageSettled } from "../helpers/functions";
-import { UserRole } from "../helpers/types";
 
 export function stepsAreEditable(cy: CypressGlobal){
     cy.get("[data-cy=activity-builder-step-type]").should("exist")

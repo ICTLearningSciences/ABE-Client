@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 import { fetchConfigResponse } from "../fixtures/fetch-config";
 import { cyMockDefault, mockGQL } from "../helpers/functions";
 
-
 describe("Config Loading Screen", ()=>{
     it("loading screen not visible on successfull load", ()=>{
         cyMockDefault(cy,

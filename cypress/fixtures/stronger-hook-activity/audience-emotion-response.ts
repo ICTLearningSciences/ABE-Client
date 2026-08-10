@@ -5,19 +5,15 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { JobStatus, AiJobStatusApiRes } from "../../helpers/types";
+import { JobStatus } from "../../../src/types";
 
 
-interface AudienceEmtionsMember{
+interface AudienceEmtionsMember {
     name: string;
     emotions: string[];
-  }
-  
-  interface AudienceAndEmotionsPromptResponse{
-    audience: AudienceEmtionsMember[];
-  }
+}
 
-export const audienceEmotionsResponse = (audienceEmotions: AudienceEmtionsMember[], jobStatus?: JobStatus): AiJobStatusApiRes => {
+export const audienceEmotionsResponse = (audienceEmotions: AudienceEmtionsMember[], jobStatus?: JobStatus) => {
     return {
         response: {
             "aiServiceResponse": {
@@ -42,22 +38,22 @@ export const audienceEmotionsResponse = (audienceEmotions: AudienceEmtionsMember
                                 "message": {
                                     "refusal": null,
                                     "role": "assistant",
-                                    "content": JSON.stringify({audience: audienceEmotions})
+                                    "content": JSON.stringify({ audience: audienceEmotions })
                                 },
                                 "finish_reason": "stop",
                                 "logprobs": null
                             }
                         ],
-                        tokenUsage:{
+                        tokenUsage: {
                             promptUsage: 1,
                             completionUsage: 1,
                             totalUsage: 2
                         }
                     }
                 ],
-                "answer": JSON.stringify({audience: audienceEmotions})
+                "answer": JSON.stringify({ audience: audienceEmotions })
             },
-            jobStatus: jobStatus || JobStatus.COMPLETE
+            jobStatus: jobStatus || 'COMPLETE'
         }
     }
 }

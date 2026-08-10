@@ -4,95 +4,87 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-export enum EducationalRole {
-    INSTRUCTOR = 'INSTRUCTOR',
-    STUDENT = 'STUDENT',
-  }
+
+import { CourseOwnership } from "../../../src/store/slices/education-management";
 
 export interface Course {
-    _id: string;
+  _id: string;
+  title: string;
+  description: string;
+  courseCode: string;
+  sectionIds: string[];
+}
+
+export interface AiServiceModel {
+  serviceName: string;
+  model: string;
+}
+
+export interface Assignment {
+  _id: string;
+  title: string;
+  description: string;
+  activityIds: string[];
+  activityOrder: string[];
+  defaultLLM?: AiServiceModel;
+}
+
+
+export interface SectionAssignment {
+  assignmentId: string;
+  mandatory: boolean;
+}
+
+export interface Section {
+  _id: string;
+  title: string;
+  sectionCode: string;
+  description: string;
+  assignments: SectionAssignment[];
+  assignmentOrder: string[];
+  numOptionalAssignmentsRequired: number;
+}
+
+export interface RelevantGoogleDoc {
+  docId: string;
+  primaryDocument: boolean;
+  docData: {
     title: string;
-    description: string;
-    courseCode: string;
-    sectionIds: string[];
   }
+}
 
-  export interface AiServiceModel {
-    serviceName: string;
-    model: string;
-  }
+export interface ActivityCompletion {
+  activityId: string;
+  complete: boolean;
+  defaultLLM?: AiServiceModel;
+}
 
-  export interface Assignment {
-    _id: string;
-    title: string;
-    description: string;
-    activityIds: string[];
-    activityOrder: string[];
-    defaultLLM?: AiServiceModel;
-  }
-
-  
-  export interface SectionAssignment {
-    assignmentId: string;
-    mandatory: boolean;
-  }
-  
-  export interface Section {
-    _id: string;
-    title: string;
-    sectionCode: string;
-    description: string;
-    assignments: SectionAssignment[];
-    assignmentOrder: string[];
-    numOptionalAssignmentsRequired: number;
-  }
-  
-  export interface RelevantGoogleDoc {
-    docId: string;
-    primaryDocument: boolean;
-    docData: {
-      title: string;
-    }
-  }
-  
-  export interface ActivityCompletion {
-    activityId: string;
-    complete: boolean;
-    defaultLLM?: AiServiceModel;
-  }
-  
-  export interface AssignmentProgress {
-    assignmentId: string;
-    relevantGoogleDocs: RelevantGoogleDoc[];
-    instructorGrade?: {
-      grade: number;
-      comment: string;
-    },
-    activityCompletions: ActivityCompletion[];
-  }
-  export interface StudentData {
-    _id: string;
-    userId: string;
-    enrolledCourses: string[];
-    enrolledSections: string[];
-    assignmentProgress: AssignmentProgress[];
-    name: string;
-  }
-
-export enum CourseOwnership {
-  OWNER = "OWNER",
-  SHARED = "SHARED",
+export interface AssignmentProgress {
+  assignmentId: string;
+  relevantGoogleDocs: RelevantGoogleDoc[];
+  instructorGrade?: {
+    grade: number;
+    comment: string;
+  },
+  activityCompletions: ActivityCompletion[];
+}
+export interface StudentData {
+  _id: string;
+  userId: string;
+  enrolledCourses: string[];
+  enrolledSections: string[];
+  assignmentProgress: AssignmentProgress[];
+  name: string;
 }
 
 export interface CourseData {
   courseId: string;
   ownership: CourseOwnership;
 }
-  
-  export interface Instructor {
-    _id: string;
-    userId: string;
-    courses: CourseData[];
-    name: string;
-  }
-  
+
+export interface Instructor {
+  _id: string;
+  userId: string;
+  courses: CourseData[];
+  name: string;
+}

@@ -5,10 +5,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { JobStatus, AiJobStatusApiRes } from "../../helpers/types"
+import { JobStatus } from "../../../src/types"
 
-
-export const helpBrainstormResponse = (jobStatus?: JobStatus): AiJobStatusApiRes => {
+export const helpBrainstormResponse = (jobStatus?: JobStatus) => {
     return {
         "response":{
             "aiServiceResponse": {
@@ -48,7 +47,7 @@ export const helpBrainstormResponse = (jobStatus?: JobStatus): AiJobStatusApiRes
                 ],
                 "answer": "Example help brainstorm response."
             },
-            jobStatus: jobStatus || JobStatus.COMPLETE
+            jobStatus: jobStatus || 'COMPLETE'
         }
     }
 }
