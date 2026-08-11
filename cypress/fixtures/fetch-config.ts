@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { AiServiceNames, Config } from "../helpers/types"
+import { Config } from "../../src/types";
 
 interface FetchConfigResponse {
     fetchConfig: Config;
@@ -20,13 +20,10 @@ export const fetchConfigResponse: FetchConfigResponse = {
         "displayedGoalActivities":[
             {
                 "goal": "65823a8799045156193339b2",
-                "activities": [],
                 "builtActivities": []
               },
             {
                 "goal": "6580e5640ac7bcb42fc8d27f",
-                activities: [
-                ],
                 builtActivities: [
                     {
                         activity: 'my-editable-activity',
@@ -52,12 +49,12 @@ export const fetchConfigResponse: FetchConfigResponse = {
         ],
         "overrideAiModel": undefined,
         "defaultAiModel": {
-            "serviceName": AiServiceNames.OPEN_AI,
+            "serviceName": 'OPEN_AI',
             "model": "gpt-3.5-turbo-16k"
         },
         "aiServiceModelConfigs": [
             {
-                "serviceName": AiServiceNames.OPEN_AI,
+                "serviceName": 'OPEN_AI',
                 "modelList": [
                     {
                         "name": "gpt-3.5-turbo-16k",
@@ -80,7 +77,7 @@ export const fetchConfigResponse: FetchConfigResponse = {
                 ]
             },
             {
-                "serviceName": AiServiceNames.AZURE,
+                "serviceName": 'AZURE_OPEN_AI',
                 "modelList": [
                     {
                         "name": "ABE-GPT-3_5_turbo_16k",

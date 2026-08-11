@@ -4,11 +4,12 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { DocService, testGoogleDocId, UserDoc } from "../../helpers/types"
+import { UserDoc } from "../../../src/types"
+import { testGoogleDocId } from "../../helpers/types"
 import { testUser } from "../user-data"
 
 export const gDocWithNoIntentions: UserDoc = {
-    "googleDocId": testGoogleDocId, 
+    "googleDocId": testGoogleDocId,
     "user": testUser._id,
     "title": "Aliens",
     "documentIntention": undefined,
@@ -18,7 +19,8 @@ export const gDocWithNoIntentions: UserDoc = {
     "admin": false,
     "updatedAt": new Date().toISOString(),
     "archived": false,
-    "service": DocService.GOOGLE_DOCS
+    "service": 'GOOGLE_DOCS',
+    courseAssignmentId: ""
 }
 
 export const gDocWithoutDocumentIntention: UserDoc = {
@@ -35,7 +37,8 @@ export const gDocWithoutDocumentIntention: UserDoc = {
     admin: false,
     updatedAt: new Date().toISOString(),
     archived: false,
-    service: DocService.GOOGLE_DOCS
+    service: 'GOOGLE_DOCS',
+    courseAssignmentId: ""
 }
 
 export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: UserDoc = {
@@ -52,7 +55,8 @@ export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: UserDoc 
     "admin": false,
     "updatedAt": new Date().toISOString(),
     "archived": false,
-    "service": DocService.GOOGLE_DOCS
+    "service": 'GOOGLE_DOCS',
+    courseAssignmentId: ""
 }
 
 export const gDocWithoutAssignmentDescription: UserDoc = {
@@ -72,7 +76,8 @@ export const gDocWithoutAssignmentDescription: UserDoc = {
     "admin": false,
     "updatedAt": new Date().toISOString(),
     "archived": false,
-    "service": DocService.GOOGLE_DOCS
+    "service": 'GOOGLE_DOCS',
+    courseAssignmentId: ""
 }
 
 export const gDocWithAllIntentions: UserDoc = {
@@ -92,7 +97,8 @@ export const gDocWithAllIntentions: UserDoc = {
     "admin": false,
     "updatedAt": new Date().toISOString(),
     "archived": false,
-    "service": DocService.GOOGLE_DOCS
+    "service": 'GOOGLE_DOCS',
+    courseAssignmentId: ""
 }
 
 export const gDocWithExpiredDayIntention: UserDoc = {
@@ -112,7 +118,8 @@ export const gDocWithExpiredDayIntention: UserDoc = {
     "admin": false,
     "updatedAt": new Date().toISOString(),
     "archived": false,
-    "service": DocService.GOOGLE_DOCS
+    "service": 'GOOGLE_DOCS',
+    courseAssignmentId: ""
 }
 
 export function storeUserDocResponse(gDoc: UserDoc): {storeGoogleDoc: UserDoc} {

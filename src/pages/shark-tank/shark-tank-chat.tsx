@@ -6,7 +6,14 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import * as React from "react";
-import { Button, Grid } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+} from "@mui/material";
 import { TextSnippet } from "@mui/icons-material";
 
 import UserDocumentDisplay from "./components/doc-display";
@@ -30,14 +37,29 @@ function SharkTankChat(): React.ReactNode {
 
   const { curDocId } = docState;
   const { activity, activePanel, setActivity } = useWithPanelActivity;
+  const [selectingDoc, setSelectingDoc] = React.useState<boolean>(!curDocId);
+  const [showWarning, setShowWarning] = React.useState<string>();
+
+  React.useEffect(() => {
+    if (!curDocId && showWarning) {
+      updateCurrentDocId(showWarning);
+      setShowWarning(undefined);
+      setSelectingDoc(false);
+    }
+  }, [curDocId]);
 
   function onSelectDocument(docId: string): void {
     if (reference) {
       setReference(undefined);
       return;
     }
+    if (!docId) {
+      setSelectingDoc(true);
+      return;
+    }
     updateCurrentDocId(docId);
     setReference(undefined);
+    setSelectingDoc(false);
   }
 
   if (!activePanel || !activity) {
@@ -73,7 +95,15 @@ function SharkTankChat(): React.ReactNode {
                 <UserDocumentDisplay
                   docId={curDocId}
                   activityId={activity?._id}
-                  onOpenDoc={(id) => updateCurrentDocId(id)}
+                  selectingDoc={selectingDoc}
+                  onOpenDoc={(id) => {
+                    if (curDocId && id !== curDocId) {
+                      setShowWarning(id);
+                    } else {
+                      setSelectingDoc(false);
+                      updateCurrentDocId(id);
+                    }
+                  }}
                 />
               )}
             </div>
@@ -105,6 +135,29 @@ function SharkTankChat(): React.ReactNode {
           </Grid>
         </Grid>
       </div>
+      {showWarning && (
+        <Dialog
+          maxWidth="sm"
+          fullWidth={true}
+          open={Boolean(showWarning)}
+          onClose={() => setShowWarning(undefined)}
+          style={{ textAlign: "center" }}
+        >
+          <DialogTitle>Switch Documents?</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Changing documents will clear your chat session.
+            </DialogContentText>
+            <Button
+              onClick={() => {
+                updateCurrentDocId("");
+              }}
+            >
+              Switch
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
     </main>
   );
 }

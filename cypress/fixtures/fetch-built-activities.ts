@@ -4,8 +4,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { ActivityBuilder, ActivityBuilderStepType, RequestUserInputActivityStep, SystemMessageActivityStep, PromptActivityStep, Checking, NumericOperations } from "../helpers/activity-builder-types";
-import { ActivityBuilderVisibility, DisplayIcons, PromptOutputTypes } from "../helpers/types";
+import { ActivityBuilder, ActivityBuilderVisibility, PromptActivityStep, RequestUserInputActivityStep, SystemMessageActivityStep } from "../../src/components/activity-builder/types";
 import { testUser } from "./user-data";
 
 export function createActivityBuilder(userId: string, title: string, activityId: string, visibility: ActivityBuilderVisibility): ActivityBuilder{
@@ -27,8 +26,8 @@ export const myEditableActivity: ActivityBuilder = {
     attachedPanel: '',
     description: '',
     user: testUser._id,
-    visibility: ActivityBuilderVisibility.EDITABLE,
-    displayIcon: DisplayIcons.DEFAULT,
+    visibility: 'editable',
+    displayIcon: 'DEFAULT',
     flowsList: [
       {
         clientId: '2',
@@ -36,7 +35,7 @@ export const myEditableActivity: ActivityBuilder = {
         steps: [
           {
             stepId: '2',
-            stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+            stepType: 'REQUEST_USER_INPUT',
             message: 'What is your name?',
             saveAsIntention: true,
             saveResponseVariableName: 'name',
@@ -47,13 +46,12 @@ export const myEditableActivity: ActivityBuilder = {
           } as RequestUserInputActivityStep,
           {
             stepId: '3',
-            stepType: ActivityBuilderStepType.SYSTEM_MESSAGE,
+            stepType: 'SYSTEM_MESSAGE',
             message: 'Hello, {{name}}!',
-            
           } as SystemMessageActivityStep,
           {
             stepId: '3.1',
-            stepType: ActivityBuilderStepType.PROMPT,
+            stepType: 'PROMPT',
             promptConfigurations: [
               {
                 promptText: 'Please generate 3 nicknames for {{name}}',
@@ -68,20 +66,20 @@ export const myEditableActivity: ActivityBuilder = {
                 ],
                 includeChatLogContext: false,
                 includeEssay: false,
-                outputDataType: PromptOutputTypes.JSON,
+                outputDataType: 'JSON',
                 customSystemRole: 'user',
               }
             ]
           } as PromptActivityStep,
           {
             stepId: "3.2",
-            stepType: ActivityBuilderStepType.CONDITIONAL,
+            stepType: 'CONDITIONAL',
             jumpToStepId: '',
             conditionals: [
                 {
                     stateDataKey: 'nickname1',
-                    checking: Checking.VALUE,
-                    operation: NumericOperations.EQUALS,
+                    checking: 'VALUE',
+                    operation: "==",
                     expectedValue: '3',
                     targetStepId: '4',
                 }
@@ -89,7 +87,7 @@ export const myEditableActivity: ActivityBuilder = {
           },
           {
             stepId: '4',
-            stepType: ActivityBuilderStepType.REQUEST_USER_INPUT,
+            stepType: 'REQUEST_USER_INPUT',
             message: 'What would you like to do next?',
             saveAsIntention: false,
             saveResponseVariableName: '',
@@ -110,11 +108,11 @@ export const myEditableActivity: ActivityBuilder = {
 
   export const fetchBuiltActivitiesResponse = {
     "fetchBuiltActivities": [
-        createActivityBuilder(testUser._id, 'My Editable Activity', 'my-editable-activity', ActivityBuilderVisibility.EDITABLE),
-        createActivityBuilder(testUser._id, 'My Private Activity', 'my-private-activity', ActivityBuilderVisibility.PRIVATE),
-        createActivityBuilder(testUser._id, 'My Read-Only Activity', 'my-read-only-activity', ActivityBuilderVisibility.READ_ONLY),
-        createActivityBuilder("other-user", 'Other User Editable Activity', 'other-user-editable-activity', ActivityBuilderVisibility.EDITABLE),
-        createActivityBuilder("other-user", 'Other User Read-Only Activity', 'other-user-read-only-activity', ActivityBuilderVisibility.READ_ONLY),
-        // createActivityBuilder("other-user", 'Other User Private Activity', 'other-user-private-activity', ActivityBuilderVisibility.PRIVATE),
+        createActivityBuilder(testUser._id, 'My Editable Activity', 'my-editable-activity', 'editable'),
+        createActivityBuilder(testUser._id, 'My Private Activity', 'my-private-activity', 'private'),
+        createActivityBuilder(testUser._id, 'My Read-Only Activity', 'my-read-only-activity', 'read-only'),
+        createActivityBuilder("other-user", 'Other User Editable Activity', 'other-user-editable-activity', 'editable'),
+        createActivityBuilder("other-user", 'Other User Read-Only Activity', 'other-user-read-only-activity', 'read-only'),
+        // createActivityBuilder("other-user", 'Other User Private Activity', 'other-user-private-activity', 'private'),
     ]
 }

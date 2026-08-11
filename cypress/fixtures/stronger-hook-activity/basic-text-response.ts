@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { JobStatus, AiJobStatusApiRes } from "../../helpers/types"
+import { JobStatus } from "../../../src/types"
 
 export function myEditableActivityResponse(){
     return openAiTextResponse(JSON.stringify({
@@ -13,7 +13,7 @@ export function myEditableActivityResponse(){
       }))
 }
 
-export const openAiTextResponse = (resText: string, jobStatus?: JobStatus): AiJobStatusApiRes => {
+export const openAiTextResponse = (resText: string, jobStatus?: JobStatus) => {
     return {
         "response": {
             "aiServiceResponse": {
@@ -53,7 +53,7 @@ export const openAiTextResponse = (resText: string, jobStatus?: JobStatus): AiJo
                 ],
                 "answer": resText
             },
-            jobStatus: jobStatus || JobStatus.COMPLETE
+            jobStatus: jobStatus || 'COMPLETE'
         }
     }
 }

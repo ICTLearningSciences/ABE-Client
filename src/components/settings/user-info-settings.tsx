@@ -74,14 +74,16 @@ export function UserInfoSettings(): React.ReactNode {
             Admin Settings
           </Typography>
           <AdminControls />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => navigate("/admin")}
-            fullWidth
-          >
-            Manage Users
-          </Button>
+          {state.user?.userRole === "ADMIN" && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/admin")}
+              fullWidth
+            >
+              Manage Users
+            </Button>
+          )}
         </Paper>
       )}
       {state.user?._id && (

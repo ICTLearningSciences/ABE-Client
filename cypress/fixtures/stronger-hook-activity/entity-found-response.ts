@@ -5,8 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { JobStatus, AiJobStatusApiRes } from "../../helpers/types";
-
+import { JobStatus } from "../../../src/types";
 
 export interface Experience {
     experience: string;
@@ -20,13 +19,12 @@ export interface Experience {
     response: string;
   }
 
-export const entityFoundResponse = (entities: Experience[], jobStatus?: JobStatus): AiJobStatusApiRes => {
+export const entityFoundResponse = (entities: Experience[], jobStatus?: JobStatus) => {
     const _response: EntityDetectionPromptResponse = {
         experiences: entities,
         response: "This is the entity found response."
     }
     const response = JSON.stringify(_response);
-
     return {
         "response": {
             "aiServiceResponse": {
@@ -66,7 +64,7 @@ export const entityFoundResponse = (entities: Experience[], jobStatus?: JobStatu
                 ],
                 "answer": response
             },
-            jobStatus: jobStatus || JobStatus.COMPLETE
+            jobStatus: jobStatus || 'COMPLETE'
         }
     }
 }

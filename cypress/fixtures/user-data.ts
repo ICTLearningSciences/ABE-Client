@@ -4,7 +4,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { User, UserRole, LoginService } from "../helpers/types";
+
+import { User } from "../../src/types";
 
 export const testUser: User = {
     "_id": "653972706e601e65dbc3acda",
@@ -13,7 +14,7 @@ export const testUser: User = {
     "email": "johndoe@gmail.com",
     "userRole": 'USER',
     "lastLoginAt": new Date(),
-    "loginService": LoginService.GOOGLE,
+    "loginService": 'GOOGLE',
     "classroomCode": {
         "code": "123456",
         "createdAt": "2025-03-02T00:00:00.000Z",

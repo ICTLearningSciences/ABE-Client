@@ -20,6 +20,7 @@ import { SelectCreatePanelist } from "../panelist-builder/select-create-panelist
 import { EditPanelist } from "../panelist-builder/edit-panelist";
 import { SelectCreatePanel } from "../panel-builder/select-create-panel";
 import { EditPanel } from "../panel-builder/edit-panel";
+import { useWithLogin } from "../../store/slices/login/use-with-login";
 
 type BuilderTab = "ACTIVITY_BUILDER" | "PANELIST_BUILDER" | "PANEL_BUILDER";
 
@@ -76,7 +77,7 @@ export function ActivityBuilderPage(props: {
     deletePanel,
     deletePanelist,
   } = props;
-
+  const { state } = useWithLogin();
   const [selectedTab, setSelectedTab] =
     React.useState<BuilderTab>("ACTIVITY_BUILDER");
   const [selectedActivityClientId, setSelectedActivityClientId] =
@@ -239,8 +240,12 @@ export function ActivityBuilderPage(props: {
         centered
       >
         <Tab label="Activity Builder" value="ACTIVITY_BUILDER" />
-        <Tab label="Panelist Builder" value="PANELIST_BUILDER" />
-        <Tab label="Panel Builder" value="PANEL_BUILDER" />
+        {state.user?.userRole === "ADMIN" && (
+          <Tab label="Panelist Builder" value="PANELIST_BUILDER" />
+        )}
+        {state.user?.userRole === "ADMIN" && (
+          <Tab label="Panel Builder" value="PANEL_BUILDER" />
+        )}
       </Tabs>
       <Box style={{ flexGrow: 1, overflow: "auto" }}>{renderContent()}</Box>
     </Box>

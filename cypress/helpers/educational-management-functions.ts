@@ -5,7 +5,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 import { CypressGlobal, cySetup, cyMockLogin, cyInterceptGraphQL, mockGQL, cyMockGoogleDoc, cyMockCreateNewDoc, cyMockGetDocTimeline } from './functions';
-import { DocService, UserRole } from './types';
 import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
 import { fetchConfigResponse } from '../fixtures/fetch-config';
 import {
@@ -37,7 +36,6 @@ import {
 } from '../fixtures/educational-management';
 import { updateStudentProgressResponse } from '../fixtures/educational-management/assignment-progress-operations';
 import { fetchBuiltActivitiesResponse } from '../fixtures/fetch-built-activities';
-import { EducationalRole } from '../fixtures/educational-management/educational-types';
 import { MockGraphQLQuery } from './functions';
 import { gDocWithAllIntentions, storeUserDocResponse } from '../fixtures/intentions/google-docs-intentions';
 import { fetchGoogleDocsResponse } from '../fixtures/fetch-google-docs';
@@ -47,6 +45,8 @@ import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
 import { fetchInstructorsResponseEmpty } from '../fixtures/educational-management/fetch-instructors';
 import { realExampleDocumentTimeline } from '../fixtures/document-timeline/real-example';
 import { gradeStudentAssignmentResponse } from '../fixtures/educational-management/grade-student-assignment';
+import { UserRole } from '../../src/store/slices/login';
+import { EducationalRole } from '../../src/types';
 
 export interface EducationalMockOptions {
   gqlQueries?: MockGraphQLQuery[] | MockGraphQLQuery;
@@ -65,7 +65,7 @@ export function cyMockEducationalManagement(
   const {
     gqlQueries = [],
     userRole = 'USER',
-    educationalRole = EducationalRole.INSTRUCTOR,
+    educationalRole = 'INSTRUCTOR',
     emptyCourses = false,
     emptySections = false,
     emptyAssignments = false,
@@ -83,19 +83,19 @@ export function cyMockEducationalManagement(
   // Choose appropriate responses based on role and empty flags
   const coursesResponse = emptyCourses 
     ? fetchCoursesResponseEmpty 
-    : educationalRole === EducationalRole.INSTRUCTOR 
+    : educationalRole === 'INSTRUCTOR' 
       ? fetchCoursesResponseInstructor 
       : fetchCoursesResponseStudent;
 
   const sectionsResponse = emptySections 
     ? fetchSectionsResponseEmpty 
-    : educationalRole === EducationalRole.INSTRUCTOR 
+    : educationalRole === 'INSTRUCTOR' 
       ? fetchSectionsResponseInstructor 
       : fetchSectionsResponseStudent;
 
   const assignmentsResponse = emptyAssignments 
     ? fetchAssignmentsResponseEmpty 
-    : educationalRole === EducationalRole.INSTRUCTOR 
+    : educationalRole === 'INSTRUCTOR' 
       ? fetchAssignmentsResponseInstructor 
       : fetchAssignmentsResponseStudent;
 
@@ -103,7 +103,7 @@ export function cyMockEducationalManagement(
     ? fetchStudentsResponseEmpty 
     : fetchStudentsResponseInstructor;
 
-  const userDataResponse = educationalRole === EducationalRole.INSTRUCTOR
+  const userDataResponse = educationalRole === 'INSTRUCTOR'
     ? createNewInstructorResponse
     : emptyCourses
       ? createNewStudentEmptyResponse
@@ -166,7 +166,7 @@ export function cyMockEducationalManagement(
 
     //
     mockGQL('FetchVersionsById', fetchDocVersionsBuilder([])),
-    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse(DocService.GOOGLE_DOCS)),
+    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse('GOOGLE_DOCS')),
     mockGQL('FetchConfig', fetchConfigResponse),
     mockGQL('FetchDocGoals', fetchDocGoalsResponse),
     mockGQL('FetchSystemPrompts', fetchConfigResponse),

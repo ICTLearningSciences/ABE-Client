@@ -12,10 +12,23 @@ import type { EducationalRole, User } from "../../types";
 import { fetchUsers, updateUserRole } from "../../hooks/api";
 import { copyAndSet } from "../../helpers";
 import type { UserRole } from "../../store/slices/login";
+import withAuthorizationOnly from "../../hooks/wrap-with-authorization-only";
+import { useWithLogin } from "../../store/slices/login/use-with-login";
+import { useNavigateWithParams } from "../../hooks/use-navigate-with-params";
 
-export default function AdminManageUsers(): React.ReactNode {
+function AdminManageUsers(): React.ReactNode {
   const [users, setUsers] = React.useState<User[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const { state } = useWithLogin();
+  const navigate = useNavigateWithParams();
+
+  React.useEffect(() => {
+    if (state.user?.userRole !== "ADMIN") {
+      navigate("/");
+      return;
+    }
+    loadUsers();
+  }, []);
 
   async function loadUsers() {
     setIsLoading(true);
@@ -39,10 +52,6 @@ export default function AdminManageUsers(): React.ReactNode {
       setUsers(copyAndSet(users, idx, user));
     }
   }
-
-  React.useEffect(() => {
-    loadUsers();
-  }, []);
 
   return (
     <div style={{ width: "100%", height: "100%" }} className="column spacing">
@@ -131,3 +140,6 @@ export default function AdminManageUsers(): React.ReactNode {
     </div>
   );
 }
+
+const Page = withAuthorizationOnly(AdminManageUsers);
+export default Page;

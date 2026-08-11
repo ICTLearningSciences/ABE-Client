@@ -11,6 +11,7 @@ import { Collapse, IconButton } from "@mui/material";
 
 import type { RagStoreConfiguration } from "../../../../types";
 import { CheckBoxInput, InputField } from "../../shared/input-components";
+import { useWithLogin } from "../../../../store/slices/login/use-with-login";
 
 type RagConfigurationUpdater =
   | RagStoreConfiguration
@@ -31,6 +32,7 @@ export function RagStoreConfigurationEditor(
     topN?: string;
     ragQuery?: string;
   }>({});
+  const { state } = useWithLogin();
 
   const isEnabled = Boolean(ragConfiguration);
 
@@ -130,6 +132,7 @@ export function RagStoreConfigurationEditor(
     });
   };
 
+  if (state.user?.userRole !== "ADMIN") return <div />;
   return (
     <div
       style={{
@@ -157,7 +160,6 @@ export function RagStoreConfigurationEditor(
         </IconButton>
         <h4 style={{ margin: 0 }}>RAG Configuration</h4>
       </div>
-
       <Collapse in={!collapsed}>
         <div
           style={{
@@ -172,7 +174,6 @@ export function RagStoreConfigurationEditor(
             value={isEnabled}
             onChange={handleEnableChange}
           />
-
           {isEnabled && ragConfiguration && (
             <>
               <div>

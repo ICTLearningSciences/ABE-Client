@@ -7,9 +7,8 @@ The full terms of this copyright and license should always be found in the root 
 
 import { eightHoursBetweenSessions } from '../fixtures/document-timeline/eight-hours-difference';
 import { generationCompleted, generationInProgress } from '../fixtures/document-timeline/generations-in-progress';
-import { tenTimelinePoints } from '../fixtures/document-timeline/ten-timeline-points';
 import { cyMockDefault, cyMockGetDocTimeline } from '../helpers/functions';
-import { JobStatus, MockDefaultType } from '../helpers/types';
+import { MockDefaultType } from '../helpers/types';
 
 describe('document timeline', () => {
   beforeEach(() => {
@@ -270,7 +269,7 @@ describe('document timeline', () => {
     it('server failure', () => {
       cyMockGetDocTimeline(cy, {
         response: eightHoursBetweenSessions,
-        jobStatus: JobStatus.FAILED,
+        jobStatus: 'FAILED',
       });
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       cy.contains('Failed to load document timeline');
@@ -291,7 +290,7 @@ describe('document timeline', () => {
       cyMockDefault(cy)
       cyMockGetDocTimeline(cy, {
         response: generationInProgress,
-        jobStatus: JobStatus.IN_PROGRESS,
+        jobStatus: 'IN_PROGRESS',
       });
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       cy.get("[data-cy=ai-summary-in-progress]").should("exist")
@@ -304,7 +303,7 @@ describe('document timeline', () => {
       cyMockDefault(cy)
       cyMockGetDocTimeline(cy, {
         response: generationInProgress,
-        jobStatus: JobStatus.IN_PROGRESS,
+        jobStatus: 'IN_PROGRESS',
       });
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       cy.get("[data-cy=ai-summary-in-progress]").should("exist")
@@ -322,7 +321,7 @@ describe('document timeline', () => {
       cyMockDefault(cy)
       cyMockGetDocTimeline(cy, {
         response: generationInProgress,
-        jobStatus: JobStatus.IN_PROGRESS,
+        jobStatus: 'IN_PROGRESS',
       });
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       cy.get("[data-cy=ai-summary-in-progress]").should("exist")
@@ -335,14 +334,14 @@ describe('document timeline', () => {
       cyMockDefault(cy)
       cyMockGetDocTimeline(cy, {
         response: generationInProgress,
-        jobStatus: JobStatus.IN_PROGRESS,
+        jobStatus: 'IN_PROGRESS',
       });
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       cy.get("[data-cy=ai-summary-in-progress]").should("exist")
       cy.get("[data-cy=ai-outline-in-progress]").should("exist")
       cyMockGetDocTimeline(cy, {
         response: generationCompleted,
-        jobStatus: JobStatus.COMPLETE,
+        jobStatus: 'COMPLETE',
       });
       cy.get("[data-cy=timeline-footer-item-card-0]").should("have.css", "opacity", "0.5")
       cy.get("[data-cy=timeline-footer-item-card-1]").should("have.css", "opacity", "0.5")
@@ -357,14 +356,14 @@ describe('document timeline', () => {
       cyMockDefault(cy)
       cyMockGetDocTimeline(cy, {
         response: generationInProgress,
-        jobStatus: JobStatus.IN_PROGRESS,
+        jobStatus: 'IN_PROGRESS',
       });
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       cy.get("[data-cy=ai-summary-in-progress]").should("exist")
       cy.get("[data-cy=ai-outline-in-progress]").should("exist")
       cyMockGetDocTimeline(cy, {
         response: generationCompleted,
-        jobStatus: JobStatus.COMPLETE,
+        jobStatus: 'COMPLETE',
       });
       cy.wait("@FetchDocumentTimelineStatus", {timeout: 3000});
       cy.get("[data-cy=summary-container]").should("contain.text", "Complete Summary")
@@ -380,7 +379,7 @@ describe('document timeline', () => {
       cyMockDefault(cy)
       cyMockGetDocTimeline(cy, {
         response: generationCompleted,
-        jobStatus: JobStatus.IN_PROGRESS,
+        jobStatus: 'IN_PROGRESS',
       });
       cy.visit('/docs/history/1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y');
       cy.get("[data-cy=assignment-textarea]").within(()=>{
