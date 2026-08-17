@@ -94,7 +94,9 @@ export function EndActivityStepBuilder(props: {
       >
         {collapsed ? <ExpandLess /> : <ExpandMore />}
       </IconButton>
-      <h4 style={{ alignSelf: "center" }}>
+      <h4
+        style={{ alignSelf: "center", display: "flex", alignItems: "center" }}
+      >
         End Activity Message{" "}
         <InfoTooltip title="The activity will stop here. You may supply a final message to the user, and optionally enable a 'Return To Home' button." />
       </h4>

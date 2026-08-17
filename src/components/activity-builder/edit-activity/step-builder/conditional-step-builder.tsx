@@ -125,7 +125,7 @@ export function ConditionalStepBuilder(props: {
       <h4
         style={{ alignSelf: "center", display: "flex", alignItems: "center" }}
       >
-        Conditionals{" "}
+        If / Then Go-To
         <InfoTooltip title="Define conditions that will trigger the flow to jump to a specific step." />
       </h4>
       {errors && errors.length > 0 && (

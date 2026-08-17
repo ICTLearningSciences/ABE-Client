@@ -567,7 +567,7 @@ export function PromptStepBuilder(props: {
       >
         <Delete />
       </IconButton>
-      <h4 style={{ alignSelf: "center" }}>Prompt Step</h4>
+      <h4 style={{ alignSelf: "center" }}>AI Prompt</h4>
       {errors && errors.length > 0 && (
         <span style={{ color: "red", textAlign: "center" }}>
           {errors.join(", ")}
