@@ -87,7 +87,7 @@ export function SystemMessageStepBuilder(props: {
         {collapsed ? <ExpandMore /> : <ExpandLess />}
       </IconButton>
 
-      <h4 style={{ alignSelf: "center" }}>System Message</h4>
+      <h4 style={{ alignSelf: "center" }}>Basic Message</h4>
       {errors && errors.length > 0 && (
         <span style={{ color: "red", textAlign: "center" }}>
           {errors.join(", ")}

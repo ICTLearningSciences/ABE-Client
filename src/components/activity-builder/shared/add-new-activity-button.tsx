@@ -20,7 +20,7 @@ export type AddNewActivityStepType =
 
 function getButtonText(t: AddNewActivityStepType): string {
   if (t === "SYSTEM_MESSAGE") return "Basic Message";
-  if (t === "REQUEST_USER_INPUT") return "User Input";
+  if (t === "REQUEST_USER_INPUT") return "Request User Input";
   if (t === "PROMPT") return "AI Prompt";
   if (t === "CONDITIONAL") return "If / Then Go-To";
   if (t === "EDIT_DOC_PROMPT") return "AI Edits Doc";
