@@ -12,6 +12,7 @@ import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-typ
 import type { ChatMessageTypes, ChatLog } from "../../../store/slices/chat";
 import Message from "./message";
 import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
+import { useAppSelector } from "../../../store/hooks";
 
 export function ChatThread(props: {
   coachResponsePending: boolean;
@@ -21,7 +22,10 @@ export function ChatThread(props: {
   sendMessage: (message: ChatMessageTypes) => void;
 }): React.ReactNode {
   const { coachResponsePending, setAiInfoToDisplay, sendMessage } = props;
-  const { activePanel, activePanelist, panelists } = useWithPanels();
+  const { activePanel, panelists } = useWithPanels();
+  const activePanelists = useAppSelector(
+    (state) => state.panels.activePanelists,
+  );
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [viewedMessages, setViewedMessages] = useState<string[]>([]);
   const [pingRef, setPingRef] = useState<NodeJS.Timeout>();
@@ -34,7 +38,7 @@ export function ChatThread(props: {
           p.panelistName === m.systemCustomName,
       );
       if (panelist) {
-        return !activePanelist || activePanelist.clientId === panelist.clientId;
+        return !activePanelists || activePanelists.includes(panelist.clientId);
       }
       return true;
     },

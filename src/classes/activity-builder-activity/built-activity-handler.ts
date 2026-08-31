@@ -44,7 +44,11 @@ import {
 } from "../../components/activity-builder/helpers";
 import { ChatLogSubscriber } from "../../hooks/use-with-chat-log-subscribers";
 import { getDocData } from "../../hooks/api";
-import type { Panelist, Panel } from "../../store/slices/panels/types";
+import type {
+  Panelist,
+  Panel,
+  PanelResponseConfiguration,
+} from "../../store/slices/panels/types";
 import type { RagStoreConfiguration } from "../../types";
 
 interface UserResponseHandleState {
@@ -93,6 +97,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   activityPanelists?: Panelist[];
   filteredToPanelists: string[] = [];
   onFilteredPanelistsChanged?: (filteredPanelistIds: string[]) => void;
+  activePanelConfig?: Record<string, PanelResponseConfiguration> = {};
 
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
@@ -175,6 +180,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     activityPanel?: Panel,
     activityPanelists?: Panelist[],
     onFilteredPanelistsChanged?: (filteredPanelistIds: string[]) => void,
+    activePanelConfig?: Record<string, PanelResponseConfiguration>,
   ) {
     this.docId = docId;
     this.docService = docService;
@@ -193,6 +199,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.onGoHome = onGoHome;
     this.activityPanel = activityPanel;
     this.activityPanelists = activityPanelists;
+    this.activePanelConfig = activePanelConfig;
     this.onFilteredPanelistsChanged = onFilteredPanelistsChanged;
     this.setBuiltActivityData = this.setBuiltActivityData.bind(this);
     this.initializeActivity = this.initializeActivity.bind(this);
@@ -863,6 +870,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         webSearch: config.webSearch || false,
         editDoc: config.editDoc || false,
         ragConfiguration: ragConfiguration,
+        panelConfiguration: Object.values(this.activePanelConfig || {}),
       },
     ];
 
@@ -979,6 +987,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         webSearch: config.webSearch || false,
         editDoc: config.editDoc || false,
         ragConfiguration: ragConfiguration,
+        panelConfiguration: Object.values(this.activePanelConfig || {}),
       },
     ];
 

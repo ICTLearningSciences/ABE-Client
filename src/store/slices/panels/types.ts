@@ -24,3 +24,12 @@ export interface Panel {
   panelDescription: string;
   panelists: string[];
 }
+
+export interface PanelResponseConfiguration {
+  id: string;
+  useSearch: boolean;
+  responseLength: ResponseLength;
+  difficultyLevel: ResponseLength;
+}
+
+export type ResponseLength = "low" | "med" | "high";

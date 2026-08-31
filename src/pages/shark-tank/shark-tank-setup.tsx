@@ -11,13 +11,18 @@ import * as motion from "motion/react-client";
 import {
   Button,
   CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Grid,
   IconButton,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
+  MenuItem,
   SvgIcon,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -26,9 +31,13 @@ import {
   DescriptionOutlined,
   InfoOutlined,
   ListAlt,
+  Message,
   PeopleOutlined,
   Person,
   PlayCircleOutlineOutlined,
+  Restore,
+  Settings,
+  Tune,
 } from "@mui/icons-material";
 
 import { Header } from "./components/header";
@@ -39,6 +48,8 @@ import withAuthorizationOnly from "./wrap-with-authorization-only";
 import type { ActivityBuilder } from "../../exported-files";
 
 import "./shark-tank.css";
+import { CssTextField } from "./components";
+import type { ResponseLength } from "../../store/slices/panels/types";
 
 const CssCard = (props: {
   icon?: React.ReactNode;
@@ -77,16 +88,19 @@ const CssCard = (props: {
 
 function SharkTankSetup(): React.ReactNode {
   const {
-    usePanelMode,
-    activity,
-    activePanel,
-    activePanelist,
     panels,
     panelists,
+    activity,
+    activePanel,
+    activePanelConfig,
     setActivity,
     setActivePanel,
-    setActivePanelist,
+    setActivePanelConfig,
+    toggleActivePanelist,
   } = useWithPanels();
+  const activePanelists = useAppSelector(
+    (state) => state.panels.activePanelists,
+  );
   const activities: ActivityBuilder[] = useAppSelector((state) =>
     state.docGoalsActivities.builtActivities.filter(
       (a: ActivityBuilder) =>
@@ -97,6 +111,7 @@ function SharkTankSetup(): React.ReactNode {
     (state) => state.docGoalsActivities.builtActivitiesLoadStatus,
   );
   const navigate = useNavigateWithParams();
+  const [showConfig, setShowConfig] = React.useState<string>();
 
   React.useEffect(() => {
     if (!activity && activities.length > 0) {
@@ -113,21 +128,28 @@ function SharkTankSetup(): React.ReactNode {
     <motion.div
       ref={ref}
       className="row spacing"
-      whileHover={
-        !usePanelMode ? { scale: 1.01, filter: "brightness(1.1)" } : {}
-      }
-      onClick={() => setActivePanelist(props.clientId)}
+      whileHover={{ scale: 1.01, filter: "brightness(1.1)" }}
     >
+      <Tooltip title="Configure Response Settings">
+        <IconButton
+          color={props.clientId in activePanelConfig ? "secondary" : "primary"}
+          onClick={() => setShowConfig(props.clientId)}
+        >
+          <Settings />
+        </IconButton>
+      </Tooltip>
       <ListItem
         className="box"
         style={{
           padding: 5,
-          borderColor: activePanelist === props.clientId ? "#5c8a69" : "",
-          backgroundImage:
-            activePanelist === props.clientId
-              ? "linear-gradient(to right, #79a07530, #64574730)"
-              : "",
+          borderColor: activePanelists?.includes(props.clientId)
+            ? "#5c8a69"
+            : "",
+          backgroundImage: activePanelists?.includes(props.clientId)
+            ? "linear-gradient(to right, #79a07530, #64574730)"
+            : "",
         }}
+        onClick={() => toggleActivePanelist(props.clientId)}
       >
         <ListItemIcon style={{ color: "white", marginLeft: 5 }}>
           <Person />
@@ -145,18 +167,20 @@ function SharkTankSetup(): React.ReactNode {
           }
         />
       </ListItem>
-      {!usePanelMode && (
+      <Tooltip
+        title={`${activePanelists?.includes(props.clientId) ? "Disable" : "Enable"} Panelist`}
+      >
         <IconButton
           color="primary"
-          onClick={() => setActivePanelist(props.clientId)}
+          onClick={() => toggleActivePanelist(props.clientId)}
         >
-          {activePanelist?.clientId === props.clientId ? (
+          {activePanelists?.includes(props.clientId) ? (
             <CheckBox />
           ) : (
             <CheckBoxOutlineBlank />
           )}
         </IconButton>
-      )}
+      </Tooltip>
     </motion.div>
   ));
 
@@ -200,23 +224,13 @@ function SharkTankSetup(): React.ReactNode {
                 fullWidth
                 startIcon={<PlayCircleOutlineOutlined />}
                 onClick={startSession}
-                disabled={!usePanelMode && !activePanelist}
+                disabled={!activePanelists || activePanelists.length === 0}
               >
                 Start Session
               </Button>
             </Grid>
 
             <Grid size={4} style={{ padding: 10 }}>
-              {/* <CssCard alt title="Use Web Search" icon={<Search />}>
-                <CssTextField
-                  select
-                  value={useSearch ? 'true' : 'false'}
-                  onChange={(e) => updateSearch(e.target.value)}
-                >
-                  <MenuItem value="true">Yes</MenuItem>
-                  <MenuItem value="false">No</MenuItem>
-                </CssTextField>
-              </CssCard> */}
               <CssCard alt title="Select Activity" icon={<ListAlt />}>
                 <List className="column spacing">
                   {activities.map((a) => {
@@ -270,10 +284,118 @@ function SharkTankSetup(): React.ReactNode {
                   })}
                 </List>
               </CssCard>
+              <CssCard alt title="Response Length" icon={<Message />}>
+                <CssTextField
+                  select
+                  value={activePanelConfig[""].responseLength}
+                  onChange={(e) =>
+                    setActivePanelConfig({
+                      ...activePanelConfig,
+                      "": {
+                        ...activePanelConfig[""],
+                        id: "",
+                        responseLength: e.target.value as ResponseLength,
+                      },
+                    })
+                  }
+                >
+                  <MenuItem value="low">Low (10-30 words)</MenuItem>
+                  <MenuItem value="med">Medium (50-100 words)</MenuItem>
+                  <MenuItem value="high">High (No limit)</MenuItem>
+                </CssTextField>
+              </CssCard>
+              <CssCard alt title="Difficulty Level" icon={<Tune />}>
+                <CssTextField
+                  select
+                  value={activePanelConfig[""].difficultyLevel}
+                  onChange={(e) =>
+                    setActivePanelConfig({
+                      ...activePanelConfig,
+                      "": {
+                        ...activePanelConfig[""],
+                        id: "",
+                        difficultyLevel: e.target.value as ResponseLength,
+                      },
+                    })
+                  }
+                >
+                  <MenuItem value="low">Low</MenuItem>
+                  <MenuItem value="med">Medium</MenuItem>
+                  <MenuItem value="high">High</MenuItem>
+                </CssTextField>
+              </CssCard>
             </Grid>
           </Grid>
         )}
       </div>
+      {showConfig && (
+        <Dialog open={true} onClose={() => setShowConfig(undefined)}>
+          <DialogTitle>
+            {panelists.find((p) => p.clientId === showConfig)?.panelistName}{" "}
+            Response Settings
+          </DialogTitle>
+          <DialogContent>
+            <CssCard alt title="Response Length" icon={<Message />}>
+              <CssTextField
+                select
+                value={
+                  activePanelConfig[showConfig]?.responseLength ||
+                  activePanelConfig[""]?.responseLength
+                }
+                onChange={(e) => {
+                  const config = { ...activePanelConfig };
+                  config[showConfig] = {
+                    ...config[""],
+                    ...config[showConfig],
+                    id: showConfig,
+                    responseLength: e.target.value as ResponseLength,
+                  };
+                  setActivePanelConfig({ ...config });
+                }}
+              >
+                <MenuItem value="low">Low (10-30 words)</MenuItem>
+                <MenuItem value="med">Medium (50-100 words)</MenuItem>
+                <MenuItem value="high">High (No limit)</MenuItem>
+              </CssTextField>
+            </CssCard>
+            <CssCard alt title="Difficulty Level" icon={<Tune />}>
+              <CssTextField
+                select
+                value={
+                  activePanelConfig[showConfig]?.difficultyLevel ||
+                  activePanelConfig[""]?.difficultyLevel
+                }
+                onChange={(e) => {
+                  const config = { ...activePanelConfig };
+                  config[showConfig] = {
+                    ...config[""],
+                    ...config[showConfig],
+                    id: showConfig,
+                    difficultyLevel: e.target.value as ResponseLength,
+                  };
+                  setActivePanelConfig({ ...config });
+                }}
+              >
+                <MenuItem value="low">Low</MenuItem>
+                <MenuItem value="med">Medium</MenuItem>
+                <MenuItem value="high">High</MenuItem>
+              </CssTextField>
+            </CssCard>
+            <Button
+              variant="contained"
+              fullWidth
+              startIcon={<Restore />}
+              onClick={() => {
+                const config = { ...activePanelConfig };
+                delete config[showConfig];
+                setActivePanelConfig({ ...config });
+              }}
+            >
+              Reset To Default
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
     </main>
   );
 }

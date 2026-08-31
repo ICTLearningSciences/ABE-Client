@@ -6,32 +6,18 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import React from "react";
-import type { Panelist } from "../../../store/slices/panels/types";
 import type { UseWithPanels } from "../../../store/slices/panels/use-with-panels";
 import PanelistCard from "./panelist-card";
+import { useAppSelector } from "../../../store/hooks";
 
 export function ChatPanelists(props: {
   useWithPanelActivity: UseWithPanels;
 }): React.ReactNode {
   const { useWithPanelActivity } = props;
-  const {
-    activePanel,
-    activePanelist,
-    panelists,
-    setPanelMode,
-    setActivePanelist,
-  } = useWithPanelActivity;
-
-  function onMemberClick(m: Panelist): void {
-    if (activePanelist?.clientId === m.clientId) {
-      setPanelMode(true);
-      setActivePanelist(undefined);
-    } else {
-      setPanelMode(false);
-      setActivePanelist(m.clientId);
-    }
-  }
-
+  const { activePanel, panelists, toggleActivePanelist } = useWithPanelActivity;
+  const activePanelists = useAppSelector(
+    (state) => state.panels.activePanelists,
+  );
   return (
     <div
       className="row center-div"
@@ -43,7 +29,12 @@ export function ChatPanelists(props: {
     >
       <div
         className="row spacing"
-        style={{ overflowX: "auto", overflowY: "hidden", padding: 10 }}
+        style={{
+          flexDirection: "row-reverse",
+          overflowX: "auto",
+          overflowY: "hidden",
+          padding: 10,
+        }}
       >
         {activePanel?.panelists.map((m) => {
           const panelist = panelists.find((p) => p.clientId === m);
@@ -52,8 +43,8 @@ export function ChatPanelists(props: {
             <PanelistCard
               key={m}
               p={panelist}
-              isActive={!activePanelist || activePanelist.clientId === m}
-              onMemberClick={onMemberClick}
+              isActive={Boolean(activePanelists?.includes(m))}
+              onMemberClick={() => toggleActivePanelist(m)}
             />
           );
         })}

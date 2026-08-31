@@ -86,6 +86,11 @@ export const fullBuiltActivityQueryData = `
               topN
               filters
             }
+            panelConfiguration {
+              id
+              responseLength
+              difficultyLevel
+            }
           }
       }
 
