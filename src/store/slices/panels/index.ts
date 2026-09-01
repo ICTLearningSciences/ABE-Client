@@ -45,7 +45,8 @@ const initialState: State = {
   activePanelConfig: {
     "": {
       id: "",
-      useSearch: false,
+      webSearch: false,
+      includeChatLog: false,
       responseLength: "high",
       difficultyLevel: "low",
     },

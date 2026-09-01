@@ -10,16 +10,22 @@ import { Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import { Close, OpenInNew, Pageview } from "@mui/icons-material";
 import { useWithChat, useWithState } from "../../../exported-files";
 import type { Source } from "../../../ai-services/ai-service-types";
+import type { ChatMessageTypes } from "../../../store/slices/chat";
 
 export function ReferencesButton(props: {
   reference?: Source;
-  onSelectReference: (ref?: Source) => void;
+  onSelectReference?: (ref?: Source) => void;
+  message?: ChatMessageTypes;
 }): React.ReactNode {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { state } = useWithState();
   const { curDocId } = state;
   const { state: chatState } = useWithChat();
-  const messages = curDocId ? chatState.chatLogs[curDocId] || [] : [];
+  const messages = curDocId
+    ? props.message
+      ? [props.message]
+      : chatState.chatLogs[curDocId] || []
+    : [];
 
   const sources = [];
   if (curDocId) {
@@ -41,7 +47,8 @@ export function ReferencesButton(props: {
   };
 
   const open = (ref?: Source) => {
-    props.onSelectReference(ref);
+    if (props.onSelectReference) props.onSelectReference(ref);
+    else if (ref) openInNew(ref.url);
     handleClose();
   };
 

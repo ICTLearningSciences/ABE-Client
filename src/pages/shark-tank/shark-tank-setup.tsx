@@ -284,45 +284,96 @@ function SharkTankSetup(): React.ReactNode {
                   })}
                 </List>
               </CssCard>
-              <CssCard alt title="Response Length" icon={<Message />}>
-                <CssTextField
-                  select
-                  value={activePanelConfig[""].responseLength}
-                  onChange={(e) =>
-                    setActivePanelConfig({
-                      ...activePanelConfig,
-                      "": {
-                        ...activePanelConfig[""],
-                        id: "",
-                        responseLength: e.target.value as ResponseLength,
-                      },
-                    })
-                  }
-                >
-                  <MenuItem value="low">Low (10-30 words)</MenuItem>
-                  <MenuItem value="med">Medium (50-100 words)</MenuItem>
-                  <MenuItem value="high">High (No limit)</MenuItem>
-                </CssTextField>
-              </CssCard>
-              <CssCard alt title="Difficulty Level" icon={<Tune />}>
-                <CssTextField
-                  select
-                  value={activePanelConfig[""].difficultyLevel}
-                  onChange={(e) =>
-                    setActivePanelConfig({
-                      ...activePanelConfig,
-                      "": {
-                        ...activePanelConfig[""],
-                        id: "",
-                        difficultyLevel: e.target.value as ResponseLength,
-                      },
-                    })
-                  }
-                >
-                  <MenuItem value="low">Low</MenuItem>
-                  <MenuItem value="med">Medium</MenuItem>
-                  <MenuItem value="high">High</MenuItem>
-                </CssTextField>
+
+              <CssCard alt title="Panel Response Settings" icon={<Tune />}>
+                <Grid container spacing={1}>
+                  <Grid size={{ xs: 12, xl: 6 }}>
+                    <Typography>Response Length</Typography>
+                    <CssTextField
+                      select
+                      fullWidth
+                      value={activePanelConfig[""].responseLength}
+                      onChange={(e) =>
+                        setActivePanelConfig({
+                          ...activePanelConfig,
+                          "": {
+                            ...activePanelConfig[""],
+                            id: "",
+                            responseLength: e.target.value as ResponseLength,
+                          },
+                        })
+                      }
+                    >
+                      <MenuItem value="low">Low (10-30 words)</MenuItem>
+                      <MenuItem value="med">Medium (50-100 words)</MenuItem>
+                      <MenuItem value="high">High (No limit)</MenuItem>
+                    </CssTextField>
+                  </Grid>
+                  <Grid size={{ xs: 12, xl: 6 }}>
+                    <Typography>Difficulty Level</Typography>
+                    <CssTextField
+                      select
+                      fullWidth
+                      value={activePanelConfig[""].difficultyLevel}
+                      onChange={(e) =>
+                        setActivePanelConfig({
+                          ...activePanelConfig,
+                          "": {
+                            ...activePanelConfig[""],
+                            id: "",
+                            difficultyLevel: e.target.value as ResponseLength,
+                          },
+                        })
+                      }
+                    >
+                      <MenuItem value="low">Low</MenuItem>
+                      <MenuItem value="med">Medium</MenuItem>
+                      <MenuItem value="high">High</MenuItem>
+                    </CssTextField>
+                  </Grid>
+                  <Grid size={6}>
+                    <Typography>Use Web Search</Typography>
+                    <CssTextField
+                      select
+                      fullWidth
+                      value={`${activePanelConfig[""].webSearch}`}
+                      onChange={(e) =>
+                        setActivePanelConfig({
+                          ...activePanelConfig,
+                          "": {
+                            ...activePanelConfig[""],
+                            id: "",
+                            webSearch: e.target.value === "true",
+                          },
+                        })
+                      }
+                    >
+                      <MenuItem value="true">Yes</MenuItem>
+                      <MenuItem value="false">No</MenuItem>
+                    </CssTextField>
+                  </Grid>
+                  <Grid size={6}>
+                    <Typography>Include Chat Log</Typography>
+                    <CssTextField
+                      select
+                      fullWidth
+                      value={`${activePanelConfig[""].includeChatLog}`}
+                      onChange={(e) =>
+                        setActivePanelConfig({
+                          ...activePanelConfig,
+                          "": {
+                            ...activePanelConfig[""],
+                            id: "",
+                            includeChatLog: e.target.value === "true",
+                          },
+                        })
+                      }
+                    >
+                      <MenuItem value="true">Yes</MenuItem>
+                      <MenuItem value="false">No</MenuItem>
+                    </CssTextField>
+                  </Grid>
+                </Grid>
               </CssCard>
             </Grid>
           </Grid>
@@ -334,7 +385,7 @@ function SharkTankSetup(): React.ReactNode {
             {panelists.find((p) => p.clientId === showConfig)?.panelistName}{" "}
             Response Settings
           </DialogTitle>
-          <DialogContent>
+          <DialogContent style={{ color: "white" }}>
             <CssCard alt title="Response Length" icon={<Message />}>
               <CssTextField
                 select

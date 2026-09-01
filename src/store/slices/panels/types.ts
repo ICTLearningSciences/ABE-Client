@@ -27,7 +27,8 @@ export interface Panel {
 
 export interface PanelResponseConfiguration {
   id: string;
-  useSearch: boolean;
+  webSearch: boolean;
+  includeChatLog: boolean;
   responseLength: ResponseLength;
   difficultyLevel: ResponseLength;
 }

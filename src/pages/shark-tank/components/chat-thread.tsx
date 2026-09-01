@@ -148,7 +148,7 @@ export function ChatThread(props: {
       );
       scrollToElementById(msg?.id || "message-end-ref");
     }
-  }, [chatMessages, viewedMessages, messageElements]);
+  }, [chatMessages.length, viewedMessages.length, messageElements.length]);
 
   return (
     <div
