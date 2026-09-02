@@ -8,7 +8,8 @@ import { Tune } from "@mui/icons-material";
 import { Grid, Typography, MenuItem } from "@mui/material";
 import type { ResponseLength } from "../../../store/slices/panels/types";
 import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
-import { CssCard, CssTextField } from ".";
+import { CssTextField } from ".";
+import CssCard from "./css-card";
 
 function PanelSettings(): React.ReactNode {
   const { activePanelConfig, setActivePanelConfig } = useWithPanels();

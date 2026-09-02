@@ -47,7 +47,8 @@ import withAuthorizationOnly from "./wrap-with-authorization-only";
 import type { ActivityBuilder } from "../../exported-files";
 
 import "./shark-tank.css";
-import { CssCard, CssTextField } from "./components";
+import { CssTextField } from "./components";
+import CssCard from "./components/css-card";
 import PanelSettings from "./components/panel-settings";
 import type { ResponseLength } from "../../store/slices/panels/types";
 

@@ -36,12 +36,12 @@ import type {
   ChatLog,
   ChatHistory,
 } from "../../../store/slices/chat";
+import CssCard from "./css-card";
 import Message from "./message";
+import { useWithChat } from "../../../exported-files";
+import { useWithWindowSize } from "../../../hooks/use-with-window-size";
 import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
 import { useAppSelector } from "../../../store/hooks";
-import { useWithChat } from "../../../exported-files";
-import { CssCard } from ".";
-import { useWithWindowSize } from "../../../hooks/use-with-window-size";
 
 export function ChatThread(props: {
   coachResponsePending: boolean;
