@@ -17,6 +17,7 @@ import type {
   UserInputType,
 } from "./store/slices/chat";
 import type { LoginService, UserRole } from "./store/slices/login";
+import type { PanelResponseConfiguration } from "./store/slices/panels/types";
 
 export type EducationalRole = "INSTRUCTOR" | "STUDENT";
 export type GoogleDocTextModifyActions = "HIGHLIGHT" | "INSERT" | "REMOVE";
@@ -194,6 +195,7 @@ export interface AiPromptStep {
   webSearch?: boolean;
   editDoc?: boolean;
   ragConfiguration?: RagStoreConfiguration;
+  panelConfiguration?: PanelResponseConfiguration[];
 }
 
 export interface AiServiceModel {

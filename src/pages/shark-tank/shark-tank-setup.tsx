@@ -11,13 +11,17 @@ import * as motion from "motion/react-client";
 import {
   Button,
   CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Grid,
   IconButton,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  SvgIcon,
+  MenuItem,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -26,9 +30,13 @@ import {
   DescriptionOutlined,
   InfoOutlined,
   ListAlt,
+  Message,
   PeopleOutlined,
   Person,
   PlayCircleOutlineOutlined,
+  Restore,
+  Settings,
+  Tune,
 } from "@mui/icons-material";
 
 import { Header } from "./components/header";
@@ -39,54 +47,26 @@ import withAuthorizationOnly from "./wrap-with-authorization-only";
 import type { ActivityBuilder } from "../../exported-files";
 
 import "./shark-tank.css";
-
-const CssCard = (props: {
-  icon?: React.ReactNode;
-  title?: string;
-  headerButton?: React.ReactNode;
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-  alt?: boolean;
-}): React.ReactNode => {
-  return (
-    <div
-      className="box column spacing"
-      style={{
-        marginBottom: 20,
-        borderColor: props.alt ? "#5c8a69" : "",
-        backgroundImage: props.alt
-          ? "linear-gradient(110deg, rgba(121, 160, 117, 0.3) 60%, rgba(100, 87, 71, 0.3) 100%)"
-          : "linear-gradient(145deg, rgb(48, 53, 58) 30%, rgb(61, 67, 74) 80%, rgb(48, 53, 58) 100%)",
-        boxShadow: "-5px 5px 10px 0px rgba(0, 0, 0, 0.2)",
-        ...props.style,
-      }}
-    >
-      <div className="row spacing">
-        <SvgIcon fontSize="small" style={{ color: props.alt ? "" : "#5c8a69" }}>
-          {props.icon}
-        </SvgIcon>
-        <Typography style={{ fontWeight: "bold", fontSize: 14, flexGrow: 1 }}>
-          {props.title?.toUpperCase()}
-        </Typography>
-        {props.headerButton}
-      </div>
-      {props.children}
-    </div>
-  );
-};
+import { CssTextField } from "./components";
+import CssCard from "./components/css-card";
+import PanelSettings from "./components/panel-settings";
+import type { ResponseLength } from "../../store/slices/panels/types";
 
 function SharkTankSetup(): React.ReactNode {
   const {
-    usePanelMode,
-    activity,
-    activePanel,
-    activePanelist,
     panels,
     panelists,
+    activity,
+    activePanel,
+    activePanelConfig,
     setActivity,
     setActivePanel,
-    setActivePanelist,
+    setActivePanelConfig,
+    toggleActivePanelist,
   } = useWithPanels();
+  const activePanelists = useAppSelector(
+    (state) => state.panels.activePanelists,
+  );
   const activities: ActivityBuilder[] = useAppSelector((state) =>
     state.docGoalsActivities.builtActivities.filter(
       (a: ActivityBuilder) =>
@@ -97,6 +77,7 @@ function SharkTankSetup(): React.ReactNode {
     (state) => state.docGoalsActivities.builtActivitiesLoadStatus,
   );
   const navigate = useNavigateWithParams();
+  const [showConfig, setShowConfig] = React.useState<string>();
 
   React.useEffect(() => {
     if (!activity && activities.length > 0) {
@@ -113,21 +94,28 @@ function SharkTankSetup(): React.ReactNode {
     <motion.div
       ref={ref}
       className="row spacing"
-      whileHover={
-        !usePanelMode ? { scale: 1.01, filter: "brightness(1.1)" } : {}
-      }
-      onClick={() => setActivePanelist(props.clientId)}
+      whileHover={{ scale: 1.01, filter: "brightness(1.1)" }}
     >
+      <Tooltip title="Configure Response Settings">
+        <IconButton
+          color={props.clientId in activePanelConfig ? "secondary" : "primary"}
+          onClick={() => setShowConfig(props.clientId)}
+        >
+          <Settings />
+        </IconButton>
+      </Tooltip>
       <ListItem
         className="box"
         style={{
           padding: 5,
-          borderColor: activePanelist === props.clientId ? "#5c8a69" : "",
-          backgroundImage:
-            activePanelist === props.clientId
-              ? "linear-gradient(to right, #79a07530, #64574730)"
-              : "",
+          borderColor: activePanelists?.includes(props.clientId)
+            ? "#5c8a69"
+            : "",
+          backgroundImage: activePanelists?.includes(props.clientId)
+            ? "linear-gradient(to right, #79a07530, #64574730)"
+            : "",
         }}
+        onClick={() => toggleActivePanelist(props.clientId)}
       >
         <ListItemIcon style={{ color: "white", marginLeft: 5 }}>
           <Person />
@@ -145,18 +133,20 @@ function SharkTankSetup(): React.ReactNode {
           }
         />
       </ListItem>
-      {!usePanelMode && (
+      <Tooltip
+        title={`${activePanelists?.includes(props.clientId) ? "Disable" : "Enable"} Panelist`}
+      >
         <IconButton
           color="primary"
-          onClick={() => setActivePanelist(props.clientId)}
+          onClick={() => toggleActivePanelist(props.clientId)}
         >
-          {activePanelist?.clientId === props.clientId ? (
+          {activePanelists?.includes(props.clientId) ? (
             <CheckBox />
           ) : (
             <CheckBoxOutlineBlank />
           )}
         </IconButton>
-      )}
+      </Tooltip>
     </motion.div>
   ));
 
@@ -200,23 +190,13 @@ function SharkTankSetup(): React.ReactNode {
                 fullWidth
                 startIcon={<PlayCircleOutlineOutlined />}
                 onClick={startSession}
-                disabled={!usePanelMode && !activePanelist}
+                disabled={!activePanelists || activePanelists.length === 0}
               >
                 Start Session
               </Button>
             </Grid>
 
             <Grid size={4} style={{ padding: 10 }}>
-              {/* <CssCard alt title="Use Web Search" icon={<Search />}>
-                <CssTextField
-                  select
-                  value={useSearch ? 'true' : 'false'}
-                  onChange={(e) => updateSearch(e.target.value)}
-                >
-                  <MenuItem value="true">Yes</MenuItem>
-                  <MenuItem value="false">No</MenuItem>
-                </CssTextField>
-              </CssCard> */}
               <CssCard alt title="Select Activity" icon={<ListAlt />}>
                 <List className="column spacing">
                   {activities.map((a) => {
@@ -270,10 +250,79 @@ function SharkTankSetup(): React.ReactNode {
                   })}
                 </List>
               </CssCard>
+              <PanelSettings />
             </Grid>
           </Grid>
         )}
       </div>
+      {showConfig && (
+        <Dialog open={true} onClose={() => setShowConfig(undefined)}>
+          <DialogTitle>
+            {panelists.find((p) => p.clientId === showConfig)?.panelistName}{" "}
+            Response Settings
+          </DialogTitle>
+          <DialogContent style={{ color: "white" }}>
+            <CssCard alt title="Response Length" icon={<Message />}>
+              <CssTextField
+                select
+                value={
+                  activePanelConfig[showConfig]?.responseLength ||
+                  activePanelConfig[""]?.responseLength
+                }
+                onChange={(e) => {
+                  const config = { ...activePanelConfig };
+                  config[showConfig] = {
+                    ...config[""],
+                    ...config[showConfig],
+                    id: showConfig,
+                    responseLength: e.target.value as ResponseLength,
+                  };
+                  setActivePanelConfig({ ...config });
+                }}
+              >
+                <MenuItem value="low">Low (10-30 words)</MenuItem>
+                <MenuItem value="med">Medium (50-100 words)</MenuItem>
+                <MenuItem value="high">High (No limit)</MenuItem>
+              </CssTextField>
+            </CssCard>
+            <CssCard alt title="Difficulty Level" icon={<Tune />}>
+              <CssTextField
+                select
+                value={
+                  activePanelConfig[showConfig]?.difficultyLevel ||
+                  activePanelConfig[""]?.difficultyLevel
+                }
+                onChange={(e) => {
+                  const config = { ...activePanelConfig };
+                  config[showConfig] = {
+                    ...config[""],
+                    ...config[showConfig],
+                    id: showConfig,
+                    difficultyLevel: e.target.value as ResponseLength,
+                  };
+                  setActivePanelConfig({ ...config });
+                }}
+              >
+                <MenuItem value="low">Low</MenuItem>
+                <MenuItem value="med">Medium</MenuItem>
+                <MenuItem value="high">High</MenuItem>
+              </CssTextField>
+            </CssCard>
+            <Button
+              variant="contained"
+              fullWidth
+              startIcon={<Restore />}
+              onClick={() => {
+                const config = { ...activePanelConfig };
+                delete config[showConfig];
+                setActivePanelConfig({ ...config });
+              }}
+            >
+              Reset To Default
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
     </main>
   );
 }

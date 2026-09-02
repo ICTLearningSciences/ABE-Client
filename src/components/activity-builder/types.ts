@@ -12,6 +12,7 @@ import type {
   PromptOutputTypes,
   RagStoreConfiguration,
 } from "../../types";
+import type { PanelResponseConfiguration } from "../../store/slices/panels/types";
 
 export type ActivityBuilderStepType =
   "SYSTEM_MESSAGE" | "REQUEST_USER_INPUT" | "PROMPT" | "CONDITIONAL";
@@ -168,6 +169,7 @@ export interface SinglePromptConfigurationGql {
   customSystemRole: string;
   webSearch?: boolean;
   ragConfiguration?: RagStoreConfiguration;
+  panelConfiguration?: PanelResponseConfiguration[];
 }
 
 export interface SinglePromptConfiguration extends Omit<

@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import * as panelApis from ".";
-import type { Panel, Panelist } from "./types";
+import type { Panel, PanelResponseConfiguration, Panelist } from "./types";
 import {
   type ActivityBuilder,
   useWithCurrentGoalActivity,
@@ -27,16 +27,15 @@ export interface UseWithPanels {
   deletePanel: (panelClientId: string) => void;
   deletePanelist: (panelistClientId: string) => void;
 
-  useSearch: boolean;
-  usePanelMode: boolean;
   activity?: ActivityBuilder;
   activePanel?: Panel;
-  activePanelist?: Panelist;
-  updateSearch: (useSearch: string) => void;
-  setPanelMode: (usePanelMode: boolean) => void;
+  activePanelists?: Panelist[];
+  activePanelConfig: Record<string, PanelResponseConfiguration>;
   setActivity: (id: string) => void;
   setActivePanel: (id: string) => void;
-  setActivePanelist: (id?: string) => void;
+  setActivePanelists: (ids?: string[]) => void;
+  setActivePanelConfig: (d: Record<string, PanelResponseConfiguration>) => void;
+  toggleActivePanelist: (id: string) => void;
 }
 
 export function useWithPanels(): UseWithPanels {
@@ -46,11 +45,10 @@ export function useWithPanels(): UseWithPanels {
     panelists,
     panelsLoadStatus,
     panelistsLoadStatus,
-    useSearch,
-    usePanelMode,
     activity,
     activePanel,
-    activePanelist,
+    activePanelists,
+    activePanelConfig,
   } = useAppSelector((state) => state.panels);
   const builtActivities: ActivityBuilder[] = useAppSelector(
     (state) => state.docGoalsActivities.builtActivities,
@@ -59,8 +57,8 @@ export function useWithPanels(): UseWithPanels {
   const { updateViewingUserRole } = useWithState();
   const _activity = builtActivities.find((a) => a._id === activity);
   const _panel = panels.find((p: Panel) => p.clientId === activePanel);
-  const _panelist = panelists.find(
-    (p: Panelist) => p.clientId === activePanelist,
+  const _panelists = panelists.filter((p: Panelist) =>
+    activePanelists?.includes(p.clientId),
   );
 
   function fetchPanels() {
@@ -83,17 +81,6 @@ export function useWithPanels(): UseWithPanels {
     dispatch(panelApis.deletePanelist(panelistClientId));
   }
 
-  function updateSearch(value: string): void {
-    dispatch(panelApis.setUseSearch(value === "true"));
-  }
-
-  function setPanelMode(tf: boolean): void {
-    if (tf) {
-      dispatch(panelApis.setActivePanelist(undefined));
-    }
-    dispatch(panelApis.setPanelMode(tf));
-  }
-
   function setActivity(id: string): void {
     const activity = builtActivities.find((a) => a._id === id);
     if (activity && activity.attachedPanel) {
@@ -110,12 +97,31 @@ export function useWithPanels(): UseWithPanels {
   }
 
   function setActivePanel(id: string): void {
-    dispatch(panelApis.setActivePanel(id));
-    setActivePanelist(undefined);
+    const panel = panels.find((p) => p.clientId === id);
+    if (panel) {
+      dispatch(panelApis.setActivePanel(id));
+      setActivePanelists(panel.panelists);
+    }
   }
 
-  function setActivePanelist(id?: string): void {
-    dispatch(panelApis.setActivePanelist(id));
+  function setActivePanelists(ids?: string[]): void {
+    dispatch(panelApis.setActivePanelists(ids));
+  }
+
+  function setActivePanelConfig(
+    c: Record<string, PanelResponseConfiguration>,
+  ): void {
+    dispatch(panelApis.setActivePanelConfig(c));
+  }
+
+  function toggleActivePanelist(id: string): void {
+    if (activePanelists?.includes(id)) {
+      if (activePanelists.length > 1) {
+        setActivePanelists(activePanelists.filter((p) => p !== id));
+      }
+    } else {
+      setActivePanelists([...(activePanelists || []), id]);
+    }
   }
 
   return {
@@ -123,21 +129,20 @@ export function useWithPanels(): UseWithPanels {
     panelists,
     panelsLoadStatus,
     panelistsLoadStatus,
-    useSearch,
-    usePanelMode,
     activity: _activity,
     activePanel: _panel,
-    activePanelist: _panelist,
+    activePanelists: _panelists,
+    activePanelConfig,
     fetchPanels,
     fetchPanelists,
     addOrUpdatePanel,
     addOrUpdatePanelist,
     deletePanel,
     deletePanelist,
-    updateSearch,
-    setPanelMode,
     setActivity,
     setActivePanel,
-    setActivePanelist,
+    setActivePanelists,
+    setActivePanelConfig,
+    toggleActivePanelist,
   };
 }

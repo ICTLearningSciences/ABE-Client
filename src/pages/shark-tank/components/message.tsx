@@ -18,6 +18,7 @@ import BaseMessage, {
   DisplayOpenAiInfoButton,
   FadingText,
 } from "../../../components/user-view/chat/message";
+import { ReferencesButton } from "./references-button";
 
 export default function Message(props: {
   message: ChatMessageTypes;
@@ -229,6 +230,13 @@ export default function Message(props: {
               : ""}
           </ReactMarkdown>
         </pre>
+        {"sources" in message &&
+          message.sources &&
+          message.sources?.length > 0 && (
+            <div className="row center-div">
+              <ReferencesButton message={message} />
+            </div>
+          )}
       </Paper>
       <DisplayOpenAiInfoButton
         chatMessage={message}

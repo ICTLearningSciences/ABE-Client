@@ -26,7 +26,10 @@ export function useWithBuiltActivityHandler(
   editDocGoal: () => void,
   selectedActivityBuilder?: ActivityBuilder,
 ) {
-  const { activePanelist, setActivePanelist } = useWithPanels();
+  const activePanelists = useAppSelector(
+    (state) => state.panels.activePanelists,
+  );
+  const { setActivePanelists } = useWithPanels();
   const { sendMessage, clearChatLog, coachResponsePending } = useWithChat();
   const { state, updateSessionIntention, newSession } = useWithState();
   const curDocId = state.curDocId;
@@ -40,7 +43,7 @@ export function useWithBuiltActivityHandler(
     studentActivityCompleted,
     goToPreviousView,
   } = useWithEducationalManagement();
-  const { panels, panelists } = useWithPanels();
+  const { panels, panelists, activePanelConfig } = useWithPanels();
   const { defaultHome, isOnCourseManagementPages, isOnStudentCoursesPages } =
     useWithPath();
   const viewState = useAppSelector(
@@ -110,6 +113,7 @@ export function useWithBuiltActivityHandler(
         attachedPanel,
         attachedPanelists,
         onFilteredPanelistsChanged,
+        activePanelConfig,
       );
       setInitialize(newActivityHandler);
     } else if (
@@ -147,12 +151,10 @@ export function useWithBuiltActivityHandler(
 
   useEffect(() => {
     if (builtActivityHandler) {
-      builtActivityHandler.filteredToPanelists = activePanelist
-        ? [activePanelist.clientId]
-        : [];
+      builtActivityHandler.filteredToPanelists = activePanelists || [];
       setBuiltActivityHandler(builtActivityHandler);
     }
-  }, [activePanelist]);
+  }, [activePanelists]);
 
   function handleStudentActivityComplete() {
     if (
@@ -185,9 +187,7 @@ export function useWithBuiltActivityHandler(
 
   function onFilteredPanelistsChanged(filteredPanelistIds: string[]): void {
     if (filteredPanelistIds.length > 0) {
-      setActivePanelist(filteredPanelistIds[0]);
-    } else {
-      setActivePanelist(undefined);
+      setActivePanelists(filteredPanelistIds);
     }
   }
 

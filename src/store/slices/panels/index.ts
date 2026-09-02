@@ -10,7 +10,7 @@ import {
   createAsyncThunk,
   createSlice,
 } from "@reduxjs/toolkit";
-import type { Panel, Panelist } from "./types";
+import type { Panel, PanelResponseConfiguration, Panelist } from "./types";
 import {
   fetchPanels as _fetchPanels,
   fetchPanelists as _fetchPanelists,
@@ -27,11 +27,10 @@ export interface State {
   panelists: Panelist[];
   panelistsLoadStatus: LoadStatus;
 
-  useSearch: boolean;
-  usePanelMode: boolean;
   activity?: string;
   activePanel?: string;
-  activePanelist?: string;
+  activePanelists?: string[];
+  activePanelConfig: Record<string, PanelResponseConfiguration>;
 }
 
 const initialState: State = {
@@ -40,11 +39,18 @@ const initialState: State = {
   panelists: [],
   panelistsLoadStatus: 0,
 
-  useSearch: true,
-  usePanelMode: true,
   activity: undefined,
   activePanel: undefined,
-  activePanelist: undefined,
+  activePanelists: undefined,
+  activePanelConfig: {
+    "": {
+      id: "",
+      webSearch: false,
+      includeChatLog: false,
+      responseLength: "high",
+      difficultyLevel: "low",
+    },
+  },
 };
 
 export const fetchPanels = createAsyncThunk("state/fetchPanels", async () => {
@@ -97,20 +103,23 @@ export const stateSlice = createSlice({
     addNewLocalPanelist: (state, action: PayloadAction<Panelist>) => {
       state.panelists.push(action.payload);
     },
-    setUseSearch: (state, action: PayloadAction<boolean>) => {
-      state.useSearch = action.payload;
-    },
-    setPanelMode: (state, action: PayloadAction<boolean>) => {
-      state.usePanelMode = action.payload;
-    },
     setActivity: (state, action: PayloadAction<string>) => {
       state.activity = action.payload;
     },
     setActivePanel: (state, action: PayloadAction<string>) => {
       state.activePanel = action.payload;
     },
-    setActivePanelist: (state, action: PayloadAction<string | undefined>) => {
-      state.activePanelist = action.payload;
+    setActivePanelists: (
+      state,
+      action: PayloadAction<string[] | undefined>,
+    ) => {
+      state.activePanelists = action.payload;
+    },
+    setActivePanelConfig: (
+      state,
+      action: PayloadAction<Record<string, PanelResponseConfiguration>>,
+    ) => {
+      state.activePanelConfig = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -175,11 +184,10 @@ export const stateSlice = createSlice({
 export const {
   addNewLocalPanel,
   addNewLocalPanelist,
-  setUseSearch,
-  setPanelMode,
   setActivity,
   setActivePanel,
-  setActivePanelist,
+  setActivePanelists,
+  setActivePanelConfig,
 } = stateSlice.actions;
 
 export default stateSlice.reducer;

@@ -511,6 +511,7 @@ export function getDefaultSinglePromptConfiguration(): SinglePromptConfiguration
     customSystemRole: "",
     webSearch: false,
     ragConfiguration: undefined,
+    panelConfiguration: undefined,
   };
 }
 function defaultEditDocPromptBuilder(): PromptActivityStep {

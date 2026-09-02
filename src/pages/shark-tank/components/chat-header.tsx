@@ -6,11 +6,18 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import React from "react";
-import { Construction, Replay } from "@mui/icons-material";
-import { Typography, Button, Menu, MenuItem, IconButton } from "@mui/material";
+import {
+  Typography,
+  Button,
+  IconButton,
+  Tooltip,
+  DialogContent,
+} from "@mui/material";
+import { History, Replay, Tune } from "@mui/icons-material";
 import type { ActivityTypes } from "../../../types";
-import { useAppSelector } from "../../../store/hooks";
-import type { ActivityBuilder } from "../../../exported-files";
+import { CssDialog } from ".";
+import { ChatHistory } from "./chat-thread";
+import PanelSettings from "./panel-settings";
 
 export function ChatHeader(props: {
   selectedActivity?: ActivityTypes;
@@ -18,21 +25,8 @@ export function ChatHeader(props: {
   onSelectActivity: (a: ActivityTypes) => void;
 }): React.ReactNode {
   const { selectedActivity } = props;
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const builtActivities: ActivityBuilder[] = useAppSelector((state) =>
-    state.docGoalsActivities.builtActivities.filter(
-      (a: ActivityBuilder) =>
-        a.attachedPanel && a.title === "CFT Panel Activity",
-    ),
-  );
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const [showSettings, setShowSettings] = React.useState<boolean>(false);
+  const [showHistory, setShowHistory] = React.useState<boolean>(false);
 
   return (
     <div
@@ -48,26 +42,36 @@ export function ChatHeader(props: {
         padding: 10,
       }}
     >
-      <IconButton color="primary" onClick={handleClick}>
-        <Construction />
-      </IconButton>
+      <Tooltip title="Edit response settings">
+        <IconButton color="primary" onClick={() => setShowSettings(true)}>
+          <Tune />
+        </IconButton>
+      </Tooltip>
       <Typography style={{ flexGrow: 1 }}>{selectedActivity?.title}</Typography>
-      <Button variant="outlined" startIcon={<Replay />} onClick={props.onReset}>
-        Reset
-      </Button>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-        {builtActivities.map((activity) => (
-          <MenuItem
-            key={activity._id}
-            onClick={() => {
-              props.onSelectActivity(activity);
-              handleClose();
-            }}
-          >
-            {activity.title}
-          </MenuItem>
-        ))}
-      </Menu>
+      <Tooltip title="Chat history">
+        <IconButton
+          color="primary"
+          onClick={() => setShowHistory(!showHistory)}
+        >
+          <History />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Reset activity">
+        <Button
+          variant="outlined"
+          startIcon={<Replay />}
+          onClick={props.onReset}
+        >
+          Reset
+        </Button>
+      </Tooltip>
+
+      <CssDialog open={showSettings} onClose={() => setShowSettings(false)}>
+        <DialogContent>
+          <PanelSettings />
+        </DialogContent>
+      </CssDialog>
+      <ChatHistory open={showHistory} onClose={() => setShowHistory(false)} />
     </div>
   );
 }

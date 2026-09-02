@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { TextField, styled } from "@mui/material";
+import { Dialog, TextField, styled } from "@mui/material";
 
 export const CssTextField = styled(TextField)({
   "& .MuiSvgIcon-root": {
@@ -28,5 +28,13 @@ export const CssTextField = styled(TextField)({
     "&.Mui-focused": {
       color: "white",
     },
+  },
+});
+
+export const CssDialog = styled(Dialog)({
+  "& .MuiPaper-root": {
+    background:
+      "radial-gradient(circle,rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.05) 100%)",
+    boxShadow: "none",
   },
 });
