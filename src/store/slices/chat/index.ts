@@ -50,14 +50,23 @@ export interface BulletPointMessage extends ChatMessage {
 export type ChatLog = ChatMessageTypes[];
 export type GoogleDocId = string;
 
+export interface ChatHistory {
+  docId: GoogleDocId;
+  sessionId: string;
+  chatLog: ChatLog;
+  startDate: string;
+}
+
 export interface ChatState {
   chatLogs: Record<GoogleDocId, ChatLog>;
+  chatHistory: ChatHistory[];
   coachResponsePending: boolean;
   systemRole: string;
 }
 
 const initialState: ChatState = {
   chatLogs: {},
+  chatHistory: [],
   coachResponsePending: false,
   systemRole: "",
 };
@@ -77,9 +86,23 @@ export const chatSlice = createSlice({
         message: ChatMessageTypes;
         clearChat: boolean;
         docId: string;
+        sessionId: string;
       }>,
     ) => {
-      const { message, clearChat, docId } = action.payload;
+      const { message, clearChat, docId, sessionId } = action.payload;
+      const historyIdx = state.chatHistory.findIndex(
+        (c) => c.sessionId === sessionId && c.docId === docId,
+      );
+      if (historyIdx === -1) {
+        state.chatHistory.push({
+          docId: docId,
+          sessionId: sessionId,
+          chatLog: [message],
+          startDate: new Date().toLocaleString(),
+        });
+      } else {
+        state.chatHistory[historyIdx].chatLog.push(message);
+      }
       if (clearChat) {
         state.chatLogs = {
           ...state.chatLogs,
@@ -89,7 +112,6 @@ export const chatSlice = createSlice({
       if (message.sender === "SYSTEM") {
         state.coachResponsePending = false;
       }
-
       if (!message) return;
       const messages = state.chatLogs[docId] || [];
       const mostRecentMessage = state.chatLogs[docId]?.slice(-1)[0];
@@ -112,9 +134,23 @@ export const chatSlice = createSlice({
         messages: ChatMessageTypes[];
         clearChat: boolean;
         docId: string;
+        sessionId: string;
       }>,
     ) => {
-      const { messages, clearChat, docId } = action.payload;
+      const { messages, clearChat, docId, sessionId } = action.payload;
+      const historyIdx = state.chatHistory.findIndex(
+        (c) => c.sessionId === sessionId,
+      );
+      if (historyIdx === -1) {
+        state.chatHistory.push({
+          docId: docId,
+          sessionId: sessionId,
+          chatLog: messages,
+          startDate: new Date().toLocaleString(),
+        });
+      } else {
+        state.chatHistory[historyIdx].chatLog.push(...messages);
+      }
       if (clearChat) {
         state.chatLogs = {
           ...state.chatLogs,
@@ -133,6 +169,9 @@ export const chatSlice = createSlice({
         [docId]: [],
       };
     },
+    clearHistory: (state: ChatState) => {
+      state.chatHistory = [];
+    },
     setCoachResponsePending: (
       state: ChatState,
       action: PayloadAction<boolean>,
@@ -147,6 +186,7 @@ export const {
   addMessages,
   setCoachResponsePending,
   clearChat,
+  clearHistory,
   updateSystemPrompt,
 } = chatSlice.actions;
 

@@ -5,6 +5,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
+import React from "react";
+import { v4 as uuidv4 } from "uuid";
 import { useAppSelector, useAppDispatch } from "../../hooks";
 import {
   type ChatState,
@@ -14,6 +16,7 @@ import {
   setCoachResponsePending,
   clearChat,
   updateSystemPrompt,
+  clearHistory,
 } from ".";
 
 interface UseWithChat {
@@ -30,6 +33,7 @@ interface UseWithChat {
   ) => void;
   coachResponsePending: (waiting: boolean) => void;
   clearChatLog: (docId: string) => void;
+  clearChatHistory: () => void;
   chatLogToString: (docId: string) => string;
   setSystemRole: (prompt: string) => void;
   downloadChatLog: (docId: string) => void;
@@ -39,13 +43,14 @@ export function useWithChat(): UseWithChat {
   const dispatch = useAppDispatch();
   const chatState: ChatState = useAppSelector((state) => state.chat);
   const currentDoc = useAppSelector((state) => state.state.curDocId);
+  const [sessionId, setSessionId] = React.useState(uuidv4());
 
   function sendMessage(
     msg: ChatMessageTypes,
     clearChat = false,
     docId: string,
   ) {
-    dispatch(addMessage({ message: msg, clearChat, docId }));
+    dispatch(addMessage({ message: msg, clearChat, docId, sessionId }));
   }
 
   function sendMessages(
@@ -53,7 +58,7 @@ export function useWithChat(): UseWithChat {
     clearChat = false,
     docId: string,
   ) {
-    dispatch(addMessages({ messages: msgs, clearChat, docId }));
+    dispatch(addMessages({ messages: msgs, clearChat, docId, sessionId }));
   }
 
   function coachResponsePending(pending: boolean) {
@@ -61,7 +66,12 @@ export function useWithChat(): UseWithChat {
   }
 
   function clearChatLog(docId: string) {
+    setSessionId(uuidv4());
     dispatch(clearChat(docId));
+  }
+
+  function clearChatHistory() {
+    dispatch(clearHistory());
   }
 
   function setSystemRole(prompt: string) {
@@ -106,6 +116,7 @@ export function useWithChat(): UseWithChat {
     sendMessages,
     coachResponsePending,
     clearChatLog,
+    clearChatHistory,
     chatLogToString,
     setSystemRole,
     downloadChatLog,

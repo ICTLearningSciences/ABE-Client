@@ -30,24 +30,25 @@ export function ChatPanelists(props: {
       <div
         className="row spacing"
         style={{
-          flexDirection: "row-reverse",
           overflowX: "auto",
           overflowY: "hidden",
           padding: 10,
         }}
       >
-        {activePanel?.panelists.map((m) => {
-          const panelist = panelists.find((p) => p.clientId === m);
-          if (!panelist) return <></>;
-          return (
-            <PanelistCard
-              key={m}
-              p={panelist}
-              isActive={Boolean(activePanelists?.includes(m))}
-              onMemberClick={() => toggleActivePanelist(m)}
-            />
-          );
-        })}
+        {activePanel?.panelists
+          ?.map((m) => {
+            const panelist = panelists.find((p) => p.clientId === m);
+            if (!panelist) return <></>;
+            return (
+              <PanelistCard
+                key={m}
+                p={panelist}
+                isActive={Boolean(activePanelists?.includes(m))}
+                onMemberClick={() => toggleActivePanelist(m)}
+              />
+            );
+          })
+          .reverse()}
       </div>
     </div>
   );

@@ -76,7 +76,12 @@ export function ReferencesButton(props: {
           </IconButton>
         </Tooltip>
       )}
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        style={{ zIndex: 9999 }}
+      >
         {sources.map((r, i) => (
           <MenuItem
             key={i}

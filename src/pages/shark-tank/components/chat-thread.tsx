@@ -6,13 +6,42 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import React, { useRef, useState, useEffect } from "react";
+import Draggable from "react-draggable";
+import { ToastContainer, toast } from "react-toastify";
+import copy from "copy-to-clipboard";
 import { v4 as uuidv4 } from "uuid";
-import { Button } from "@mui/material";
+import {
+  Button,
+  CardActions,
+  Collapse,
+  IconButton,
+  List,
+  ListSubheader,
+  Menu,
+  MenuItem,
+  Typography,
+} from "@mui/material";
+import {
+  Close,
+  ContentPaste,
+  DragHandle,
+  ExpandLess,
+  ExpandMore,
+  History,
+} from "@mui/icons-material";
+
 import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-types";
-import type { ChatMessageTypes, ChatLog } from "../../../store/slices/chat";
+import type {
+  ChatMessageTypes,
+  ChatLog,
+  ChatHistory,
+} from "../../../store/slices/chat";
 import Message from "./message";
 import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
 import { useAppSelector } from "../../../store/hooks";
+import { useWithChat } from "../../../exported-files";
+import { CssCard } from ".";
+import { useWithWindowSize } from "../../../hooks/use-with-window-size";
 
 export function ChatThread(props: {
   coachResponsePending: boolean;
@@ -186,5 +215,177 @@ export function ChatThread(props: {
       )}
       <div id="message-end-ref" />
     </div>
+  );
+}
+
+export function ChatHistoryLog(props: { c: ChatHistory }): React.ReactNode {
+  const { c } = props;
+  const { userDocs } = useAppSelector((state) => state.state);
+  const { activePanel, panelists } = useWithPanels();
+  const [collapsed, setCollapsed] = useState<boolean>(false);
+
+  const activePanelists = useAppSelector(
+    (state) => state.panels.activePanelists,
+  );
+  const doc = userDocs.find((d) => d.googleDocId === c.docId);
+  const chatMessages: ChatMessageTypes[] = [...(c.chatLog || [])].filter(
+    (m) => {
+      const panelist = panelists.find(
+        (p) =>
+          activePanel?.panelists?.includes(p.clientId) &&
+          p.panelistName === m.systemCustomName,
+      );
+      if (panelist) {
+        return !activePanelists || activePanelists.includes(panelist.clientId);
+      }
+      return true;
+    },
+  );
+
+  return (
+    <div id={`${c.sessionId}-${c.docId}`}>
+      <ListSubheader
+        className="row header center-div"
+        style={{
+          color: "white",
+          padding: 5,
+          paddingLeft: 10,
+          paddingRight: 10,
+          border: "2px solid rgb(87, 119, 82)",
+        }}
+      >
+        <Typography>{doc?.title}</Typography>
+        <div style={{ minWidth: 5, flexGrow: 1 }} />
+        <Typography>{c.startDate}</Typography>
+        <IconButton
+          style={{ color: "white" }}
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          {collapsed ? <ExpandMore /> : <ExpandLess />}
+        </IconButton>
+      </ListSubheader>
+      <Collapse in={!collapsed} style={{ backgroundColor: "rgb(80, 80, 80)" }}>
+        {chatMessages.map((m, i) => {
+          return (
+            <div key={i} className="row">
+              <Message
+                viewed
+                message={m}
+                messageIndex={i}
+                setAiInfoToDisplay={() => {}}
+              />
+              <IconButton
+                onClick={() => {
+                  copy(m.message);
+                  toast("Copied to clipboard!");
+                }}
+              >
+                <ContentPaste fontSize="small" sx={{ color: "gray" }} />
+              </IconButton>
+            </div>
+          );
+        })}
+      </Collapse>
+    </div>
+  );
+}
+
+export function ChatHistory(props: {
+  open: boolean;
+  onClose: () => void;
+}): React.ReactNode {
+  const { chatHistory } = useAppSelector((state) => state.chat);
+  const { userDocs } = useAppSelector((state) => state.state);
+  const { height, width } = useWithWindowSize();
+  const { clearChatHistory } = useWithChat();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  function scrollToElementById(id: string) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  const nodeRef = useRef(null);
+  if (!props.open) return <div />;
+  return (
+    <Draggable nodeRef={nodeRef}>
+      <div
+        ref={nodeRef}
+        style={{
+          position: "absolute",
+          zIndex: 9998,
+          top: 100,
+          right: width - 500,
+          width: 450,
+          padding: 20,
+          background:
+            "radial-gradient(circle,rgba(255, 255, 255, 0.2) 50%, rgba(200, 200, 200, 0.05) 100%)",
+          boxShadow: "-5px 5px 10px 0px rgba(0, 0, 0, 0.2)",
+        }}
+      >
+        <CssCard
+          title="Chat History"
+          icon={<DragHandle style={{ cursor: "pointer" }} />}
+          headerButton={
+            <div className="row center-div">
+              <IconButton
+                onClick={(e) => setAnchorEl(e.currentTarget)}
+                style={{ color: "white" }}
+              >
+                <History />
+              </IconButton>
+              <IconButton onClick={props.onClose} style={{ color: "white" }}>
+                <Close />
+              </IconButton>
+            </div>
+          }
+        >
+          <List
+            className="column spacing"
+            sx={{
+              padding: 0,
+              overflowX: "hidden",
+              overflowY: "auto",
+              maxHeight: height - 450,
+            }}
+          >
+            {chatHistory.map((c, i) => (
+              <ChatHistoryLog c={c} key={i} />
+            ))}
+          </List>
+          <CardActions className="row center-div">
+            <Button color="secondary" onClick={clearChatHistory}>
+              Clear chat history
+            </Button>
+          </CardActions>
+        </CssCard>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={() => setAnchorEl(null)}
+          style={{ zIndex: 9999 }}
+        >
+          {chatHistory.map((c, i) => {
+            const doc = userDocs.find((d) => d.googleDocId === c.docId);
+            return (
+              <MenuItem
+                key={i}
+                className="row"
+                style={{ justifyContent: "space-between", minWidth: 200 }}
+                onClick={() => {
+                  scrollToElementById(`${c.sessionId}-${c.docId}`);
+                  setAnchorEl(null);
+                }}
+              >
+                {doc?.title} - {c.startDate}
+              </MenuItem>
+            );
+          })}
+        </Menu>
+        <ToastContainer />
+      </div>
+    </Draggable>
   );
 }

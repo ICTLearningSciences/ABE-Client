@@ -21,7 +21,6 @@ import {
   ListItemIcon,
   ListItemText,
   MenuItem,
-  SvgIcon,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -48,43 +47,9 @@ import withAuthorizationOnly from "./wrap-with-authorization-only";
 import type { ActivityBuilder } from "../../exported-files";
 
 import "./shark-tank.css";
-import { CssTextField } from "./components";
+import { CssCard, CssTextField } from "./components";
+import PanelSettings from "./components/panel-settings";
 import type { ResponseLength } from "../../store/slices/panels/types";
-
-const CssCard = (props: {
-  icon?: React.ReactNode;
-  title?: string;
-  headerButton?: React.ReactNode;
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-  alt?: boolean;
-}): React.ReactNode => {
-  return (
-    <div
-      className="box column spacing"
-      style={{
-        marginBottom: 20,
-        borderColor: props.alt ? "#5c8a69" : "",
-        backgroundImage: props.alt
-          ? "linear-gradient(110deg, rgba(121, 160, 117, 0.3) 60%, rgba(100, 87, 71, 0.3) 100%)"
-          : "linear-gradient(145deg, rgb(48, 53, 58) 30%, rgb(61, 67, 74) 80%, rgb(48, 53, 58) 100%)",
-        boxShadow: "-5px 5px 10px 0px rgba(0, 0, 0, 0.2)",
-        ...props.style,
-      }}
-    >
-      <div className="row spacing">
-        <SvgIcon fontSize="small" style={{ color: props.alt ? "" : "#5c8a69" }}>
-          {props.icon}
-        </SvgIcon>
-        <Typography style={{ fontWeight: "bold", fontSize: 14, flexGrow: 1 }}>
-          {props.title?.toUpperCase()}
-        </Typography>
-        {props.headerButton}
-      </div>
-      {props.children}
-    </div>
-  );
-};
 
 function SharkTankSetup(): React.ReactNode {
   const {
@@ -284,97 +249,7 @@ function SharkTankSetup(): React.ReactNode {
                   })}
                 </List>
               </CssCard>
-
-              <CssCard alt title="Panel Response Settings" icon={<Tune />}>
-                <Grid container spacing={1}>
-                  <Grid size={{ xs: 12, xl: 6 }}>
-                    <Typography>Response Length</Typography>
-                    <CssTextField
-                      select
-                      fullWidth
-                      value={activePanelConfig[""].responseLength}
-                      onChange={(e) =>
-                        setActivePanelConfig({
-                          ...activePanelConfig,
-                          "": {
-                            ...activePanelConfig[""],
-                            id: "",
-                            responseLength: e.target.value as ResponseLength,
-                          },
-                        })
-                      }
-                    >
-                      <MenuItem value="low">Low (10-30 words)</MenuItem>
-                      <MenuItem value="med">Medium (50-100 words)</MenuItem>
-                      <MenuItem value="high">High (No limit)</MenuItem>
-                    </CssTextField>
-                  </Grid>
-                  <Grid size={{ xs: 12, xl: 6 }}>
-                    <Typography>Difficulty Level</Typography>
-                    <CssTextField
-                      select
-                      fullWidth
-                      value={activePanelConfig[""].difficultyLevel}
-                      onChange={(e) =>
-                        setActivePanelConfig({
-                          ...activePanelConfig,
-                          "": {
-                            ...activePanelConfig[""],
-                            id: "",
-                            difficultyLevel: e.target.value as ResponseLength,
-                          },
-                        })
-                      }
-                    >
-                      <MenuItem value="low">Low</MenuItem>
-                      <MenuItem value="med">Medium</MenuItem>
-                      <MenuItem value="high">High</MenuItem>
-                    </CssTextField>
-                  </Grid>
-                  <Grid size={6}>
-                    <Typography>Use Web Search</Typography>
-                    <CssTextField
-                      select
-                      fullWidth
-                      value={`${activePanelConfig[""].webSearch}`}
-                      onChange={(e) =>
-                        setActivePanelConfig({
-                          ...activePanelConfig,
-                          "": {
-                            ...activePanelConfig[""],
-                            id: "",
-                            webSearch: e.target.value === "true",
-                          },
-                        })
-                      }
-                    >
-                      <MenuItem value="true">Yes</MenuItem>
-                      <MenuItem value="false">No</MenuItem>
-                    </CssTextField>
-                  </Grid>
-                  <Grid size={6}>
-                    <Typography>Include Chat Log</Typography>
-                    <CssTextField
-                      select
-                      fullWidth
-                      value={`${activePanelConfig[""].includeChatLog}`}
-                      onChange={(e) =>
-                        setActivePanelConfig({
-                          ...activePanelConfig,
-                          "": {
-                            ...activePanelConfig[""],
-                            id: "",
-                            includeChatLog: e.target.value === "true",
-                          },
-                        })
-                      }
-                    >
-                      <MenuItem value="true">Yes</MenuItem>
-                      <MenuItem value="false">No</MenuItem>
-                    </CssTextField>
-                  </Grid>
-                </Grid>
-              </CssCard>
+              <PanelSettings />
             </Grid>
           </Grid>
         )}
