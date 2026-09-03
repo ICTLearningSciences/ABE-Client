@@ -5,6 +5,14 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
+import {
+  Engine,
+  LanguageCode,
+  PollyClient,
+  SynthesizeSpeechCommand,
+  VoiceId,
+} from "@aws-sdk/client-polly";
+
 export function stringToColor(string: string) {
   let hash = 0;
   let i;
@@ -26,4 +34,34 @@ export function stringAvatar(name: string) {
     },
     children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
   };
+}
+
+export const pollyClient = new PollyClient({
+  region: import.meta.env.VITE_AWS_S3_REGION,
+  credentials: {
+    accessKeyId: import.meta.env.VITE_AWS_ACCESSKEY || "",
+    secretAccessKey: import.meta.env.VITE_AWS_SECRETACCESSKEY || "",
+  },
+});
+
+export async function getPollyTTS(args: {
+  text: string;
+  voice?: string;
+  engine?: string;
+  language?: string;
+}) {
+  let text = args.text;
+  if (!text.startsWith("<speak>") && !text.endsWith("</speak>")) {
+    text = `<speak>${text}</speak>`;
+  }
+  const command = new SynthesizeSpeechCommand({
+    Text: text,
+    Engine: (args.engine || "long-form") as Engine,
+    VoiceId: (args.voice || "Danielle") as VoiceId,
+    LanguageCode: (args.language || "en-US") as LanguageCode,
+    TextType: "ssml",
+    OutputFormat: "mp3",
+  });
+  const response = await pollyClient.send(command);
+  return response.AudioStream?.transformToWebStream();
 }

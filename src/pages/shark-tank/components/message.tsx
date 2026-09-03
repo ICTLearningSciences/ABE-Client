@@ -7,20 +7,31 @@ The full terms of this copyright and license should always be found in the root 
 
 import React from "react";
 import ReactMarkdown from "react-markdown";
+import { toast, ToastContainer } from "react-toastify";
 import remarkBreaks from "remark-breaks";
 import rehypeRaw from "rehype-raw";
-import { Avatar, Paper, Typography } from "@mui/material";
-import type { ChatMessageTypes } from "../../../store/slices/chat";
-import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-types";
-import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
-import { stringAvatar, stringToColor } from "../helpers";
+import copy from "copy-to-clipboard";
+import {
+  Avatar,
+  CircularProgress,
+  IconButton,
+  Paper,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { ContentPaste, VolumeUp } from "@mui/icons-material";
+
+import { ReferencesButton } from "./references-button";
+import { getPollyTTS, stringAvatar, stringToColor } from "../helpers";
 import BaseMessage, {
   DisplayOpenAiInfoButton,
   FadingText,
 } from "../../../components/user-view/chat/message";
-import { ReferencesButton } from "./references-button";
+import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
+import type { ChatMessageTypes } from "../../../store/slices/chat";
+import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-types";
 
-export default function Message(props: {
+function Message(props: {
   message: ChatMessageTypes;
   messageIndex: number;
   viewed?: boolean;
@@ -242,6 +253,61 @@ export default function Message(props: {
         chatMessage={message}
         setAiInfoToDisplay={setAiInfoToDisplay}
       />
+    </div>
+  );
+}
+
+export default function MessageWithOptions(props: {
+  message: ChatMessageTypes;
+  messageIndex: number;
+  viewed?: boolean;
+  setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
+  onClicked?: (id: string) => void;
+}): React.ReactNode {
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [playing, setPlaying] = React.useState<boolean>(false);
+
+  async function textToSpeech() {
+    setLoading(true);
+    const stream = await getPollyTTS({ text: props.message.message });
+    const blob = await new Response(stream).blob();
+    const audio = new Audio(URL.createObjectURL(blob));
+    setPlaying(true);
+    audio.play();
+    audio.onended = function () {
+      setPlaying(false);
+    };
+    setLoading(false);
+  }
+
+  function copyToClipboard() {
+    copy(props.message.message);
+    toast("Copied to clipboard!");
+  }
+
+  return (
+    <div className="row">
+      <Message {...props} />
+      <div className="column center-div" style={{ marginRight: 5 }}>
+        <Tooltip title="Text to speech">
+          <IconButton onClick={textToSpeech} disabled={playing}>
+            {loading ? (
+              <CircularProgress style={{ width: 20, height: 20 }} />
+            ) : (
+              <VolumeUp
+                fontSize="small"
+                sx={{ color: playing ? "yellow" : "gray" }}
+              />
+            )}
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Copy to clipboard">
+          <IconButton onClick={copyToClipboard}>
+            <ContentPaste fontSize="small" sx={{ color: "gray" }} />
+          </IconButton>
+        </Tooltip>
+      </div>
+      <ToastContainer />
     </div>
   );
 }
