@@ -66,12 +66,31 @@ export interface ChatState {
 
 const initialState: ChatState = {
   chatLogs: {},
-  chatHistory: [],
+  chatHistory: loadHistory(),
   coachResponsePending: false,
   systemRole: "",
 };
 
 /** Reducer */
+
+function saveHistory(state: ChatHistory[]) {
+  try {
+    localStorage.setItem("chatHistory", JSON.stringify(state));
+  } catch (e) {
+    console.warn(e);
+  }
+}
+
+function loadHistory(): ChatHistory[] {
+  try {
+    const serialisedState = localStorage.getItem("chatHistory");
+    if (serialisedState === null) return [];
+    return JSON.parse(serialisedState);
+  } catch (e) {
+    console.warn(e);
+    return [];
+  }
+}
 
 export const chatSlice = createSlice({
   name: "chat",
@@ -103,6 +122,8 @@ export const chatSlice = createSlice({
       } else {
         state.chatHistory[historyIdx].chatLog.push(message);
       }
+      saveHistory(state.chatHistory);
+
       if (clearChat) {
         state.chatLogs = {
           ...state.chatLogs,
@@ -151,6 +172,8 @@ export const chatSlice = createSlice({
       } else {
         state.chatHistory[historyIdx].chatLog.push(...messages);
       }
+      saveHistory(state.chatHistory);
+
       if (clearChat) {
         state.chatLogs = {
           ...state.chatLogs,
@@ -171,6 +194,7 @@ export const chatSlice = createSlice({
     },
     clearHistory: (state: ChatState) => {
       state.chatHistory = [];
+      saveHistory(state.chatHistory);
     },
     setCoachResponsePending: (
       state: ChatState,
