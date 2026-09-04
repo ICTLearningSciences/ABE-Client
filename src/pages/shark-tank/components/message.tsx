@@ -31,7 +31,7 @@ import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
 import type { ChatMessageTypes } from "../../../store/slices/chat";
 import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-types";
 
-function Message(props: {
+export default function Message(props: {
   message: ChatMessageTypes;
   messageIndex: number;
   viewed?: boolean;
@@ -40,6 +40,8 @@ function Message(props: {
 }): React.ReactNode {
   const { activePanel, panelists } = useWithPanels();
   const { message, messageIndex, setAiInfoToDisplay } = props;
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [playing, setPlaying] = React.useState<boolean>(false);
 
   const panelist = panelists.find(
     (p) =>
@@ -59,17 +61,66 @@ function Message(props: {
     });
   }
 
+  async function textToSpeech() {
+    setLoading(true);
+    try {
+      const voice = panelist?.ttsConfig || {};
+      const stream = await getPollyTTS({
+        text: props.message.message,
+        ...voice,
+      });
+      const blob = await new Response(stream).blob();
+      const audio = new Audio(URL.createObjectURL(blob));
+      setPlaying(true);
+      audio.play();
+      audio.onended = function () {
+        setPlaying(false);
+      };
+      setLoading(false);
+    } catch {
+      setLoading(false);
+      setPlaying(false);
+    }
+  }
+
+  function copyToClipboard() {
+    copy(props.message.message);
+    toast("Copied to clipboard!");
+  }
+
   if (message.message === "") {
     return <></>;
   }
   if (!panelist) {
     return (
-      <BaseMessage
-        message={message}
-        setAiInfoToDisplay={setAiInfoToDisplay}
-        messageIndex={messageIndex}
-        displayMarkdown={true}
-      />
+      <div className="row">
+        <BaseMessage
+          message={message}
+          setAiInfoToDisplay={setAiInfoToDisplay}
+          messageIndex={messageIndex}
+          displayMarkdown={true}
+        />
+        <div className="column center-div" style={{ marginRight: 5 }}>
+          <Tooltip title="Text to speech">
+            <IconButton onClick={textToSpeech} disabled={playing}>
+              {loading ? (
+                <CircularProgress style={{ width: 20, height: 20 }} />
+              ) : (
+                <VolumeUp
+                  fontSize="small"
+                  sx={{ color: playing ? "yellow" : "gray" }}
+                />
+              )}
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Copy to clipboard">
+            <IconButton onClick={copyToClipboard}>
+              <ContentPaste fontSize="small" sx={{ color: "gray" }} />
+            </IconButton>
+          </Tooltip>
+        </div>
+        <ToastContainer />
+      </div>
     );
   }
   if (!props.viewed) {
@@ -127,187 +178,164 @@ function Message(props: {
           </Typography>
         </div>
       )}
-      <Paper
-        square
-        elevation={0}
-        sx={{
-          p: 3,
-          whiteSpace: "normal",
-          wordWrap: "break-word",
-          backgroundColor: "rgb(180, 180, 180)",
-          paddingLeft: "10%",
-          paddingRight: "5%",
-          clipPath:
-            "polygon(0% 0%, 100% 0%, 100% 100%, calc(0% + 1em) 100%, calc(0% + 1em) calc(0% + 1em), 0% 0%)",
-          borderBottomRightRadius: "1em",
-          borderTopRightRadius: "1em",
-          borderRight: `solid 8px ${stringToColor(panelist.panelistName)}`,
-        }}
-        style={{ marginTop: 10, marginLeft: 10 }}
-      >
-        <pre
-          style={{
-            margin: 0,
-            whiteSpace: "pre-wrap",
+
+      <div className="row">
+        <Paper
+          square
+          elevation={0}
+          sx={{
+            p: 3,
+            whiteSpace: "normal",
             wordWrap: "break-word",
-            overflowWrap: "break-word",
-            fontFamily: "inherit",
-            color: "black",
+            backgroundColor: "rgb(180, 180, 180)",
+            paddingLeft: "10%",
+            paddingRight: "5%",
+            clipPath:
+              "polygon(0% 0%, 100% 0%, 100% 100%, calc(0% + 1em) 100%, calc(0% + 1em) calc(0% + 1em), 0% 0%)",
+            borderBottomRightRadius: "1em",
+            borderTopRightRadius: "1em",
+            borderRight: `solid 8px ${stringToColor(panelist.panelistName)}`,
           }}
+          style={{ marginTop: 10, marginLeft: 10 }}
         >
-          <ReactMarkdown
-            remarkPlugins={[remarkBreaks]}
-            rehypePlugins={[rehypeRaw]}
-            components={{
-              h1: ({ children }) => (
-                <h1
-                  style={{ marginTop: "0", marginBottom: "0", lineHeight: "1" }}
-                >
-                  {children}
-                </h1>
-              ),
-              h2: ({ children }) => (
-                <h2 style={{ marginTop: "0", marginBottom: "0" }}>
-                  {children}
-                </h2>
-              ),
-              h3: ({ children }) => (
-                <h3 style={{ marginTop: "0", marginBottom: "0" }}>
-                  {children}
-                </h3>
-              ),
-              h4: ({ children }) => (
-                <h4 style={{ marginTop: "0", marginBottom: "0" }}>
-                  {children}
-                </h4>
-              ),
-              h5: ({ children }) => (
-                <h5 style={{ marginTop: "0", marginBottom: "0" }}>
-                  {children}
-                </h5>
-              ),
-              h6: ({ children }) => (
-                <h6 style={{ marginTop: "0", marginBottom: "0" }}>
-                  {children}
-                </h6>
-              ),
-              p: ({ children }) => (
-                <p
-                  style={{ marginTop: "0", marginBottom: "0", lineHeight: "1" }}
-                >
-                  {children}
-                </p>
-              ),
-              li: ({ children }) => (
-                <li
-                  style={{
-                    display: "flex",
-                    alignItems: "baseline",
-                    marginTop: "0",
-                    marginBottom: "0",
-                  }}
-                >
-                  {children}
-                </li>
-              ),
-              ul: ({ children }) => (
-                <ul
-                  style={{
-                    marginTop: "0",
-                    marginBottom: "0",
-                    lineHeight: "1",
-                    paddingLeft: "10px",
-                  }}
-                >
-                  {children}
-                </ul>
-              ),
-              ol: ({ children }) => (
-                <ol
-                  style={{
-                    marginTop: "0",
-                    marginBottom: "0",
-                    lineHeight: "1",
-                    paddingLeft: "10px",
-                  }}
-                >
-                  {children}
-                </ol>
-              ),
+          <pre
+            style={{
+              margin: 0,
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              fontFamily: "inherit",
+              color: "black",
             }}
           >
-            {message.displayType === "TEXT"
-              ? formatMessage(message.message).trim()
-              : ""}
-          </ReactMarkdown>
-        </pre>
-        {"sources" in message &&
-          message.sources &&
-          message.sources?.length > 0 && (
-            <div className="row center-div">
-              <ReferencesButton message={message} />
-            </div>
-          )}
-      </Paper>
+            <ReactMarkdown
+              remarkPlugins={[remarkBreaks]}
+              rehypePlugins={[rehypeRaw]}
+              components={{
+                h1: ({ children }) => (
+                  <h1
+                    style={{
+                      marginTop: "0",
+                      marginBottom: "0",
+                      lineHeight: "1",
+                    }}
+                  >
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 style={{ marginTop: "0", marginBottom: "0" }}>
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 style={{ marginTop: "0", marginBottom: "0" }}>
+                    {children}
+                  </h3>
+                ),
+                h4: ({ children }) => (
+                  <h4 style={{ marginTop: "0", marginBottom: "0" }}>
+                    {children}
+                  </h4>
+                ),
+                h5: ({ children }) => (
+                  <h5 style={{ marginTop: "0", marginBottom: "0" }}>
+                    {children}
+                  </h5>
+                ),
+                h6: ({ children }) => (
+                  <h6 style={{ marginTop: "0", marginBottom: "0" }}>
+                    {children}
+                  </h6>
+                ),
+                p: ({ children }) => (
+                  <p
+                    style={{
+                      marginTop: "0",
+                      marginBottom: "0",
+                      lineHeight: "1",
+                    }}
+                  >
+                    {children}
+                  </p>
+                ),
+                li: ({ children }) => (
+                  <li
+                    style={{
+                      display: "flex",
+                      alignItems: "baseline",
+                      marginTop: "0",
+                      marginBottom: "0",
+                    }}
+                  >
+                    {children}
+                  </li>
+                ),
+                ul: ({ children }) => (
+                  <ul
+                    style={{
+                      marginTop: "0",
+                      marginBottom: "0",
+                      lineHeight: "1",
+                      paddingLeft: "10px",
+                    }}
+                  >
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol
+                    style={{
+                      marginTop: "0",
+                      marginBottom: "0",
+                      lineHeight: "1",
+                      paddingLeft: "10px",
+                    }}
+                  >
+                    {children}
+                  </ol>
+                ),
+              }}
+            >
+              {message.displayType === "TEXT"
+                ? formatMessage(message.message).trim()
+                : ""}
+            </ReactMarkdown>
+          </pre>
+          {"sources" in message &&
+            message.sources &&
+            message.sources?.length > 0 && (
+              <div className="row center-div">
+                <ReferencesButton message={message} />
+              </div>
+            )}
+        </Paper>
+        <div className="column center-div" style={{ marginRight: 5 }}>
+          <Tooltip title="Text to speech">
+            <IconButton onClick={textToSpeech} disabled={playing}>
+              {loading ? (
+                <CircularProgress style={{ width: 20, height: 20 }} />
+              ) : (
+                <VolumeUp
+                  fontSize="small"
+                  sx={{ color: playing ? "yellow" : "gray" }}
+                />
+              )}
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Copy to clipboard">
+            <IconButton onClick={copyToClipboard}>
+              <ContentPaste fontSize="small" sx={{ color: "gray" }} />
+            </IconButton>
+          </Tooltip>
+        </div>
+        <ToastContainer />
+      </div>
+
       <DisplayOpenAiInfoButton
         chatMessage={message}
         setAiInfoToDisplay={setAiInfoToDisplay}
       />
-    </div>
-  );
-}
-
-export default function MessageWithOptions(props: {
-  message: ChatMessageTypes;
-  messageIndex: number;
-  viewed?: boolean;
-  setAiInfoToDisplay: (aiInfo?: AiServiceStepDataTypes[]) => void;
-  onClicked?: (id: string) => void;
-}): React.ReactNode {
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [playing, setPlaying] = React.useState<boolean>(false);
-
-  async function textToSpeech() {
-    setLoading(true);
-    const stream = await getPollyTTS({ text: props.message.message });
-    const blob = await new Response(stream).blob();
-    const audio = new Audio(URL.createObjectURL(blob));
-    setPlaying(true);
-    audio.play();
-    audio.onended = function () {
-      setPlaying(false);
-    };
-    setLoading(false);
-  }
-
-  function copyToClipboard() {
-    copy(props.message.message);
-    toast("Copied to clipboard!");
-  }
-
-  return (
-    <div className="row">
-      <Message {...props} />
-      <div className="column center-div" style={{ marginRight: 5 }}>
-        <Tooltip title="Text to speech">
-          <IconButton onClick={textToSpeech} disabled={playing}>
-            {loading ? (
-              <CircularProgress style={{ width: 20, height: 20 }} />
-            ) : (
-              <VolumeUp
-                fontSize="small"
-                sx={{ color: playing ? "yellow" : "gray" }}
-              />
-            )}
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Copy to clipboard">
-          <IconButton onClick={copyToClipboard}>
-            <ContentPaste fontSize="small" sx={{ color: "gray" }} />
-          </IconButton>
-        </Tooltip>
-      </div>
-      <ToastContainer />
     </div>
   );
 }

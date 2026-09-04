@@ -65,3 +65,39 @@ export async function getPollyTTS(args: {
   const response = await pollyClient.send(command);
   return response.AudioStream?.transformToWebStream();
 }
+
+export function getPollyVoiceOptions(engine: string): string[] {
+  if (engine === "generative") {
+    return ["Danielle", "Joanna", "Ruth", "Salli", "Matthew", "Stephen"];
+  } else if (engine === "long-form") {
+    return ["Danielle", "Ruth", "Gregory", "Patrick"];
+  } else if (engine === "neural") {
+    return [
+      "Danielle",
+      "Joanna",
+      "Ruth",
+      "Salli",
+      "Kimberly",
+      "Kendra",
+      "Ivy",
+      "Gregory",
+      "Kevin",
+      "Matthew",
+      "Justin",
+      "Joey",
+      "Stephen",
+    ];
+  } else if (engine === "standard") {
+    return [
+      "Joanna",
+      "Salli",
+      "Kimberly",
+      "Kendra",
+      "Ivy",
+      "Matthew",
+      "Justin",
+      "Joey",
+    ];
+  }
+  return [];
+}

@@ -56,7 +56,13 @@ ragConfig {
   ragQuery
   topN
   filters
-}`;
+}
+ttsConfig {
+  voice
+  engine
+  language
+}
+`;
 
 export const fetchPanelistsQuery = `
 query FetchPanelists($limit: Int, $filter: String, $filterObject: Object, $sortAscending: Boolean, $sortBy: String){
