@@ -97,6 +97,11 @@ export function EditGoogleDoc(props: {
         topN: 0,
         filters: {},
       },
+      ttsConfig: {
+        voice: "Danielle",
+        engine: "long-form",
+        language: "en-US",
+      },
     };
     addOrUpdatePanelist(newPanelist);
     return newPanelist;

@@ -10,6 +10,7 @@ import ViewUserGoogleDocs from "../../../components/admin-view/admin-view-docs";
 import { useWithStoreDocVersions } from "../../../hooks/use-with-google-doc-versions";
 import { useAppSelector } from "../../../store/hooks";
 import { useNavigateWithParams } from "../../../hooks/use-navigate-with-params";
+import { HugeRTEEditor } from "../../../components/user-view/raw-text-document/huge-rte";
 
 export default function UserDocumentDisplay(props: {
   docId?: string;
@@ -19,6 +20,7 @@ export default function UserDocumentDisplay(props: {
 }): React.ReactNode {
   const { docId, activityId, onOpenDoc } = props;
   const { user } = useAppSelector((state) => state.login);
+  const loginService = user?.loginService;
   const navigate = useNavigateWithParams();
   useWithStoreDocVersions(activityId || "");
 
@@ -30,7 +32,7 @@ export default function UserDocumentDisplay(props: {
     navigate(`/docs/history/${docId}`);
   }
 
-  if (!docId || props.selectingDoc) {
+  if (!activityId || !docId || props.selectingDoc) {
     return (
       <ViewUserGoogleDocs
         goToDoc={onOpenDoc}
@@ -39,11 +41,21 @@ export default function UserDocumentDisplay(props: {
       />
     );
   }
-  return (
-    <iframe
-      width="100%"
-      height="100%"
-      src={`https://docs.google.com/document/d/${docId}/edit?authuser=${user?.email}`}
-    />
-  );
+  if (loginService === "GOOGLE") {
+    return (
+      <iframe
+        width="100%"
+        height="100%"
+        src={`https://docs.google.com/document/d/${docId}/edit?authuser=${user?.email}`}
+      />
+    );
+  }
+  if (loginService === "AMAZON_COGNITO") {
+    return (
+      <div style={{ color: "white" }}>
+        <HugeRTEEditor docId={docId} currentActivityId={activityId} />
+      </div>
+    );
+  }
+  return <div />;
 }

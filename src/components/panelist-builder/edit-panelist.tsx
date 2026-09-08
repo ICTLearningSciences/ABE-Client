@@ -10,6 +10,7 @@ import { Button, TextField } from "@mui/material";
 import type { Panelist } from "../../store/slices/panels/types";
 import { ColumnDiv } from "../../styled-components";
 import { RagStoreConfigurationEditor } from "../activity-builder/edit-activity/step-builder/rag-store-configuration-editor";
+import { TTSConfigEditor } from "./edit-tts-config";
 
 export function EditPanelist(props: {
   panelist: Panelist;
@@ -106,6 +107,10 @@ export function EditPanelist(props: {
           fullWidth
         />
 
+        <TTSConfigEditor
+          panelist={editedPanelist}
+          setEditedPanelist={setEditedPanelist}
+        />
         <RagStoreConfigurationEditor
           ragConfiguration={editedPanelist.ragConfig}
           updateRagConfiguration={(updater) => {

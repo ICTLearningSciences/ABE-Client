@@ -7,6 +7,12 @@ The full terms of this copyright and license should always be found in the root 
 
 import type { RagStoreConfiguration } from "../../../types";
 
+export interface TTSConfig {
+  voice: string;
+  engine: string;
+  language: string;
+}
+
 export interface Panelist {
   clientId: string;
   promptSegment: string;
@@ -16,6 +22,7 @@ export interface Panelist {
   panelistDescription: string;
   introductionMessage: string;
   ragConfig?: RagStoreConfiguration;
+  ttsConfig: TTSConfig;
 }
 
 export interface Panel {
