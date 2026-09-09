@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import { v4 as uuidv4 } from "uuid";
-
+import { chunk } from "lodash";
 import type {
   AiServicesResponseTypes,
   AiServiceStepDataTypes,
@@ -67,6 +67,7 @@ export const EDIT_DOC_GOAL_MESSAGE = "New Activity";
 export const GO_HOME_BUTTON_MESSAGE = "Return to Home";
 export const DOC_TEXT_KEY = "doc_text";
 export const DOC_NUM_WORDS_KEY = "doc_num_words";
+export const DEFAULT_CHUNK_SIZE = 2;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type StateData = Record<string, any>;
@@ -731,22 +732,51 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
                 this.filteredToPanelists.includes(p.clientId),
               )
             : allEffectivePanelists;
+
+        // split requests into chunks
+        const chunkedPanelists = chunk(effectivePanelists, DEFAULT_CHUNK_SIZE);
         // Execute prompt for each panelist
-        for (const panelist of effectivePanelists) {
-          promptExecutions.push(
-            this.executePanelistPromptConfiguration(config, panelist),
-          );
+        for (const chunk of chunkedPanelists){        
+         for (const panelist of chunk) {
+            promptExecutions.push(
+             this.executePanelistPromptConfiguration(config, panelist),
+           );
+          }
+          const promptResults = await Promise.allSettled(promptExecutions);
+          await this.evaluatePromptResults(step, promptResults)
         }
       } else {
         // Execute normal prompt
         promptExecutions.push(this.executeSinglePromptConfiguration(config));
+
+          // Execute all prompts in parallel
+        const promptResults = await Promise.allSettled(promptExecutions);
+        await this.evaluatePromptResults(step, promptResults)
       }
     }
 
-    // Execute all prompts in parallel
-    const promptResults = await Promise.allSettled(promptExecutions);
+  
 
-    // Check if any prompts failed
+    this.setResponsePending(false);
+    await this.goToNextStep();
+  }
+
+  async evaluatePromptResults(step: PromptActivityStep, promptResults: PromiseSettledResult<{
+    type: "json";
+    data: StateData;
+    originalConfiguration: SinglePromptConfiguration;
+    panelistClientId?: string;
+} | {
+    type: "text";
+    message: string;
+    sources?: Source[];
+    aiServiceStepData: AiServiceStepDataTypes[];
+    originalConfiguration: SinglePromptConfiguration;
+    panelistClientId?: string;
+    panelistName?: string;
+}>[]): Promise<void>
+  {
+        // Check if any prompts failed
     const hasFailures = promptResults.some(
       (result) => result.status === "rejected",
     );
@@ -814,9 +844,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         },
       };
     }
-
-    this.setResponsePending(false);
-    await this.goToNextStep();
   }
 
   async executeSinglePromptConfiguration(
