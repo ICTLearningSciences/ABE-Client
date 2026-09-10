@@ -6,7 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import { v4 as uuidv4 } from "uuid";
-import { chunk } from "lodash";
 import type {
   AiServicesResponseTypes,
   AiServiceStepDataTypes,
@@ -58,6 +57,11 @@ interface UserResponseHandleState {
   }[];
 }
 
+interface PromptToExecute {
+  config: SinglePromptConfiguration;
+  panelist?: Panelist;
+}
+
 function getDefaultUserResponseHandleState(): UserResponseHandleState {
   return {
     responseNavigations: [],
@@ -67,6 +71,7 @@ export const EDIT_DOC_GOAL_MESSAGE = "New Activity";
 export const GO_HOME_BUTTON_MESSAGE = "Return to Home";
 export const DOC_TEXT_KEY = "doc_text";
 export const DOC_NUM_WORDS_KEY = "doc_num_words";
+export const AGENT_RESULT_COUNT_KEY = "AGENT_RESULT_COUNT";
 export const DEFAULT_CHUNK_SIZE = 2;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -690,6 +695,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.setResponsePending(true);
 
     // Prepare all prompt executions (including panelist prompts)
+    const promptsToExecute: PromptToExecute[] = [];
     const promptExecutions: Promise<
       | {
           type: "json";
@@ -733,50 +739,72 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
               )
             : allEffectivePanelists;
 
-        // split requests into chunks
-        const chunkedPanelists = chunk(effectivePanelists, DEFAULT_CHUNK_SIZE);
         // Execute prompt for each panelist
-        for (const chunk of chunkedPanelists){        
-         for (const panelist of chunk) {
-            promptExecutions.push(
-             this.executePanelistPromptConfiguration(config, panelist),
-           );
-          }
-          const promptResults = await Promise.allSettled(promptExecutions);
-          await this.evaluatePromptResults(step, promptResults)
+        for (const panelist of effectivePanelists) {
+          promptsToExecute.push({ config: config, panelist: panelist });
+          //promptExecutions.push(
+          //  this.executePanelistPromptConfiguration(config, panelist),
+          //);
         }
       } else {
         // Execute normal prompt
-        promptExecutions.push(this.executeSinglePromptConfiguration(config));
-
-          // Execute all prompts in parallel
-        const promptResults = await Promise.allSettled(promptExecutions);
-        await this.evaluatePromptResults(step, promptResults)
+        promptsToExecute.push({ config: config });
+        //promptExecutions.push(this.executeSinglePromptConfiguration(config));
       }
     }
 
-  
+    // split requests into chunks
+    const resolvedAgentsCount = this.stateData[AGENT_RESULT_COUNT_KEY] || 0;
+
+    for (const promptToExecute of promptsToExecute.slice(
+      resolvedAgentsCount,
+      resolvedAgentsCount + DEFAULT_CHUNK_SIZE,
+    )) {
+      if (promptToExecute.panelist)
+        promptExecutions.push(
+          this.executePanelistPromptConfiguration(
+            promptToExecute.config,
+            promptToExecute.panelist,
+          ),
+        );
+      else
+        promptExecutions.push(
+          this.executeSinglePromptConfiguration(promptToExecute.config),
+        );
+    }
+
+    const promptResults = await Promise.allSettled(promptExecutions);
+    await this.evaluatePromptResults(step, promptResults);
 
     this.setResponsePending(false);
-    await this.goToNextStep();
+
+    if (this.stateData[AGENT_RESULT_COUNT_KEY] >= promptsToExecute.length) {
+      this.stateData[AGENT_RESULT_COUNT_KEY] = 0;
+      await this.goToNextStep();
+    }
   }
 
-  async evaluatePromptResults(step: PromptActivityStep, promptResults: PromiseSettledResult<{
-    type: "json";
-    data: StateData;
-    originalConfiguration: SinglePromptConfiguration;
-    panelistClientId?: string;
-} | {
-    type: "text";
-    message: string;
-    sources?: Source[];
-    aiServiceStepData: AiServiceStepDataTypes[];
-    originalConfiguration: SinglePromptConfiguration;
-    panelistClientId?: string;
-    panelistName?: string;
-}>[]): Promise<void>
-  {
-        // Check if any prompts failed
+  async evaluatePromptResults(
+    step: PromptActivityStep,
+    promptResults: PromiseSettledResult<
+      | {
+          type: "json";
+          data: StateData;
+          originalConfiguration: SinglePromptConfiguration;
+          panelistClientId?: string;
+        }
+      | {
+          type: "text";
+          message: string;
+          sources?: Source[];
+          aiServiceStepData: AiServiceStepDataTypes[];
+          originalConfiguration: SinglePromptConfiguration;
+          panelistClientId?: string;
+          panelistName?: string;
+        }
+    >[],
+  ): Promise<void> {
+    // Check if any prompts failed
     const hasFailures = promptResults.some(
       (result) => result.status === "rejected",
     );
@@ -834,6 +862,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       this.stateData = { ...this.stateData, ...jsonResults };
     }
 
+    const previousAgentResultCount =
+      this.stateData[AGENT_RESULT_COUNT_KEY] || 0;
+    this.stateData[AGENT_RESULT_COUNT_KEY] =
+      previousAgentResultCount + promptResults.length;
     // Add panelist data to stateData
     if (Object.keys(panelistData).length > 0) {
       this.stateData = {
