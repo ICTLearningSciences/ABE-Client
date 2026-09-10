@@ -29,7 +29,7 @@ function DocHistoryContainer(props: {
       <div
         style={{
           width: "100%",
-          height: "94%", //header takes 6%
+          height: "92%", //header takes 6%
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

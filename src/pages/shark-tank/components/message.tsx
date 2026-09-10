@@ -22,7 +22,8 @@ import {
 import { ContentPaste, VolumeUp } from "@mui/icons-material";
 
 import { ReferencesButton } from "./references-button";
-import { getPollyTTS, stringAvatar, stringToColor } from "../helpers";
+import { stringAvatar, stringToColor } from "../helpers";
+import { getPollyTTS } from "../../../helpers/s3-helpers";
 import BaseMessage, {
   DisplayOpenAiInfoButton,
   FadingText,

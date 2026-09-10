@@ -15,10 +15,7 @@ import {
 } from "@mui/material";
 import { ExpandMore, ExpandLess, PlayCircle } from "@mui/icons-material";
 import type { Panelist, TTSConfig } from "../../store/slices/panels/types";
-import {
-  getPollyTTS,
-  getPollyVoiceOptions,
-} from "../../pages/shark-tank/helpers";
+import { getPollyTTS, getPollyVoiceOptions } from "../../helpers/s3-helpers";
 
 export function TTSConfigEditor(props: {
   panelist: Panelist;
