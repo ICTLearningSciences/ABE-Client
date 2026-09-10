@@ -781,7 +781,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     if (this.stateData[AGENT_RESULT_COUNT_KEY] >= promptsToExecute.length) {
       this.stateData[AGENT_RESULT_COUNT_KEY] = 0;
       await this.goToNextStep();
-    }
+    } else await this.handlePromptStep(step);
   }
 
   async evaluatePromptResults(
