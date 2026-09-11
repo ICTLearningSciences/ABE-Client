@@ -5,8 +5,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import React from "react";
-import { v4 as uuidv4 } from "uuid";
 import { useAppSelector, useAppDispatch } from "../../hooks";
 import {
   type ChatState,
@@ -18,8 +16,9 @@ import {
   updateSystemPrompt,
   clearHistory,
 } from ".";
+import { useWithState } from "../../../exported-files";
 
-interface UseWithChat {
+export interface UseWithChat {
   state: ChatState;
   sendMessage: (
     msg: ChatMessageTypes,
@@ -43,13 +42,15 @@ export function useWithChat(): UseWithChat {
   const dispatch = useAppDispatch();
   const chatState: ChatState = useAppSelector((state) => state.chat);
   const currentDoc = useAppSelector((state) => state.state.curDocId);
-  const [sessionId, setSessionId] = React.useState(uuidv4());
+  const sessionId = useAppSelector((state) => state.state.sessionId);
+  const { newSession } = useWithState();
 
   function sendMessage(
     msg: ChatMessageTypes,
     clearChat = false,
     docId: string,
   ) {
+    console.warn(`${sessionId} `, msg);
     dispatch(addMessage({ message: msg, clearChat, docId, sessionId }));
   }
 
@@ -58,6 +59,7 @@ export function useWithChat(): UseWithChat {
     clearChat = false,
     docId: string,
   ) {
+    console.warn(`${sessionId} `, msgs);
     dispatch(addMessages({ messages: msgs, clearChat, docId, sessionId }));
   }
 
@@ -66,7 +68,7 @@ export function useWithChat(): UseWithChat {
   }
 
   function clearChatLog(docId: string) {
-    setSessionId(uuidv4());
+    newSession();
     dispatch(clearChat(docId));
   }
 

@@ -235,10 +235,10 @@ function MainApp() {
 }
 
 function App() {
-  const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "123";
+  const GOOGLE_CLIENT_ID = import.meta.env.GOOGLE_CLIENT_ID || "123";
   const cognitoAuthConfig: AuthProviderProps = {
-    authority: import.meta.env.VITE_COGNITO_AUTHORITY || "",
-    client_id: import.meta.env.VITE_COGNITO_CLIENT_ID || "",
+    authority: import.meta.env.COGNITO_AUTHORITY || "",
+    client_id: import.meta.env.COGNITO_CLIENT_ID || "",
     redirect_uri: typeof window === "undefined" ? "" : window.location.origin,
     response_type: "code",
     scope: "email openid phone",

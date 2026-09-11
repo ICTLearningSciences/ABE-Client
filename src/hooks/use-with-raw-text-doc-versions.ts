@@ -9,7 +9,7 @@ import { useState } from "react";
 import type { DocVersion, DocData, UserDoc } from "../types";
 import { useAppSelector } from "../store/hooks";
 import { submitDocVersion as submitDocVersionGQL } from "./api";
-import { useWithChat, useWithUsersDocs } from "../exported-files";
+import { useWithUsersDocs } from "../exported-files";
 import { equals, hasHoursPassed } from "../helpers";
 import useInterval from "./use-interval";
 import type { ChatMessageTypes } from "../store/slices/chat";
@@ -19,11 +19,11 @@ export function useWithRawTextDocVersions(
   currentActivityId: string,
   docData?: DocData,
 ) {
-  const { state: chatState } = useWithChat();
+  const { chatLogs } = useAppSelector((state) => state.chat);
   const curDocId = useAppSelector((state) => state.state.curDocId);
   const sessionId = useAppSelector((state) => state.state.sessionId);
   const { updateDocTitleLocally } = useWithUsersDocs();
-  const messages = chatState.chatLogs[curDocId] || [];
+  const messages = chatLogs[curDocId] || [];
   const viewState = useAppSelector(
     (state) => state.educationManagement.viewState,
   );

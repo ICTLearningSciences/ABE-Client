@@ -192,6 +192,12 @@ export function HugeRTEEditor({
               onChange={(e) => setTempTitle(e.target.value)}
               size="small"
               autoFocus
+              style={{ color: "inherit" }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  color: "inherit",
+                },
+              }}
             />
             <IconButton onClick={handleSaveEdit} color="primary">
               <Save />
@@ -210,6 +216,7 @@ export function HugeRTEEditor({
               {docData.title || "New Document"}
             </Typography>
             <IconButton
+              color="inherit"
               onClick={() => {
                 setTempTitle(docData.title);
                 setIsEditingTitle(true);

@@ -31,7 +31,7 @@ export interface TrackedState {
  * @param selectedActivityId
  */
 export function useWithStoreDocVersions(selectedActivityId: string) {
-  const { state } = useWithChat();
+  const { chatLogs } = useAppSelector((state) => state.chat);
   const { updateMostRecentDocVersion, warnExpiredAccessToken } = useWithState();
   const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const sessionId: string = useAppSelector((state) => state.state.sessionId);
@@ -56,7 +56,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         8,
       )
     : false;
-  const messages = state.chatLogs[curDocId] || [];
+  const messages = chatLogs[curDocId] || [];
   const [lastSavedVersion, setLastSavedVersion] = useState<TrackedState>({
     id: "",
     title: "",

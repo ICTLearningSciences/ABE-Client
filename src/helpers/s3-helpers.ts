@@ -5,119 +5,6 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import {
-  Engine,
-  LanguageCode,
-  PollyClient,
-  SynthesizeSpeechCommand,
-  VoiceId,
-} from "@aws-sdk/client-polly";
-import {
-  S3Client,
-  ListObjectsCommand,
-  PutObjectCommand,
-} from "@aws-sdk/client-s3"; // ES Modules import
-
-export const s3Client = new S3Client({
-  region: import.meta.env.VITE_AWS_S3_REGION,
-  credentials: {
-    accessKeyId: import.meta.env.VITE_AWS_ACCESSKEY || "",
-    secretAccessKey: import.meta.env.VITE_AWS_SECRETACCESSKEY || "",
-  },
-});
-
-export const pollyClient = new PollyClient({
-  region: import.meta.env.VITE_AWS_S3_REGION,
-  credentials: {
-    accessKeyId: import.meta.env.VITE_AWS_ACCESSKEY || "",
-    secretAccessKey: import.meta.env.VITE_AWS_SECRETACCESSKEY || "",
-  },
-});
-
-export async function getPollyTTS(args: {
-  text: string;
-  voice?: string;
-  engine?: string;
-  language?: string;
-}) {
-  let text = args.text;
-  if (!text.startsWith("<speak>") && !text.endsWith("</speak>")) {
-    text = `<speak>${text}</speak>`;
-  }
-  const command = new SynthesizeSpeechCommand({
-    Text: text,
-    Engine: (args.engine || "long-form") as Engine,
-    VoiceId: (args.voice || "Danielle") as VoiceId,
-    LanguageCode: (args.language || "en-US") as LanguageCode,
-    TextType: "ssml",
-    OutputFormat: "mp3",
-  });
-  const response = await pollyClient.send(command);
-  return response.AudioStream?.transformToWebStream();
-}
-
-export function getPollyVoiceOptions(engine: string): string[] {
-  if (engine === "generative") {
-    return ["Danielle", "Joanna", "Ruth", "Salli", "Matthew", "Stephen"];
-  } else if (engine === "long-form") {
-    return ["Danielle", "Ruth", "Gregory", "Patrick"];
-  } else if (engine === "neural") {
-    return [
-      "Danielle",
-      "Joanna",
-      "Ruth",
-      "Salli",
-      "Kimberly",
-      "Kendra",
-      "Ivy",
-      "Gregory",
-      "Kevin",
-      "Matthew",
-      "Justin",
-      "Joey",
-      "Stephen",
-    ];
-  } else if (engine === "standard") {
-    return [
-      "Joanna",
-      "Salli",
-      "Kimberly",
-      "Kendra",
-      "Ivy",
-      "Matthew",
-      "Justin",
-      "Joey",
-    ];
-  }
-  return [];
-}
-
-export async function getRagStore() {
-  const command = new ListObjectsCommand({
-    Bucket: import.meta.env.VITE_AWS_S3_BUCKET,
-  });
-  try {
-    const response = await s3Client.send(command);
-    return response.Contents;
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-export async function uploadRagFile(file: File, name?: string) {
-  const filename = (name || file.name).replaceAll(" ", "_");
-  const ext = filename.split(".").pop();
-  const contentType = getMimeTypeFromExtension(ext);
-  const command = new PutObjectCommand({
-    Bucket: import.meta.env.VITE_AWS_S3_BUCKET,
-    Key: filename,
-    ContentType: contentType,
-    Body: file,
-  });
-  const response = await s3Client.send(command);
-  return response;
-}
-
 export function getFileName(url: string): string {
   return url.substring(url.lastIndexOf("/") + 1);
 }
@@ -211,3 +98,50 @@ export function getMimeTypeFromExtension(extension = "txt"): string {
     }[extension] || "application/octet-stream"
   );
 }
+
+export function getPollyVoiceOptions(engine: string): string[] {
+  if (engine === "generative") {
+    return ["Danielle", "Joanna", "Ruth", "Salli", "Matthew", "Stephen"];
+  } else if (engine === "long-form") {
+    return ["Danielle", "Ruth", "Gregory", "Patrick"];
+  } else if (engine === "neural") {
+    return [
+      "Danielle",
+      "Joanna",
+      "Ruth",
+      "Salli",
+      "Kimberly",
+      "Kendra",
+      "Ivy",
+      "Gregory",
+      "Kevin",
+      "Matthew",
+      "Justin",
+      "Joey",
+      "Stephen",
+    ];
+  } else if (engine === "standard") {
+    return [
+      "Joanna",
+      "Salli",
+      "Kimberly",
+      "Kendra",
+      "Ivy",
+      "Matthew",
+      "Justin",
+      "Joey",
+    ];
+  }
+  return [];
+}
+
+export async function getPollyTTS(args: {
+  text: string;
+  voice?: string;
+  engine?: string;
+  language?: string;
+}) {}
+
+export async function getRagStore() {}
+
+export async function uploadRagFile(file: File, name?: string) {}

@@ -12,9 +12,9 @@ import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-typ
 import ViewPreviousRunModal from "../../../components/admin-view/view-previous-run-modal";
 import SystemPromptModal from "../../../components/user-view/chat/system-prompt-modal";
 import {
-  useWithChat,
   useWithState,
   isActivityBuilder,
+  useWithChat,
 } from "../../../exported-files";
 import { useWithBuiltActivityHandler } from "../../../hooks/use-with-built-activity-handler";
 import { useWithSystemPromptsConfig } from "../../../hooks/use-with-system-prompts-config";
@@ -37,7 +37,8 @@ export function Chat(props: {
   setSelectedActivity: (activity: ActivityTypes) => void;
 }) {
   const { selectedActivity } = props;
-  const { sendMessage, state: chatState, setSystemRole } = useWithChat();
+  const { state: chatState, sendMessage, setSystemRole } = useWithChat();
+
   const {
     editedData: systemPromptData,
     editOrAddSystemPrompt,
@@ -46,7 +47,7 @@ export function Chat(props: {
     deleteSystemPrompt,
     isSaving,
   } = useWithSystemPromptsConfig();
-  const { state } = useWithState();
+  const { state, newSession } = useWithState();
   const { curDocId } = state;
   const coachResponsePending = useAppSelector(
     (state) => state.chat.coachResponsePending,
@@ -106,6 +107,7 @@ export function Chat(props: {
             selectedActivity={selectedActivity}
             onSelectActivity={props.setSelectedActivity}
             onReset={() => {
+              newSession();
               setResetActivityCounter(resetActivityCounter + 1);
             }}
           />

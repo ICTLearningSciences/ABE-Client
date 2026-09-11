@@ -42,15 +42,7 @@ const initialState: State = {
   activity: undefined,
   activePanel: undefined,
   activePanelists: undefined,
-  activePanelConfig: {
-    "": {
-      id: "",
-      webSearch: false,
-      includeChatLog: false,
-      responseLength: "high",
-      difficultyLevel: "low",
-    },
-  },
+  activePanelConfig: {},
 };
 
 export const fetchPanels = createAsyncThunk("state/fetchPanels", async () => {

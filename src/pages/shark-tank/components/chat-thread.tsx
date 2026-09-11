@@ -35,10 +35,10 @@ import type {
 } from "../../../store/slices/chat";
 import CssCard from "./css-card";
 import Message from "./message";
-import { useWithChat } from "../../../exported-files";
 import { useWithWindowSize } from "../../../hooks/use-with-window-size";
 import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
 import { useAppSelector } from "../../../store/hooks";
+import { useWithChat } from "../../../store/slices/chat/use-with-chat";
 
 export function ChatThread(props: {
   coachResponsePending: boolean;
@@ -159,7 +159,7 @@ export function ChatThread(props: {
         () => {
           setPingRef(undefined);
         },
-        unviewedMessage.message.split(" ").length * 100,
+        Math.min(3000, unviewedMessage.message.split(" ").length * 100),
       );
       setPingRef(timeoutId);
       setViewedMessages([...viewedMessages, unviewedMessage.id]);
@@ -253,7 +253,8 @@ export function ChatHistoryLog(props: { c: ChatHistory }): React.ReactNode {
       >
         <Typography>{doc?.title}</Typography>
         <div style={{ minWidth: 5, flexGrow: 1 }} />
-        <Typography>{c.startDate}</Typography>
+        <Typography>{c.sessionId}</Typography>
+        {/* <Typography>{c.startDate}</Typography> */}
         <IconButton
           style={{ color: "white" }}
           onClick={() => setCollapsed(!collapsed)}
@@ -282,10 +283,10 @@ export function ChatHistory(props: {
   open: boolean;
   onClose: () => void;
 }): React.ReactNode {
+  const { clearChatHistory } = useWithChat();
   const { chatHistory } = useAppSelector((state) => state.chat);
   const { userDocs } = useAppSelector((state) => state.state);
   const { height, width } = useWithWindowSize();
-  const { clearChatHistory } = useWithChat();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   function scrollToElementById(id: string) {

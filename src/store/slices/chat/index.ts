@@ -110,7 +110,7 @@ export const chatSlice = createSlice({
     ) => {
       const { message, clearChat, docId, sessionId } = action.payload;
       const historyIdx = state.chatHistory.findIndex(
-        (c) => c.sessionId === sessionId && c.docId === docId,
+        (c) => c.sessionId === sessionId,
       );
       if (historyIdx === -1) {
         state.chatHistory.push({
