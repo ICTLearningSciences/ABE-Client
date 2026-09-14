@@ -7,8 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 
 import React, { useRef, useState, useEffect } from "react";
 import Draggable from "react-draggable";
-import { ToastContainer, toast } from "react-toastify";
-import copy from "copy-to-clipboard";
 import { v4 as uuidv4 } from "uuid";
 import {
   Button,
@@ -23,7 +21,6 @@ import {
 } from "@mui/material";
 import {
   Close,
-  ContentPaste,
   DragHandle,
   ExpandLess,
   ExpandMore,
@@ -267,22 +264,13 @@ export function ChatHistoryLog(props: { c: ChatHistory }): React.ReactNode {
       <Collapse in={!collapsed} style={{ backgroundColor: "rgb(80, 80, 80)" }}>
         {chatMessages.map((m, i) => {
           return (
-            <div key={i} className="row">
-              <Message
-                viewed
-                message={m}
-                messageIndex={i}
-                setAiInfoToDisplay={() => {}}
-              />
-              <IconButton
-                onClick={() => {
-                  copy(m.message);
-                  toast("Copied to clipboard!");
-                }}
-              >
-                <ContentPaste fontSize="small" sx={{ color: "gray" }} />
-              </IconButton>
-            </div>
+            <Message
+              viewed
+              key={i}
+              message={m}
+              messageIndex={i}
+              setAiInfoToDisplay={() => {}}
+            />
           );
         })}
       </Collapse>
@@ -384,7 +372,6 @@ export function ChatHistory(props: {
             );
           })}
         </Menu>
-        <ToastContainer />
       </div>
     </Draggable>
   );
