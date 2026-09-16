@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 
 import { useState } from "react";
 import { isAxiosError } from "axios";
-import { useWithChat } from "../store/slices/chat/use-with-chat";
 import { getDocData, submitDocVersion } from "./api";
 import { useAppSelector } from "../store/hooks";
 import useInterval from "./use-interval";

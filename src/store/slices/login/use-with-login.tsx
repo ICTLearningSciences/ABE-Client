@@ -150,7 +150,7 @@ export function useWithLogin(): UseWithLogin {
       try {
         await awsCognitoAuth.signoutRedirect({
           extraQueryParams: {
-            client_id: import.meta.env.COGNITO_CLIENT_ID || "",
+            client_id: import.meta.env.VITE_COGNITO_CLIENT_ID || "",
             logout_uri: window.location.origin,
           },
         });

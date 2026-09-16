@@ -5,18 +5,12 @@ env:
     STAGE: 'dev'
     VITE_GOOGLE_API_ENDPOINT: "https://api-dev.abewriting.org/docs"
     VITE_GRAPHQL_ENDPOINT: "https://api-dev.abewriting.org/graphql/graphql"
-    VITE_DOCUMENT_SERVICE: "GOOGLE_DOCS"
-    VITE_COGNITO_REDIRECT_URI: "https://dev.abewriting.org"
-    VITE_COGNITO_LOGOUT_REDIRECT_URI: "https://dev.abewriting.org"
   parameter-store:
     S3_DEPLOY_BUCKET_DEV: "/abewriting/dev/s3-websites/NAME"
     CDN_ID_DEV: "/abewriting/dev/CLOUDFRONT_DISTRIBUTION_ID"
-    GOOGLE_CLIENT_ID: "/ABE/google_client_id"
-    COGNITO_DOMAIN: "/ABE/COGNITO_DOMAIN"
-    COGNITO_CLIENT_ID: "/ABE/COGNITO_CLIENT_ID"
-    COGNITO_AUTHORITY: "/ABE/COGNITO_AUTHORITY"
-    AWS_ACCESSKEY: "/ABE/AWS_ACCESSKEY"
-    AWS_SECRETACCESSKEY: "/ABE/AWS_SECRETACCESSKEY"
+    VITE_GOOGLE_CLIENT_ID: "/ABE/google_client_id"
+    VITE_COGNITO_CLIENT_ID: "/ABE/COGNITO_CLIENT_ID"
+    VITE_COGNITO_AUTHORITY: "/ABE/COGNITO_AUTHORITY"
 
 phases:
   install:

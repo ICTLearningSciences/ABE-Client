@@ -66,12 +66,10 @@ export default function Message(props: {
     setLoading(true);
     try {
       const voice = panelist?.ttsConfig || {};
-      const stream = await getPollyTTS({
+      const audio = await getPollyTTS({
         text: props.message.message,
         ...voice,
       });
-      const blob = await new Response(stream).blob();
-      const audio = new Audio(URL.createObjectURL(blob));
       setPlaying(true);
       audio.play();
       audio.onended = function () {

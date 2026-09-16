@@ -29,12 +29,10 @@ export function TTSConfigEditor(props: {
   async function textToSpeech() {
     setLoading(true);
     try {
-      const stream = await getPollyTTS({
+      const audio = await getPollyTTS({
         text: text,
         ...props.panelist.ttsConfig,
       });
-      const blob = await new Response(stream).blob();
-      const audio = new Audio(URL.createObjectURL(blob));
       audio.play();
       setLoading(false);
     } catch {

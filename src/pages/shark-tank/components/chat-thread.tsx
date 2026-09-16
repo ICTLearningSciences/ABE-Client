@@ -253,8 +253,7 @@ export function ChatHistoryLog(props: { c: ChatHistory }): React.ReactNode {
       >
         <Typography>{doc?.title}</Typography>
         <div style={{ minWidth: 5, flexGrow: 1 }} />
-        <Typography>{c.sessionId}</Typography>
-        {/* <Typography>{c.startDate}</Typography> */}
+        <Typography>{c.startDate}</Typography>
         <IconButton
           style={{ color: "white" }}
           onClick={() => setCollapsed(!collapsed)}

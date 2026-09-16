@@ -6,11 +6,15 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import { CloudUpload } from "@mui/icons-material";
-import { Button, styled } from "@mui/material";
+import { Button, CircularProgress, styled } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import React from "react";
 import { ColumnDiv } from "../../styled-components";
-import { getRagStore, uploadRagFile } from "../../helpers/s3-helpers";
+import {
+  getRagStore,
+  uploadRagFile,
+  type S3File,
+} from "../../helpers/s3-helpers";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -25,21 +29,21 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 export default function ViewRagDocuments(): React.ReactNode {
-  const [documents, setDocuments] = React.useState<string[]>([]);
+  const [documents, setDocuments] = React.useState<S3File[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(false);
   const [uploading, setUploading] = React.useState<boolean>(false);
 
-  let loaded = false;
   React.useEffect(() => {
-    if (loaded) return;
     onLoad();
-    loaded = true;
   }, []);
 
   async function onLoad() {
+    setLoading(true);
     const documents = await getRagStore();
     if (documents) {
-      setDocuments(documents.map((d) => d.Key || ""));
+      setDocuments(documents);
     }
+    setLoading(false);
   }
 
   async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -69,6 +73,8 @@ export default function ViewRagDocuments(): React.ReactNode {
         <h2>RAG Store</h2>
         {documents.length === 0 ? (
           <p>No documents found</p>
+        ) : loading ? (
+          <CircularProgress />
         ) : (
           <DataGrid
             sx={{ border: 0 }}
@@ -82,17 +88,31 @@ export default function ViewRagDocuments(): React.ReactNode {
               },
             }}
             rows={documents.map((d) => ({
-              id: d,
-              file: d,
+              id: d.Key,
+              ...d,
             }))}
             columns={[
               { field: "id" },
               {
-                field: "file",
-                headerName: "File",
+                field: "Key",
+                headerName: "File Name",
+                width: 500,
+                renderCell: (params) => (
+                  <a
+                    href={`${import.meta.env.VITE_RAG_BUCKET}${params.value}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {params.value}
+                  </a>
+                ),
+              },
+              {
+                field: "LastModified",
+                headerName: "Last Modified",
+                width: 300,
               },
             ]}
-            checkboxSelection
             hideFooterSelectedRowCount
             disableRowSelectionOnClick={true}
           />
@@ -111,7 +131,7 @@ export default function ViewRagDocuments(): React.ReactNode {
           Upload Media
           <VisuallyHiddenInput
             type="file"
-            disabled={uploading}
+            disabled={loading}
             onChange={onUpload}
           />
         </Button>

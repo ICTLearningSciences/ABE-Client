@@ -5,6 +5,9 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
+import axios from "axios";
+import { ACCESS_TOKEN_KEY, localStorageGet } from "../store/local-storage";
+
 export function getFileName(url: string): string {
   return url.substring(url.lastIndexOf("/") + 1);
 }
@@ -99,6 +102,53 @@ export function getMimeTypeFromExtension(extension = "txt"): string {
   );
 }
 
+/** S3 */
+
+export interface S3File {
+  Key: string;
+  LastModified: string;
+}
+export async function getRagStore(): Promise<S3File[]> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const url = import.meta.env.VITE_ABE_API_ENDPOINT || "/graphql";
+  const data = await axios.get(`${url}/s3list`, {
+    headers: {
+      Authorization: `bearer ${accessToken}`,
+    },
+  });
+  return data.data.Contents;
+}
+
+export async function uploadRagFile(file: File, name?: string): Promise<void> {
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const url = import.meta.env.VITE_ABE_API_ENDPOINT || "/graphql";
+  const filename = (name || file.name).replaceAll(" ", "");
+  const ext = filename.split(".").pop();
+  const mimetype = getMimeTypeFromExtension(ext);
+  const data = await axios.post(
+    `${url}/s3upload`,
+    { Key: filename, ContentType: mimetype },
+    {
+      headers: {
+        Authorization: `bearer ${accessToken}`,
+      },
+    },
+  );
+  const presignedPostData = data.data;
+  const formData = new FormData();
+  Object.entries(presignedPostData.fields).forEach(([key, value]) => {
+    formData.append(key, value as string);
+  });
+  formData.append("file", file);
+  const response = await fetch(presignedPostData.url, {
+    method: "POST",
+    body: formData,
+  });
+  console.warn(response);
+}
+
+/** Polly */
+
 export function getPollyVoiceOptions(engine: string): string[] {
   if (engine === "generative") {
     return ["Danielle", "Joanna", "Ruth", "Salli", "Matthew", "Stephen"];
@@ -140,8 +190,34 @@ export async function getPollyTTS(args: {
   voice?: string;
   engine?: string;
   language?: string;
-}) {}
-
-export async function getRagStore() {}
-
-export async function uploadRagFile(file: File, name?: string) {}
+}): Promise<HTMLAudioElement> {
+  let text = args.text;
+  if (!text.startsWith("<speak>") && !text.endsWith("</speak>")) {
+    text = `<speak>${text}</speak>`;
+  }
+  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const apiUrl = import.meta.env.VITE_ABE_API_ENDPOINT || "/graphql";
+  const data = await axios.post(
+    `${apiUrl}/polly`,
+    {
+      Text: text,
+      Engine: args.engine || "long-form",
+      VoiceId: args.voice || "Danielle",
+      LanguageCode: args.language || "en-US",
+      TextType: "ssml",
+      OutputFormat: "mp3",
+    },
+    {
+      headers: {
+        Authorization: `bearer ${accessToken}`,
+      },
+    },
+  );
+  const stream = data.data.AudioStream;
+  const uInt8Array = new Uint8Array(stream.data);
+  const blob = new Blob([uInt8Array.buffer], { type: "audio/mp3" });
+  const url = URL.createObjectURL(blob);
+  const audio = new Audio();
+  audio.src = url;
+  return audio;
+}
