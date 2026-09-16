@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 
 import { useEffect, useState } from "react";
 import { useAppSelector } from "../store/hooks";
-import { useWithChat } from "../store/slices/chat/use-with-chat";
 import type { ChatLog } from "../store/slices/chat";
 import type { DocData } from "../types";
 
@@ -18,13 +17,12 @@ export abstract class ChatLogSubscriber {
 
 export function useWithChatLogSubscribers() {
   const [subscribers, setSubscribers] = useState<ChatLogSubscriber[]>([]);
-
-  const { state } = useWithChat();
+  const { chatLogs } = useAppSelector((state) => state.chat);
   const mostRecentDocVersion = useAppSelector(
     (state) => state.state.mostRecentDocVersion,
   );
   const curDocId: string = useAppSelector((state) => state.state.curDocId);
-  const messages = state.chatLogs[curDocId] || [];
+  const messages = chatLogs[curDocId] || [];
 
   useEffect(() => {
     for (let i = 0; i < subscribers.length; i++) {

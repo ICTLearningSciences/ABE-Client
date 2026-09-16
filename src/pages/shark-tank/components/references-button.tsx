@@ -8,9 +8,10 @@ The full terms of this copyright and license should always be found in the root 
 import React from "react";
 import { Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import { Close, OpenInNew, Pageview } from "@mui/icons-material";
-import { useWithChat, useWithState } from "../../../exported-files";
+import { useWithState } from "../../../exported-files";
 import type { Source } from "../../../ai-services/ai-service-types";
 import type { ChatMessageTypes } from "../../../store/slices/chat";
+import { useAppSelector } from "../../../store/hooks";
 
 export function ReferencesButton(props: {
   reference?: Source;
@@ -20,11 +21,11 @@ export function ReferencesButton(props: {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { state } = useWithState();
   const { curDocId } = state;
-  const { state: chatState } = useWithChat();
+  const { chatLogs } = useAppSelector((state) => state.chat);
   const messages = curDocId
     ? props.message
       ? [props.message]
-      : chatState.chatLogs[curDocId] || []
+      : chatLogs[curDocId] || []
     : [];
 
   const sources = [];

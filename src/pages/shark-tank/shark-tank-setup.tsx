@@ -11,16 +11,13 @@ import * as motion from "motion/react-client";
 import {
   Button,
   CircularProgress,
-  Dialog,
   DialogContent,
-  DialogTitle,
   Grid,
   IconButton,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  MenuItem,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -30,13 +27,10 @@ import {
   DescriptionOutlined,
   InfoOutlined,
   ListAlt,
-  Message,
   PeopleOutlined,
   Person,
   PlayCircleOutlineOutlined,
-  Restore,
   Settings,
-  Tune,
 } from "@mui/icons-material";
 
 import { Header } from "./components/header";
@@ -47,10 +41,9 @@ import withAuthorizationOnly from "./wrap-with-authorization-only";
 import type { ActivityBuilder } from "../../exported-files";
 
 import "./shark-tank.css";
-import { CssTextField } from "./components";
+import { CssDialog } from "./components";
 import CssCard from "./components/css-card";
 import PanelSettings from "./components/panel-settings";
-import type { ResponseLength } from "../../store/slices/panels/types";
 
 function SharkTankSetup(): React.ReactNode {
   const {
@@ -61,7 +54,6 @@ function SharkTankSetup(): React.ReactNode {
     activePanelConfig,
     setActivity,
     setActivePanel,
-    setActivePanelConfig,
     toggleActivePanelist,
   } = useWithPanels();
   const activePanelists = useAppSelector(
@@ -256,72 +248,13 @@ function SharkTankSetup(): React.ReactNode {
         )}
       </div>
       {showConfig && (
-        <Dialog open={true} onClose={() => setShowConfig(undefined)}>
-          <DialogTitle>
-            {panelists.find((p) => p.clientId === showConfig)?.panelistName}{" "}
-            Response Settings
-          </DialogTitle>
-          <DialogContent style={{ color: "white" }}>
-            <CssCard alt title="Response Length" icon={<Message />}>
-              <CssTextField
-                select
-                value={
-                  activePanelConfig[showConfig]?.responseLength ||
-                  activePanelConfig[""]?.responseLength
-                }
-                onChange={(e) => {
-                  const config = { ...activePanelConfig };
-                  config[showConfig] = {
-                    ...config[""],
-                    ...config[showConfig],
-                    id: showConfig,
-                    responseLength: e.target.value as ResponseLength,
-                  };
-                  setActivePanelConfig({ ...config });
-                }}
-              >
-                <MenuItem value="low">Low (10-30 words)</MenuItem>
-                <MenuItem value="med">Medium (50-100 words)</MenuItem>
-                <MenuItem value="high">High (No limit)</MenuItem>
-              </CssTextField>
-            </CssCard>
-            <CssCard alt title="Difficulty Level" icon={<Tune />}>
-              <CssTextField
-                select
-                value={
-                  activePanelConfig[showConfig]?.difficultyLevel ||
-                  activePanelConfig[""]?.difficultyLevel
-                }
-                onChange={(e) => {
-                  const config = { ...activePanelConfig };
-                  config[showConfig] = {
-                    ...config[""],
-                    ...config[showConfig],
-                    id: showConfig,
-                    difficultyLevel: e.target.value as ResponseLength,
-                  };
-                  setActivePanelConfig({ ...config });
-                }}
-              >
-                <MenuItem value="low">Low</MenuItem>
-                <MenuItem value="med">Medium</MenuItem>
-                <MenuItem value="high">High</MenuItem>
-              </CssTextField>
-            </CssCard>
-            <Button
-              variant="contained"
-              fullWidth
-              startIcon={<Restore />}
-              onClick={() => {
-                const config = { ...activePanelConfig };
-                delete config[showConfig];
-                setActivePanelConfig({ ...config });
-              }}
-            >
-              Reset To Default
-            </Button>
+        <CssDialog open={true} onClose={() => setShowConfig(undefined)}>
+          <DialogContent>
+            <PanelSettings
+              panelist={panelists.find((p) => p.clientId === showConfig)}
+            />
           </DialogContent>
-        </Dialog>
+        </CssDialog>
       )}
     </main>
   );

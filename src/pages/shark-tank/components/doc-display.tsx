@@ -52,7 +52,7 @@ export default function UserDocumentDisplay(props: {
   }
   if (loginService === "AMAZON_COGNITO") {
     return (
-      <div style={{ color: "white" }}>
+      <div style={{ color: "white", width: "100%", height: "100%" }}>
         <HugeRTEEditor docId={docId} currentActivityId={activityId} />
       </div>
     );

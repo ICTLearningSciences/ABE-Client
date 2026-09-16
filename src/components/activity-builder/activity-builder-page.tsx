@@ -21,8 +21,10 @@ import { EditPanelist } from "../panelist-builder/edit-panelist";
 import { SelectCreatePanel } from "../panel-builder/select-create-panel";
 import { EditPanel } from "../panel-builder/edit-panel";
 import { useWithLogin } from "../../store/slices/login/use-with-login";
+import ViewRagDocuments from "./rag-store-document-viewer";
 
-type BuilderTab = "ACTIVITY_BUILDER" | "PANELIST_BUILDER" | "PANEL_BUILDER";
+type BuilderTab =
+  "ACTIVITY_BUILDER" | "PANELIST_BUILDER" | "PANEL_BUILDER" | "RAG_UPLOAD";
 
 export function ActivityBuilderPage(props: {
   goToActivity: (activity: ActivityBuilder) => void;
@@ -216,6 +218,11 @@ export function ActivityBuilderPage(props: {
       }
     }
 
+    // RAG Document Tab
+    if (selectedTab === "RAG_UPLOAD") {
+      return <ViewRagDocuments />;
+    }
+
     return null;
   };
 
@@ -245,6 +252,9 @@ export function ActivityBuilderPage(props: {
         )}
         {state.user?.userRole === "ADMIN" && (
           <Tab label="Panel Builder" value="PANEL_BUILDER" />
+        )}
+        {state.user?.userRole === "ADMIN" && (
+          <Tab label="RAG Store" value="RAG_UPLOAD" />
         )}
       </Tabs>
       <Box style={{ flexGrow: 1, overflow: "auto" }}>{renderContent()}</Box>

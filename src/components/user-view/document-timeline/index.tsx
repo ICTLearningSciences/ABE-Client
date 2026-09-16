@@ -109,7 +109,7 @@ export function DocumentTimelinePage(props: {
           position: "absolute",
           height: "calc(100% - 10%)",
           width: "100%",
-          top: 45,
+          top: 55,
         }}
       >
         <RowDiv

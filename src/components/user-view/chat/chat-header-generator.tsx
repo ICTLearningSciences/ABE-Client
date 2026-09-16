@@ -19,7 +19,6 @@ import {
 import { ChatHeader, ColumnDiv, RowDiv } from "../../../styled-components";
 import type { DocGoal, ActivityTypes } from "../../../types";
 import { useAppSelector } from "../../../store/hooks";
-import { useWithChat } from "../../../store/slices/chat/use-with-chat";
 import { useWithWindowSize } from "../../../hooks/use-with-window-size";
 
 export function ChatHeaderGenerator(props: {
@@ -31,6 +30,7 @@ export function ChatHeaderGenerator(props: {
   displayMarkdown: boolean;
   setDisplayMarkdown: (displayMarkdown: boolean) => void;
   setToDocView: () => void;
+  downloadChatLog: (docId: string) => void;
 }): React.ReactNode {
   const {
     incrementActivityCounter,
@@ -45,7 +45,6 @@ export function ChatHeaderGenerator(props: {
   const viewingAdvancedOptions = useAppSelector(
     (state) => state.state.viewingAdvancedOptions,
   );
-  const { downloadChatLog } = useWithChat();
   const { isMobile, width: screenWidth } = useWithWindowSize();
   let title = selectedGoal?.title || "";
   title += selectedGoal && selectedActivity ? " - " : "";
@@ -176,7 +175,7 @@ export function ChatHeaderGenerator(props: {
               <Divider orientation="vertical" flexItem />
               <Button
                 data-cy="download-chat-log-button"
-                onClick={() => downloadChatLog("")}
+                onClick={() => props.downloadChatLog("")}
                 style={{
                   padding: 3,
                   marginBottom: 5,

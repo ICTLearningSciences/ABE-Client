@@ -409,9 +409,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           const panelist = effectivePanelists.find(
             (p) => p.clientId === panelistClientId,
           );
-
           if (panelist) {
-            console.log("panelist found", panelist.panelistName);
             this.sendMessage({
               id: uuidv4(),
               message: replaceStoredDataInString(
@@ -860,8 +858,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           filters: config.ragConfiguration.filters,
         }
       : undefined;
-    const webSearch =
-      config.webSearch || this.activePanelConfig[""]?.webSearch || false;
+    const webSearch = config.webSearch || false;
     const includeChatLogContext = config.includeChatLogContext || false;
 
     const aiPromptSteps: AiPromptStep[] = [
@@ -873,7 +870,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         webSearch: webSearch,
         editDoc: config.editDoc || false,
         ragConfiguration: ragConfiguration,
-        panelConfiguration: Object.values(this.activePanelConfig),
       },
     ];
 
@@ -896,23 +892,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       promptRole: "user",
     };
     aiPromptSteps[0].prompts.push(promptConfiguration);
-
-    // Limit response length
-    const responseLength = this.activePanelConfig[""]?.responseLength || "high";
-    if (responseLength === "low") {
-      aiPromptSteps[0].prompts.push({
-        promptText: `Please keep your response between 10 to 30 words long`,
-        includeEssay: false,
-        promptRole: "user",
-      });
-    }
-    if (responseLength === "med") {
-      aiPromptSteps[0].prompts.push({
-        promptText: `Please keep your response between 50 to 100 words long`,
-        includeEssay: false,
-        promptRole: "user",
-      });
-    }
 
     // Handle JSON response format
     if (config.jsonResponseData && config.outputDataType === "JSON") {
@@ -997,9 +976,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           filters: mergedRagConfig.filters || {},
         }
       : undefined;
-    const webSearch =
-      config.webSearch || this.activePanelConfig[""]?.webSearch || false;
-    const includeChatLogContext = config.includeChatLogContext || false;
+    const webSearch = this.activePanelConfig[""]?.webSearch || config.webSearch;
+    const includeChatLogContext =
+      this.activePanelConfig[""]?.includeChatLog ||
+      config.includeChatLogContext;
 
     const aiPromptSteps: AiPromptStep[] = [
       {
@@ -1037,8 +1017,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // Limit response length
     const responseLength =
       this.activePanelConfig[panelist.clientId]?.responseLength ||
-      this.activePanelConfig[""]?.responseLength ||
-      "high";
+      this.activePanelConfig[""]?.responseLength;
     if (responseLength === "low") {
       aiPromptSteps[0].prompts.push({
         promptText: `Please keep your response between 10 to 30 words long`,

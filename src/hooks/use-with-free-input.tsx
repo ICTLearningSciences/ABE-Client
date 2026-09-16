@@ -15,15 +15,19 @@ import { FREE_INPUT_GOAL_ID } from "../constants";
 import { useWithExecutePrompt } from "./use-with-execute-prompts";
 
 export default function useWithFreeInput(selectedGoal?: DocGoal) {
-  const { state, sendMessage, chatLogToString, coachResponsePending } =
-    useWithChat();
+  const {
+    state,
+    sendMessage,
+    sendMessages,
+    chatLogToString,
+    coachResponsePending,
+  } = useWithChat();
   const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const userId: string | undefined = useAppSelector(
     (state) => state.login.user?._id,
   );
   const messages = state.chatLogs[curDocId] || [];
   const isFreeInput = selectedGoal?._id === FREE_INPUT_GOAL_ID;
-  const { sendMessages } = useWithChat();
   const { abortController, executePromptSteps } = useWithExecutePrompt();
 
   useEffect(() => {

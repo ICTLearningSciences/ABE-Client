@@ -139,19 +139,16 @@ export async function execGql<T>(
   query: GQLQuery,
   opts?: HttpRequestConfig,
 ): Promise<T> {
-  return execHttp<T>(
-    "POST",
-    import.meta.env.VITE_GRAPHQL_ENDPOINT || "/graphql/graphql",
-    {
-      // axiosMiddleware: applyAppTokenRefreshInterceptor,
-      ...(opts || {}),
-      axiosConfig: {
-        timeout: REQUEST_TIMEOUT_GRAPHQL_DEFAULT, // default timeout can be overriden by passed-in config
-        ...(opts?.axiosConfig || {}),
-        data: query,
-      },
+  const url = import.meta.env.VITE_ABE_API_ENDPOINT || "/graphql";
+  return execHttp<T>("POST", `${url}/graphql`, {
+    // axiosMiddleware: applyAppTokenRefreshInterceptor,
+    ...(opts || {}),
+    axiosConfig: {
+      timeout: REQUEST_TIMEOUT_GRAPHQL_DEFAULT, // default timeout can be overriden by passed-in config
+      ...(opts?.axiosConfig || {}),
+      data: query,
     },
-  );
+  });
 }
 
 /**
@@ -298,10 +295,9 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
 }
 
 export async function fetchDocs(userId: string): Promise<UserDoc[]> {
-  const res = await axios.post(
-    import.meta.env.VITE_GRAPHQL_ENDPOINT || "/graphql/graphql",
-    {
-      query: `
+  const url = import.meta.env.VITE_ABE_API_ENDPOINT || "/graphql";
+  const res = await axios.post(`${url}/graphql`, {
+    query: `
         query FetchGoogleDocs($userId: ID!) {
           fetchGoogleDocs(userId: $userId) {
             googleDocId
@@ -326,11 +322,10 @@ export async function fetchDocs(userId: string): Promise<UserDoc[]> {
           }
         }
       `,
-      variables: {
-        userId: userId,
-      },
+    variables: {
+      userId: userId,
     },
-  );
+  });
   return res.data.data.fetchGoogleDocs;
 }
 
