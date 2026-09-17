@@ -4,7 +4,7 @@ env:
   variables:
     STAGE: 'qa'
     VITE_GOOGLE_API_ENDPOINT: "https://api-qa.abewriting.org/docs"
-    VITE_GRAPHQL_ENDPOINT: "https://api-qa.abewriting.org/graphql/graphql"
+    VITE_ABE_API_ENDPOINT: "https://api-qa.abewriting.org/graphql"
   parameter-store:
     S3_DEPLOY_BUCKET_QA: "/abewriting/qa/s3-websites/NAME"
     CDN_ID_QA: "/abewriting/qa/CLOUDFRONT_DISTRIBUTION_ID"
