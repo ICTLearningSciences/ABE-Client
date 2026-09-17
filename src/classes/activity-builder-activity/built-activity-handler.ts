@@ -691,7 +691,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     }
   }
 
-  async handlePromptStep(step: PromptActivityStep) {
+  async handlePromptStep(
+    step: PromptActivityStep,
+    extraChat: ChatMessageTypes[] = [],
+  ) {
     this.setResponsePending(true);
 
     // Prepare all prompt executions (including panelist prompts)
@@ -742,14 +745,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         // Execute prompt for each panelist
         for (const panelist of effectivePanelists) {
           promptsToExecute.push({ config: config, panelist: panelist });
-          //promptExecutions.push(
-          //  this.executePanelistPromptConfiguration(config, panelist),
-          //);
         }
       } else {
         // Execute normal prompt
         promptsToExecute.push({ config: config });
-        //promptExecutions.push(this.executeSinglePromptConfiguration(config));
       }
     }
 
@@ -765,6 +764,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           this.executePanelistPromptConfiguration(
             promptToExecute.config,
             promptToExecute.panelist,
+            extraChat,
           ),
         );
       else
@@ -781,7 +781,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     if (this.stateData[AGENT_RESULT_COUNT_KEY] >= promptsToExecute.length) {
       this.stateData[AGENT_RESULT_COUNT_KEY] = 0;
       await this.goToNextStep();
-    } else await this.handlePromptStep(step);
+    } else await this.handlePromptStep(step, extraChat);
   }
 
   async evaluatePromptResults(
@@ -803,7 +803,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           panelistName?: string;
         }
     >[],
-  ): Promise<void> {
+  ): Promise<ChatLog> {
+    const resultText: ChatLog = [];
     // Check if any prompts failed
     const hasFailures = promptResults.some(
       (result) => result.status === "rejected",
@@ -814,7 +815,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       this.sendErrorMessage("AI Service request failed");
       this.lastFailedStepId = step.stepId;
       this.setResponsePending(false);
-      return;
+      return [];
     }
 
     // All prompts succeeded - process results
@@ -853,6 +854,13 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
               result.value.originalConfiguration.systemCustomName,
             displayType: "TEXT",
           });
+          resultText.push({
+            message: result.value.message,
+            sources: result.value.sources,
+            id: uuidv4(),
+            sender: "SYSTEM",
+            displayType: "TEXT",
+          });
         }
       }
     }
@@ -876,6 +884,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         },
       };
     }
+    return resultText;
   }
 
   async executeSinglePromptConfiguration(
@@ -996,6 +1005,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   async executePanelistPromptConfiguration(
     config: SinglePromptConfiguration,
     panelist: Panelist,
+    extraChat: ChatLog = [],
   ): Promise<
     | {
         type: "json";
@@ -1077,7 +1087,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     if (includeChatLogContext) {
       aiPromptSteps[0].prompts.push({
         promptText: `Current state of chat log between user and system: ${chatLogToString(
-          this.chatLog,
+          this.chatLog.concat(extraChat),
           30,
         )}`,
         includeEssay: false,
