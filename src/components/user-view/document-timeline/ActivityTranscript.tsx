@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import React from "react";
-import { IconButton } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import { Chat } from "@mui/icons-material";
 import type { ChatItem } from "../../../types";
 import { useWithDocGoalsActivities } from "../../../store/slices/doc-goals-activities/use-with-doc-goals-activites";
@@ -108,9 +108,11 @@ function ActivityTranscript(props: ActivityTranscriptProps): React.ReactNode {
         >
           {activityTitle ? `${activityTitle}` : ""}
         </Text3NoIndent>
-        <IconButton aria-label="chat" onClick={handleClick}>
-          <Chat style={{ fontSize: 18 }} />
-        </IconButton>
+        <Tooltip title="Chat Log">
+          <IconButton aria-label="chat" onClick={handleClick}>
+            <Chat style={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
       </div>
 
       <StyledPopover
@@ -123,13 +125,15 @@ function ActivityTranscript(props: ActivityTranscriptProps): React.ReactNode {
         }}
       >
         <StyledCloseIcon onClick={handleClose} />
-        {chatLog.map((chatItem, index) => (
-          <ChatMessage
-            key={index}
-            message={chatItem.message}
-            sender={chatItem.sender}
-          />
-        ))}
+        {chatLog
+          .filter((m) => m.message)
+          .map((chatItem, index) => (
+            <ChatMessage
+              key={index}
+              message={chatItem.message}
+              sender={chatItem.sender}
+            />
+          ))}
       </StyledPopover>
     </Text3>
   );

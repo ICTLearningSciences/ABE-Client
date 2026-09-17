@@ -18,6 +18,7 @@ export function ChatInput(props: {
 }): React.ReactNode {
   const { sendMessage } = props;
   const [message, setMessage] = React.useState<string>("");
+
   function handleSendUserMessage(message: string) {
     sendMessage({
       id: uuidv4(),

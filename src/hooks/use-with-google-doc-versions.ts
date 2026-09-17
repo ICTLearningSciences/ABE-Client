@@ -7,7 +7,6 @@ The full terms of this copyright and license should always be found in the root 
 
 import { useState } from "react";
 import { isAxiosError } from "axios";
-import { useWithChat } from "../store/slices/chat/use-with-chat";
 import { getDocData, submitDocVersion } from "./api";
 import { useAppSelector } from "../store/hooks";
 import useInterval from "./use-interval";
@@ -31,7 +30,7 @@ export interface TrackedState {
  * @param selectedActivityId
  */
 export function useWithStoreDocVersions(selectedActivityId: string) {
-  const { state } = useWithChat();
+  const { chatLogs } = useAppSelector((state) => state.chat);
   const { updateMostRecentDocVersion, warnExpiredAccessToken } = useWithState();
   const curDocId: string = useAppSelector((state) => state.state.curDocId);
   const sessionId: string = useAppSelector((state) => state.state.sessionId);
@@ -56,7 +55,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         8,
       )
     : false;
-  const messages = state.chatLogs[curDocId] || [];
+  const messages = chatLogs[curDocId] || [];
   const [lastSavedVersion, setLastSavedVersion] = useState<TrackedState>({
     id: "",
     title: "",

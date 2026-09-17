@@ -14,8 +14,8 @@ import type {
   MessageDisplayType,
   Sender,
 } from "../../../store/slices/chat";
-import { useWithChat } from "../../../store/slices/chat/use-with-chat";
 import Message from "./message";
+import { useAppSelector } from "../../../store/hooks";
 
 export function ChatMessagesContainer(props: {
   coachResponsePending: boolean;
@@ -33,8 +33,8 @@ export function ChatMessagesContainer(props: {
   } = props;
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const [messageElements, setMessageElements] = useState<React.ReactNode[]>([]);
-  const { state } = useWithChat();
-  const messages = state.chatLogs[curDocId] || [];
+  const { chatLogs } = useAppSelector((state) => state.chat);
+  const messages = chatLogs[curDocId] || [];
   const chatMessages: ChatMessageTypes[] = [
     ...messages,
     ...(coachResponsePending

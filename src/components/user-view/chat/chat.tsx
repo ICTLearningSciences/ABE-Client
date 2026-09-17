@@ -65,7 +65,12 @@ export function Chat(props: {
     disableActivitySelector,
     setToDocView,
   } = props;
-  const { sendMessage, state: chatState, setSystemRole } = useWithChat();
+  const {
+    sendMessage,
+    state: chatState,
+    setSystemRole,
+    downloadChatLog,
+  } = useWithChat();
   const {
     editedData: systemPromptData,
     editOrAddSystemPrompt,
@@ -162,6 +167,7 @@ export function Chat(props: {
                 displayMarkdown={displayMarkdown}
                 setDisplayMarkdown={setDisplayMarkdown}
                 setToDocView={setToDocView}
+                downloadChatLog={downloadChatLog}
               />
             </ChatHeader>
             <ChatMessagesContainer

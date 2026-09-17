@@ -235,7 +235,7 @@ function MainApp() {
 }
 
 function App() {
-  const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "123";
+  const VITE_GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "123";
   const cognitoAuthConfig: AuthProviderProps = {
     authority: import.meta.env.VITE_COGNITO_AUTHORITY || "",
     client_id: import.meta.env.VITE_COGNITO_CLIENT_ID || "",
@@ -247,7 +247,7 @@ function App() {
     <Provider store={store}>
       <div style={{ height: "100vh" }}>
         <CognitoAuthProvider {...cognitoAuthConfig}>
-          <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          <GoogleOAuthProvider clientId={VITE_GOOGLE_CLIENT_ID}>
             <MainApp />
           </GoogleOAuthProvider>
         </CognitoAuthProvider>
