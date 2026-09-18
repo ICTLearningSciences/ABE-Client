@@ -255,6 +255,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.filteredToPanelists = [];
     this.onFilteredPanelistsChanged?.([]);
     this.handleStep(this.curStep);
+    this.stateData[AGENT_RESULT_COUNT_KEY] = 0;
   }
 
   async handleStep(step: ActivityBuilderStep) {
