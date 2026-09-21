@@ -371,12 +371,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
   async handleSystemMessageStep(step: SystemMessageActivityStep) {
     // Check if we should send messages from panelists
-    console.log(
-      "step.sendFromPanelistClientIds",
-      step.sendFromPanelistClientIds,
-    );
-    console.log("this.activityPanel", this.activityPanel);
-    console.log("this.activityPanelists", this.activityPanelists);
     if (
       step.sendFromPanelistClientIds &&
       step.sendFromPanelistClientIds.length > 0 &&
@@ -593,7 +587,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     if (this.curStep.stepType !== "REQUEST_USER_INPUT") {
       return;
     }
-    console.log("message", message);
     if (message === EDIT_DOC_GOAL_MESSAGE) {
       this.editDocGoal();
     }
@@ -1017,7 +1010,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // Limit response length
     const responseLength =
       this.activePanelConfig[panelist.clientId]?.responseLength ||
-      this.activePanelConfig[""]?.responseLength;
+      this.activePanelConfig[""]?.responseLength ||
+      "low";
     if (responseLength === "low") {
       aiPromptSteps[0].prompts.push({
         promptText: `Please keep your response between 10 to 30 words long`,

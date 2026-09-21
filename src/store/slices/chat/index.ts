@@ -76,8 +76,8 @@ const initialState: ChatState = {
 function saveHistory(state: ChatHistory[]) {
   try {
     localStorage.setItem("chatHistory", JSON.stringify(state));
-  } catch (e) {
-    console.warn(e);
+  } catch {
+    console.error("failed to load history");
   }
 }
 
@@ -86,8 +86,7 @@ function loadHistory(): ChatHistory[] {
     const serialisedState = localStorage.getItem("chatHistory");
     if (serialisedState === null) return [];
     return JSON.parse(serialisedState);
-  } catch (e) {
-    console.warn(e);
+  } catch {
     return [];
   }
 }

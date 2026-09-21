@@ -7,16 +7,19 @@ The full terms of this copyright and license should always be found in the root 
 
 import React from "react";
 import * as motion from "motion/react-client";
-import { Card, CardMedia, Typography } from "@mui/material";
+import { Card, CardMedia, IconButton, Typography } from "@mui/material";
 import { stringToColor } from "../helpers";
 import type { Panelist } from "../../../store/slices/panels/types";
+import { ArrowCircleLeft } from "@mui/icons-material";
 
 export default function PanelistCard(props: {
   p: Panelist;
   isActive: boolean;
   onMemberClick: (m: Panelist) => void;
+  rearrangePanelist?: () => void;
 }): React.ReactNode {
   const { p, onMemberClick } = props;
+
   return (
     <motion.div
       key={p.clientId}
@@ -36,6 +39,24 @@ export default function PanelistCard(props: {
         }}
       >
         <CardMedia component="img" image={p.profilePicture} />
+        {props.rearrangePanelist && (
+          <div
+            style={{
+              position: "absolute",
+              top: -5,
+              left: -5,
+            }}
+          >
+            <IconButton
+              onClick={(e) => {
+                props.rearrangePanelist!();
+                e.stopPropagation();
+              }}
+            >
+              <ArrowCircleLeft fontSize="small" />
+            </IconButton>
+          </div>
+        )}
         <div
           className="row"
           style={{

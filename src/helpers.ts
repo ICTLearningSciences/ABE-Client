@@ -505,11 +505,11 @@ export function getDefaultSinglePromptConfiguration(): SinglePromptConfiguration
     editDoc: false,
     outputDataType: "TEXT",
     jsonResponseData: [],
-    includeChatLogContext: false,
     systemCustomName: "",
     includeEssay: false,
     customSystemRole: "",
-    webSearch: false,
+    webSearch: true,
+    includeChatLogContext: true,
     ragConfiguration: undefined,
     panelConfiguration: undefined,
   };

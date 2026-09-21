@@ -14,10 +14,17 @@ export function ChatPanelists(props: {
   useWithPanelActivity: UseWithPanels;
 }): React.ReactNode {
   const { useWithPanelActivity } = props;
-  const { activePanel, panelists, toggleActivePanelist } = useWithPanelActivity;
+  const { activePanel, panelists, toggleActivePanelist, setActivePanelists } =
+    useWithPanelActivity;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const _panelists =
+    activePanel?.panelists?.filter((m) => urlParams.getAll("p").includes(m)) ||
+    [];
   const activePanelists = useAppSelector(
     (state) => state.panels.activePanelists,
   );
+
   return (
     <div
       className="row center-div"
@@ -35,8 +42,30 @@ export function ChatPanelists(props: {
           padding: 10,
         }}
       >
-        {activePanel?.panelists
-          ?.map((m) => {
+        {activePanelists?.map((m, i) => {
+          const panelist = panelists.find((p) => p.clientId === m);
+          if (!panelist) return <></>;
+          return (
+            <PanelistCard
+              key={m}
+              p={panelist}
+              isActive={Boolean(activePanelists?.includes(m))}
+              onMemberClick={() => toggleActivePanelist(m)}
+              rearrangePanelist={
+                i === 0
+                  ? undefined
+                  : () => {
+                      const ids = activePanelists.filter((p) => p !== m);
+                      ids.splice(i - 1, 0, m);
+                      setActivePanelists(ids);
+                    }
+              }
+            />
+          );
+        })}
+        {_panelists
+          ?.filter((p) => !activePanelists?.includes(p))
+          .map((m) => {
             const panelist = panelists.find((p) => p.clientId === m);
             if (!panelist) return <></>;
             return (
@@ -47,8 +76,7 @@ export function ChatPanelists(props: {
                 onMemberClick={() => toggleActivePanelist(m)}
               />
             );
-          })
-          .reverse()}
+          })}
       </div>
     </div>
   );

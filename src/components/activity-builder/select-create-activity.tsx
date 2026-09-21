@@ -154,7 +154,6 @@ export function ExistingActivities(props: {
     isActivityEducationReady,
   } = props;
   const activityContext = useActivityBuilderContext();
-  console.log(activityContext);
   const user = useAppSelector((state) => state.login.user);
   const myActivities = activities.filter(
     (activity) => activity.user === activityContext.userId,

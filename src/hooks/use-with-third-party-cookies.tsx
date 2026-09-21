@@ -63,7 +63,6 @@ export function useWithThirdPartyCookies(): ThirdPartyCookieStatus {
       iframeRef.current = iframe;
 
       const handleMessage = (event: MessageEvent) => {
-        console.log("handleMessage", event);
         // Verify the message is from our test iframe
         if (event.origin !== new URL(IFRAME_TEST_URL).origin) {
           return;

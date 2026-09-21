@@ -50,7 +50,6 @@ export function useWithChat(): UseWithChat {
     clearChat = false,
     docId: string,
   ) {
-    console.warn(`${sessionId} `, msg);
     dispatch(addMessage({ message: msg, clearChat, docId, sessionId }));
   }
 
@@ -59,7 +58,6 @@ export function useWithChat(): UseWithChat {
     clearChat = false,
     docId: string,
   ) {
-    console.warn(`${sessionId} `, msgs);
     dispatch(addMessages({ messages: msgs, clearChat, docId, sessionId }));
   }
 

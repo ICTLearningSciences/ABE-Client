@@ -140,11 +140,10 @@ export async function uploadRagFile(file: File, name?: string): Promise<void> {
     formData.append(key, value as string);
   });
   formData.append("file", file);
-  const response = await fetch(presignedPostData.url, {
+  await fetch(presignedPostData.url, {
     method: "POST",
     body: formData,
   });
-  console.warn(response);
 }
 
 /** Polly */
