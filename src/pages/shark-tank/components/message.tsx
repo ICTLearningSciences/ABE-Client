@@ -92,34 +92,12 @@ export default function Message(props: {
   }
   if (!panelist) {
     return (
-      <div className="row">
-        <BaseMessage
-          message={message}
-          setAiInfoToDisplay={setAiInfoToDisplay}
-          messageIndex={messageIndex}
-          displayMarkdown={true}
-        />
-        <div className="column center-div" style={{ marginRight: 5 }}>
-          <Tooltip title="Text to speech">
-            <IconButton onClick={textToSpeech} disabled={playing}>
-              {loading ? (
-                <CircularProgress style={{ width: 20, height: 20 }} />
-              ) : (
-                <VolumeUp
-                  fontSize="small"
-                  sx={{ color: playing ? "yellow" : "gray" }}
-                />
-              )}
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Copy to clipboard">
-            <IconButton onClick={copyToClipboard}>
-              <ContentPaste fontSize="small" sx={{ color: "gray" }} />
-            </IconButton>
-          </Tooltip>
-        </div>
-        <ToastContainer />
-      </div>
+      <BaseMessage
+        message={message}
+        setAiInfoToDisplay={setAiInfoToDisplay}
+        messageIndex={messageIndex}
+        displayMarkdown={true}
+      />
     );
   }
   if (!props.viewed) {
@@ -308,33 +286,36 @@ export default function Message(props: {
                 <ReferencesButton message={message} />
               </div>
             )}
+          <div
+            className="row"
+            style={{ position: "absolute", bottom: 0, right: 5 }}
+          >
+            <Tooltip title="Copy to clipboard">
+              <IconButton onClick={copyToClipboard}>
+                <ContentPaste fontSize="small" sx={{ color: "gray" }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Text to speech">
+              <IconButton onClick={textToSpeech} disabled={playing}>
+                {loading ? (
+                  <CircularProgress style={{ width: 20, height: 20 }} />
+                ) : (
+                  <VolumeUp
+                    fontSize="small"
+                    sx={{ color: playing ? "yellow" : "gray" }}
+                  />
+                )}
+              </IconButton>
+            </Tooltip>
+          </div>
         </Paper>
-        <div className="column center-div" style={{ marginRight: 5 }}>
-          <Tooltip title="Text to speech">
-            <IconButton onClick={textToSpeech} disabled={playing}>
-              {loading ? (
-                <CircularProgress style={{ width: 20, height: 20 }} />
-              ) : (
-                <VolumeUp
-                  fontSize="small"
-                  sx={{ color: playing ? "yellow" : "gray" }}
-                />
-              )}
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Copy to clipboard">
-            <IconButton onClick={copyToClipboard}>
-              <ContentPaste fontSize="small" sx={{ color: "gray" }} />
-            </IconButton>
-          </Tooltip>
-        </div>
-        <ToastContainer />
       </div>
 
       <DisplayOpenAiInfoButton
         chatMessage={message}
         setAiInfoToDisplay={setAiInfoToDisplay}
       />
+      <ToastContainer />
     </div>
   );
 }

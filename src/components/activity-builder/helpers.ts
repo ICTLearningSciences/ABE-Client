@@ -144,8 +144,6 @@ export function replaceStoredDataInString(
   const stateData = forPanelistClientId
     ? globalStateData["panelistData"]?.[forPanelistClientId]
     : globalStateData;
-  console.log("looking for string", str);
-  console.log("in stateData", stateData);
   try {
     // replace all instances of {{key.data...}} in str with stored data[key][data...]
     const regex = /{{(.*?)}}/g;

@@ -108,10 +108,6 @@ export const AssignmentDocumentTimelines: React.FC<
       getAssignmentsByStudentCompletionStatus(student, assignmentsInSection),
     [student, assignmentsInSection],
   );
-  console.log(
-    "studentAssignmentCompletionStatuses",
-    studentAssignmentCompletionStatuses,
-  );
   const currentTimeline = useMemo(() => {
     if (selectedDocId && currentDocState?.status === "SUCCESS") {
       return getHydratedTimeline(selectedDocId);

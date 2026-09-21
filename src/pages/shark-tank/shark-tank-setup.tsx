@@ -34,7 +34,6 @@ import {
 } from "@mui/icons-material";
 
 import { Header } from "./components/header";
-import { useNavigateWithParams } from "../../hooks/use-navigate-with-params";
 import { useAppSelector } from "../../store/hooks";
 import { useWithPanels } from "../../store/slices/panels/use-with-panels";
 import withAuthorizationOnly from "./wrap-with-authorization-only";
@@ -44,6 +43,7 @@ import "./shark-tank.css";
 import { CssDialog } from "./components";
 import CssCard from "./components/css-card";
 import PanelSettings from "./components/panel-settings";
+import { useNavigate } from "react-router-dom";
 
 function SharkTankSetup(): React.ReactNode {
   const {
@@ -68,7 +68,7 @@ function SharkTankSetup(): React.ReactNode {
   const activitiesLoadStatus = useAppSelector(
     (state) => state.docGoalsActivities.builtActivitiesLoadStatus,
   );
-  const navigate = useNavigateWithParams();
+  const navigate = useNavigate();
   const [showConfig, setShowConfig] = React.useState<string>();
 
   React.useEffect(() => {
@@ -78,7 +78,12 @@ function SharkTankSetup(): React.ReactNode {
   }, [activity, activities]);
 
   function startSession(): void {
-    navigate("/shark-tank/chat");
+    let urlParams = "";
+    for (const panelist of activePanelists || []) {
+      if (urlParams.length > 0) urlParams += "&";
+      urlParams += `p=${panelist}`;
+    }
+    navigate(`/shark-tank/chat?${urlParams}`);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -132,6 +137,7 @@ function SharkTankSetup(): React.ReactNode {
           color="primary"
           onClick={() => toggleActivePanelist(props.clientId)}
         >
+          {props.i !== undefined && <Typography>{props.i + 1}</Typography>}
           {activePanelists?.includes(props.clientId) ? (
             <CheckBox />
           ) : (
@@ -172,9 +178,21 @@ function SharkTankSetup(): React.ReactNode {
               </CssCard>
               <CssCard title="Panelists" icon={<PeopleOutlined />}>
                 <FlipMove className="column spacing">
-                  {activePanel?.panelists?.map((p, i) => (
-                    <PanelMemberItem key={p} {...panelists[i]} />
-                  ))}
+                  {activePanelists?.map((p, i) => {
+                    const panelist = {
+                      ...panelists.find((pp) => pp.clientId === p),
+                      i,
+                    };
+                    return <PanelMemberItem key={p} {...panelist} />;
+                  })}
+                  {activePanel?.panelists
+                    ?.filter((p) => !activePanelists?.includes(p))
+                    .map((p) => {
+                      const panelist = panelists.find(
+                        (pp) => pp.clientId === p,
+                      );
+                      return <PanelMemberItem key={p} {...panelist} />;
+                    })}
                 </FlipMove>
               </CssCard>
               <Button

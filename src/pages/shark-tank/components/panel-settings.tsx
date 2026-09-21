@@ -14,9 +14,14 @@ import type {
 import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
 import { CssTextField } from ".";
 import CssCard from "./css-card";
+import { getDefaultSinglePromptConfiguration } from "../../../helpers";
+import type {
+  PromptActivityStep,
+  SinglePromptConfiguration,
+} from "../../../exported-files";
 
 function PanelSettings(props: { panelist?: Panelist }): React.ReactNode {
-  const { activePanelConfig, setActivePanelConfig } = useWithPanels();
+  const { activity, activePanelConfig, setActivePanelConfig } = useWithPanels();
   const id = props.panelist?.clientId || "";
 
   function onUpdate(update: Partial<PanelResponseConfiguration>) {
@@ -29,6 +34,47 @@ function PanelSettings(props: { panelist?: Panelist }): React.ReactNode {
     const config = { ...activePanelConfig };
     delete config[id];
     setActivePanelConfig({ ...config });
+  }
+
+  function defaultWebSearch() {
+    const useWebSearch = getDefaultSinglePromptConfiguration().webSearch;
+    if (activity) {
+      const steps = activity.flowsList.reduce(
+        (acc: PromptActivityStep[], cur) => {
+          return [...acc, ...cur.steps.filter((s) => s.stepType === "PROMPT")];
+        },
+        [],
+      );
+      const configs = steps.reduce((acc: SinglePromptConfiguration[], cur) => {
+        return [...acc, ...cur.promptConfigurations];
+      }, []);
+      const yes = configs.filter((c) => c.webSearch);
+      if (yes.length === configs.length) return "Yes";
+      if (yes.length === 0) return "No";
+      return "Sometimes";
+    }
+    return useWebSearch ? "Yes" : "No";
+  }
+
+  function defaultChatHistory() {
+    const useChatLog =
+      getDefaultSinglePromptConfiguration().includeChatLogContext;
+    if (activity) {
+      const steps = activity.flowsList.reduce(
+        (acc: PromptActivityStep[], cur) => {
+          return [...acc, ...cur.steps.filter((s) => s.stepType === "PROMPT")];
+        },
+        [],
+      );
+      const configs = steps.reduce((acc: SinglePromptConfiguration[], cur) => {
+        return [...acc, ...cur.promptConfigurations];
+      }, []);
+      const yes = configs.filter((c) => c.includeChatLogContext);
+      if (yes.length === configs.length) return "Yes";
+      if (yes.length === 0) return "No";
+      return "Sometimes";
+    }
+    return useChatLog ? "Yes" : "No";
   }
 
   return (
@@ -48,7 +94,7 @@ function PanelSettings(props: { panelist?: Panelist }): React.ReactNode {
               onUpdate({ responseLength: e.target.value as ResponseLength });
             }}
           >
-            <MenuItem value={undefined}>Default</MenuItem>
+            <MenuItem value={undefined}>Default (Low)</MenuItem>
             <MenuItem value="low">Low (10-30 words)</MenuItem>
             <MenuItem value="med">Medium (50-100 words)</MenuItem>
             <MenuItem value="high">High (No limit)</MenuItem>
@@ -64,7 +110,7 @@ function PanelSettings(props: { panelist?: Panelist }): React.ReactNode {
               onUpdate({ difficultyLevel: e.target.value as ResponseLength });
             }}
           >
-            <MenuItem value={undefined}>Default</MenuItem>
+            <MenuItem value={undefined}>Default (Medium)</MenuItem>
             <MenuItem value="low">Low</MenuItem>
             <MenuItem value="med">Medium</MenuItem>
             <MenuItem value="high">High</MenuItem>
@@ -81,7 +127,9 @@ function PanelSettings(props: { panelist?: Panelist }): React.ReactNode {
                 onUpdate({ webSearch: e.target.value === "true" });
               }}
             >
-              <MenuItem value={undefined}>Default</MenuItem>
+              <MenuItem value={undefined}>
+                Default ({defaultWebSearch()})
+              </MenuItem>
               <MenuItem value="true">Yes</MenuItem>
               <MenuItem value="false">No</MenuItem>
             </CssTextField>
@@ -98,7 +146,9 @@ function PanelSettings(props: { panelist?: Panelist }): React.ReactNode {
                 onUpdate({ includeChatLog: e.target.value === "true" });
               }}
             >
-              <MenuItem value={undefined}>Default</MenuItem>
+              <MenuItem value={undefined}>
+                Default ({defaultChatHistory()})
+              </MenuItem>
               <MenuItem value="true">Yes</MenuItem>
               <MenuItem value="false">No</MenuItem>
             </CssTextField>
