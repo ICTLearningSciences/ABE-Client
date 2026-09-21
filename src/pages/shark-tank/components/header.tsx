@@ -13,14 +13,15 @@ import {
   KeyboardArrowRight,
 } from "@mui/icons-material";
 import { useNavigateWithParams } from "../../../hooks/use-navigate-with-params";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { logout } from "../../../store/slices/login";
+import { useAppSelector } from "../../../store/hooks";
 
 import sharkIcon from "../../../static-images/shark-icon.png";
+import { useWithLogin } from "../../../exported-files";
 
 export function Header(props: { title?: string }) {
-  const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.login);
+  const { logout } = useWithLogin();
+
   const navigate = useNavigateWithParams();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -32,7 +33,7 @@ export function Header(props: { title?: string }) {
     setAnchorEl(null);
   };
   const onLogout = () => {
-    dispatch(logout());
+    logout();
     onMenuClose();
   };
 
