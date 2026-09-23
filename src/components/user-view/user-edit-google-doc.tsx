@@ -64,6 +64,7 @@ export function EditGoogleDoc(props: {
     addNewLocalBuiltActivity,
     copyBuiltActivity,
     deleteBuiltActivity,
+    loadBuiltActivities,
     educationReadyActivities,
   } = useWithDocGoalsActivities(user?._id || "", config);
   const { activityVersions, loadActivityVersions } = useWithActivityVersions();
@@ -162,6 +163,7 @@ export function EditGoogleDoc(props: {
               addNewLocalBuiltActivity={addNewLocalBuiltActivity}
               copyBuiltActivity={copyBuiltActivity}
               deleteBuiltActivity={deleteBuiltActivity}
+              loadBuiltActivities={loadBuiltActivities}
               canEditActivity={(activity) => {
                 return (
                   activity.user === user?._id ||

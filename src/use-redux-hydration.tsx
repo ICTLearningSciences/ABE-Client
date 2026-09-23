@@ -13,26 +13,27 @@ import { useWithEducationalManagement } from "./store/slices/education-managemen
 import { useWithPanels } from "./store/slices/panels/use-with-panels";
 
 export function useReduxHydration() {
-  const userData = useAppSelector((state) => state.login.user);
-  const loginStatus = useAppSelector((state) => state.login.loginStatus);
+  const { user, accessToken, loginStatus } = useAppSelector(
+    (state) => state.login,
+  );
   const config = useAppSelector((state) => state.config).config;
   const dispatch = useAppDispatch();
   const { loadActivities, loadDocGoals, loadBuiltActivities } =
-    useWithDocGoalsActivities(userData?._id || "", config);
+    useWithDocGoalsActivities(user?._id || "", config);
   const { loadAllEducationalDataWithUserData } = useWithEducationalManagement();
   const { fetchPanels, fetchPanelists } = useWithPanels();
   const hydrated = useRef(false);
 
   useEffect(() => {
-    if (loginStatus !== 3) {
+    if (loginStatus === 0 || loginStatus === 1) {
       hydrated.current = false;
     }
   }, [loginStatus]);
 
   useEffect(() => {
-    if (!userData || hydrated.current || loginStatus !== 3) return;
+    if (!user || !accessToken || loginStatus !== 3 || hydrated.current) return;
     hydrated.current = true;
-    const { _id: userId, educationalRole } = userData;
+    const { _id: userId, educationalRole } = user;
     dispatch(loadUserDocs({ userId }));
     fetchPanels();
     fetchPanelists();
@@ -42,15 +43,5 @@ export function useReduxHydration() {
     if (educationalRole) {
       loadAllEducationalDataWithUserData(userId, educationalRole);
     }
-  }, [
-    loginStatus,
-    userData,
-    dispatch,
-    fetchPanels,
-    fetchPanelists,
-    loadActivities,
-    loadBuiltActivities,
-    loadDocGoals,
-    loadAllEducationalDataWithUserData,
-  ]);
+  }, [loginStatus]);
 }

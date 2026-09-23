@@ -41,8 +41,15 @@ export interface UseWithChat {
 export function useWithChat(): UseWithChat {
   const dispatch = useAppDispatch();
   const chatState: ChatState = useAppSelector((state) => state.chat);
-  const currentDoc = useAppSelector((state) => state.state.curDocId);
-  const sessionId = useAppSelector((state) => state.state.sessionId);
+  const { userDocs, sessionId, curDocId } = useAppSelector(
+    (state) => state.state,
+  );
+  const { activity, activePanel, panels } = useAppSelector(
+    (state) => state.panels,
+  );
+  const { builtActivities } = useAppSelector(
+    (state) => state.docGoalsActivities,
+  );
   const { newSession } = useWithState();
 
   function sendMessage(
@@ -50,7 +57,21 @@ export function useWithChat(): UseWithChat {
     clearChat = false,
     docId: string,
   ) {
-    dispatch(addMessage({ message: msg, clearChat, docId, sessionId }));
+    dispatch(
+      addMessage({
+        message: msg,
+        clearChat,
+        docId,
+        docTitle: userDocs.find(
+          (d) => d.googleDocId === curDocId || d.wordDocId === curDocId,
+        )?.title,
+        sessionId,
+        activityId: activity,
+        activityTitle: builtActivities.find((a) => a._id === activity)?.title,
+        panelId: activePanel,
+        panelTitle: panels.find((p) => p.clientId === activePanel)?.panelName,
+      }),
+    );
   }
 
   function sendMessages(
@@ -92,8 +113,8 @@ export function useWithChat(): UseWithChat {
   }
 
   function downloadChatLog(docId?: string) {
-    let chatLog = chatLogToString(docId || currentDoc);
-    const totalTokenUsage = chatState.chatLogs[docId || currentDoc].reduce(
+    let chatLog = chatLogToString(docId || curDocId);
+    const totalTokenUsage = chatState.chatLogs[docId || curDocId].reduce(
       (acc, chatLogItem) => {
         return (
           acc + (chatLogItem.aiServiceStepData?.[0].tokenUsage.totalUsage || 0)

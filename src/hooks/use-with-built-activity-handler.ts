@@ -56,105 +56,103 @@ export function useWithBuiltActivityHandler(
     selectedActivityBuilder,
     builtActivityHandler?.builtActivityData,
   );
-  const [initialize, setInitialize] = useState<BuiltActivityHandler>();
+
+  let initialized = false;
+  useEffect(() => {
+    if (!curDocId) return;
+    if (!selectedActivityBuilder?._id) return;
+    if (builtActivityHandler) return;
+    if (initialized) return;
+
+    const attachedPanel = selectedActivityBuilder?.attachedPanel
+      ? panels.find(
+          (p) => p.clientId === selectedActivityBuilder?.attachedPanel,
+        )
+      : undefined;
+    const attachedPanelists = attachedPanel
+      ? panelists.filter((p) => attachedPanel.panelists.includes(p.clientId))
+      : undefined;
+    const newActivityHandler = new BuiltActivityHandler(
+      sendMessageHelper,
+      () => {
+        clearChatLog(curDocId);
+      },
+      (waiting: boolean) => {
+        console.log(waiting);
+      },
+      coachResponsePending,
+      updateSessionIntentionHelper,
+      executePromptSteps,
+      curDocId,
+      editDocGoal,
+      docService,
+      handleStudentActivityComplete,
+      () => {
+        if (isOnCourseManagementPages || isOnStudentCoursesPages) {
+          goToPreviousView();
+        } else {
+          navigate(defaultHome);
+        }
+      },
+      selectedActivityBuilder,
+      attachedPanel,
+      attachedPanelists,
+      onFilteredPanelistsChanged,
+      activePanelConfig,
+    );
+    newActivityHandler.initializeActivity();
+    newActivityHandler.filteredToPanelists = activePanelists || [];
+    newActivityHandler.executePrompt = executePromptSteps;
+    addNewSubscriber(newActivityHandler);
+    setBuiltActivityHandler(newActivityHandler);
+    initialized = true;
+    // setInitialize(newActivityHandler);
+  }, []);
+
+  useEffect(() => {
+    if (builtActivityHandler && !curDocId) {
+      builtActivityHandler.resetActivity();
+      setBuiltActivityHandler(undefined);
+    }
+  }, [curDocId]);
+
+  useEffect(() => {
+    if (builtActivityHandler && !selectedActivityBuilder?._id) {
+      removeAllSubscribers();
+      clearChatLog(curDocId);
+      setBuiltActivityHandler(undefined);
+    }
+  }, [selectedActivityBuilder?._id]);
+
+  useEffect(() => {
+    if (builtActivityHandler && updatesFound) {
+      builtActivityHandler.setBuiltActivityData(selectedActivityBuilder);
+      builtActivityHandler.resetActivity();
+    }
+  }, [updatesFound]);
+
+  useEffect(() => {
+    if (builtActivityHandler) {
+      newSession();
+      builtActivityHandler.resetActivity();
+    }
+  }, [resetActivityCounter]);
+
+  useEffect(() => {
+    if (
+      builtActivityHandler &&
+      builtActivityHandler.filteredToPanelists.toString() !==
+        activePanelists?.toString()
+    ) {
+      builtActivityHandler.filteredToPanelists = activePanelists || [];
+    }
+  }, [activePanelists]);
 
   useEffect(() => {
     if (builtActivityHandler) {
       builtActivityHandler.executePrompt = executePromptSteps;
-      setBuiltActivityHandler(builtActivityHandler);
     }
   }, [executePromptSteps]);
-
-  useEffect(() => {
-    if (!curDocId) {
-      if (builtActivityHandler) {
-        builtActivityHandler.resetActivity();
-        setBuiltActivityHandler(undefined);
-      }
-      //hack to ensure that sendMessageHelper is fully loaded with googleDocId
-      return;
-    }
-    if (!selectedActivityBuilder?._id) {
-      removeAllSubscribers();
-      setBuiltActivityHandler(undefined);
-      clearChatLog(curDocId);
-    } else if (!builtActivityHandler) {
-      const attachedPanel = selectedActivityBuilder?.attachedPanel
-        ? panels.find(
-            (p) => p.clientId === selectedActivityBuilder?.attachedPanel,
-          )
-        : undefined;
-      const attachedPanelists = attachedPanel
-        ? panelists.filter((p) => attachedPanel.panelists.includes(p.clientId))
-        : undefined;
-      const newActivityHandler = new BuiltActivityHandler(
-        sendMessageHelper,
-        () => {
-          clearChatLog(curDocId);
-        },
-        (waiting: boolean) => {
-          console.log(waiting);
-        },
-        coachResponsePending,
-        updateSessionIntentionHelper,
-        executePromptSteps,
-        curDocId,
-        editDocGoal,
-        docService,
-        handleStudentActivityComplete,
-        () => {
-          if (isOnCourseManagementPages || isOnStudentCoursesPages) {
-            goToPreviousView();
-          } else {
-            navigate(defaultHome);
-          }
-        },
-        selectedActivityBuilder,
-        attachedPanel,
-        attachedPanelists,
-        onFilteredPanelistsChanged,
-        activePanelConfig,
-      );
-      setInitialize(newActivityHandler);
-    } else if (
-      builtActivityHandler.builtActivityData?._id !==
-        selectedActivityBuilder._id ||
-      updatesFound
-    ) {
-      builtActivityHandler.setBuiltActivityData(selectedActivityBuilder);
-      builtActivityHandler.resetActivity();
-    }
-  }, [
-    curDocId,
-    selectedActivityBuilder?._id,
-    Boolean(builtActivityHandler),
-    updatesFound,
-    defaultHome,
-  ]);
-
-  useEffect(() => {
-    if (initialize) {
-      initialize.initializeActivity();
-      setBuiltActivityHandler(initialize);
-      addNewSubscriber(initialize);
-      setInitialize(undefined);
-    }
-  }, [initialize]);
-
-  useEffect(() => {
-    if (!builtActivityHandler) {
-      return;
-    }
-    newSession();
-    builtActivityHandler.resetActivity();
-  }, [resetActivityCounter]);
-
-  useEffect(() => {
-    if (builtActivityHandler) {
-      builtActivityHandler.filteredToPanelists = activePanelists || [];
-      setBuiltActivityHandler(builtActivityHandler);
-    }
-  }, [activePanelists]);
 
   function handleStudentActivityComplete() {
     if (

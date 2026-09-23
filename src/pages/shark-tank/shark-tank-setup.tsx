@@ -61,8 +61,7 @@ function SharkTankSetup(): React.ReactNode {
   );
   const activities: ActivityBuilder[] = useAppSelector((state) =>
     state.docGoalsActivities.builtActivities.filter(
-      (a: ActivityBuilder) =>
-        a.attachedPanel && a.title === "CFT Panel Activity",
+      (a: ActivityBuilder) => a.attachedPanel,
     ),
   );
   const activitiesLoadStatus = useAppSelector(
@@ -208,7 +207,14 @@ function SharkTankSetup(): React.ReactNode {
 
             <Grid size={4} style={{ padding: 10 }}>
               <CssCard alt title="Select Activity" icon={<ListAlt />}>
-                <List className="column spacing">
+                <List
+                  className="column spacing"
+                  style={{
+                    maxHeight: 250,
+                    overflowY: "auto",
+                    paddingRight: 10,
+                  }}
+                >
                   {activities.map((a) => {
                     const panel = panels.find(
                       (p) => p.clientId === a.attachedPanel,

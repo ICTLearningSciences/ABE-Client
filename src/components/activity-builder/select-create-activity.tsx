@@ -16,7 +16,10 @@ import {
 } from "@mui/icons-material";
 
 import { ColumnDiv, RowDiv } from "../../styled-components";
-import type { ActivityBuilder as ActivityBuilderType } from "./types";
+import type {
+  ActivityBuilder,
+  ActivityBuilder as ActivityBuilderType,
+} from "./types";
 import { isActivityRunnable, useActivityBuilderContext } from "./helpers";
 import { TwoOptionDialog } from "../dialog";
 import { useAppSelector } from "../../store/hooks";
@@ -27,6 +30,7 @@ export function ExistingActivityItem(props: {
   editActivity: () => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
   deleteBuiltActivity: (activityId: string) => Promise<void>;
+  loadBuiltActivities: () => Promise<ActivityBuilder[]>;
   canEditActivity: boolean;
   canDeleteActivity: boolean;
   isInstructor: boolean;
@@ -125,6 +129,7 @@ export function ExistingActivityItem(props: {
             deleteBuiltActivity(activity._id).finally(() => {
               setDeleting(false);
               setShowDeleteDialog(false);
+              props.loadBuiltActivities();
             });
           },
         }}
@@ -140,6 +145,7 @@ export function ExistingActivities(props: {
   editActivity: (activity: ActivityBuilderType) => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
   deleteBuiltActivity: (activityId: string) => Promise<void>;
+  loadBuiltActivities: () => Promise<ActivityBuilder[]>;
   onCreateActivity: () => void;
   isInstructor: boolean;
   isActivityEducationReady: (activityId: string) => boolean;
@@ -189,6 +195,7 @@ export function ExistingActivities(props: {
               props.goToActivity(activity);
             }}
             deleteBuiltActivity={deleteBuiltActivity}
+            loadBuiltActivities={props.loadBuiltActivities}
             canEditActivity={true}
             canDeleteActivity={true}
             isInstructor={isInstructor}
@@ -235,6 +242,7 @@ export function ExistingActivities(props: {
               props.goToActivity(activity);
             }}
             deleteBuiltActivity={deleteBuiltActivity}
+            loadBuiltActivities={props.loadBuiltActivities}
             canEditActivity={canEdit}
             canDeleteActivity={canDelete}
             isInstructor={isInstructor}
@@ -254,6 +262,7 @@ export function SelectCreateActivity(props: {
   onCreateActivity: () => void;
   copyActivity: (activityId: string) => Promise<ActivityBuilderType>;
   deleteBuiltActivity: (activityId: string) => Promise<void>;
+  loadBuiltActivities: () => Promise<ActivityBuilder[]>;
 }): React.ReactNode {
   const {
     builtActivities,
@@ -263,6 +272,7 @@ export function SelectCreateActivity(props: {
     goToActivity,
     copyActivity,
     deleteBuiltActivity,
+    loadBuiltActivities,
   } = props;
   const userRole = useAppSelector((state) => state.login.userRole);
   const educationalRole = useAppSelector(
@@ -286,6 +296,7 @@ export function SelectCreateActivity(props: {
         editActivity={onEditActivity}
         copyActivity={copyActivity}
         deleteBuiltActivity={deleteBuiltActivity}
+        loadBuiltActivities={loadBuiltActivities}
         onCreateActivity={onCreateActivity}
         isInstructor={isInstructor}
         isActivityEducationReady={isActivityEducationReady}

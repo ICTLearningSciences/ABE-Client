@@ -24,6 +24,7 @@ import type { ActivityTypes } from "../../../types";
 import { ChatHeader } from "./chat-header";
 import { ChatInput } from "./chat-input";
 import { ChatThread } from "./chat-thread";
+import React from "react";
 
 const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
@@ -53,6 +54,7 @@ export function Chat(props: {
     (state) => state.chat.coachResponsePending,
   );
   const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
+
   const { activityReady: builtActivityReady } = useWithBuiltActivityHandler(
     resetActivityCounter,
     () => {
@@ -72,14 +74,18 @@ export function Chat(props: {
     useState<AiServiceStepDataTypes[]>();
   const [viewSystemPrompts, setViewSystemPrompts] = useState<boolean>(false);
   const [targetSystemPrompt, setTargetSystemPrompt] = useState<number>(0);
+
   const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
     : "";
-  setSystemRole(systemRole);
 
   async function sendNewMessage(message: ChatMessageTypes) {
     sendMessage(message, false, curDocId);
   }
+
+  React.useEffect(() => {
+    setSystemRole(systemRole);
+  }, [systemRole]);
 
   return (
     <div
