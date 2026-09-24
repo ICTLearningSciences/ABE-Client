@@ -27,6 +27,7 @@ export interface ChatMessage {
   disableUserInput?: boolean;
   selectedGoal?: DocGoal;
   userInputType?: UserInputType;
+  executionUUID?: string;
   retryFunction?: () => void;
 }
 
