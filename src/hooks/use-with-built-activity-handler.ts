@@ -70,7 +70,7 @@ export function useWithBuiltActivityHandler(
   useEffect(() => {
     if (!curDocId) {
       if (builtActivityHandler) {
-        builtActivityHandler.resetActivity("place uuid here");
+        builtActivityHandler.resetActivity(PLACE_UUID_HERE);
         setBuiltActivityHandler(undefined);
       }
       //hack to ensure that sendMessageHelper is fully loaded with googleDocId
