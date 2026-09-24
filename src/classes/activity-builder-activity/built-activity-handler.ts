@@ -766,7 +766,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     }
 
     const promptResults = await Promise.allSettled(promptExecutions);
-    await this.evaluatePromptResults(step, promptResults);
+    await this.evaluatePromptResults(step, promptResults, promptsToExecute);
 
     this.setResponsePending(false);
 
@@ -795,6 +795,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           panelistName?: string;
         }
     >[],
+    promptsToExecute: PromptToExecute[],
   ): Promise<ChatLog> {
     const resultText: ChatLog = [];
     // Check if any prompts failed
@@ -839,6 +840,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             id: uuidv4(),
             message: result.value.message,
             sources: result.value.sources,
+            moreMessagesExpected:
+              this.stateData[AGENT_RESULT_COUNT_KEY] < promptsToExecute.length,
             aiServiceStepData: result.value.aiServiceStepData,
             sender: "SYSTEM",
             systemCustomName:
