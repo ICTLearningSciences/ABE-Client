@@ -27,6 +27,7 @@ export interface ChatMessage {
   disableUserInput?: boolean;
   selectedGoal?: DocGoal;
   userInputType?: UserInputType;
+  executionUUID?: string;
   retryFunction?: () => void;
 }
 
@@ -40,6 +41,7 @@ export interface PendingMessage extends ChatMessage {
 export interface TextMessage extends ChatMessage {
   message: string;
   sources?: Source[];
+  moreMessagesExpected?: boolean;
 }
 
 export interface BulletPointMessage extends ChatMessage {

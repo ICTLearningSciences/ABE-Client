@@ -9,9 +9,10 @@ import { useEffect, useState } from "react";
 import { useAppSelector } from "../store/hooks";
 import type { ChatLog } from "../store/slices/chat";
 import type { DocData } from "../types";
+import { PLACE_UUID_HERE } from "./use-with-built-activity-handler";
 
 export abstract class ChatLogSubscriber {
-  abstract newChatLogReceived(chatLog: ChatLog): void;
+  abstract newChatLogReceived(chatLog: ChatLog, executionUUID: string): void;
   abstract newDocDataReceived(docData?: DocData): void;
 }
 
@@ -29,7 +30,7 @@ export function useWithChatLogSubscribers() {
       const newChatLogFunction = subscribers[i].newChatLogReceived.bind(
         subscribers[i],
       );
-      newChatLogFunction(messages);
+      newChatLogFunction(messages, PLACE_UUID_HERE);
     }
   }, [messages]);
 

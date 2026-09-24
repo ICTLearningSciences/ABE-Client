@@ -228,7 +228,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.builtActivityData = builtActivityData;
   }
 
-  initializeActivity() {
+  initializeActivity(executionUUID: string) {
     if (
       !this.builtActivityData ||
       !this.builtActivityData.flowsList.length ||
@@ -236,10 +236,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     ) {
       throw new Error("No built activity data found");
     }
-    this.resetActivity();
+    this.resetActivity(executionUUID);
   }
 
-  resetActivity() {
+  resetActivity(executionUUID: string) {
     if (
       !this.builtActivityData ||
       !this.builtActivityData.flowsList.length ||
@@ -254,11 +254,11 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.userResponseHandleState = getDefaultUserResponseHandleState();
     this.filteredToPanelists = [];
     this.onFilteredPanelistsChanged?.([]);
-    this.handleStep(this.curStep);
+    this.handleStep(this.curStep, executionUUID);
     this.stateData[AGENT_RESULT_COUNT_KEY] = 0;
   }
 
-  async handleStep(step: ActivityBuilderStep) {
+  async handleStep(step: ActivityBuilderStep, executionUUID: string) {
     if (this.curStep?.stepId !== step.stepId) {
       this.curStep = step;
     }
@@ -288,20 +288,29 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         );
         break;
       case "SYSTEM_MESSAGE":
-        await this.handleSystemMessageStep(step as SystemMessageActivityStep);
+        await this.handleSystemMessageStep(
+          step as SystemMessageActivityStep,
+          executionUUID,
+        );
         break;
       case "PROMPT":
-        await this.handlePromptStep(step as PromptActivityStep);
+        await this.handlePromptStep(step as PromptActivityStep, executionUUID);
         break;
       case "CONDITIONAL":
-        await this.handleLogicOperationStep(step as ConditionalActivityStep);
+        await this.handleLogicOperationStep(
+          step as ConditionalActivityStep,
+          executionUUID,
+        );
         break;
       default:
         throw new Error(`Unknown step type: ${step.stepType}`);
     }
   }
 
-  async handleLogicOperationStep(step: ConditionalActivityStep) {
+  async handleLogicOperationStep(
+    step: ConditionalActivityStep,
+    executionUUID: string,
+  ) {
     this.setResponsePending(true);
     const docData = await getDocData(this.docId, this.docService);
     this.stateData = {
@@ -337,7 +346,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             );
             return;
           }
-          this.handleStep(step);
+          this.handleStep(step, executionUUID);
           return;
         }
       } else if (condition.checking === "LENGTH") {
@@ -351,7 +360,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             );
             return;
           }
-          this.handleStep(step);
+          this.handleStep(step, executionUUID);
           return;
         }
       } else {
@@ -367,16 +376,19 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             );
             return;
           }
-          this.handleStep(step);
+          this.handleStep(step, executionUUID);
           return;
         }
       }
     }
 
-    await this.goToNextStep();
+    await this.goToNextStep(executionUUID);
   }
 
-  async handleSystemMessageStep(step: SystemMessageActivityStep) {
+  async handleSystemMessageStep(
+    step: SystemMessageActivityStep,
+    executionUUID: string,
+  ) {
     // Check if we should send messages from panelists
     if (
       step.sendFromPanelistClientIds &&
@@ -437,7 +449,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         displayType: "TEXT",
       });
     }
-    await this.goToNextStep();
+    await this.goToNextStep(executionUUID);
   }
 
   async handleRequestUserInputStep(step: RequestUserInputActivityStep) {
@@ -563,7 +575,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     };
   }
 
-  async goToNextStep() {
+  async goToNextStep(executionUUID: string) {
     if (!this.curStep) {
       throw new Error("No current step found");
     }
@@ -574,7 +586,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       this.sendErrorMessage(err.message);
       return;
     }
-    await this.handleStep(this.curStep);
+    await this.handleStep(this.curStep, executionUUID);
   }
 
   sendErrorMessage(message: string) {
@@ -587,7 +599,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     });
   }
 
-  async handleNewUserMessage(message: string) {
+  async handleNewUserMessage(message: string, executionUUID: string) {
     if (!this.curStep) {
       throw new Error("No current step found");
     }
@@ -627,7 +639,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             );
             return;
           }
-          this.handleStep(jumpStep);
+          this.handleStep(jumpStep, executionUUID);
           return;
         }
       }
@@ -649,14 +661,14 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             );
             return;
           }
-          this.handleStep(jumpStep);
+          this.handleStep(jumpStep, executionUUID);
           return;
         }
       }
     }
     // reset user response handle state since we handled the user response
     this.userResponseHandleState = getDefaultUserResponseHandleState();
-    await this.goToNextStep();
+    await this.goToNextStep(executionUUID);
   }
 
   newDocDataReceived(docData?: DocData) {
@@ -672,19 +684,20 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     };
   }
 
-  newChatLogReceived(chatLog: ChatLog) {
+  newChatLogReceived(chatLog: ChatLog, executionUUID: string) {
     this.chatLog = chatLog;
     if (chatLog.length === 0) {
       return;
     }
     const newMessage = chatLog[chatLog.length - 1];
     if (newMessage.sender === "USER") {
-      this.handleNewUserMessage(newMessage.message);
+      this.handleNewUserMessage(newMessage.message, executionUUID);
     }
   }
 
   async handlePromptStep(
     step: PromptActivityStep,
+    executionUUID: string,
     extraChat: ChatMessageTypes[] = [],
   ) {
     this.setResponsePending(true);
@@ -766,14 +779,19 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     }
 
     const promptResults = await Promise.allSettled(promptExecutions);
-    await this.evaluatePromptResults(step, promptResults);
+    await this.evaluatePromptResults(
+      step,
+      promptResults,
+      promptsToExecute,
+      executionUUID,
+    );
 
     this.setResponsePending(false);
 
     if (this.stateData[AGENT_RESULT_COUNT_KEY] >= promptsToExecute.length) {
       this.stateData[AGENT_RESULT_COUNT_KEY] = 0;
-      await this.goToNextStep();
-    } else await this.handlePromptStep(step, extraChat);
+      await this.goToNextStep(executionUUID);
+    } else await this.handlePromptStep(step, executionUUID, extraChat);
   }
 
   async evaluatePromptResults(
@@ -795,6 +813,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           panelistName?: string;
         }
     >[],
+    promptsToExecute: PromptToExecute[],
+    executionUUID: string,
   ): Promise<ChatLog> {
     const resultText: ChatLog = [];
     // Check if any prompts failed
@@ -839,6 +859,9 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             id: uuidv4(),
             message: result.value.message,
             sources: result.value.sources,
+            executionUUID: executionUUID,
+            moreMessagesExpected:
+              this.stateData[AGENT_RESULT_COUNT_KEY] < promptsToExecute.length,
             aiServiceStepData: result.value.aiServiceStepData,
             sender: "SYSTEM",
             systemCustomName:

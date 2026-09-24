@@ -21,6 +21,8 @@ import { useNavigateWithParams } from "./use-navigate-with-params";
 import { useWithPath } from "./use-with-path";
 import { useWithPanels } from "../store/slices/panels/use-with-panels";
 
+export const PLACE_UUID_HERE = "place UUID Here";
+
 export function useWithBuiltActivityHandler(
   resetActivityCounter: number,
   editDocGoal: () => void,
@@ -68,7 +70,7 @@ export function useWithBuiltActivityHandler(
   useEffect(() => {
     if (!curDocId) {
       if (builtActivityHandler) {
-        builtActivityHandler.resetActivity();
+        builtActivityHandler.resetActivity(PLACE_UUID_HERE);
         setBuiltActivityHandler(undefined);
       }
       //hack to ensure that sendMessageHelper is fully loaded with googleDocId
@@ -122,7 +124,7 @@ export function useWithBuiltActivityHandler(
       updatesFound
     ) {
       builtActivityHandler.setBuiltActivityData(selectedActivityBuilder);
-      builtActivityHandler.resetActivity();
+      builtActivityHandler.resetActivity(PLACE_UUID_HERE);
     }
   }, [
     curDocId,
@@ -134,7 +136,7 @@ export function useWithBuiltActivityHandler(
 
   useEffect(() => {
     if (initialize) {
-      initialize.initializeActivity();
+      initialize.initializeActivity(PLACE_UUID_HERE);
       setBuiltActivityHandler(initialize);
       addNewSubscriber(initialize);
       setInitialize(undefined);
@@ -146,7 +148,7 @@ export function useWithBuiltActivityHandler(
       return;
     }
     newSession();
-    builtActivityHandler.resetActivity();
+    builtActivityHandler.resetActivity(PLACE_UUID_HERE);
   }, [resetActivityCounter]);
 
   useEffect(() => {
