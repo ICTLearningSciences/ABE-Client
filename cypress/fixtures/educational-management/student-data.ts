@@ -4,30 +4,31 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { StudentData } from './educational-types';
-import { testStudent, testStudentEmpty } from './fetch-students';
+import { StudentData } from "./educational-types";
+import { testStudent, testStudentEmpty } from "./fetch-students";
 
 export interface CreateNewStudentResponse {
   createNewStudent: StudentData;
 }
 
 export const createNewStudentResponse: CreateNewStudentResponse = {
-  createNewStudent: testStudent
+  createNewStudent: testStudent,
 };
 
-export const createNewStudentWithIncompleteActivityResponse: CreateNewStudentResponse = {
-  createNewStudent: {
-    ...testStudent,
-    assignmentProgress: testStudent.assignmentProgress.map(ap => ({
-      ...ap,
-      activityCompletions: ap.activityCompletions.map(ac => ({
-        ...ac,
-        complete: false
-      }))
-    }))
-  }
-};
+export const createNewStudentWithIncompleteActivityResponse: CreateNewStudentResponse =
+  {
+    createNewStudent: {
+      ...testStudent,
+      assignmentProgress: testStudent.assignmentProgress.map((ap) => ({
+        ...ap,
+        activityCompletions: ap.activityCompletions.map((ac) => ({
+          ...ac,
+          complete: false,
+        })),
+      })),
+    },
+  };
 
 export const createNewStudentEmptyResponse: CreateNewStudentResponse = {
-  createNewStudent: testStudentEmpty
+  createNewStudent: testStudentEmpty,
 };

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "vite --port 8000",
     "build": "tsc -b && vite build",
-    "format": "prettier --write \"src/**/*.{js,ts,tsx}\"",
+    "format": "prettier --write \"src/**/*.{js,ts,tsx}\" \"cypress/**/*.{js,ts,tsx}\"",
     "cy:open": "npx cypress open",
     "test:audit": "npm audit --production --audit-level=moderate",
     "test:lint": "eslint src --ext ts --ext tsx --ext js --ext jsx --max-warnings 0",

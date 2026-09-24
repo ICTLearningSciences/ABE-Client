@@ -4,67 +4,67 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { StudentData } from './educational-types';
+import { StudentData } from "./educational-types";
 
 export const testStudent: StudentData = {
-  _id: 'student-123',
-  userId: 'user-123',
-  enrolledCourses: ['course-123'],
-  enrolledSections: ['section-456'],
-  name: 'John Doe',
+  _id: "student-123",
+  userId: "user-123",
+  enrolledCourses: ["course-123"],
+  enrolledSections: ["section-456"],
+  name: "John Doe",
   assignmentProgress: [
     {
-      assignmentId: 'assignment-123',
+      assignmentId: "assignment-123",
       relevantGoogleDocs: [
         {
           primaryDocument: false,
-          docId:"1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
+          docId: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
           docData: {
-            title: "Test 1"
-          }
+            title: "Test 1",
+          },
         },
         {
           primaryDocument: true,
-          docId:"1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fB",
+          docId: "1Cu_jvKeZGH9obZ2-39q1mZXg_n6M-DnDmHpgXGmJ2fB",
           docData: {
-            title: "Test 2"
-          }
-        }
+            title: "Test 2",
+          },
+        },
       ],
       activityCompletions: [
-        { activityId: 'my-editable-activity', complete: true },
-        { activityId: 'my-read-only-activity', complete: true }
-      ]
-    }
-  ]
+        { activityId: "my-editable-activity", complete: true },
+        { activityId: "my-read-only-activity", complete: true },
+      ],
+    },
+  ],
 };
 
 export const testStudent2: StudentData = {
-  _id: 'student-456',
-  userId: 'user-456',
-  enrolledCourses: ['course-123'],
-  enrolledSections: ['section-789'],
-  name: 'Jane Smith',
+  _id: "student-456",
+  userId: "user-456",
+  enrolledCourses: ["course-123"],
+  enrolledSections: ["section-789"],
+  name: "Jane Smith",
   assignmentProgress: [
     {
-      assignmentId: 'assignment-123',
+      assignmentId: "assignment-123",
       relevantGoogleDocs: [],
       activityCompletions: [
-        { activityId: 'my-editable-activity', complete: true },
-        { activityId: 'my-read-only-activity', complete: true }
-      ]
-    }
-  ]
+        { activityId: "my-editable-activity", complete: true },
+        { activityId: "my-read-only-activity", complete: true },
+      ],
+    },
+  ],
 };
 
 // Student with no enrollments (for testing enrollment)
 export const testStudentEmpty: StudentData = {
-  _id: 'student-789',
-  userId: 'user-789',
+  _id: "student-789",
+  userId: "user-789",
   enrolledCourses: [],
   enrolledSections: [],
-  name: 'Bob Johnson',
-  assignmentProgress: []
+  name: "Bob Johnson",
+  assignmentProgress: [],
 };
 
 export interface FetchStudentsResponse {
@@ -72,9 +72,9 @@ export interface FetchStudentsResponse {
 }
 
 export const fetchStudentsResponseInstructor: FetchStudentsResponse = {
-  fetchStudentsInMyCourses: [testStudent, testStudent2]
+  fetchStudentsInMyCourses: [testStudent, testStudent2],
 };
 
 export const fetchStudentsResponseEmpty: FetchStudentsResponse = {
-  fetchStudentsInMyCourses: []
+  fetchStudentsInMyCourses: [],
 };

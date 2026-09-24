@@ -13,8 +13,8 @@ import ViewPreviousRunModal from "../../../components/admin-view/view-previous-r
 import SystemPromptModal from "../../../components/user-view/chat/system-prompt-modal";
 import {
   useWithState,
-  isActivityBuilder,
   useWithChat,
+  type ActivityBuilder,
 } from "../../../exported-files";
 import { useWithBuiltActivityHandler } from "../../../hooks/use-with-built-activity-handler";
 import { useWithSystemPromptsConfig } from "../../../hooks/use-with-system-prompts-config";
@@ -60,9 +60,7 @@ export function Chat(props: {
     () => {
       /**/
     },
-    selectedActivity && isActivityBuilder(selectedActivity)
-      ? selectedActivity
-      : undefined,
+    selectedActivity as ActivityBuilder,
   );
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
   const disableInput =

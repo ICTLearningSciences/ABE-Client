@@ -8,15 +8,14 @@ The full terms of this copyright and license should always be found in the root 
 import { UserDoc } from "../../src/types";
 
 export function archiveDocResponse(googleDoc: Partial<UserDoc>) {
-    return {
-        "addOrUpdateDoc": {
-            "googleDocId": googleDoc.googleDocId || "docId",
-            "title": googleDoc.title || "docTitle",
-            "user": googleDoc.user || "userId",
-            "createdAt": googleDoc.createdAt || new Date().toISOString(),
-            "updatedAt": googleDoc.updatedAt || new Date().toISOString(),
-            "archived": googleDoc.archived || false
-        }
-    }
-
+  return {
+    addOrUpdateDoc: {
+      googleDocId: googleDoc.googleDocId || "docId",
+      title: googleDoc.title || "docTitle",
+      user: googleDoc.user || "userId",
+      createdAt: googleDoc.createdAt || new Date().toISOString(),
+      updatedAt: googleDoc.updatedAt || new Date().toISOString(),
+      archived: googleDoc.archived || false,
+    },
+  };
 }

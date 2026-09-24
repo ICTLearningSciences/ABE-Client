@@ -4,15 +4,15 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { StudentData } from './educational-types';
-import { testStudent } from './fetch-students';
+import { StudentData } from "./educational-types";
+import { testStudent } from "./fetch-students";
 
 // Student after enrolling in section
 export const studentAfterEnrollment: StudentData = {
   ...testStudent,
-  enrolledCourses: ['course-123'],
-  enrolledSections: ['section-456'],
-  assignmentProgress: []
+  enrolledCourses: ["course-123"],
+  enrolledSections: ["section-456"],
+  assignmentProgress: [],
 };
 
 // Student after removing from section (empty enrollments)
@@ -20,24 +20,30 @@ export const studentAfterRemoval: StudentData = {
   ...testStudent,
   enrolledCourses: [],
   enrolledSections: [],
-  assignmentProgress: []
+  assignmentProgress: [],
 };
 
 // Student with updated activity progress
 export const studentWithUpdatedProgress: StudentData = {
   ...testStudent,
-  enrolledCourses: ['course-123'],
-  enrolledSections: ['section-456'],
+  enrolledCourses: ["course-123"],
+  enrolledSections: ["section-456"],
   assignmentProgress: [
     {
-      assignmentId: 'assignment-123',
-      relevantGoogleDocs: [{docId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y', primaryDocument: true, docData: {title: 'Test 1'}}],
+      assignmentId: "assignment-123",
+      relevantGoogleDocs: [
+        {
+          docId: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
+          primaryDocument: true,
+          docData: { title: "Test 1" },
+        },
+      ],
       activityCompletions: [
-        { activityId: 'my-editable-activity', complete: true },
-        { activityId: 'my-read-only-activity', complete: true }
-      ]
-    }
-  ]
+        { activityId: "my-editable-activity", complete: true },
+        { activityId: "my-read-only-activity", complete: true },
+      ],
+    },
+  ],
 };
 
 export interface ModifySectionEnrollmentResponse {
@@ -49,9 +55,9 @@ export interface ModifyStudentAssignmentProgressResponse {
 }
 
 export const enrollInSectionResponse: ModifySectionEnrollmentResponse = {
-  modifySectionEnrollment: studentAfterEnrollment
+  modifySectionEnrollment: studentAfterEnrollment,
 };
 
 export const removeFromSectionResponse: ModifySectionEnrollmentResponse = {
-  modifySectionEnrollment: studentAfterRemoval
+  modifySectionEnrollment: studentAfterRemoval,
 };

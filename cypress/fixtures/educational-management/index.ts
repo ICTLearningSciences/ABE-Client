@@ -6,13 +6,13 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 // Export all fixtures for easy access
-export * from './fetch-courses';
-export * from './fetch-sections';
-export * from './fetch-assignments';
-export * from './fetch-students';
-export * from './instructor-data';
-export * from './student-data';
-export * from './course-operations';
-export * from './section-operations';
-export * from './assignment-operations';
-export * from './enrollment-operations';
+export * from "./fetch-courses";
+export * from "./fetch-sections";
+export * from "./fetch-assignments";
+export * from "./fetch-students";
+export * from "./instructor-data";
+export * from "./student-data";
+export * from "./course-operations";
+export * from "./section-operations";
+export * from "./assignment-operations";
+export * from "./enrollment-operations";

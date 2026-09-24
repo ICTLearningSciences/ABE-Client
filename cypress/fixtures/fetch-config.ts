@@ -8,98 +8,96 @@ The full terms of this copyright and license should always be found in the root 
 import { Config } from "../../src/types";
 
 interface FetchConfigResponse {
-    fetchConfig: Config;
+  fetchConfig: Config;
 }
 
 export const fetchConfigResponse: FetchConfigResponse = {
-    "fetchConfig": {
-        "aiSystemPrompt": [
-            "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-3.5 architecture. Knowledge cutoff: 2021-09.",
-            "You are a professor that speaks very eloquently and in short sentences."
+  fetchConfig: {
+    aiSystemPrompt: [
+      "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-3.5 architecture. Knowledge cutoff: 2021-09.",
+      "You are a professor that speaks very eloquently and in short sentences.",
+    ],
+    displayedGoalActivities: [
+      {
+        goal: "65823a8799045156193339b2",
+        builtActivities: [],
+      },
+      {
+        goal: "6580e5640ac7bcb42fc8d27f",
+        builtActivities: [
+          {
+            activity: "my-editable-activity",
+            disabled: false,
+          },
+          {
+            activity: "my-read-only-activity",
+            disabled: false,
+          },
         ],
-        "displayedGoalActivities":[
-            {
-                "goal": "65823a8799045156193339b2",
-                "builtActivities": []
-              },
-            {
-                "goal": "6580e5640ac7bcb42fc8d27f",
-                builtActivities: [
-                    {
-                        activity: 'my-editable-activity',
-                        disabled: false
-                    },
-                    {
-                        activity: 'my-read-only-activity',
-                        disabled: false
-                    }
-                ]
-              },
+      },
+    ],
+    colorTheme: {
+      headerColor: "#1B6A9C",
+      headerButtonsColor: "#ffffff",
+      chatSystemBubbleColor: "#42A5F5",
+      chatSystemTextColor: "#ffffff",
+      chatUserBubbleColor: "#a6e3ff",
+      chatUserTextColor: "#000000",
+    },
+    exampleGoogleDocs: ["1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"],
+    overrideAiModel: undefined,
+    defaultAiModel: {
+      serviceName: "OPEN_AI",
+      model: "gpt-3.5-turbo-16k",
+    },
+    aiServiceModelConfigs: [
+      {
+        serviceName: "OPEN_AI",
+        modelList: [
+          {
+            name: "gpt-3.5-turbo-16k",
+            maxTokens: 16384,
+            supportsWebSearch: true,
+            onlyAdminUse: false,
+          },
+          {
+            name: "gpt-4",
+            maxTokens: 8192,
+            supportsWebSearch: true,
+            onlyAdminUse: false,
+          },
+          {
+            name: "gpt-4-turbo-preview",
+            maxTokens: 16384,
+            supportsWebSearch: true,
+            onlyAdminUse: false,
+          },
         ],
-        "colorTheme": {
-            "headerColor": "#1B6A9C",
-            "headerButtonsColor": "#ffffff",
-            "chatSystemBubbleColor": "#42A5F5",
-            "chatSystemTextColor": "#ffffff",
-            "chatUserBubbleColor": "#a6e3ff",
-            "chatUserTextColor": "#000000",
-        },
-        "exampleGoogleDocs": [
-            "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y"
+      },
+      {
+        serviceName: "AZURE_OPEN_AI",
+        modelList: [
+          {
+            name: "ABE-GPT-3_5_turbo_16k",
+            maxTokens: 16384,
+            supportsWebSearch: true,
+            onlyAdminUse: false,
+          },
+          {
+            name: "ABE-gpt-4-turbo-preview",
+            maxTokens: 16384,
+            supportsWebSearch: true,
+            onlyAdminUse: false,
+          },
         ],
-        "overrideAiModel": undefined,
-        "defaultAiModel": {
-            "serviceName": 'OPEN_AI',
-            "model": "gpt-3.5-turbo-16k"
-        },
-        "aiServiceModelConfigs": [
-            {
-                "serviceName": 'OPEN_AI',
-                "modelList": [
-                    {
-                        "name": "gpt-3.5-turbo-16k",
-                        "maxTokens": 16384,
-                        "supportsWebSearch": true,
-                        "onlyAdminUse": false
-                    },
-                    {
-                        "name": "gpt-4",
-                        "maxTokens": 8192,
-                        "supportsWebSearch": true,
-                        "onlyAdminUse": false
-                    },
-                    {
-                        "name": "gpt-4-turbo-preview",
-                        "maxTokens": 16384,
-                        "supportsWebSearch": true,
-                        "onlyAdminUse": false
-                    }
-                ]
-            },
-            {
-                "serviceName": 'AZURE_OPEN_AI',
-                "modelList": [
-                    {
-                        "name": "ABE-GPT-3_5_turbo_16k",
-                        "maxTokens": 16384,
-                        "supportsWebSearch": true,
-                        "onlyAdminUse": false
-                    },
-                    {
-                        "name": "ABE-gpt-4-turbo-preview",
-                        "maxTokens": 16384,
-                        "supportsWebSearch": true,
-                        "onlyAdminUse": false
-                    }
-                ]
-            }
-        ],
-        headerTitle: "AWE Army Writing Enhancement",
-        orgName: "",
-        surveyConfig: {
-            surveyLink: "https://test-survey-link.com",
-            surveyQueryParam: "userId",
-            surveyClassroomParam: "classroomId"
-        }
-    }   
-}
+      },
+    ],
+    headerTitle: "AWE Army Writing Enhancement",
+    orgName: "",
+    surveyConfig: {
+      surveyLink: "https://test-survey-link.com",
+      surveyQueryParam: "userId",
+      surveyClassroomParam: "classroomId",
+    },
+  },
+};

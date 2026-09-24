@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BuiltActivityHandler } from "../classes/activity-builder-activity/built-activity-handler";
 import type { ChatMessageTypes } from "../store/slices/chat";
 import { useWithChat } from "../store/slices/chat/use-with-chat";
@@ -57,12 +57,13 @@ export function useWithBuiltActivityHandler(
     builtActivityHandler?.builtActivityData,
   );
 
-  let initialized = false;
+  const hasRun = useRef(false);
   useEffect(() => {
     if (!curDocId) return;
     if (!selectedActivityBuilder?._id) return;
     if (builtActivityHandler) return;
-    if (initialized) return;
+    if (hasRun.current) return; // Skip subsequent executions
+    hasRun.current = true; // Mark as executed
 
     const attachedPanel = selectedActivityBuilder?.attachedPanel
       ? panels.find(
@@ -105,9 +106,7 @@ export function useWithBuiltActivityHandler(
     newActivityHandler.executePrompt = executePromptSteps;
     addNewSubscriber(newActivityHandler);
     setBuiltActivityHandler(newActivityHandler);
-    initialized = true;
-    // setInitialize(newActivityHandler);
-  }, []);
+  }, [curDocId, selectedActivityBuilder?._id, Boolean(builtActivityHandler)]);
 
   useEffect(() => {
     if (builtActivityHandler && !curDocId) {
@@ -139,11 +138,7 @@ export function useWithBuiltActivityHandler(
   }, [resetActivityCounter]);
 
   useEffect(() => {
-    if (
-      builtActivityHandler &&
-      builtActivityHandler.filteredToPanelists.toString() !==
-        activePanelists?.toString()
-    ) {
+    if (builtActivityHandler) {
       builtActivityHandler.filteredToPanelists = activePanelists || [];
     }
   }, [activePanelists]);

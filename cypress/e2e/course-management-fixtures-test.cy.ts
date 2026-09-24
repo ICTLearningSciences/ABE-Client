@@ -5,74 +5,74 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { cyMockEducationalManagement } from '../helpers/educational-management-functions';
+import { cyMockEducationalManagement } from "../helpers/educational-management-functions";
 
-describe('Course Management Fixtures Test', () => {
-  it('Should load all fixtures without errors - Instructor', () => {
+describe("Course Management Fixtures Test", () => {
+  it("Should load all fixtures without errors - Instructor", () => {
     cyMockEducationalManagement(cy, {
-      userRole: 'USER',
-      educationalRole: 'INSTRUCTOR'
+      userRole: "USER",
+      educationalRole: "INSTRUCTOR",
     });
-    
-    cy.visit('/course-management');
-    
+
+    cy.visit("/course-management");
+
     // Wait for all the GraphQL calls to complete
-    cy.wait('@RefreshAccessToken');
-    cy.wait('@FetchConfig');
-    cy.wait('@CreateNewInstructor');
-    cy.wait('@FetchCourses');
-    cy.wait('@FetchSections');
-    cy.wait('@FetchAssignments');
-    cy.wait('@FetchStudentsInMyCourses');
-    cy.wait('@FetchBuiltActivities');
-    
+    cy.wait("@RefreshAccessToken");
+    cy.wait("@FetchConfig");
+    cy.wait("@CreateNewInstructor");
+    cy.wait("@FetchCourses");
+    cy.wait("@FetchSections");
+    cy.wait("@FetchAssignments");
+    cy.wait("@FetchStudentsInMyCourses");
+    cy.wait("@FetchBuiltActivities");
+
     // Verify page loads without errors
-    cy.get('body').should('exist');
+    cy.get("body").should("exist");
   });
 
-  it('Should load all fixtures without errors - Student', () => {
+  it("Should load all fixtures without errors - Student", () => {
     cyMockEducationalManagement(cy, {
-      userRole: 'USER',
-      educationalRole: 'STUDENT'
+      userRole: "USER",
+      educationalRole: "STUDENT",
     });
-    
-    cy.visit('/course-management');
-    
+
+    cy.visit("/course-management");
+
     // Wait for all the GraphQL calls to complete
-    cy.wait('@RefreshAccessToken');
-    cy.wait('@FetchConfig');
-    cy.wait('@CreateNewStudent');
-    cy.wait('@FetchCourses');
-    cy.wait('@FetchSections');
-    cy.wait('@FetchAssignments');
-    cy.wait('@FetchBuiltActivities');
-    
+    cy.wait("@RefreshAccessToken");
+    cy.wait("@FetchConfig");
+    cy.wait("@CreateNewStudent");
+    cy.wait("@FetchCourses");
+    cy.wait("@FetchSections");
+    cy.wait("@FetchAssignments");
+    cy.wait("@FetchBuiltActivities");
+
     // Verify page loads without errors
-    cy.get('body').should('exist');
+    cy.get("body").should("exist");
   });
 
-  it('Should load empty state fixtures without errors', () => {
+  it("Should load empty state fixtures without errors", () => {
     cyMockEducationalManagement(cy, {
-      userRole: 'USER',
-      educationalRole: 'STUDENT',
+      userRole: "USER",
+      educationalRole: "STUDENT",
       emptyCourses: true,
       emptySections: true,
       emptyAssignments: true,
-      emptyStudents: true
+      emptyStudents: true,
     });
-    
-    cy.visit('/course-management');
-    
+
+    cy.visit("/course-management");
+
     // Wait for all the GraphQL calls to complete
-    cy.wait('@RefreshAccessToken');
-    cy.wait('@FetchConfig');
-    cy.wait('@CreateNewStudent');
-    cy.wait('@FetchCourses');
-    cy.wait('@FetchSections');
-    cy.wait('@FetchAssignments');
-    cy.wait('@FetchBuiltActivities');
-    
+    cy.wait("@RefreshAccessToken");
+    cy.wait("@FetchConfig");
+    cy.wait("@CreateNewStudent");
+    cy.wait("@FetchCourses");
+    cy.wait("@FetchSections");
+    cy.wait("@FetchAssignments");
+    cy.wait("@FetchBuiltActivities");
+
     // Verify page loads without errors
-    cy.get('body').should('exist');
+    cy.get("body").should("exist");
   });
 });
