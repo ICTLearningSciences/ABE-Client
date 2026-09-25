@@ -6,14 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import * as React from "react";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Grid,
-} from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import { TextSnippet } from "@mui/icons-material";
 
 import UserDocumentDisplay from "./components/doc-display";
@@ -28,25 +21,20 @@ import withAuthorizationOnly from "./wrap-with-authorization-only";
 import type { Source } from "../../ai-services/ai-service-types";
 
 import "./shark-tank.css";
+import { useWithBuiltActivityHandler } from "./use-with-built-activity-handler";
 
 function SharkTankChat(): React.ReactNode {
   const navigate = useNavigateWithParams();
-  const { state: docState, updateCurrentDocId } = useWithState();
+  const useWithDoc = useWithState();
   const useWithPanelActivity = useWithPanels();
+  const useWithActivityHandler = useWithBuiltActivityHandler();
+
+  const { curDocId } = useWithDoc.state;
+  const { activity, activePanel } = useWithPanelActivity;
+  const { resetActivity } = useWithActivityHandler;
+
   const [reference, setReference] = React.useState<Source>();
-
-  const { curDocId } = docState;
-  const { activity, activePanel, setActivity } = useWithPanelActivity;
   const [selectingDoc, setSelectingDoc] = React.useState<boolean>(!curDocId);
-  const [showWarning, setShowWarning] = React.useState<string>();
-
-  React.useEffect(() => {
-    if (!curDocId && showWarning) {
-      updateCurrentDocId(showWarning);
-      setShowWarning(undefined);
-      setSelectingDoc(false);
-    }
-  }, [curDocId]);
 
   function onSelectDocument(docId: string): void {
     if (reference) {
@@ -57,9 +45,15 @@ function SharkTankChat(): React.ReactNode {
       setSelectingDoc(true);
       return;
     }
-    updateCurrentDocId(docId);
+    useWithDoc.updateCurrentDocId(docId);
     setReference(undefined);
     setSelectingDoc(false);
+  }
+
+  async function onOpenDoc(docId: string): Promise<void> {
+    if (curDocId && docId !== curDocId) resetActivity();
+    setSelectingDoc(false);
+    useWithDoc.updateCurrentDocId(docId);
   }
 
   if (!activePanel || !activity) {
@@ -92,19 +86,25 @@ function SharkTankChat(): React.ReactNode {
               {reference ? (
                 <iframe width="100%" height="100%" src={reference.url} />
               ) : (
-                <UserDocumentDisplay
-                  docId={curDocId}
-                  activityId={activity?._id}
-                  selectingDoc={selectingDoc}
-                  onOpenDoc={(id) => {
-                    if (curDocId && id !== curDocId) {
-                      setShowWarning(id);
-                    } else {
-                      setSelectingDoc(false);
-                      updateCurrentDocId(id);
-                    }
-                  }}
-                />
+                <div
+                  className="column center-div"
+                  style={{ width: "100%", height: "100%" }}
+                >
+                  <UserDocumentDisplay
+                    docId={curDocId}
+                    activityId={activity?._id}
+                    selectingDoc={selectingDoc}
+                    onOpenDoc={(id) => onOpenDoc(id)}
+                  />
+                  {selectingDoc && (
+                    <Typography
+                      variant="subtitle2"
+                      style={{ marginBottom: 10 }}
+                    >
+                      (Note: Changing documents will clear your chat session)
+                    </Typography>
+                  )}
+                </div>
               )}
             </div>
             <div className="row spacing center-div" style={{ padding: 20 }}>
@@ -127,37 +127,13 @@ function SharkTankChat(): React.ReactNode {
             style={{ height: "100%", paddingRight: 20, paddingLeft: 20 }}
           >
             <Chat
-              selectedActivity={activity}
-              setSelectedActivity={(activity) => {
-                setActivity(activity._id);
-              }}
+              useWithDoc={useWithDoc}
+              useWithActivityHandler={useWithActivityHandler}
+              useWithPanelActivity={useWithPanelActivity}
             />
           </Grid>
         </Grid>
       </div>
-      {showWarning && (
-        <Dialog
-          maxWidth="sm"
-          fullWidth={true}
-          open={Boolean(showWarning)}
-          onClose={() => setShowWarning(undefined)}
-          style={{ textAlign: "center" }}
-        >
-          <DialogTitle>Switch Documents?</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Changing documents will clear your chat session.
-            </DialogContentText>
-            <Button
-              onClick={() => {
-                updateCurrentDocId("");
-              }}
-            >
-              Switch
-            </Button>
-          </DialogContent>
-        </Dialog>
-      )}
     </main>
   );
 }

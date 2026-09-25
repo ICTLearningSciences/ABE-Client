@@ -20,7 +20,7 @@ import {
 import type { AiServiceModel, DocData, Intention } from "../../../types";
 import type { UserRole } from "../login";
 
-interface UseWithState {
+export interface UseWithState {
   state: State;
   updateCurrentDocId: (docId: string) => void;
   overrideAiModel: (aiServiceModel?: AiServiceModel) => void;

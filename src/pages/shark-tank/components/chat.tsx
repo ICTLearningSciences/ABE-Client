@@ -11,20 +11,17 @@ import { Typography } from "@mui/material";
 import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-types";
 import ViewPreviousRunModal from "../../../components/admin-view/view-previous-run-modal";
 import SystemPromptModal from "../../../components/user-view/chat/system-prompt-modal";
-import {
-  useWithState,
-  useWithChat,
-  type ActivityBuilder,
-} from "../../../exported-files";
-import { useWithBuiltActivityHandler } from "../../../hooks/use-with-built-activity-handler";
+import { useWithChat } from "../../../exported-files";
+import { type UseWithBuiltActivityHandler } from "../use-with-built-activity-handler";
 import { useWithSystemPromptsConfig } from "../../../hooks/use-with-system-prompts-config";
 import { useAppSelector } from "../../../store/hooks";
 import type { ChatMessageTypes } from "../../../store/slices/chat";
-import type { ActivityTypes } from "../../../types";
 import { ChatHeader } from "./chat-header";
 import { ChatInput } from "./chat-input";
 import { ChatThread } from "./chat-thread";
 import React from "react";
+import type { UseWithPanels } from "../../../store/slices/panels/use-with-panels";
+import type { UseWithState } from "../../../store/slices/state/use-with-state";
 
 const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
@@ -34,12 +31,11 @@ const GlobalChatStyles = createGlobalStyle`
 `;
 
 export function Chat(props: {
-  selectedActivity?: ActivityTypes;
-  setSelectedActivity: (activity: ActivityTypes) => void;
+  useWithDoc: UseWithState;
+  useWithActivityHandler: UseWithBuiltActivityHandler;
+  useWithPanelActivity: UseWithPanels;
 }) {
-  const { selectedActivity } = props;
-  const { state: chatState, sendMessage, setSystemRole } = useWithChat();
-
+  const { state: chatState, setSystemRole } = useWithChat();
   const {
     editedData: systemPromptData,
     editOrAddSystemPrompt,
@@ -48,20 +44,14 @@ export function Chat(props: {
     deleteSystemPrompt,
     isSaving,
   } = useWithSystemPromptsConfig();
-  const { state, newSession } = useWithState();
-  const { curDocId } = state;
+  const { curDocId } = props.useWithDoc.state;
   const coachResponsePending = useAppSelector(
     (state) => state.chat.coachResponsePending,
   );
-  const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
+  const { builtActivityHandler, activityReady, resetActivity } =
+    props.useWithActivityHandler;
+  const { activity, setActivity } = props.useWithPanelActivity;
 
-  const { activityReady: builtActivityReady } = useWithBuiltActivityHandler(
-    resetActivityCounter,
-    () => {
-      /**/
-    },
-    selectedActivity as ActivityBuilder,
-  );
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
   const disableInput =
     coachResponsePending ||
@@ -78,7 +68,7 @@ export function Chat(props: {
     : "";
 
   async function sendNewMessage(message: ChatMessageTypes) {
-    sendMessage(message, false, curDocId);
+    builtActivityHandler?.sendUserMessage(message);
   }
 
   React.useEffect(() => {
@@ -108,14 +98,11 @@ export function Chat(props: {
           }}
         >
           <ChatHeader
-            selectedActivity={selectedActivity}
-            onSelectActivity={props.setSelectedActivity}
-            onReset={() => {
-              newSession();
-              setResetActivityCounter(resetActivityCounter + 1);
-            }}
+            selectedActivity={activity}
+            onSelectActivity={(a) => setActivity(a._id)}
+            onReset={resetActivity}
           />
-          {curDocId && builtActivityReady ? (
+          {curDocId && activityReady ? (
             <ChatThread
               sendMessage={sendNewMessage}
               coachResponsePending={coachResponsePending}
@@ -133,7 +120,7 @@ export function Chat(props: {
           )}
           <ChatInput
             sendMessage={sendNewMessage}
-            disableInput={!curDocId || !builtActivityReady || disableInput}
+            disableInput={!curDocId || !activityReady || disableInput}
           />
         </div>
         {systemPromptData && (
