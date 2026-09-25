@@ -8,7 +8,7 @@ The full terms of this copyright and license should always be found in the root 
 import { IGDocVersion } from "../../src/types";
 
 export function fetchDocVersionsBuilder(versions: IGDocVersion[]) {
-    return {
-        "fetchVersionsById": versions,
-    };
+  return {
+    fetchVersionsById: versions,
+  };
 }

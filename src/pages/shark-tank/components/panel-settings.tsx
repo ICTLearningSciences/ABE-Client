@@ -122,35 +122,31 @@ function PanelSettings(props: { panelist?: Panelist }): React.ReactNode {
             <CssTextField
               select
               fullWidth
-              value={`${activePanelConfig[id]?.webSearch}`}
+              value={`${Boolean(activePanelConfig[id]?.disableWebSearch)}`}
               onChange={(e) => {
-                onUpdate({ webSearch: e.target.value === "true" });
+                onUpdate({ disableWebSearch: e.target.value === "true" });
               }}
             >
-              <MenuItem value={undefined}>
-                Default ({defaultWebSearch()})
-              </MenuItem>
-              <MenuItem value="true">Yes</MenuItem>
-              <MenuItem value="false">No</MenuItem>
+              <MenuItem value="false">Default ({defaultWebSearch()})</MenuItem>
+              <MenuItem value="true">Disable</MenuItem>
             </CssTextField>
           </Grid>
         )}
         {!props.panelist && (
           <Grid size={6}>
-            <Typography>Include Chat Log</Typography>
+            <Typography>Use Chat Log</Typography>
             <CssTextField
               select
               fullWidth
-              value={`${activePanelConfig[id]?.includeChatLog}`}
+              value={`${Boolean(activePanelConfig[id]?.disableChatLog)}`}
               onChange={(e) => {
-                onUpdate({ includeChatLog: e.target.value === "true" });
+                onUpdate({ disableChatLog: e.target.value === "true" });
               }}
             >
-              <MenuItem value={undefined}>
+              <MenuItem value="false">
                 Default ({defaultChatHistory()})
               </MenuItem>
-              <MenuItem value="true">Yes</MenuItem>
-              <MenuItem value="false">No</MenuItem>
+              <MenuItem value="true">Disable</MenuItem>
             </CssTextField>
           </Grid>
         )}

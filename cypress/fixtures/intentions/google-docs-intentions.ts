@@ -4,126 +4,129 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { UserDoc } from "../../../src/types"
-import { testGoogleDocId } from "../../helpers/types"
-import { testUser } from "../user-data"
+import { UserDoc } from "../../../src/types";
+import { testGoogleDocId } from "../../helpers/types";
+import { testUser } from "../user-data";
 
 export const gDocWithNoIntentions: UserDoc = {
-    "googleDocId": testGoogleDocId,
-    "user": testUser._id,
-    "title": "Aliens",
-    "documentIntention": undefined,
-    currentDayIntention: undefined,
-    assignmentDescription: undefined,
-    "createdAt": new Date().toISOString(),
-    "admin": false,
-    "updatedAt": new Date().toISOString(),
-    "archived": false,
-    "service": 'GOOGLE_DOCS',
-    courseAssignmentId: ""
-}
+  googleDocId: testGoogleDocId,
+  user: testUser._id,
+  title: "Aliens",
+  documentIntention: undefined,
+  currentDayIntention: undefined,
+  assignmentDescription: undefined,
+  createdAt: new Date().toISOString(),
+  admin: false,
+  updatedAt: new Date().toISOString(),
+  archived: false,
+  service: "GOOGLE_DOCS",
+  courseAssignmentId: "",
+};
 
 export const gDocWithoutDocumentIntention: UserDoc = {
+  googleDocId: testGoogleDocId,
+  user: testUser._id,
+  title: "Aliens",
+  documentIntention: undefined,
+  currentDayIntention: {
+    description: "Aliens day intention",
+    createdAt: new Date().toISOString(),
+  },
+  assignmentDescription: "Aliens assignment description",
+  createdAt: new Date().toISOString(),
+  admin: false,
+  updatedAt: new Date().toISOString(),
+  archived: false,
+  service: "GOOGLE_DOCS",
+  courseAssignmentId: "",
+};
+
+export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: UserDoc =
+  {
     googleDocId: testGoogleDocId,
     user: testUser._id,
     title: "Aliens",
-    documentIntention: undefined,
-    currentDayIntention: {
-        description: "Aliens day intention",
-        createdAt: new Date().toISOString(),
-    },
-    assignmentDescription: "Aliens assignment description",
-    createdAt: new Date().toISOString(),
-    admin: false,
-    updatedAt: new Date().toISOString(),
-    archived: false,
-    service: 'GOOGLE_DOCS',
-    courseAssignmentId: ""
-}
-
-export const gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention: UserDoc = {
-    "googleDocId": testGoogleDocId,
-    "user": testUser._id,
-    "title": "Aliens",
-    "documentIntention": {
-        description: "Aliens document intention",
-        createdAt: "2021-06-01T00:00:00.000Z",
+    documentIntention: {
+      description: "Aliens document intention",
+      createdAt: "2021-06-01T00:00:00.000Z",
     },
     currentDayIntention: undefined,
     assignmentDescription: "Aliens assignment description",
-    "createdAt": "2021-06-01T00:00:00.000Z",
-    "admin": false,
-    "updatedAt": new Date().toISOString(),
-    "archived": false,
-    "service": 'GOOGLE_DOCS',
-    courseAssignmentId: ""
-}
+    createdAt: "2021-06-01T00:00:00.000Z",
+    admin: false,
+    updatedAt: new Date().toISOString(),
+    archived: false,
+    service: "GOOGLE_DOCS",
+    courseAssignmentId: "",
+  };
 
 export const gDocWithoutAssignmentDescription: UserDoc = {
-    "googleDocId": testGoogleDocId,
-    "user": testUser._id,
-    "title": "Aliens",
-    "documentIntention": {
-        description: "Aliens document intention",
-        createdAt: new Date().toISOString(),
-    },
-    currentDayIntention: {
-        description: "Aliens day intention",
-        createdAt: new Date().toISOString(),
-    },
-    assignmentDescription: undefined,
-    "createdAt": new Date().toISOString(),
-    "admin": false,
-    "updatedAt": new Date().toISOString(),
-    "archived": false,
-    "service": 'GOOGLE_DOCS',
-    courseAssignmentId: ""
-}
+  googleDocId: testGoogleDocId,
+  user: testUser._id,
+  title: "Aliens",
+  documentIntention: {
+    description: "Aliens document intention",
+    createdAt: new Date().toISOString(),
+  },
+  currentDayIntention: {
+    description: "Aliens day intention",
+    createdAt: new Date().toISOString(),
+  },
+  assignmentDescription: undefined,
+  createdAt: new Date().toISOString(),
+  admin: false,
+  updatedAt: new Date().toISOString(),
+  archived: false,
+  service: "GOOGLE_DOCS",
+  courseAssignmentId: "",
+};
 
 export const gDocWithAllIntentions: UserDoc = {
-    "googleDocId": testGoogleDocId,
-    "user": testUser._id,
-    "title": "Aliens",
-    "documentIntention": {
-        description: "Aliens document intention",
-        createdAt: new Date().toISOString(),
-    },
-    currentDayIntention: {
-        description: "Aliens day intention",
-        createdAt: new Date().toISOString(),
-    },
-    assignmentDescription: "Aliens assignment description",
-    "createdAt": new Date().toISOString(),
-    "admin": false,
-    "updatedAt": new Date().toISOString(),
-    "archived": false,
-    "service": 'GOOGLE_DOCS',
-    courseAssignmentId: ""
-}
+  googleDocId: testGoogleDocId,
+  user: testUser._id,
+  title: "Aliens",
+  documentIntention: {
+    description: "Aliens document intention",
+    createdAt: new Date().toISOString(),
+  },
+  currentDayIntention: {
+    description: "Aliens day intention",
+    createdAt: new Date().toISOString(),
+  },
+  assignmentDescription: "Aliens assignment description",
+  createdAt: new Date().toISOString(),
+  admin: false,
+  updatedAt: new Date().toISOString(),
+  archived: false,
+  service: "GOOGLE_DOCS",
+  courseAssignmentId: "",
+};
 
 export const gDocWithExpiredDayIntention: UserDoc = {
-    "googleDocId": testGoogleDocId,
-    "user": testUser._id,
-    "title": "Aliens",
-    "documentIntention": {
-        description: "Aliens document intention",
-        createdAt: new Date().toISOString(),
-    },
-    currentDayIntention: {
-        description: "Aliens day intention",
-        createdAt: "2021-06-01T00:00:00.000Z",
-    },
-    assignmentDescription: "Aliens assignment description",
-    "createdAt": new Date().toISOString(),
-    "admin": false,
-    "updatedAt": new Date().toISOString(),
-    "archived": false,
-    "service": 'GOOGLE_DOCS',
-    courseAssignmentId: ""
-}
+  googleDocId: testGoogleDocId,
+  user: testUser._id,
+  title: "Aliens",
+  documentIntention: {
+    description: "Aliens document intention",
+    createdAt: new Date().toISOString(),
+  },
+  currentDayIntention: {
+    description: "Aliens day intention",
+    createdAt: "2021-06-01T00:00:00.000Z",
+  },
+  assignmentDescription: "Aliens assignment description",
+  createdAt: new Date().toISOString(),
+  admin: false,
+  updatedAt: new Date().toISOString(),
+  archived: false,
+  service: "GOOGLE_DOCS",
+  courseAssignmentId: "",
+};
 
-export function storeUserDocResponse(gDoc: UserDoc): {storeGoogleDoc: UserDoc} {
-    return {
-        storeGoogleDoc: gDoc
-    }
+export function storeUserDocResponse(gDoc: UserDoc): {
+  storeGoogleDoc: UserDoc;
+} {
+  return {
+    storeGoogleDoc: gDoc,
+  };
 }

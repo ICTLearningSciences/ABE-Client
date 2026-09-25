@@ -7,5 +7,5 @@ The full terms of this copyright and license should always be found in the root 
 import "cypress-localstorage-commands";
 
 Cypress.on("uncaught:exception", (err, runnable) => {
-    return false;
+  return false;
 });

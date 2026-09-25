@@ -29,7 +29,6 @@ export interface Assignment {
   defaultLLM?: AiServiceModel;
 }
 
-
 export interface SectionAssignment {
   assignmentId: string;
   mandatory: boolean;
@@ -50,7 +49,7 @@ export interface RelevantGoogleDoc {
   primaryDocument: boolean;
   docData: {
     title: string;
-  }
+  };
 }
 
 export interface ActivityCompletion {
@@ -65,7 +64,7 @@ export interface AssignmentProgress {
   instructorGrade?: {
     grade: number;
     comment: string;
-  },
+  };
   activityCompletions: ActivityCompletion[];
 }
 export interface StudentData {

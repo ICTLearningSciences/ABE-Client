@@ -95,10 +95,10 @@ export const stateSlice = createSlice({
     addNewLocalPanelist: (state, action: PayloadAction<Panelist>) => {
       state.panelists.push(action.payload);
     },
-    setActivity: (state, action: PayloadAction<string>) => {
+    setActivity: (state, action: PayloadAction<string | undefined>) => {
       state.activity = action.payload;
     },
-    setActivePanel: (state, action: PayloadAction<string>) => {
+    setActivePanel: (state, action: PayloadAction<string | undefined>) => {
       state.activePanel = action.payload;
     },
     setActivePanelists: (

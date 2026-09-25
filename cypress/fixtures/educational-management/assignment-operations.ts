@@ -4,30 +4,30 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { Assignment } from './educational-types';
+import { Assignment } from "./educational-types";
 
 export const newTestAssignment: Assignment = {
-  _id: 'new-assignment-123',
-  title: 'New Test Assignment',
-  description: 'A newly created test assignment.',
+  _id: "new-assignment-123",
+  title: "New Test Assignment",
+  description: "A newly created test assignment.",
   activityIds: [],
   activityOrder: [],
   defaultLLM: {
-    serviceName: 'OPEN_AI',
-    model: 'gpt-4'
-  }
+    serviceName: "OPEN_AI",
+    model: "gpt-4",
+  },
 };
 
 export const updatedTestAssignment: Assignment = {
   ...newTestAssignment,
-  title: 'Updated Assignment Title',
-  description: 'An updated assignment description.',
-  activityIds: ['my-editable-activity', 'my-read-only-activity'],
-  activityOrder: ['my-editable-activity', 'my-read-only-activity'],
+  title: "Updated Assignment Title",
+  description: "An updated assignment description.",
+  activityIds: ["my-editable-activity", "my-read-only-activity"],
+  activityOrder: ["my-editable-activity", "my-read-only-activity"],
   defaultLLM: {
-    serviceName: 'OPEN_AI',
-    model: 'gpt-4'
-  }
+    serviceName: "OPEN_AI",
+    model: "gpt-4",
+  },
 };
 
 export interface AddOrUpdateAssignmentResponse {
@@ -35,13 +35,13 @@ export interface AddOrUpdateAssignmentResponse {
 }
 
 export const createAssignmentResponse: AddOrUpdateAssignmentResponse = {
-  addOrUpdateAssignment: newTestAssignment
+  addOrUpdateAssignment: newTestAssignment,
 };
 
 export const updateAssignmentResponse: AddOrUpdateAssignmentResponse = {
-  addOrUpdateAssignment: updatedTestAssignment
+  addOrUpdateAssignment: updatedTestAssignment,
 };
 
 export const deleteAssignmentResponse: AddOrUpdateAssignmentResponse = {
-  addOrUpdateAssignment: updatedTestAssignment
+  addOrUpdateAssignment: updatedTestAssignment,
 };

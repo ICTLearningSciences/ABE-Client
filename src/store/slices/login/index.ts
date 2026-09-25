@@ -25,7 +25,7 @@ import {
 } from "../../local-storage";
 import { loginMicrosoft } from "../../../hooks/microsoft-api";
 
-export type LoginStatus = 0 | 1 | 2 | 3 | 4;
+export type LoginStatus = 0 | 1 | 2 | 3 | 4; // none = 0, logged_out = 1, loading = 2, success = 3, failed = 4
 export type LoginRejectedReason =
   "NONE" | "DISABLED" | "FAILED" | "NO_ACCOUNT_FOUND";
 export type UserRole = "NONE" | "ADMIN" | "CONTENT_MANAGER" | "USER";
@@ -51,10 +51,6 @@ export const refreshAccessToken = createAsyncThunk(
     return await _refreshAccessToken();
   },
 );
-
-export const logout = createAsyncThunk("login/logout", async () => {
-  return Promise.resolve();
-});
 
 export const login = createAsyncThunk(
   "login/login",
@@ -101,6 +97,13 @@ export const loginSlice = createSlice({
   name: "login",
   initialState,
   reducers: {
+    logout: (state: LoginState) => {
+      localStorageClear(ACCESS_TOKEN_KEY);
+      state.userRole = "NONE";
+      state.loginStatus = 1;
+      delete state.accessToken;
+      delete state.user;
+    },
     setIsDisabled: (state: LoginState, action: PayloadAction<boolean>) => {
       state.isDisabled = action.payload;
     },
@@ -114,12 +117,6 @@ export const loginSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(logout.fulfilled, (state) => {
-        localStorageClear(ACCESS_TOKEN_KEY);
-        state.userRole = "NONE";
-        state.accessToken = undefined;
-        state.loginStatus = 1;
-      })
       .addCase(login.pending, (state) => {
         state.loginStatus = 2;
       })
@@ -159,6 +156,6 @@ export const loginSlice = createSlice({
   },
 });
 
-export const { setIsDisabled, setUser } = loginSlice.actions;
+export const { logout, setIsDisabled, setUser } = loginSlice.actions;
 
 export default loginSlice.reducer;
