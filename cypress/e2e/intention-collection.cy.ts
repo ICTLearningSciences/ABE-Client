@@ -4,7 +4,10 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { cyMockOpenAiCall, getDocServiceFromLoginService } from '../helpers/functions';
+import {
+  cyMockOpenAiCall,
+  getDocServiceFromLoginService,
+} from "../helpers/functions";
 import {
   gDocWithAllIntentions,
   gDocWithExpiredDayIntention,
@@ -12,68 +15,68 @@ import {
   gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention,
   gDocWithoutDocumentIntention,
   storeUserDocResponse,
-} from '../fixtures/intentions/google-docs-intentions';
-import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
+} from "../fixtures/intentions/google-docs-intentions";
+import { refreshAccessTokenResponse } from "../fixtures/refresh-access-token";
 import {
   CypressGlobal,
   cyMockDefault,
   mockGQL,
   sendChatMessage,
-} from '../helpers/functions';
-import { testGoogleDocId } from '../helpers/types';
-import { myEditableActivityResponse } from '../fixtures/stronger-hook-activity/basic-text-response';
-import { DocVersion } from '../../src/types';
+} from "../helpers/functions";
+import { testGoogleDocId } from "../helpers/types";
+import { myEditableActivityResponse } from "../fixtures/stronger-hook-activity/basic-text-response";
+import { DocVersion } from "../../src/types";
 
 function writeDocumentIntention(cy: CypressGlobal, input: string) {
-  cy.get('[data-cy=input-document-intention]')
+  cy.get("[data-cy=input-document-intention]")
     .clear()
     .type(input, { delay: 0 });
 }
 
 function writeDocumentAssignment(cy: CypressGlobal, input: string) {
-  cy.get('[data-cy=input-document-assignment]').type(input, { delay: 0 });
+  cy.get("[data-cy=input-document-assignment]").type(input, { delay: 0 });
 }
 
 function writeDayIntention(cy: CypressGlobal, input: string) {
-  cy.get('[data-cy=input-day-intention]').clear().type(input, { delay: 0 });
+  cy.get("[data-cy=input-day-intention]").clear().type(input, { delay: 0 });
 }
 
 function isBackButtonDisabled(cy: CypressGlobal) {
-  cy.get('[data-cy=doc-goal-modal-back-button]').should('be.disabled');
+  cy.get("[data-cy=doc-goal-modal-back-button]").should("be.disabled");
 }
 
 function isOnSelectGoalScreen(cy: CypressGlobal) {
-  cy.get('[data-cy=doc-goal-modal]').should(
-    'contain.text',
-    'What is your current goal?'
+  cy.get("[data-cy=doc-goal-modal]").should(
+    "contain.text",
+    "What is your current goal?",
   );
 }
 
 function reOpenModal(cy: CypressGlobal) {
-  cy.get('[data-cy=edit-goal-button]').click();
+  cy.get("[data-cy=edit-goal-button]").click();
 }
 
 function clickNextIntentionModal(cy: CypressGlobal) {
-  cy.get('[data-cy=doc-goal-modal-next-button]').click();
+  cy.get("[data-cy=doc-goal-modal-next-button]").click();
 }
 
 function goToMyEditableActivity(cy: CypressGlobal) {
-  cy.get('[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]').click();
-  cy.get('[data-cy=activity-display-my-editable-activity]').click();
-  cy.get('[data-cy=doc-goal-modal-next-button]').click();
+  cy.get("[data-cy=goal-display-6580e5640ac7bcb42fc8d27f]").click();
+  cy.get("[data-cy=activity-display-my-editable-activity]").click();
+  cy.get("[data-cy=doc-goal-modal-next-button]").click();
 }
 
 function didDocDataGetSaved(
   cy: CypressGlobal,
   docIntention?: string,
   docAssignment?: string,
-  dayIntention?: string
+  dayIntention?: string,
 ) {
-  cy.wait('@StoreUserDoc').then((xhr) => {
+  cy.wait("@StoreUserDoc").then((xhr) => {
     const variablesSent = xhr.request.body.variables;
     if (docIntention) {
       expect(variablesSent.googleDoc.documentIntention.description).to.eql(
-        docIntention
+        docIntention,
       );
     } else {
       expect(variablesSent.googleDoc.documentIntention).to.eql(undefined);
@@ -81,7 +84,7 @@ function didDocDataGetSaved(
 
     if (docAssignment) {
       expect(variablesSent.googleDoc.assignmentDescription).to.eql(
-        docAssignment
+        docAssignment,
       );
     } else {
       expect(variablesSent.googleDoc.assignmentDescription).to.eql(undefined);
@@ -89,7 +92,7 @@ function didDocDataGetSaved(
 
     if (dayIntention) {
       expect(variablesSent.googleDoc.currentDayIntention.description).to.eql(
-        dayIntention
+        dayIntention,
       );
     } else {
       expect(variablesSent.googleDoc.currentDayIntention).to.eql(undefined);
@@ -101,10 +104,10 @@ function didDocVersionDataGetSaved(
   cy: CypressGlobal,
   sessionIntention?: string,
   docIntention?: string,
-  dayIntention?: string
+  dayIntention?: string,
 ) {
   cy.wait(6000); //to allow next version to be submitted
-  cy.get('@SubmitDocVersion.all').then((xhr) => {
+  cy.get("@SubmitDocVersion.all").then((xhr) => {
     const lastRequest: any = xhr[xhr.length - 1];
     const variablesSent: Partial<DocVersion> =
       lastRequest.request.body.variables.googleDocData;
@@ -115,7 +118,7 @@ function didDocVersionDataGetSaved(
     }
     if (sessionIntention) {
       expect(variablesSent.sessionIntention?.description).to.eql(
-        sessionIntention
+        sessionIntention,
       );
     } else {
       expect(variablesSent.sessionIntention).to.eql(undefined);
@@ -130,91 +133,79 @@ function didDocVersionDataGetSaved(
 
 function checkNumberSessionIds(cy: CypressGlobal, num: number) {
   cy.wait(6000); //to allow next version to be submitted
-  cy.get('@SubmitDocVersion.all').then((xhr) => {
+  cy.get("@SubmitDocVersion.all").then((xhr) => {
     const sessionIds = xhr.map(
-      (x: any) => x.request.body.variables.googleDocData.sessionId
+      (x: any) => x.request.body.variables.googleDocData.sessionId,
     );
     expect(new Set(sessionIds).size).to.eql(num);
   });
 }
 
-describe('collectin user intentions', () => {
-  describe('document intention', () => {
-    it('collects and saves document intention on first visit for document', () => {
+describe("collectin user intentions", () => {
+  describe("document intention", () => {
+    it("collects and saves document intention on first visit for document", () => {
       cyMockDefault(cy, {
         gqlQueries: [
-          mockGQL('FetchGoogleDocs', {
+          mockGQL("FetchGoogleDocs", {
             fetchGoogleDocs: [gDocWithoutDocumentIntention],
           }),
-          mockGQL(
-            'StoreUserDoc',
-            storeUserDocResponse(gDocWithAllIntentions)
-          ),
+          mockGQL("StoreUserDoc", storeUserDocResponse(gDocWithAllIntentions)),
         ],
       });
       cy.visit(`/docs/${testGoogleDocId}`);
-      writeDocumentIntention(cy, 'test');
+      writeDocumentIntention(cy, "test");
       clickNextIntentionModal(cy);
-      didDocDataGetSaved(cy, 'test');
+      didDocDataGetSaved(cy, "test");
     });
 
-    it.only('does not ask for document intention again if provided', () => {
+    it("does not ask for document intention again if provided", () => {
       cyMockDefault(cy, {
         gqlQueries: [
-          mockGQL('FetchGoogleDocs', {
+          mockGQL("FetchGoogleDocs", {
             fetchGoogleDocs: [gDocWithoutDocumentIntention],
           }),
-          mockGQL(
-            'StoreUserDoc',
-            storeUserDocResponse(gDocWithAllIntentions)
-          ),
+          mockGQL("StoreUserDoc", storeUserDocResponse(gDocWithAllIntentions)),
         ],
       });
       cy.visit(`/docs/${testGoogleDocId}`);
-      writeDocumentIntention(cy, 'test');
+      writeDocumentIntention(cy, "test");
       clickNextIntentionModal(cy);
-      didDocDataGetSaved(cy, 'test');
+      didDocDataGetSaved(cy, "test");
       goToMyEditableActivity(cy);
       reOpenModal(cy);
       isOnSelectGoalScreen(cy);
       isBackButtonDisabled(cy);
     });
 
-    it('when re-visiting document, does not ask for document intention again if provided', () => {
+    it("when re-visiting document, does not ask for document intention again if provided", () => {
       cyMockDefault(cy, {
         gqlQueries: [
-          mockGQL('FetchGoogleDocs', {
+          mockGQL("FetchGoogleDocs", {
             fetchGoogleDocs: [gDocWithoutDocumentIntention],
           }),
-          mockGQL(
-            'StoreUserDoc',
-            storeUserDocResponse(gDocWithAllIntentions)
-          ),
+          mockGQL("StoreUserDoc", storeUserDocResponse(gDocWithAllIntentions)),
         ],
       });
       cy.visit(`/docs/${testGoogleDocId}`);
-      writeDocumentIntention(cy, 'test');
+      writeDocumentIntention(cy, "test");
       clickNextIntentionModal(cy);
-      didDocDataGetSaved(cy, 'test');
+      didDocDataGetSaved(cy, "test");
       goToMyEditableActivity(cy);
-      cy.get('[data-cy=doc-home-button]').click();
-      cy.get('[data-cy=doc-list-item-Aliens]').click();
+      cy.get("[data-cy=doc-home-button]").click();
+      cy.get("[data-cy=doc-list-item-Aliens]").click();
       isOnSelectGoalScreen(cy);
       isBackButtonDisabled(cy);
     });
   });
 
-  describe('day intention', () => {
-    it('does not collect day intention for new document within 8 hours of creation', () => {
+  describe("day intention", () => {
+    it("does not collect day intention for new document within 8 hours of creation", () => {
       cyMockDefault(cy, {
         gqlQueries: [
-          mockGQL('FetchGoogleDocs', {
+          mockGQL("FetchGoogleDocs", {
             fetchGoogleDocs: [gDocWithAllIntentions],
           }),
-          mockGQL(
-            'StoreUserDoc',
-            storeUserDocResponse(gDocWithAllIntentions)
-          ),
+          mockGQL("StoreUserDoc", storeUserDocResponse(gDocWithAllIntentions)),
         ],
       });
       cy.visit(`/docs/${testGoogleDocId}`);
@@ -222,60 +213,51 @@ describe('collectin user intentions', () => {
       isBackButtonDisabled(cy);
     });
 
-    it('collects and saves day intention for new document after 8 hours of creation', () => {
+    it("collects and saves day intention for new document after 8 hours of creation", () => {
       cyMockDefault(cy, {
         gqlQueries: [
-          mockGQL('FetchGoogleDocs', {
+          mockGQL("FetchGoogleDocs", {
             fetchGoogleDocs: [
               gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention,
             ],
           }),
-          mockGQL(
-            'StoreUserDoc',
-            storeUserDocResponse(gDocWithAllIntentions)
-          ),
+          mockGQL("StoreUserDoc", storeUserDocResponse(gDocWithAllIntentions)),
         ],
       });
       cy.visit(`/docs/${testGoogleDocId}`);
-      writeDayIntention(cy, 'test');
+      writeDayIntention(cy, "test");
       clickNextIntentionModal(cy);
-      didDocDataGetSaved(cy, undefined, undefined, 'test');
+      didDocDataGetSaved(cy, undefined, undefined, "test");
     });
 
-    it('collects and saves day intention if 8 hours after last collection', () => {
+    it("collects and saves day intention if 8 hours after last collection", () => {
       cyMockDefault(cy, {
         gqlQueries: [
-          mockGQL('FetchGoogleDocs', {
+          mockGQL("FetchGoogleDocs", {
             fetchGoogleDocs: [gDocWithExpiredDayIntention],
           }),
-          mockGQL(
-            'StoreUserDoc',
-            storeUserDocResponse(gDocWithAllIntentions)
-          ),
+          mockGQL("StoreUserDoc", storeUserDocResponse(gDocWithAllIntentions)),
         ],
       });
       cy.visit(`/docs/${testGoogleDocId}`);
-      writeDayIntention(cy, 'test');
+      writeDayIntention(cy, "test");
       clickNextIntentionModal(cy);
-      didDocDataGetSaved(cy, undefined, undefined, 'test');
+      didDocDataGetSaved(cy, undefined, undefined, "test");
     });
 
-    it('does not recollect day intention if already provided', () => {
+    it("does not recollect day intention if already provided", () => {
       cyMockDefault(cy, {
         gqlQueries: [
-          mockGQL('FetchGoogleDocs', {
+          mockGQL("FetchGoogleDocs", {
             fetchGoogleDocs: [gDocWithExpiredDayIntention],
           }),
-          mockGQL(
-            'StoreUserDoc',
-            storeUserDocResponse(gDocWithAllIntentions)
-          ),
+          mockGQL("StoreUserDoc", storeUserDocResponse(gDocWithAllIntentions)),
         ],
       });
       cy.visit(`/docs/${testGoogleDocId}`);
-      writeDayIntention(cy, 'test');
+      writeDayIntention(cy, "test");
       clickNextIntentionModal(cy);
-      didDocDataGetSaved(cy, undefined, undefined, 'test');
+      didDocDataGetSaved(cy, undefined, undefined, "test");
       goToMyEditableActivity(cy);
       reOpenModal(cy);
       isOnSelectGoalScreen(cy);
@@ -283,41 +265,35 @@ describe('collectin user intentions', () => {
     });
   });
 
-  describe('document assignment', () => {
-    it('collects and saves document assignment on first visit for document', () => {
+  describe("document assignment", () => {
+    it("collects and saves document assignment on first visit for document", () => {
       cyMockDefault(cy, {
         gqlQueries: [
-          mockGQL('FetchGoogleDocs', {
+          mockGQL("FetchGoogleDocs", {
             fetchGoogleDocs: [gDocWithoutAssignmentDescription],
           }),
-          mockGQL(
-            'StoreUserDoc',
-            storeUserDocResponse(gDocWithAllIntentions)
-          ),
+          mockGQL("StoreUserDoc", storeUserDocResponse(gDocWithAllIntentions)),
         ],
       });
       cy.visit(`/docs/${testGoogleDocId}`);
-      writeDocumentAssignment(cy, 'test');
+      writeDocumentAssignment(cy, "test");
       clickNextIntentionModal(cy);
-      didDocDataGetSaved(cy, undefined, 'test');
+      didDocDataGetSaved(cy, undefined, "test");
     });
 
-    it('does not ask for document assignment again if provided', () => {
+    it("does not ask for document assignment again if provided", () => {
       cyMockDefault(cy, {
         gqlQueries: [
-          mockGQL('FetchGoogleDocs', {
+          mockGQL("FetchGoogleDocs", {
             fetchGoogleDocs: [gDocWithoutAssignmentDescription],
           }),
-          mockGQL(
-            'StoreUserDoc',
-            storeUserDocResponse(gDocWithAllIntentions)
-          ),
+          mockGQL("StoreUserDoc", storeUserDocResponse(gDocWithAllIntentions)),
         ],
       });
       cy.visit(`/docs/${testGoogleDocId}`);
-      writeDocumentAssignment(cy, 'test');
+      writeDocumentAssignment(cy, "test");
       clickNextIntentionModal(cy);
-      didDocDataGetSaved(cy, undefined, 'test');
+      didDocDataGetSaved(cy, undefined, "test");
       goToMyEditableActivity(cy);
       reOpenModal(cy);
       isOnSelectGoalScreen(cy);
@@ -325,174 +301,174 @@ describe('collectin user intentions', () => {
     });
   });
 
-  describe('session intention (in memory only)', () => {
-    describe('stronger hook activity', () => {
+  describe("session intention (in memory only)", () => {
+    describe("stronger hook activity", () => {
       it("collects and saves session intention when asked what they'd like to revise", () => {
         cyMockDefault(cy);
         cy.visit(`/docs/${testGoogleDocId}`);
-        cyMockOpenAiCall(cy, {response: myEditableActivityResponse()});
+        cyMockOpenAiCall(cy, { response: myEditableActivityResponse() });
         goToMyEditableActivity(cy);
-        sendChatMessage(cy, 'This is my session intention.');
+        sendChatMessage(cy, "This is my session intention.");
         didDocVersionDataGetSaved(
           cy,
-          'This is my session intention.',
-          'Aliens document intention',
-          'Aliens day intention'
+          "This is my session intention.",
+          "Aliens document intention",
+          "Aliens day intention",
         );
       });
     });
 
-    it('resetting activity clears session intention', () => {
+    it("resetting activity clears session intention", () => {
       cyMockDefault(cy);
       cy.visit(`/docs/${testGoogleDocId}`);
-      cyMockOpenAiCall(cy, {response: myEditableActivityResponse()});
+      cyMockOpenAiCall(cy, { response: myEditableActivityResponse() });
       goToMyEditableActivity(cy);
       didDocVersionDataGetSaved(
         cy,
         undefined,
-        'Aliens document intention',
-        'Aliens day intention'
+        "Aliens document intention",
+        "Aliens day intention",
       );
-      sendChatMessage(cy, 'This is my intention');
-      cy.get('[data-cy=messages-container]').should(
-        'contain.text',
-        'Hello, This is my intention!'
+      sendChatMessage(cy, "This is my intention");
+      cy.get("[data-cy=messages-container]").should(
+        "contain.text",
+        "Hello, This is my intention!",
       );
       didDocVersionDataGetSaved(
         cy,
-        'This is my intention',
-        'Aliens document intention',
-        'Aliens day intention'
+        "This is my intention",
+        "Aliens document intention",
+        "Aliens day intention",
       );
-      cy.get('[data-cy=reset-activity-button]').click();
+      cy.get("[data-cy=reset-activity-button]").click();
       didDocVersionDataGetSaved(
         cy,
         undefined,
-        'Aliens document intention',
-        'Aliens day intention'
+        "Aliens document intention",
+        "Aliens day intention",
       );
     });
   });
-['AMAZON_COGNITO', 'GOOGLE'].forEach((loginService) => {
-  const extraGqlQueries = [
+  ["AMAZON_COGNITO", "GOOGLE"].forEach((loginService) => {
+    const extraGqlQueries = [
       mockGQL(
-          'RefreshAccessToken',
-          refreshAccessTokenResponse('USER', loginService)
-          ),
-  ]
-  const docService = getDocServiceFromLoginService(loginService)
-  describe(`intentions are saved with doc versions for ${loginService}`, () => {
-    it('saves most up to date session intentions with doc versions', () => {
-      cyMockDefault(cy, {gqlQueries: extraGqlQueries});
-      cy.visit(`/docs/${testGoogleDocId}`);
-      cyMockOpenAiCall(cy, {response: myEditableActivityResponse()});
-      goToMyEditableActivity(cy);
-      sendChatMessage(cy, 'This is my session intention.');
-      didDocVersionDataGetSaved(
-        cy,
-        'This is my session intention.',
-        'Aliens document intention',
-        'Aliens day intention'
-      );
-    });
-
-    it('saves day intentions with doc versions', () => {
-      cyMockDefault(cy, {
-        gqlQueries: [
-          ...extraGqlQueries,
-          mockGQL('FetchGoogleDocs', {
-            fetchGoogleDocs: [
-              {
-                ...gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention,
-                service: docService
-              },
-            ],
-          }),
-          mockGQL(
-            'StoreUserDoc',
-            storeUserDocResponse({
-              ...gDocWithAllIntentions,
-              service: docService
-            })
-          ),
-        ],
+        "RefreshAccessToken",
+        refreshAccessTokenResponse("USER", loginService),
+      ),
+    ];
+    const docService = getDocServiceFromLoginService(loginService);
+    describe(`intentions are saved with doc versions for ${loginService}`, () => {
+      it("saves most up to date session intentions with doc versions", () => {
+        cyMockDefault(cy, { gqlQueries: extraGqlQueries });
+        cy.visit(`/docs/${testGoogleDocId}`);
+        cyMockOpenAiCall(cy, { response: myEditableActivityResponse() });
+        goToMyEditableActivity(cy);
+        sendChatMessage(cy, "This is my session intention.");
+        didDocVersionDataGetSaved(
+          cy,
+          "This is my session intention.",
+          "Aliens document intention",
+          "Aliens day intention",
+        );
       });
-      cy.visit(`/docs/${testGoogleDocId}`);
-      writeDayIntention(cy, 'Aliens day intention');
-      clickNextIntentionModal(cy);
-      didDocDataGetSaved(cy, undefined, undefined, 'Aliens day intention');
-      goToMyEditableActivity(cy);
-      didDocVersionDataGetSaved(
-        cy,
-        undefined,
-        'Aliens document intention',
-        'Aliens day intention'
-      );
-    });
 
-    it('save document intentions with doc versions', () => {
-      cyMockDefault(cy, {
-        gqlQueries: [
-          ...extraGqlQueries,
-          mockGQL('FetchGoogleDocs', {
-            fetchGoogleDocs: [
-              {
-                ...gDocWithoutDocumentIntention,
-                service: docService
-              },
-            ],
-          }),
-          mockGQL(
-            'StoreUserDoc',
-            storeUserDocResponse({
-              ...gDocWithAllIntentions,
-              service: docService
-            })
-          ),
-        ],
+      it("saves day intentions with doc versions", () => {
+        cyMockDefault(cy, {
+          gqlQueries: [
+            ...extraGqlQueries,
+            mockGQL("FetchGoogleDocs", {
+              fetchGoogleDocs: [
+                {
+                  ...gDocWithoutCurrentDayIntentionAndExpiredDocumentIntention,
+                  service: docService,
+                },
+              ],
+            }),
+            mockGQL(
+              "StoreUserDoc",
+              storeUserDocResponse({
+                ...gDocWithAllIntentions,
+                service: docService,
+              }),
+            ),
+          ],
+        });
+        cy.visit(`/docs/${testGoogleDocId}`);
+        writeDayIntention(cy, "Aliens day intention");
+        clickNextIntentionModal(cy);
+        didDocDataGetSaved(cy, undefined, undefined, "Aliens day intention");
+        goToMyEditableActivity(cy);
+        didDocVersionDataGetSaved(
+          cy,
+          undefined,
+          "Aliens document intention",
+          "Aliens day intention",
+        );
       });
-      cy.visit(`/docs/${testGoogleDocId}`);
-      writeDocumentIntention(cy, 'Aliens document intention');
-      clickNextIntentionModal(cy);
-      didDocDataGetSaved(cy, 'Aliens document intention');
-      goToMyEditableActivity(cy);
-      didDocVersionDataGetSaved(
-        cy,
-        undefined,
-        'Aliens document intention',
-        'Aliens day intention'
-      );
+
+      it("save document intentions with doc versions", () => {
+        cyMockDefault(cy, {
+          gqlQueries: [
+            ...extraGqlQueries,
+            mockGQL("FetchGoogleDocs", {
+              fetchGoogleDocs: [
+                {
+                  ...gDocWithoutDocumentIntention,
+                  service: docService,
+                },
+              ],
+            }),
+            mockGQL(
+              "StoreUserDoc",
+              storeUserDocResponse({
+                ...gDocWithAllIntentions,
+                service: docService,
+              }),
+            ),
+          ],
+        });
+        cy.visit(`/docs/${testGoogleDocId}`);
+        writeDocumentIntention(cy, "Aliens document intention");
+        clickNextIntentionModal(cy);
+        didDocDataGetSaved(cy, "Aliens document intention");
+        goToMyEditableActivity(cy);
+        didDocVersionDataGetSaved(
+          cy,
+          undefined,
+          "Aliens document intention",
+          "Aliens day intention",
+        );
+      });
     });
   });
-});
 
-  describe('sessionId changes', () => {
-    it('sessionId exists when user visits a new document', () => {
+  describe("sessionId changes", () => {
+    it("sessionId exists when user visits a new document", () => {
       cyMockDefault(cy);
       cy.visit(`/docs/${testGoogleDocId}`);
       goToMyEditableActivity(cy);
       checkNumberSessionIds(cy, 1);
     });
 
-    it('sessionId changes when user revisits a document', () => {
+    it("sessionId changes when user revisits a document", () => {
       cyMockDefault(cy);
       cy.visit(`/docs/${testGoogleDocId}`);
       goToMyEditableActivity(cy);
       checkNumberSessionIds(cy, 1);
-      cy.get('[data-cy=doc-home-button]').click();
-      cy.get('[data-cy=doc-list-item-Aliens-2]').click();
+      cy.get("[data-cy=doc-home-button]").click();
+      cy.get("[data-cy=doc-list-item-Aliens-2]").click();
       goToMyEditableActivity(cy);
       checkNumberSessionIds(cy, 2);
     });
 
-    it('sessionId changes when resetting activity', () => {
+    it("sessionId changes when resetting activity", () => {
       cyMockDefault(cy);
       cy.visit(`/docs/${testGoogleDocId}`);
       goToMyEditableActivity(cy);
       checkNumberSessionIds(cy, 1);
-      cy.get('[data-cy=reset-activity-button]').click();
+      cy.get("[data-cy=reset-activity-button]").click();
       checkNumberSessionIds(cy, 2);
-      cy.get('[data-cy=reset-activity-button]').click();
+      cy.get("[data-cy=reset-activity-button]").click();
       checkNumberSessionIds(cy, 3);
     });
   });

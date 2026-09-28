@@ -4,22 +4,22 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { Course } from './educational-types';
+import { Course } from "./educational-types";
 
 export const newTestCourse: Course = {
-  _id: 'new-course-123',
-  title: 'New Test Course',
-  description: 'A newly created test course.',
-  courseCode: 'TEST101',
-  sectionIds: []
+  _id: "new-course-123",
+  title: "New Test Course",
+  description: "A newly created test course.",
+  courseCode: "TEST101",
+  sectionIds: [],
 };
 
 export const updatedTestCourse: Course = {
-  _id: 'course-123',
-  title: 'Updated Course Title',
-  description: 'An updated course description.',
-  courseCode: 'CS101-UPDATED',
-  sectionIds: ['section-456', 'section-789']
+  _id: "course-123",
+  title: "Updated Course Title",
+  description: "An updated course description.",
+  courseCode: "CS101-UPDATED",
+  sectionIds: ["section-456", "section-789"],
 };
 
 export interface AddOrUpdateCourseResponse {
@@ -27,19 +27,20 @@ export interface AddOrUpdateCourseResponse {
 }
 
 export const createCourseResponse: AddOrUpdateCourseResponse = {
-  addOrUpdateCourse: newTestCourse
+  addOrUpdateCourse: newTestCourse,
 };
 
 export const updateCourseResponse: AddOrUpdateCourseResponse = {
-  addOrUpdateCourse: updatedTestCourse
+  addOrUpdateCourse: updatedTestCourse,
 };
 
 export const deleteCourseResponse: AddOrUpdateCourseResponse = {
   addOrUpdateCourse: {
-    _id: 'course-123',
-    title: 'Introduction to Computer Science',
-    description: 'A comprehensive introduction to computer science principles and programming fundamentals.',
-    courseCode: 'CS101',
-    sectionIds: ['section-456', 'section-789']
-  }
+    _id: "course-123",
+    title: "Introduction to Computer Science",
+    description:
+      "A comprehensive introduction to computer science principles and programming fundamentals.",
+    courseCode: "CS101",
+    sectionIds: ["section-456", "section-789"],
+  },
 };

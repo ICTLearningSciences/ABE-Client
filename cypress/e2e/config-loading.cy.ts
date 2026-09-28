@@ -7,74 +7,71 @@ The full terms of this copyright and license should always be found in the root 
 import { fetchConfigResponse } from "../fixtures/fetch-config";
 import { cyMockDefault, mockGQL } from "../helpers/functions";
 
-describe("Config Loading Screen", ()=>{
-    it("loading screen not visible on successfull load", ()=>{
-        cyMockDefault(cy,
-            {
-                gqlQueries: [
-                    mockGQL('FetchConfig', fetchConfigResponse, {statusCode: 200})
-                ]
-            });
-        cy.visit("/");
-        cy.get("[data-cy=header]").should("exist")
-        cy.get("[data-cy=config-loading-screen]").should("not.exist");
-    })
+describe("Config Loading Screen", () => {
+  it("loading screen not visible on successfull load", () => {
+    cyMockDefault(cy, {
+      gqlQueries: [
+        mockGQL("FetchConfig", fetchConfigResponse, { statusCode: 200 }),
+      ],
+    });
+    cy.visit("/");
+    cy.get("[data-cy=header]").should("exist");
+    cy.get("[data-cy=config-loading-screen]").should("not.exist");
+  });
 
-    it("displays spinner on config load", ()=>{
-        cy.visit("/");
-        cy.get("[data-cy=config-loading-screen]").should("exist");
-        cy.get("[data-cy=config-loading-spinner]").should("exist");
-    })
+  it("displays spinner on config load", () => {
+    cy.visit("/");
+    cy.get("[data-cy=config-loading-screen]").should("exist");
+    cy.get("[data-cy=config-loading-spinner]").should("exist");
+  });
 
-    it("displays retry button on config load failure", ()=>{
-        cyMockDefault(cy,
-            {
-                gqlQueries: [
-                    mockGQL('FetchConfig', fetchConfigResponse, {statusCode: 500})
-                ]
-            }
-        );
-        cy.visit("/");
-        cy.get("[data-cy=config-loading-screen]").should("exist");
-        cy.get("[data-cy=config-load-retry-button]").should("exist");
-    })
+  it("displays retry button on config load failure", () => {
+    cyMockDefault(cy, {
+      gqlQueries: [
+        mockGQL("FetchConfig", fetchConfigResponse, { statusCode: 500 }),
+      ],
+    });
+    cy.visit("/");
+    cy.get("[data-cy=config-loading-screen]").should("exist");
+    cy.get("[data-cy=config-load-retry-button]").should("exist");
+  });
 
-    it("retries config load on retry button click", ()=>{
-        cyMockDefault(cy,
-            {
-                gqlQueries: [
-                    mockGQL('FetchConfig', [
-                        {error: ""},
-                        fetchConfigResponse
-                    ], {delayMs: 1000, statusCode: 500}),
-                ]
-            }
-        );
-        cy.visit("/");
-        cy.get("[data-cy=config-loading-screen]").should("exist");
-        cy.get("[data-cy=config-load-retry-button]").click();
-        cy.get("[data-cy=config-loading-screen]").should("exist");
-    })
+  it("retries config load on retry button click", () => {
+    cyMockDefault(cy, {
+      gqlQueries: [
+        mockGQL("FetchConfig", [{ error: "" }, fetchConfigResponse], {
+          delayMs: 1000,
+          statusCode: 500,
+        }),
+      ],
+    });
+    cy.visit("/");
+    cy.get("[data-cy=config-loading-screen]").should("exist");
+    cy.get("[data-cy=config-load-retry-button]").click();
+    cy.get("[data-cy=config-loading-screen]").should("exist");
+  });
 
-    it("gets banner from config", ()=>{
-        cyMockDefault(cy,
-            {
-                gqlQueries: [
-                    mockGQL('FetchConfig', {
-                        fetchConfig: {
-                            ...fetchConfigResponse.fetchConfig,
-                            bannerConfig:{
-                                bannerText: "THIS AWE SYSTEM IS UNCLASSIFIED - DO NOT USE WITH CUI OR RESTRICTED MATERIALS",
-                                bannerTextColor: "#ffffff",
-                                bannerBgColor: "#067a35"
-                            }
-                        }
-                    }, {statusCode: 200})
-                ]
-            }
-        );
-        cy.visit("/");
-        cy.get("[data-cy=cui-banner]").should("exist");
-    })
-
-})
+  it("gets banner from config", () => {
+    cyMockDefault(cy, {
+      gqlQueries: [
+        mockGQL(
+          "FetchConfig",
+          {
+            fetchConfig: {
+              ...fetchConfigResponse.fetchConfig,
+              bannerConfig: {
+                bannerText:
+                  "THIS AWE SYSTEM IS UNCLASSIFIED - DO NOT USE WITH CUI OR RESTRICTED MATERIALS",
+                bannerTextColor: "#ffffff",
+                bannerBgColor: "#067a35",
+              },
+            },
+          },
+          { statusCode: 200 },
+        ),
+      ],
+    });
+    cy.visit("/");
+    cy.get("[data-cy=cui-banner]").should("exist");
+  });
+});

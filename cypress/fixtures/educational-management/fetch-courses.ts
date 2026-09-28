@@ -4,22 +4,24 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { Course } from './educational-types';
+import { Course } from "./educational-types";
 
 export const testCourse: Course = {
-  _id: 'course-123',
-  title: 'Introduction to Computer Science',
-  description: 'A comprehensive introduction to computer science principles and programming fundamentals.',
-  courseCode: 'CS101',
-  sectionIds: ['section-456', 'section-789']
+  _id: "course-123",
+  title: "Introduction to Computer Science",
+  description:
+    "A comprehensive introduction to computer science principles and programming fundamentals.",
+  courseCode: "CS101",
+  sectionIds: ["section-456", "section-789"],
 };
 
 export const testCourse2: Course = {
-  _id: 'course-456',
-  title: 'Advanced Programming',
-  description: 'Advanced topics in programming including data structures and algorithms.',
-  courseCode: 'CS201',
-  sectionIds: ['section-abc']
+  _id: "course-456",
+  title: "Advanced Programming",
+  description:
+    "Advanced topics in programming including data structures and algorithms.",
+  courseCode: "CS201",
+  sectionIds: ["section-abc"],
 };
 
 export interface FetchCoursesResponse {
@@ -27,13 +29,13 @@ export interface FetchCoursesResponse {
 }
 
 export const fetchCoursesResponseInstructor: FetchCoursesResponse = {
-  fetchCourses: [testCourse, testCourse2]
+  fetchCourses: [testCourse, testCourse2],
 };
 
 export const fetchCoursesResponseStudent: FetchCoursesResponse = {
-  fetchCourses: [testCourse]
+  fetchCourses: [testCourse],
 };
 
 export const fetchCoursesResponseEmpty: FetchCoursesResponse = {
-  fetchCourses: []
+  fetchCourses: [],
 };
