@@ -119,6 +119,20 @@ export function TTSConfigEditor(props: {
             onChange={(e) => editConfig({ language: e.target.value })}
             fullWidth
           />
+          <TextField
+            select
+            label="Voice Speed"
+            value={props.panelist.ttsConfig?.speed || "medium"}
+            onChange={(e) => editConfig({ speed: e.target.value })}
+            fullWidth
+          >
+            <MenuItem value="x-slow">Extra Slow</MenuItem>
+            <MenuItem value="slow">Slow</MenuItem>
+            <MenuItem value="medium">Medium</MenuItem>
+            <MenuItem value="fast">Fast</MenuItem>
+            <MenuItem value="x-fast">Extra Fast</MenuItem>
+          </TextField>
+
           <div className="row center">
             <TextField
               label="Test Voice Line"

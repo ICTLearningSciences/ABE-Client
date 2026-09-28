@@ -6,6 +6,8 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import { useEffect, useState } from "react";
+import { v4 as uuid } from "uuid";
+
 import { BuiltActivityHandler } from "../classes/activity-builder-activity/built-activity-handler";
 import type { ChatMessageTypes } from "../store/slices/chat";
 import { useWithChat } from "../store/slices/chat/use-with-chat";
@@ -21,13 +23,15 @@ import { useNavigateWithParams } from "./use-navigate-with-params";
 import { useWithPath } from "./use-with-path";
 import { useWithPanels } from "../store/slices/panels/use-with-panels";
 
-export const PLACE_UUID_HERE = "place UUID Here";
-
 export function useWithBuiltActivityHandler(
   resetActivityCounter: number,
   editDocGoal: () => void,
   selectedActivityBuilder?: ActivityBuilder,
 ) {
+  const [executionUUID, setExecutionUUID] = useState<string>(uuid());
+  const [executionIDs, setExecutionIDs] = useState<
+    Record<string, { disabled: boolean; timestamp: string }>
+  >({});
   const activePanelists = useAppSelector(
     (state) => state.panels.activePanelists,
   );
@@ -39,7 +43,7 @@ export function useWithBuiltActivityHandler(
   const docService = getDocServiceFromLoginService(user?.loginService);
   const { executePromptSteps } = useWithExecutePrompt();
   const { addNewSubscriber, removeAllSubscribers } =
-    useWithChatLogSubscribers();
+    useWithChatLogSubscribers(executionUUID);
   const {
     myData: myEducationalData,
     studentActivityCompleted,
@@ -70,7 +74,7 @@ export function useWithBuiltActivityHandler(
   useEffect(() => {
     if (!curDocId) {
       if (builtActivityHandler) {
-        builtActivityHandler.resetActivity(PLACE_UUID_HERE);
+        builtActivityHandler.resetActivity(executionUUID);
         setBuiltActivityHandler(undefined);
       }
       //hack to ensure that sendMessageHelper is fully loaded with googleDocId
@@ -124,7 +128,7 @@ export function useWithBuiltActivityHandler(
       updatesFound
     ) {
       builtActivityHandler.setBuiltActivityData(selectedActivityBuilder);
-      builtActivityHandler.resetActivity(PLACE_UUID_HERE);
+      builtActivityHandler.resetActivity(executionUUID);
     }
   }, [
     curDocId,
@@ -136,7 +140,7 @@ export function useWithBuiltActivityHandler(
 
   useEffect(() => {
     if (initialize) {
-      initialize.initializeActivity(PLACE_UUID_HERE);
+      initialize.initializeActivity(executionUUID);
       setBuiltActivityHandler(initialize);
       addNewSubscriber(initialize);
       setInitialize(undefined);
@@ -148,7 +152,7 @@ export function useWithBuiltActivityHandler(
       return;
     }
     newSession();
-    builtActivityHandler.resetActivity(PLACE_UUID_HERE);
+    builtActivityHandler.resetActivity(executionUUID);
   }, [resetActivityCounter]);
 
   useEffect(() => {
@@ -195,5 +199,6 @@ export function useWithBuiltActivityHandler(
 
   return {
     activityReady: Boolean(builtActivityHandler),
+    executionIDs,
   };
 }

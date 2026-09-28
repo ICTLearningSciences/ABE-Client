@@ -80,7 +80,7 @@ export function ChatThread(props: {
             messageIndex={index}
             viewed={viewedMessages.includes(message.id)}
           />
-          {message.mcqChoices && index === chatMessages.length - 1 && (
+          {message.mcqChoices && (
             <div
               key={`mcq-choices-${index}`}
               style={{

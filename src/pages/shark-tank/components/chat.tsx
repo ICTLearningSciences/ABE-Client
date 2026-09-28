@@ -48,16 +48,18 @@ export function Chat(props: {
   const coachResponsePending = useAppSelector(
     (state) => state.chat.coachResponsePending,
   );
-  const { builtActivityHandler, activityReady, resetActivity } =
-    props.useWithActivityHandler;
+  const {
+    activityReady,
+    resetActivity,
+    sendUserMessage,
+    builtActivityHandler,
+  } = props.useWithActivityHandler;
   const { activity, setActivity } = props.useWithPanelActivity;
 
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
-  const disableInput =
-    coachResponsePending ||
-    Boolean(
-      messages?.length > 0 && messages[messages.length - 1].disableUserInput,
-    );
+  const disableInput = Boolean(
+    messages?.length > 0 && messages[messages.length - 1].disableUserInput,
+  );
   const [openAiInfoToDisplay, setAiInfoToDisplay] =
     useState<AiServiceStepDataTypes[]>();
   const [viewSystemPrompts, setViewSystemPrompts] = useState<boolean>(false);
@@ -67,13 +69,15 @@ export function Chat(props: {
     ? systemPromptData[targetSystemPrompt]
     : "";
 
-  async function sendNewMessage(message: ChatMessageTypes) {
-    builtActivityHandler?.sendUserMessage(message);
-  }
-
   React.useEffect(() => {
     setSystemRole(systemRole);
   }, [systemRole]);
+
+  React.useEffect(() => {
+    console.warn(`messages: `, messages);
+    console.warn(`executionUUID: `, builtActivityHandler?.executionUUID);
+    console.warn(`UUIDs: `, builtActivityHandler?.executionUUIDs);
+  }, [messages]);
 
   return (
     <div
@@ -104,7 +108,7 @@ export function Chat(props: {
           />
           {curDocId && activityReady ? (
             <ChatThread
-              sendMessage={sendNewMessage}
+              sendMessage={sendUserMessage}
               coachResponsePending={coachResponsePending}
               curDocId={curDocId}
               chatLog={messages}
@@ -119,7 +123,7 @@ export function Chat(props: {
             </Typography>
           )}
           <ChatInput
-            sendMessage={sendNewMessage}
+            sendMessage={sendUserMessage}
             disableInput={!curDocId || !activityReady || disableInput}
           />
         </div>

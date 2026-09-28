@@ -28,6 +28,7 @@ export interface UseWithBuiltActivityHandler {
     selectedActivityBuilder: ActivityBuilder,
   ) => void;
   resetActivity: () => void;
+  sendUserMessage: (msg: ChatMessageTypes) => void;
 }
 
 export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
@@ -87,7 +88,6 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
     docId: string,
     selectedActivityBuilder: ActivityBuilder,
   ) {
-    console.warn(`startActivity ${docId} ${selectedActivityBuilder._id}`);
     const attachedPanel = selectedActivityBuilder.attachedPanel
       ? panels.find((p) => p.clientId === selectedActivityBuilder.attachedPanel)
       : undefined;
@@ -132,9 +132,16 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
 
   function resetActivity() {
     if (builtActivityHandler) {
+      builtActivityHandler.resetActivity();
       removeAllSubscribers();
       clearChatLog(curDocId);
       setBuiltActivityHandler(undefined);
+    }
+  }
+
+  function sendUserMessage(message: ChatMessageTypes) {
+    if (builtActivityHandler) {
+      builtActivityHandler.sendUserMessage(message);
     }
   }
 
@@ -178,5 +185,6 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
     activityReady: Boolean(builtActivityHandler),
     startActivity,
     resetActivity,
+    sendUserMessage,
   };
 }

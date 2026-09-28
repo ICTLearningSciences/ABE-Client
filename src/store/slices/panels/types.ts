@@ -11,6 +11,7 @@ export interface TTSConfig {
   voice: string;
   engine: string;
   language: string;
+  speed?: string;
 }
 
 export interface Panelist {
