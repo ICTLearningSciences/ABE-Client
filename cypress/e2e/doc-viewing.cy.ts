@@ -9,65 +9,64 @@ import { fetchGoogleDocsDated } from "../fixtures/fetch-google-docs";
 import { testUser } from "../fixtures/user-data";
 import { cyMockDefault, mockGQL } from "../helpers/functions";
 
-describe('Doc Viewing', () => {
-
-    it("Can sort by updated at", ()=>{
-      cyMockDefault(cy, {
-        userRole: 'ADMIN',
-        gqlQueries: [
-          mockGQL('FetchGoogleDocs', fetchGoogleDocsDated('GOOGLE_DOCS'))
-        ]
-      });
-      cy.visit(`/`);
-      cy.get("[data-cy='doc-list-item-0']").within(()=>{
-        cy.contains("Aliens 2")
-      })
-      cy.get("[data-cy='doc-list-item-1']").within(()=>{
-        cy.contains("Aliens")
-      })
-      cy.get("[data-cy='updated-at-header']").click();
-      cy.get("[data-cy='doc-list-item-0']").within(()=>{
-        cy.contains("Aliens")
-      })
-      cy.get("[data-cy='doc-list-item-1']").within(()=>{
-        cy.contains("Aliens 2")
-      })
-    })
-
-    it('can archive and unarchive a doc', ()=>{
-      cyMockDefault(cy, {
-        userRole: 'ADMIN',
-        gqlQueries: [
-            mockGQL('AddOrUpdateDoc', [
-              archiveDocResponse({
-                googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
-                user: testUser._id,
-                archived: true
-              }),
-              archiveDocResponse({
-                googleDocId: '1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y',
-                user: testUser._id,
-                archived: false})
-            ]),
-        ]
-      });
-      cy.visit(`/`);
-      cy.get("[data-cy='doc-list-item-0']").within(()=>{
-        cy.contains("Aliens")
-      })
-      cy.get("[data-cy='archive-doc-Aliens']").click();
-      cy.get("[data-cy='doc-list-item-0']").within(()=>{
-        cy.contains("Aliens 2")
-      })
-      cy.get("[data-cy='toggle-view-archived']").click();
-      cy.get("[data-cy='doc-list-item-0']").within(()=>{
-        cy.contains("Aliens")
-      })
-      cy.get("[data-cy='unarchive-doc-Aliens']").click();
-      cy.get("[data-cy='toggle-view-archived']").click();
-      cy.get("[data-cy='doc-list-item-0']").within(()=>{
-        cy.contains("Aliens")
-      })
-      
-    })
+describe("Doc Viewing", () => {
+  it("Can sort by updated at", () => {
+    cyMockDefault(cy, {
+      userRole: "ADMIN",
+      gqlQueries: [
+        mockGQL("FetchGoogleDocs", fetchGoogleDocsDated("GOOGLE_DOCS")),
+      ],
+    });
+    cy.visit(`/`);
+    cy.get("[data-cy='doc-list-item-0']").within(() => {
+      cy.contains("Aliens 2");
+    });
+    cy.get("[data-cy='doc-list-item-1']").within(() => {
+      cy.contains("Aliens");
+    });
+    cy.get("[data-cy='updated-at-header']").click();
+    cy.get("[data-cy='doc-list-item-0']").within(() => {
+      cy.contains("Aliens");
+    });
+    cy.get("[data-cy='doc-list-item-1']").within(() => {
+      cy.contains("Aliens 2");
+    });
   });
+
+  it("can archive and unarchive a doc", () => {
+    cyMockDefault(cy, {
+      userRole: "ADMIN",
+      gqlQueries: [
+        mockGQL("AddOrUpdateDoc", [
+          archiveDocResponse({
+            googleDocId: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
+            user: testUser._id,
+            archived: true,
+          }),
+          archiveDocResponse({
+            googleDocId: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
+            user: testUser._id,
+            archived: false,
+          }),
+        ]),
+      ],
+    });
+    cy.visit(`/`);
+    cy.get("[data-cy='doc-list-item-0']").within(() => {
+      cy.contains("Aliens");
+    });
+    cy.get("[data-cy='archive-doc-Aliens']").click();
+    cy.get("[data-cy='doc-list-item-0']").within(() => {
+      cy.contains("Aliens 2");
+    });
+    cy.get("[data-cy='toggle-view-archived']").click();
+    cy.get("[data-cy='doc-list-item-0']").within(() => {
+      cy.contains("Aliens");
+    });
+    cy.get("[data-cy='unarchive-doc-Aliens']").click();
+    cy.get("[data-cy='toggle-view-archived']").click();
+    cy.get("[data-cy='doc-list-item-0']").within(() => {
+      cy.contains("Aliens");
+    });
+  });
+});

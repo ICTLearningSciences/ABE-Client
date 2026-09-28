@@ -217,14 +217,12 @@ export function ChatThread(props: {
 
 export function ChatHistoryLog(props: { c: ChatHistory }): React.ReactNode {
   const { c } = props;
-  const { userDocs } = useAppSelector((state) => state.state);
   const { activePanel, panelists } = useWithPanels();
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [collapsed, setCollapsed] = useState<boolean>(true);
 
   const activePanelists = useAppSelector(
     (state) => state.panels.activePanelists,
   );
-  const doc = userDocs.find((d) => d.googleDocId === c.docId);
   const chatMessages: ChatMessageTypes[] = [...(c.chatLog || [])].filter(
     (m) => {
       const panelist = panelists.find(
@@ -251,9 +249,15 @@ export function ChatHistoryLog(props: { c: ChatHistory }): React.ReactNode {
           border: "2px solid rgb(87, 119, 82)",
         }}
       >
-        <Typography>{doc?.title}</Typography>
+        <div>
+          <Typography>
+            {c?.panelTitle}: {c?.docTitle}
+          </Typography>
+          <Typography variant="subtitle2" style={{ color: "#ccc" }}>
+            {c?.startDate}
+          </Typography>
+        </div>
         <div style={{ minWidth: 5, flexGrow: 1 }} />
-        <Typography>{c.startDate}</Typography>
         <IconButton
           style={{ color: "white" }}
           onClick={() => setCollapsed(!collapsed)}
@@ -284,7 +288,6 @@ export function ChatHistory(props: {
 }): React.ReactNode {
   const { clearChatHistory } = useWithChat();
   const { chatHistory } = useAppSelector((state) => state.chat);
-  const { userDocs } = useAppSelector((state) => state.state);
   const { height, width } = useWithWindowSize();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -356,7 +359,6 @@ export function ChatHistory(props: {
           style={{ zIndex: 9999 }}
         >
           {chatHistory.map((c, i) => {
-            const doc = userDocs.find((d) => d.googleDocId === c.docId);
             return (
               <MenuItem
                 key={i}
@@ -367,7 +369,7 @@ export function ChatHistory(props: {
                   setAnchorEl(null);
                 }}
               >
-                {doc?.title} - {c.startDate}
+                {c.panelTitle}: {c.docTitle} ({c.startDate})
               </MenuItem>
             );
           })}

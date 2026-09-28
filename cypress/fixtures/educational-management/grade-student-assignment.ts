@@ -4,22 +4,22 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { StudentData } from './educational-types';
-import { testStudent } from './fetch-students';
+import { StudentData } from "./educational-types";
+import { testStudent } from "./fetch-students";
 
 export const gradeStudentAssignment: StudentData = {
-    ...testStudent,
+  ...testStudent,
   assignmentProgress: [
-    ...testStudent.assignmentProgress.map(ap=>{
-        return {
-            ...ap,
-            instructorGrade: {
-                grade: 5,
-                comment: 'Great job!'
-            }
-        }
-    })
-  ]
+    ...testStudent.assignmentProgress.map((ap) => {
+      return {
+        ...ap,
+        instructorGrade: {
+          grade: 5,
+          comment: "Great job!",
+        },
+      };
+    }),
+  ],
 };
 
 export interface GradeStudentAssignmentResponse {
@@ -27,5 +27,5 @@ export interface GradeStudentAssignmentResponse {
 }
 
 export const gradeStudentAssignmentResponse: GradeStudentAssignmentResponse = {
-  gradeStudentAssignment: gradeStudentAssignment
+  gradeStudentAssignment: gradeStudentAssignment,
 };

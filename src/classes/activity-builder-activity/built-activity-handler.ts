@@ -599,6 +599,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     });
   }
 
+  sendUserMessage(message: ChatMessageTypes) {
+    this.sendMessage(message);
+  }
+
   async handleNewUserMessage(message: string, executionUUID: string) {
     if (!this.curStep) {
       throw new Error("No current step found");
@@ -1062,10 +1066,12 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           filters: mergedRagConfig.filters || {},
         }
       : undefined;
-    const webSearch = this.activePanelConfig[""]?.webSearch || config.webSearch;
-    const includeChatLogContext =
-      this.activePanelConfig[""]?.includeChatLog ||
-      config.includeChatLogContext;
+    const webSearch = this.activePanelConfig[""]?.disableWebSearch
+      ? false
+      : config.webSearch;
+    const includeChatLogContext = this.activePanelConfig[""]?.disableChatLog
+      ? false
+      : config.includeChatLogContext;
 
     const aiPromptSteps: AiPromptStep[] = [
       {

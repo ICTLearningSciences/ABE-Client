@@ -8,25 +8,25 @@ The full terms of this copyright and license should always be found in the root 
 import { User } from "../../src/types";
 
 export const testUser: User = {
-    "_id": "653972706e601e65dbc3acda",
-    "googleId": "112851111131325081111",
-    "name": "John Doe",
-    "email": "johndoe@gmail.com",
-    "userRole": 'USER',
-    "lastLoginAt": new Date(),
-    "loginService": 'GOOGLE',
-    "classroomCode": {
-        "code": "123456",
-        "createdAt": "2025-03-02T00:00:00.000Z",
+  _id: "653972706e601e65dbc3acda",
+  googleId: "112851111131325081111",
+  name: "John Doe",
+  email: "johndoe@gmail.com",
+  userRole: "USER",
+  lastLoginAt: new Date(),
+  loginService: "GOOGLE",
+  classroomCode: {
+    code: "123456",
+    createdAt: "2025-03-02T00:00:00.000Z",
+  },
+  previousClassroomCodes: [
+    {
+      code: "123456",
+      createdAt: "2025-03-02T00:00:00.000Z",
     },
-    "previousClassroomCodes": [
-        {
-            "code": "123456",
-            "createdAt": "2025-03-02T00:00:00.000Z",
-        },
-        {
-            "code": "123457",
-            "createdAt": "2025-03-02T00:00:00.000Z",
-        }
-    ]
-}
+    {
+      code: "123457",
+      createdAt: "2025-03-02T00:00:00.000Z",
+    },
+  ],
+};

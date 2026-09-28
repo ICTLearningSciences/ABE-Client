@@ -4,9 +4,18 @@ Permission to use, copy, modify, and distribute this software and its documentat
 
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
-import { CypressGlobal, cySetup, cyMockLogin, cyInterceptGraphQL, mockGQL, cyMockGoogleDoc, cyMockCreateNewDoc, cyMockGetDocTimeline } from './functions';
-import { refreshAccessTokenResponse } from '../fixtures/refresh-access-token';
-import { fetchConfigResponse } from '../fixtures/fetch-config';
+import {
+  CypressGlobal,
+  cySetup,
+  cyMockLogin,
+  cyInterceptGraphQL,
+  mockGQL,
+  cyMockGoogleDoc,
+  cyMockCreateNewDoc,
+  cyMockGetDocTimeline,
+} from "./functions";
+import { refreshAccessTokenResponse } from "../fixtures/refresh-access-token";
+import { fetchConfigResponse } from "../fixtures/fetch-config";
 import {
   fetchCoursesResponseInstructor,
   fetchCoursesResponseStudent,
@@ -33,20 +42,23 @@ import {
   deleteAssignmentResponse,
   enrollInSectionResponse,
   removeFromSectionResponse,
-} from '../fixtures/educational-management';
-import { updateStudentProgressResponse } from '../fixtures/educational-management/assignment-progress-operations';
-import { fetchBuiltActivitiesResponse } from '../fixtures/fetch-built-activities';
-import { MockGraphQLQuery } from './functions';
-import { gDocWithAllIntentions, storeUserDocResponse } from '../fixtures/intentions/google-docs-intentions';
-import { fetchGoogleDocsResponse } from '../fixtures/fetch-google-docs';
-import { fetchDocVersionsBuilder } from '../fixtures/fetch-doc-versions-builder';
-import { fetchDocGoalsResponse } from '../fixtures/fetch-doc-goals';
-import { fetchActivitiesResponse } from '../fixtures/fetch-activities';
-import { fetchInstructorsResponseEmpty } from '../fixtures/educational-management/fetch-instructors';
-import { realExampleDocumentTimeline } from '../fixtures/document-timeline/real-example';
-import { gradeStudentAssignmentResponse } from '../fixtures/educational-management/grade-student-assignment';
-import { UserRole } from '../../src/store/slices/login';
-import { EducationalRole } from '../../src/types';
+} from "../fixtures/educational-management";
+import { updateStudentProgressResponse } from "../fixtures/educational-management/assignment-progress-operations";
+import { fetchBuiltActivitiesResponse } from "../fixtures/fetch-built-activities";
+import { MockGraphQLQuery } from "./functions";
+import {
+  gDocWithAllIntentions,
+  storeUserDocResponse,
+} from "../fixtures/intentions/google-docs-intentions";
+import { fetchGoogleDocsResponse } from "../fixtures/fetch-google-docs";
+import { fetchDocVersionsBuilder } from "../fixtures/fetch-doc-versions-builder";
+import { fetchDocGoalsResponse } from "../fixtures/fetch-doc-goals";
+import { fetchActivitiesResponse } from "../fixtures/fetch-activities";
+import { fetchInstructorsResponseEmpty } from "../fixtures/educational-management/fetch-instructors";
+import { realExampleDocumentTimeline } from "../fixtures/document-timeline/real-example";
+import { gradeStudentAssignmentResponse } from "../fixtures/educational-management/grade-student-assignment";
+import { UserRole } from "../../src/store/slices/login";
+import { EducationalRole } from "../../src/types";
 
 export interface EducationalMockOptions {
   gqlQueries?: MockGraphQLQuery[] | MockGraphQLQuery;
@@ -60,12 +72,12 @@ export interface EducationalMockOptions {
 
 export function cyMockEducationalManagement(
   cy: CypressGlobal,
-  options: EducationalMockOptions = {}
+  options: EducationalMockOptions = {},
 ): void {
   const {
     gqlQueries = [],
-    userRole = 'USER',
-    educationalRole = 'INSTRUCTOR',
+    userRole = "USER",
+    educationalRole = "INSTRUCTOR",
     emptyCourses = false,
     emptySections = false,
     emptyAssignments = false,
@@ -81,100 +93,105 @@ export function cyMockEducationalManagement(
   });
 
   // Choose appropriate responses based on role and empty flags
-  const coursesResponse = emptyCourses 
-    ? fetchCoursesResponseEmpty 
-    : educationalRole === 'INSTRUCTOR' 
-      ? fetchCoursesResponseInstructor 
+  const coursesResponse = emptyCourses
+    ? fetchCoursesResponseEmpty
+    : educationalRole === "INSTRUCTOR"
+      ? fetchCoursesResponseInstructor
       : fetchCoursesResponseStudent;
 
-  const sectionsResponse = emptySections 
-    ? fetchSectionsResponseEmpty 
-    : educationalRole === 'INSTRUCTOR' 
-      ? fetchSectionsResponseInstructor 
+  const sectionsResponse = emptySections
+    ? fetchSectionsResponseEmpty
+    : educationalRole === "INSTRUCTOR"
+      ? fetchSectionsResponseInstructor
       : fetchSectionsResponseStudent;
 
-  const assignmentsResponse = emptyAssignments 
-    ? fetchAssignmentsResponseEmpty 
-    : educationalRole === 'INSTRUCTOR' 
-      ? fetchAssignmentsResponseInstructor 
+  const assignmentsResponse = emptyAssignments
+    ? fetchAssignmentsResponseEmpty
+    : educationalRole === "INSTRUCTOR"
+      ? fetchAssignmentsResponseInstructor
       : fetchAssignmentsResponseStudent;
 
-  const studentsResponse = emptyStudents 
-    ? fetchStudentsResponseEmpty 
+  const studentsResponse = emptyStudents
+    ? fetchStudentsResponseEmpty
     : fetchStudentsResponseInstructor;
 
-  const userDataResponse = educationalRole === 'INSTRUCTOR'
-    ? createNewInstructorResponse
-    : emptyCourses
-      ? createNewStudentEmptyResponse
-      : createNewStudentResponse;
+  const userDataResponse =
+    educationalRole === "INSTRUCTOR"
+      ? createNewInstructorResponse
+      : emptyCourses
+        ? createNewStudentEmptyResponse
+        : createNewStudentResponse;
 
   cyInterceptGraphQL(cy, [
     ...(Array.isArray(gqlQueries) ? gqlQueries : [gqlQueries]),
     // Authentication
-    mockGQL('RefreshAccessToken', refreshAccessTokenResponse(userRole, undefined, educationalRole)),
-    
+    mockGQL(
+      "RefreshAccessToken",
+      refreshAccessTokenResponse(userRole, undefined, educationalRole),
+    ),
+
     // Configuration
-    mockGQL('FetchConfig', fetchConfigResponse),
-    
+    mockGQL("FetchConfig", fetchConfigResponse),
+
     // Educational Management - Fetch Operations
-    mockGQL('FetchCourses', coursesResponse),
-    mockGQL('FetchSections', sectionsResponse),
-    mockGQL('FetchAssignments', assignmentsResponse),
-    mockGQL('FetchStudentsInMyCourses', studentsResponse),
-    mockGQL('FetchInstructors', fetchInstructorsResponseEmpty),
+    mockGQL("FetchCourses", coursesResponse),
+    mockGQL("FetchSections", sectionsResponse),
+    mockGQL("FetchAssignments", assignmentsResponse),
+    mockGQL("FetchStudentsInMyCourses", studentsResponse),
+    mockGQL("FetchInstructors", fetchInstructorsResponseEmpty),
     // User Data
-    mockGQL('CreateNewInstructor', userDataResponse),
-    mockGQL('CreateNewStudent', userDataResponse),
+    mockGQL("CreateNewInstructor", userDataResponse),
+    mockGQL("CreateNewStudent", userDataResponse),
 
     // Grade Student Assignment
-    mockGQL('GradeStudentAssignment', gradeStudentAssignmentResponse),
-    
+    mockGQL("GradeStudentAssignment", gradeStudentAssignmentResponse),
+
     // Course Operations
-    mockGQL('AddOrUpdateCourse', [
+    mockGQL("AddOrUpdateCourse", [
       createCourseResponse,
       updateCourseResponse,
       deleteCourseResponse,
     ]),
-    
+
     // Section Operations
-    mockGQL('AddOrUpdateSection', [
+    mockGQL("AddOrUpdateSection", [
       createSectionResponse,
       updateSectionResponse,
       deleteSectionResponse,
     ]),
-    
+
     // Assignment Operations
-    mockGQL('AddOrUpdateAssignment', [
+    mockGQL("AddOrUpdateAssignment", [
       createAssignmentResponse,
       updateAssignmentResponse,
       deleteAssignmentResponse,
     ]),
-    
+
     // Enrollment Operations
-    mockGQL('ModifySectionEnrollment', [
+    mockGQL("ModifySectionEnrollment", [
       enrollInSectionResponse,
       removeFromSectionResponse,
     ]),
-    
-    // Student Progress
-    mockGQL('ModifyStudentAssignmentProgress', updateStudentProgressResponse),
-    
-    // Built Activities (for assignment activities)
-    mockGQL('FetchBuiltActivities', fetchBuiltActivitiesResponse),
 
+    // Student Progress
+    mockGQL("ModifyStudentAssignmentProgress", updateStudentProgressResponse),
+
+    // Built Activities (for assignment activities)
+    mockGQL("FetchBuiltActivities", fetchBuiltActivitiesResponse),
 
     //
-    mockGQL('FetchVersionsById', fetchDocVersionsBuilder([])),
-    mockGQL('FetchGoogleDocs', fetchGoogleDocsResponse('GOOGLE_DOCS')),
-    mockGQL('FetchConfig', fetchConfigResponse),
-    mockGQL('FetchDocGoals', fetchDocGoalsResponse),
-    mockGQL('FetchSystemPrompts', fetchConfigResponse),
-    mockGQL('StoreUserDoc', storeUserDocResponse(gDocWithAllIntentions)),
-    mockGQL('FetchActivities', fetchActivitiesResponse),
-    mockGQL('FetchBuiltActivities', fetchBuiltActivitiesResponse),
-    mockGQL('FetchBuiltActivityVersions', {fetchBuiltActivityVersions: {
-      edges: []
-    }}),
+    mockGQL("FetchVersionsById", fetchDocVersionsBuilder([])),
+    mockGQL("FetchGoogleDocs", fetchGoogleDocsResponse("GOOGLE_DOCS")),
+    mockGQL("FetchConfig", fetchConfigResponse),
+    mockGQL("FetchDocGoals", fetchDocGoalsResponse),
+    mockGQL("FetchSystemPrompts", fetchConfigResponse),
+    mockGQL("StoreUserDoc", storeUserDocResponse(gDocWithAllIntentions)),
+    mockGQL("FetchActivities", fetchActivitiesResponse),
+    mockGQL("FetchBuiltActivities", fetchBuiltActivitiesResponse),
+    mockGQL("FetchBuiltActivityVersions", {
+      fetchBuiltActivityVersions: {
+        edges: [],
+      },
+    }),
   ]);
 }

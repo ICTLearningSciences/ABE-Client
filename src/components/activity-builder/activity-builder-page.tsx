@@ -37,6 +37,7 @@ export function ActivityBuilderPage(props: {
   addNewLocalBuiltActivity: () => ActivityBuilder;
   copyBuiltActivity: (activityId: string) => Promise<ActivityBuilder>;
   deleteBuiltActivity: (activityId: string) => Promise<void>;
+  loadBuiltActivities: () => Promise<ActivityBuilder[]>;
   userId?: string;
   canEditActivity: (activity: ActivityBuilder) => boolean;
   canDeleteActivity: (activity: ActivityBuilder) => boolean;
@@ -67,6 +68,7 @@ export function ActivityBuilderPage(props: {
     addNewLocalBuiltActivity,
     copyBuiltActivity,
     deleteBuiltActivity,
+    loadBuiltActivities,
     activityVersions,
     loadActivityVersions,
     executePromptSteps,
@@ -125,6 +127,7 @@ export function ActivityBuilderPage(props: {
                 setSelectedActivityClientId(newActivity.clientId);
               }}
               deleteBuiltActivity={deleteBuiltActivity}
+              loadBuiltActivities={loadBuiltActivities}
             />
           </ActivityBuilderProvider>
         );
