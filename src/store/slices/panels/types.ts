@@ -31,6 +31,7 @@ export interface Panel {
   panelName: string;
   panelDescription: string;
   panelists: string[];
+  groupSize: number;
 }
 
 export interface PanelResponseConfiguration {

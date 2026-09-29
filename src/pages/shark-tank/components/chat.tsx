@@ -15,7 +15,6 @@ import { useWithChat } from "../../../exported-files";
 import { type UseWithBuiltActivityHandler } from "../use-with-built-activity-handler";
 import { useWithSystemPromptsConfig } from "../../../hooks/use-with-system-prompts-config";
 import { useAppSelector } from "../../../store/hooks";
-import type { ChatMessageTypes } from "../../../store/slices/chat";
 import { ChatHeader } from "./chat-header";
 import { ChatInput } from "./chat-input";
 import { ChatThread } from "./chat-thread";
@@ -73,12 +72,6 @@ export function Chat(props: {
     setSystemRole(systemRole);
   }, [systemRole]);
 
-  React.useEffect(() => {
-    console.warn(`messages: `, messages);
-    console.warn(`executionUUID: `, builtActivityHandler?.executionUUID);
-    console.warn(`UUIDs: `, builtActivityHandler?.executionUUIDs);
-  }, [messages]);
-
   return (
     <div
       data-cy="chat-container-parent"
@@ -113,6 +106,7 @@ export function Chat(props: {
               curDocId={curDocId}
               chatLog={messages}
               setAiInfoToDisplay={setAiInfoToDisplay}
+              builtActivityHandler={builtActivityHandler}
             />
           ) : (
             <Typography
