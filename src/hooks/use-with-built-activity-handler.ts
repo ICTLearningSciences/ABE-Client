@@ -6,8 +6,6 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import { useEffect, useState } from "react";
-import { v4 as uuid } from "uuid";
-
 import { BuiltActivityHandler } from "../classes/activity-builder-activity/built-activity-handler";
 import type { ChatMessageTypes } from "../store/slices/chat";
 import { useWithChat } from "../store/slices/chat/use-with-chat";
@@ -28,10 +26,6 @@ export function useWithBuiltActivityHandler(
   editDocGoal: () => void,
   selectedActivityBuilder?: ActivityBuilder,
 ) {
-  const [executionUUID, setExecutionUUID] = useState<string>(uuid());
-  const [executionIDs, setExecutionIDs] = useState<
-    Record<string, { disabled: boolean; timestamp: string }>
-  >({});
   const activePanelists = useAppSelector(
     (state) => state.panels.activePanelists,
   );
@@ -43,7 +37,7 @@ export function useWithBuiltActivityHandler(
   const docService = getDocServiceFromLoginService(user?.loginService);
   const { executePromptSteps } = useWithExecutePrompt();
   const { addNewSubscriber, removeAllSubscribers } =
-    useWithChatLogSubscribers(executionUUID);
+    useWithChatLogSubscribers();
   const {
     myData: myEducationalData,
     studentActivityCompleted,
@@ -74,7 +68,7 @@ export function useWithBuiltActivityHandler(
   useEffect(() => {
     if (!curDocId) {
       if (builtActivityHandler) {
-        builtActivityHandler.resetActivity(executionUUID);
+        builtActivityHandler.resetActivity();
         setBuiltActivityHandler(undefined);
       }
       //hack to ensure that sendMessageHelper is fully loaded with googleDocId
@@ -128,7 +122,7 @@ export function useWithBuiltActivityHandler(
       updatesFound
     ) {
       builtActivityHandler.setBuiltActivityData(selectedActivityBuilder);
-      builtActivityHandler.resetActivity(executionUUID);
+      builtActivityHandler.resetActivity();
     }
   }, [
     curDocId,
@@ -140,7 +134,7 @@ export function useWithBuiltActivityHandler(
 
   useEffect(() => {
     if (initialize) {
-      initialize.initializeActivity(executionUUID);
+      initialize.initializeActivity();
       setBuiltActivityHandler(initialize);
       addNewSubscriber(initialize);
       setInitialize(undefined);
@@ -152,7 +146,7 @@ export function useWithBuiltActivityHandler(
       return;
     }
     newSession();
-    builtActivityHandler.resetActivity(executionUUID);
+    builtActivityHandler.resetActivity();
   }, [resetActivityCounter]);
 
   useEffect(() => {
@@ -199,6 +193,5 @@ export function useWithBuiltActivityHandler(
 
   return {
     activityReady: Boolean(builtActivityHandler),
-    executionIDs,
   };
 }
