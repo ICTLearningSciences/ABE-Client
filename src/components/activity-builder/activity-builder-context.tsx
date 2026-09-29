@@ -253,10 +253,17 @@ function editActivityReducer(
       return {
         ...state,
         flowsList: state.flowsList.map((f) => {
-          if (f.clientId === action.payload.flowClientId) {
+          if (
+            f.clientId === action.payload.stepId ||
+            f.clientId === action.payload.flowClientId
+          ) {
             return {
               ...f,
-              steps: f.steps.filter((s) => s.stepId !== action.payload.stepId),
+              steps: f.steps.filter(
+                (s) =>
+                  s.stepId !== action.payload.flowClientId &&
+                  s.stepId !== action.payload.stepId,
+              ),
             };
           }
           return f;

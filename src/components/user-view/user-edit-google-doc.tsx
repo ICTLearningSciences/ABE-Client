@@ -102,6 +102,7 @@ export function EditGoogleDoc(props: {
         voice: "Danielle",
         engine: "long-form",
         language: "en-US",
+        speed: "medium",
       },
     };
     addOrUpdatePanelist(newPanelist);
@@ -114,6 +115,7 @@ export function EditGoogleDoc(props: {
       panelName: "",
       panelDescription: "",
       panelists: [],
+      groupSize: 2,
     };
     addOrUpdatePanel(newPanel);
     return newPanel;

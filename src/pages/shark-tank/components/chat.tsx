@@ -15,7 +15,6 @@ import { useWithChat } from "../../../exported-files";
 import { type UseWithBuiltActivityHandler } from "../use-with-built-activity-handler";
 import { useWithSystemPromptsConfig } from "../../../hooks/use-with-system-prompts-config";
 import { useAppSelector } from "../../../store/hooks";
-import type { ChatMessageTypes } from "../../../store/slices/chat";
 import { ChatHeader } from "./chat-header";
 import { ChatInput } from "./chat-input";
 import { ChatThread } from "./chat-thread";
@@ -48,16 +47,18 @@ export function Chat(props: {
   const coachResponsePending = useAppSelector(
     (state) => state.chat.coachResponsePending,
   );
-  const { builtActivityHandler, activityReady, resetActivity } =
-    props.useWithActivityHandler;
+  const {
+    activityReady,
+    resetActivity,
+    sendUserMessage,
+    builtActivityHandler,
+  } = props.useWithActivityHandler;
   const { activity, setActivity } = props.useWithPanelActivity;
 
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
-  const disableInput =
-    coachResponsePending ||
-    Boolean(
-      messages?.length > 0 && messages[messages.length - 1].disableUserInput,
-    );
+  const disableInput = Boolean(
+    messages?.length > 0 && messages[messages.length - 1].disableUserInput,
+  );
   const [openAiInfoToDisplay, setAiInfoToDisplay] =
     useState<AiServiceStepDataTypes[]>();
   const [viewSystemPrompts, setViewSystemPrompts] = useState<boolean>(false);
@@ -66,10 +67,6 @@ export function Chat(props: {
   const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
     : "";
-
-  async function sendNewMessage(message: ChatMessageTypes) {
-    builtActivityHandler?.sendUserMessage(message);
-  }
 
   React.useEffect(() => {
     setSystemRole(systemRole);
@@ -104,11 +101,12 @@ export function Chat(props: {
           />
           {curDocId && activityReady ? (
             <ChatThread
-              sendMessage={sendNewMessage}
+              sendMessage={sendUserMessage}
               coachResponsePending={coachResponsePending}
               curDocId={curDocId}
               chatLog={messages}
               setAiInfoToDisplay={setAiInfoToDisplay}
+              builtActivityHandler={builtActivityHandler}
             />
           ) : (
             <Typography
@@ -119,7 +117,7 @@ export function Chat(props: {
             </Typography>
           )}
           <ChatInput
-            sendMessage={sendNewMessage}
+            sendMessage={sendUserMessage}
             disableInput={!curDocId || !activityReady || disableInput}
           />
         </div>

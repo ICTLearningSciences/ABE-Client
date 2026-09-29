@@ -39,6 +39,7 @@ import { useWithWindowSize } from "../../../hooks/use-with-window-size";
 import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
 import { useAppSelector } from "../../../store/hooks";
 import { useWithChat } from "../../../store/slices/chat/use-with-chat";
+import type { BuiltActivityHandler } from "../../../classes/activity-builder-activity/built-activity-handler";
 
 export function ChatThread(props: {
   coachResponsePending: boolean;
@@ -46,6 +47,7 @@ export function ChatThread(props: {
   curDocId: string;
   setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
   sendMessage: (message: ChatMessageTypes) => void;
+  builtActivityHandler: BuiltActivityHandler | undefined;
 }): React.ReactNode {
   const { coachResponsePending, setAiInfoToDisplay, sendMessage } = props;
   const { activePanel, panelists } = useWithPanels();
@@ -80,7 +82,8 @@ export function ChatThread(props: {
             messageIndex={index}
             viewed={viewedMessages.includes(message.id)}
           />
-          {message.mcqChoices && index === chatMessages.length - 1 && (
+          {}
+          {message.mcqChoices && (
             <div
               key={`mcq-choices-${index}`}
               style={{
@@ -126,6 +129,41 @@ export function ChatThread(props: {
       );
     },
   );
+  if (props.builtActivityHandler?.curStep?.stepType === "PROMPT") {
+    messageElements.push(
+      <div
+        key={`mcq-choices-skip`}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: "98%",
+          justifyContent: "flex-end",
+          alignItems: "flex-end",
+          margin: "10px",
+        }}
+      >
+        <Button
+          variant="outlined"
+          color="secondary"
+          style={{
+            borderWidth: "2px",
+            marginBottom: "5px",
+          }}
+          onClick={() => {
+            sendMessage({
+              id: uuidv4(),
+              message: "Skip waiting and continue to next step",
+              sender: "USER",
+              displayType: "TEXT",
+              userInputType: "MCQ",
+            });
+          }}
+        >
+          Skip to next
+        </Button>
+      </div>,
+    );
+  }
 
   function scrollToElementById(id: string) {
     const element = document.getElementById(id);
@@ -159,7 +197,7 @@ export function ChatThread(props: {
         () => {
           setPingRef(undefined);
         },
-        Math.min(3000, unviewedMessage.message.split(" ").length * 100),
+        Math.min(1000, unviewedMessage.message.split(" ").length * 100),
       );
       setPingRef(timeoutId);
       setViewedMessages([...viewedMessages, unviewedMessage.id]);

@@ -15,6 +15,7 @@ clientId
 panelName
 panelDescription
 panelists
+groupSize
 `;
 
 export const fetchPanelsQuery = `
@@ -61,6 +62,7 @@ ttsConfig {
   voice
   engine
   language
+  speed
 }
 `;
 

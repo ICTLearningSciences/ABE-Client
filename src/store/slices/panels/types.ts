@@ -11,6 +11,7 @@ export interface TTSConfig {
   voice: string;
   engine: string;
   language: string;
+  speed?: string;
 }
 
 export interface Panelist {
@@ -30,6 +31,7 @@ export interface Panel {
   panelName: string;
   panelDescription: string;
   panelists: string[];
+  groupSize: number;
 }
 
 export interface PanelResponseConfiguration {
