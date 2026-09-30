@@ -148,10 +148,13 @@ export function useWithLogin(): UseWithLogin {
     await dispatch(loginActions.logout());
     if (awsCognitoAuth.isAuthenticated && typeof window !== "undefined") {
       try {
+        const url = window.location.pathname.includes("shark-tank")
+          ? `${window.location.origin}/shark-tank`
+          : window.location.origin;
         await awsCognitoAuth.signoutRedirect({
           extraQueryParams: {
             client_id: import.meta.env.VITE_COGNITO_CLIENT_ID || "",
-            logout_uri: window.location.origin,
+            logout_uri: url,
           },
         });
       } catch (error) {

@@ -236,10 +236,16 @@ function MainApp() {
 
 function App() {
   const VITE_GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "123";
+  const url =
+    typeof window === "undefined"
+      ? ""
+      : window.location.pathname.includes("shark-tank")
+        ? `${window.location.origin}/shark-tank`
+        : window.location.origin;
   const cognitoAuthConfig: AuthProviderProps = {
     authority: import.meta.env.VITE_COGNITO_AUTHORITY || "",
     client_id: import.meta.env.VITE_COGNITO_CLIENT_ID || "",
-    redirect_uri: typeof window === "undefined" ? "" : window.location.origin,
+    redirect_uri: url,
     response_type: "code",
     scope: "email openid phone",
   };
