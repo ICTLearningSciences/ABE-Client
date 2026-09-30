@@ -50,7 +50,30 @@ export const configSlice = createSlice({
         state.status = 1;
       })
       .addCase(updateConfig.fulfilled, (state, action) => {
-        state.config = action.payload;
+        const aiServiceModelConfigs = action.payload.aiServiceModelConfigs;
+        const firstAvailableAiServiceModel: AiServiceModel | undefined =
+          aiServiceModelConfigs &&
+          aiServiceModelConfigs.length > 0 &&
+          aiServiceModelConfigs[0].modelList.length > 0
+            ? {
+                serviceName: aiServiceModelConfigs[0].serviceName,
+                model: aiServiceModelConfigs[0].modelList[0].name,
+              }
+            : undefined;
+        const defaultAiModel =
+          action.payload.defaultAiModel || firstAvailableAiServiceModel;
+
+        const colorTheme: ColorThemeConfig = {
+          ...DEFAULT_COLOR_THEME,
+          ...(action.payload.colorTheme || {}),
+        };
+
+        state.config = {
+          ...action.payload,
+          defaultAiModel,
+          colorTheme,
+        };
+
         state.status = 2;
       })
       .addCase(getConfig.pending, (state) => {
