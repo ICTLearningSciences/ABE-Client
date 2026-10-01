@@ -925,6 +925,10 @@ export async function fetchDocVersions(
       dataPath: "fetchVersionsById",
     },
   );
+  for (const docVersion of res) {
+    docVersion.markdownText = decodeURI(docVersion.markdownText);
+    docVersion.plainText = decodeURI(docVersion.plainText);
+  }
   return res;
 }
 
