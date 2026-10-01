@@ -98,6 +98,7 @@ export interface NewDocData {
 export interface DocData {
   plainText: string;
   markdownText: string;
+  uriEncoded: boolean;
   lastChangedId: string;
   title: string;
   lastModifyingUser: string;
@@ -127,6 +128,7 @@ export interface DocVersion {
   docId: string;
   plainText: string;
   markdownText: string;
+  uriEncoded: boolean;
   lastChangedId: string;
   sessionId: string;
   sessionIntention?: Intention;
@@ -388,6 +390,7 @@ export interface IGDocVersion {
   docId: string;
   plainText: string;
   markdownText: string;
+  uriEncoded?: boolean;
   lastChangedId: string;
   sessionId: string;
   sessionIntention?: Intention;

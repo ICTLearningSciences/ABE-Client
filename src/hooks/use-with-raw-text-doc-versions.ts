@@ -66,6 +66,7 @@ export function useWithRawTextDocVersions(
       docId: curDocId,
       plainText: docText,
       markdownText: markdownText,
+      uriEncoded: true,
       lastChangedId: "", // does not apply to raw text.
       sessionIntention,
       dayIntention: useDayIntention
