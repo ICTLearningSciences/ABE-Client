@@ -48,24 +48,6 @@ export function HugeRTEEditor({
 
   const editor = useRef<Editor>(null);
 
-  const editorConfig = useMemo(
-    () => ({
-      plugins: ["markdown", "lists"],
-      toolbar: [
-        { name: "history", items: ["undo", "redo"] },
-        { name: "styles", items: ["styles"] },
-        { name: "formatting", items: ["bold", "italic"] },
-        {
-          name: "alignment",
-          items: ["alignleft", "aligncenter", "alignright", "alignjustify"],
-        },
-        { name: "indentation", items: ["outdent", "indent"] },
-        { name: "lists", items: ["unordered", "ordered"] },
-      ],
-    }),
-    [],
-  );
-
   const debouncedUpdate = useMemo(
     () =>
       // eslint-disable-next-line react-hooks/refs
@@ -140,13 +122,17 @@ export function HugeRTEEditor({
   const MemoizedEditor = useMemo(
     () => (
       <Editor
-        initialValue={converter.makeHtml(initialDocData?.markdownText || "")}
         ref={editor}
+        initialValue={converter.makeHtml(initialDocData?.markdownText || "")}
         onChange={(value) => {
           console.log(value.target);
         }}
-        plugins={editorConfig.plugins}
-        toolbar={editorConfig.toolbar}
+        init={{
+          menubar: "edit view insert format",
+          plugins: ["markdown", "lists"],
+          toolbar:
+            "undo redo | styles | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | unordered ordered",
+        }}
         onEditorChange={handleEditorChange}
       />
     ),
