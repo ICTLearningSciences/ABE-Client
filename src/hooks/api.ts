@@ -229,8 +229,11 @@ export async function getDocData(
       },
     },
   );
-  res.data.markdownText = decodeURI(res.data.markdownText);
-  res.data.plainText = decodeURI(res.data.plainText);
+  if (res.data.uriEncoded) {
+    res.data.markdownText = decodeURI(res.data.markdownText);
+    res.data.plainText = decodeURI(res.data.plainText);
+  }
+
   return res.data;
 }
 
@@ -244,6 +247,7 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
             docId
             plainText
             markdownText
+            uriEncoded
             lastChangedId
             chatLog {
               sender
@@ -883,6 +887,7 @@ query FetchVersionsById($ids: [String!]!) {
           docId
           plainText
           markdownText
+          uriEncoded
           lastChangedId
           sessionId
           sessionIntention{
@@ -926,8 +931,10 @@ export async function fetchDocVersions(
     },
   );
   for (const docVersion of res) {
-    docVersion.markdownText = decodeURI(docVersion.markdownText);
-    docVersion.plainText = decodeURI(docVersion.plainText);
+    if (docVersion.uriEncoded) {
+      docVersion.markdownText = decodeURI(docVersion.markdownText);
+      docVersion.plainText = decodeURI(docVersion.plainText);
+    }
   }
   return res;
 }

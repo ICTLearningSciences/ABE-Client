@@ -102,6 +102,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         docId: curDocId,
         plainText: docData.plainText,
         markdownText: docData.markdownText,
+        uriEncoded: true,
         lastChangedId: docData.lastChangedId,
         sessionIntention,
         dayIntention: useDayIntention
