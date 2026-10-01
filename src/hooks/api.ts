@@ -229,6 +229,8 @@ export async function getDocData(
       },
     },
   );
+  res.data.markdownText = decodeURI(res.data.markdownText);
+  res.data.plainText = decodeURI(res.data.plainText);
   return res.data;
 }
 
@@ -262,6 +264,8 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
       variables: {
         googleDocData: {
           ...docVersion,
+          plainText: docVersion.plainText ? encodeURI(docVersion.plainText) : docVersion.plainText,
+          markdownText: docVersion.markdownText ? encodeURI(docVersion.markdownText) : docVersion.markdownText,
           dayIntention: docVersion.dayIntention
             ? {
                 description: docVersion.dayIntention.description,
