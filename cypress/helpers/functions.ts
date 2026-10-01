@@ -317,6 +317,7 @@ export function cyMockGetDocData(
   const defaultDocData: DocData = {
     plainText: encodeURI("This is a test doc"),
     markdownText: encodeURI("This is a test doc"),
+    uriEncoded: true,
     lastChangedId: "123",
     title: "Test Doc",
     lastModifyingUser: "",

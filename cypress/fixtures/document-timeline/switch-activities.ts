@@ -47,8 +47,9 @@ export const switchActivitiesDocVersions: IGDocVersion[] = [
   {
     _id: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
     docId: "1LqProM_kIFbMbMfZKzvlgaFNl5ii6z5xwyAsQZ0U87Y",
-    plainText: "CDC vaccines are great!\n",
-    markdownText: "CDC vaccines are great!\n",
+    plainText: encodeURI("CDC vaccines are great!\n"),
+    markdownText: encodeURI("CDC vaccines are great!\n"),
+    uriEncoded: true,
     lastChangedId:
       "ALBJ4LuqOjQVnAA3GapMNWBmG4F6vdvlfyZ-1VzMT3QtO1R3ZNros6a03RQWlZb16ebVWYnsMKjHOkJjNeEahs8",
     chatLog: [
