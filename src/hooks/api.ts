@@ -264,8 +264,12 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
       variables: {
         googleDocData: {
           ...docVersion,
-          plainText: docVersion.plainText ? encodeURI(docVersion.plainText) : docVersion.plainText,
-          markdownText: docVersion.markdownText ? encodeURI(docVersion.markdownText) : docVersion.markdownText,
+          plainText: docVersion.plainText
+            ? encodeURI(docVersion.plainText)
+            : docVersion.plainText,
+          markdownText: docVersion.markdownText
+            ? encodeURI(docVersion.markdownText)
+            : docVersion.markdownText,
           dayIntention: docVersion.dayIntention
             ? {
                 description: docVersion.dayIntention.description,
