@@ -13,7 +13,7 @@ import {
   Tooltip,
   DialogContent,
 } from "@mui/material";
-import { History, Replay, Tune } from "@mui/icons-material";
+import { History, Replay } from "@mui/icons-material";
 import type { ActivityTypes } from "../../../types";
 import { CssDialog } from ".";
 import { ChatHistory } from "./chat-thread";
@@ -42,12 +42,6 @@ export function ChatHeader(props: {
         padding: 10,
       }}
     >
-      <Tooltip title="Edit response settings">
-        <IconButton color="primary" onClick={() => setShowSettings(true)}>
-          <Tune />
-        </IconButton>
-      </Tooltip>
-      <Typography style={{ flexGrow: 1 }}>{selectedActivity?.title}</Typography>
       <Tooltip title="Chat history">
         <IconButton
           color="primary"
@@ -56,6 +50,7 @@ export function ChatHeader(props: {
           <History />
         </IconButton>
       </Tooltip>
+      <Typography style={{ flexGrow: 1 }}>{selectedActivity?.title}</Typography>
       <Tooltip title="Reset activity">
         <Button
           variant="outlined"
