@@ -47,7 +47,7 @@ export function ChatThread(props: {
   curDocId: string;
   setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
   sendMessage: (message: ChatMessageTypes) => void;
-  builtActivityHandler: BuiltActivityHandler | undefined;
+  builtActivityHandler: BuiltActivityHandler | null;
 }): React.ReactNode {
   const { coachResponsePending, setAiInfoToDisplay, sendMessage } = props;
   const { activePanel, panelists } = useWithPanels();
