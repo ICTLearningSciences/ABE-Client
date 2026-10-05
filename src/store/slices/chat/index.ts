@@ -81,11 +81,7 @@ const initialState: ChatState = {
 /** Reducer */
 
 function saveHistory(state: ChatHistory[]) {
-  try {
-    localStorage.setItem("chatHistory", JSON.stringify(state));
-  } catch {
-    console.error("failed to load history");
-  }
+  localStorage.setItem("chatHistory", JSON.stringify(state));
 }
 
 function loadHistory(): ChatHistory[] {

@@ -144,7 +144,6 @@ function SharkTankSetup(): React.ReactNode {
           color="primary"
           onClick={() => toggleActivePanelist(props.clientId)}
         >
-          {props.i !== undefined && <Typography>{props.i + 1}</Typography>}
           {activePanelists?.includes(props.clientId) ? (
             <CheckBox />
           ) : (
@@ -185,21 +184,10 @@ function SharkTankSetup(): React.ReactNode {
               </CssCard>
               <CssCard title="Panelists" icon={<PeopleOutlined />}>
                 <FlipMove className="column spacing">
-                  {activePanelists?.map((p, i) => {
-                    const panelist = {
-                      ...panelists.find((pp) => pp.clientId === p),
-                      i,
-                    };
+                  {activePanel?.panelists.map((p) => {
+                    const panelist = panelists.find((pp) => pp.clientId === p);
                     return <PanelMemberItem key={p} {...panelist} />;
                   })}
-                  {activePanel?.panelists
-                    ?.filter((p) => !activePanelists?.includes(p))
-                    .map((p) => {
-                      const panelist = panelists.find(
-                        (pp) => pp.clientId === p,
-                      );
-                      return <PanelMemberItem key={p} {...panelist} />;
-                    })}
                 </FlipMove>
               </CssCard>
               <Button

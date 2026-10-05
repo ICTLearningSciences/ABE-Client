@@ -5,6 +5,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 import { Header } from "./components/header";
 import { useWithLogin } from "../../store/slices/login/use-with-login";
@@ -14,6 +16,19 @@ import Login from "../login/login";
 const withAuthorizationOnly = (Component: any) => (props: any) => {
   const useLogin = useWithLogin();
   const loginState = useLogin.state;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (
+      (loginState.loginStatus === 1 || loginState.loginStatus === 4) &&
+      !loginState.accessToken
+    ) {
+      if (typeof window !== "undefined") {
+        navigate("/shark-tank");
+      }
+      navigate("/shark-tank");
+    }
+  }, [loginState]);
 
   if (loginState.loginStatus === 0 || loginState.loginStatus === 2) {
     return (

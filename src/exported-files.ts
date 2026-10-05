@@ -15,7 +15,6 @@ export { useWithChat } from "./store/slices/chat/use-with-chat";
 export { useWithConfig } from "./store/slices/config/use-with-config";
 export { docGoalsActivitiesReducer }; // store slice
 export { useWithDocGoalsActivities } from "./store/slices/doc-goals-activities/use-with-doc-goals-activites";
-export { useWithSpfxLogin } from "./store/slices/login/use-with-spfx-login";
 export { useWithState } from "./store/slices/state/use-with-state";
 export { useWithUsersDocs } from "./hooks/use-with-users-docs";
 export { useReduxHydration } from "./use-redux-hydration";
