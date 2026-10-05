@@ -10,6 +10,8 @@ import ReactMarkdown from "react-markdown";
 import { toast, ToastContainer } from "react-toastify";
 import remarkBreaks from "remark-breaks";
 import rehypeRaw from "rehype-raw";
+import rehypeExternalLinks from "rehype-external-links";
+
 import copy from "copy-to-clipboard";
 import {
   Avatar,
@@ -65,9 +67,16 @@ export default function Message(props: {
   async function textToSpeech() {
     setLoading(true);
     try {
+      let text = "";
+      const elem = document.getElementById(`markdown-${props.message.id}`);
+      if (elem) {
+        for (const child of elem.children) {
+          text += child.textContent;
+        }
+      }
       const voice = panelist?.ttsConfig || {};
       const audio = await getPollyTTS({
-        text: props.message.message,
+        text,
         ...voice,
       });
       setPlaying(true);
@@ -176,6 +185,7 @@ export default function Message(props: {
           style={{ marginTop: 10, marginLeft: 10 }}
         >
           <pre
+            id={`markdown-${message.id}`}
             style={{
               margin: 0,
               whiteSpace: "pre-wrap",
@@ -187,8 +197,19 @@ export default function Message(props: {
           >
             <ReactMarkdown
               remarkPlugins={[remarkBreaks]}
-              rehypePlugins={[rehypeRaw]}
+              rehypePlugins={[
+                rehypeRaw,
+                [rehypeExternalLinks, { target: "_blank" }],
+              ]}
               components={{
+                a: ({ children, href }) => {
+                  if (href && href.length > 2000) return <div>{children}</div>;
+                  return (
+                    <a href={href} target="_blank" rel="noreferrer">
+                      {children}
+                    </a>
+                  );
+                },
                 h1: ({ children }) => (
                   <h1
                     style={{
@@ -279,22 +300,17 @@ export default function Message(props: {
                 : ""}
             </ReactMarkdown>
           </pre>
-          {"sources" in message &&
-            message.sources &&
-            message.sources?.length > 0 && (
-              <div className="row center-div">
-                <ReferencesButton message={message} />
-              </div>
-            )}
-          <div
-            className="row"
-            style={{ position: "absolute", bottom: -5, right: 5 }}
-          >
+          <div className="row center-div">
             <Tooltip title="Copy to clipboard">
               <IconButton onClick={copyToClipboard}>
                 <ContentPaste fontSize="small" sx={{ color: "gray" }} />
               </IconButton>
             </Tooltip>
+            {"sources" in message &&
+              message.sources &&
+              message.sources?.length > 0 && (
+                <ReferencesButton message={message} />
+              )}
             <Tooltip title="Text to speech">
               <IconButton onClick={textToSpeech} disabled={playing}>
                 {loading ? (

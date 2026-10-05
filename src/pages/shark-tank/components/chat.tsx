@@ -56,9 +56,11 @@ export function Chat(props: {
   const { activity, setActivity } = props.useWithPanelActivity;
 
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
-  const disableInput = Boolean(
-    messages?.length > 0 && messages[messages.length - 1].disableUserInput,
-  );
+  const disableInput =
+    coachResponsePending ||
+    Boolean(
+      messages?.length > 0 && messages[messages.length - 1].disableUserInput,
+    );
   const [openAiInfoToDisplay, setAiInfoToDisplay] =
     useState<AiServiceStepDataTypes[]>();
   const [viewSystemPrompts, setViewSystemPrompts] = useState<boolean>(false);
@@ -118,7 +120,7 @@ export function Chat(props: {
           )}
           <ChatInput
             sendMessage={sendUserMessage}
-            disableInput={!curDocId || !activityReady || disableInput}
+            disableInput={disableInput}
           />
         </div>
         {systemPromptData && (

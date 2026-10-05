@@ -17,6 +17,7 @@ import {
 } from "../../local-storage";
 import type { UpdateUserInfo, User, UserAccessToken } from "../../../types";
 import { removeQueryParamFromUrl } from "../../../helpers";
+import { clearHistory } from "../chat";
 
 export interface UseWithLogin {
   state: loginActions.LoginState;
@@ -145,6 +146,7 @@ export function useWithLogin(): UseWithLogin {
   }
 
   async function logout() {
+    dispatch(clearHistory());
     await dispatch(loginActions.logout());
     if (awsCognitoAuth.isAuthenticated && typeof window !== "undefined") {
       try {

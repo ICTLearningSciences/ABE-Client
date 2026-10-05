@@ -6,8 +6,8 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import * as React from "react";
-import { Button, Grid, Typography } from "@mui/material";
-import { TextSnippet } from "@mui/icons-material";
+import { Button, Grid, IconButton, Typography } from "@mui/material";
+import { Close, TextSnippet } from "@mui/icons-material";
 
 import UserDocumentDisplay from "./components/doc-display";
 import { Header } from "./components/header";
@@ -88,7 +88,11 @@ function SharkTankChat(): React.ReactNode {
               ) : (
                 <div
                   className="column center-div"
-                  style={{ width: "100%", height: "100%" }}
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    height: "100%",
+                  }}
                 >
                   <UserDocumentDisplay
                     docId={curDocId}
@@ -96,13 +100,21 @@ function SharkTankChat(): React.ReactNode {
                     selectingDoc={selectingDoc}
                     onOpenDoc={(id) => onOpenDoc(id)}
                   />
-                  {selectingDoc && (
+                  {selectingDoc && curDocId && (
                     <Typography
                       variant="subtitle2"
                       style={{ marginBottom: 10 }}
                     >
                       (Note: Changing documents will clear your chat session)
                     </Typography>
+                  )}
+                  {selectingDoc && curDocId && (
+                    <IconButton
+                      style={{ position: "absolute", top: 0, right: 0 }}
+                      onClick={() => setSelectingDoc(false)}
+                    >
+                      <Close style={{ color: "white" }} />
+                    </IconButton>
                   )}
                 </div>
               )}
