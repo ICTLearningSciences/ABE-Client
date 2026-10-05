@@ -118,7 +118,7 @@ export function Chat(props: {
           )}
           <ChatInput
             sendMessage={sendUserMessage}
-            disableInput={!curDocId || !activityReady || disableInput}
+            disableInput={disableInput}
           />
         </div>
         {systemPromptData && (
