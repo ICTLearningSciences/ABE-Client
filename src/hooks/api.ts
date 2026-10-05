@@ -229,6 +229,11 @@ export async function getDocData(
       },
     },
   );
+  if (res.data.uriEncoded) {
+    res.data.markdownText = decodeURI(res.data.markdownText);
+    res.data.plainText = decodeURI(res.data.plainText);
+  }
+
   return res.data;
 }
 
@@ -242,6 +247,7 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
             docId
             plainText
             markdownText
+            uriEncoded
             lastChangedId
             chatLog {
               sender
@@ -262,6 +268,12 @@ export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
       variables: {
         googleDocData: {
           ...docVersion,
+          plainText: docVersion.plainText
+            ? encodeURI(docVersion.plainText)
+            : docVersion.plainText,
+          markdownText: docVersion.markdownText
+            ? encodeURI(docVersion.markdownText)
+            : docVersion.markdownText,
           dayIntention: docVersion.dayIntention
             ? {
                 description: docVersion.dayIntention.description,
@@ -442,65 +454,68 @@ export async function loginGoogle(
   );
 }
 
+const configQuery = `
+aiSystemPrompt
+privacyPolicy
+displayedGoalActivities{
+  goal
+  activities{
+    activity
+    disabled
+  }
+  builtActivities{
+    activity
+    disabled
+  }
+}
+colorTheme{
+  headerColor
+  headerButtonsColor
+  chatSystemBubbleColor
+  chatSystemTextColor
+  chatUserBubbleColor
+  chatUserTextColor
+}
+exampleGoogleDocs
+overrideAiModel{
+  serviceName
+  model
+}
+defaultAiModel{
+  serviceName
+  model
+}
+approvedEmailsForAiModels
+headerTitle
+orgName
+loginScreenTitle
+surveyConfig{
+  surveyLink
+  surveyQueryParam
+  surveyClassroomParam
+}
+bannerConfig{
+  bannerText
+  bannerTextColor
+  bannerBgColor
+}
+aiServiceModelConfigs{
+  serviceName
+  modelList{
+    name
+    maxTokens
+    supportsWebSearch
+    onlyAdminUse
+  }
+}
+`;
 export async function fetchConfig(subdomain?: string): Promise<Config> {
   return await execGql<Config>(
     {
       query: `
         query FetchConfig($subdomain: String){
           fetchConfig(subdomain: $subdomain) {
-            aiSystemPrompt
-            privacyPolicy
-            displayedGoalActivities{
-              goal
-              activities{
-                activity
-                disabled
-              }
-              builtActivities{
-                activity
-                disabled
-              }
-            }
-            colorTheme{
-              headerColor
-              headerButtonsColor
-              chatSystemBubbleColor
-              chatSystemTextColor
-              chatUserBubbleColor
-              chatUserTextColor
-            }
-            exampleGoogleDocs
-            overrideAiModel{
-              serviceName
-              model
-            }
-            defaultAiModel{
-              serviceName
-              model
-            }
-            approvedEmailsForAiModels
-            headerTitle
-            orgName
-            loginScreenTitle
-            surveyConfig{
-              surveyLink
-              surveyQueryParam
-              surveyClassroomParam
-            }
-            bannerConfig{
-              bannerText
-              bannerTextColor
-              bannerBgColor
-            }
-            aiServiceModelConfigs{
-              serviceName
-              modelList{
-                name
-                maxTokens
-                supportsWebSearch
-                onlyAdminUse
-              }
-            }
+            ${configQuery}
           }
         }
       `,
@@ -536,19 +551,21 @@ export async function fetchSystemPrompts(): Promise<string[]> {
  * @param key string key of the config to update
  * @param value Must be a JSON serializable type (string, list, object, etc.)
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function updateConfigByKey(key: string, value: any): Promise<any> {
+export async function updateConfigByKey(
+  key: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: any,
+): Promise<Config> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   if (!accessToken) throw new Error("No access token");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return execGql<any>(
+  return execGql<Config>(
     {
       query: `
-      mutation ConfigUpdateByKey($key: String!, $value: AnythingScalarType!) {
-        configUpdateByKey(key: $key, value: $value) {
-          aiSystemPrompt
-      }
-  }
+        mutation ConfigUpdateByKey($key: String!, $value: AnythingScalarType!) {
+          configUpdateByKey(key: $key, value: $value) {
+            ${configQuery}
+          }
+        }
     `,
       variables: {
         key: key,
@@ -556,7 +573,7 @@ export async function updateConfigByKey(key: string, value: any): Promise<any> {
       },
     },
     {
-      dataPath: ["configUpdateByKey", key],
+      dataPath: "configUpdateByKey",
       accessToken: accessToken,
     },
   );
@@ -870,6 +887,7 @@ query FetchVersionsById($ids: [String!]!) {
           docId
           plainText
           markdownText
+          uriEncoded
           lastChangedId
           sessionId
           sessionIntention{
@@ -912,6 +930,12 @@ export async function fetchDocVersions(
       dataPath: "fetchVersionsById",
     },
   );
+  for (const docVersion of res) {
+    if (docVersion.uriEncoded) {
+      docVersion.markdownText = decodeURI(docVersion.markdownText);
+      docVersion.plainText = decodeURI(docVersion.plainText);
+    }
+  }
   return res;
 }
 

@@ -68,7 +68,11 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
 
   async function checkForNewVersion() {
     try {
-      if (!messages.length || !sessionId) {
+      if (
+        !messages.length ||
+        !sessionId ||
+        curGoogleDoc?.service != "GOOGLE_DOCS"
+      ) {
         return;
       }
       const docData = await getDocData(curDocId, "GOOGLE_DOCS").catch((e) => {
@@ -98,6 +102,7 @@ export function useWithStoreDocVersions(selectedActivityId: string) {
         docId: curDocId,
         plainText: docData.plainText,
         markdownText: docData.markdownText,
+        uriEncoded: true,
         lastChangedId: docData.lastChangedId,
         sessionIntention,
         dayIntention: useDayIntention

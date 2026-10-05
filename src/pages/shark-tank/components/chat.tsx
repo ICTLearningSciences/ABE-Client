@@ -11,19 +11,16 @@ import { Typography } from "@mui/material";
 import type { AiServiceStepDataTypes } from "../../../ai-services/ai-service-types";
 import ViewPreviousRunModal from "../../../components/admin-view/view-previous-run-modal";
 import SystemPromptModal from "../../../components/user-view/chat/system-prompt-modal";
-import {
-  useWithState,
-  isActivityBuilder,
-  useWithChat,
-} from "../../../exported-files";
-import { useWithBuiltActivityHandler } from "../../../hooks/use-with-built-activity-handler";
+import { useWithChat } from "../../../exported-files";
+import { type UseWithBuiltActivityHandler } from "../use-with-built-activity-handler";
 import { useWithSystemPromptsConfig } from "../../../hooks/use-with-system-prompts-config";
 import { useAppSelector } from "../../../store/hooks";
-import type { ChatMessageTypes } from "../../../store/slices/chat";
-import type { ActivityTypes } from "../../../types";
 import { ChatHeader } from "./chat-header";
 import { ChatInput } from "./chat-input";
 import { ChatThread } from "./chat-thread";
+import React from "react";
+import type { UseWithPanels } from "../../../store/slices/panels/use-with-panels";
+import type { UseWithState } from "../../../store/slices/state/use-with-state";
 
 const GlobalChatStyles = createGlobalStyle`
   .MuiOutlinedInput-notchedOutline {
@@ -33,12 +30,11 @@ const GlobalChatStyles = createGlobalStyle`
 `;
 
 export function Chat(props: {
-  selectedActivity?: ActivityTypes;
-  setSelectedActivity: (activity: ActivityTypes) => void;
+  useWithDoc: UseWithState;
+  useWithActivityHandler: UseWithBuiltActivityHandler;
+  useWithPanelActivity: UseWithPanels;
 }) {
-  const { selectedActivity } = props;
-  const { state: chatState, sendMessage, setSystemRole } = useWithChat();
-
+  const { state: chatState, setSystemRole } = useWithChat();
   const {
     editedData: systemPromptData,
     editOrAddSystemPrompt,
@@ -47,39 +43,34 @@ export function Chat(props: {
     deleteSystemPrompt,
     isSaving,
   } = useWithSystemPromptsConfig();
-  const { state, newSession } = useWithState();
-  const { curDocId } = state;
+  const { curDocId } = props.useWithDoc.state;
   const coachResponsePending = useAppSelector(
     (state) => state.chat.coachResponsePending,
   );
-  const [resetActivityCounter, setResetActivityCounter] = useState<number>(0);
-  const { activityReady: builtActivityReady } = useWithBuiltActivityHandler(
-    resetActivityCounter,
-    () => {
-      /**/
-    },
-    selectedActivity && isActivityBuilder(selectedActivity)
-      ? selectedActivity
-      : undefined,
-  );
+  const {
+    activityReady,
+    resetActivity,
+    sendUserMessage,
+    builtActivityHandler,
+  } = props.useWithActivityHandler;
+  const { activity, setActivity } = props.useWithPanelActivity;
+
   const messages = curDocId ? chatState.chatLogs[curDocId] : [];
-  const disableInput =
-    coachResponsePending ||
-    Boolean(
-      messages?.length > 0 && messages[messages.length - 1].disableUserInput,
-    );
+  const disableInput = Boolean(
+    messages?.length > 0 && messages[messages.length - 1].disableUserInput,
+  );
   const [openAiInfoToDisplay, setAiInfoToDisplay] =
     useState<AiServiceStepDataTypes[]>();
   const [viewSystemPrompts, setViewSystemPrompts] = useState<boolean>(false);
   const [targetSystemPrompt, setTargetSystemPrompt] = useState<number>(0);
+
   const systemRole = systemPromptData
     ? systemPromptData[targetSystemPrompt]
     : "";
-  setSystemRole(systemRole);
 
-  async function sendNewMessage(message: ChatMessageTypes) {
-    sendMessage(message, false, curDocId);
-  }
+  React.useEffect(() => {
+    setSystemRole(systemRole);
+  }, [systemRole]);
 
   return (
     <div
@@ -104,20 +95,18 @@ export function Chat(props: {
           }}
         >
           <ChatHeader
-            selectedActivity={selectedActivity}
-            onSelectActivity={props.setSelectedActivity}
-            onReset={() => {
-              newSession();
-              setResetActivityCounter(resetActivityCounter + 1);
-            }}
+            selectedActivity={activity}
+            onSelectActivity={(a) => setActivity(a._id)}
+            onReset={resetActivity}
           />
-          {curDocId && builtActivityReady ? (
+          {curDocId && activityReady ? (
             <ChatThread
-              sendMessage={sendNewMessage}
+              sendMessage={sendUserMessage}
               coachResponsePending={coachResponsePending}
               curDocId={curDocId}
               chatLog={messages}
               setAiInfoToDisplay={setAiInfoToDisplay}
+              builtActivityHandler={builtActivityHandler}
             />
           ) : (
             <Typography
@@ -128,8 +117,8 @@ export function Chat(props: {
             </Typography>
           )}
           <ChatInput
-            sendMessage={sendNewMessage}
-            disableInput={!curDocId || !builtActivityReady || disableInput}
+            sendMessage={sendUserMessage}
+            disableInput={!curDocId || !activityReady || disableInput}
           />
         </div>
         {systemPromptData && (

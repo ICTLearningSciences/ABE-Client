@@ -6,27 +6,32 @@ The full terms of this copyright and license should always be found in the root 
 */
 import { ModifyStudentAssignmentProgressResponse } from "./enrollment-operations";
 import { studentWithUpdatedProgress } from "./enrollment-operations";
-import { AiServiceModel } from "../../fixtures/educational-management/educational-types"
+import { AiServiceModel } from "../../fixtures/educational-management/educational-types";
 
-export const updateStudentProgressResponse: ModifyStudentAssignmentProgressResponse = {
-    modifyStudentAssignmentProgress: studentWithUpdatedProgress
+export const updateStudentProgressResponse: ModifyStudentAssignmentProgressResponse =
+  {
+    modifyStudentAssignmentProgress: studentWithUpdatedProgress,
   };
 
-export function studentWithUpdatedActivityDefaultLLM(defaultLLM: AiServiceModel): ModifyStudentAssignmentProgressResponse {
-    return {
-        modifyStudentAssignmentProgress: {
-        ...studentWithUpdatedProgress,
-        assignmentProgress: studentWithUpdatedProgress.assignmentProgress.map(ap=>{
-            return {
-                ...ap,
-                activityCompletions: ap.activityCompletions.map(ac=>{
-                    return {
-                        ...ac,
-                        defaultLLM: defaultLLM
-                    }
-                })
-                }
-            })
-        }
-    }
-};
+export function studentWithUpdatedActivityDefaultLLM(
+  defaultLLM: AiServiceModel,
+): ModifyStudentAssignmentProgressResponse {
+  return {
+    modifyStudentAssignmentProgress: {
+      ...studentWithUpdatedProgress,
+      assignmentProgress: studentWithUpdatedProgress.assignmentProgress.map(
+        (ap) => {
+          return {
+            ...ap,
+            activityCompletions: ap.activityCompletions.map((ac) => {
+              return {
+                ...ac,
+                defaultLLM: defaultLLM,
+              };
+            }),
+          };
+        },
+      ),
+    },
+  };
+}

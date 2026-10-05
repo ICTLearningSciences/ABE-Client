@@ -31,7 +31,7 @@ export interface UseWithPanels {
   activePanel?: Panel;
   activePanelists?: Panelist[];
   activePanelConfig: Record<string, PanelResponseConfiguration>;
-  setActivity: (id: string) => void;
+  setActivity: (id?: string) => void;
   setActivePanel: (id: string) => void;
   setActivePanelists: (ids?: string[]) => void;
   setActivePanelConfig: (d: Record<string, PanelResponseConfiguration>) => void;
@@ -81,7 +81,13 @@ export function useWithPanels(): UseWithPanels {
     dispatch(panelApis.deletePanelist(panelistClientId));
   }
 
-  function setActivity(id: string): void {
+  function setActivity(id?: string): void {
+    if (!id) {
+      dispatch(panelApis.setActivity(undefined));
+      dispatch(panelApis.setActivePanel(undefined));
+      dispatch(panelApis.setActivePanelists([]));
+      return;
+    }
     const activity = builtActivities.find((a) => a._id === id);
     if (activity && activity.attachedPanel) {
       const panel = panels.find(

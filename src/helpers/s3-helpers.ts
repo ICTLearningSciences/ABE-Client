@@ -186,13 +186,17 @@ export function getPollyVoiceOptions(engine: string): string[] {
 
 export async function getPollyTTS(args: {
   text: string;
+  speed?: string;
   voice?: string;
   engine?: string;
   language?: string;
 }): Promise<HTMLAudioElement> {
-  let text = args.text;
+  let text = args.text
+    .replace("&", " and ")
+    .replace("<", " less than ")
+    .replace(">", " greater than ");
   if (!text.startsWith("<speak>") && !text.endsWith("</speak>")) {
-    text = `<speak>${text}</speak>`;
+    text = `<speak><prosody rate="${args.speed || "medium"}">${text}</prosody></speak>`;
   }
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const apiUrl = import.meta.env.VITE_ABE_API_ENDPOINT || "/graphql";

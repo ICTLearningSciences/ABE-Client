@@ -8,8 +8,15 @@ import React from "react";
 import { EditActivity } from "../../../src/components/activity-builder/edit-activity/edit-activity";
 import { multipleFlowActivity } from "../../../src/unit-tests/activity-builder-fixture";
 
-it("should render", ()=>{
-    let activity = multipleFlowActivity;
-    cy.viewport(1200, 800);
-    cy.mount(<EditActivity activity={activity} saveActivity={(activity)=>{return Promise.resolve(activity)}}/>);
-})
+it("should render", () => {
+  let activity = multipleFlowActivity;
+  cy.viewport(1200, 800);
+  cy.mount(
+    <EditActivity
+      activity={activity}
+      saveActivity={(activity) => {
+        return Promise.resolve(activity);
+      }}
+    />,
+  );
+});

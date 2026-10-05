@@ -6,29 +6,28 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 export const fetchDocGoalsResponse = {
-    "fetchDocGoals": {
-        "edges": [
-            {
-                "node": {
-                    "_id": "65823a8799045156193339b2",
-                    "title": "Free Input",
-                    "description": "Ask any question you'd like about your essay.",
-                    "displayIcon": "PENCIL_OUTLINE",
-                    "introduction": "Feel free to ask me any questions about your essay.",
-                    "activities": [],
-                }
-            },
-            {
-                "node": {
-                    "_id": "6580e5640ac7bcb42fc8d27f",
-                    "title": "Review & Revise",
-                    "description": "Review and Revise your paper.",
-                    "displayIcon": "PENCIL",
-                    "introduction": "",
-                    "activities": [],
-                    
-                }
-            },
-        ]
-    }
-}
+  fetchDocGoals: {
+    edges: [
+      {
+        node: {
+          _id: "65823a8799045156193339b2",
+          title: "Free Input",
+          description: "Ask any question you'd like about your essay.",
+          displayIcon: "PENCIL_OUTLINE",
+          introduction: "Feel free to ask me any questions about your essay.",
+          activities: [],
+        },
+      },
+      {
+        node: {
+          _id: "6580e5640ac7bcb42fc8d27f",
+          title: "Review & Revise",
+          description: "Review and Revise your paper.",
+          displayIcon: "PENCIL",
+          introduction: "",
+          activities: [],
+        },
+      },
+    ],
+  },
+};

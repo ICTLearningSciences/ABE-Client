@@ -60,6 +60,7 @@ interface UserResponseHandleState {
 interface PromptToExecute {
   config: SinglePromptConfiguration;
   panelist?: Panelist;
+  executionUUID?: string;
 }
 
 function getDefaultUserResponseHandleState(): UserResponseHandleState {
@@ -104,6 +105,15 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   filteredToPanelists: string[] = [];
   onFilteredPanelistsChanged?: (filteredPanelistIds: string[]) => void;
   activePanelConfig: Record<string, PanelResponseConfiguration> = {};
+  executionUUID: string;
+  executionUUIDs: Record<
+    string,
+    {
+      prompt?: PromptToExecute;
+      disabled?: boolean;
+      timestamp?: string;
+    }
+  > = {};
 
   getStepById(stepId: string): ActivityBuilderStep | undefined {
     if (
@@ -222,6 +232,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.addResponseNavigation = this.addResponseNavigation.bind(this);
     this.handleExtractMcqChoices = this.handleExtractMcqChoices.bind(this);
     this.applyButtonAction = this.applyButtonAction.bind(this);
+    this.executionUUID = "";
+    this.executionUUIDs = {};
   }
 
   setBuiltActivityData(builtActivityData?: ActivityBuilder) {
@@ -236,6 +248,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     ) {
       throw new Error("No built activity data found");
     }
+    this.executionUUID = uuidv4();
+    this.executionUUIDs = {};
     this.resetActivity();
   }
 
@@ -247,6 +261,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     ) {
       throw new Error("No built activity data found");
     }
+    this.executionUUID = uuidv4();
+    this.executionUUIDs = {};
     this.clearChat();
     this.curStep = this.builtActivityData.flowsList[0].steps[0];
     this.stateData = {};
@@ -275,6 +291,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           "Oops! A loop was detected in this activity, we are halting the activity to prevent an infinite loop. Please contact the activity creator to fix this issue.",
         sender: "SYSTEM",
         displayType: "TEXT",
+        executionUUID: this.executionUUID,
       });
       return;
     }
@@ -421,6 +438,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
               sender: "SYSTEM",
               systemCustomName: panelist.panelistName,
               displayType: "TEXT",
+              executionUUID: this.executionUUID,
             });
           } else {
             console.log("panelist not found", panelistClientId);
@@ -435,6 +453,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         sender: "SYSTEM",
         systemCustomName: step.systemCustomName,
         displayType: "TEXT",
+        executionUUID: this.executionUUID,
       });
     }
     await this.goToNextStep();
@@ -453,6 +472,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       displayType: "TEXT",
       disableUserInput: step.disableFreeInput,
       mcqChoices: this.handleExtractMcqChoices(processedPredefinedResponses),
+      executionUUID: this.executionUUID,
     });
     this.setWaitingForUserAnswer(true);
     // Will now wait for user input before progressing to next step
@@ -584,7 +604,20 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       sender: "SYSTEM",
       displayType: "TEXT",
       disableUserInput: true,
+      executionUUID: this.executionUUID,
     });
+  }
+
+  sendUserMessage(message: ChatMessageTypes) {
+    this.sendMessage({ ...message, executionUUID: this.executionUUID });
+    // cancel the currently running executions
+    for (const executionUUID of Object.keys(this.executionUUIDs)) {
+      this.executionUUIDs[executionUUID].disabled = true;
+    }
+    // skip remaining panel prompts and move onto the next step
+    if (this.curStep?.stepType !== "REQUEST_USER_INPUT") {
+      this.goToNextStep();
+    }
   }
 
   async handleNewUserMessage(message: string) {
@@ -697,6 +730,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           data: StateData;
           originalConfiguration: SinglePromptConfiguration;
           panelistClientId?: string;
+          executionUUID?: string;
         }
       | {
           type: "text";
@@ -706,6 +740,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           originalConfiguration: SinglePromptConfiguration;
           panelistClientId?: string;
           panelistName?: string;
+          executionUUID?: string;
         }
     >[] = [];
 
@@ -747,33 +782,42 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // split requests into chunks
     const resolvedAgentsCount = this.stateData[AGENT_RESULT_COUNT_KEY] || 0;
 
+    this.executionUUID = uuidv4();
+    this.executionUUIDs[this.executionUUID] = {
+      timestamp: new Date().toLocaleString(),
+      disabled: false,
+    };
     for (const promptToExecute of promptsToExecute.slice(
       resolvedAgentsCount,
-      resolvedAgentsCount + DEFAULT_CHUNK_SIZE,
+      resolvedAgentsCount +
+        (this.activityPanel?.groupSize || DEFAULT_CHUNK_SIZE),
     )) {
-      if (promptToExecute.panelist)
+      if (promptToExecute.panelist) {
         promptExecutions.push(
           this.executePanelistPromptConfiguration(
             promptToExecute.config,
             promptToExecute.panelist,
+            this.executionUUID,
             extraChat,
           ),
         );
-      else
+      } else
         promptExecutions.push(
           this.executeSinglePromptConfiguration(promptToExecute.config),
         );
     }
 
     const promptResults = await Promise.allSettled(promptExecutions);
-    await this.evaluatePromptResults(step, promptResults);
+    await this.evaluatePromptResults(step, promptResults, promptsToExecute);
 
     this.setResponsePending(false);
 
     if (this.stateData[AGENT_RESULT_COUNT_KEY] >= promptsToExecute.length) {
       this.stateData[AGENT_RESULT_COUNT_KEY] = 0;
       await this.goToNextStep();
-    } else await this.handlePromptStep(step, extraChat);
+    } else if (!this.executionUUIDs[this.executionUUID]?.disabled) {
+      await this.handlePromptStep(step, extraChat);
+    }
   }
 
   async evaluatePromptResults(
@@ -784,6 +828,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           data: StateData;
           originalConfiguration: SinglePromptConfiguration;
           panelistClientId?: string;
+          executionUUID?: string;
         }
       | {
           type: "text";
@@ -793,8 +838,10 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           originalConfiguration: SinglePromptConfiguration;
           panelistClientId?: string;
           panelistName?: string;
+          executionUUID?: string;
         }
     >[],
+    promptsToExecute: PromptToExecute[],
   ): Promise<ChatLog> {
     const resultText: ChatLog = [];
     // Check if any prompts failed
@@ -834,18 +881,29 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             }
           }
         } else if (result.value.type === "text") {
-          // Send text response as message
-          this.sendMessage({
-            id: uuidv4(),
-            message: result.value.message,
-            sources: result.value.sources,
-            aiServiceStepData: result.value.aiServiceStepData,
-            sender: "SYSTEM",
-            systemCustomName:
-              result.value.panelistName ||
-              result.value.originalConfiguration.systemCustomName,
-            displayType: "TEXT",
-          });
+          if (
+            result.value.executionUUID &&
+            this.executionUUIDs[result.value.executionUUID]?.disabled
+          ) {
+            // ignore message
+          } else {
+            // Send text response as message
+            this.sendMessage({
+              id: uuidv4(),
+              message: result.value.message,
+              sources: result.value.sources,
+              executionUUID: result.value.executionUUID,
+              moreMessagesExpected:
+                this.stateData[AGENT_RESULT_COUNT_KEY] <
+                promptsToExecute.length,
+              aiServiceStepData: result.value.aiServiceStepData,
+              sender: "SYSTEM",
+              systemCustomName:
+                result.value.panelistName ||
+                result.value.originalConfiguration.systemCustomName,
+              displayType: "TEXT",
+            });
+          }
           resultText.push({
             message: result.value.message,
             sources: result.value.sources,
@@ -978,6 +1036,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   async executePanelistPromptConfiguration(
     config: SinglePromptConfiguration,
     panelist: Panelist,
+    executionUUID: string,
     extraChat: ChatLog = [],
   ): Promise<
     | {
@@ -985,6 +1044,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         data: StateData;
         originalConfiguration: SinglePromptConfiguration;
         panelistClientId: string;
+        executionUUID: string;
       }
     | {
         type: "text";
@@ -995,6 +1055,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         originalConfiguration: SinglePromptConfiguration;
         panelistClientId: string;
         panelistName: string;
+        executionUUID: string;
       }
   > {
     // Build AI prompt steps with replaced data and panelist modifications
@@ -1039,10 +1100,12 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           filters: mergedRagConfig.filters || {},
         }
       : undefined;
-    const webSearch = this.activePanelConfig[""]?.webSearch || config.webSearch;
-    const includeChatLogContext =
-      this.activePanelConfig[""]?.includeChatLog ||
-      config.includeChatLogContext;
+    const webSearch = this.activePanelConfig[""]?.disableWebSearch
+      ? false
+      : config.webSearch;
+    const includeChatLogContext = this.activePanelConfig[""]?.disableChatLog
+      ? false
+      : config.includeChatLogContext;
 
     const aiPromptSteps: AiPromptStep[] = [
       {
@@ -1120,6 +1183,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       return {
         ...result,
         panelistClientId: panelist.clientId,
+        executionUUID,
       };
     } else {
       return {
@@ -1127,6 +1191,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         sources: result.sources,
         panelistClientId: panelist.clientId,
         panelistName: panelist.panelistName,
+        executionUUID,
       };
     }
   }

@@ -30,7 +30,7 @@ export function EditPanel(props: {
   const { panel, panelists, onSave, onCancel } = props;
   const [editedPanel, setEditedPanel] = React.useState<Panel>(panel);
 
-  const updateField = (field: keyof Panel, value: string) => {
+  const updateField = (field: keyof Panel, value: string | number) => {
     setEditedPanel({
       ...editedPanel,
       [field]: value,
@@ -105,6 +105,22 @@ export function EditPanel(props: {
           fullWidth
           multiline
           rows={3}
+        />
+
+        <TextField
+          label="Panel Group Size"
+          value={editedPanel.groupSize || 2}
+          type="number"
+          slotProps={{
+            htmlInput: {
+              min: 1,
+              max: 10,
+            },
+          }}
+          onChange={(e) =>
+            updateField("groupSize", Number.parseInt(e.target.value))
+          }
+          fullWidth
         />
 
         <div>

@@ -27,6 +27,7 @@ export interface ChatMessage {
   disableUserInput?: boolean;
   selectedGoal?: DocGoal;
   userInputType?: UserInputType;
+  executionUUID?: string;
   retryFunction?: () => void;
 }
 
@@ -40,6 +41,7 @@ export interface PendingMessage extends ChatMessage {
 export interface TextMessage extends ChatMessage {
   message: string;
   sources?: Source[];
+  moreMessagesExpected?: boolean;
 }
 
 export interface BulletPointMessage extends ChatMessage {
@@ -52,8 +54,13 @@ export type GoogleDocId = string;
 
 export interface ChatHistory {
   docId: GoogleDocId;
-  sessionId: string;
+  docTitle?: string;
+  activityId?: string;
+  activityTitle?: string;
+  panelId?: string;
+  panelTitle?: string;
   chatLog: ChatLog;
+  sessionId: string;
   startDate: string;
 }
 
@@ -104,7 +111,12 @@ export const chatSlice = createSlice({
         message: ChatMessageTypes;
         clearChat: boolean;
         docId: string;
+        docTitle?: string;
         sessionId: string;
+        activityId?: string;
+        activityTitle?: string;
+        panelId?: string;
+        panelTitle?: string;
       }>,
     ) => {
       const { message, clearChat, docId, sessionId } = action.payload;
@@ -113,9 +125,14 @@ export const chatSlice = createSlice({
       );
       if (historyIdx === -1) {
         state.chatHistory.push({
-          docId: docId,
-          sessionId: sessionId,
+          docId: action.payload.docId,
+          docTitle: action.payload.docTitle,
+          activityId: action.payload.activityId,
+          activityTitle: action.payload.activityTitle,
+          panelId: action.payload.panelId,
+          panelTitle: action.payload.panelTitle,
           chatLog: [message],
+          sessionId: action.payload.sessionId,
           startDate: new Date().toLocaleString(),
         });
       } else {

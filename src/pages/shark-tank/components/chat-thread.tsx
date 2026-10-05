@@ -39,6 +39,7 @@ import { useWithWindowSize } from "../../../hooks/use-with-window-size";
 import { useWithPanels } from "../../../store/slices/panels/use-with-panels";
 import { useAppSelector } from "../../../store/hooks";
 import { useWithChat } from "../../../store/slices/chat/use-with-chat";
+import type { BuiltActivityHandler } from "../../../classes/activity-builder-activity/built-activity-handler";
 
 export function ChatThread(props: {
   coachResponsePending: boolean;
@@ -46,6 +47,7 @@ export function ChatThread(props: {
   curDocId: string;
   setAiInfoToDisplay: (aiServiceStepData?: AiServiceStepDataTypes[]) => void;
   sendMessage: (message: ChatMessageTypes) => void;
+  builtActivityHandler: BuiltActivityHandler | undefined;
 }): React.ReactNode {
   const { coachResponsePending, setAiInfoToDisplay, sendMessage } = props;
   const { activePanel, panelists } = useWithPanels();
@@ -80,7 +82,8 @@ export function ChatThread(props: {
             messageIndex={index}
             viewed={viewedMessages.includes(message.id)}
           />
-          {message.mcqChoices && index === chatMessages.length - 1 && (
+          {}
+          {message.mcqChoices && (
             <div
               key={`mcq-choices-${index}`}
               style={{
@@ -126,6 +129,41 @@ export function ChatThread(props: {
       );
     },
   );
+  if (props.builtActivityHandler?.curStep?.stepType === "PROMPT") {
+    messageElements.push(
+      <div
+        key={`mcq-choices-skip`}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: "98%",
+          justifyContent: "flex-end",
+          alignItems: "flex-end",
+          margin: "10px",
+        }}
+      >
+        <Button
+          variant="outlined"
+          color="secondary"
+          style={{
+            borderWidth: "2px",
+            marginBottom: "5px",
+          }}
+          onClick={() => {
+            sendMessage({
+              id: uuidv4(),
+              message: "Skip waiting and continue to next step",
+              sender: "USER",
+              displayType: "TEXT",
+              userInputType: "MCQ",
+            });
+          }}
+        >
+          Skip to next
+        </Button>
+      </div>,
+    );
+  }
 
   function scrollToElementById(id: string) {
     const element = document.getElementById(id);
@@ -159,7 +197,7 @@ export function ChatThread(props: {
         () => {
           setPingRef(undefined);
         },
-        Math.min(3000, unviewedMessage.message.split(" ").length * 100),
+        Math.min(1000, unviewedMessage.message.split(" ").length * 100),
       );
       setPingRef(timeoutId);
       setViewedMessages([...viewedMessages, unviewedMessage.id]);
@@ -217,14 +255,12 @@ export function ChatThread(props: {
 
 export function ChatHistoryLog(props: { c: ChatHistory }): React.ReactNode {
   const { c } = props;
-  const { userDocs } = useAppSelector((state) => state.state);
   const { activePanel, panelists } = useWithPanels();
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [collapsed, setCollapsed] = useState<boolean>(true);
 
   const activePanelists = useAppSelector(
     (state) => state.panels.activePanelists,
   );
-  const doc = userDocs.find((d) => d.googleDocId === c.docId);
   const chatMessages: ChatMessageTypes[] = [...(c.chatLog || [])].filter(
     (m) => {
       const panelist = panelists.find(
@@ -251,9 +287,15 @@ export function ChatHistoryLog(props: { c: ChatHistory }): React.ReactNode {
           border: "2px solid rgb(87, 119, 82)",
         }}
       >
-        <Typography>{doc?.title}</Typography>
+        <div>
+          <Typography>
+            {c?.panelTitle}: {c?.docTitle}
+          </Typography>
+          <Typography variant="subtitle2" style={{ color: "#ccc" }}>
+            {c?.startDate}
+          </Typography>
+        </div>
         <div style={{ minWidth: 5, flexGrow: 1 }} />
-        <Typography>{c.startDate}</Typography>
         <IconButton
           style={{ color: "white" }}
           onClick={() => setCollapsed(!collapsed)}
@@ -284,7 +326,6 @@ export function ChatHistory(props: {
 }): React.ReactNode {
   const { clearChatHistory } = useWithChat();
   const { chatHistory } = useAppSelector((state) => state.chat);
-  const { userDocs } = useAppSelector((state) => state.state);
   const { height, width } = useWithWindowSize();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -356,7 +397,6 @@ export function ChatHistory(props: {
           style={{ zIndex: 9999 }}
         >
           {chatHistory.map((c, i) => {
-            const doc = userDocs.find((d) => d.googleDocId === c.docId);
             return (
               <MenuItem
                 key={i}
@@ -367,7 +407,7 @@ export function ChatHistory(props: {
                   setAnchorEl(null);
                 }}
               >
-                {doc?.title} - {c.startDate}
+                {c.panelTitle}: {c.docTitle} ({c.startDate})
               </MenuItem>
             );
           })}

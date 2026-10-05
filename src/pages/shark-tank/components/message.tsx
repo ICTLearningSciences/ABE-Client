@@ -288,7 +288,7 @@ export default function Message(props: {
             )}
           <div
             className="row"
-            style={{ position: "absolute", bottom: 0, right: 5 }}
+            style={{ position: "absolute", bottom: -5, right: 5 }}
           >
             <Tooltip title="Copy to clipboard">
               <IconButton onClick={copyToClipboard}>

@@ -37,7 +37,7 @@ import { Header } from "./components/header";
 import { useAppSelector } from "../../store/hooks";
 import { useWithPanels } from "../../store/slices/panels/use-with-panels";
 import withAuthorizationOnly from "./wrap-with-authorization-only";
-import type { ActivityBuilder } from "../../exported-files";
+import { useWithState, type ActivityBuilder } from "../../exported-files";
 
 import "./shark-tank.css";
 import { CssDialog } from "./components";
@@ -53,16 +53,16 @@ function SharkTankSetup(): React.ReactNode {
     activePanel,
     activePanelConfig,
     setActivity,
-    setActivePanel,
     toggleActivePanelist,
   } = useWithPanels();
+  const { state: docState, updateCurrentDocId } = useWithState();
+
   const activePanelists = useAppSelector(
     (state) => state.panels.activePanelists,
   );
   const activities: ActivityBuilder[] = useAppSelector((state) =>
     state.docGoalsActivities.builtActivities.filter(
-      (a: ActivityBuilder) =>
-        a.attachedPanel && a.title === "CFT Panel Activity",
+      (a: ActivityBuilder) => a.attachedPanel,
     ),
   );
   const activitiesLoadStatus = useAppSelector(
@@ -71,6 +71,13 @@ function SharkTankSetup(): React.ReactNode {
   const navigate = useNavigate();
   const [showConfig, setShowConfig] = React.useState<string>();
 
+  /** reset activity at start */
+  React.useEffect(() => {
+    if (activity) setActivity();
+    if (docState.curDocId) updateCurrentDocId("");
+  }, []);
+
+  /** select latest activity by default */
   React.useEffect(() => {
     if (!activity && activities.length > 0) {
       setActivity(activities[activities.length - 1]._id);
@@ -208,56 +215,69 @@ function SharkTankSetup(): React.ReactNode {
 
             <Grid size={4} style={{ padding: 10 }}>
               <CssCard alt title="Select Activity" icon={<ListAlt />}>
-                <List className="column spacing">
-                  {activities.map((a) => {
-                    const panel = panels.find(
-                      (p) => p.clientId === a.attachedPanel,
-                    );
-                    if (!panel) return <></>;
-                    return (
-                      <motion.div
-                        id={a._id}
-                        key={a._id}
-                        whileHover={{ scale: 1.01, filter: "brightness(1.1)" }}
-                        className="box column spacing"
-                        style={{
-                          backgroundColor: "rgb(100, 100, 100)",
-                        }}
-                      >
-                        <div
-                          className="row"
-                          style={{ justifyContent: "space-between" }}
-                        >
-                          <Typography
-                            color="secondary"
-                            style={{ fontWeight: "bold" }}
-                          >
-                            {a.title}
-                          </Typography>
-                          <div className="row center-div">
-                            <PeopleOutlined />
-                            <Typography style={{ fontSize: 12, marginLeft: 5 }}>
-                              {panel?.panelists.length || 0}
-                            </Typography>
-                          </div>
-                        </div>
-                        <Typography>{a.description}</Typography>
-                        <Typography variant="subtitle2">
-                          Panel: {panel.panelName}
-                        </Typography>
-                        <Button
-                          variant="contained"
-                          onClick={() => {
-                            setActivity(a._id);
-                            setActivePanel(panel.clientId);
+                <List
+                  className="column spacing"
+                  style={{
+                    maxHeight: 250,
+                    overflowY: "auto",
+                    paddingRight: 10,
+                  }}
+                >
+                  {activities
+                    .filter((a) =>
+                      panels.find((p) => p.clientId === a.attachedPanel),
+                    )
+                    .map((a) => {
+                      const panel = panels.find(
+                        (p) => p.clientId === a.attachedPanel,
+                      )!;
+                      return (
+                        <motion.div
+                          id={a._id}
+                          key={a._id}
+                          whileHover={{
+                            scale: 1.01,
+                            filter: "brightness(1.1)",
                           }}
-                          disabled={activity?._id === a._id}
+                          className="box column spacing"
+                          style={{
+                            backgroundColor: "rgb(100, 100, 100)",
+                          }}
                         >
-                          {activity?._id === a._id ? "Selected" : "Select"}
-                        </Button>
-                      </motion.div>
-                    );
-                  })}
+                          <div
+                            className="row"
+                            style={{ justifyContent: "space-between" }}
+                          >
+                            <Typography
+                              color="secondary"
+                              style={{ fontWeight: "bold" }}
+                            >
+                              {a.title}
+                            </Typography>
+                            <div className="row center-div">
+                              <PeopleOutlined />
+                              <Typography
+                                style={{ fontSize: 12, marginLeft: 5 }}
+                              >
+                                {panel.panelists.length || 0}
+                              </Typography>
+                            </div>
+                          </div>
+                          <Typography>{a.description}</Typography>
+                          <Typography variant="subtitle2">
+                            Panel: {panel.panelName}
+                          </Typography>
+                          <Button
+                            variant="contained"
+                            onClick={() => setActivity(a._id)}
+                            disabled={activity?._id === a._id}
+                          >
+                            {activity?._id === a._id ? "Selected" : "Select"}
+                          </Button>
+                        </motion.div>
+                      );
+                    })
+                    .reverse()}
                 </List>
               </CssCard>
               <PanelSettings />

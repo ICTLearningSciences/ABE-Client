@@ -8,14 +8,21 @@ import { LoginService, UserRole } from "../../src/store/slices/login";
 import { EducationalRole } from "../../src/types";
 import { testUser } from "./user-data";
 
-export const refreshAccessTokenResponse = (role: UserRole, loginService?: LoginService, educationalRole?: EducationalRole) =>{
-    const newUser = {
-        ...testUser,
-        userRole: role,
-        loginService: loginService || 'GOOGLE',
-        educationalRole: educationalRole || undefined
-    }
-    return  { "refreshAccessToken": {
-    "user": newUser,
-    "accessToken": "fake-access-token-2"
-} }}
+export const refreshAccessTokenResponse = (
+  role: UserRole,
+  loginService?: LoginService,
+  educationalRole?: EducationalRole,
+) => {
+  const newUser = {
+    ...testUser,
+    userRole: role,
+    loginService: loginService || "GOOGLE",
+    educationalRole: educationalRole || undefined,
+  };
+  return {
+    refreshAccessToken: {
+      user: newUser,
+      accessToken: "fake-access-token-2",
+    },
+  };
+};

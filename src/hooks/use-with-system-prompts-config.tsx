@@ -42,8 +42,8 @@ export function useWithSystemPromptsConfig() {
     editData(newData);
   }
 
-  function saveWrapper(value: string[]) {
-    return updateConfigByKey("aiSystemPrompt", value);
+  async function saveWrapper(value: string[]) {
+    return (await updateConfigByKey("aiSystemPrompt", value))["aiSystemPrompt"];
   }
 
   function save() {
