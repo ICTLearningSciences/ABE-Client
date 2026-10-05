@@ -78,7 +78,9 @@ export const DEFAULT_CHUNK_SIZE = 2;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type StateData = Record<string, any>;
 
+export let BuiltActivityHandlerInstance: BuiltActivityHandler | null = null;
 export class BuiltActivityHandler implements ChatLogSubscriber {
+  destroyed?: boolean;
   builtActivityData: ActivityBuilder | undefined;
   curStep: ActivityBuilderStep | undefined;
   stateData: StateData;
@@ -114,69 +116,6 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       timestamp?: string;
     }
   > = {};
-
-  getStepById(stepId: string): ActivityBuilderStep | undefined {
-    if (
-      !this.builtActivityData ||
-      !this.builtActivityData.flowsList.length ||
-      !this.builtActivityData.flowsList[0].steps.length
-    ) {
-      throw new Error("No activity data found");
-    }
-    for (let i = 0; i < this.builtActivityData.flowsList.length; i++) {
-      const flow = this.builtActivityData.flowsList[i];
-      for (let j = 0; j < flow.steps.length; j++) {
-        const step = flow.steps[j];
-        if (step.stepId === stepId) {
-          return step;
-        }
-      }
-    }
-    return undefined;
-  }
-
-  getNextStep(currentStep: ActivityBuilderStep): ActivityBuilderStep {
-    if (!this.builtActivityData) {
-      throw new Error("No activity data found");
-    }
-
-    if (currentStep.jumpToStepId) {
-      const jumpStep = this.getStepById(currentStep.jumpToStepId);
-      if (!jumpStep) {
-        throw new Error(
-          `Unable to find target step ${currentStep.jumpToStepId}, maybe you deleted it and forgot to update this step?`,
-        );
-      }
-      return jumpStep;
-    } else {
-      // go to next step in current flow
-      const currentStepFlowList = this.builtActivityData.flowsList.find(
-        (flow) => flow.steps.find((step) => step.stepId === currentStep.stepId),
-      );
-
-      if (!currentStepFlowList) {
-        throw new Error(`Unable to find flow for step: ${currentStep.stepId}`);
-      }
-
-      const currentStepIndex = currentStepFlowList.steps.findIndex(
-        (step) => step.stepId === currentStep.stepId,
-      );
-
-      if (currentStepIndex === -1) {
-        throw new Error(
-          `Unable to find requested step: ${currentStep.stepId} in flow ${currentStepFlowList.name}`,
-        );
-      }
-      const nextStepIndex = currentStepIndex + 1;
-      if (nextStepIndex >= currentStepFlowList.steps.length) {
-        throw new Error(
-          "No next step found, maybe you forgot to add a jumpToStepId for the last step in a flow?",
-        );
-      } else {
-        return currentStepFlowList.steps[nextStepIndex];
-      }
-    }
-  }
 
   constructor(
     sendMessage: (msg: ChatMessageTypes) => void,
@@ -234,13 +173,98 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     this.applyButtonAction = this.applyButtonAction.bind(this);
     this.executionUUID = "";
     this.executionUUIDs = {};
+
+    if (BuiltActivityHandlerInstance === null) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      BuiltActivityHandlerInstance = this;
+    } else {
+      BuiltActivityHandlerInstance.resetActivity();
+      BuiltActivityHandlerInstance.destroy();
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      BuiltActivityHandlerInstance = this;
+    }
+  }
+
+  destroy() {
+    this.destroyed = true;
+    if (BuiltActivityHandlerInstance) {
+      BuiltActivityHandlerInstance.destroyed = true;
+      BuiltActivityHandlerInstance = null;
+    }
+  }
+
+  getStepById(stepId: string): ActivityBuilderStep | undefined {
+    if (this.destroyed) throw new Error("Activity was destroyed");
+    if (
+      !this.builtActivityData ||
+      !this.builtActivityData.flowsList.length ||
+      !this.builtActivityData.flowsList[0].steps.length
+    ) {
+      throw new Error("No activity data found");
+    }
+    for (let i = 0; i < this.builtActivityData.flowsList.length; i++) {
+      const flow = this.builtActivityData.flowsList[i];
+      for (let j = 0; j < flow.steps.length; j++) {
+        const step = flow.steps[j];
+        if (step.stepId === stepId) {
+          return step;
+        }
+      }
+    }
+    return undefined;
+  }
+
+  getNextStep(currentStep: ActivityBuilderStep): ActivityBuilderStep {
+    if (this.destroyed) throw new Error("Activity was destroyed");
+    if (!this.builtActivityData) {
+      throw new Error("No activity data found");
+    }
+
+    if (currentStep.jumpToStepId) {
+      const jumpStep = this.getStepById(currentStep.jumpToStepId);
+      if (!jumpStep) {
+        throw new Error(
+          `Unable to find target step ${currentStep.jumpToStepId}, maybe you deleted it and forgot to update this step?`,
+        );
+      }
+      return jumpStep;
+    } else {
+      // go to next step in current flow
+      const currentStepFlowList = this.builtActivityData.flowsList.find(
+        (flow) => flow.steps.find((step) => step.stepId === currentStep.stepId),
+      );
+
+      if (!currentStepFlowList) {
+        throw new Error(`Unable to find flow for step: ${currentStep.stepId}`);
+      }
+
+      const currentStepIndex = currentStepFlowList.steps.findIndex(
+        (step) => step.stepId === currentStep.stepId,
+      );
+
+      if (currentStepIndex === -1) {
+        throw new Error(
+          `Unable to find requested step: ${currentStep.stepId} in flow ${currentStepFlowList.name}`,
+        );
+      }
+      const nextStepIndex = currentStepIndex + 1;
+      if (nextStepIndex >= currentStepFlowList.steps.length) {
+        throw new Error(
+          "No next step found, maybe you forgot to add a jumpToStepId for the last step in a flow?",
+        );
+      } else {
+        return currentStepFlowList.steps[nextStepIndex];
+      }
+    }
   }
 
   setBuiltActivityData(builtActivityData?: ActivityBuilder) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     this.builtActivityData = builtActivityData;
   }
 
   initializeActivity() {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     if (
       !this.builtActivityData ||
       !this.builtActivityData.flowsList.length ||
@@ -254,6 +278,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   resetActivity() {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     if (
       !this.builtActivityData ||
       !this.builtActivityData.flowsList.length ||
@@ -275,6 +300,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async handleStep(step: ActivityBuilderStep) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     if (this.curStep?.stepId !== step.stepId) {
       this.curStep = step;
     }
@@ -319,6 +345,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async handleLogicOperationStep(step: ConditionalActivityStep) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     this.setResponsePending(true);
     const docData = await getDocData(this.docId, this.docService);
     this.stateData = {
@@ -394,6 +421,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async handleSystemMessageStep(step: SystemMessageActivityStep) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     // Check if we should send messages from panelists
     if (
       step.sendFromPanelistClientIds &&
@@ -460,6 +488,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async handleRequestUserInputStep(step: RequestUserInputActivityStep) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     const processedPredefinedResponses = processPredefinedResponses(
       step.predefinedResponses,
       this.stateData,
@@ -479,6 +508,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   handleExtractMcqChoices(predefinedResponses: PredefinedResponse[]): string[] {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     const finalRes: string[] = [];
     for (let i = 0; i < predefinedResponses.length; i++) {
       const res = predefinedResponses[i];
@@ -505,6 +535,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   addResponseNavigation(response: string, jumpToStepId: string) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     this.userResponseHandleState.responseNavigations.push({
       response,
       jumpToStepId,
@@ -512,6 +543,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   applyButtonAction(buttonAction: ButtonAction) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     if (buttonAction.buttonActionType === "FILTER_TO_PANELIST") {
       this.filteredToPanelists = buttonAction.buttonActionValue;
     } else if (buttonAction.buttonActionType === "CLEAR_PANELIST_FILTERS") {
@@ -521,6 +553,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   getStoredArray(str: string): string[] {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     const regex = /{{(.*?)}}/g;
     const key = str.match(regex);
     if (key) {
@@ -536,6 +569,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     baseRagConfig: RagStoreConfiguration | undefined,
     panelistRagConfig: RagStoreConfiguration,
   ): RagStoreConfiguration | undefined {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     // If no base config, return panelist config
     if (!baseRagConfig) {
       return panelistRagConfig;
@@ -584,6 +618,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async goToNextStep() {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     if (!this.curStep) {
       throw new Error("No current step found");
     }
@@ -598,6 +633,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   sendErrorMessage(message: string) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     this.sendMessage({
       id: uuidv4(),
       message,
@@ -609,6 +645,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   sendUserMessage(message: ChatMessageTypes) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     this.sendMessage({ ...message, executionUUID: this.executionUUID });
     // cancel the currently running executions
     for (const executionUUID of Object.keys(this.executionUUIDs)) {
@@ -621,6 +658,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   async handleNewUserMessage(message: string) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     if (!this.curStep) {
       throw new Error("No current step found");
     }
@@ -693,6 +731,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   newDocDataReceived(docData?: DocData) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     if (!docData) {
       delete this.stateData[DOC_TEXT_KEY];
       delete this.stateData[DOC_NUM_WORDS_KEY];
@@ -706,6 +745,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
   }
 
   newChatLogReceived(chatLog: ChatLog) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     this.chatLog = chatLog;
     if (chatLog.length === 0) {
       return;
@@ -720,6 +760,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     step: PromptActivityStep,
     extraChat: ChatMessageTypes[] = [],
   ) {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     this.setResponsePending(true);
 
     // Prepare all prompt executions (including panelist prompts)
@@ -843,6 +884,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     >[],
     promptsToExecute: PromptToExecute[],
   ): Promise<ChatLog> {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     const resultText: ChatLog = [];
     // Check if any prompts failed
     const hasFailures = promptResults.some(
@@ -954,6 +996,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         originalConfiguration: SinglePromptConfiguration;
       }
   > {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     // Build AI prompt steps with replaced data
     const promptText = replaceStoredDataInString(
       config.promptText,
@@ -1058,6 +1101,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         executionUUID: string;
       }
   > {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     // Build AI prompt steps with replaced data and panelist modifications
     const basePromptText = replaceStoredDataInString(
       config.promptText,
@@ -1216,6 +1260,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         originalConfiguration: SinglePromptConfiguration;
       }
   > {
+    if (this.destroyed) throw new Error("Activity was destroyed");
     let lastError: Error | null = null;
 
     for (let attempt = 0; attempt < 3; attempt++) {

@@ -18,6 +18,7 @@ import {
 import type { UpdateUserInfo, User, UserAccessToken } from "../../../types";
 import { removeQueryParamFromUrl } from "../../../helpers";
 import { clearHistory } from "../chat";
+import { BuiltActivityHandlerInstance } from "../../../classes/activity-builder-activity/built-activity-handler";
 
 export interface UseWithLogin {
   state: loginActions.LoginState;
@@ -148,6 +149,10 @@ export function useWithLogin(): UseWithLogin {
   async function logout() {
     dispatch(clearHistory());
     await dispatch(loginActions.logout());
+    if (BuiltActivityHandlerInstance) {
+      BuiltActivityHandlerInstance.resetActivity();
+      BuiltActivityHandlerInstance.destroy();
+    }
     if (awsCognitoAuth.isAuthenticated && typeof window !== "undefined") {
       try {
         const url = window.location.pathname.includes("shark-tank")
