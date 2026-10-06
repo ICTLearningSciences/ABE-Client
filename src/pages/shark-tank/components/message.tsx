@@ -204,6 +204,13 @@ export default function Message(props: {
               components={{
                 a: ({ children, href }) => {
                   if (href && href.length > 2000) return <div>{children}</div>;
+                  if (href?.startsWith("origin-"))
+                    href = href.replace("origin-", "");
+                  if (
+                    typeof children === "string" &&
+                    children.startsWith("origin-")
+                  )
+                    children = children.replace("origin-", "");
                   return (
                     <a href={href} target="_blank" rel="noreferrer">
                       {children}

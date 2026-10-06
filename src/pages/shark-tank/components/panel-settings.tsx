@@ -94,7 +94,7 @@ function PanelSettings(props: { panelist?: Panelist }): React.ReactNode {
               onUpdate({ responseLength: e.target.value as ResponseLength });
             }}
           >
-            <MenuItem value={undefined}>Default (Low)</MenuItem>
+            <MenuItem value={undefined}>Default (No limit)</MenuItem>
             <MenuItem value="low">Low (10-30 words)</MenuItem>
             <MenuItem value="med">Medium (50-100 words)</MenuItem>
             <MenuItem value="high">High (No limit)</MenuItem>
