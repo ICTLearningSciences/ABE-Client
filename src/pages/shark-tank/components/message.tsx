@@ -44,7 +44,7 @@ export default function Message(props: {
   const { activePanel, panelists } = useWithPanels();
   const { message, messageIndex, setAiInfoToDisplay } = props;
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [playing, setPlaying] = React.useState<boolean>(false);
+  const [playing, setPlaying] = React.useState<HTMLAudioElement>();
 
   const panelist = panelists.find(
     (p) =>
@@ -65,6 +65,11 @@ export default function Message(props: {
   }
 
   async function textToSpeech() {
+    if (playing) {
+      playing.pause();
+      setPlaying(undefined);
+      return;
+    }
     setLoading(true);
     try {
       let text = "";
@@ -79,15 +84,15 @@ export default function Message(props: {
         text,
         ...voice,
       });
-      setPlaying(true);
+      setPlaying(audio);
       audio.play();
       audio.onended = function () {
-        setPlaying(false);
+        setPlaying(undefined);
       };
       setLoading(false);
     } catch {
       setLoading(false);
-      setPlaying(false);
+      setPlaying(undefined);
     }
   }
 
@@ -318,8 +323,8 @@ export default function Message(props: {
               message.sources?.length > 0 && (
                 <ReferencesButton message={message} />
               )}
-            <Tooltip title="Text to speech">
-              <IconButton onClick={textToSpeech} disabled={playing}>
+            <Tooltip title={playing ? "Stop audio" : "Text to speech"}>
+              <IconButton onClick={textToSpeech}>
                 {loading ? (
                   <CircularProgress style={{ width: 20, height: 20 }} />
                 ) : (
