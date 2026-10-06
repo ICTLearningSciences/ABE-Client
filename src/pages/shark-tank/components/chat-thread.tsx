@@ -20,6 +20,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
+  ArrowDropDown,
   Close,
   DragHandle,
   ExpandLess,
@@ -205,51 +206,52 @@ export function ChatThread(props: {
     addMessagesWithDelay();
   }, [chatMessages, viewedMessages, pingRef]);
 
-  useEffect(() => {
-    if (messageContainerRef.current) {
-      const msg = chatMessages.find(
-        (m) => m.id === viewedMessages[viewedMessages.length - 1],
-      );
-      scrollToElementById(msg?.id || "message-end-ref");
-    }
-  }, [chatMessages.length, viewedMessages.length, messageElements.length]);
-
   return (
-    <div
-      ref={messageContainerRef}
-      data-cy="messages-container"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        width: "100%",
-        maxWidth: "100%",
-        justifyContent: "flex-start",
-        margin: "1rem",
-        borderRadius: "1rem",
-        overflowX: "hidden",
-        overflowY: "auto",
-        border: "1px solid black",
-        position: "relative",
-      }}
-    >
-      {messageElements}
-      {coachResponsePending && (
-        <Message
-          key={chatMessages.length}
-          message={{
-            id: "pending-message",
-            message: "...",
-            sender: "SYSTEM",
-            displayType: "PENDING_MESSAGE",
-          }}
-          setAiInfoToDisplay={setAiInfoToDisplay}
-          messageIndex={chatMessages.length}
-          onClicked={onClickMessage}
-        />
-      )}
-      <div id="message-end-ref" />
-    </div>
+    <>
+      <div
+        ref={messageContainerRef}
+        data-cy="messages-container"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          width: "100%",
+          maxWidth: "100%",
+          justifyContent: "flex-start",
+          margin: "1rem",
+          borderRadius: "1rem",
+          overflowX: "hidden",
+          overflowY: "auto",
+          border: "1px solid black",
+          position: "relative",
+        }}
+      >
+        {messageElements}
+        {coachResponsePending && (
+          <Message
+            key={chatMessages.length}
+            message={{
+              id: "pending-message",
+              message: "...",
+              sender: "SYSTEM",
+              displayType: "PENDING_MESSAGE",
+            }}
+            setAiInfoToDisplay={setAiInfoToDisplay}
+            messageIndex={chatMessages.length}
+            onClicked={onClickMessage}
+          />
+        )}
+        <div id="message-end-ref" />
+      </div>
+      <Typography
+        color="secondary"
+        className="row center-div"
+        style={{ fontSize: 12, cursor: "pointer" }}
+        onClick={() => scrollToElementById("message-end-ref")}
+      >
+        Scroll to Bottom <ArrowDropDown />
+      </Typography>
+    </>
   );
 }
 
