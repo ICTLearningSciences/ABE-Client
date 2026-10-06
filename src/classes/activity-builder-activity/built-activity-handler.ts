@@ -1187,8 +1187,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // Limit response length
     const responseLength =
       this.activePanelConfig[panelist.clientId]?.responseLength ||
-      this.activePanelConfig[""]?.responseLength ||
-      "low";
+      this.activePanelConfig[""]?.responseLength;
     if (responseLength === "low") {
       aiPromptSteps[0].prompts.push({
         promptText: `Please keep your response between 10 to 30 words long`,
