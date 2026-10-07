@@ -74,10 +74,10 @@ export function useWithLogin(): UseWithLogin {
       localStorageClear(CLASSROOM_CODE_KEY);
     }
 
-    checkForClassroomCode(state.loginStatus);
     if (state.loginStatus === 3 || state.loginStatus === 2) {
       return;
     }
+    checkForClassroomCode(state.loginStatus);
     const token = localStorageGet(ACCESS_TOKEN_KEY);
     if (token) {
       refreshAccessToken();
