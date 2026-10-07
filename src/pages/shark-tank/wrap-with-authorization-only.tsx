@@ -8,14 +8,11 @@ The full terms of this copyright and license should always be found in the root 
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
-import { Header } from "./components/header";
-import { useWithLogin } from "../../store/slices/login/use-with-login";
-import Login from "../login/login";
+import { useAppSelector } from "../../store/hooks";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const withAuthorizationOnly = (Component: any) => (props: any) => {
-  const useLogin = useWithLogin();
-  const loginState = useLogin.state;
+  const loginState = useAppSelector((state) => state.login);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,14 +29,9 @@ const withAuthorizationOnly = (Component: any) => (props: any) => {
 
   if (loginState.loginStatus === 0 || loginState.loginStatus === 2) {
     return (
-      <main className="root">
-        <div
-          className="page row center-div"
-          style={{ height: "100%", width: "100%" }}
-        >
-          <CircularProgress />
-        </div>
-      </main>
+      <div>
+        <CircularProgress />
+      </div>
     );
   }
 
@@ -50,15 +42,9 @@ const withAuthorizationOnly = (Component: any) => (props: any) => {
       user={loginState.user}
     />
   ) : (
-    <main className="root">
-      <Header title="Login" />
-      <div
-        className="page row center-div"
-        style={{ height: "100%", width: "100%" }}
-      >
-        <Login useLogin={useLogin} loginTo="/shark-tank" />
-      </div>
-    </main>
+    <div>
+      <CircularProgress />
+    </div>
   );
 };
 
