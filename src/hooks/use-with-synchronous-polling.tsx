@@ -38,6 +38,12 @@ export async function asyncPromptExecute(
       }
       return res.jobStatus === "COMPLETE";
     },
+    (res: AiServicesJobStatusResponseTypes, startTime: number) => {
+      const QUEUED_TIMEOUT = 15 * 1000;
+      return (
+        res.jobStatus == "QUEUED" && Date.now() - startTime > QUEUED_TIMEOUT
+      );
+    },
     1000,
     180 * 1000,
   );
@@ -47,6 +53,7 @@ export async function asyncPromptExecute(
 export function pollUntilTrue<T>(
   pollFunction: () => Promise<T>,
   endPollCondition: (res: T) => boolean,
+  queuedTimeoutCondition: (res: T, startTime: number) => boolean,
   interval: number,
   timeout = 0,
 ) {
@@ -60,6 +67,10 @@ export function pollUntilTrue<T>(
 
     if (timeout && Date.now() - startTime > timeout) {
       throw new Error("Polling timed out");
+    }
+
+    if (queuedTimeoutCondition(data, startTime)) {
+      throw new Error("Job Failed to start");
     }
 
     await new Promise((resolve) => setTimeout(resolve, interval));
