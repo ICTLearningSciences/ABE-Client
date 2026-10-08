@@ -159,14 +159,23 @@ export default function Message(props: {
           <Typography style={{ flexGrow: 1, fontWeight: "bold" }}>
             {panelist?.panelistName}
           </Typography>
-          <Typography
-            style={{
-              fontWeight: "bold",
-              color: stringToColor(panelist.panelistName),
-            }}
-          >
-            {panelist?.panelistDescription}
-          </Typography>
+          <Tooltip title="Copy to clipboard">
+            <IconButton onClick={copyToClipboard}>
+              <ContentPaste fontSize="small" sx={{ color: "gray" }} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={playing ? "Stop audio" : "Text to speech"}>
+            <IconButton onClick={textToSpeech}>
+              {loading ? (
+                <CircularProgress style={{ width: 20, height: 20 }} />
+              ) : (
+                <VolumeUp
+                  fontSize="small"
+                  sx={{ color: playing ? "yellow" : "gray" }}
+                />
+              )}
+            </IconButton>
+          </Tooltip>
         </div>
       )}
 
@@ -313,28 +322,11 @@ export default function Message(props: {
             </ReactMarkdown>
           </pre>
           <div className="row center-div">
-            <Tooltip title="Copy to clipboard">
-              <IconButton onClick={copyToClipboard}>
-                <ContentPaste fontSize="small" sx={{ color: "gray" }} />
-              </IconButton>
-            </Tooltip>
             {"sources" in message &&
               message.sources &&
               message.sources?.length > 0 && (
                 <ReferencesButton message={message} />
               )}
-            <Tooltip title={playing ? "Stop audio" : "Text to speech"}>
-              <IconButton onClick={textToSpeech}>
-                {loading ? (
-                  <CircularProgress style={{ width: 20, height: 20 }} />
-                ) : (
-                  <VolumeUp
-                    fontSize="small"
-                    sx={{ color: playing ? "yellow" : "gray" }}
-                  />
-                )}
-              </IconButton>
-            </Tooltip>
           </div>
         </Paper>
       </div>
