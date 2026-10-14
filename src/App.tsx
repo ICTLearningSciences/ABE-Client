@@ -18,6 +18,8 @@ import Login from "./pages/login/login";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 import Header from "./components/header/header";
+import { Header as SharkHeader } from "./pages/shark-tank/components/header";
+
 import DocView from "./components/doc-view";
 import { useWithLogin } from "./store/slices/login/use-with-login";
 import { useReduxHydration } from "./use-redux-hydration";
@@ -181,12 +183,39 @@ function MainApp() {
         </>
       ),
     },
+
     {
       path: "/shark-tank",
       element: (
         <>
           <ThemeProvider theme={sharkTankTheme}>
-            <SharkTankSetup />
+            <main className="root">
+              <SharkHeader title="Login" />
+              <div
+                style={{
+                  width: "100%",
+                  height: MAIN_APP_HEIGHT,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Login useLogin={useLogin} loginTo="/shark-tank/setup" />
+              </div>
+            </main>
+          </ThemeProvider>
+        </>
+      ),
+    },
+    {
+      path: "/shark-tank/setup",
+      element: (
+        <>
+          <ThemeProvider theme={sharkTankTheme}>
+            <main className="root">
+              <SharkHeader title="Configure Session" />
+              <SharkTankSetup />
+            </main>
           </ThemeProvider>
         </>
       ),
@@ -196,7 +225,10 @@ function MainApp() {
       element: (
         <>
           <ThemeProvider theme={sharkTankTheme}>
-            <SharkTankChat />
+            <main className="root">
+              <SharkHeader title="Chat" />
+              <SharkTankChat />
+            </main>
           </ThemeProvider>
         </>
       ),

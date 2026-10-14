@@ -33,7 +33,6 @@ import {
   Settings,
 } from "@mui/icons-material";
 
-import { Header } from "./components/header";
 import { useAppSelector } from "../../store/hooks";
 import { useWithPanels } from "../../store/slices/panels/use-with-panels";
 import withAuthorizationOnly from "./wrap-with-authorization-only";
@@ -155,124 +154,7 @@ function SharkTankSetup(): React.ReactNode {
   ));
 
   return (
-    <main className="root">
-      <Header title="Configure Session" />
-      <div className="page">
-        <Typography variant="h4" style={{ fontWeight: "bold", marginTop: 20 }}>
-          Configure Session
-        </Typography>
-        <Typography color="secondary">
-          Choose your activity and panelists.
-        </Typography>
-        {activitiesLoadStatus === 1 ? (
-          <CircularProgress
-            size={40}
-            style={{ alignSelf: "center", marginTop: 20 }}
-          />
-        ) : (
-          <Grid container style={{ width: "90%", marginTop: 20 }}>
-            <Grid size={8} style={{ padding: 10 }}>
-              <CssCard title="Panel Name" icon={<InfoOutlined />}>
-                <div className="box">
-                  <Typography>{activePanel?.panelName}</Typography>
-                </div>
-              </CssCard>
-              <CssCard title="Description" icon={<DescriptionOutlined />}>
-                <div className="box">
-                  <Typography>{activePanel?.panelDescription}</Typography>
-                </div>
-              </CssCard>
-              <CssCard title="Panelists" icon={<PeopleOutlined />}>
-                <FlipMove className="column spacing">
-                  {activePanel?.panelists.map((p) => {
-                    const panelist = panelists.find((pp) => pp.clientId === p);
-                    return <PanelMemberItem key={p} {...panelist} />;
-                  })}
-                </FlipMove>
-              </CssCard>
-              <Button
-                variant="contained"
-                fullWidth
-                startIcon={<PlayCircleOutlineOutlined />}
-                onClick={startSession}
-                disabled={!activePanelists || activePanelists.length === 0}
-              >
-                Start Session
-              </Button>
-            </Grid>
-
-            <Grid size={4} style={{ padding: 10 }}>
-              <CssCard alt title="Select Activity" icon={<ListAlt />}>
-                <List
-                  className="column spacing"
-                  style={{
-                    maxHeight: 250,
-                    overflowY: "auto",
-                    paddingRight: 10,
-                  }}
-                >
-                  {activities
-                    .filter((a) =>
-                      panels.find((p) => p.clientId === a.attachedPanel),
-                    )
-                    .map((a) => {
-                      const panel = panels.find(
-                        (p) => p.clientId === a.attachedPanel,
-                      )!;
-                      return (
-                        <motion.div
-                          id={a._id}
-                          key={a._id}
-                          whileHover={{
-                            scale: 1.01,
-                            filter: "brightness(1.1)",
-                          }}
-                          className="box column spacing"
-                          style={{
-                            backgroundColor: "rgb(100, 100, 100)",
-                          }}
-                        >
-                          <div
-                            className="row"
-                            style={{ justifyContent: "space-between" }}
-                          >
-                            <Typography
-                              color="secondary"
-                              style={{ fontWeight: "bold" }}
-                            >
-                              {a.title}
-                            </Typography>
-                            <div className="row center-div">
-                              <PeopleOutlined />
-                              <Typography
-                                style={{ fontSize: 12, marginLeft: 5 }}
-                              >
-                                {panel.panelists.length || 0}
-                              </Typography>
-                            </div>
-                          </div>
-                          <Typography>{a.description}</Typography>
-                          <Typography variant="subtitle2">
-                            Panel: {panel.panelName}
-                          </Typography>
-                          <Button
-                            variant="contained"
-                            onClick={() => setActivity(a._id)}
-                            disabled={activity?._id === a._id}
-                          >
-                            {activity?._id === a._id ? "Selected" : "Select"}
-                          </Button>
-                        </motion.div>
-                      );
-                    })
-                    .reverse()}
-                </List>
-              </CssCard>
-              <PanelSettings />
-            </Grid>
-          </Grid>
-        )}
-      </div>
+    <div className="page">
       {showConfig && (
         <CssDialog open={true} onClose={() => setShowConfig(undefined)}>
           <DialogContent>
@@ -282,7 +164,119 @@ function SharkTankSetup(): React.ReactNode {
           </DialogContent>
         </CssDialog>
       )}
-    </main>
+      <Typography variant="h4" style={{ fontWeight: "bold", marginTop: 20 }}>
+        Configure Session
+      </Typography>
+      <Typography color="secondary">
+        Choose your activity and panelists.
+      </Typography>
+      {activitiesLoadStatus === 1 ? (
+        <CircularProgress
+          size={40}
+          style={{ alignSelf: "center", marginTop: 20 }}
+        />
+      ) : (
+        <Grid container style={{ width: "90%", marginTop: 20 }}>
+          <Grid size={8} style={{ padding: 10 }}>
+            <CssCard title="Panel Name" icon={<InfoOutlined />}>
+              <div className="box">
+                <Typography>{activePanel?.panelName}</Typography>
+              </div>
+            </CssCard>
+            <CssCard title="Description" icon={<DescriptionOutlined />}>
+              <div className="box">
+                <Typography>{activePanel?.panelDescription}</Typography>
+              </div>
+            </CssCard>
+            <CssCard title="Panelists" icon={<PeopleOutlined />}>
+              <FlipMove className="column spacing">
+                {activePanel?.panelists.map((p) => {
+                  const panelist = panelists.find((pp) => pp.clientId === p);
+                  return <PanelMemberItem key={p} {...panelist} />;
+                })}
+              </FlipMove>
+            </CssCard>
+            <Button
+              variant="contained"
+              fullWidth
+              startIcon={<PlayCircleOutlineOutlined />}
+              onClick={startSession}
+              disabled={!activePanelists || activePanelists.length === 0}
+            >
+              Start Session
+            </Button>
+          </Grid>
+
+          <Grid size={4} style={{ padding: 10 }}>
+            <CssCard alt title="Select Activity" icon={<ListAlt />}>
+              <List
+                className="column spacing"
+                style={{
+                  maxHeight: 250,
+                  overflowY: "auto",
+                  paddingRight: 10,
+                }}
+              >
+                {activities
+                  .filter((a) =>
+                    panels.find((p) => p.clientId === a.attachedPanel),
+                  )
+                  .map((a) => {
+                    const panel = panels.find(
+                      (p) => p.clientId === a.attachedPanel,
+                    )!;
+                    return (
+                      <motion.div
+                        id={a._id}
+                        key={a._id}
+                        whileHover={{
+                          scale: 1.01,
+                          filter: "brightness(1.1)",
+                        }}
+                        className="box column spacing"
+                        style={{
+                          backgroundColor: "rgb(100, 100, 100)",
+                        }}
+                      >
+                        <div
+                          className="row"
+                          style={{ justifyContent: "space-between" }}
+                        >
+                          <Typography
+                            color="secondary"
+                            style={{ fontWeight: "bold" }}
+                          >
+                            {a.title}
+                          </Typography>
+                          <div className="row center-div">
+                            <PeopleOutlined />
+                            <Typography style={{ fontSize: 12, marginLeft: 5 }}>
+                              {panel.panelists.length || 0}
+                            </Typography>
+                          </div>
+                        </div>
+                        <Typography>{a.description}</Typography>
+                        <Typography variant="subtitle2">
+                          Panel: {panel.panelName}
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          onClick={() => setActivity(a._id)}
+                          disabled={activity?._id === a._id}
+                        >
+                          {activity?._id === a._id ? "Selected" : "Select"}
+                        </Button>
+                      </motion.div>
+                    );
+                  })
+                  .reverse()}
+              </List>
+            </CssCard>
+            <PanelSettings />
+          </Grid>
+        </Grid>
+      )}
+    </div>
   );
 }
 

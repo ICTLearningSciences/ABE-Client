@@ -275,6 +275,13 @@ export function useWithDocumentTimeline(): DocumentTimelineHookReturn {
           }
           return res.jobStatus === "COMPLETE";
         },
+        (res: DocumentTimelineJobStatus, startTime: number) => {
+          const QUEUED_TIMEOUT = 15 * 1000;
+          return (
+            res.jobStatus === "QUEUED" &&
+            Date.now() - startTime > QUEUED_TIMEOUT
+          );
+        },
         2 * 1000,
         300 * 1000,
       );

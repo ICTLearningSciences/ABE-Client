@@ -5,8 +5,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { useEffect, useState } from "react";
-import { BuiltActivityHandler } from "../../classes/activity-builder-activity/built-activity-handler";
+import { useEffect } from "react";
+import {
+  BuiltActivityHandler,
+  BuiltActivityHandlerInstance,
+} from "../../classes/activity-builder-activity/built-activity-handler";
 import type { ChatMessageTypes } from "../../store/slices/chat";
 import { useWithChat } from "../../store/slices/chat/use-with-chat";
 import { useWithState } from "../../store/slices/state/use-with-state";
@@ -21,7 +24,7 @@ import { useWithPath } from "../../hooks/use-with-path";
 import { useWithPanels } from "../../store/slices/panels/use-with-panels";
 
 export interface UseWithBuiltActivityHandler {
-  builtActivityHandler?: BuiltActivityHandler;
+  builtActivityHandler: BuiltActivityHandler | null;
   activityReady: boolean;
   startActivity: (
     curDocId: string,
@@ -32,6 +35,7 @@ export interface UseWithBuiltActivityHandler {
 }
 
 export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
+  const builtActivityHandler = BuiltActivityHandlerInstance;
   const {
     activity,
     activePanelists,
@@ -61,8 +65,12 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
   );
   const navigate = useNavigateWithParams();
 
-  const [builtActivityHandler, setBuiltActivityHandler] =
-    useState<BuiltActivityHandler>();
+  useEffect(() => {
+    if (!user && builtActivityHandler) {
+      builtActivityHandler.resetActivity();
+      builtActivityHandler.destroy();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!curDocId) return;
@@ -127,7 +135,6 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
       activePanelists?.map((a) => a.clientId) || [];
     newActivityHandler.executePrompt = executePromptSteps;
     addNewSubscriber(newActivityHandler);
-    setBuiltActivityHandler(newActivityHandler);
   }
 
   function resetActivity() {
@@ -135,7 +142,6 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
       builtActivityHandler.resetActivity();
       removeAllSubscribers();
       clearChatLog(curDocId);
-      setBuiltActivityHandler(undefined);
     }
   }
 

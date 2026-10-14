@@ -10,7 +10,6 @@ import { Button, Grid, IconButton, Typography } from "@mui/material";
 import { Close, TextSnippet } from "@mui/icons-material";
 
 import UserDocumentDisplay from "./components/doc-display";
-import { Header } from "./components/header";
 import { Chat } from "./components/chat";
 import { ReferencesButton } from "./components/references-button";
 import { ChatPanelists } from "./components/chat-panelists";
@@ -57,96 +56,90 @@ function SharkTankChat(): React.ReactNode {
   }
 
   if (!activePanel || !activity) {
-    navigate("/shark-tank");
+    navigate("/shark-tank/setup");
     return <></>;
   }
 
   return (
-    <main className="root">
-      <Header title="Chat" />
-      <div className="page">
-        <Grid container style={{ width: "100%", height: "100%" }}>
-          <Grid
-            size={8}
+    <div className="page">
+      <Grid container style={{ width: "100%", height: "100%" }}>
+        <Grid
+          size={8}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+          }}
+        >
+          <ChatPanelists useWithPanelActivity={useWithPanelActivity} />
+          <div
+            className="column center-div"
             style={{
-              display: "flex",
-              flexDirection: "column",
-              height: "100%",
+              flexGrow: 1,
+              background: "rgb(48, 53, 58)",
+              margin: 10,
             }}
           >
-            <ChatPanelists useWithPanelActivity={useWithPanelActivity} />
-            <div
-              className="column center-div"
-              style={{
-                flexGrow: 1,
-                background: "rgb(48, 53, 58)",
-                margin: 10,
-              }}
-            >
-              {reference ? (
-                <iframe width="100%" height="100%" src={reference.url} />
-              ) : (
-                <div
-                  className="column center-div"
-                  style={{
-                    position: "relative",
-                    width: "100%",
-                    height: "100%",
-                  }}
-                >
-                  <UserDocumentDisplay
-                    docId={curDocId}
-                    activityId={activity?._id}
-                    selectingDoc={selectingDoc}
-                    onOpenDoc={(id) => onOpenDoc(id)}
-                  />
-                  {selectingDoc && curDocId && (
-                    <Typography
-                      variant="subtitle2"
-                      style={{ marginBottom: 10 }}
-                    >
-                      (Note: Changing documents will clear your chat session)
-                    </Typography>
-                  )}
-                  {selectingDoc && curDocId && (
-                    <IconButton
-                      style={{ position: "absolute", top: 0, right: 0 }}
-                      onClick={() => setSelectingDoc(false)}
-                    >
-                      <Close style={{ color: "white" }} />
-                    </IconButton>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="row spacing center-div" style={{ padding: 20 }}>
-              <Button
-                variant={reference ? "outlined" : "contained"}
-                startIcon={<TextSnippet />}
-                onClick={() => onSelectDocument("")}
+            {reference ? (
+              <iframe width="100%" height="100%" src={reference.url} />
+            ) : (
+              <div
+                className="column center-div"
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  height: "100%",
+                }}
               >
-                My Documents
-              </Button>
-              <div />
-              <ReferencesButton
-                onSelectReference={setReference}
-                reference={reference}
-              />
-            </div>
-          </Grid>
-          <Grid
-            size={4}
-            style={{ height: "100%", paddingRight: 20, paddingLeft: 20 }}
-          >
-            <Chat
-              useWithDoc={useWithDoc}
-              useWithActivityHandler={useWithActivityHandler}
-              useWithPanelActivity={useWithPanelActivity}
+                <UserDocumentDisplay
+                  docId={curDocId}
+                  activityId={activity?._id}
+                  selectingDoc={selectingDoc}
+                  onOpenDoc={(id) => onOpenDoc(id)}
+                />
+                {selectingDoc && curDocId && (
+                  <Typography variant="subtitle2" style={{ marginBottom: 10 }}>
+                    (Note: Changing documents will clear your chat session)
+                  </Typography>
+                )}
+                {selectingDoc && curDocId && (
+                  <IconButton
+                    style={{ position: "absolute", top: 0, right: 0 }}
+                    onClick={() => setSelectingDoc(false)}
+                  >
+                    <Close style={{ color: "white" }} />
+                  </IconButton>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="row spacing center-div" style={{ padding: 20 }}>
+            <Button
+              variant={reference ? "outlined" : "contained"}
+              startIcon={<TextSnippet />}
+              onClick={() => onSelectDocument("")}
+            >
+              My Documents
+            </Button>
+            <div />
+            <ReferencesButton
+              onSelectReference={setReference}
+              reference={reference}
             />
-          </Grid>
+          </div>
         </Grid>
-      </div>
-    </main>
+        <Grid
+          size={4}
+          style={{ height: "100%", paddingRight: 20, paddingLeft: 20 }}
+        >
+          <Chat
+            useWithDoc={useWithDoc}
+            useWithActivityHandler={useWithActivityHandler}
+            useWithPanelActivity={useWithPanelActivity}
+          />
+        </Grid>
+      </Grid>
+    </div>
   );
 }
 

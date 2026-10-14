@@ -97,7 +97,10 @@ export function Chat(props: {
           <ChatHeader
             selectedActivity={activity}
             onSelectActivity={(a) => setActivity(a._id)}
-            onReset={resetActivity}
+            onReset={() => {
+              resetActivity();
+              builtActivityHandler?.destroy();
+            }}
           />
           {curDocId && activityReady ? (
             <ChatThread

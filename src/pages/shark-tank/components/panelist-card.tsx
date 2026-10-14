@@ -71,12 +71,6 @@ export default function PanelistCard(props: {
         >
           <div style={{ flexGrow: 1 }}>
             <Typography
-              color="secondary"
-              style={{ fontSize: 10, fontWeight: "bold" }}
-            >
-              {p.panelistDescription?.toUpperCase()}
-            </Typography>
-            <Typography
               style={{
                 fontSize: 12,
                 fontWeight: "bold",

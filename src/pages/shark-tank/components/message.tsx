@@ -44,7 +44,7 @@ export default function Message(props: {
   const { activePanel, panelists } = useWithPanels();
   const { message, messageIndex, setAiInfoToDisplay } = props;
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [playing, setPlaying] = React.useState<boolean>(false);
+  const [playing, setPlaying] = React.useState<HTMLAudioElement>();
 
   const panelist = panelists.find(
     (p) =>
@@ -65,6 +65,11 @@ export default function Message(props: {
   }
 
   async function textToSpeech() {
+    if (playing) {
+      playing.pause();
+      setPlaying(undefined);
+      return;
+    }
     setLoading(true);
     try {
       let text = "";
@@ -79,15 +84,15 @@ export default function Message(props: {
         text,
         ...voice,
       });
-      setPlaying(true);
+      setPlaying(audio);
       audio.play();
       audio.onended = function () {
-        setPlaying(false);
+        setPlaying(undefined);
       };
       setLoading(false);
     } catch {
       setLoading(false);
-      setPlaying(false);
+      setPlaying(undefined);
     }
   }
 
@@ -154,14 +159,23 @@ export default function Message(props: {
           <Typography style={{ flexGrow: 1, fontWeight: "bold" }}>
             {panelist?.panelistName}
           </Typography>
-          <Typography
-            style={{
-              fontWeight: "bold",
-              color: stringToColor(panelist.panelistName),
-            }}
-          >
-            {panelist?.panelistDescription}
-          </Typography>
+          <Tooltip title="Copy to clipboard">
+            <IconButton onClick={copyToClipboard}>
+              <ContentPaste fontSize="small" sx={{ color: "gray" }} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={playing ? "Stop audio" : "Text to speech"}>
+            <IconButton onClick={textToSpeech} disabled={loading}>
+              {loading ? (
+                <CircularProgress style={{ width: 20, height: 20 }} />
+              ) : (
+                <VolumeUp
+                  fontSize="small"
+                  sx={{ color: playing ? "yellow" : "gray" }}
+                />
+              )}
+            </IconButton>
+          </Tooltip>
         </div>
       )}
 
@@ -204,6 +218,13 @@ export default function Message(props: {
               components={{
                 a: ({ children, href }) => {
                   if (href && href.length > 2000) return <div>{children}</div>;
+                  if (href?.startsWith("origin-"))
+                    href = href.replace("origin-", "");
+                  if (
+                    typeof children === "string" &&
+                    children.startsWith("origin-")
+                  )
+                    children = children.replace("origin-", "");
                   return (
                     <a href={href} target="_blank" rel="noreferrer">
                       {children}
@@ -301,28 +322,11 @@ export default function Message(props: {
             </ReactMarkdown>
           </pre>
           <div className="row center-div">
-            <Tooltip title="Copy to clipboard">
-              <IconButton onClick={copyToClipboard}>
-                <ContentPaste fontSize="small" sx={{ color: "gray" }} />
-              </IconButton>
-            </Tooltip>
             {"sources" in message &&
               message.sources &&
               message.sources?.length > 0 && (
                 <ReferencesButton message={message} />
               )}
-            <Tooltip title="Text to speech">
-              <IconButton onClick={textToSpeech} disabled={playing}>
-                {loading ? (
-                  <CircularProgress style={{ width: 20, height: 20 }} />
-                ) : (
-                  <VolumeUp
-                    fontSize="small"
-                    sx={{ color: playing ? "yellow" : "gray" }}
-                  />
-                )}
-              </IconButton>
-            </Tooltip>
           </div>
         </Paper>
       </div>
