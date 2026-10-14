@@ -165,7 +165,7 @@ export default function Message(props: {
             </IconButton>
           </Tooltip>
           <Tooltip title={playing ? "Stop audio" : "Text to speech"}>
-            <IconButton onClick={textToSpeech}>
+            <IconButton onClick={textToSpeech} disabled={loading}>
               {loading ? (
                 <CircularProgress style={{ width: 20, height: 20 }} />
               ) : (
