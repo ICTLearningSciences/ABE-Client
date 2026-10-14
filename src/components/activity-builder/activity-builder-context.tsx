@@ -16,6 +16,7 @@ import type {
 } from "./types";
 import type { AiPromptStep, RagStoreConfiguration } from "../../types";
 import type { AiServicesResponseTypes } from "../../ai-services/ai-service-types";
+import { copyAndSet } from "../../helpers";
 
 interface ActivityBuilderContextType {
   userId?: string;
@@ -187,6 +188,30 @@ function editActivityReducer(
       return { ...state, visibility: action.payload };
 
     case "UPDATE_ATTACHED_PANEL":
+      for (let f = 0; f < state.flowsList.length; f++) {
+        const flow = state.flowsList[f];
+        for (let s = 0; s < flow.steps.length; s++) {
+          const step = flow.steps[s];
+          if (step.stepType === "PROMPT") {
+            for (let c = 0; c < step.promptConfigurations.length; c++) {
+              const config = step.promptConfigurations[c];
+              if (config.runForPanelistClientIds?.length !== 0) {
+                state.flowsList = copyAndSet(state.flowsList, f, {
+                  ...flow,
+                  steps: copyAndSet(flow.steps, s, {
+                    ...step,
+                    promptConfigurations: copyAndSet(
+                      step.promptConfigurations,
+                      c,
+                      { ...config, runForPanelistClientIds: [] },
+                    ),
+                  }),
+                });
+              }
+            }
+          }
+        }
+      }
       return { ...state, attachedPanel: action.payload };
 
     case "ADD_FLOW":
