@@ -562,7 +562,7 @@ export function PromptStepBuilder(props: {
           top: 10,
         }}
         onClick={() => {
-          deleteStep(step.stepId, currentFLow?.clientId || "");
+          deleteStep(currentFLow?.clientId || "", step.stepId);
         }}
       >
         <Delete />
