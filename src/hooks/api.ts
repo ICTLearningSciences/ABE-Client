@@ -166,7 +166,9 @@ export async function createNewDoc(
 ): Promise<NewDocData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   if (!accessToken) throw new Error("No access token");
-  let url = `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/create_google_doc`;
+  let url = `${
+    import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"
+  }/create_google_doc`;
   url = addQueryParam(url, "userId", userId);
   if (userEmail) {
     url = addQueryParam(url, "emails", userEmail);
@@ -206,7 +208,9 @@ export async function docTextAction(
 ): Promise<void> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY);
   await axios.get<void>(
-    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/google_doc_text_modify/?docId=${docId}&text=${textToHighlight}&action=${action}&insertAfterText=${insertAfterText}`,
+    `${
+      import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"
+    }/google_doc_text_modify/?docId=${docId}&text=${textToHighlight}&action=${action}&insertAfterText=${insertAfterText}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -222,7 +226,9 @@ export async function getDocData(
 ): Promise<DocData> {
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY);
   const res = await axios.get<DocData>(
-    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/get_doc_data/${docId}/${docService}`,
+    `${
+      import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"
+    }/get_doc_data/${docId}/${docService}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -709,7 +715,9 @@ export async function asyncOpenAiRequest(
   if (!accessToken) throw new Error("No access token");
   const res = await execHttp<OpenAiJobId>(
     "POST",
-    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/async_open_ai_doc_question/?docId=${docsId}&userAction=${"MULTISTEP_PROMPTS"}&userId=${userId}&docService=${docService}`,
+    `${
+      import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"
+    }/async_open_ai_doc_question/?docId=${docsId}&userAction=${"MULTISTEP_PROMPTS"}&userId=${userId}&docService=${docService}`,
     {
       accessToken: accessToken,
       dataPath: ["response", "jobId"],
@@ -732,7 +740,9 @@ export async function asyncOpenAiJobStatus(
   if (!accessToken) throw new Error("No access token");
   const res = await execHttp<OpenAiServiceJobStatusResponseType>(
     "POST",
-    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/async_open_ai_doc_question_status/?jobId=${jobId}`,
+    `${
+      import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"
+    }/async_open_ai_doc_question_status/?jobId=${jobId}`,
     {
       accessToken: accessToken,
       dataPath: ["response"],
@@ -757,7 +767,9 @@ export async function asyncRequestDocTimeline(
   if (!accessToken) throw new Error("No access token");
   const res = await execHttp<DocumentTimelineJobId>(
     "POST",
-    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/async_get_document_timeline/?docId=${docId}&userId=${userId}&docService=${docService}`,
+    `${
+      import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"
+    }/async_get_document_timeline/?docId=${docId}&userId=${userId}&docService=${docService}`,
     {
       accessToken: accessToken,
       dataPath: ["response", "jobId"],
@@ -780,7 +792,9 @@ export async function asyncRequestDocTimelineStatus(
   if (!accessToken) throw new Error("No access token");
   const res = await execHttp<DocumentTimelineJobStatus>(
     "POST",
-    `${import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"}/async_document_timeline_status/?jobId=${jobId}`,
+    `${
+      import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"
+    }/async_document_timeline_status/?jobId=${jobId}`,
     {
       accessToken: accessToken,
       dataPath: ["response"],

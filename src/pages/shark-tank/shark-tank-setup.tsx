@@ -137,7 +137,9 @@ function SharkTankSetup(): React.ReactNode {
         />
       </ListItem>
       <Tooltip
-        title={`${activePanelists?.includes(props.clientId) ? "Disable" : "Enable"} Panelist`}
+        title={`${
+          activePanelists?.includes(props.clientId) ? "Disable" : "Enable"
+        } Panelist`}
       >
         <IconButton
           color="primary"

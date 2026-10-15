@@ -196,7 +196,9 @@ export async function getPollyTTS(args: {
     .replace("<", " less than ")
     .replace(">", " greater than ");
   if (!text.startsWith("<speak>") && !text.endsWith("</speak>")) {
-    text = `<speak><prosody rate="${args.speed || "medium"}">${text}</prosody></speak>`;
+    text = `<speak><prosody rate="${
+      args.speed || "medium"
+    }">${text}</prosody></speak>`;
   }
   const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
   const apiUrl = import.meta.env.VITE_ABE_API_ENDPOINT || "/graphql";
