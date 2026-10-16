@@ -139,10 +139,10 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
 
   function resetActivity() {
     if (builtActivityHandler) {
-      builtActivityHandler.resetActivity();
-      removeAllSubscribers();
-      clearChatLog(curDocId);
+      builtActivityHandler.destroy();
     }
+    removeAllSubscribers();
+    clearChatLog(curDocId);
   }
 
   function sendUserMessage(message: ChatMessageTypes) {
