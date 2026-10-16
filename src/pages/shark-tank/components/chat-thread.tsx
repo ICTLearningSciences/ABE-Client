@@ -17,6 +17,7 @@ import {
   ListSubheader,
   Menu,
   MenuItem,
+  Switch,
   Typography,
 } from "@mui/material";
 import {
@@ -56,6 +57,7 @@ export function ChatThread(props: {
     (state) => state.panels.activePanelists,
   );
   const messageContainerRef = useRef<HTMLDivElement>(null);
+  const [autoScroll, setAutoScroll] = useState<boolean>(true);
   const [viewedMessages, setViewedMessages] = useState<string[]>([]);
   const [pingRef, setPingRef] = useState<NodeJS.Timeout>();
 
@@ -179,6 +181,21 @@ export function ChatThread(props: {
     }
   }
 
+  function isBottomInView() {
+    if (autoScroll) return true;
+    const container = messageContainerRef?.current;
+    const lastMessage = chatMessages[chatMessages.length - 1];
+    const element = document.getElementById(lastMessage.id);
+    const cTop = container?.scrollTop || 0;
+    const cBottom = cTop + (container?.clientHeight || 0);
+    const eTop = (element?.offsetTop || 0) - (container?.offsetTop || 0); // change here
+    const eBottom = eTop + (element?.clientHeight || 0);
+    const isTotal = eTop >= cTop && eBottom <= cBottom;
+    const isPartial =
+      (eTop < cTop && eBottom > cTop) || (eBottom > cBottom && eTop < cBottom);
+    return isTotal || isPartial;
+  }
+
   useEffect(() => {
     return () => {
       if (pingRef) {
@@ -205,6 +222,15 @@ export function ChatThread(props: {
     }
     addMessagesWithDelay();
   }, [chatMessages, viewedMessages, pingRef]);
+
+  useEffect(() => {
+    if (messageContainerRef.current && isBottomInView()) {
+      const msg = chatMessages.find(
+        (m) => m.id === viewedMessages[viewedMessages.length - 1],
+      );
+      scrollToElementById(msg?.id || "message-end-ref");
+    }
+  }, [chatMessages.length, viewedMessages.length, messageElements.length]);
 
   return (
     <>
@@ -243,14 +269,21 @@ export function ChatThread(props: {
         )}
         <div id="message-end-ref" />
       </div>
-      <Typography
-        color="secondary"
-        className="row center-div"
-        style={{ fontSize: 12, cursor: "pointer" }}
-        onClick={() => scrollToElementById("message-end-ref")}
-      >
-        Scroll to Bottom <ArrowDropDown />
-      </Typography>
+      <div className="row center-div">
+        <Switch
+          checked={autoScroll}
+          onChange={(e) => setAutoScroll(e.target.checked)}
+        />
+        <Typography
+          color="secondary"
+          className="row center-div"
+          style={{ fontSize: 12, cursor: "pointer" }}
+          onClick={() => scrollToElementById("message-end-ref")}
+        >
+          Scroll to Bottom
+          <ArrowDropDown />
+        </Typography>
+      </div>
     </>
   );
 }
