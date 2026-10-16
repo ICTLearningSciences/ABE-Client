@@ -181,14 +181,14 @@ export function ChatThread(props: {
     }
   }
 
-  function isBottomInView() {
-    if (autoScroll) return true;
+  /** check if the last chat message bubble is in view */
+  function isLastMessageInView() {
     const container = messageContainerRef?.current;
     const lastMessage = chatMessages[chatMessages.length - 1];
     const element = document.getElementById(lastMessage.id);
     const cTop = container?.scrollTop || 0;
     const cBottom = cTop + (container?.clientHeight || 0);
-    const eTop = (element?.offsetTop || 0) - (container?.offsetTop || 0); // change here
+    const eTop = (element?.offsetTop || 0) - (container?.offsetTop || 0);
     const eBottom = eTop + (element?.clientHeight || 0);
     const isTotal = eTop >= cTop && eBottom <= cBottom;
     const isPartial =
@@ -224,7 +224,9 @@ export function ChatThread(props: {
   }, [chatMessages, viewedMessages, pingRef]);
 
   useEffect(() => {
-    if (messageContainerRef.current && isBottomInView()) {
+    // scroll to latest chat message if auto-scroll enable or last chat message is in view
+    // and a new chat message appears
+    if (messageContainerRef.current && (autoScroll || isLastMessageInView())) {
       const msg = chatMessages.find(
         (m) => m.id === viewedMessages[viewedMessages.length - 1],
       );
