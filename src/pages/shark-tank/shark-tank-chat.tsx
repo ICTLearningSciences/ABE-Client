@@ -50,9 +50,9 @@ function SharkTankChat(): React.ReactNode {
   }
 
   async function onOpenDoc(docId: string): Promise<void> {
-    if (curDocId && docId !== curDocId) resetActivity();
     setSelectingDoc(false);
     useWithDoc.updateCurrentDocId(docId);
+    if (curDocId && docId !== curDocId) resetActivity();
   }
 
   if (!activePanel || !activity) {
