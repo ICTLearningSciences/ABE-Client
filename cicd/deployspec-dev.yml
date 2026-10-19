@@ -5,6 +5,7 @@ env:
     STAGE: 'dev'
     VITE_GOOGLE_API_ENDPOINT: "https://api-dev.abewriting.org/docs"
     VITE_ABE_API_ENDPOINT: "https://api-dev.abewriting.org/graphql"
+    VITE_RAG_BUCKET: "https://media.abewriting.org/"
   parameter-store:
     S3_DEPLOY_BUCKET_DEV: "/abewriting/dev/s3-websites/NAME"
     CDN_ID_DEV: "/abewriting/dev/CLOUDFRONT_DISTRIBUTION_ID"
