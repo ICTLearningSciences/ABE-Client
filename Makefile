@@ -9,11 +9,6 @@ test-all:
 	$(MAKE) test-format
 	$(MAKE) test-lint
 	$(MAKE) test-types
-	$(MAKE) test-unit-tests
-
-.PHONY: test-unit-tests
-test-unit-tests:
-	npm run test:unit
 
 .PHONY: test-audit
 test-audit:

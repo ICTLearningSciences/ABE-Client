@@ -30,7 +30,6 @@ function SharkTankChat(): React.ReactNode {
 
   const { curDocId } = useWithDoc.state;
   const { activity, activePanel } = useWithPanelActivity;
-  const { resetActivity } = useWithActivityHandler;
 
   const [reference, setReference] = React.useState<Source>();
   const [selectingDoc, setSelectingDoc] = React.useState<boolean>(!curDocId);
@@ -50,7 +49,6 @@ function SharkTankChat(): React.ReactNode {
   }
 
   async function onOpenDoc(docId: string): Promise<void> {
-    if (curDocId && docId !== curDocId) resetActivity();
     setSelectingDoc(false);
     useWithDoc.updateCurrentDocId(docId);
   }

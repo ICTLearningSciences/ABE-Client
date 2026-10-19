@@ -5,11 +5,8 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { useEffect } from "react";
-import {
-  BuiltActivityHandler,
-  BuiltActivityHandlerInstance,
-} from "../../classes/activity-builder-activity/built-activity-handler";
+import { useEffect, useState } from "react";
+import { BuiltActivityHandler } from "../../classes/activity-builder-activity/built-activity-handler";
 import type { ChatMessageTypes } from "../../store/slices/chat";
 import { useWithChat } from "../../store/slices/chat/use-with-chat";
 import { useWithState } from "../../store/slices/state/use-with-state";
@@ -35,7 +32,9 @@ export interface UseWithBuiltActivityHandler {
 }
 
 export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
-  const builtActivityHandler = BuiltActivityHandlerInstance;
+  const [builtActivityHandler, setBuiltActivityHandler] =
+    useState<BuiltActivityHandler | null>(null);
+  const [resetNonce, setResetNonce] = useState(0);
   const {
     activity,
     activePanelists,
@@ -66,18 +65,16 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
   const navigate = useNavigateWithParams();
 
   useEffect(() => {
-    if (!user && builtActivityHandler) {
-      builtActivityHandler.resetActivity();
-      builtActivityHandler.destroy();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (!curDocId) return;
-    if (!activity?._id) return;
-    if (builtActivityHandler) return;
-    startActivity(curDocId, activity);
-  }, [Boolean(builtActivityHandler)]);
+    if (!user?._id || !curDocId || !activity?._id) return;
+    const handler = startActivity(curDocId, activity);
+    setBuiltActivityHandler(handler);
+    return () => {
+      handler.destroy();
+      removeAllSubscribers();
+      coachResponsePending(false);
+      setBuiltActivityHandler(null);
+    };
+  }, [user?._id, curDocId, activity?._id, resetNonce]);
 
   useEffect(() => {
     if (builtActivityHandler) {
@@ -95,17 +92,20 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
   function startActivity(
     docId: string,
     selectedActivityBuilder: ActivityBuilder,
-  ) {
+  ): BuiltActivityHandler {
     const attachedPanel = selectedActivityBuilder.attachedPanel
       ? panels.find((p) => p.clientId === selectedActivityBuilder.attachedPanel)
       : undefined;
     const attachedPanelists = attachedPanel
       ? panelists.filter((p) => attachedPanel.panelists.includes(p.clientId))
       : undefined;
-    const newActivityHandler = new BuiltActivityHandler(
-      sendMessageHelper,
+    const newActivityHandler: BuiltActivityHandler = new BuiltActivityHandler(
+      (msg: ChatMessageTypes, clearChat?: boolean) => {
+        if (newActivityHandler.destroyed) return;
+        sendMessage(msg, clearChat || false, docId);
+      },
       () => {
-        clearChatLog(docId);
+        clearChatLog();
       },
       (waiting: boolean) => {
         console.log(waiting);
@@ -135,14 +135,11 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
       activePanelists?.map((a) => a.clientId) || [];
     newActivityHandler.executePrompt = executePromptSteps;
     addNewSubscriber(newActivityHandler);
+    return newActivityHandler;
   }
 
   function resetActivity() {
-    if (builtActivityHandler) {
-      builtActivityHandler.resetActivity();
-      removeAllSubscribers();
-      clearChatLog(curDocId);
-    }
+    setResetNonce((n) => n + 1);
   }
 
   function sendUserMessage(message: ChatMessageTypes) {
@@ -168,10 +165,6 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
       viewState.selectedAssignmentId,
       activity._id,
     );
-  }
-
-  function sendMessageHelper(msg: ChatMessageTypes, clearChat?: boolean) {
-    sendMessage(msg, clearChat || false, curDocId);
   }
 
   function updateSessionIntentionHelper(intention: string) {

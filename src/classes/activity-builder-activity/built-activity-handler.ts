@@ -81,7 +81,7 @@ export type StateData = Record<string, any>;
 export let BuiltActivityHandlerInstance: BuiltActivityHandler | null = null;
 export class BuiltActivityHandler implements ChatLogSubscriber {
   destroyed?: boolean;
-  builtActivityData: ActivityBuilder | undefined;
+  builtActivityData: ActivityBuilder;
   curStep: ActivityBuilderStep | undefined;
   stateData: StateData;
   chatLog: ChatLog = [];
@@ -131,7 +131,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     docService: DocService,
     handleStudentActivityComplete: () => void,
     onGoHome: () => void,
-    builtActivityData?: ActivityBuilder,
+    builtActivityData: ActivityBuilder,
     activityPanel?: Panel,
     activityPanelists?: Panelist[],
     onFilteredPanelistsChanged?: (filteredPanelistIds: string[]) => void,
@@ -187,8 +187,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
   destroy() {
     this.destroyed = true;
-    if (BuiltActivityHandlerInstance) {
-      BuiltActivityHandlerInstance.destroyed = true;
+    if (BuiltActivityHandlerInstance === this) {
       BuiltActivityHandlerInstance = null;
     }
   }
@@ -258,7 +257,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     }
   }
 
-  setBuiltActivityData(builtActivityData?: ActivityBuilder) {
+  setBuiltActivityData(builtActivityData: ActivityBuilder) {
     if (this.destroyed) throw new Error("Activity was destroyed");
     this.builtActivityData = builtActivityData;
   }
