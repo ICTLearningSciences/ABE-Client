@@ -8,7 +8,11 @@ The full terms of this copyright and license should always be found in the root 
 import { useMemo, useState } from "react";
 import axios, { type CancelTokenSource } from "axios";
 import type { AiServicesResponseTypes } from "../ai-services/ai-service-types";
-import { type AiPromptStep, type AiServiceModel, getDocServiceFromLoginService } from "../types";
+import {
+  type AiPromptStep,
+  type AiServiceModel,
+  getDocServiceFromLoginService,
+} from "../types";
 import { asyncPromptExecute } from "./use-with-synchronous-polling";
 import { useAppSelector } from "../store/hooks";
 import { useWithConfig } from "../store/slices/config/use-with-config";
@@ -62,10 +66,10 @@ export function useWithExecutePrompt() {
   ): AiPromptStep[] {
     return promptSteps.map((step) => {
       step.targetAiServiceModel =
-        overrideAiServiceModel ||
         studentOverrideAiServiceModel ||
         assignmentDefaultAiServiceModel ||
         localAiServiceModelOverride ||
+        overrideAiServiceModel ||
         configAiServiceModelOverride ||
         step.targetAiServiceModel;
       const targetAvailableAiService = availableAiServiceModels.find(
@@ -100,8 +104,10 @@ export function useWithExecutePrompt() {
       controller: abortController,
       source,
     });
-    const processedAiPromptSteps =
-      applyAvailableModelsToPromptSteps(aiPromptSteps, overrideAiServiceModel);
+    const processedAiPromptSteps = applyAvailableModelsToPromptSteps(
+      aiPromptSteps,
+      overrideAiServiceModel,
+    );
 
     const res = await asyncPromptExecute(
       curDocId,

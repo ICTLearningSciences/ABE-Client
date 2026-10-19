@@ -53,7 +53,11 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
   const defaultSharkTankAiModel = useAppSelector(
     (state) => state.config.config?.defaultSharkTankAiModel,
   );
-  const executePromptStepsForSharkTank = useCallback((aiPromptSteps: AiPromptStep[]) => _executePromptSteps(aiPromptSteps, undefined, defaultSharkTankAiModel), [_executePromptSteps, defaultSharkTankAiModel]);
+  const executePromptStepsForSharkTank = useCallback(
+    (aiPromptSteps: AiPromptStep[]) =>
+      _executePromptSteps(aiPromptSteps, undefined, defaultSharkTankAiModel),
+    [_executePromptSteps, defaultSharkTankAiModel],
+  );
   const { addNewSubscriber, removeAllSubscribers } =
     useWithChatLogSubscribers();
   const {
@@ -89,7 +93,7 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
 
   useEffect(() => {
     if (builtActivityHandler) {
-      builtActivityHandler.executePrompt = executePromptStepsForSharkTank
+      builtActivityHandler.executePrompt = executePromptStepsForSharkTank;
     }
   }, [executePromptStepsForSharkTank]);
 
