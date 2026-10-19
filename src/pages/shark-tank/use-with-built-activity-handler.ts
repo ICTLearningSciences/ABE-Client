@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BuiltActivityHandler } from "../../classes/activity-builder-activity/built-activity-handler";
 import type { ChatMessageTypes } from "../../store/slices/chat";
 import { useWithChat } from "../../store/slices/chat/use-with-chat";
@@ -13,7 +13,7 @@ import { useWithState } from "../../store/slices/state/use-with-state";
 import { useWithChatLogSubscribers } from "../../hooks/use-with-chat-log-subscribers";
 import { useWithExecutePrompt } from "../../hooks/use-with-execute-prompts";
 import type { ActivityBuilder } from "../../components/activity-builder/types";
-import { getDocServiceFromLoginService } from "../../types";
+import { getDocServiceFromLoginService, type AiPromptStep } from "../../types";
 import { useAppSelector } from "../../store/hooks";
 import { useWithEducationalManagement } from "../../store/slices/education-management/use-with-educational-management";
 import { useNavigateWithParams } from "../../hooks/use-navigate-with-params";
@@ -49,7 +49,15 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
 
   const user = useAppSelector((state) => state.login.user);
   const docService = getDocServiceFromLoginService(user?.loginService);
-  const { executePromptSteps } = useWithExecutePrompt();
+  const { executePromptSteps: _executePromptSteps } = useWithExecutePrompt();
+  const defaultSharkTankAiModel = useAppSelector(
+    (state) => state.config.config?.defaultSharkTankAiModel,
+  );
+  const executePromptStepsForSharkTank = useCallback(
+    (aiPromptSteps: AiPromptStep[]) =>
+      _executePromptSteps(aiPromptSteps, undefined, defaultSharkTankAiModel),
+    [_executePromptSteps, defaultSharkTankAiModel],
+  );
   const { addNewSubscriber, removeAllSubscribers } =
     useWithChatLogSubscribers();
   const {
@@ -85,9 +93,9 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
 
   useEffect(() => {
     if (builtActivityHandler) {
-      builtActivityHandler.executePrompt = executePromptSteps;
+      builtActivityHandler.executePrompt = executePromptStepsForSharkTank;
     }
-  }, [executePromptSteps]);
+  }, [executePromptStepsForSharkTank]);
 
   function startActivity(
     docId: string,
@@ -112,7 +120,7 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
       },
       coachResponsePending,
       updateSessionIntentionHelper,
-      executePromptSteps,
+      executePromptStepsForSharkTank,
       docId,
       () => {},
       docService,
@@ -133,7 +141,7 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
     newActivityHandler.initializeActivity();
     newActivityHandler.filteredToPanelists =
       activePanelists?.map((a) => a.clientId) || [];
-    newActivityHandler.executePrompt = executePromptSteps;
+    newActivityHandler.executePrompt = executePromptStepsForSharkTank;
     addNewSubscriber(newActivityHandler);
     return newActivityHandler;
   }
