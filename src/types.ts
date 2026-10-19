@@ -255,6 +255,7 @@ export interface Config {
   exampleGoogleDocs?: string[];
   overrideAiModel?: AiServiceModel;
   defaultAiModel?: AiServiceModel;
+  defaultSharkTankAiModel?: AiServiceModel;
   aiServiceModelConfigs?: AiServiceModelConfigs[];
   approvedEmailsForAiModels?: string[];
   headerTitle?: string; // first word will be golden

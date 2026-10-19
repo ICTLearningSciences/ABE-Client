@@ -491,6 +491,10 @@ defaultAiModel{
   serviceName
   model
 }
+defaultSharkTankAiModel{
+  serviceName
+  model
+}
 approvedEmailsForAiModels
 headerTitle
 orgName
