@@ -8,7 +8,7 @@ The full terms of this copyright and license should always be found in the root 
 import { useMemo, useState } from "react";
 import axios, { type CancelTokenSource } from "axios";
 import type { AiServicesResponseTypes } from "../ai-services/ai-service-types";
-import { type AiPromptStep, getDocServiceFromLoginService } from "../types";
+import { type AiPromptStep, type AiServiceModel, getDocServiceFromLoginService } from "../types";
 import { asyncPromptExecute } from "./use-with-synchronous-polling";
 import { useAppSelector } from "../store/hooks";
 import { useWithConfig } from "../store/slices/config/use-with-config";
@@ -58,9 +58,11 @@ export function useWithExecutePrompt() {
    */
   function applyAvailableModelsToPromptSteps(
     promptSteps: AiPromptStep[],
+    overrideAiServiceModel?: AiServiceModel,
   ): AiPromptStep[] {
     return promptSteps.map((step) => {
       step.targetAiServiceModel =
+        overrideAiServiceModel ||
         studentOverrideAiServiceModel ||
         assignmentDefaultAiServiceModel ||
         localAiServiceModelOverride ||
@@ -90,6 +92,7 @@ export function useWithExecutePrompt() {
   async function executePromptSteps(
     aiPromptSteps: AiPromptStep[],
     callback?: (response: AiServicesResponseTypes) => void,
+    overrideAiServiceModel?: AiServiceModel,
   ) {
     const abortController = new AbortController();
     const source = axios.CancelToken.source();
@@ -98,7 +101,7 @@ export function useWithExecutePrompt() {
       source,
     });
     const processedAiPromptSteps =
-      applyAvailableModelsToPromptSteps(aiPromptSteps);
+      applyAvailableModelsToPromptSteps(aiPromptSteps, overrideAiServiceModel);
 
     const res = await asyncPromptExecute(
       curDocId,
