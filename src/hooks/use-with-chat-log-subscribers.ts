@@ -11,6 +11,7 @@ import type { ChatLog } from "../store/slices/chat";
 import type { DocData } from "../types";
 
 export abstract class ChatLogSubscriber {
+  destroyed?: boolean;
   abstract newChatLogReceived(chatLog: ChatLog): void;
   abstract newDocDataReceived(docData?: DocData): void;
 }
@@ -26,6 +27,7 @@ export function useWithChatLogSubscribers() {
 
   useEffect(() => {
     for (let i = 0; i < subscribers.length; i++) {
+      if (subscribers[i].destroyed) continue;
       const newChatLogFunction = subscribers[i].newChatLogReceived.bind(
         subscribers[i],
       );
@@ -35,6 +37,7 @@ export function useWithChatLogSubscribers() {
 
   useEffect(() => {
     for (let i = 0; i < subscribers.length; i++) {
+      if (subscribers[i].destroyed) continue;
       const newDocDataFunction = subscribers[i].newDocDataReceived.bind(
         subscribers[i],
       );
@@ -43,7 +46,7 @@ export function useWithChatLogSubscribers() {
   }, [mostRecentDocVersion]);
 
   function addNewSubscriber(subscriber: ChatLogSubscriber) {
-    setSubscribers([...subscribers, subscriber]);
+    setSubscribers((prev) => [...prev, subscriber]);
   }
 
   function removeAllSubscribers() {

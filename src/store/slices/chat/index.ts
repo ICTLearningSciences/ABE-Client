@@ -197,12 +197,18 @@ export const chatSlice = createSlice({
         [docId]: [...(state.chatLogs[docId] || []), ...messages],
       };
     },
-    clearChat: (state: ChatState, action: PayloadAction<string>) => {
-      const docId = action.payload;
-      state.chatLogs = {
-        ...state.chatLogs,
-        [docId]: [],
-      };
+    clearChat: (
+      state: ChatState,
+      action: PayloadAction<string | undefined>,
+    ) => {
+      if (action.payload) {
+        state.chatLogs = {
+          ...state.chatLogs,
+          [action.payload]: [],
+        };
+      } else {
+        state.chatLogs = {};
+      }
     },
     clearHistory: (state: ChatState) => {
       state.chatHistory = [];

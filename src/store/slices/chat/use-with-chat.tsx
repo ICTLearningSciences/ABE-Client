@@ -31,7 +31,7 @@ export interface UseWithChat {
     docId: string,
   ) => void;
   coachResponsePending: (waiting: boolean) => void;
-  clearChatLog: (docId: string) => void;
+  clearChatLog: (docId?: string) => void;
   clearChatHistory: () => void;
   chatLogToString: (docId: string) => string;
   setSystemRole: (prompt: string) => void;
@@ -86,7 +86,7 @@ export function useWithChat(): UseWithChat {
     dispatch(setCoachResponsePending(pending));
   }
 
-  function clearChatLog(docId: string) {
+  function clearChatLog(docId?: string) {
     newSession();
     dispatch(clearChat(docId));
   }
