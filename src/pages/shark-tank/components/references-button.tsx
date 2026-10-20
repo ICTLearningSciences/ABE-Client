@@ -28,12 +28,12 @@ export function ReferencesButton(props: {
       : chatLogs[curDocId] || []
     : [];
 
-  const sources = [];
+  const sources: Source[] = [];
   if (curDocId) {
     for (const msg of messages) {
       if ("sources" in msg) {
         for (const source of msg.sources || []) {
-          sources.push(source);
+          if (!sources.find((s) => s.url === source.url)) sources.push(source);
         }
       }
     }
