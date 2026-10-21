@@ -116,26 +116,6 @@ export const chatSlice = createSlice({
       }>,
     ) => {
       const { message, clearChat, docId, sessionId } = action.payload;
-      const historyIdx = state.chatHistory.findIndex(
-        (c) => c.sessionId === sessionId,
-      );
-      if (historyIdx === -1) {
-        state.chatHistory.push({
-          docId: action.payload.docId,
-          docTitle: action.payload.docTitle,
-          activityId: action.payload.activityId,
-          activityTitle: action.payload.activityTitle,
-          panelId: action.payload.panelId,
-          panelTitle: action.payload.panelTitle,
-          chatLog: [message],
-          sessionId: action.payload.sessionId,
-          startDate: new Date().toLocaleString(),
-        });
-      } else {
-        state.chatHistory[historyIdx].chatLog.push(message);
-      }
-      saveHistory(state.chatHistory);
-
       if (clearChat) {
         state.chatLogs = {
           ...state.chatLogs,
@@ -160,6 +140,34 @@ export const chatSlice = createSlice({
         ...state.chatLogs,
         [docId]: [...(state.chatLogs[docId] || []), message],
       };
+
+      try {
+        const historyIdx = state.chatHistory.findIndex(
+          (c) => c.sessionId === sessionId,
+        );
+        if (historyIdx === -1) {
+          // only keep up to 10 chat histories to prevent memory from exceeding amount storable by local storage
+          while (state.chatHistory.length >= 10) {
+            state.chatHistory.shift();
+          }
+          state.chatHistory.push({
+            docId: action.payload.docId,
+            docTitle: action.payload.docTitle,
+            activityId: action.payload.activityId,
+            activityTitle: action.payload.activityTitle,
+            panelId: action.payload.panelId,
+            panelTitle: action.payload.panelTitle,
+            chatLog: [message],
+            sessionId: action.payload.sessionId,
+            startDate: new Date().toLocaleString(),
+          });
+        } else {
+          state.chatHistory[historyIdx].chatLog.push(message);
+        }
+        saveHistory(state.chatHistory);
+      } catch (err) {
+        console.warn(err);
+      }
     },
     addMessages: (
       state: ChatState,
