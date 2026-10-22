@@ -73,7 +73,7 @@ export const GO_HOME_BUTTON_MESSAGE = "Return to Home";
 export const DOC_TEXT_KEY = "doc_text";
 export const DOC_NUM_WORDS_KEY = "doc_num_words";
 export const AGENT_RESULT_COUNT_KEY = "AGENT_RESULT_COUNT";
-export const DEFAULT_CHUNK_SIZE = 2;
+export const DEFAULT_CHUNK_SIZE = 1;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type StateData = Record<string, any>;
