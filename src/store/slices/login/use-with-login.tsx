@@ -10,8 +10,8 @@ import { useAuth } from "react-oidc-context";
 import { useAppSelector, useAppDispatch } from "../../hooks";
 import * as loginActions from ".";
 import {
-  ACCESS_TOKEN_KEY,
   CLASSROOM_CODE_KEY,
+  getAccessToken,
   localStorageClear,
   localStorageGet,
 } from "../../local-storage";
@@ -80,7 +80,7 @@ export function useWithLogin(): UseWithLogin {
       return;
     }
     checkForClassroomCode(state.loginStatus);
-    const token = localStorageGet(ACCESS_TOKEN_KEY);
+    const token = getAccessToken();
     if (token) {
       refreshAccessToken();
     } else {

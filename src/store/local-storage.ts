@@ -24,6 +24,11 @@ export function localStorageGet(key: string): string | object | null {
   }
 }
 
+export function getAccessToken() {
+  const token = localStorageGet(ACCESS_TOKEN_KEY) as string;
+  return token || "";
+}
+
 export function localStorageStore(key: string, value: string): void {
   if (typeof window === "undefined") {
     return;
