@@ -9,18 +9,32 @@ export const ACCESS_TOKEN_KEY = "accessToken";
 export const ACTIVE_MENTOR_KEY = "activeMentor";
 export const CLASSROOM_CODE_KEY = "classroomCode";
 
-export function localStorageGet(key: string): string | null {
+/** local storage */
+
+export function localStorageGet(key: string): string | object | null {
   if (typeof window === "undefined") {
     return "";
   }
-  return localStorage.getItem(key);
+  const item = localStorage.getItem(key);
+  if (!item) return null;
+  try {
+    return JSON.parse(item);
+  } catch {
+    return item;
+  }
 }
 
 export function localStorageStore(key: string, value: string): void {
   if (typeof window === "undefined") {
     return;
   }
-  localStorage.setItem(key, value);
+  try {
+    localStorage.setItem(key, value);
+  } catch (err) {
+    if (err.name === "QuotaExceededError") {
+      console.log("Storage is full!");
+    }
+  }
 }
 
 export function localStorageClear(key: string): void {
@@ -29,6 +43,8 @@ export function localStorageClear(key: string): void {
   }
   localStorage.removeItem(key);
 }
+
+/** session storage */
 
 export function sessionStorageGet(key: string): string | null {
   if (typeof window === "undefined") {
@@ -50,3 +66,26 @@ export function sessionStorageClear(key: string): void {
   }
   sessionStorage.removeItem(key);
 }
+
+/** indexed db */
+
+export const initDB = (): Promise<boolean> => {
+  let request: IDBOpenDBRequest;
+  let db: IDBDatabase;
+  return new Promise((resolve) => {
+    request = indexedDB.open("MyDB");
+    request.onupgradeneeded = () => {
+      db = request.result;
+      if (!db.objectStoreNames.contains("ChatLog")) {
+        db.createObjectStore("ChatLog", { keyPath: "sessionId" });
+      }
+    };
+    request.onsuccess = () => {
+      db = request.result;
+      resolve(true);
+    };
+    request.onerror = () => {
+      resolve(false);
+    };
+  });
+};

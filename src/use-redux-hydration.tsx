@@ -11,6 +11,8 @@ import { loadUserDocs } from "./store/slices/state";
 import { useWithDocGoalsActivities } from "./store/slices/doc-goals-activities/use-with-doc-goals-activites";
 import { useWithEducationalManagement } from "./store/slices/education-management/use-with-educational-management";
 import { useWithPanels } from "./store/slices/panels/use-with-panels";
+import { initDB } from "./store/local-storage";
+import { fetchChatHistory } from "./store/slices/chat";
 
 export function useReduxHydration() {
   const { user, accessToken, loginStatus } = useAppSelector(
@@ -23,6 +25,10 @@ export function useReduxHydration() {
   const { loadAllEducationalDataWithUserData } = useWithEducationalManagement();
   const { fetchPanels, fetchPanelists } = useWithPanels();
   const hydrated = useRef(false);
+
+  useEffect(() => {
+    initDB().then(() => dispatch(fetchChatHistory()));
+  }, []);
 
   useEffect(() => {
     if (loginStatus === 0 || loginStatus === 1) {

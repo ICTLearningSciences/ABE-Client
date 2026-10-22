@@ -64,7 +64,9 @@ export function useWithLogin(): UseWithLogin {
       }
       const urlParams = new URLSearchParams(window.location.search);
       const classroomCodeUrlParam = urlParams.get("classroomCode");
-      const classroomCodeLocalStorage = localStorageGet(CLASSROOM_CODE_KEY);
+      const classroomCodeLocalStorage = localStorageGet(
+        CLASSROOM_CODE_KEY,
+      ) as string;
       if (classroomCodeUrlParam) {
         await updateUserInfo({ classroomCode: classroomCodeUrlParam });
       } else if (classroomCodeLocalStorage) {
