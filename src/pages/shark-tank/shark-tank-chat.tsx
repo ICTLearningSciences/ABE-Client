@@ -33,6 +33,14 @@ function SharkTankChat(): React.ReactNode {
 
   const [reference, setReference] = React.useState<Source>();
   const [selectingDoc, setSelectingDoc] = React.useState<boolean>(!curDocId);
+  const [changingDoc, setChangingDoc] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (curDocId && changingDoc) {
+      useWithActivityHandler.resetActivity();
+      setChangingDoc(false);
+    }
+  }, [curDocId, changingDoc]);
 
   function onSelectDocument(docId: string): void {
     if (reference) {
@@ -43,6 +51,7 @@ function SharkTankChat(): React.ReactNode {
       setSelectingDoc(true);
       return;
     }
+    setChangingDoc(true);
     useWithDoc.updateCurrentDocId(docId);
     setReference(undefined);
     setSelectingDoc(false);
@@ -50,6 +59,7 @@ function SharkTankChat(): React.ReactNode {
 
   async function onOpenDoc(docId: string): Promise<void> {
     setSelectingDoc(false);
+    setChangingDoc(true);
     useWithDoc.updateCurrentDocId(docId);
   }
 
