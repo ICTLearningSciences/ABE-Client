@@ -73,7 +73,7 @@ export const GO_HOME_BUTTON_MESSAGE = "Return to Home";
 export const DOC_TEXT_KEY = "doc_text";
 export const DOC_NUM_WORDS_KEY = "doc_num_words";
 export const AGENT_RESULT_COUNT_KEY = "AGENT_RESULT_COUNT";
-export const DEFAULT_CHUNK_SIZE = 2;
+export const DEFAULT_CHUNK_SIZE = 1;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type StateData = Record<string, any>;
@@ -333,6 +333,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         await this.handleSystemMessageStep(step as SystemMessageActivityStep);
         break;
       case "PROMPT":
+        this.stateData[AGENT_RESULT_COUNT_KEY] = 0;
         await this.handlePromptStep(step as PromptActivityStep);
         break;
       case "CONDITIONAL":
@@ -822,8 +823,8 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     // split requests into chunks
     const resolvedAgentsCount = this.stateData[AGENT_RESULT_COUNT_KEY] || 0;
 
-    this.executionUUID = uuidv4();
-    this.executionUUIDs[this.executionUUID] = {
+    const thisExecutionUUID = uuidv4();
+    this.executionUUIDs[thisExecutionUUID] = {
       timestamp: new Date().toLocaleString(),
       disabled: false,
     };
@@ -837,25 +838,35 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
           this.executePanelistPromptConfiguration(
             promptToExecute.config,
             promptToExecute.panelist,
-            this.executionUUID,
+            thisExecutionUUID,
             extraChat,
           ),
         );
       } else
         promptExecutions.push(
-          this.executeSinglePromptConfiguration(promptToExecute.config),
+          this.executeSinglePromptConfiguration(
+            promptToExecute.config,
+            thisExecutionUUID,
+          ),
         );
     }
 
     const promptResults = await Promise.allSettled(promptExecutions);
-    await this.evaluatePromptResults(step, promptResults, promptsToExecute);
+    await this.evaluatePromptResults(
+      step,
+      promptResults,
+      promptsToExecute,
+      thisExecutionUUID,
+    );
 
-    this.setResponsePending(false);
+    if (!this.executionUUIDs[thisExecutionUUID]?.disabled) {
+      this.setResponsePending(false);
+    }
 
     if (this.stateData[AGENT_RESULT_COUNT_KEY] >= promptsToExecute.length) {
       this.stateData[AGENT_RESULT_COUNT_KEY] = 0;
       await this.goToNextStep();
-    } else if (!this.executionUUIDs[this.executionUUID]?.disabled) {
+    } else if (!this.executionUUIDs[thisExecutionUUID]?.disabled) {
       await this.handlePromptStep(step, extraChat);
     }
   }
@@ -882,6 +893,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         }
     >[],
     promptsToExecute: PromptToExecute[],
+    batchExecutionUUID: string,
   ): Promise<ChatLog> {
     if (this.destroyed) throw new Error("Activity was destroyed");
     const resultText: ChatLog = [];
@@ -961,10 +973,14 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       this.stateData = { ...this.stateData, ...jsonResults };
     }
 
-    const previousAgentResultCount =
-      this.stateData[AGENT_RESULT_COUNT_KEY] || 0;
-    this.stateData[AGENT_RESULT_COUNT_KEY] =
-      previousAgentResultCount + promptResults.length;
+    // Only increment counter if this batch execution wasn't disabled
+    const isBatchDisabled = this.executionUUIDs[batchExecutionUUID]?.disabled;
+    if (!isBatchDisabled) {
+      const previousAgentResultCount =
+        this.stateData[AGENT_RESULT_COUNT_KEY] || 0;
+      this.stateData[AGENT_RESULT_COUNT_KEY] =
+        previousAgentResultCount + promptResults.length;
+    }
     // Add panelist data to stateData
     if (Object.keys(panelistData).length > 0) {
       this.stateData = {
@@ -980,11 +996,13 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
 
   async executeSinglePromptConfiguration(
     config: SinglePromptConfiguration,
+    executionUUID?: string,
   ): Promise<
     | {
         type: "json";
         data: StateData;
         originalConfiguration: SinglePromptConfiguration;
+        executionUUID?: string;
       }
     | {
         type: "text";
@@ -993,6 +1011,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         aiServiceStepData: any;
         originalConfiguration: SinglePromptConfiguration;
+        executionUUID?: string;
       }
   > {
     if (this.destroyed) throw new Error("Activity was destroyed");
@@ -1072,6 +1091,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
       config.outputDataType,
       config,
       config.jsonResponseData,
+      executionUUID,
     );
   }
 
@@ -1243,11 +1263,13 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
     outputDataType: PromptOutputTypes,
     originalConfiguration: SinglePromptConfiguration,
     jsonResponseData?: JsonResponseData[],
+    executionUUID?: string,
   ): Promise<
     | {
         type: "json";
         data: StateData;
         originalConfiguration: SinglePromptConfiguration;
+        executionUUID?: string;
       }
     | {
         type: "text";
@@ -1256,6 +1278,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         aiServiceStepData: any;
         originalConfiguration: SinglePromptConfiguration;
+        executionUUID?: string;
       }
   > {
     if (this.destroyed) throw new Error("Activity was destroyed");
@@ -1281,6 +1304,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             type: "json",
             data: resData,
             originalConfiguration: originalConfiguration,
+            executionUUID,
           };
         } else {
           // Return text response
@@ -1290,6 +1314,7 @@ export class BuiltActivityHandler implements ChatLogSubscriber {
             sources: _response.sources,
             aiServiceStepData: _response.aiAllStepsData,
             originalConfiguration: originalConfiguration,
+            executionUUID,
           };
         }
       } catch (err) {
