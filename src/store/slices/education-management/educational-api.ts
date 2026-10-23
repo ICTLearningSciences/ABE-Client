@@ -5,7 +5,7 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { ACCESS_TOKEN_KEY, localStorageGet } from "../../local-storage";
+import { getAccessToken } from "../../local-storage";
 import { execGql } from "../../../hooks/api";
 import type {
   Course,
@@ -106,7 +106,7 @@ export const instructorQueryData = `
 
 // Fetch courses for a specific user
 export async function fetchCourses(forUserId: string): Promise<Course[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Course[]>(
     {
       query: `
@@ -132,7 +132,7 @@ export async function fetchCourses(forUserId: string): Promise<Course[]> {
 export async function fetchAssignments(
   forUserId: string,
 ): Promise<Assignment[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Assignment[]>(
     {
       query: `
@@ -156,7 +156,7 @@ export async function fetchAssignments(
 
 // Fetch sections for a specific user
 export async function fetchSections(forUserId: string): Promise<Section[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Section[]>(
     {
       query: `
@@ -182,7 +182,7 @@ export async function fetchSections(forUserId: string): Promise<Section[]> {
 export async function fetchStudentsInMyCourses(
   instructorId: string,
 ): Promise<StudentData[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<StudentData[]>(
     {
       query: `
@@ -209,7 +209,7 @@ export async function addOrUpdateCourse(
   courseData?: Partial<Course>,
   action: "CREATE" | "MODIFY" | "DELETE" = "CREATE",
 ): Promise<Course> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Course>(
     {
       query: `
@@ -238,7 +238,7 @@ export async function addOrUpdateSection(
   sectionData?: Partial<Section>,
   action: "CREATE" | "MODIFY" | "DELETE" = "CREATE",
 ): Promise<Section> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Section>(
     {
       query: `
@@ -268,7 +268,7 @@ export async function addOrUpdateAssignment(
   assignmentData?: Partial<Assignment>,
   action: "CREATE" | "MODIFY" | "DELETE" = "CREATE",
 ): Promise<Assignment> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Assignment>(
     {
       query: `
@@ -300,7 +300,7 @@ export async function modifySectionEnrollment(
   sectionId?: string,
   sectionCode?: string,
 ): Promise<StudentData> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<StudentData>(
     {
       query: `
@@ -337,7 +337,7 @@ export async function modifyStudentAssignmentProgress(
   docId?: string,
   defaultLLM?: AiServiceModel,
 ): Promise<StudentData> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<StudentData>(
     {
       query: `
@@ -367,7 +367,7 @@ export async function modifyStudentAssignmentProgress(
 }
 
 export async function createNewStudent(userId: string): Promise<StudentData> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<StudentData>(
     {
       query: `
@@ -390,7 +390,7 @@ export async function createNewStudent(userId: string): Promise<StudentData> {
 }
 
 export async function createNewInstructor(userId: string): Promise<Instructor> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Instructor>(
     {
       query: `
@@ -425,7 +425,7 @@ export async function modifyCourseShareStatus(
   courseId: string,
   action: "SHARE" | "UNSHARE",
 ): Promise<Instructor> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Instructor>(
     {
       query: courseShareStatusMutation,
@@ -444,7 +444,7 @@ export async function modifyCourseShareStatus(
 }
 
 export async function fetchInstructors(): Promise<Instructor[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Instructor[]>(
     {
       query: `
@@ -468,7 +468,7 @@ export async function modifyStudentBanInSection(
   studentId: string,
   action: BanStudentFromSectionAction,
 ): Promise<Section> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Section>(
     {
       query: `mutation ModifyStudentBanInSection($sectionId: ID!, $studentId: ID!, $action: BanStudentFromSectionAction!) {
@@ -494,7 +494,7 @@ export async function fetchStudentsGoogleDocIds(
   userId: string,
   courseAssignmentId: string,
 ): Promise<string[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Connection<UserDoc>>(
     {
       query: `query FindAllGoogleDocs($limit: Int, $filter: String, $filterObject: Object, $sortAscending: Boolean, $sortBy: String){
@@ -530,7 +530,7 @@ export async function gradeStudentAssignment(
   grade: number,
   comment: string,
 ): Promise<StudentData> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<StudentData>(
     {
       query: `

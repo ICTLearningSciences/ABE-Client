@@ -6,7 +6,7 @@ The full terms of this copyright and license should always be found in the root 
 */
 
 import axios from "axios";
-import { ACCESS_TOKEN_KEY, localStorageGet } from "../store/local-storage";
+import { getAccessToken } from "../store/local-storage";
 
 export function getFileName(url: string): string {
   return url.substring(url.lastIndexOf("/") + 1);
@@ -109,7 +109,7 @@ export interface S3File {
   LastModified: string;
 }
 export async function getRagStore(): Promise<S3File[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const url = import.meta.env.VITE_ABE_API_ENDPOINT || "/graphql";
   const data = await axios.get(`${url}/s3list`, {
     headers: {
@@ -120,7 +120,7 @@ export async function getRagStore(): Promise<S3File[]> {
 }
 
 export async function uploadRagFile(file: File, name?: string): Promise<void> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const url = import.meta.env.VITE_ABE_API_ENDPOINT || "/graphql";
   const filename = (name || file.name).replaceAll(" ", "");
   const ext = filename.split(".").pop();
@@ -200,7 +200,7 @@ export async function getPollyTTS(args: {
       args.speed || "medium"
     }">${text}</prosody></speak>`;
   }
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const apiUrl = import.meta.env.VITE_ABE_API_ENDPOINT || "/graphql";
   const data = await axios.post(
     `${apiUrl}/polly`,
