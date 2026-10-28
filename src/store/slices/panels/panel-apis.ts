@@ -7,7 +7,7 @@ The full terms of this copyright and license should always be found in the root 
 
 import { execGql } from "../../../hooks/api";
 import type { Connection } from "../../../types";
-import { ACCESS_TOKEN_KEY, localStorageGet } from "../../local-storage";
+import { getAccessToken } from "../../local-storage";
 import type { Panel, Panelist } from "./types";
 
 export const fullPanelData = `
@@ -93,7 +93,7 @@ mutation AddOrUpdatePanelist($panelist: PanelistInputType!) {
 }`;
 
 export async function fetchPanels(): Promise<Panel[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Connection<Panel>>(
     {
       query: fetchPanelsQuery,
@@ -110,7 +110,7 @@ export async function fetchPanels(): Promise<Panel[]> {
 }
 
 export async function deletePanel(panelClientId: string): Promise<Panel> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Panel>(
     {
       query: deletePanelMutation,
@@ -127,7 +127,7 @@ export async function deletePanel(panelClientId: string): Promise<Panel> {
 }
 
 export async function addOrUpdatePanel(panel: Panel): Promise<Panel> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Panel>(
     {
       query: addOrUpdatePanelMutation,
@@ -144,7 +144,7 @@ export async function addOrUpdatePanel(panel: Panel): Promise<Panel> {
 }
 
 export async function fetchPanelists(): Promise<Panelist[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Connection<Panelist>>(
     {
       query: fetchPanelistsQuery,
@@ -160,7 +160,7 @@ export async function fetchPanelists(): Promise<Panelist[]> {
 export async function deletePanelist(
   panelistClientId: string,
 ): Promise<Panelist> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Panelist>(
     {
       query: deletePanelistMutation,
@@ -179,7 +179,7 @@ export async function deletePanelist(
 export async function addOrUpdatePanelist(
   panelist: Panelist,
 ): Promise<Panelist> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Panelist>(
     {
       query: addOrUpdatePanelistMutation,

@@ -38,7 +38,7 @@ import type {
   EducationalRole,
 } from "../types";
 import type { AxiosMiddleware } from "./axios-middlewares";
-import { ACCESS_TOKEN_KEY, localStorageGet } from "../store/local-storage";
+import { getAccessToken } from "../store/local-storage";
 import { addQueryParam } from "../helpers";
 import { isBulletPointMessage } from "../store/slices/chat/helpers";
 import { activityQueryData } from "./api-helpers";
@@ -164,7 +164,7 @@ export async function createNewDoc(
   courseId?: string,
   courseAssignmentId?: string,
 ): Promise<NewDocData> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   if (!accessToken) throw new Error("No access token");
   let url = `${
     import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"
@@ -206,7 +206,7 @@ export async function docTextAction(
   action: GoogleDocTextModifyActions,
   insertAfterText?: string,
 ): Promise<void> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY);
+  const accessToken = getAccessToken();
   await axios.get<void>(
     `${
       import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"
@@ -224,7 +224,7 @@ export async function getDocData(
   docId: string,
   docService: DocService,
 ): Promise<DocData> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY);
+  const accessToken = getAccessToken();
   const res = await axios.get<DocData>(
     `${
       import.meta.env.VITE_GOOGLE_API_ENDPOINT || "http://localhost:8000/docs"
@@ -244,7 +244,7 @@ export async function getDocData(
 }
 
 export async function submitDocVersion(docVersion: DocVersion): Promise<void> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   return await execGql<void>(
     {
       query: `
@@ -351,7 +351,7 @@ export async function deleteUserDoc(
   docId: string,
   userId: string,
 ): Promise<UserDoc> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   if (!accessToken) throw new Error("No access token");
   const data = await execGql<UserDoc>(
     {
@@ -566,7 +566,7 @@ export async function updateConfigByKey(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any,
 ): Promise<Config> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   if (!accessToken) throw new Error("No access token");
   return execGql<Config>(
     {
@@ -632,7 +632,7 @@ export async function refreshAccessToken(): Promise<UserAccessToken> {
 }
 
 export async function updateUserInfo(userInfo: UpdateUserInfo): Promise<User> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   if (!accessToken) throw new Error("No access token");
   return execGql<User>(
     {
@@ -715,7 +715,7 @@ export async function asyncOpenAiRequest(
   docService: DocService,
   cancelToken?: CancelToken,
 ): Promise<OpenAiJobId> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   if (!accessToken) throw new Error("No access token");
   const res = await execHttp<OpenAiJobId>(
     "POST",
@@ -740,7 +740,7 @@ export async function asyncOpenAiJobStatus(
   jobId: string,
   cancelToken?: CancelToken,
 ): Promise<OpenAiServiceJobStatusResponseType> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   if (!accessToken) throw new Error("No access token");
   const res = await execHttp<OpenAiServiceJobStatusResponseType>(
     "POST",
@@ -767,7 +767,7 @@ export async function asyncRequestDocTimeline(
   docService: DocService,
   cancelToken?: CancelToken,
 ): Promise<DocumentTimelineJobId> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   if (!accessToken) throw new Error("No access token");
   const res = await execHttp<DocumentTimelineJobId>(
     "POST",
@@ -792,7 +792,7 @@ export async function asyncRequestDocTimelineStatus(
   jobId: string,
   cancelToken?: CancelToken,
 ): Promise<DocumentTimelineJobStatus> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   if (!accessToken) throw new Error("No access token");
   const res = await execHttp<DocumentTimelineJobStatus>(
     "POST",
@@ -857,7 +857,7 @@ const storeDocTimelineMutation = `mutation StoreDocTimeline($docTimeline: DocTim
 export async function storeDocTimeline(
   docTimeline: GQLDocumentTimeline,
 ): Promise<GQLDocumentTimeline> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   if (!accessToken) throw new Error("No access token");
   const inputDocs = docTimeline.timelinePoints.map((timelinePoint) => {
     const omittedTimestamps = omit(timelinePoint.version, [
@@ -962,7 +962,7 @@ export async function archiveDoc(
   userId: string,
   archive: boolean,
 ): Promise<UserDoc> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   if (!accessToken) throw new Error("No access token");
   const data = await execGql<UserDoc>(
     {
@@ -991,7 +991,7 @@ export async function archiveDoc(
 }
 
 export async function fetchUsers(): Promise<User[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const data = await execGql<User[]>(
     {
       query: `
@@ -1015,7 +1015,7 @@ export async function updateUserRole(
   userRole?: UserRole,
   educationalRole?: EducationalRole,
 ): Promise<User> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const data = await execGql<User>(
     {
       query: `

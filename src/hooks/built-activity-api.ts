@@ -10,7 +10,7 @@ import type {
   BuiltActivityVersion,
   PromptActivityStepGql,
 } from "../components/activity-builder/types";
-import { ACCESS_TOKEN_KEY, localStorageGet } from "../store/local-storage";
+import { getAccessToken } from "../store/local-storage";
 import type { Connection } from "../types";
 import { execGql } from "./api";
 
@@ -172,7 +172,7 @@ export function convertBuiltActivityToGql(
 export async function addOrUpdateBuiltActivity(
   activity: ActivityBuilder,
 ): Promise<ActivityBuilder> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<ActivityBuilder>(
     {
       query: `
@@ -195,7 +195,7 @@ export async function addOrUpdateBuiltActivity(
 }
 
 export async function fetchBuiltActivities(): Promise<ActivityBuilder[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<ActivityBuilder[]>(
     {
       query: `
@@ -217,7 +217,7 @@ export async function fetchBuiltActivities(): Promise<ActivityBuilder[]> {
 export async function fetchActivityVersions(
   activityClientId: string,
 ): Promise<BuiltActivityVersion[]> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<Connection<BuiltActivityVersion>>(
     {
       query: `
@@ -252,7 +252,7 @@ export async function fetchActivityVersions(
 export async function storeActivityVersion(
   activity: ActivityBuilder,
 ): Promise<BuiltActivityVersion> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<BuiltActivityVersion>(
     {
       query: `
@@ -277,7 +277,7 @@ export async function storeActivityVersion(
 export async function copyBuiltActivity(
   activityId: string,
 ): Promise<ActivityBuilder> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<ActivityBuilder>(
     {
       query: `
@@ -300,7 +300,7 @@ mutation CopyBuiltActivity($activityIdToCopy: String!) {
 }
 
 export async function deleteBuiltActivity(activityId: string): Promise<string> {
-  const accessToken = localStorageGet(ACCESS_TOKEN_KEY) || "";
+  const accessToken = getAccessToken();
   const res = await execGql<string>(
     {
       query: `mutation DeleteBuiltActivity($activityIdToDelete: String!) {

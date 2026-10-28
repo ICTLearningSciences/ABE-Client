@@ -5,7 +5,11 @@ Permission to use, copy, modify, and distribute this software and its documentat
 The full terms of this copyright and license should always be found in the root directory of this software deliverable as "license.txt" and if these terms are not found with this software, please contact the USC Stevens Center for the full license.
 */
 
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import type { Activity, DocGoal } from "../../../types";
 import type {
   AiServiceStepDataTypes,
@@ -73,25 +77,88 @@ export interface ChatState {
 
 const initialState: ChatState = {
   chatLogs: {},
-  chatHistory: loadHistory(),
+  chatHistory: [],
   coachResponsePending: false,
   systemRole: "",
 };
 
 /** Reducer */
 
-function saveHistory(state: ChatHistory[]) {
-  localStorage.setItem("chatHistory", JSON.stringify(state));
+export const fetchChatHistory = createAsyncThunk(
+  "chat/fetchChatHistory",
+  async () => {
+    return await loadHistory();
+  },
+);
+function loadHistory(): Promise<ChatHistory[]> {
+  return new Promise((resolve) => {
+    const request = indexedDB.open("MyDB", 1);
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction("ChatLog", "readonly");
+      const store = tx.objectStore("ChatLog");
+      const getAll = store.getAll();
+      getAll.onsuccess = () => {
+        resolve(getAll.result);
+      };
+      getAll.onerror = () => {
+        resolve([]);
+      };
+    };
+  });
 }
 
-function loadHistory(): ChatHistory[] {
-  try {
-    const serialisedState = localStorage.getItem("chatHistory");
-    if (serialisedState === null) return [];
-    return JSON.parse(serialisedState);
-  } catch {
-    return [];
-  }
+function deleteHistory() {
+  return new Promise((resolve) => {
+    const request = indexedDB.open("MyDB", 1);
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction("ChatLog", "readwrite");
+      const store = tx.objectStore("ChatLog");
+      const clear = store.clear();
+      clear.onsuccess = () => resolve([]);
+      clear.onerror = () => resolve(undefined);
+    };
+  });
+}
+
+function addHistory(chatHistory: ChatHistory) {
+  return new Promise((resolve) => {
+    const request = indexedDB.open("MyDB", 1);
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction("ChatLog", "readwrite");
+      const store = tx.objectStore("ChatLog");
+      const add = store.add(chatHistory);
+      add.onsuccess = () => resolve(chatHistory);
+      add.onerror = () => resolve(undefined);
+    };
+  });
+}
+function updateHistory(chatHistory: ChatHistory) {
+  return new Promise((resolve) => {
+    const request = indexedDB.open("MyDB", 1);
+    const key = chatHistory.sessionId;
+    const data: ChatLog = chatHistory.chatLog.map((m) => ({
+      id: m.id,
+      sender: m.sender,
+      systemCustomName: m.systemCustomName,
+      displayType: m.displayType,
+      message: m.message,
+    }));
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction("ChatLog", "readwrite");
+      const store = tx.objectStore("ChatLog");
+      const get = store.get(key);
+      get.onsuccess = () => {
+        const item = get.result as ChatHistory;
+        item.chatLog = data;
+        store.put(item);
+        resolve(item);
+      };
+    };
+  });
 }
 
 export const chatSlice = createSlice({
@@ -116,26 +183,6 @@ export const chatSlice = createSlice({
       }>,
     ) => {
       const { message, clearChat, docId, sessionId } = action.payload;
-      const historyIdx = state.chatHistory.findIndex(
-        (c) => c.sessionId === sessionId,
-      );
-      if (historyIdx === -1) {
-        state.chatHistory.push({
-          docId: action.payload.docId,
-          docTitle: action.payload.docTitle,
-          activityId: action.payload.activityId,
-          activityTitle: action.payload.activityTitle,
-          panelId: action.payload.panelId,
-          panelTitle: action.payload.panelTitle,
-          chatLog: [message],
-          sessionId: action.payload.sessionId,
-          startDate: new Date().toLocaleString(),
-        });
-      } else {
-        state.chatHistory[historyIdx].chatLog.push(message);
-      }
-      saveHistory(state.chatHistory);
-
       if (clearChat) {
         state.chatLogs = {
           ...state.chatLogs,
@@ -160,6 +207,28 @@ export const chatSlice = createSlice({
         ...state.chatLogs,
         [docId]: [...(state.chatLogs[docId] || []), message],
       };
+
+      const historyIdx = state.chatHistory.findIndex(
+        (c) => c.sessionId === sessionId,
+      );
+      if (historyIdx === -1) {
+        const log = {
+          docId: action.payload.docId,
+          docTitle: action.payload.docTitle,
+          activityId: action.payload.activityId,
+          activityTitle: action.payload.activityTitle,
+          panelId: action.payload.panelId,
+          panelTitle: action.payload.panelTitle,
+          chatLog: [message],
+          sessionId: action.payload.sessionId,
+          startDate: new Date().toLocaleString(),
+        };
+        state.chatHistory.push(log);
+        addHistory(log);
+      } else {
+        state.chatHistory[historyIdx].chatLog.push(message);
+        updateHistory(state.chatHistory[historyIdx]);
+      }
     },
     addMessages: (
       state: ChatState,
@@ -175,16 +244,18 @@ export const chatSlice = createSlice({
         (c) => c.sessionId === sessionId,
       );
       if (historyIdx === -1) {
-        state.chatHistory.push({
+        const log = {
           docId: docId,
           sessionId: sessionId,
           chatLog: messages,
           startDate: new Date().toLocaleString(),
-        });
+        };
+        state.chatHistory.push(log);
+        addHistory(log);
       } else {
         state.chatHistory[historyIdx].chatLog.push(...messages);
+        updateHistory(state.chatHistory[historyIdx]);
       }
-      saveHistory(state.chatHistory);
 
       if (clearChat) {
         state.chatLogs = {
@@ -212,7 +283,7 @@ export const chatSlice = createSlice({
     },
     clearHistory: (state: ChatState) => {
       state.chatHistory = [];
-      saveHistory(state.chatHistory);
+      deleteHistory();
     },
     setCoachResponsePending: (
       state: ChatState,
@@ -220,6 +291,15 @@ export const chatSlice = createSlice({
     ) => {
       state.coachResponsePending = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchChatHistory.fulfilled, (state, action) => {
+        state.chatHistory = action.payload;
+      })
+      .addCase(fetchChatHistory.rejected, (state) => {
+        state.chatHistory = [];
+      });
   },
 });
 

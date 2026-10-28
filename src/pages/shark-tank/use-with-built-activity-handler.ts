@@ -82,7 +82,7 @@ export function useWithBuiltActivityHandler(): UseWithBuiltActivityHandler {
       coachResponsePending(false);
       setBuiltActivityHandler(null);
     };
-  }, [user?._id, curDocId, activity?._id, resetNonce]);
+  }, [activity?._id, resetNonce]);
 
   useEffect(() => {
     if (builtActivityHandler) {
